@@ -2,18 +2,29 @@ package org.github.holgerbrandl.basamil
 
 import java.util.*
 
-class Environment(trace: Boolean = true) {
+val MAIN = "main"
+
+class Environment {
 
     private val components: MutableList<Component> = listOf<Component>().toMutableList()
 
-    val main = Component(env = this, name = "main")
 
     private var running: Boolean = false
     private var stopped: Boolean = false
 
+
+    val eventQueue = PriorityQueue<QueueElement>()
+
+    val traceListeners = listOf<TraceListener>().toMutableList()
+
+    var now = 0;
+    var offset = 0;
+
+    val main = Component(env = this, name = "main")
     private var curComponent: Component? = main
 
-     val eventQueue = PriorityQueue<QueueElement>()
+    val standBy = listOf<Component>().toMutableList()
+    val pendingStandBy = listOf<Component>().toMutableList()
 
     fun build(builder: (Environment.() -> Environment)): Environment {
         builder(this)
@@ -42,17 +53,36 @@ class Environment(trace: Boolean = true) {
         TODO("Not yet implemented")
     }
 
-    fun now(): Int = main.now()
+    fun now(): Int = now - offset
+
+
+    fun addStandy(component: Component) {
+        standBy.add(component)
+    }
+
+    fun addPendingStandBy(component: Component) {
+        pendingStandBy.add(component)
+
+    }
+
+    fun addTraceListener(tr: TraceListener) = traceListeners.add(tr)
+    fun removeTraceListener(tr: TraceListener) = traceListeners.remove(tr)
 
     /**
      *         prints a trace line
      *
-     *   @param s1 (usually formatted  now), padded to 10 characters
-     *  @param s2 (usually only used for the compoent that gets current), padded to 20 characters
+     *   @param component (usually formatted  now), padded to 10 characters
+     *  @param action (usually only used for the compoent that gets current), padded to 20 characters
      */
-    fun printTrace(s: String, s1: String, s2: String, s3: String) {
-        println(s + s2 + s3)
+    fun printTrace(time: Int?, component: Component?, action: String, info: String) {
+        listOf(time.toString(), component?.name, action, info)
+            .map { (it ?: "").padEnd(12) }.joinToString("")
+            .let { println(it) }
+
+        traceListeners.forEach {
+            it.processTrace(TraceElement(time, component, action, info))
+        }
     }
-
-
 }
+
+data class TraceElement(val time: Int?, val component: Component?, val action: String, val info: String)
