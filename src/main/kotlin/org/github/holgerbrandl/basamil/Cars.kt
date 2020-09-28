@@ -2,6 +2,11 @@ package org.github.holgerbrandl.basamil
 
 
 class Car(env: Environment) : Component(env = env) {
+
+    override fun process(): Sequence<Component> {
+        return super.process()
+    }
+
     override suspend fun SequenceScope<Component>.process() {
         while (true) {
             yield(hold(1.0))

@@ -42,7 +42,7 @@ class Environment {
         printTrace(now, main, CURRENT.toString(), null)
     }
 
-    fun build(builder: (Environment.() -> Environment)): Environment {
+    fun build(builder: (Environment.() -> Unit )): Environment {
         builder(this)
         return (this);
     }
@@ -86,7 +86,7 @@ class Environment {
 
                     printTrace(now(), it, "current (standby)")
 
-                    it.process?.call()
+                    it.callProcess()
                 }
 
         }
@@ -120,13 +120,7 @@ class Environment {
             return
         }
 
-        if (component.isGenerator) {
-            component.process!!.call()
-        } else {
-            component.process!!.call()
-            component.terminate()
-        }
-
+        component.callProcess()
     }
 
 
@@ -159,13 +153,16 @@ class Environment {
             it.processTrace(tr)
         }
     }
+
+    operator fun <T: Component> plus(componentGenerator: ComponentGenerator<T>)  = addComponent(componentGenerator)
+    operator fun  plus(componentGenerator: Component)  = addComponent(componentGenerator)
 }
 
 data class TraceElement(val time: Double?, val component: Component?, val action: String, val info: String?) {
     override fun toString(): String {
         return listOf(time.toString(), component?.name, component?.name + " " + action, info)
             .map { (it ?: "") }
-            .zip(listOf(5, 8, 20, 20))
+            .zip(listOf(5, 14, 20, 20))
             .map { (str, padLength) -> str.padEnd(padLength) }
             .joinToString("")
     }

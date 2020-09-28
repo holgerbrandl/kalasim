@@ -15,7 +15,7 @@ import org.apache.commons.math3.distribution.RealDistribution
  *  @param till time up to which components should be generated. If omitted, no end
  */
 class ComponentGenerator<T : Component>(
-    val from: Double?,
+    val from: Double? = 0.0,
     var till: Double = Double.MAX_VALUE,
     val iat: RealDistribution,
     val total: Int = Int.MAX_VALUE,
@@ -24,13 +24,12 @@ class ComponentGenerator<T : Component>(
     priority: Int = 0,
     urgent: Boolean = false,
     val builder: () -> T
-) : Component(env, name, priority = priority) {
+) : Component(env, name, priority = priority, process = ComponentGenerator<T>::doIat) {
 
 
     init {
-        // build intervals
+        // TODO build intervals
 
-        process = ComponentGenerator<T>::doIat
     }
 
     fun doIat(): Sequence<Component> = sequence {

@@ -2,6 +2,7 @@ package org.github.holgerbrandl.basamil
 
 import org.github.holgerbrandl.basamil.State.*
 import java.util.*
+import kotlin.reflect.KFunction
 import kotlin.reflect.KFunction1
 
 
@@ -9,8 +10,37 @@ private val componentCounters = mapOf<String, Int>().toMutableMap()
 
 private fun getComponentCounter(className: String) = componentCounters.merge(className, 1, Int::plus)
 
-typealias Process = KFunction1<*, Sequence<Any>>
+typealias FunPointer = KFunction<*>
+typealias GenProcess = KFunction1<*, Sequence<Component>>
 
+
+interface SimProcess {
+    fun call()
+}
+
+class GenProcessInternal(val component: Component, seq: Sequence<Component>) : SimProcess {
+
+    val iterator = seq.iterator()
+
+    override fun call() {
+        try {
+            iterator.next()
+        } catch (e: NoSuchElementException) {
+            component.terminate()
+        }
+
+        //todo reenable
+//        if(!iterator.hasNext()) {
+//
+//        }
+    }
+}
+
+class SimpleProcessInternal(val component: Component, val funPointer: FunPointer) : SimProcess {
+    override fun call() {
+        funPointer.call(component)
+    }
+}
 
 /**
  * A salabim component is used as component (primarily for queueing)
@@ -24,7 +54,7 @@ Usually, a component will be defined as a subclass of Component.
 open class Component(
     protected val env: Environment, //todo inject via setter to simplify api
     name: String? = null,
-    var process: Process? = Component::process,
+    process: FunPointer? = Component::process,
     val priority: Int = 0,
     val delay: Int = 0
 ) {
@@ -33,6 +63,8 @@ open class Component(
     val claims = mapOf<Resource, Int>().toMutableMap()
 
     private var failed: Boolean = false
+
+    private var process: SimProcess? = null
 
     var name: String
         private set
@@ -54,6 +86,10 @@ open class Component(
         val dataSuffix = if (process == null && name() != MAIN) " data" else ""
         env.printTrace(now(), this, "create" + dataSuffix, "")
 
+
+        // if its a generator treat it as such
+        this.process = ingestFunPointer(process)
+
         if (process != null) {
             scheduledTime = env.now() + delay
 
@@ -61,6 +97,26 @@ open class Component(
         }
 
         setup()
+    }
+
+    private fun ingestFunPointer(process: FunPointer?): SimProcess? {
+//        if(process != null ){
+//            print("param type is " + process!!.returnType)
+//            if(process!!.returnType.toString().startsWith("kotlin.sequences.Sequence"))
+//        }
+
+        return if (process != null) {
+            val isGenerator = process.returnType.toString().startsWith("kotlin.sequences.Sequence")
+
+            if (isGenerator) {
+                val sequence = process.call(this) as Sequence<Component>
+                GenProcessInternal(this, sequence)
+            } else {
+                SimpleProcessInternal(this, process)
+            }
+        } else {
+            null
+        }
     }
 
     /**  called immediately after initialization of a component.
@@ -315,14 +371,26 @@ open class Component(
         keepRequest: Boolean = false,
         keepWait: Boolean = false,
         urgent: Boolean = false,
-        process: Process? = null
+        process: FunPointer? = null
     ): Component {
 
-        val p: Process? = if (process == null && status == DATA) {
+        val p: FunPointer? = if (process == null && status == DATA) {
             Component::process
         } else {
             process
+
+            //todo
+//            if inspect.isgeneratorfunction(p):
+//            self._process = p(**kwargs)
+//            self._process_isgenerator = True
+//            else:
+//            self._process = p
+//            self._process_isgenerator = False
+//            self._process_kwargs = kwargs
         }
+
+        this.process = ingestFunPointer(process)
+
 
         if (status != CURRENT) {
             remove()
@@ -390,12 +458,14 @@ open class Component(
         //todo implement bits from print_info
         return "todo implement bits from print_info" + super.toString()
     }
+
+    fun callProcess() = process!!.call()
 }
 
 data class QueueElement(val time: Double, val priority: Int, val seq: Int, val component: Component) :
     Comparable<QueueElement> {
     override fun compareTo(other: QueueElement): Int {
-        return priority.compareTo(other.priority)
+        return compareValuesBy(this, other, { it.time}, {it.priority})
     }
 
     override fun toString(): String {

@@ -15,6 +15,7 @@ repositories {
 dependencies {
     // cant upgrade to 1.8 because of https://issues.apache.org/jira/browse/CSV-257
     implementation("org.apache.commons:commons-math3:3.6.1")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.10")
 
     testImplementation(kotlin("test-junit"))
 }
