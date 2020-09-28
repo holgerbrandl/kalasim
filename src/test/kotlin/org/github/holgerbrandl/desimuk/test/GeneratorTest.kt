@@ -1,7 +1,7 @@
-package org.github.holgerbrandl.basamil.test
+package org.github.holgerbrandl.desimuk.test
 
 import org.apache.commons.math3.distribution.ExponentialDistribution
-import org.github.holgerbrandl.basamil.*
+import org.github.holgerbrandl.desimuk.*
 import org.junit.Test
 import kotlin.test.assertEquals
 

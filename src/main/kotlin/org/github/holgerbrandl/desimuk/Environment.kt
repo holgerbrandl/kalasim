@@ -1,7 +1,7 @@
-package org.github.holgerbrandl.basamil
+package org.github.holgerbrandl.desimuk
 
-import org.github.holgerbrandl.basamil.State.CURRENT
-import org.github.holgerbrandl.basamil.State.STANDBY
+import org.github.holgerbrandl.desimuk.State.CURRENT
+import org.github.holgerbrandl.desimuk.State.STANDBY
 import java.util.*
 
 private val Component.isGenerator: Boolean

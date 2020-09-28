@@ -1,4 +1,4 @@
-package org.github.holgerbrandl.basamil
+package org.github.holgerbrandl.desimuk
 
 import org.apache.commons.math3.distribution.RealDistribution
 
