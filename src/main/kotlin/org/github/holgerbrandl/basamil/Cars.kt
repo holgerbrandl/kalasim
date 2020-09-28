@@ -4,7 +4,7 @@ package org.github.holgerbrandl.basamil
 class Car(env: Environment) : Component(env = env) {
     override suspend fun SequenceScope<Component>.process() {
         while (true) {
-            yield(hold(1))
+            yield(hold(1.0))
         }
     }
 }
@@ -16,6 +16,6 @@ fun main() {
         addComponent(Car( this))
 
         this
-    }.run(5)
+    }.run(5.0)
 }
 

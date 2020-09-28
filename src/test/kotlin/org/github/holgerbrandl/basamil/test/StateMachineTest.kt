@@ -11,7 +11,7 @@ class StateMachineTest {
         class TestCar(env: Environment) : Component(env = env) {
             override suspend fun SequenceScope<Component>.process() {
                 while (true) {
-                    yield(hold(1))
+                    yield(hold(1.0))
                 }
             }
         }
@@ -28,13 +28,11 @@ class StateMachineTest {
             })
 
             addComponent(TestCar(this))
-            addComponent(TestCar(this))
-            addComponent(TestCar(this))
 
             this
-        }.run(5)
+        }.run(5.0)
 
-        traces.forEach { println(it) }
+//        traces.forEach { println(it) }
 
         assert(traces[0].component!!.name==MAIN)
         assert(traces[1].component!!.name==MAIN)

@@ -9,6 +9,9 @@ private val componentCounters = mapOf<String, Int>().toMutableMap()
 
 private fun getComponentCounter(className: String) = componentCounters.merge(className, 1, Int::plus)
 
+typealias Process = KFunction1<*, Sequence<Any>>
+
+
 /**
  * A salabim component is used as component (primarily for queueing)
 or as a component with a process
@@ -19,15 +22,15 @@ Usually, a component will be defined as a subclass of Component.
 
  */
 open class Component(
-    private val env: Environment, //todo inject via setter to simplify api
+    protected val env: Environment, //todo inject via setter to simplify api
     name: String? = null,
-    var process: KFunction1<Component, Sequence<Any>>? = Component::process,
+    var process: Process? = Component::process,
     val priority: Int = 0,
     val delay: Int = 0
 ) {
 
     private val requests = mapOf<Resource, Int>().toMutableMap()
-    private val _claims = mapOf<Resource, Int>().toMutableMap()
+    val claims = mapOf<Resource, Int>().toMutableMap()
 
     private var failed: Boolean = false
 
@@ -35,10 +38,10 @@ open class Component(
         private set
 
     // make only getter private
-    private var now = 0;
-    private var scheduledTime = Int.MAX_VALUE
+    private var now = 0.0;
+    var scheduledTime = Double.MAX_VALUE
 
-    private var remainingDuration = 0
+    private var remainingDuration = 0.0
 
     var status: State = DATA
 
@@ -47,12 +50,15 @@ open class Component(
         //todo determine process
         this.name = name ?: javaClass.simpleName + "." + getComponentCounter(javaClass.simpleName)
 
-        scheduledTime = env.now() + delay
 
-        env.printTrace(now(), this, "create", "TODO mode")
+        val dataSuffix = if (process == null && name() != MAIN) " data" else ""
+        env.printTrace(now(), this, "create" + dataSuffix, "")
 
+        if (process != null) {
+            scheduledTime = env.now() + delay
 
-        reschedule(scheduledTime, priority, false, "activate", extra = "TODO")
+            reschedule(scheduledTime, priority, false, "activate", extra = "TODO")
+        }
 
         setup()
     }
@@ -72,39 +78,9 @@ open class Component(
 
     open suspend fun SequenceScope<Component>.process() {
         while (true)
-            yield(hold(1))
+            yield(hold(1.0))
     }
 
-
-    /**
-     * hold the component. See https://www.salabim.org/manual/Component.html#hold
-     */
-    fun hold(
-        duration: Int? = null,
-        till: Int? = null,
-        priority: Int = 0,
-        urgent: Boolean = false
-    ): Component {
-        if (status != DATA && status != CURRENT) {
-            requireNotData()
-            remove()
-            //todo
-//            _check_fail()
-        }
-
-        scheduledTime = if (till == null) {
-            if (duration == null) env.now() else {
-                env.now() + duration
-            }
-        } else {
-            require(duration == null) { "both duration and till specified" }
-            till + env.offset
-        }
-
-        reschedule(scheduledTime, priority, urgent, "hold")
-
-        return (this)
-    }
 
     /** Passivate a component
      *
@@ -112,7 +88,7 @@ open class Component(
      */
     fun passivate() {
         if (status == CURRENT) {
-            remainingDuration = 0
+            remainingDuration = 0.0
         } else {
             requireNotData()
             remove()
@@ -120,9 +96,9 @@ open class Component(
             remainingDuration = scheduledTime - env.now()
         }
 
-        scheduledTime = Int.MAX_VALUE
+        scheduledTime = Double.MAX_VALUE
 
-        env.printTrace(now(), this," passivate", "TODO merge_blanks(_modetxt(self._mode))")
+        env.printTrace(now(), this, " passivate", "TODO merge_blanks(_modetxt(self._mode))")
 
         status = PASSIVE
     }
@@ -141,7 +117,7 @@ open class Component(
         }
 
         process = null;
-        scheduledTime = Int.MAX_VALUE
+        scheduledTime = Double.MAX_VALUE
 
         env.printTrace(now(), this, "cancel", "")
 
@@ -191,7 +167,7 @@ open class Component(
      * Request has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
      * See https://www.salabim.org/manual/Component.html#request
      */
-    fun request(resources: List<Resource>, failAt: Int? = null, oneof: Boolean = false) {
+    fun request(resources: List<Resource>, failAt: Double? = null, oneof: Boolean = false) {
 
         //todo oneof_request
 
@@ -202,7 +178,7 @@ open class Component(
             //todo checkFail
         }
 
-        scheduledTime = failAt ?: Int.MAX_VALUE
+        scheduledTime = failAt ?: Double.MAX_VALUE
         failed = false
 
         val q = 1
@@ -281,6 +257,16 @@ open class Component(
         }
     }
 
+    fun terminate() {
+        claims.forEach { (resource, quantity) ->
+            resource.release(quantity)
+        }
+
+        status = DATA
+        scheduledTime = Double.MAX_VALUE
+        process = null
+    }
+
     private fun requireNotData() =
         require(status != DATA) { name + "data component not allowed" }
 
@@ -288,23 +274,23 @@ open class Component(
         require(this != env.main) { name + "data component not allowed" }
 
     fun reschedule(
-        scheduledTime: Int,
+        scheduledTime: Double,
         priority: Int = 0,
         urgent: Boolean = false,
         caller: String? = null,
         extra: Any? = null
     ) {
-        require(scheduledTime <= env.now()) { "scheduled time ({:0.3f}) before now ({:0.3f})" }
+        require(scheduledTime >= env.now()) { "scheduled time (${scheduledTime}) before now (${env.now()})" }
 
         this.scheduledTime = scheduledTime
 
-        if (this.scheduledTime != Int.MAX_VALUE) push(this.scheduledTime, priority, urgent)
+        if (this.scheduledTime != Double.MAX_VALUE) push(this.scheduledTime, priority, urgent)
 
         //todo implement extra
         val extra = ""
 
         // calculate scheduling delta
-        val delta = if (this.scheduledTime == env.now() || (this.scheduledTime == Int.MAX_VALUE)) "" else {
+        val delta = if (this.scheduledTime == env.now() || (this.scheduledTime == Double.MAX_VALUE)) "" else {
             "+" + (this.scheduledTime - env.now())
         }
 
@@ -312,10 +298,87 @@ open class Component(
         env.printTrace(now(), this, "$caller $delta", extra)
     }
 
+    /**
+     * Activate component
+     *
+     * See https://www.salabim.org/manual/Component.html#activate
+     *
+     * @param process name of process to be started.
+     * * if None (default), process will not be changed
+     * * if the component is a data component, the
+     * * generator function process will be used as the default process.
+     * * note that the function *must* be a generator, i.e. contains at least one yield.
+     */
+    fun activate(
+        at: Double? = null,
+        priority: Int = 0,
+        keepRequest: Boolean = false,
+        keepWait: Boolean = false,
+        urgent: Boolean = false,
+        process: Process? = null
+    ): Component {
+
+        val p: Process? = if (process == null && status == DATA) {
+            Component::process
+        } else {
+            process
+        }
+
+        if (status != CURRENT) {
+            remove()
+            if (p != null) {
+                if (!(keepRequest || keepWait)) {
+                    checkFail()
+                }
+            } else {
+                checkFail()
+            }
+        }
+
+        val scheduledTime = if (at == null) {
+            env.now + delay
+        } else {
+            at + env.offset + delay
+        }
+
+        val extra = if (p != null) "process ${p.name}" else ""
+        reschedule(scheduledTime, priority, urgent, "hold", extra)
+
+        return (this)
+    }
+
+    private fun checkFail() {
+        TODO("Not yet implemented")
+    }
+
+
+    /**
+     * hold the component. See https://www.salabim.org/manual/Component.html#hold
+     */
+    fun hold(
+        duration: Double? = null,
+        till: Double? = null,
+        priority: Int = 0,
+        urgent: Boolean = false
+    ): Component {
+        if (status != DATA && status != CURRENT) {
+            requireNotData()
+            remove()
+            //todo
+//            _check_fail()
+        }
+
+        val scheduledTime = env.calcScheduleTime(till, duration)
+
+        reschedule(scheduledTime, priority, urgent, "hold")
+
+        return (this)
+    }
+
 
     var seq: Int = 0
 
-    private fun push(scheduledTime: Int, priority: Int, urgent: Boolean) {
+    private fun push(scheduledTime: Double, priority: Int, urgent: Boolean) {
         seq++
         val heapSeq = if (urgent) -seq else seq
 
@@ -329,12 +392,15 @@ open class Component(
     }
 }
 
-data class QueueElement(val time: Int, val priority: Int, val seq: Int, val component: Component) :
+data class QueueElement(val time: Double, val priority: Int, val seq: Int, val component: Component) :
     Comparable<QueueElement> {
     override fun compareTo(other: QueueElement): Int {
         return priority.compareTo(other.priority)
     }
 
+    override fun toString(): String {
+        return "${component.javaClass.simpleName}(${component.name}, $time, $priority, $seq)"
+    }
 }
 
 enum class State {
