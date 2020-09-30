@@ -2,6 +2,8 @@ package org.github.holgerbrandl.desimuk
 
 import org.github.holgerbrandl.desimuk.State.CURRENT
 import org.github.holgerbrandl.desimuk.State.STANDBY
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
 import java.util.*
 
 private val Component.isGenerator: Boolean
@@ -11,7 +13,7 @@ private val Component.isGenerator: Boolean
 
 val MAIN = "main"
 
-class Environment {
+open class Environment(koins: org.koin.core.module.Module = module {  }) {
 
     private val components: MutableList<Component> = listOf<Component>().toMutableList()
 
@@ -29,25 +31,35 @@ class Environment {
 
     var offset = 0;
 
-    val main = Component(env = this, name = "main", process = null)
-    private var curComponent: Component? = main
+    private var curComponent: Component?
+    var main: Component
+        private set
+
+    init {
+        startKoin { modules(module { single { this@Environment } }, koins) }
+
+        main = Component(name = "main", process = null)
+        curComponent = main
+    }
+
 
     var endOnEmptyEventlist = false
 
     val standBy = listOf<Component>().toMutableList()
     val pendingStandBy = listOf<Component>().toMutableList()
 
-    init {
-        main.status = CURRENT
-        printTrace(now, main, CURRENT.toString(), null)
-    }
 
-    fun build(builder: (Environment.() -> Unit )): Environment {
+//    fun build(vararg compoennts: Component) = compoennts.forEach { this + it }
+
+    fun build(builder: (Environment.() -> Unit)): Environment {
         builder(this)
         return (this);
     }
 
-    fun addComponent(c: Component) = components.add(c)
+    fun addComponent(c: Component): Boolean {
+        require(!components.contains(c)){"we must not add a component twice"}
+        return components.add(c)
+    }
 
 
     /**
@@ -154,8 +166,13 @@ class Environment {
         }
     }
 
-    operator fun <T: Component> plus(componentGenerator: ComponentGenerator<T>)  = addComponent(componentGenerator)
-    operator fun  plus(componentGenerator: Component)  = addComponent(componentGenerator)
+    operator fun <T : Component> plus(componentGenerator: ComponentGenerator<T>): Environment {
+        addComponent(componentGenerator); return (this)
+    }
+
+    operator fun plus(component: Component): Environment {
+        addComponent(component); return (this)
+    }
 }
 
 data class TraceElement(val time: Double?, val component: Component?, val action: String, val info: String?) {

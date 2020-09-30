@@ -9,7 +9,7 @@ class StateMachineTest {
 
     @Test
     fun testCars() {
-        class TestCar(env: Environment) : Component(env = env) {
+        class TestCar : Component() {
             override suspend fun SequenceScope<Component>.process() {
                 while (true) {
                     yield(hold(1.0))
@@ -20,38 +20,40 @@ class StateMachineTest {
         val traces = mutableListOf<TraceElement>()
 
 
-        Environment().build {
+        Environment().apply {
             addTraceListener(object : TraceListener {
                 override fun processTrace(traceElement: TraceElement) {
                     traces.add(traceElement)
                 }
             })
 
-            addComponent(TestCar(this))
+            TestCar()
         }.run(5.0)
 
 //        traces.forEach { println(it) }
 
         // make sure multiple cars are created
-        val cars = traces.map{it.component}.filterNotNull().distinct().filter { it.name.startsWith("Car") }
+        val cars = traces.map { it.component }.filterNotNull().distinct().filter { it.name.startsWith("Car") }
         assertEquals(5, cars.size, "expected cars count does not match")
 
-        assert(traces[0].component!!.name==MAIN)
-        assert(traces[1].component!!.name==MAIN)
-        assert(traces[2].component!!.name==MAIN)
+        assert(traces[0].component!!.name == MAIN)
+        assert(traces[1].component!!.name == MAIN)
+        assert(traces[2].component!!.name == MAIN)
     }
 
 
     @Test
-    fun customProc(){
-        class Customer(env: Environment) : Component(env, process=Customer::doSmthg){
+    fun customProc() {
+        class Customer : Component(process = Customer::doSmthg) {
 
-            fun doSmthg(){
+            fun doSmthg() {
                 print("hello")
                 terminate()
             }
         }
 
-        Environment().build { this + Customer(env= this) }.run(1.0)
+        Environment().apply {
+            Customer()
+        }.run(1.0)
     }
 }

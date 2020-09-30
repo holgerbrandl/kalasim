@@ -1,6 +1,8 @@
 package org.github.holgerbrandl.desimuk
 
 import org.github.holgerbrandl.desimuk.State.*
+import org.koin.core.KoinComponent
+import org.koin.core.inject
 import java.util.*
 import kotlin.reflect.KFunction
 import kotlin.reflect.KFunction1
@@ -52,12 +54,13 @@ Usually, a component will be defined as a subclass of Component.
 
  */
 open class Component(
-    protected val env: Environment, //todo inject via setter to simplify api
     name: String? = null,
     process: FunPointer? = Component::process,
     val priority: Int = 0,
     val delay: Int = 0
-) {
+) : KoinComponent {
+
+    protected val env: Environment by inject()
 
     private val requests = mapOf<Resource, Int>().toMutableMap()
     val claims = mapOf<Resource, Int>().toMutableMap()
@@ -84,6 +87,7 @@ open class Component(
 
 
         val dataSuffix = if (process == null && name() != MAIN) " data" else ""
+        env.addComponent(this)
         env.printTrace(now(), this, "create" + dataSuffix, "")
 
 
@@ -128,21 +132,30 @@ open class Component(
     fun now() = now - env.offset
 //    fun now() = env.now()
 
-    open fun process(): Sequence<Component> = sequence {
-        process()
+    open fun process() = this.let {
+        sequence {
+            process(it)
+            process()
+        }
     }
 
-    open suspend fun SequenceScope<Component>.process() {
-        while (true)
-            yield(hold(1.0))
-    }
+    open suspend fun SequenceScope<Component>.process(it: Component) {}
 
+    open suspend fun SequenceScope<Component>.process() {}
+
+
+//    open suspend fun SequenceScope<Component>.process() {
+//        while (true)
+//            yield(hold(1.0))
+//    }
+
+    val isPassive: Boolean = status == PASSIVE
 
     /** Passivate a component
      *
      * See https://www.salabim.org/manual/Component.html#passivate
      */
-    fun passivate() {
+    fun passivate(): Component {
         if (status == CURRENT) {
             remainingDuration = 0.0
         } else {
@@ -157,6 +170,8 @@ open class Component(
         env.printTrace(now(), this, " passivate", "TODO merge_blanks(_modetxt(self._mode))")
 
         status = PASSIVE
+
+        return this
     }
 
 
@@ -313,7 +328,7 @@ open class Component(
         }
     }
 
-    fun terminate() {
+    fun terminate(): Component {
         claims.forEach { (resource, quantity) ->
             resource.release(quantity)
         }
@@ -321,6 +336,10 @@ open class Component(
         status = DATA
         scheduledTime = Double.MAX_VALUE
         process = null
+
+        env.printTrace(now(), this, "ended")
+
+        return (this)
     }
 
     private fun requireNotData() =
@@ -465,7 +484,7 @@ open class Component(
 data class QueueElement(val time: Double, val priority: Int, val seq: Int, val component: Component) :
     Comparable<QueueElement> {
     override fun compareTo(other: QueueElement): Int {
-        return compareValuesBy(this, other, { it.time}, {it.priority})
+        return compareValuesBy(this, other, { it.time }, { it.priority })
     }
 
     override fun toString(): String {

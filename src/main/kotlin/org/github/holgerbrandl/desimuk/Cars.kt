@@ -1,11 +1,7 @@
 package org.github.holgerbrandl.desimuk
 
 
-class Car(env: Environment) : Component(env = env) {
-
-    override fun process(): Sequence<Component> {
-        return super.process()
-    }
+class Car : Component() {
 
     override suspend fun SequenceScope<Component>.process() {
         while (true) {
@@ -15,12 +11,10 @@ class Car(env: Environment) : Component(env = env) {
 }
 
 fun main() {
-    Environment().build {
-        addComponent(Car(this))
-        addComponent(Car( this))
-        addComponent(Car( this))
-
-        this
+    Environment().apply {
+        addComponent(Car())
+        addComponent(Car())
+        addComponent(Car())
     }.run(5.0)
 }
 

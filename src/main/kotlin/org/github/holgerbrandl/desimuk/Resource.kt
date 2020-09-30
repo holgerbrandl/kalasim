@@ -2,9 +2,9 @@ package org.github.holgerbrandl.desimuk;
 
 import java.util.*
 
-public class Resource(name: String, env: Environment, val isPreemptive: Boolean = false) :
-    Component(env = env, name = name, process = null) {
-    fun availableQuantity():Int {
+class Resource(name: String, val isPreemptive: Boolean = false) : Component(name = name, process = null) {
+
+    fun availableQuantity(): Int {
         TODO()
 
     }

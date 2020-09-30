@@ -15,22 +15,21 @@ class TraceCollector : TraceListener {
 
 class GeneratorTest {
 
-    class Customer(env: Environment) : Component(env = env){}
+    class Customer : Component(){}
 
     @Test
     fun testCustomerGenerator() {
 
         val tc = TraceCollector()
 
-        Environment().build {
+        Environment().apply {
 
             addTraceListener(tc)
 
-            this + ComponentGenerator(iat = ExponentialDistribution(2.0), env = this, total = 4) { Customer(this) }
+            ComponentGenerator(iat = ExponentialDistribution(2.0), env = this, total = 4) { Customer() }
         }.run(100.0)
 
-        val customers =
-            tc.traces
+        val customers = tc.traces
                 .map { it.component }
                 .filterNotNull().distinct()
                 .filter { it.name.startsWith("Customer") }

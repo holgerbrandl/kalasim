@@ -24,7 +24,7 @@ class ComponentGenerator<T : Component>(
     priority: Int = 0,
     urgent: Boolean = false,
     val builder: () -> T
-) : Component(env, name, priority = priority, process = ComponentGenerator<T>::doIat) {
+) : Component(name, priority = priority, process = ComponentGenerator<T>::doIat) {
 
 
     init {
