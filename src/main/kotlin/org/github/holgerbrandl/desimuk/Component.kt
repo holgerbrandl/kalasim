@@ -86,7 +86,7 @@ open class Component(
 
         val dataSuffix = if (process == null && this.name != MAIN) " data" else ""
         env.addComponent(this)
-        env.printTrace(now(), env.curComponent, this, "create" + dataSuffix, "")
+        env.printTrace(now(), env.curComponent, this, "create" + dataSuffix)
 
 
         // if its a generator treat it as such
@@ -170,10 +170,9 @@ open class Component(
         }
 
         scheduledTime = Double.MAX_VALUE
-
-        env.printTrace(now(), env.curComponent, this, "passivate", "TODO merge_blanks(_modetxt(self._mode))")
-
         status = PASSIVE
+        env.printTrace(now(), env.curComponent, this)
+
 
         return this
     }
@@ -194,9 +193,9 @@ open class Component(
         process = null
         scheduledTime = Double.MAX_VALUE
 
-        env.printTrace(now(), env.curComponent, this, "cancel", "")
-
         status = DATA
+
+        env.printTrace(now(), env.curComponent, this, "cancel")
     }
 
     /**
@@ -217,9 +216,9 @@ open class Component(
         scheduledTime = env.now
         env.addStandy(this)
 
-        env.printTrace(now(), env.curComponent, this, "standby", "todo _modetxt(self._mode)")
-
         status = STANDBY
+        env.printTrace(now(), env.curComponent, this)
+
     }
 
     /**
@@ -280,7 +279,7 @@ open class Component(
 
         enterSorted(r.requesters, priority)
 
-        env.printTrace(now(), env.curComponent, this, REQUESTING.toString(), r.name)
+        env.printTrace(now(), env.curComponent, this, REQUESTING.toString() + " " + r.name)
 
         if (r.isPreemptive) {
             val av = r.availableQuantity()
@@ -374,7 +373,7 @@ open class Component(
         }
 
         // print trace
-        env.printTrace(now(), env.curComponent, this, "$caller $delta", extra)
+        env.printTrace(now(), env.curComponent, this, "$caller $delta $extra")
     }
 
     /**

@@ -7,11 +7,11 @@ import org.koin.core.context.startKoin
 import org.koin.core.definition.Definition
 import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.module
-import java.text.DecimalFormat
 import java.util.*
 
 
 val MAIN = "main"
+
 
 class Environment(koins: org.koin.core.module.Module = module { }) : KoinComponent {
 
@@ -38,24 +38,9 @@ class Environment(koins: org.koin.core.module.Module = module { }) : KoinCompone
     init {
 
         // start console logger
-        var hasPrintedHeader = false
-        addTraceListener {
-            if (!hasPrintedHeader) {
-                hasPrintedHeader = true
 
-                val header = listOf(
-                    "time",
-                    "current component",
-                    "component",
-                    "action",
-                    "info"
-                )
-                println(header.renderTraceLine())
-                println(TRACE_COL_WIDTHS.map { "-".repeat(it - 1) }.joinToString(separator = " "))
-            }
-
-            println(it)
-        }
+//        addTraceListener { print(it) }
+        addTraceListener(ConsoleTraceLogger(true))
 
         startKoin { modules(module { single { this@Environment } }) }
 
@@ -137,7 +122,7 @@ class Environment(koins: org.koin.core.module.Module = module { }) : KoinCompone
             time to c
         } else {
             val t = if (endOnEmptyEventlist) {
-                printTrace(now, curComponent, null, "run ended", "no events left")
+                printTrace(now, curComponent, null,  "run end; no events left")
                 now
             } else {
                 Double.MAX_VALUE
@@ -166,7 +151,7 @@ class Environment(koins: org.koin.core.module.Module = module { }) : KoinCompone
 
         curComponent = c
 
-        printTrace(now, curComponent, c, "current", info)
+        printTrace(now, curComponent, c, info)
     }
 
 
@@ -189,16 +174,15 @@ class Environment(koins: org.koin.core.module.Module = module { }) : KoinCompone
      *         prints a trace line
      *
      *   @param component (usually formatted  now), padded to 10 characters
-     *  @param action (usually only used for the compoent that gets current), padded to 20 characters
+     *  @param state (usually only used for the compoent that gets current), padded to 20 characters
      */
     fun printTrace(
         time: Double,
         curComponent: Component?,
         component: Component?,
-        action: String,
         info: String? = null
     ) {
-        val tr = TraceElement(time, curComponent, component, action, info)
+        val tr = TraceElement(time, curComponent, component, info)
 
         traceListeners.forEach {
             it.processTrace(tr)
@@ -213,34 +197,6 @@ class Environment(koins: org.koin.core.module.Module = module { }) : KoinCompone
         addComponent(component); return (this)
     }
 }
-
-private val TRACE_DF = DecimalFormat("#.00")
-private val TRACE_COL_WIDTHS = listOf(10, 25, 25, 30, 30)
-
-
-data class TraceElement(
-    val time: Double,
-    val curComponent: Component?,
-    val component: Component?,
-    val action: String,
-    val info: String?
-) {
-    override fun toString(): String {
-
-        return listOf(
-            TRACE_DF.format(time).padStart(TRACE_COL_WIDTHS[0] - 3),
-            curComponent?.name,
-            component?.name,
-            action,
-            info
-        ).renderTraceLine()
-    }
-}
-
-private fun List<String?>.renderTraceLine(): String = map { (it ?: "") }
-    .zip(TRACE_COL_WIDTHS)
-    .map { (str, padLength) -> str.padEnd(padLength) }
-    .joinToString("")
 
 fun Environment.calcScheduleTime(till: Double?, duration: Double?): Double {
     return if (till == null) {
