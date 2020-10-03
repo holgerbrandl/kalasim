@@ -51,7 +51,7 @@ class ComponentGenerator<T : Component>(
     }
 
     fun doFinalize(): Sequence<Component> = sequence {
-        env.printTrace(now(), this@ComponentGenerator, "till reached")
+        env.printTrace(now(), env.curComponent, this@ComponentGenerator, "till reached")
     }
 
     fun printInfo(): Nothing = TODO("Implement me")

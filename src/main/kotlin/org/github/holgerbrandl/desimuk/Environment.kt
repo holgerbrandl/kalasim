@@ -13,7 +13,7 @@ import java.util.*
 
 val MAIN = "main"
 
-open class Environment(koins: org.koin.core.module.Module = module { }) : KoinComponent {
+class Environment(koins: org.koin.core.module.Module = module { }) : KoinComponent {
 
     private val components: MutableList<Component> = listOf<Component>().toMutableList()
 
@@ -29,15 +29,43 @@ open class Environment(koins: org.koin.core.module.Module = module { }) : KoinCo
     var now = 0.0
         private set
 
-    private var curComponent: Component?
+    var curComponent: Component? = null
+        private set
 
     var main: Component
         private set
+
     init {
-        startKoin { modules(module { single { this@Environment } }, koins) }
+
+        // start console logger
+        var hasPrintedHeader = false
+        addTraceListener {
+            if (!hasPrintedHeader) {
+                hasPrintedHeader = true
+
+                val header = listOf(
+                    "time",
+                    "current component",
+                    "component",
+                    "action",
+                    "info"
+                )
+                println(header.renderTraceLine())
+                println(TRACE_COL_WIDTHS.map { "-".repeat(it - 1) }.joinToString(separator = " "))
+            }
+
+            println(it)
+        }
+
+        startKoin { modules(module { single { this@Environment } }) }
 
         main = Component(name = "main", process = null)
-        curComponent = main
+        setCurrent(main)
+
+        getKoin().loadModules(listOf(koins))
+//        startKoin { modules(koins) }
+
+//        curComponent = main
 
     }
 
@@ -93,12 +121,7 @@ open class Environment(koins: org.koin.core.module.Module = module { }) : KoinCo
 
             notCancelled
                 .forEach {
-                    it.status = CURRENT
-                    it.scheduledTime = Double.MAX_VALUE
-                    curComponent = it
-
-                    printTrace(now, it, "current (standby)")
-
+                    setCurrent(it, "standby")
                     it.callProcess()
                 }
 
@@ -114,7 +137,7 @@ open class Environment(koins: org.koin.core.module.Module = module { }) : KoinCo
             time to c
         } else {
             val t = if (endOnEmptyEventlist) {
-                printTrace(now, null, "run ended", "no events left")
+                printTrace(now, curComponent, null, "run ended", "no events left")
                 now
             } else {
                 Double.MAX_VALUE
@@ -126,9 +149,8 @@ open class Environment(koins: org.koin.core.module.Module = module { }) : KoinCo
         require(time >= now) { "clock must not run backwards" }
 
         now = time
-        curComponent = component
-        component.status = CURRENT
-        component.scheduledTime = Double.MAX_VALUE
+
+        setCurrent(component)
 
         if (component == main) {
             running = false
@@ -136,6 +158,15 @@ open class Environment(koins: org.koin.core.module.Module = module { }) : KoinCo
         }
 
         component.callProcess()
+    }
+
+    private fun setCurrent(c: Component, info: String? = null) {
+        c.status = CURRENT
+        c.scheduledTime = Double.MAX_VALUE
+
+        curComponent = c
+
+        printTrace(now, curComponent, c, "current", info)
     }
 
 
@@ -160,9 +191,14 @@ open class Environment(koins: org.koin.core.module.Module = module { }) : KoinCo
      *   @param component (usually formatted  now), padded to 10 characters
      *  @param action (usually only used for the compoent that gets current), padded to 20 characters
      */
-    fun printTrace(time: Double, component: Component?, action: String, info: String? = null) {
-        val tr = TraceElement(time, component, action, info)
-        println(tr)
+    fun printTrace(
+        time: Double,
+        curComponent: Component?,
+        component: Component?,
+        action: String,
+        info: String? = null
+    ) {
+        val tr = TraceElement(time, curComponent, component, action, info)
 
         traceListeners.forEach {
             it.processTrace(tr)
@@ -178,18 +214,33 @@ open class Environment(koins: org.koin.core.module.Module = module { }) : KoinCo
     }
 }
 
-private val DF = DecimalFormat("#.00")
+private val TRACE_DF = DecimalFormat("#.00")
+private val TRACE_COL_WIDTHS = listOf(10, 25, 25, 30, 30)
 
 
-data class TraceElement(val time: Double, val component: Component?, val action: String, val info: String?) {
+data class TraceElement(
+    val time: Double,
+    val curComponent: Component?,
+    val component: Component?,
+    val action: String,
+    val info: String?
+) {
     override fun toString(): String {
-        return listOf(DF.format(time).padStart(7), component?.name, component?.name + " " + action, info)
-            .map { (it ?: "") }
-            .zip(listOf(10, 25, 30, 30))
-            .map { (str, padLength) -> str.padEnd(padLength) }
-            .joinToString("")
+
+        return listOf(
+            TRACE_DF.format(time).padStart(TRACE_COL_WIDTHS[0] - 3),
+            curComponent?.name,
+            component?.name,
+            action,
+            info
+        ).renderTraceLine()
     }
 }
+
+private fun List<String?>.renderTraceLine(): String = map { (it ?: "") }
+    .zip(TRACE_COL_WIDTHS)
+    .map { (str, padLength) -> str.padEnd(padLength) }
+    .joinToString("")
 
 fun Environment.calcScheduleTime(till: Double?, duration: Double?): Double {
     return if (till == null) {

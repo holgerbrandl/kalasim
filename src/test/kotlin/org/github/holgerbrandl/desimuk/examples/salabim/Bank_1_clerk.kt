@@ -80,9 +80,9 @@ fun main() {
     }.apply {
         // register other components by simpliy
         CustomerGenerator()
-    }.run(1000.0)
+    }.run(50.0)
 
     val waitingLine: ComponentQueue<Customer> = env.get()
 
-    waitingLine.stats.print()
+//    waitingLine.stats.print()
 }
