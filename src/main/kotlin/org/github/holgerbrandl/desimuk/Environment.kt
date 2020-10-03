@@ -7,6 +7,7 @@ import org.koin.core.context.startKoin
 import org.koin.core.definition.Definition
 import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.module
+import java.text.DecimalFormat
 import java.util.*
 
 
@@ -113,7 +114,7 @@ open class Environment(koins: org.koin.core.module.Module = module { }) : KoinCo
             time to c
         } else {
             val t = if (endOnEmptyEventlist) {
-                printTrace(null, null, "run ended", "no events left")
+                printTrace(now, null, "run ended", "no events left")
                 now
             } else {
                 Double.MAX_VALUE
@@ -152,13 +153,14 @@ open class Environment(koins: org.koin.core.module.Module = module { }) : KoinCo
     @Suppress("unused")
     fun removeTraceListener(tr: TraceListener) = traceListeners.remove(tr)
 
+
     /**
      *         prints a trace line
      *
      *   @param component (usually formatted  now), padded to 10 characters
      *  @param action (usually only used for the compoent that gets current), padded to 20 characters
      */
-    fun printTrace(time: Double?, component: Component?, action: String, info: String? = null) {
+    fun printTrace(time: Double, component: Component?, action: String, info: String? = null) {
         val tr = TraceElement(time, component, action, info)
         println(tr)
 
@@ -176,11 +178,14 @@ open class Environment(koins: org.koin.core.module.Module = module { }) : KoinCo
     }
 }
 
-data class TraceElement(val time: Double?, val component: Component?, val action: String, val info: String?) {
+private val DF = DecimalFormat("#.00")
+
+
+data class TraceElement(val time: Double, val component: Component?, val action: String, val info: String?) {
     override fun toString(): String {
-        return listOf(time.toString(), component?.name, component?.name + " " + action, info)
+        return listOf(DF.format(time).padStart(7), component?.name, component?.name + " " + action, info)
             .map { (it ?: "") }
-            .zip(listOf(5, 20, 30, 30))
+            .zip(listOf(10, 25, 30, 30))
             .map { (str, padLength) -> str.padEnd(padLength) }
             .joinToString("")
     }

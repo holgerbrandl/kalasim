@@ -14,10 +14,12 @@ import org.koin.dsl.module
 
 class CustomerGenerator : Component() {
 
+    //    var numCreated  = 0
     override fun process() = sequence {
-        Customer(get(), get())
-
+//        if(numCreated++ >5 ) return@sequence
         while (true) {
+            Customer(get(), get())
+
             yield(hold(UniformRealDistribution(5.0, 15.0).sample()))
         }
     }
