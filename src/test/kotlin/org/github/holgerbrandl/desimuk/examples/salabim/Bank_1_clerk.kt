@@ -1,9 +1,12 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package org.github.holgerbrandl.desimuk.examples.koiner
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.github.holgerbrandl.desimuk.Component
 import org.github.holgerbrandl.desimuk.ComponentQueue
 import org.github.holgerbrandl.desimuk.Environment
+import org.github.holgerbrandl.desimuk.add
 import org.koin.core.get
 import org.koin.core.inject
 import org.koin.dsl.module
@@ -14,7 +17,9 @@ class CustomerGenerator : Component() {
     override fun process() = sequence {
         Customer(get(), get())
 
-        yield(hold(UniformRealDistribution(5.0, 15.0).sample()))
+        while (true) {
+            yield(hold(UniformRealDistribution(5.0, 15.0).sample()))
+        }
     }
 }
 
@@ -31,11 +36,13 @@ class Customer(val waitingLine: ComponentQueue<Customer>, val clerk: Clerk) : Co
 //    }
 
     override fun process() = sequence {
-        waitingLine.add(this@Customer)
+        while (true) {
+            waitingLine.add(this@Customer)
 
-        if (clerk.isPassive) clerk.activate()
+            if (clerk.isPassive) clerk.activate()
 
-        yield(passivate())
+            yield(passivate())
+        }
     }
 }
 
@@ -45,7 +52,7 @@ class Clerk : Component() {
     override suspend fun SequenceScope<Component>.process() {
         while (waitingLine.isEmpty()) yield(passivate())
 
-        val customer = waitingLine.poll() as Customer
+        val customer = waitingLine.poll()
 
         yield(hold(30.0)) // bearbeitungszeit
         customer.activate()
@@ -56,15 +63,24 @@ fun createSimulation(builder: org.koin.core.module.Module.() -> Unit): Environme
 
 fun main() {
 
-    createSimulation {
 
-        // register components needed for injection
-        single { ComponentQueue<Customer>() }
-        single { Clerk() }
+    val env = createSimulation {
+
+        add { Clerk() }
+        add { ComponentQueue<Customer>() }
+
+//        repeat(10) { add{ Customer(get(), get()) } }
+        // register components needed for dependency injection
+//        single(createdAtStart = true) { ComponentQueue<Customer>() }
+//        single(createdAtStart = true) { Clerk() }
 
 //        single { HelloServiceImpl(get()) as HelloService }
     }.apply {
-        // register other components
+        // register other components by simpliy
         CustomerGenerator()
-    }.run( 100.0 )
+    }.run(1000.0)
+
+    val waitingLine: ComponentQueue<Customer> = env.get()
+
+    waitingLine.stats.print()
 }

@@ -26,7 +26,7 @@ class GeneratorTest {
 
             addTraceListener(tc)
 
-            ComponentGenerator(iat = ExponentialDistribution(2.0), env = this, total = 4) { Customer() }
+            ComponentGenerator(iat = ExponentialDistribution(2.0), total = 4) { Customer() }
         }.run(100.0)
 
         val customers = tc.traces

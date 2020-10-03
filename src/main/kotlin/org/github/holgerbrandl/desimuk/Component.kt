@@ -72,8 +72,6 @@ open class Component(
     var name: String
         private set
 
-    // make only getter private
-    private var now = 0.0;
     var scheduledTime = Double.MAX_VALUE
 
     private var remainingDuration = 0.0
@@ -86,7 +84,7 @@ open class Component(
         this.name = name ?: javaClass.simpleName + "." + getComponentCounter(javaClass.simpleName)
 
 
-        val dataSuffix = if (process == null && name() != MAIN) " data" else ""
+        val dataSuffix = if (process == null && this.name != MAIN) " data" else ""
         env.addComponent(this)
         env.printTrace(now(), this, "create" + dataSuffix, "")
 
@@ -95,11 +93,12 @@ open class Component(
         this.process = ingestFunPointer(process)
 
         if (process != null) {
-            scheduledTime = env.now() + delay
+            scheduledTime = env.now + delay
 
             reschedule(scheduledTime, priority, false, "activate", extra = "TODO")
         }
 
+        @Suppress("LeakingThis")
         setup()
     }
 
@@ -113,6 +112,7 @@ open class Component(
             val isGenerator = process.returnType.toString().startsWith("kotlin.sequences.Sequence")
 
             if (isGenerator) {
+                @Suppress("UNCHECKED_CAST")
                 val sequence = process.call(this) as Sequence<Component>
                 GenProcessInternal(this, sequence)
             } else {
@@ -129,16 +129,19 @@ open class Component(
     open fun setup() {}
 
     /**         the current simulation time : float */
-    fun now() = now - env.offset
+    fun now() = env.now
 //    fun now() = env.now()
 
     open fun process() = this.let {
         sequence {
-            process(it)
-            process()
+            while (true) {
+                process(it)
+                process()
+            }
         }
     }
 
+    /** Generator function that implements "process". This can be overwritten in component classes a convenience alternative to process itself.*/
     open suspend fun SequenceScope<Component>.process(it: Component) {}
 
     open suspend fun SequenceScope<Component>.process() {}
@@ -149,7 +152,8 @@ open class Component(
 //            yield(hold(1.0))
 //    }
 
-    val isPassive: Boolean = status == PASSIVE
+    val isPassive: Boolean
+        get() = status == PASSIVE
 
     /** Passivate a component
      *
@@ -162,7 +166,7 @@ open class Component(
             requireNotData()
             remove()
             //todo checkFail
-            remainingDuration = scheduledTime - env.now()
+            remainingDuration = scheduledTime - env.now
         }
 
         scheduledTime = Double.MAX_VALUE
@@ -187,7 +191,7 @@ open class Component(
             //todo checkFail
         }
 
-        process = null;
+        process = null
         scheduledTime = Double.MAX_VALUE
 
         env.printTrace(now(), this, "cancel", "")
@@ -210,7 +214,7 @@ open class Component(
             //todo checkFail
         }
 
-        scheduledTime = env.now()
+        scheduledTime = env.now
         env.addStandy(this)
 
         env.printTrace(now(), this, "standby", "todo _modetxt(self._mode)")
@@ -238,7 +242,12 @@ open class Component(
      * Request has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
      * See https://www.salabim.org/manual/Component.html#request
      */
-    fun request(resources: List<Resource>, failAt: Double? = null, oneof: Boolean = false) {
+    fun request(
+        resources: List<Resource>,
+        failAt: Double? = null,
+        @Suppress("UNUSED_PARAMETER")
+        oneof: Boolean = false
+    ) {
 
         //todo oneof_request
 
@@ -271,7 +280,7 @@ open class Component(
 
         enterSorted(r.requesters, priority)
 
-        env.printTrace(now(), this, REQUESTING.toString(), r.name!!)
+        env.printTrace(now(), this, REQUESTING.toString(), r.name)
 
         if (r.isPreemptive) {
             val av = r.availableQuantity()
@@ -301,11 +310,6 @@ open class Component(
 
     private fun tryRequest() {
         TODO("Not yet implemented")
-    }
-
-    private fun name(): String {
-        return name ?: javaClass.name + "TODO Counter"
-
     }
 
     private fun enterSorted(requesters: Queue<Component>, priority: Int) {
@@ -355,7 +359,7 @@ open class Component(
         caller: String? = null,
         extra: Any? = null
     ) {
-        require(scheduledTime >= env.now()) { "scheduled time (${scheduledTime}) before now (${env.now()})" }
+        require(scheduledTime >= env.now) { "scheduled time (${scheduledTime}) before now (${env.now})" }
 
         this.scheduledTime = scheduledTime
 
@@ -365,8 +369,8 @@ open class Component(
         val extra = ""
 
         // calculate scheduling delta
-        val delta = if (this.scheduledTime == env.now() || (this.scheduledTime == Double.MAX_VALUE)) "" else {
-            "+" + (this.scheduledTime - env.now())
+        val delta = if (this.scheduledTime == env.now || (this.scheduledTime == Double.MAX_VALUE)) "" else {
+            "+" + (this.scheduledTime - env.now)
         }
 
         // print trace
@@ -393,12 +397,21 @@ open class Component(
         process: FunPointer? = null
     ): Component {
 
-        val p: FunPointer? = if (process == null && status == DATA) {
-            Component::process
+        val p = if (process == null) {
+            if (status == DATA) require(this.process != null) { "no process for data component" }
+            this.process
         } else {
-            process
+            ingestFunPointer(process)
+        }
 
-            //todo
+        var extra = ""
+
+        if (p != null) {
+            this.process = p
+
+            extra = "process ${process}"
+        }
+        //todo
 //            if inspect.isgeneratorfunction(p):
 //            self._process = p(**kwargs)
 //            self._process_isgenerator = True
@@ -406,9 +419,6 @@ open class Component(
 //            self._process = p
 //            self._process_isgenerator = False
 //            self._process_kwargs = kwargs
-        }
-
-        this.process = ingestFunPointer(process)
 
 
         if (status != CURRENT) {
@@ -425,17 +435,22 @@ open class Component(
         val scheduledTime = if (at == null) {
             env.now + delay
         } else {
-            at + env.offset + delay
+            at + delay
         }
 
-        val extra = if (p != null) "process ${p.name}" else ""
         reschedule(scheduledTime, priority, urgent, "hold", extra)
 
         return (this)
     }
 
     private fun checkFail() {
-        TODO("Not yet implemented")
+//        TODO("Not yet implemented")
+//        if(requests.isNotEmpty()){
+//            requests.forEach{ leave()}
+//        }
+        requests.clear()
+//        wai
+//    wai
     }
 
 
@@ -470,7 +485,7 @@ open class Component(
         val heapSeq = if (urgent) -seq else seq
 
 //        https://bezkoder.com/kotlin-priority-queue/
-        env.eventQueue.add(QueueElement(scheduledTime, priority, seq, this))
+        env.eventQueue.add(QueueElement(scheduledTime, priority, heapSeq, this))
     }
 
     override fun toString(): String {

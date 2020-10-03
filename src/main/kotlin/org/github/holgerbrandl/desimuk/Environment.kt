@@ -2,18 +2,17 @@ package org.github.holgerbrandl.desimuk
 
 import org.github.holgerbrandl.desimuk.State.CURRENT
 import org.github.holgerbrandl.desimuk.State.STANDBY
+import org.koin.core.KoinComponent
 import org.koin.core.context.startKoin
+import org.koin.core.definition.Definition
+import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.module
 import java.util.*
 
-private val Component.isGenerator: Boolean
-    get() {
-        TODO("Not yet implemented")
-    }
 
 val MAIN = "main"
 
-open class Environment(koins: org.koin.core.module.Module = module {  }) {
+open class Environment(koins: org.koin.core.module.Module = module { }) : KoinComponent {
 
     private val components: MutableList<Component> = listOf<Component>().toMutableList()
 
@@ -29,17 +28,16 @@ open class Environment(koins: org.koin.core.module.Module = module {  }) {
     var now = 0.0
         private set
 
-    var offset = 0;
-
     private var curComponent: Component?
+
     var main: Component
         private set
-
     init {
         startKoin { modules(module { single { this@Environment } }, koins) }
 
         main = Component(name = "main", process = null)
         curComponent = main
+
     }
 
 
@@ -53,11 +51,11 @@ open class Environment(koins: org.koin.core.module.Module = module {  }) {
 
     fun build(builder: (Environment.() -> Unit)): Environment {
         builder(this)
-        return (this);
+        return (this)
     }
 
     fun addComponent(c: Component): Boolean {
-        require(!components.contains(c)){"we must not add a component twice"}
+        require(!components.contains(c)) { "we must not add a component twice" }
         return components.add(c)
     }
 
@@ -65,7 +63,7 @@ open class Environment(koins: org.koin.core.module.Module = module {  }) {
     /**
      * Start execution of the simulation
      */
-    fun run(duration: Double? = null, until: Double? = null, priority: Int = 0, urgent: Boolean = false) {
+    fun run(duration: Double? = null, until: Double? = null, priority: Int = 0, urgent: Boolean = false): Environment {
 
         if (duration == null) endOnEmptyEventlist = true
 
@@ -78,6 +76,8 @@ open class Environment(koins: org.koin.core.module.Module = module {  }) {
         while (running) {
             step()
         }
+
+        return (this)
     }
 
     /** Executes the next step of the future event list */
@@ -96,7 +96,7 @@ open class Environment(koins: org.koin.core.module.Module = module {  }) {
                     it.scheduledTime = Double.MAX_VALUE
                     curComponent = it
 
-                    printTrace(now(), it, "current (standby)")
+                    printTrace(now, it, "current (standby)")
 
                     it.callProcess()
                 }
@@ -108,7 +108,7 @@ open class Environment(koins: org.koin.core.module.Module = module {  }) {
 
 
         val (time, component) = if (eventQueue.isNotEmpty()) {
-            val (time, priority, seq, c) = eventQueue.poll()
+            val (time, _, _, c) = eventQueue.poll()
 
             time to c
         } else {
@@ -121,6 +121,8 @@ open class Environment(koins: org.koin.core.module.Module = module {  }) {
 
             t to main
         }
+
+        require(time >= now) { "clock must not run backwards" }
 
         now = time
         curComponent = component
@@ -136,9 +138,6 @@ open class Environment(koins: org.koin.core.module.Module = module {  }) {
     }
 
 
-    fun now(): Double = now - offset
-
-
     fun addStandy(component: Component) {
         standBy.add(component)
     }
@@ -149,6 +148,8 @@ open class Environment(koins: org.koin.core.module.Module = module {  }) {
     }
 
     fun addTraceListener(tr: TraceListener) = traceListeners.add(tr)
+
+    @Suppress("unused")
     fun removeTraceListener(tr: TraceListener) = traceListeners.remove(tr)
 
     /**
@@ -179,7 +180,7 @@ data class TraceElement(val time: Double?, val component: Component?, val action
     override fun toString(): String {
         return listOf(time.toString(), component?.name, component?.name + " " + action, info)
             .map { (it ?: "") }
-            .zip(listOf(5, 14, 20, 20))
+            .zip(listOf(5, 20, 30, 30))
             .map { (str, padLength) -> str.padEnd(padLength) }
             .joinToString("")
     }
@@ -187,11 +188,20 @@ data class TraceElement(val time: Double?, val component: Component?, val action
 
 fun Environment.calcScheduleTime(till: Double?, duration: Double?): Double {
     return if (till == null) {
-        if (duration == null) now() else {
-            now() + duration
+        if (duration == null) now else {
+            now + duration
         }
     } else {
         require(duration == null) { "both duration and till specified" }
-        till + offset
+        till
     }
+}
+
+
+inline fun <reified T> org.koin.core.module.Module.add(
+    qualifier: Qualifier? = null,
+    noinline definition: Definition<T>
+) {
+    single(qualifier = qualifier, createdAtStart = true, definition = definition)
+
 }

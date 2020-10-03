@@ -19,10 +19,9 @@ class ComponentGenerator<T : Component>(
     var till: Double = Double.MAX_VALUE,
     val iat: RealDistribution,
     val total: Int = Int.MAX_VALUE,
-    env: Environment,
     name: String? = null,
     priority: Int = 0,
-    urgent: Boolean = false,
+    @Suppress("UNUSED_PARAMETER") urgent: Boolean = false,
     val builder: () -> T
 ) : Component(name, priority = priority, process = ComponentGenerator<T>::doIat) {
 
@@ -36,12 +35,12 @@ class ComponentGenerator<T : Component>(
         var numGenerated = 0
 
         while (true) {
-            val c = builder()
+            builder()
             numGenerated++
 
             if (numGenerated >= total) break
 
-            val t = env.now() + iat.sample()
+            val t = env.now + iat.sample()
 
             if (t > till) {
                 yield((this@ComponentGenerator).activate(process = ComponentGenerator<T>::doFinalize, at = till))
