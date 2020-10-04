@@ -47,6 +47,10 @@ class Environment(koins: org.koin.core.module.Module = module { }) : KoinCompone
         main = Component(name = "main", process = null)
         setCurrent(main)
 
+        require(koins.createAtStart) {
+            "createAtStart must be enabled by convention to instantiate injected components before starting the simulation"
+        }
+
         getKoin().loadModules(listOf(koins))
 //        startKoin { modules(koins) }
 
@@ -122,7 +126,7 @@ class Environment(koins: org.koin.core.module.Module = module { }) : KoinCompone
             time to c
         } else {
             val t = if (endOnEmptyEventlist) {
-                printTrace(now, curComponent, null,  "run end; no events left")
+                printTrace(now, curComponent, null, "run end; no events left")
                 now
             } else {
                 Double.MAX_VALUE
@@ -168,6 +172,9 @@ class Environment(koins: org.koin.core.module.Module = module { }) : KoinCompone
 
     @Suppress("unused")
     fun removeTraceListener(tr: TraceListener) = traceListeners.remove(tr)
+
+
+    fun printTrace(info: String) = printTrace(now, curComponent, null, info)
 
 
     /**
