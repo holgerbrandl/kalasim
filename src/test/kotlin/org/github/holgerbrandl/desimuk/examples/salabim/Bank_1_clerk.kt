@@ -61,7 +61,8 @@ class Clerk : Component() {
     }
 }
 
-fun createSimulation(builder: org.koin.core.module.Module.() -> Unit): Environment = Environment(module { builder() })
+fun createSimulation(builder: org.koin.core.module.Module.() -> Unit): Environment =
+    Environment(module(createdAtStart = true) { builder() })
 
 fun main() {
 
