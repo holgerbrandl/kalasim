@@ -3,7 +3,7 @@ package org.github.holgerbrandl.desimuk
 import java.text.DecimalFormat
 
 
-private val TRACE_DF = DecimalFormat("#.00")
+private val TRACE_DF = DecimalFormat("###.00")
 private val TRACE_COL_WIDTHS = listOf(10, 25, 25, 12, 30)
 
 
@@ -16,7 +16,7 @@ data class TraceElement(
     override fun toString(): String {
 
         return listOf(
-            TRACE_DF.format(time).padStart(TRACE_COL_WIDTHS[0] - 3),
+            TRACE_DF.format(time),
             curComponent?.name,
             component?.name,
             component?.status?.toString() ?: "",
