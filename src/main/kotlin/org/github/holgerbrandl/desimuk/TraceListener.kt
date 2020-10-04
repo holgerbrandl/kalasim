@@ -4,7 +4,7 @@ import java.text.DecimalFormat
 
 
 private val TRACE_DF = DecimalFormat("#.00")
-private val TRACE_COL_WIDTHS = listOf(10, 25, 25, 30, 30)
+private val TRACE_COL_WIDTHS = listOf(10, 25, 25, 12, 30)
 
 
 data class TraceElement(
@@ -21,7 +21,7 @@ data class TraceElement(
             component?.name,
             component?.status?.toString() ?: "",
             info
-        ).renderTraceLine()
+        ).renderTraceLine().trim()
     }
 }
 
