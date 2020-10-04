@@ -62,6 +62,9 @@ open class Component(
 
     protected val env: Environment by inject()
 
+    var name: String
+        private set
+
     private val requests = mapOf<Resource, Int>().toMutableMap()
     val claims = mapOf<Resource, Int>().toMutableMap()
 
@@ -69,8 +72,6 @@ open class Component(
 
     private var process: SimProcess? = null
 
-    var name: String
-        private set
 
     var scheduledTime = Double.MAX_VALUE
 
@@ -79,10 +80,7 @@ open class Component(
     var status: State = DATA
 
     init {
-
-        //todo determine process
-        this.name = name ?: javaClass.simpleName + "." + getComponentCounter(javaClass.simpleName)
-
+        this.name = nameOrDefault(name)
 
         val dataSuffix = if (process == null && this.name != MAIN) " data" else ""
         env.addComponent(this)
@@ -101,6 +99,7 @@ open class Component(
         @Suppress("LeakingThis")
         setup()
     }
+
 
     private fun ingestFunPointer(process: FunPointer?): SimProcess? {
 //        if(process != null ){
@@ -509,3 +508,6 @@ data class QueueElement(val time: Double, val priority: Int, val seq: Int, val c
 enum class State {
     DATA, CURRENT, STANDBY, PASSIVE, INTERRUPTED, SCHEDULED, REQUESTING, WAITING
 }
+
+internal fun Any.nameOrDefault(name: String?) =
+    name ?: javaClass.simpleName + "." + getComponentCounter(javaClass.simpleName)

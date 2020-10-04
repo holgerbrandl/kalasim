@@ -8,7 +8,7 @@ import java.util.*
 data class CQElement<T>(val t: T, val enterTime: Double)
 
 
-class ComponentQueue<T : Component>(val q: Queue<CQElement<T>> = LinkedList()) :
+class ComponentQueue<T : Component>(name:String? = null, val q: Queue<CQElement<T>> = LinkedList()) :
     KoinComponent {
 
     val size: Int
@@ -19,6 +19,15 @@ class ComponentQueue<T : Component>(val q: Queue<CQElement<T>> = LinkedList()) :
     val queueLengthStats = Frequency()
 
     val env by lazy { getKoin().get<Environment>() }
+
+    var name: String
+        private set
+
+    init{
+        this.name = nameOrDefault(name)
+
+        env.printTrace("create ${this.name}")
+    }
 
     fun add(element: T): Boolean = q.add(CQElement(element, env.now))
 
