@@ -72,7 +72,7 @@ This example corresponds to the `Cars` `salabmim` example https://www.salabim.or
 ## References
 
 
-`desmiuk` is built on top of some great libraries
+`desimuk` is built on top of some great libraries
 * https://github.com/InsertKoinIO/koin for dependency injection,
 * [apache-commons-math](http://commons.apache.org/proper/commons-math/) for stats and distributions
 

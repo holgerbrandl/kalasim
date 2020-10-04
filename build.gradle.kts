@@ -3,10 +3,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.4.10"
     application
+    `maven-publish`
+    id("com.jfrog.bintray") version "1.8.5"
 }
 
 group = "com.github.holgerbrandl"
-version = "1.0-SNAPSHOT"
+version = "0.2-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -30,4 +32,95 @@ tasks.withType<KotlinCompile>() {
 
 //application {
 //    mainClassName = "MainKt"
+//}
+
+//bintray kts example https://gist.github.com/s1monw1/9bb3d817f31e22462ebdd1a567d8e78a
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+//                    artifact sourcesJar { classifier "sources" }
+//            artifact javadocJar
+        }
+    }
+}
+
+
+fun findProperty(s: String) = project.findProperty(s) as String?
+
+bintray {
+    user = findProperty("bintray_user")
+    key = findProperty("bintray_key")
+
+    publish = true
+//    dryRun = false
+    setPublications("maven")
+
+
+    pkg(closureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
+        repo = "github"
+        name = "desimuk"
+        websiteUrl = "https://github.com/holgerbrandl/desimuk"
+//        description = "Simple Lib for TLS/SSL socket handling written in Kotlin"
+//        setLabels("kotlin")
+        setLicenses("MIT")
+        publicDownloadNumbers = true
+
+        desc = description
+
+        version = VersionConfig().apply{
+            name  = project.name
+            description = "."
+            vcsTag = "v" + project.version
+//            released = java.util.Date().toString()
+        }
+
+//        version{
+//            name = project.version //Bintray logical version name
+//                desc = '.'
+//                released = new Date()
+//                vcsTag = 'v' + project.version
+//        }
+//        versions{
+//
+//        }
+    })
+}
+
+//
+//if (hasProperty('bintray_user') && hasProperty('bintray_key')) {
+//    bintray {
+//
+//        // property must be set in ~/.gradle/gradle.properties
+//        user = bintray_user
+//        key = bintray_key
+//
+//        publications = ['maven'] //When uploading configuration files
+//
+//        dryRun = false //Whether to run this as dry-run, without deploying
+//        publish = true // If version should be auto published after an upload
+//
+//        pkg {
+//            repo = 'mpicbg-scicomp'
+//            name = 'krangl'
+//            vcsUrl = 'https://github.com/holgerbrandl/krangl'
+//
+//            licenses = ['MIT']
+//            publicDownloadNumbers = true
+//
+//            //Optional version descriptor
+//            version {
+//                name = project.version //Bintray logical version name
+//                desc = '.'
+//                released = new Date()
+//                vcsTag = 'v' + project.version
+//            }
+//        }
+//    }
 //}
