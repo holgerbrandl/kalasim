@@ -1,9 +1,9 @@
-# desimuk
+# desim
 
-{D}iscrete {Event} {Sim}ulation {U}sing {Kotlin}
+{D}iscrete {Event} {Sim}ulator
 
 
-[ ![Download](https://api.bintray.com/packages/holgerbrandl/github/desimuk/images/download.svg) ](https://bintray.com/holgerbrandl/github/desimuk/_latestVersion)  [![Build Status](https://travis-ci.org/holgerbrandl/desimuk.svg?branch=master)](https://travis-ci.org/holgerbrandl/desimuk) [![Gitter](https://badges.gitter.im/holgerbrandl/desimuk.svg)](https://gitter.im/holgerbrandl/desimuk?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[ ![Download](https://api.bintray.com/packages/holgerbrandl/github/desim/images/download.svg) ](https://bintray.com/holgerbrandl/github/desim/_latestVersion)  [![Build Status](https://travis-ci.org/holgerbrandl/desimuk.svg?branch=master)](https://travis-ci.org/holgerbrandl/desimuk) [![Gitter](https://badges.gitter.im/desimuk.svg)](https://gitter.im/desimuk/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![Join the chat at https://gitter.im/holgerbrandl/desim](https://badges.gitter.im/holgerbrandl/desim.svg)](https://gitter.im/holgerbrandl/desim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This repo is a rather blunt copy of https://www.salabim.org/. It reimplements all core APIs of salabim in a more typesafe API, better test coverage, real-time capabilities,
 
@@ -12,17 +12,17 @@ This repo is a rather blunt copy of https://www.salabim.org/. It reimplements al
 
 To get started simply add it as a dependency via Jcenter:
 ```
-implementation "com.github.holgerbrandl:desimuk:0.1"
+implementation "com.github.holgerbrandl:desim:0.1"
 ```
 
-You can also use [JitPack with Maven or Gradle](https://jitpack.io/#holgerbrandl/desimuk) to build the latest snapshot as a dependency in your project.
+You can also use [JitPack with Maven or Gradle](https://jitpack.io/#holgerbrandl/desim) to build the latest snapshot as a dependency in your project.
 
 ```groovy
 repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-        implementation 'com.github.holgerbrandl:desimuk:-SNAPSHOT'
+        implementation 'com.github.holgerbrandl:desim:-SNAPSHOT'
 }
 ```
 
@@ -72,7 +72,7 @@ This example corresponds to the `Cars` `salabmim` example https://www.salabim.or
 ## References
 
 
-`desmiuk` is built on top of some great libraries
+`desim` is built on top of some great libraries
 * https://github.com/InsertKoinIO/koin for dependency injection,
 * [apache-commons-math](http://commons.apache.org/proper/commons-math/) for stats and distributions
 
