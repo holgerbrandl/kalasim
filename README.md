@@ -3,7 +3,7 @@
 {D}iscrete {Event} {Sim}ulator
 
 
-[ ![Download](https://api.bintray.com/packages/holgerbrandl/github/desim/images/download.svg) ](https://bintray.com/holgerbrandl/github/desim/_latestVersion)  [![Build Status](https://travis-ci.org/holgerbrandl/desimuk.svg?branch=master)](https://travis-ci.org/holgerbrandl/desimuk) [![Gitter](https://badges.gitter.im/desimuk.svg)](https://gitter.im/desimuk/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[ ![Download](https://api.bintray.com/packages/holgerbrandl/github/desim/images/download.svg) ](https://bintray.com/holgerbrandl/github/desim/_latestVersion)  [![Build Status](https://travis-ci.org/holgerbrandl/desim.svg?branch=master)](https://travis-ci.org/holgerbrandl/desim) [![Gitter](https://badges.gitter.im/desim.svg)](https://gitter.im/desim/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 This repo is a rather blunt copy of https://www.salabim.org/. It reimplements all core APIs of salabim in a more typesafe API, better test coverage, real-time capabilities,
 
