@@ -1,6 +1,5 @@
-import org.github.holgerbrandl.desimuk.Component
-import org.github.holgerbrandl.desimuk.Environment
-import org.github.holgerbrandl.desimuk.examples.koiner.createSimulation
+import org.github.holgerbrandl.desim.Component
+import org.github.holgerbrandl.desim.examples.koiner.createSimulation
 
 class Car : Component() {
     override suspend fun SequenceScope<Component>.process() {

@@ -1,4 +1,4 @@
-package org.github.holgerbrandl.desimuk
+package org.github.holgerbrandl.desim
 
 import org.apache.commons.math3.stat.Frequency
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics

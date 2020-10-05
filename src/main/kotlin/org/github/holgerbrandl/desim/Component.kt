@@ -1,6 +1,6 @@
-package org.github.holgerbrandl.desimuk
+package org.github.holgerbrandl.desim
 
-import org.github.holgerbrandl.desimuk.State.*
+import org.github.holgerbrandl.desim.State.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.util.*

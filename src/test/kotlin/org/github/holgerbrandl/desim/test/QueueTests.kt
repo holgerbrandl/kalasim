@@ -1,9 +1,9 @@
-package org.github.holgerbrandl.desimuk.test
+package org.github.holgerbrandl.desim.test
 
-import org.github.holgerbrandl.desimuk.Component
-import org.github.holgerbrandl.desimuk.ComponentQueue
-import org.github.holgerbrandl.desimuk.add
-import org.github.holgerbrandl.desimuk.examples.koiner.createSimulation
+import org.github.holgerbrandl.desim.Component
+import org.github.holgerbrandl.desim.ComponentQueue
+import org.github.holgerbrandl.desim.add
+import org.github.holgerbrandl.desim.examples.koiner.createSimulation
 import org.junit.Test
 import kotlin.test.assertEquals
 

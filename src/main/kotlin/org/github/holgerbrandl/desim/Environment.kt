@@ -1,7 +1,7 @@
-package org.github.holgerbrandl.desimuk
+package org.github.holgerbrandl.desim
 
-import org.github.holgerbrandl.desimuk.State.CURRENT
-import org.github.holgerbrandl.desimuk.State.STANDBY
+import org.github.holgerbrandl.desim.State.CURRENT
+import org.github.holgerbrandl.desim.State.STANDBY
 import org.koin.core.KoinComponent
 import org.koin.core.context.startKoin
 import org.koin.core.definition.Definition

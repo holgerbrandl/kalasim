@@ -1,4 +1,4 @@
-package org.github.holgerbrandl.desimuk
+package org.github.holgerbrandl.desim
 
 
 class Car : Component() {

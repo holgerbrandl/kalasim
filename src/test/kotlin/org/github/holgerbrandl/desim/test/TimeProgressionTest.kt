@@ -1,7 +1,7 @@
-package org.github.holgerbrandl.desimuk.test
+package org.github.holgerbrandl.desim.test
 
-import org.github.holgerbrandl.desimuk.Component
-import org.github.holgerbrandl.desimuk.Environment
+import org.github.holgerbrandl.desim.Component
+import org.github.holgerbrandl.desim.Environment
 import org.junit.Test
 
 class TimeProgressionTest {

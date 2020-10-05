@@ -1,3 +1,3 @@
 
-rootProject.name = "desimuk"
+rootProject.name = "desim"
 

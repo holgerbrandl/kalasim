@@ -65,8 +65,8 @@ bintray {
 
     pkg(closureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
         repo = "github"
-        name = "desimuk"
-        websiteUrl = "https://github.com/holgerbrandl/desimuk"
+        name = "desim"
+        websiteUrl = "https://github.com/holgerbrandl/desim"
 //        description = "Simple Lib for TLS/SSL socket handling written in Kotlin"
 //        setLabels("kotlin")
         setLicenses("MIT")
