@@ -5,7 +5,7 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics
 import org.koin.core.KoinComponent
 import java.util.*
 
-data class CQElement<T>(val t: T, val enterTime: Double)
+data class CQElement<T:Component>(val t: T, val enterTime: Double)
 
 
 class ComponentQueue<T : Component>(name:String? = null, val q: Queue<CQElement<T>> = LinkedList()) :
@@ -29,10 +29,16 @@ class ComponentQueue<T : Component>(name:String? = null, val q: Queue<CQElement<
         env.printTrace("create ${this.name}")
     }
 
-    fun add(element: T): Boolean = q.add(CQElement(element, env.now))
+    fun add(element: T): Boolean {
+        env.printTrace(element, "entering " + name)
+
+        return q.add(CQElement(element, env.now))
+    }
 
     fun poll(): T {
         val (element, enterTime) = q.poll()
+
+        env.printTrace(element, "leaving " + name)
 
         lengthOfStayStats.addValue(enterTime)
         queueLengthStats.addValue(q.size)

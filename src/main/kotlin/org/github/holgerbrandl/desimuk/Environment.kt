@@ -176,6 +176,8 @@ class Environment(koins: org.koin.core.module.Module = module { }) : KoinCompone
 
     fun printTrace(info: String) = printTrace(now, curComponent, null, info)
 
+    fun <T : Component> printTrace(element: T, info: String) = printTrace(now, curComponent, element, info)
+
 
     /**
      *         prints a trace line
