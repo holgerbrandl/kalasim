@@ -24,49 +24,66 @@ abstract class Monitor<T>(name: String? = null) : KoinComponent {
 
     abstract fun reset()
 
-    abstract fun printStats()
 }
 
 
 /**
- * Level monitors tally levels along with the current (simulation) time. e.g. the number of parts a machine is working on.
+ * Frequency tally levels irrespective of current (simulation) time.
+ *
+ * @sample org.github.holgerbrandl.kalasim.examples.DokkaExamplesKt.freqLevelDemo
  */
-open class DiscreteStatisticMonitor<T : Comparable<T>>(name: String? = null) : Monitor<T>(name) {
-    val queueLengthStats = Frequency()
+open class FrequencyMonitor<T : Comparable<T>>(name: String? = null) : Monitor<T>(name) {
+    val frequencies = Frequency()
 
     open fun addValue(value: Comparable<T>) {
-        queueLengthStats.addValue(value)
+        frequencies.addValue(value)
     }
 
-    override fun reset() {
-        TODO("Not yet implemented")
-    }
+    override fun reset() = frequencies.clear()
 
-    override fun printStats() {
+    fun printHistogram() {
         println(name)
         println("----")
-
-        queueLengthStats.valuesIterator().asSequence().map {
-            println("${it}\t${queueLengthStats.getPct(it)}\t${queueLengthStats.getCount(it)}")
+        println("# Records: ${frequencies.getSumFreq()}")
+        println()
+        frequencies.valuesIterator().asSequence().map {
+            println("${it}\t${frequencies.getPct(it)}\t${frequencies.getCount(it)}")
         }
     }
+
+    open fun getPct(value: T): Double = frequencies.getPct(value)
 }
 
-
-class DiscreteLevelMonitor<T : Comparable<T>>(name: String? = null) : DiscreteStatisticMonitor<T>(name) {
-    private val durations = DescriptiveStatistics()
+/**
+ * Level monitors tally levels along with the current (simulation) time. e.g. the number of parts a machine is working on.
+ *
+ * @sample org.github.holgerbrandl.kalasim.examples.DokkaExamplesKt.freqLevelDemo
+ */
+class FrequencyLevelMonitor<T : Comparable<T>>(name: String? = null) : FrequencyMonitor<T>(name) {
+    private val timestamps = listOf<Double>().toMutableList()
+    private val values = listOf<Comparable<T>>().toMutableList()
 
     override fun addValue(value: Comparable<T>) {
-        super.addValue(value)
-        durations.addValue(env.now)
+        timestamps.add(env.now)
+        values.add(value)
+//        super.addValue(value)
     }
 
-    override fun toString(): String {
-        return super.toString()
-    }
+    override fun getPct(value: T): Double {
+        val durations = timestamps.toMutableList()
+            .apply { add(env.now) }.zipWithNext { first, second -> second - first }
+            .toDoubleArray()
 
-    override fun printStats() {
-        super.printStats()
+        val freqHist = durations
+            .zip(values)
+            .groupBy { it.second }
+            .mapValues { (_, values) ->
+                values.map { it.first }.sum()
+            }
+
+        val total =  freqHist.values.sum()
+
+        return (freqHist[value] ?: error("Invalid or non-observed state"))/total
     }
 }
 
@@ -82,7 +99,7 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
         TODO("Not yet implemented")
     }
 
-    override fun printStats() = sumStats.run {
+    fun printStats() = sumStats.run {
         println(
             """"
        |name
@@ -95,7 +112,7 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
         )
     }
 
-     open fun mean() = sumStats.mean
+    open fun mean() = sumStats.mean
 }
 
 class NumericLevelMonitor(name: String? = null) : NumericStatisticMonitor(name) {
@@ -113,7 +130,9 @@ class NumericLevelMonitor(name: String? = null) : NumericStatisticMonitor(name) 
     }
 
     override fun mean(): Double {
-        val durations = timestamps.toMutableList().apply { add(env.now) }.zipWithNext { first, second -> second - first }.toDoubleArray()
+        val durations =
+            timestamps.toMutableList().apply { add(env.now) }.zipWithNext { first, second -> second - first }
+                .toDoubleArray()
 
         return Mean().evaluate(sumStats.values, durations)
     }

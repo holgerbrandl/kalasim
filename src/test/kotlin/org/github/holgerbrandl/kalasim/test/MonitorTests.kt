@@ -3,7 +3,7 @@ package org.github.holgerbrandl.kalasim.test
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import org.apache.commons.math3.distribution.EnumeratedDistribution
-import org.github.holgerbrandl.kalasim.DiscreteLevelMonitor
+import org.github.holgerbrandl.kalasim.FrequencyLevelMonitor
 import org.github.holgerbrandl.kalasim.Environment
 import org.github.holgerbrandl.kalasim.NumericLevelMonitor
 import org.github.holgerbrandl.kalasim.NumericStatisticMonitor
@@ -29,36 +29,32 @@ class MonitorTests {
     }
 
     @Test
-    fun `level means should be correct`() {
-        val m = DiscreteLevelMonitor<Car>()
+    fun `Frequency stats should be correct`() {
+        val m = FrequencyLevelMonitor<Car>()
 
-        env.now = 10.0
         m.addValue(AUDI)
-        env.now = 22.0
+        env.now = 2.0
 
         m.addValue(VW)
+        env.now = 8.0
 
-//        m.addValue()
-
+        m.getPct(AUDI) shouldBe 0.5
     }
 
-    // Adopted from example in https://www.salabim.org/manual/Monitor.html
-    @Test
-    fun `it should print a histogram for discrete level stats`() {
-        val data = listOf<Pair<String, Double>>(
-            "foo" to 0.1,
-            "bar" to 0.9
-        )
 
-        val dist = EnumeratedDistribution(data.asCM())
+   @Test
+    fun `Frequency level stats should be correct`() {
+        val m = FrequencyLevelMonitor<Car>()
 
-        val dm = DiscreteLevelMonitor<String>()
+       m.addValue(AUDI)
+       env.now = 2.0
 
-        repeat(1000) { dm.addValue(dist.sample()); env.now += 1 }
+       m.addValue(VW)
+       env.now = 8.0
 
-        dm.printStats()
-
+       m.getPct(AUDI) shouldBe 0.25
     }
+
 
     @Test
     fun `it should correctly calculate numeric level stats`() {
