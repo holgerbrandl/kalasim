@@ -1,5 +1,6 @@
 package org.github.holgerbrandl.kalasim
 
+import org.apache.commons.math3.random.EmpiricalDistribution
 import org.apache.commons.math3.stat.Frequency
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.moment.Mean
@@ -24,6 +25,12 @@ abstract class Monitor<T>(name: String? = null) : KoinComponent {
 
     abstract fun reset()
 
+    /**
+     * When Monitor.get() is called with a time parameter or a direct call with a time parameter, the value at that time will be returned.
+     * */
+    operator fun get(time: Double = env.now): T {
+        TODO("Not yet implemented")
+    }
 }
 
 
@@ -41,7 +48,7 @@ open class FrequencyMonitor<T : Comparable<T>>(name: String? = null) : Monitor<T
 
     override fun reset() = frequencies.clear()
 
-    fun printHistogram() {
+   open fun printHistogram() {
         println(name)
         println("----")
         println("# Records: ${frequencies.getSumFreq()}")
@@ -70,9 +77,7 @@ class FrequencyLevelMonitor<T : Comparable<T>>(name: String? = null) : Frequency
     }
 
     override fun getPct(value: T): Double {
-        val durations = timestamps.toMutableList()
-            .apply { add(env.now) }.zipWithNext { first, second -> second - first }
-            .toDoubleArray()
+        val durations = xDuration()
 
         val freqHist = durations
             .zip(values)
@@ -81,9 +86,20 @@ class FrequencyLevelMonitor<T : Comparable<T>>(name: String? = null) : Frequency
                 values.map { it.first }.sum()
             }
 
-        val total =  freqHist.values.sum()
+        val total = freqHist.values.sum()
 
-        return (freqHist[value] ?: error("Invalid or non-observed state"))/total
+        return (freqHist[value] ?: error("Invalid or non-observed state")) / total
+    }
+
+    private fun xDuration(): DoubleArray {
+        return timestamps.toMutableList()
+            .apply { add(env.now) }.zipWithNext { first, second -> second - first }
+            .toDoubleArray()
+    }
+
+
+    override fun printHistogram() {
+        super.printHistogram()
     }
 }
 
@@ -110,6 +126,12 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
        |maximum\t\t${max}
        |"""".trimMargin()
         )
+
+        // also print histogram
+        val hist = sumStats.buildHistogram().map{ 1000*it.toDouble()/ sumStats.sum}
+        hist.forEachIndexed{ idx, value ->
+            "*".repeat(value.toInt()).padEnd(120,' ').println()
+        }
     }
 
     open fun mean() = sumStats.mean
@@ -130,12 +152,14 @@ class NumericLevelMonitor(name: String? = null) : NumericStatisticMonitor(name) 
     }
 
     override fun mean(): Double {
-        val durations =
-            timestamps.toMutableList().apply { add(env.now) }.zipWithNext { first, second -> second - first }
-                .toDoubleArray()
+        val durations = xDuration()
 
         return Mean().evaluate(sumStats.values, durations)
     }
+
+    private fun xDuration() =
+        timestamps.toMutableList().apply { add(env.now) }.zipWithNext { first, second -> second - first }
+            .toDoubleArray()
 }
 
 
@@ -144,4 +168,24 @@ fun main() {
 //    DiscreteLevelMonitor<String>().addValue("sdf")
     Environment()
 
+}
+
+
+// https://stackoverflow.com/questions/10786465/how-to-generate-bins-for-histogram-using-apache-math-3-0-in-java
+internal fun DescriptiveStatistics.buildHistogram(binCount: Int=30): LongArray {
+    val data = values
+
+    val histogram = LongArray(binCount)
+    val distribution = EmpiricalDistribution(binCount)
+    distribution.load(data)
+    var k = 0
+    for (stats in distribution.binStats) {
+        histogram[k++] = stats.n
+    }
+
+    return histogram;
+}
+
+internal fun Any.println(){
+    println(toString())
 }
