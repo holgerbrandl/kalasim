@@ -1,9 +1,9 @@
-# desim
+# kalasim
 
-{D}iscrete {Event} {Sim}ulator
+Discrete Event Simulator
 
 
-[ ![Download](https://api.bintray.com/packages/holgerbrandl/github/desim/images/download.svg) ](https://bintray.com/holgerbrandl/github/desim/_latestVersion)  [![Build Status](https://travis-ci.org/holgerbrandl/desim.svg?branch=master)](https://travis-ci.org/holgerbrandl/desim) [![Gitter](https://badges.gitter.im/desim.svg)](https://gitter.im/desim/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[ ![Download](https://api.bintray.com/packages/holgerbrandl/github/kalasim/images/download.svg) ](https://bintray.com/holgerbrandl/github/kalasim/_latestVersion)  [![Build Status](https://travis-ci.org/holgerbrandl/kalasim.svg?branch=master)](https://travis-ci.org/holgerbrandl/kalasim) [![Gitter](https://badges.gitter.im/kalasim.svg)](https://gitter.im/kalasim/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 This repo is a rather blunt copy of https://www.salabim.org/. It reimplements all core APIs of salabim in a more typesafe API, better test coverage, real-time capabilities,
 
@@ -12,17 +12,17 @@ This repo is a rather blunt copy of https://www.salabim.org/. It reimplements al
 
 To get started simply add it as a dependency via Jcenter:
 ```
-implementation "com.github.holgerbrandl:desim:0.1"
+implementation "com.github.holgerbrandl:kalasim:0.1"
 ```
 
-You can also use [JitPack with Maven or Gradle](https://jitpack.io/#holgerbrandl/desim) to build the latest snapshot as a dependency in your project.
+You can also use [JitPack with Maven or Gradle](https://jitpack.io/#holgerbrandl/kalasim) to build the latest snapshot as a dependency in your project.
 
 ```groovy
 repositories {
     maven { url 'https://jitpack.io' }
 }
 dependencies {
-        implementation 'com.github.holgerbrandl:desim:-SNAPSHOT'
+        implementation 'com.github.holgerbrandl:kalasim:-SNAPSHOT'
 }
 ```
 
@@ -72,7 +72,7 @@ This example corresponds to the `Cars` `salabmim` example https://www.salabim.or
 ## References
 
 
-`desim` is built on top of some great libraries
+`kalasim` is built on top of some great libraries
 * https://github.com/InsertKoinIO/koin for dependency injection,
 * [apache-commons-math](http://commons.apache.org/proper/commons-math/) for stats and distributions
 
@@ -80,6 +80,9 @@ Further reading
 * https://jabm.sourceforge.io/doc/easss2013/jabm-beamer.pdf
 * https://en.wikipedia.org/wiki/Comparison_of_agent-based_modeling_software
 
+
+Other discrete simulation engines
+*  https://github.com/aybabtme/desim - written in
 
 ## Terminology
 

@@ -1,12 +1,12 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package org.github.holgerbrandl.desim.examples.koiner
+package org.github.holgerbrandl.kalasim.examples.koiner
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
-import org.github.holgerbrandl.desim.Component
-import org.github.holgerbrandl.desim.ComponentQueue
-import org.github.holgerbrandl.desim.Environment
-import org.github.holgerbrandl.desim.add
+import org.github.holgerbrandl.kalasim.Component
+import org.github.holgerbrandl.kalasim.ComponentQueue
+import org.github.holgerbrandl.kalasim.Environment
+import org.github.holgerbrandl.kalasim.add
 import org.koin.core.get
 import org.koin.core.inject
 import org.koin.dsl.module

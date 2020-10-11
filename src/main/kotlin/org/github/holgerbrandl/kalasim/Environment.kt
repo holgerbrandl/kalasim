@@ -1,7 +1,7 @@
-package org.github.holgerbrandl.desim
+package org.github.holgerbrandl.kalasim
 
-import org.github.holgerbrandl.desim.State.CURRENT
-import org.github.holgerbrandl.desim.State.STANDBY
+import org.github.holgerbrandl.kalasim.State.CURRENT
+import org.github.holgerbrandl.kalasim.State.STANDBY
 import org.koin.core.KoinComponent
 import org.koin.core.context.startKoin
 import org.koin.core.definition.Definition
@@ -13,7 +13,7 @@ import java.util.*
 val MAIN = "main"
 
 
-class Environment(koins: org.koin.core.module.Module = module { }) : KoinComponent {
+class Environment(koins: org.koin.core.module.Module = module(createdAtStart = true) { }) : KoinComponent {
 
     private val components: MutableList<Component> = listOf<Component>().toMutableList()
 
@@ -27,7 +27,7 @@ class Environment(koins: org.koin.core.module.Module = module { }) : KoinCompone
     val traceListeners = listOf<TraceListener>().toMutableList()
 
     var now = 0.0
-        private set
+        internal set
 
     var curComponent: Component? = null
         private set
@@ -52,6 +52,7 @@ class Environment(koins: org.koin.core.module.Module = module { }) : KoinCompone
         }
 
         getKoin().loadModules(listOf(koins))
+//        KoinContextHandler.get()._scopeRegistry.rootScope.createEagerInstances()
 //        startKoin { modules(koins) }
 
 //        curComponent = main

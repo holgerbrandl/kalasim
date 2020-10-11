@@ -1,6 +1,6 @@
-package org.github.holgerbrandl.desim
+package org.github.holgerbrandl.kalasim
 
-import org.github.holgerbrandl.desim.State.*
+import org.github.holgerbrandl.kalasim.State.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.util.*
@@ -304,6 +304,8 @@ open class Component(
         if (requests.isNotEmpty()) {
             reschedule(scheduledTime, 0, false, "request")
         }
+
+        return
     }
 
     private fun tryRequest() {

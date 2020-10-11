@@ -21,8 +21,11 @@ dependencies {
     implementation("org.apache.commons:commons-math3:3.6.1")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.10")
     implementation("org.koin:koin-core:2.1.6")
+//    implementation("org.koin:koin-core:2.2.0-rc-2")
 
     testImplementation(kotlin("test-junit"))
+    testImplementation("io.kotest:kotest-assertions-core:4.2.6")
+
     testImplementation(kotlin("script-runtime"))
 }
 
@@ -66,7 +69,7 @@ bintray {
     pkg(closureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
         repo = "github"
         name = "desim"
-        websiteUrl = "https://github.com/holgerbrandl/desim"
+        websiteUrl = "https://github.com/holgerbrandl/kalasim"
 //        description = "Simple Lib for TLS/SSL socket handling written in Kotlin"
 //        setLabels("kotlin")
         setLicenses("MIT")

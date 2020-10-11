@@ -1,4 +1,4 @@
-package org.github.holgerbrandl.desim
+package org.github.holgerbrandl.kalasim
 
 
 class Car : Component() {

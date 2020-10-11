@@ -1,4 +1,4 @@
-package org.github.holgerbrandl.desim.examples.salabim
+package org.github.holgerbrandl.kalasim.examples.kalasim
 
 import kotlin.test.Test
 

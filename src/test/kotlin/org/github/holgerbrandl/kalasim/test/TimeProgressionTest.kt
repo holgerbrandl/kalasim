@@ -1,7 +1,7 @@
-package org.github.holgerbrandl.desim.test
+package org.github.holgerbrandl.kalasim.test
 
-import org.github.holgerbrandl.desim.Component
-import org.github.holgerbrandl.desim.Environment
+import org.github.holgerbrandl.kalasim.Component
+import org.github.holgerbrandl.kalasim.Environment
 import org.junit.Test
 
 class TimeProgressionTest {

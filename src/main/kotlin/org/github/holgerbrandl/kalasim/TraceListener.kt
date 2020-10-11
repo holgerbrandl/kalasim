@@ -1,4 +1,4 @@
-package org.github.holgerbrandl.desim
+package org.github.holgerbrandl.kalasim
 
 import java.text.DecimalFormat
 

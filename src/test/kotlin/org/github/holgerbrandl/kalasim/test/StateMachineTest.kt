@@ -1,6 +1,6 @@
-package org.github.holgerbrandl.desim.test
+package org.github.holgerbrandl.kalasim.test
 
-import org.github.holgerbrandl.desim.*
+import org.github.holgerbrandl.kalasim.*
 import org.junit.Test
 import kotlin.test.assertEquals
 

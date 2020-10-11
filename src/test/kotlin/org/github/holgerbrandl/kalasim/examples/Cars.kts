@@ -1,5 +1,5 @@
-import org.github.holgerbrandl.desim.Component
-import org.github.holgerbrandl.desim.examples.koiner.createSimulation
+import org.github.holgerbrandl.kalasim.Component
+import org.github.holgerbrandl.kalasim.examples.koiner.createSimulation
 
 class Car : Component() {
     override suspend fun SequenceScope<Component>.process() {
