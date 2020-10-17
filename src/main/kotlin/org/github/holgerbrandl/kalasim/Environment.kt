@@ -1,7 +1,7 @@
 package org.github.holgerbrandl.kalasim
 
-import org.github.holgerbrandl.kalasim.State.CURRENT
-import org.github.holgerbrandl.kalasim.State.STANDBY
+import org.github.holgerbrandl.kalasim.ComponentState.CURRENT
+import org.github.holgerbrandl.kalasim.ComponentState.STANDBY
 import org.koin.core.KoinComponent
 import org.koin.core.context.startKoin
 import org.koin.core.definition.Definition
@@ -11,6 +11,9 @@ import java.util.*
 
 
 val MAIN = "main"
+
+fun createSimulation(builder: org.koin.core.module.Module.() -> Unit): Environment =
+    Environment(module(createdAtStart = true) { builder() })
 
 
 class Environment(koins: org.koin.core.module.Module = module(createdAtStart = true) { }) : KoinComponent {
