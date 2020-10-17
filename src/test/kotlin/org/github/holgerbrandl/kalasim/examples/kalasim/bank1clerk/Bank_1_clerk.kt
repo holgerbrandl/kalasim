@@ -3,27 +3,11 @@
 package org.github.holgerbrandl.kalasim.examples.koiner
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
-import org.github.holgerbrandl.kalasim.Component
-import org.github.holgerbrandl.kalasim.ComponentQueue
-import org.github.holgerbrandl.kalasim.Environment
-import org.github.holgerbrandl.kalasim.add
+import org.github.holgerbrandl.kalasim.*
 import org.koin.core.get
 import org.koin.core.inject
 import org.koin.dsl.module
 
-
-class CustomerGenerator : Component() {
-
-    //    var numCreated  = 0
-    override fun process() = sequence {
-//        if(numCreated++ >5 ) return@sequence
-        while (true) {
-            Customer(get(), get())
-
-            yield(hold(UniformRealDistribution(5.0, 15.0).sample()))
-        }
-    }
-}
 
 class Customer(val waitingLine: ComponentQueue<Customer>, val clerk: Clerk) : Component() {
 
@@ -47,6 +31,20 @@ class Customer(val waitingLine: ComponentQueue<Customer>, val clerk: Clerk) : Co
         }
     }
 }
+class CustomerGenerator : Component() {
+
+    //    var numCreated  = 0
+    override fun process() = sequence {
+//        if(numCreated++ >5 ) return@sequence
+        while (true) {
+            Customer(get(), get())
+
+            yield(hold(UniformRealDistribution(5.0, 15.0).sample()))
+        }
+    }
+}
+
+
 
 class Clerk : Component() {
     val waitingLine: ComponentQueue<Customer> by inject()
@@ -61,11 +59,7 @@ class Clerk : Component() {
     }
 }
 
-fun createSimulation(builder: org.koin.core.module.Module.() -> Unit): Environment =
-    Environment(module(createdAtStart = true) { builder() })
-
 fun main() {
-
 
     val env = createSimulation {
 
