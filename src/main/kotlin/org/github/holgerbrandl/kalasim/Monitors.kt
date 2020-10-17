@@ -53,6 +53,8 @@ open class FrequencyMonitor<T : Comparable<T>>(name: String? = null) : Monitor<T
         println("----")
         println("# Records: ${frequencies.getSumFreq()}")
         println()
+        println("value\t%\tcount")
+       // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
         frequencies.valuesIterator().asSequence().map {
             println("${it}\t${frequencies.getPct(it)}\t${frequencies.getCount(it)}")
         }
