@@ -17,7 +17,12 @@ open class Resource(
     var claimedQuantity = 0.0
         set(x) {
             field = x
+
             claimedQuantityMonitor.addValue(x)
+            availableQuantityMonitor.addValue(capacity - claimedQuantity)
+            occupancyMonitor.addValue(if (capacity < 0) 0 else claimedQuantity)
+
+            env.printTrace("claim ${claimedQuantity} from $this")
         }
 
     val claimedQuantityMonitor = NumericLevelMonitor()
@@ -30,7 +35,6 @@ open class Resource(
     val availableQuantityMonitor = NumericLevelMonitor()
 
 
-    val occupancy = NumericLevelMonitor()
     val occupancyMonitor = NumericLevelMonitor()
 
     val capacityMonitor = NumericLevelMonitor("Capacity of ${name}").apply {
@@ -38,6 +42,29 @@ open class Resource(
     }
 
     fun availableQuantity(): Double = capacity - claimedQuantity
+
+
+    override fun tryRequest(): Boolean {
+        val iterator = requesters.q.iterator()
+
+        if (anonymous) {
+            // TODO trying not implemented
+
+            iterator.forEach {
+                it.c.tryRequest()
+            }
+        } else {
+            while (iterator.hasNext()) {
+                //try honor as many requests as possible
+                if (minq > (capacity - claimedQuantity + 1E-8)) {
+                    break
+                }
+                iterator.next().c.tryRequest()
+            }
+        }
+
+        return true
+    }
 
     /** releases all claims or a specified quantity
      *
@@ -56,13 +83,18 @@ open class Resource(
             occupancyMonitor.addValue(if (capacity <= 0) 0 else claimedQuantity / capacity)
             availableQuantityMonitor.addValue(capacity - claimedQuantity)
 
-        }else{
-            require(quantity!=null) { "quantity missing for non-anonymous resource" }
+        } else {
+            require(quantity != null) { "quantity missing for non-anonymous resource" }
 
-            while(requesters.isNotEmpty()){
+            while (requesters.isNotEmpty()) {
                 requesters.poll().release(this)
             }
         }
+    }
+
+    fun removeRequester(component: Component) {
+        requesters.remove(component)
+        if(requesters.isEmpty()) minq = Double.MAX_VALUE
     }
 }
 

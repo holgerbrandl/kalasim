@@ -10,7 +10,7 @@ import org.koin.dsl.module
 import java.util.*
 
 
-val MAIN = "main"
+const val MAIN = "main"
 
 fun createSimulation(builder: org.koin.core.module.Module.() -> Unit): Environment =
     Environment(module(createdAtStart = true) { builder() })
@@ -22,12 +22,10 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
 
 
     private var running: Boolean = false
-    private var stopped: Boolean = false
-
 
     val eventQueue = PriorityQueue<QueueElement>()
 
-    val traceListeners = listOf<TraceListener>().toMutableList()
+    private val traceListeners = listOf<TraceListener>().toMutableList()
 
     var now = 0.0
         internal set
@@ -63,13 +61,13 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
     }
 
 
-    var endOnEmptyEventlist = false
+    private var endOnEmptyEventlist = false
 
-    val standBy = listOf<Component>().toMutableList()
-    val pendingStandBy = listOf<Component>().toMutableList()
+    private val standBy = listOf<Component>().toMutableList()
+    private val pendingStandBy = listOf<Component>().toMutableList()
 
 
-//    fun build(vararg compoennts: Component) = compoennts.forEach { this + it }
+//    fun build(vararg compoennts: Component) = components.forEach { this + it }
 
     fun build(builder: (Environment.() -> Unit)): Environment {
         builder(this)
@@ -90,9 +88,9 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
         if (duration == null) endOnEmptyEventlist = true
 
 
-        val scheduled_time = calcScheduleTime(until, duration)
+        val scheduledTime = calcScheduleTime(until, duration)
 
-        main.reschedule(scheduled_time, priority, urgent, "run", extra = "TODO implement me")
+        main.reschedule(scheduledTime, priority, urgent, "run")
 
         running = true
         while (running) {
@@ -163,7 +161,7 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
     }
 
 
-    fun addStandy(component: Component) {
+    fun addStandBy(component: Component) {
         standBy.add(component)
     }
 
@@ -184,10 +182,11 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
 
 
     /**
-     *         prints a trace line
+     * Prints a trace line
      *
-     *   @param component (usually formatted  now), padded to 10 characters
-     *  @param state (usually only used for the compoent that gets current), padded to 20 characters
+     *  @param curComponent  Modification consuming component
+     *  @param component Modification causing component
+     *  @param info Detailing out the nature of the modification
      */
     fun printTrace(
         time: Double,

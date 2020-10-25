@@ -10,6 +10,8 @@ import kotlin.reflect.KFunction
 import kotlin.reflect.KFunction1
 
 
+private val EPS = 1E-8
+
 /**
  * A salabim component is used as component (primarily for queueing)
 or as a component with a process
@@ -26,6 +28,7 @@ open class Component(
     val delay: Int = 0
 ) : KoinComponent {
 
+    private var oneOfRequest: Boolean = false
     protected val env: Environment by inject()
 
     var name: String
@@ -61,7 +64,7 @@ open class Component(
         if (process != null) {
             scheduledTime = env.now + delay
 
-            reschedule(scheduledTime, priority, false, "activate", extra = "TODO")
+            reschedule(scheduledTime, priority, false, "activate")
         }
 
         @Suppress("LeakingThis")
@@ -181,7 +184,7 @@ open class Component(
         }
 
         scheduledTime = env.now
-        env.addStandy(this)
+        env.addStandBy(this)
 
         status = STANDBY
         env.printTrace(now(), env.curComponent, this)
@@ -272,7 +275,7 @@ open class Component(
         oneOf: Boolean = false,
         //todo use type here and not string
         // try to avoid argument by inferring from stacktrace
-        calledFrom:String? = null
+        calledFrom: String? = null
 
     ): Component {
 
@@ -285,12 +288,16 @@ open class Component(
             checkFail()
         }
 
-        scheduledTime = failAt?.sample() ?: Double.MAX_VALUE
+        scheduledTime = env.now +
+                (failAt?.sample() ?: Double.MAX_VALUE) +
+                (failDelay?.sample() ?: 0.0)
+
         failed = false
+        this.oneOfRequest = oneOf
 
 //        val rr = resourceRequests.first()
         resourceRequests.forEach { (r, quantity, priority) ->
-            var q = 1 -quantity
+            var q = 1 - quantity
 
 
             if (r.isPreemptive && resourceRequests.size > 1) {
@@ -299,18 +306,19 @@ open class Component(
 
 
             // TODO
-            if(calledFrom == "put"){
+            if (calledFrom == "put") {
                 q = -q
             }
 
-            require(q > 0 || r.anonymous){ "quantity <0" }
+            require(q > 0 || r.anonymous) { "quantity <0" }
 
             //  is same resource is specified several times, just add them up
             //https://stackoverflow.com/questions/53826903/increase-value-in-mutable-map
             requests.merge(r, q, Double::plus)
 
 
-            val reqText = (calledFrom ?: "") + "request ${q} from ${r.name}  with priority ${priority} and oneof=${oneOf}"
+            val reqText =
+                (calledFrom ?: "") + "request ${q} from ${r.name}  with priority ${priority} and oneof=${oneOf}"
 
 
 //            enterSorted(r.requesters, priority)
@@ -320,7 +328,8 @@ open class Component(
                 now(),
                 env.curComponent,
                 this,
-                REQUESTING.toString() + " " + r.name
+//                REQUESTING.toString() + " " + r.name
+                reqText
             )
 
             // TODO build test case (current implementation seems incorrect & incomplete
@@ -328,15 +337,17 @@ open class Component(
                 var av = r.availableQuantity()
                 val thisClaimers = r.claimers.q
 
-                var bumpCandidates= mutableListOf<Component>()
+                val bumpCandidates = mutableListOf<Component>()
 //                val claimComponents = thisClaimers.map { it.c }
-                for (cqe in thisClaimers.reversed() ) {
+                for (cqe in thisClaimers.reversed()) {
                     if (av >= q) {
                         break
                     }
 
                     // check if prior of component
-                    if (priority !=null && priority >= (thisClaimers.find { it.c ==  this }?.priority ?: Int.MIN_VALUE)) {
+                    if (priority != null && priority >= (thisClaimers.find { it.c == this }?.priority
+                            ?: Int.MIN_VALUE)
+                    ) {
                         break
                     }
 
@@ -344,8 +355,8 @@ open class Component(
                     bumpCandidates.add(cqe.c)
                 }
 
-                if(av >=0){
-                    bumpCandidates.forEach{
+                if (av >= 0) {
+                    bumpCandidates.forEach {
                         it.releaseInternal(r)
                         env.printTrace("$it bumped from $r by $this")
                         it.activate()
@@ -355,9 +366,9 @@ open class Component(
         }
 
 
-        requests.forEach{ (resource, quantity) ->
-            if(quantity< resource.minq)
-                resource.minq= quantity
+        requests.forEach { (resource, quantity) ->
+            if (quantity < resource.minq)
+                resource.minq = quantity
         }
 
         tryRequest()
@@ -369,14 +380,74 @@ open class Component(
         return this
     }
 
-    private fun tryRequest() {
-        TODO("Not yet implemented")
+
+    // TODO what is the reasoning here
+    private fun honorAll(): List<Pair<Resource, Double>>? {
+        for ((r, requestedQuantity) in requests) {
+            if (requestedQuantity > r.capacity - r.claimedQuantity + EPS) {
+                return null
+            } else if (-requestedQuantity > r.claimedQuantity + EPS) {
+                return null
+            }
+        }
+
+        return requests.toList()
     }
 
-    @Deprecated("no longer needed, handled by queue directly")
-    private fun enterSorted(requesters: Queue<Component>, priority: Int) {
-        TODO("Not yet implemented")
+    private fun honorAny(): List<Pair<Resource, Double>>? {
+        for (request in requests) {
+            val (r, requestedQuantity) = request
+            if (requestedQuantity > r.capacity - r.claimedQuantity + EPS) {
+                return listOf(r to requestedQuantity)
+            } else if (-requestedQuantity <= r.claimedQuantity + EPS) {
+                return listOf(r to requestedQuantity)
+            }
+        }
+
+        return null
     }
+
+    internal open fun tryRequest(): Boolean {
+        if (status == INTERRUPTED) return false
+
+        val rHonor = if (oneOfRequest) honorAny() else honorAll()
+
+        if (rHonor.isNullOrEmpty()) return false
+
+        requests
+            .filterNot { it.key.anonymous }
+            .forEach { (resource, quantity) ->
+                // just if request was honored claim it
+                if (rHonor.none { it.first == resource }) {
+                    resource.claimedQuantity += quantity //this will also update the monitor
+                    val thisPrio = resource.requesters.q.first { it.c == this }.priority
+
+                    claims.merge(resource, quantity, Double::plus)
+
+                    if (resource.claimers.q.none { it.c == this }) {
+                        resource.claimers.add(this, thisPrio)
+                    }
+                }
+
+                resource.removeRequester(this)
+            }
+
+        requests.clear()
+        remove()
+
+        val honorInfo = rHonor.firstOrNull()!!.first.name + (if(rHonor.size> 1) "++" else "")
+
+        reschedule(now(), 0,false, "request honor $honorInfo")
+
+        rHonor.filter { it.first.anonymous }.forEach { it.first.tryRequest() }
+
+        return true
+    }
+
+//    @Deprecated("no longer needed, handled by queue directly")
+//    private fun enterSorted(requesters: Queue<Component>, priority: Int) {
+//        TODO("Not yet implemented")
+//    }
 
 
     private fun remove() {
@@ -389,7 +460,7 @@ open class Component(
         }
 
         if (status == STANDBY) {
-            env.addStandy(this)
+            env.addStandBy(this)
             env.addPendingStandBy(this)
         }
     }
@@ -419,7 +490,6 @@ open class Component(
         priority: Int = 0,
         urgent: Boolean = false,
         caller: String? = null,
-        extra: Any? = null
     ) {
         require(scheduledTime >= env.now) { "scheduled time (${scheduledTime}) before now (${env.now})" }
 
@@ -500,7 +570,7 @@ open class Component(
             at + delay
         }
 
-        reschedule(scheduledTime, priority, urgent, "hold", extra)
+        reschedule(scheduledTime, priority, urgent, "hold" +  extra)
 
         return (this)
     }
@@ -600,7 +670,7 @@ open class Component(
 
         claims[resource] = claims[resource]!! - quantity
 
-        if (claims[resource]!! < 1E-8) {
+        if (claims[resource]!! < EPS) {
             leave(resource.claimers)
         }
     }
@@ -643,7 +713,7 @@ open class Component(
         //todo change to support distribution parameters instead
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null,
-        oneOf: Boolean = false
+        all: Boolean = false
     ): Component {
 
         if (status != CURRENT) {
@@ -652,6 +722,8 @@ open class Component(
             remove()
             checkFail()
         }
+
+        waitAll = all
 
         scheduledTime = env.now +
                 (failAt?.sample() ?: Double.MAX_VALUE) +
@@ -662,7 +734,7 @@ open class Component(
             // skip already tracked states
             .filterNot { sr -> waits.any { it.state == sr.state } }
             .forEach { (state, _, priority) ->
-                    state.addWaiter(this, priority)
+                state.addWaiter(this, priority)
             }
 
         tryWait()
@@ -679,18 +751,19 @@ open class Component(
             return false
         }
 
-        val honored = if(waitAll) {
+        @Suppress("UNCHECKED_CAST")
+        val honored = if (waitAll) {
             waits.all { sr ->
-                (sr as StateRequest<Any>).predicate(sr.state as State<Any>)
+                (sr as StateRequest<Any>).predicate(sr.state)
             }
-        }else{
+        } else {
             waits.any { sr ->
-                (sr as StateRequest<Any>).predicate(sr.state as State<Any>)
+                (sr as StateRequest<Any>).predicate(sr.state)
             }
         }
 
-        if(honored){
-            waits.forEach { sr-> sr.state.removeWaiter(this)}
+        if (honored) {
+            waits.forEach { sr -> sr.state.removeWaiter(this) }
             waits.clear()
             reschedule(scheduledTime, 0, false, "wait")
         }
@@ -762,7 +835,7 @@ enum class ComponentState {
 data class ResourceRequest(val r: Resource, val quantity: Double, val priority: Int? = null)
 
 fun main() {
-    val (state, predicate, priority) = StateRequest(State("foo"), { it.value == "House" })
+    val (state, predicate, _) = StateRequest(State("foo"), { it.value == "House" })
     predicate(state)
 }
 

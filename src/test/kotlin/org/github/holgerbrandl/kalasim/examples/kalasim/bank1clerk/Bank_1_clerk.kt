@@ -79,5 +79,5 @@ fun main() {
 
     val waitingLine: ComponentQueue<Customer> = env.get()
 
-//    waitingLine.stats.print()
+    waitingLine.stats.print()
 }
