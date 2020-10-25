@@ -33,7 +33,7 @@ fun main() {
         val worktodo: State<Any> by inject()
 
         override suspend fun SequenceScope<Component>.process() {
-            while (waitingLine.isEmpty()) this@Clerk.wait(worktodo)
+            while (waitingLine.isEmpty()) this@Clerk.wait(worktodo, true)
 
             val customer = waitingLine.poll()
 

@@ -1,48 +1,14 @@
 package org.github.holgerbrandl.kalasim
 
-import org.github.holgerbrandl.kalasim.State.*
+import org.apache.commons.math3.distribution.ConstantRealDistribution
+import org.apache.commons.math3.distribution.RealDistribution
+import org.github.holgerbrandl.kalasim.ComponentState.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.util.*
 import kotlin.reflect.KFunction
 import kotlin.reflect.KFunction1
 
-
-private val componentCounters = mapOf<String, Int>().toMutableMap()
-
-private fun getComponentCounter(className: String) = componentCounters.merge(className, 1, Int::plus)
-
-typealias FunPointer = KFunction<*>
-typealias GenProcess = KFunction1<*, Sequence<Component>>
-
-
-interface SimProcess {
-    fun call()
-}
-
-class GenProcessInternal(val component: Component, seq: Sequence<Component>) : SimProcess {
-
-    val iterator = seq.iterator()
-
-    override fun call() {
-        try {
-            iterator.next()
-        } catch (e: NoSuchElementException) {
-            component.terminate()
-        }
-
-        //todo reenable
-//        if(!iterator.hasNext()) {
-//
-//        }
-    }
-}
-
-class SimpleProcessInternal(val component: Component, val funPointer: FunPointer) : SimProcess {
-    override fun call() {
-        funPointer.call(component)
-    }
-}
 
 /**
  * A salabim component is used as component (primarily for queueing)
@@ -65,10 +31,12 @@ open class Component(
     var name: String
         private set
 
-    private val requests = mapOf<Resource, Int>().toMutableMap()
-    val claims = mapOf<Resource, Int>().toMutableMap()
+    private val requests = mapOf<Resource, Double>().toMutableMap()
+    private val waits = listOf<StateRequest<*>>().toMutableList()
+    val claims = mapOf<Resource, Double>().toMutableMap()
 
     private var failed: Boolean = false
+    private var waitAll: Boolean = false
 
     private var process: SimProcess? = null
 
@@ -77,7 +45,7 @@ open class Component(
 
     private var remainingDuration = 0.0
 
-    var status: State = DATA
+    var status: ComponentState = DATA
 
     init {
         this.name = nameOrDefault(name)
@@ -133,10 +101,10 @@ open class Component(
 
     open fun process() = this.let {
         sequence {
-            while (true) {
-                process(it)
-                process()
-            }
+//            while (true) { // disabled because too much abstraction
+            process(it)
+            process()
+//            }
         }
     }
 
@@ -220,32 +188,93 @@ open class Component(
 
     }
 
+    fun put(
+        vararg resourceRequests: ResourceRequest,
+        failAt: RealDistribution? = null,
+        failDelay: RealDistribution? = null,
+    ): Component = request(
+        *resourceRequests.map { it.copy(quantity = -it.quantity) }.toTypedArray(),
+        failAt = failAt, failDelay = failDelay
+    )
+
     /**
-     * request from a resource or resources
+     * Request from a resource or resources
      *
      *  Not allowed for data components or main.
 
-     *
-     *  -------
-    ``yield self.request(r1)`` |n|
-    --> requests 1 from r1 |n|
-    ``yield self.request(r1,r2)`` |n|
-    --> requests 1 from r1 and 1 from r2 |n|
-    ``yield self.request(r1,(r2,2),(r3,3,100))`` |n|
-    --> requests 1 from r1, 2 from r2 and 3 from r3 with priority 100 |n|
-    ``yield self.request((r1,1),(r2,2))`` |n|
-    --> requests 1 from r1, 2 from r2 |n|
-    ``yield self.request(r1, r2, r3, oneoff=True)`` |n|
-    --> requests 1 from r1, r2 or r3 |n|
-     * Request has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
-     * See https://www.salabim.org/manual/Component.html#request
+     * @sample org.github.holgerbrandl.kalasim.examples.kalasim.GasStation.main
      */
     fun request(
-        resources: List<Resource>,
-        failAt: Double? = null,
-        @Suppress("UNUSED_PARAMETER")
-        oneof: Boolean = false
-    ) {
+        vararg resources: Resource,
+        failAt: RealDistribution? = null,
+        failDelay: RealDistribution? = null,
+        oneOf: Boolean = false,
+    ) = request(
+        *resources.map { it withQuantity 1.0 }.toTypedArray(),
+        failAt = failAt,
+        failDelay = failDelay,
+        oneOf = oneOf
+    )
+
+
+    //todo we should just support one here
+    fun fixed(value: Double) = value.asConstantDist()
+    fun Double.asConstantDist() = ConstantRealDistribution(this)
+
+
+    /**
+     * Request from a resource or resources
+     *
+     *  Not allowed for data components or main.
+
+     * Examples
+     * - `request(r1)` --> requests 1 from r1
+     * - `request(r1,r2)` --> requests 1 from r1 and 1 from r2
+     * - `request(r1,(r2,2),(r3,3,100))` --> requests 1 from r1, 2 from r2 and 3 from r3 with priority 100
+     * - `request((r1,1),(r2,2))` --> requests 1 from r1, 2 from r2
+     * - `request(r1, r2, r3, oneoff=True)` --> requests 1 from r1, r2 or r3
+     *
+     *   `request` has the effect that the component will check whether the requested quantity from a resource is
+     *   available. It is possible to check for multiple availability of a certain quantity from several resources.
+     *
+     *  Not allowed for data components or main.
+     *
+     * If to be used for the current component
+     * (which will be nearly always the case),
+     * use `yield (request(...))`.
+     *
+     * If the same resource is specified more that once, the quantities are summed
+     *
+     * The requested quantity may exceed the current capacity of a resource
+     *
+     * The parameter failed will be reset by a calling request or wait
+     *
+     * @sample org.github.holgerbrandl.kalasim.examples.kalasim.GasStation.main
+     *
+     * @param resourceRequests sequence of items where each item can be:
+     * - resource, where quantity=1, priority=tail of requesters queue
+     * - tuples/list containing a resource, a quantity and optionally a priority. if the priority is not specified,
+     * the request for the resource be added to the tail of the requesters queue
+     *
+     * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
+     *
+     * @param failDelay  if the request is not honored before now+fail_delay,
+    the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
+
+    @param oneOf If `true`, just one of the requests has to be met (or condition),
+    where honoring follows the order given
+     */
+    fun request(
+        vararg resourceRequests: ResourceRequest,
+        //todo change to support distribution parameters instead
+        failAt: RealDistribution? = null,
+        failDelay: RealDistribution? = null,
+        oneOf: Boolean = false,
+        //todo use type here and not string
+        // try to avoid argument by inferring from stacktrace
+        calledFrom:String? = null
+
+    ): Component {
 
         //todo oneof_request
 
@@ -253,50 +282,82 @@ open class Component(
             requireNotData()
             requireNotMain()
             remove()
-            //todo checkFail
+            checkFail()
         }
 
-        scheduledTime = failAt ?: Double.MAX_VALUE
+        scheduledTime = failAt?.sample() ?: Double.MAX_VALUE
         failed = false
 
-        val q = 1
+//        val rr = resourceRequests.first()
+        resourceRequests.forEach { (r, quantity, priority) ->
+            var q = 1 -quantity
 
-        val priority = Int.MAX_VALUE
 
-        val r = resources.first()
+            if (r.isPreemptive && resourceRequests.size > 1) {
+                throw IllegalArgumentException("preemptive resources do not support multiple resource requests")
+            }
 
-        if (r.isPreemptive && resources.size > 1) {
-            throw IllegalArgumentException("preemptive resources do not support multiple resource requests")
+
+            // TODO
+            if(calledFrom == "put"){
+                q = -q
+            }
+
+            require(q > 0 || r.anonymous){ "quantity <0" }
+
+            //  is same resource is specified several times, just add them up
+            //https://stackoverflow.com/questions/53826903/increase-value-in-mutable-map
+            requests.merge(r, q, Double::plus)
+
+
+            val reqText = (calledFrom ?: "") + "request ${q} from ${r.name}  with priority ${priority} and oneof=${oneOf}"
+
+
+//            enterSorted(r.requesters, priority)
+            r.requesters.add(this, priority)
+
+            env.printTrace(
+                now(),
+                env.curComponent,
+                this,
+                REQUESTING.toString() + " " + r.name
+            )
+
+            // TODO build test case (current implementation seems incorrect & incomplete
+            if (r.isPreemptive) {
+                var av = r.availableQuantity()
+                val thisClaimers = r.claimers.q
+
+                var bumpCandidates= mutableListOf<Component>()
+//                val claimComponents = thisClaimers.map { it.c }
+                for (cqe in thisClaimers.reversed() ) {
+                    if (av >= q) {
+                        break
+                    }
+
+                    // check if prior of component
+                    if (priority !=null && priority >= (thisClaimers.find { it.c ==  this }?.priority ?: Int.MIN_VALUE)) {
+                        break
+                    }
+
+                    av += quantity
+                    bumpCandidates.add(cqe.c)
+                }
+
+                if(av >=0){
+                    bumpCandidates.forEach{
+                        it.releaseInternal(r)
+                        env.printTrace("$it bumped from $r by $this")
+                        it.activate()
+                    }
+                }
+            }
         }
 
-//        if(requests.contains(r)){
-        //  is same resource is specified several times, just add them up
 
-        //https://stackoverflow.com/questions/53826903/increase-value-in-mutable-map
-        requests.merge(r, 1, Int::plus)
-//        }
-
-        enterSorted(r.requesters, priority)
-
-        env.printTrace(now(), env.curComponent, this, REQUESTING.toString() + " " + r.name)
-
-        if (r.isPreemptive) {
-            val av = r.availableQuantity()
-            val claimers = r.claimers
-
-            for (c in claimers.reversed()) {
-                if (av >= q) {
-                    break
-                }
-
-                if (priority >= claimers.first { it == r }.priority) {
-                    break
-                }
-
-                TODO()
-                // unclear
-//                av+= c._claims.toMap().claimers.first { it ==c }
-            }
+        requests.forEach{ (resource, quantity) ->
+            if(quantity< resource.minq)
+                resource.minq= quantity
         }
 
         tryRequest()
@@ -305,13 +366,14 @@ open class Component(
             reschedule(scheduledTime, 0, false, "request")
         }
 
-        return
+        return this
     }
 
     private fun tryRequest() {
         TODO("Not yet implemented")
     }
 
+    @Deprecated("no longer needed, handled by queue directly")
     private fun enterSorted(requesters: Queue<Component>, priority: Int) {
         TODO("Not yet implemented")
     }
@@ -444,11 +506,19 @@ open class Component(
     }
 
     private fun checkFail() {
-//        TODO("Not yet implemented")
+        if (requests.isNotEmpty()) {
+            env.printTrace("request failed")
+            requests.clear()
+        }
+        if (waits.isNotEmpty()) {
+            env.printTrace("request failed")
+            waits.clear()
+        }
+
+        TODO("Not yet implemented")
 //        if(requests.isNotEmpty()){
 //            requests.forEach{ leave()}
 //        }
-        requests.clear()
 //        wai
 //    wai
     }
@@ -494,12 +564,190 @@ open class Component(
     }
 
     fun callProcess() = process!!.call()
+
+    /**
+     *   release a quantity from a resource or resources
+     *
+     * It is not possible to release from an anonymous resource, this way.
+    Use Resource.release() in that case.
+     *
+     * @param  quantity  quantity to be released. If not specified, the resource will be emptied completely.
+     * For non-anonymous resources, all components claiming from this resource will be released.
+     */
+    fun release(resource: Resource) {
+        require(resource.anonymous == false) { " It is not possible to release from an anonymous resource, this way.            Use Resource.release() in that case." }
+
+        // TODO Incomplete implementation in case of arguments
+
+        if (claims.containsKey(resource)) {
+            releaseInternal(resource)
+        }
+
+    }
+
+    private fun releaseInternal(resource: Resource, q: Double? = null) {
+        require(resource in claims) { "$name not claiming from resource ${resource.name}" }
+
+        val quantity = if (q == null) {
+            claims[resource]!!
+        } else if (q > claims[resource]!!) {
+            claims[resource]!!
+        } else {
+            q
+        }
+
+        resource.claimedQuantity -= quantity
+
+        claims[resource] = claims[resource]!! - quantity
+
+        if (claims[resource]!! < 1E-8) {
+            leave(resource.claimers)
+        }
+    }
+
+    // todo states may have different types so this methods does not make real sense here. Either remove type from state or enforce the user to call wait multiple times
+    fun <T> wait(
+        state: State<T>,
+        value: T,
+        failAt: RealDistribution? = null,
+        failDelay: RealDistribution? = null
+    ): Component = wait(
+        StateRequest(state, { state.value == value }),
+//        *states.map { StateRequest(it) }.toTypedArray(),
+        failAt = failAt,
+        failDelay = failDelay,
+    )
+
+
+    /**
+     * Wait for any or all of the given state values are met
+     *
+     * @sample TODO
+     *
+     * @param args Sequence of items, where each item can be
+    - a state, where value=True, priority=tail of waiters queue)
+    - a tuple/list containing
+    state, a value and optionally a priority.
+    if the priority is not specified, this component will
+    be added to the tail of the waiters queue
+
+     *
+     * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
+     *
+     * @param failDelay  If the request is not honored before now+fail_delay,
+    the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
+
+     */
+    fun wait(
+        vararg stateRequests: StateRequest<*>,
+        //todo change to support distribution parameters instead
+        failAt: RealDistribution? = null,
+        failDelay: RealDistribution? = null,
+        oneOf: Boolean = false
+    ): Component {
+
+        if (status != CURRENT) {
+            requireNotData()
+            requireNotMain()
+            remove()
+            checkFail()
+        }
+
+        scheduledTime = env.now +
+                (failAt?.sample() ?: Double.MAX_VALUE) +
+                (failDelay?.sample() ?: 0.0)
+
+
+        stateRequests
+            // skip already tracked states
+            .filterNot { sr -> waits.any { it.state == sr.state } }
+            .forEach { (state, _, priority) ->
+                    state.addWaiter(this, priority)
+            }
+
+        tryWait()
+
+        if (waits.isNotEmpty()) {
+            reschedule(scheduledTime, 0, false, "wait")
+        }
+
+        return this
+    }
+
+    private fun tryWait(): Boolean {
+        if (status == INTERRUPTED) {
+            return false
+        }
+
+        val honored = if(waitAll) {
+            waits.all { sr ->
+                (sr as StateRequest<Any>).predicate(sr.state as State<Any>)
+            }
+        }else{
+            waits.any { sr ->
+                (sr as StateRequest<Any>).predicate(sr.state as State<Any>)
+            }
+        }
+
+        if(honored){
+            waits.forEach { sr-> sr.state.removeWaiter(this)}
+            waits.clear()
+            reschedule(scheduledTime, 0, false, "wait")
+        }
+
+        return honored
+    }
+
+    /**
+     * Leave queue
+     *
+     * @param q Queue queue to leave
+     */
+    fun leave(q: ComponentQueue<Component>) {
+        env.printTrace("leave ${q.name}")
+        q.remove(this)
+    }
 }
+
+
+
+typealias FunPointer = KFunction<*>
+typealias GenProcess = KFunction1<*, Sequence<Component>>
+
+
+interface SimProcess {
+    fun call()
+}
+
+class GenProcessInternal(val component: Component, seq: Sequence<Component>) : SimProcess {
+
+    val iterator = seq.iterator()
+
+    override fun call() {
+        try {
+            iterator.next()
+        } catch (e: NoSuchElementException) {
+            component.terminate()
+        }
+
+        //todo reenable
+//        if(!iterator.hasNext()) {
+//
+//        }
+    }
+}
+
+class SimpleProcessInternal(val component: Component, val funPointer: FunPointer) : SimProcess {
+    override fun call() {
+        funPointer.call(component)
+    }
+}
+
 
 data class QueueElement(val time: Double, val priority: Int, val seq: Int, val component: Component) :
     Comparable<QueueElement> {
     override fun compareTo(other: QueueElement): Int {
-        return compareValuesBy(this, other, { it.time }, { it.priority })
+        return compareValuesBy(this, other, { it.priority }, { it.time })
     }
 
     override fun toString(): String {
@@ -507,9 +755,37 @@ data class QueueElement(val time: Double, val priority: Int, val seq: Int, val c
     }
 }
 
-enum class State {
+enum class ComponentState {
     DATA, CURRENT, STANDBY, PASSIVE, INTERRUPTED, SCHEDULED, REQUESTING, WAITING
 }
 
-internal fun Any.nameOrDefault(name: String?) =
-    name ?: javaClass.simpleName + "." + getComponentCounter(javaClass.simpleName)
+data class ResourceRequest(val r: Resource, val quantity: Double, val priority: Int? = null)
+
+fun main() {
+    val (state, predicate, priority) = StateRequest(State("foo"), { it.value == "House" })
+    predicate(state)
+}
+
+//    data class StateRequest<T>(val s: State<T>, val value: T? = null, val priority: Int? = null)
+data class StateRequest<T>(val state: State<T>, val predicate: (State<T>) -> Boolean, val priority: Int? = null) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as StateRequest<*>
+
+        if (state != other.state) return false
+        if (predicate != other.predicate) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = state.hashCode()
+        result = 31 * result + predicate.hashCode()
+        return result
+    }
+}
+
+
+infix fun Resource.withQuantity(quantity: Double) = ResourceRequest(this, quantity)

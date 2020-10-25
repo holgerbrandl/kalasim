@@ -1,10 +1,7 @@
 package org.github.holgerbrandl.kalasim.examples.kalasim
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
-import org.github.holgerbrandl.kalasim.Component
-import org.github.holgerbrandl.kalasim.ComponentGenerator
-import org.github.holgerbrandl.kalasim.Resource
-import org.github.holgerbrandl.kalasim.createSimulation
+import org.github.holgerbrandl.kalasim.*
 import org.koin.core.get
 import org.koin.core.inject
 import org.koin.core.qualifier.named

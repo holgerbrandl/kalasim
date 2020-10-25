@@ -1,10 +1,14 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+//val kotlinVersion = KotlinVersion.CURRENT
+
 plugins {
     kotlin("jvm") version "1.4.10"
     application
     `maven-publish`
     id("com.jfrog.bintray") version "1.8.5"
+
+    kotlin("plugin.serialization") version "1.4.10"
 }
 
 group = "com.github.holgerbrandl"
@@ -21,6 +25,10 @@ dependencies {
     implementation("org.apache.commons:commons-math3:3.6.1")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.10")
     implementation("org.koin:koin-core:2.1.6")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
+
 //    implementation("org.koin:koin-core:2.2.0-rc-2")
 
     testImplementation(kotlin("test-junit"))
@@ -29,7 +37,7 @@ dependencies {
     testImplementation(kotlin("script-runtime"))
 }
 
-tasks.withType<KotlinCompile>() {
+tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
@@ -68,7 +76,7 @@ bintray {
 
     pkg(closureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
         repo = "github"
-        name = "desim"
+        name = "kalasim"
         websiteUrl = "https://github.com/holgerbrandl/kalasim"
 //        description = "Simple Lib for TLS/SSL socket handling written in Kotlin"
 //        setLabels("kotlin")
@@ -95,35 +103,3 @@ bintray {
 //        }
     })
 }
-
-//
-//if (hasProperty('bintray_user') && hasProperty('bintray_key')) {
-//    bintray {
-//
-//        // property must be set in ~/.gradle/gradle.properties
-//        user = bintray_user
-//        key = bintray_key
-//
-//        publications = ['maven'] //When uploading configuration files
-//
-//        dryRun = false //Whether to run this as dry-run, without deploying
-//        publish = true // If version should be auto published after an upload
-//
-//        pkg {
-//            repo = 'mpicbg-scicomp'
-//            name = 'krangl'
-//            vcsUrl = 'https://github.com/holgerbrandl/krangl'
-//
-//            licenses = ['MIT']
-//            publicDownloadNumbers = true
-//
-//            //Optional version descriptor
-//            version {
-//                name = project.version //Bintray logical version name
-//                desc = '.'
-//                released = new Date()
-//                vcsTag = 'v' + project.version
-//            }
-//        }
-//    }
-//}

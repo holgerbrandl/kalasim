@@ -5,9 +5,15 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics
 import org.koin.core.KoinComponent
 import java.util.*
 
-data class CQElement<T : Component>(val t: T, val enterTime: Double)
+data class CQElement<C : Component>(val c: C, val enterTime: Double, val priority: Int? = null)
 
-class ComponentQueue<T : Component>(name: String? = null, val q: Queue<CQElement<T>> = LinkedList()) :
+class ComponentQueue<T : Component>(
+    name: String? = null,
+//    val q: Queue<CQElement<T>> = LinkedList()
+    val q: Queue<CQElement<T>> = PriorityQueue(kotlin.Comparator { o1, o2 ->
+         compareValuesBy(o1, o2, { it.priority })
+    })
+) :
     KoinComponent, SimulationEntity(name) {
 
     val size: Int
@@ -18,12 +24,12 @@ class ComponentQueue<T : Component>(name: String? = null, val q: Queue<CQElement
     val queueLengthStats = Frequency()
 
 
-    fun add(element: T): Boolean {
+    fun add(element: T, priority: Int?=null): Boolean {
         env.printTrace(element, "entering " + name)
 
         queueLengthStats.addValue(q.size)
 
-        return q.add(CQElement(element, env.now))
+        return q.add(CQElement(element, env.now, priority))
     }
 
     fun poll(): T {
@@ -38,7 +44,7 @@ class ComponentQueue<T : Component>(name: String? = null, val q: Queue<CQElement
     }
 
     fun remove(elem:T): T {
-        val (component, enterTime) = q.first { it.t == elem  }
+        val (component, enterTime) = q.first { it.c == elem  }
 
         env.printTrace( "leaving " + name)
 
@@ -70,17 +76,4 @@ class QueueStatistics(val queueLengthStats: Frequency, val lengthOfStayStats: Su
 //    todo serialize to json etc
 
     // add listener for live streaming
-}
-
-
-abstract class SimulationEntity(name: String?) : KoinComponent {
-    val env by lazy { getKoin().get<Environment>() }
-
-    var name: String
-        private set
-
-    init {
-        this.name = nameOrDefault(name)
-        env.printTrace("create ${this.name}")
-    }
 }

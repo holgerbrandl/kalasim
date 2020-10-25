@@ -8,6 +8,8 @@ open class Resource(
 ) : Component(name = name, process = null) {
 
 
+    var minq: Double = Double.MAX_VALUE
+
     // should we this make readonly from outside?
     val requesters = ComponentQueue<Component>()
     val claimers = ComponentQueue<Component>()

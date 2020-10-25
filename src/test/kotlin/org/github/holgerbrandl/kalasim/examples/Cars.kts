@@ -1,5 +1,5 @@
 import org.github.holgerbrandl.kalasim.Component
-import org.github.holgerbrandl.kalasim.examples.koiner.createSimulation
+import org.github.holgerbrandl.kalasim.createSimulation
 
 class Car : Component() {
     override suspend fun SequenceScope<Component>.process() {
