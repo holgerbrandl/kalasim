@@ -13,8 +13,7 @@ class ComponentQueue<T : Component>(
     val q: Queue<CQElement<T>> = PriorityQueue(kotlin.Comparator { o1, o2 ->
          compareValuesBy(o1, o2, { it.priority })
     })
-) :
-    KoinComponent, SimulationEntity(name) {
+) : KoinComponent, SimulationEntity(name) {
 
     val size: Int
         get() = q.size
@@ -62,6 +61,9 @@ class ComponentQueue<T : Component>(
 
     val stats: QueueStatistics
         get() = QueueStatistics(queueLengthStats, lengthOfStayStats)
+
+    override val info: Snapshot
+        get() = TODO()
 }
 
 class QueueStatistics(val queueLengthStats: Frequency, val lengthOfStayStats: SummaryStatistics) {

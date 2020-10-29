@@ -54,5 +54,11 @@ class ComponentGenerator<T : Component>(
         env.printTrace(now(), env.curComponent, this@ComponentGenerator, "till reached")
     }
 
-    fun printInfo(): Nothing = TODO("Implement me")
+    override val info: Snapshot
+        get() = ComponentGeneratorInfo(this)
+}
+
+
+class ComponentGeneratorInfo<T:Component>(cg: ComponentGenerator<T>): ComponentInfo(cg) {
+
 }

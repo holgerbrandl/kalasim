@@ -1,16 +1,24 @@
 package org.github.holgerbrandl.kalasim
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.apache.commons.math3.distribution.ConstantRealDistribution
 import org.apache.commons.math3.distribution.RealDistribution
 import org.github.holgerbrandl.kalasim.ComponentState.*
 import org.koin.core.KoinComponent
-import org.koin.core.inject
 import java.util.*
 import kotlin.reflect.KFunction
 import kotlin.reflect.KFunction1
 
 
-private val EPS = 1E-8
+internal val EPS = 1E-8
+
+
+enum class ComponentState {
+    DATA, CURRENT, STANDBY, PASSIVE, INTERRUPTED, SCHEDULED, REQUESTING, WAITING
+}
+
 
 /**
  * A salabim component is used as component (primarily for queueing)
@@ -26,15 +34,11 @@ open class Component(
     process: FunPointer? = Component::process,
     val priority: Int = 0,
     val delay: Int = 0
-) : KoinComponent {
+) : KoinComponent , SimulationEntity(name){
 
     private var oneOfRequest: Boolean = false
-    protected val env: Environment by inject()
 
-    var name: String
-        private set
-
-    private val requests = mapOf<Resource, Double>().toMutableMap()
+    internal val requests = mapOf<Resource, Double>().toMutableMap()
     private val waits = listOf<StateRequest<*>>().toMutableList()
     val claims = mapOf<Resource, Double>().toMutableMap()
 
@@ -51,8 +55,6 @@ open class Component(
     var status: ComponentState = DATA
 
     init {
-        this.name = nameOrDefault(name)
-
         val dataSuffix = if (process == null && this.name != MAIN) " data" else ""
         env.addComponent(this)
         env.printTrace(now(), env.curComponent, this, "create" + dataSuffix)
@@ -205,7 +207,7 @@ open class Component(
      *
      *  Not allowed for data components or main.
 
-     * @sample org.github.holgerbrandl.kalasim.examples.kalasim.GasStation.main
+     * @sample org.github.holgerbrandl.kalasim.examples.kalasim.Refuel.main
      */
     fun request(
         vararg resources: Resource,
@@ -252,7 +254,7 @@ open class Component(
      *
      * The parameter failed will be reset by a calling request or wait
      *
-     * @sample org.github.holgerbrandl.kalasim.examples.kalasim.GasStation.main
+     * @sample org.github.holgerbrandl.kalasim.examples.kalasim.Refuel.main
      *
      * @param resourceRequests sequence of items where each item can be:
      * - resource, where quantity=1, priority=tail of requesters queue
@@ -297,29 +299,26 @@ open class Component(
 
 //        val rr = resourceRequests.first()
         resourceRequests.forEach { (r, quantity, priority) ->
-            var q = 1 - quantity
+            var q = quantity
 
 
-            if (r.isPreemptive && resourceRequests.size > 1) {
+            if (r.preemptive && resourceRequests.size > 1) {
                 throw IllegalArgumentException("preemptive resources do not support multiple resource requests")
             }
 
+//            // TODO clarify intent here
+//            if (calledFrom == "put") {
+//                q = -q
+//            }
 
-            // TODO
-            if (calledFrom == "put") {
-                q = -q
-            }
-
-            require(q > 0 || r.anonymous) { "quantity <0" }
+            require(q >= 0 || r.anonymous) { "quantity <0" }
 
             //  is same resource is specified several times, just add them up
             //https://stackoverflow.com/questions/53826903/increase-value-in-mutable-map
             requests.merge(r, q, Double::plus)
 
-
             val reqText =
-                (calledFrom ?: "") + "request ${q} from ${r.name}  with priority ${priority} and oneof=${oneOf}"
-
+                (calledFrom ?: "") + "requesting ${q} from ${r.name} with priority ${priority} and oneof=${oneOf}"
 
 //            enterSorted(r.requesters, priority)
             r.requesters.add(this, priority)
@@ -333,7 +332,7 @@ open class Component(
             )
 
             // TODO build test case (current implementation seems incorrect & incomplete
-            if (r.isPreemptive) {
+            if (r.preemptive) {
                 var av = r.availableQuantity()
                 val thisClaimers = r.claimers.q
 
@@ -364,7 +363,6 @@ open class Component(
                 }
             }
         }
-
 
         requests.forEach { (resource, quantity) ->
             if (quantity < resource.minq)
@@ -415,17 +413,20 @@ open class Component(
         if (rHonor.isNullOrEmpty()) return false
 
         requests
-            .filterNot { it.key.anonymous }
+//            .filterNot { it.key.anonymous }
             .forEach { (resource, quantity) ->
-                // just if request was honored claim it
-                if (rHonor.none { it.first == resource }) {
+                // proceed just if request was honored claim it
+                if (rHonor.any { it.first == resource }) {
                     resource.claimedQuantity += quantity //this will also update the monitor
-                    val thisPrio = resource.requesters.q.first { it.c == this }.priority
 
-                    claims.merge(resource, quantity, Double::plus)
+                    if(!resource.anonymous) {
+                        val thisPrio = resource.requesters.q.firstOrNull { it.c == this }?.priority
+                        claims.merge(resource, quantity, Double::plus)
 
-                    if (resource.claimers.q.none { it.c == this }) {
-                        resource.claimers.add(this, thisPrio)
+                        //also register as claimer in resource if not yet present
+                        if (resource.claimers.q.none { it.c == this }) {
+                            resource.claimers.add(this, thisPrio)
+                        }
                     }
                 }
 
@@ -439,6 +440,7 @@ open class Component(
 
         reschedule(now(), 0,false, "request honor $honorInfo")
 
+        // process negative put requests (todo can't we handle them separately)
         rHonor.filter { it.first.anonymous }.forEach { it.first.tryRequest() }
 
         return true
@@ -628,10 +630,6 @@ open class Component(
         env.eventQueue.add(QueueElement(scheduledTime, priority, heapSeq, this))
     }
 
-    override fun toString(): String {
-        //todo implement bits from print_info
-        return "todo implement bits from print_info" + super.toString()
-    }
 
     fun callProcess() = process!!.call()
 
@@ -645,7 +643,7 @@ open class Component(
      * For non-anonymous resources, all components claiming from this resource will be released.
      */
     fun release(resource: Resource) {
-        require(resource.anonymous == false) { " It is not possible to release from an anonymous resource, this way.            Use Resource.release() in that case." }
+        require(!resource.anonymous) { " It is not possible to release from an anonymous resource, this way.            Use Resource.release() in that case." }
 
         // TODO Incomplete implementation in case of arguments
 
@@ -682,7 +680,7 @@ open class Component(
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null
     ): Component = wait(
-        StateRequest(state, { state.value == value }),
+        StateRequest(state) { state.value == value },
 //        *states.map { StateRequest(it) }.toTypedArray(),
         failAt = failAt,
         failDelay = failDelay,
@@ -733,7 +731,7 @@ open class Component(
         stateRequests
             // skip already tracked states
             .filterNot { sr -> waits.any { it.state == sr.state } }
-            .forEach { (state, _, priority) ->
+            .forEach { (state, priority, _) ->
                 state.addWaiter(this, priority)
             }
 
@@ -780,9 +778,49 @@ open class Component(
         env.printTrace("leave ${q.name}")
         q.remove(this)
     }
+
+
+    public override val info: Snapshot
+        get() = ComponentInfo(this)
 }
 
 
+@Serializable
+abstract class Snapshot {
+    override fun toString(): String {
+        return Json.encodeToString(this)
+    }
+}
+
+/** Captures the current state of a `State`*/
+open class ComponentInfo(c: Component) : Snapshot() {
+
+    val name = c.name
+    val status = c.status
+    val creationTime = c.creationTime
+    val scheduledTime = c.scheduledTime
+
+    val claims = c.claims.toList()
+    val requests = c.requests.toMap()
+}
+
+
+fun main() {
+    Component("foo").info.println()
+}
+
+/** Captures the current state of a `State`*/
+@Serializable
+internal data class ComponentInfo2(val time: Double, val name: String, val value: String, val waiters: List<String>) {
+    override fun toString(): String {
+        return Json.encodeToString(this)
+    }
+}
+
+
+//
+// Abstract component process to be either generator or simple function
+//
 
 typealias FunPointer = KFunction<*>
 typealias GenProcess = KFunction1<*, Sequence<Component>>
@@ -828,19 +866,12 @@ data class QueueElement(val time: Double, val priority: Int, val seq: Int, val c
     }
 }
 
-enum class ComponentState {
-    DATA, CURRENT, STANDBY, PASSIVE, INTERRUPTED, SCHEDULED, REQUESTING, WAITING
-}
 
 data class ResourceRequest(val r: Resource, val quantity: Double, val priority: Int? = null)
 
-fun main() {
-    val (state, predicate, _) = StateRequest(State("foo"), { it.value == "House" })
-    predicate(state)
-}
 
 //    data class StateRequest<T>(val s: State<T>, val value: T? = null, val priority: Int? = null)
-data class StateRequest<T>(val state: State<T>, val predicate: (State<T>) -> Boolean, val priority: Int? = null) {
+data class StateRequest<T>(val state: State<T>, val priority: Int? = null, val predicate: (State<T>) -> Boolean) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

@@ -1,11 +1,18 @@
 package org.github.holgerbrandl.kalasim;
 
+import kotlinx.serialization.Serializable
+
+/**
+ * @param preemptive If a component requests from a preemptive resource, it may bump component(s) that are claiming from
+the resource, provided these have a lower priority = higher value). If component is bumped, it releases the resource and is the activated, thus essentially stopping the current action (usually hold or passivate). Therefore, it is necessary that a component claiming from a preemptive resource should check
+whether the component is bumped or still claiming at any point where they can be bumped.
+ */
 open class Resource(
     name: String? = null,
     var capacity: Double = 1.0,
-    val isPreemptive: Boolean = false,
+    val preemptive: Boolean = false,
     val anonymous: Boolean = false
-) : Component(name = name, process = null) {
+) : SimulationEntity(name = name) {
 
 
     var minq: Double = Double.MAX_VALUE
@@ -22,29 +29,34 @@ open class Resource(
             availableQuantityMonitor.addValue(capacity - claimedQuantity)
             occupancyMonitor.addValue(if (capacity < 0) 0 else claimedQuantity)
 
-            env.printTrace("claim ${claimedQuantity} from $this")
+            env.printTrace("claim ${claimedQuantity} from $name")
         }
 
-    val claimedQuantityMonitor = NumericLevelMonitor()
 
     var availableQuantity = 0
         set(x) {
             field = x
             availableQuantityMonitor.addValue(x)
         }
-    val availableQuantityMonitor = NumericLevelMonitor()
 
 
-    val occupancyMonitor = NumericLevelMonitor()
+    val claimedQuantityMonitor = NumericLevelMonitor("Claimed quantity of $name")
+    val availableQuantityMonitor = NumericLevelMonitor("Available quantity of $name")
+    val occupancyMonitor = NumericLevelMonitor("Occupancy of $name")
 
     val capacityMonitor = NumericLevelMonitor("Capacity of ${name}").apply {
         addValue(capacity)
     }
 
+    init {
+        env.printTrace("create ${this.name} with capcacity ${capacity} "+ if(anonymous) "anonymous" else "")
+    }
+
     fun availableQuantity(): Double = capacity - claimedQuantity
 
 
-    override fun tryRequest(): Boolean {
+
+    fun tryRequest(): Boolean {
         val iterator = requesters.q.iterator()
 
         if (anonymous) {
@@ -56,7 +68,7 @@ open class Resource(
         } else {
             while (iterator.hasNext()) {
                 //try honor as many requests as possible
-                if (minq > (capacity - claimedQuantity + 1E-8)) {
+                if (minq > (capacity - claimedQuantity + EPS)) {
                     break
                 }
                 iterator.next().c.tryRequest()
@@ -77,11 +89,11 @@ open class Resource(
             val q = quantity ?: claimedQuantity
 
             claimedQuantity = -q
-            if (claimedQuantity < 1E-8) claimedQuantity = 0.0
+            if (claimedQuantity < EPS) claimedQuantity = 0.0
 
-
-            occupancyMonitor.addValue(if (capacity <= 0) 0 else claimedQuantity / capacity)
-            availableQuantityMonitor.addValue(capacity - claimedQuantity)
+            // done within decrementing claimedQuantity
+//            occupancyMonitor.addValue(if (capacity <= 0) 0 else claimedQuantity / capacity)
+//            availableQuantityMonitor.addValue(capacity - claimedQuantity)
 
         } else {
             require(quantity != null) { "quantity missing for non-anonymous resource" }
@@ -94,7 +106,26 @@ open class Resource(
 
     fun removeRequester(component: Component) {
         requesters.remove(component)
-        if(requesters.isEmpty()) minq = Double.MAX_VALUE
+        if (requesters.isEmpty()) minq = Double.MAX_VALUE
     }
+
+    override val info: Snapshot
+        get() = ResourceInfo(this)
 }
 
+@Serializable
+open class ResourceInfo : Snapshot {
+
+    constructor(c: Resource) : super() {
+        this.name = c.name
+        this.creationTime = c.creationTime
+        this.claimers = c.claimers.q.toList().map { it.c.name to it.priority }
+        this.requesters = c.requesters.q.toList().map { it.c.name to it.priority }
+    }
+
+    val name: String
+    val creationTime: Double
+
+    val claimers: List<Pair<String, Int?>>
+    val requesters: List<Pair<String, Int?>>
+}

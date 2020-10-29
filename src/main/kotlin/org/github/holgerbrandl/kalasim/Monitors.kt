@@ -20,7 +20,7 @@ abstract class Monitor<T>(name: String? = null) : KoinComponent {
     init {
         this.name = nameOrDefault(name)
 
-        env.printTrace("create ${this.name}")
+//        env.printTrace("create ${this.name}")
     }
 
     abstract fun reset()
@@ -109,6 +109,9 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
     //    val sumStats = SummaryStatistics()
     val sumStats = DescriptiveStatistics()
 
+    val values: DoubleArray
+        get() = sumStats.values
+
     open fun addValue(value: Number) {
         sumStats.addValue(value.toDouble())
     }
@@ -119,28 +122,28 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
 
     fun printStats() = sumStats.run {
         println(
-            """"
+            """
        |name
        |entries\t\t${n}
        |minimum\t\t${min}
        |mean\t\t${mean()}
        |minimum\t\t${min}
        |maximum\t\t${max}
-       |"""".trimMargin()
+       |""".trimMargin()
         )
 
         // also print histogram
         val hist = sumStats.buildHistogram().map{ 1000*it.toDouble()/ sumStats.sum}
         hist.forEachIndexed{ idx, value ->
-            "*".repeat(value.toInt()).padEnd(120,' ').println()
+            idx.toString()+"\t"+ "*".repeat(value.toInt()).padEnd(120,' ').println()
         }
     }
 
-    open fun mean() = sumStats.mean
+    open fun mean(): Double? = sumStats.mean
 }
 
 class NumericLevelMonitor(name: String? = null) : NumericStatisticMonitor(name) {
-    private val timestamps = listOf<Double>().toMutableList()
+    val timestamps = listOf<Double>().toMutableList()
 
     override fun addValue(value: Number) {
         timestamps.add(env.now)
@@ -153,8 +156,10 @@ class NumericLevelMonitor(name: String? = null) : NumericStatisticMonitor(name) 
         super.addValue(value)
     }
 
-    override fun mean(): Double {
+    override fun mean(): Double? {
         val durations = xDuration()
+
+        if(sumStats.values.isEmpty()) return null
 
         return Mean().evaluate(sumStats.values, durations)
     }

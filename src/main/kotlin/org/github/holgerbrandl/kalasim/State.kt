@@ -30,16 +30,15 @@ class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
 
     }
 
-    private val info: StateInfo
+    override val info
         get() = StateInfo(env.now, name, value.toString(), waiters.q.map { it.c.name })
-
-    fun printInfo() = info.println()
 
 }
 
+
 /** Captures the current state of a `State`*/
 @Serializable
-data class StateInfo(val time: Double, val name: String, val value: String, val waiters: List<String>) {
+data class StateInfo(val time: Double, val name: String, val value: String, val waiters: List<String>) : Snapshot(){
     override fun toString(): String {
         return Json.encodeToString(this)
     }

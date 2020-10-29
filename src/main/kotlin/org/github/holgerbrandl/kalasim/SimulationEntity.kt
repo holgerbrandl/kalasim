@@ -8,10 +8,17 @@ abstract class SimulationEntity(name: String?) : KoinComponent {
     var name: String
         private set
 
+    val creationTime  = env.now
+
     init {
         this.name = nameOrDefault(name)
-        env.printTrace("create ${this.name}")
     }
+
+//    abstract fun getSnapshot(): Snapshot
+    protected abstract val info: Snapshot
+
+    fun printInfo() = info.println()
+    override fun toString(): String = "${javaClass.simpleName}($name)"
 }
 
 
@@ -26,4 +33,4 @@ private fun getComponentCounter(className: String) = componentCounters.merge(cla
 internal fun Any.nameOrDefault(name: String?) =
     name ?: this.javaClass.defaultName()
 
-internal fun Class<Any>.defaultName() = javaClass.simpleName + "." + getComponentCounter(javaClass.simpleName)
+internal fun Class<Any>.defaultName() = simpleName + "." + getComponentCounter(simpleName)

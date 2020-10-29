@@ -33,6 +33,7 @@ dependencies {
 
     testImplementation(kotlin("test-junit"))
     testImplementation("io.kotest:kotest-assertions-core:4.2.6")
+    testImplementation( "com.github.holgerbrandl:kravis:0.5.1")
 
     testImplementation(kotlin("script-runtime"))
 }
