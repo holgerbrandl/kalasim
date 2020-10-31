@@ -5,6 +5,7 @@ import org.apache.commons.math3.stat.Frequency
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.koin.core.KoinComponent
+import kotlin.math.roundToInt
 
 
 // See https://commons.apache.org/proper/commons-math/userguide/stat.html
@@ -115,6 +116,13 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
     open fun addValue(value: Number) {
         sumStats.addValue(value.toDouble())
     }
+
+    /** Increment the current value by 1 and add it as value. Autostart with 0 if there is no prior value. */
+    fun inc(){
+        val roundToInt = (values.lastOrNull() ?: 0.0).roundToInt()
+        addValue((roundToInt+1).toDouble())
+    }
+
 
     override fun reset() {
         TODO("Not yet implemented")

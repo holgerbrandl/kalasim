@@ -27,7 +27,7 @@ open class Resource(
 
             claimedQuantityMonitor.addValue(x)
             availableQuantityMonitor.addValue(capacity - claimedQuantity)
-            occupancyMonitor.addValue(if (capacity < 0) 0 else claimedQuantity)
+            occupancyMonitor.addValue(if (capacity < 0) 0 else claimedQuantity/capacity)
 
             env.printTrace("claim ${claimedQuantity} from $name")
         }

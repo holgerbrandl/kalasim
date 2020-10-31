@@ -33,14 +33,12 @@ To build and install it into your local maven cache, simply clone the repo and r
 
 ##  Features
 
-Currently we support a subset of features as documented under https://www.salabim.org/manual/ including
+Currently, `kalasim` supports the majaority of `salabim` features as documented under https://www.salabim.org/manual/ including
 * [Components](https://www.salabim.org/manual/Component.html)
 * [ComponentGenerator](https://www.salabim.org/manual/ComponentGenerator.html)
 * [Queue](https://www.salabim.org/manual/Queue.html)
 * [Distributions](https://www.salabim.org/manual/Distributions.html) (via apache-commons-math)
 * [Monitor](https://www.salabim.org/manual/Monitor.html) (via apache-commons-math)
-
-Planned
 * [Resource](https://www.salabim.org/manual/Resource.html)
 * [State](https://www.salabim.org/manual/State.html)
 

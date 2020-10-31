@@ -1,5 +1,6 @@
-package org.github.holgerbrandl.kalasim.examples.kalasim
+package org.github.holgerbrandl.kalasim.test
 
+import kravis.*
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.github.holgerbrandl.kalasim.*
 import org.koin.core.get
@@ -13,21 +14,26 @@ import org.koin.core.qualifier.named
  * desired amount of gas from it. If the stations reservoir is
  * depleted, the car has to wait for the tank truck to arrive.
  */
-object Refuel {
+object DeterministicRefuel {
 
     // based on SimPy example model
-    val GAS_STATION_SIZE = 200.0  // liters
+    val GAS_STATION_SIZE = 2000.0  // liters
     val THRESHOLD = 25.0  // Threshold for calling the tank truck (in %)
     val FUEL_TANK_SIZE = 50.0  // liters
-    val FUEL_TANK_LEVEL = UniformRealDistribution(5.0, 25.0) // Min/max levels of fuel tanks (in liters)
+    val FUEL_TANK_LEVEL = UniformRealDistribution(5.0, 25.0).apply {  reseedRandomGenerator(1) }// Min/max levels of fuel tanks (in liters)
     val REFUELING_SPEED = 2.0  // liters / second
     val TANK_TRUCK_TIME = 300.0  // Seconds it takes the tank truck to arrive
-    val T_INTER = UniformRealDistribution(10.0, 100.0)  // Create a car every [min, max] seconds
+    val T_INTER = UniformRealDistribution(100.0, 200.0).apply{reseedRandomGenerator(1)}  // Create a car every [min, max] seconds
 //    val SIM_TIME = 200000.0  // Original Simulation time in seconds
     val SIM_TIME = 20000.0  // Simulation time in seconds
 
 
     private val FUEL_PUMP = "fuel_pump"
+
+    private val CAR_LEAVING = "car_leaving"
+
+    private val TRUCKS_EN_ROUTE = "trucks_on_the_road"
+    private val TRUCKS_ORDERED = "trucks_ordered"
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -64,10 +70,18 @@ object Refuel {
                 if ((fuelPump.availableQuantity() - litersRequired) / fuelPump.capacity * 100 < THRESHOLD) {
                     env.printTrace("running out of fuel at $gasStation. Ordering new fuel truck...")
                     TankTruck()
+
+                    // track number of trucks
+                    get<NumericLevelMonitor>(named(TRUCKS_ORDERED)).inc()
+                    get<NumericLevelMonitor>(named(TRUCKS_EN_ROUTE)).addValue(
+                        env.eventQueue.map{ it.component}.count { it is TankTruck }
+                    )
                 }
 
                 yield(request(fuelPump withQuantity litersRequired))
                 yield(hold(litersRequired / REFUELING_SPEED))
+                get<NumericLevelMonitor>(named(CAR_LEAVING)).inc()
+//                get<NumericLevelMonitor>(named(TRUCKS_EN_ROUTE)).inc()
             }
         }
 
@@ -78,6 +92,9 @@ object Refuel {
             single { GasStation() }
 
             single(qualifier = named(FUEL_PUMP)) { Resource(FUEL_PUMP, GAS_STATION_SIZE, anonymous = true) }
+            single(qualifier = named(CAR_LEAVING)) { NumericLevelMonitor(CAR_LEAVING) }
+            single(qualifier = named(TRUCKS_EN_ROUTE)) { NumericLevelMonitor(TRUCKS_EN_ROUTE) }
+            single(qualifier = named(TRUCKS_ORDERED)) { NumericLevelMonitor(TRUCKS_ORDERED) }
         }.apply {
 
             ComponentGenerator(iat = T_INTER) { Car(get()) }
@@ -92,8 +109,29 @@ object Refuel {
                 availableQuantityMonitor.printStats()
             }
 
+
             get<GasStation>().requesters.queueLengthStats.println()
             get<GasStation>().requesters.lengthOfStayStats.println()
+
+            // save the simulation state to file
+//            Json.encodeToString(this).println()
+
+            get<GasStation>().claimedQuantityMonitor.display()
+            fuelPump.claimedQuantityMonitor.display()
+            get<NumericLevelMonitor>(named(CAR_LEAVING)).display()
+            get<NumericLevelMonitor>(named(TRUCKS_EN_ROUTE)).display()
+            get<NumericLevelMonitor>(named(TRUCKS_ORDERED)).display()
         }
     }
+}
+
+internal fun NumericLevelMonitor.display() {
+    apply {
+        val data = timestamps.zip(values.toList())
+        data.plot(
+            x =  Pair<Double,Double>::first,
+            y =  Pair<Double,Double>::second
+        ).xLabel("time").yLabel("").geomLine().title(name).show()
+    }
+
 }

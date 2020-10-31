@@ -34,7 +34,7 @@ open class Component(
     process: FunPointer? = Component::process,
     val priority: Int = 0,
     val delay: Int = 0
-) : KoinComponent , SimulationEntity(name){
+) : KoinComponent, SimulationEntity(name){
 
     private var oneOfRequest: Boolean = false
 
@@ -676,11 +676,11 @@ open class Component(
     // todo states may have different types so this methods does not make real sense here. Either remove type from state or enforce the user to call wait multiple times
     fun <T> wait(
         state: State<T>,
-        value: T,
+        waitFor: T,
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null
     ): Component = wait(
-        StateRequest(state) { state.value == value },
+        StateRequest(state) { state.value == waitFor },
 //        *states.map { StateRequest(it) }.toTypedArray(),
         failAt = failAt,
         failDelay = failDelay,
