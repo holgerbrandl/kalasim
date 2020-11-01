@@ -2,92 +2,21 @@
 
 Discrete Event Simulator
 
-
 [ ![Download](https://api.bintray.com/packages/holgerbrandl/github/kalasim/images/download.svg) ](https://bintray.com/holgerbrandl/github/kalasim/_latestVersion)  [![Build Status](https://travis-ci.org/holgerbrandl/kalasim.svg?branch=master)](https://travis-ci.org/holgerbrandl/kalasim) [![Gitter](https://badges.gitter.im/kalasim.svg)](https://gitter.im/kalasim/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-This repo is a rather blunt copy of https://www.salabim.org/. It reimplements all core APIs of salabim in a more typesafe API, better test coverage, real-time capabilities,
+
+`kalasim` is a discrete event simulator with type support, dependency injection, modern persistence and logging to enable large-scale, industrial-ready simulations.
 
 
-## Installation
-
-To get started simply add it as a dependency via Jcenter:
-```
-implementation "com.github.holgerbrandl:kalasim:0.1"
-```
-
-You can also use [JitPack with Maven or Gradle](https://jitpack.io/#holgerbrandl/kalasim) to build the latest snapshot as a dependency in your project.
-
-```groovy
-repositories {
-    maven { url 'https://jitpack.io' }
-}
-dependencies {
-        implementation 'com.github.holgerbrandl:kalasim:-SNAPSHOT'
-}
-```
-
-To build and install it into your local maven cache, simply clone the repo and run
-```bash
-./gradlew install
-```
-
-##  Features
-
-Currently, `kalasim` supports the majaority of `salabim` features as documented under https://www.salabim.org/manual/ including
-* [Components](https://www.salabim.org/manual/Component.html)
-* [ComponentGenerator](https://www.salabim.org/manual/ComponentGenerator.html)
-* [Queue](https://www.salabim.org/manual/Queue.html)
-* [Distributions](https://www.salabim.org/manual/Distributions.html) (via apache-commons-math)
-* [Monitor](https://www.salabim.org/manual/Monitor.html) (via apache-commons-math)
-* [Resource](https://www.salabim.org/manual/Resource.html)
-* [State](https://www.salabim.org/manual/State.html)
+`kalasim` started off as a blunt rewrite of [salabim](https://www.salabim.org/). `salabim` is written in python and provides a great model to built simulations. `kalasim` reimplements all core APIs of `salabim` in a more typesafe API while providing better test coverage, real-time capabilities and (arguably) more modern built-in support for visualization.
 
 
-Not planned
-* [Animation](https://www.salabim.org/manual/Animation.html) - which we believe should live in a different project
+`kalsim` is written in [Kotlin](https://kotlinlang.org/), designed on top of [koin](https://github.com/InsertKoinIO/koin) as dependency injection framework, is using [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) for event tracking and persistence, and [plotly.kt](https://github.com/mipt-npm/plotly.kt) as well as [`kravis`](https://github.com/holgerbrandl/kravis) for visualization.
+
+In contrast to many other simulation tools, `kalasim` is neither low-code nor no-code. It is _just-code_ to enable change tracking, scaling, refactoring, CI/CD, unit-tests, and the rest of the gang that makes development fun.
 
 
-## Example
+## Documentation
 
-```kotlin
-class Car : Component() {
-    override suspend fun SequenceScope<Component>.process() {
-            // wait for 1 sec
-            yield(hold(1.0))
-            // and terminate it
-            yield(terminate())
-    }
-}
+### >> [kalasim user guide](https://holgerbrandl.github.io/kalasim) <<
 
-createSimulation{
-    Car()
-}.run(5.0)
-
-```
-
-This example corresponds to the `Cars` `salabmim` example https://www.salabim.org/manual/Modeling.html
-
-## References
-
-Its started off as a blunt clone of `salabmin`, so the best reference is
-* https://www.salabim.org/
-* [Salabim paper](https://www.semanticscholar.org/paper/salabim%3A-discrete-event-simulation-and-animation-in-Ham/b513ce3d7cd56c478bb045d7080f7e34c0eb20de)
-
-
-`kalasim` is built on top of some great libraries
-* https://github.com/InsertKoinIO/koin for dependency injection,
-* [apache-commons-math](http://commons.apache.org/proper/commons-math/) for stats and distributions
-
-Further reading
-* https://jabm.sourceforge.io/doc/easss2013/jabm-beamer.pdf
-* https://en.wikipedia.org/wiki/Comparison_of_agent-based_modeling_software
-
-
-Other discrete simulation engines
-*  https://github.com/aybabtme/desim - written in
-
-## Terminology
-
-> Generator
-
-A `Component` that contains at least one yield.

@@ -21,8 +21,7 @@ theme:
 nav:
   - Home:
     - Introduction: index.md
-    - Technicalities: setup.md
-    - Technicalities: setup.md
+    - Setup: setup.md
     - FAQ: faq.md
   - Concepts:
     - Overview: concepts.md
