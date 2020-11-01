@@ -1,0 +1,46 @@
+site_name: kalasim - discrete event simulator
+
+site_url: https://squidfunk.github.io/mkdocs-material/
+site_author: Holger Brandl
+site_description: >-
+  Discrete event simulator with type support, dependency injection, modern persistence and logging to enable large-scale, industrial-ready simulations
+repo_name: holgerbrandl/kalasim
+repo_url: https://github.com/holgerbrandl/kalasim
+edit_uri: ""
+
+# Copyright
+copyright: Copyright &copy; 2020 - 2020 Holger Brandl
+
+theme:
+  name: material
+  features:
+    - navigation.expand
+    - navigation.instant
+    - navigation.tabs
+
+nav:
+  - Home:
+    - Introduction: index.md
+    - Technicalities: setup.md
+    - Technicalities: setup.md
+  - Concepts:
+    - Components: components.md
+    - Resources: resources.md
+    - States: state.md
+    - Examples: examples.md
+  - Analysis:
+    - Visualization: visual.md
+  - Advanced:
+    - Livemode: visual.md
+  - About: about.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/holgerbrandl
+    - icon: fontawesome/brands/gitter
+      link: https://gitter.im/holgerbrandl/kalasim
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/holgerbrandl
+    - icon: fontawesome/brands/linkedin
+      link: https://linkedin.com/in/holgerbrandl/
