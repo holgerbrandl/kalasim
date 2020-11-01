@@ -24,12 +24,13 @@ dependencies {
     // cant upgrade to 1.8 because of https://issues.apache.org/jira/browse/CSV-257
     implementation("org.apache.commons:commons-math3:3.6.1")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.10")
+
+    //https://github.com/InsertKoinIO/koin/issues/939
     implementation("org.koin:koin-core:2.1.6")
+//    implementation("org.koin:koin-core:2.2.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
-
-//    implementation("org.koin:koin-core:2.2.0-rc-2")
 
     testImplementation(kotlin("test-junit"))
     testImplementation("io.kotest:kotest-assertions-core:4.2.6")
