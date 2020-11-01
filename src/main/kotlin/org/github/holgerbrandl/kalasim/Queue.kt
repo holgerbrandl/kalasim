@@ -7,12 +7,12 @@ import java.util.*
 
 data class CQElement<C : Component>(val c: C, val enterTime: Double, val priority: Int? = null)
 
+//TODO add opt-out for queue monitoring
+
 class ComponentQueue<T : Component>(
     name: String? = null,
 //    val q: Queue<CQElement<T>> = LinkedList()
-    val q: Queue<CQElement<T>> = PriorityQueue(kotlin.Comparator { o1, o2 ->
-         compareValuesBy(o1, o2, { it.priority })
-    })
+    val q: Queue<CQElement<T>> = PriorityQueue { o1, o2 -> compareValuesBy(o1, o2, { it.priority }) }
 ) : KoinComponent, SimulationEntity(name) {
 
     val size: Int
@@ -23,8 +23,8 @@ class ComponentQueue<T : Component>(
     val queueLengthStats = Frequency()
 
 
-    fun add(element: T, priority: Int?=null): Boolean {
-        env.printTrace(element, "entering " + name)
+    fun add(element: T, priority: Int? = null): Boolean {
+        env.printTrace(element, "entering $name")
 
         queueLengthStats.addValue(q.size)
 
@@ -34,7 +34,7 @@ class ComponentQueue<T : Component>(
     fun poll(): T {
         val (element, enterTime) = q.poll()
 
-        env.printTrace(element, "leaving " + name)
+        env.printTrace(element, "leaving $name")
 
         lengthOfStayStats.addValue(enterTime)
         queueLengthStats.addValue(q.size)
@@ -42,10 +42,10 @@ class ComponentQueue<T : Component>(
         return element
     }
 
-    fun remove(elem:T): T {
-        val (component, enterTime) = q.first { it.c == elem  }
+    fun remove(elem: T): T {
+        val (component, enterTime) = q.first { it.c == elem }
 
-        env.printTrace( "leaving " + name)
+        env.printTrace("leaving $name")
 
         lengthOfStayStats.addValue(enterTime)
         queueLengthStats.addValue(q.size)
@@ -66,6 +66,7 @@ class ComponentQueue<T : Component>(
         get() = TODO()
 }
 
+@Suppress("MemberVisibilityCanBePrivate")
 class QueueStatistics(val queueLengthStats: Frequency, val lengthOfStayStats: SummaryStatistics) {
     fun print() {
         println("Queue Length:")

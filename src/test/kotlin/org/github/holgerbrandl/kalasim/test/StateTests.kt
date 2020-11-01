@@ -1,5 +1,7 @@
 package org.github.holgerbrandl.kalasim.test
 
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.shouldBe
 import org.github.holgerbrandl.kalasim.*
 import org.junit.Test
 import org.koin.core.get
@@ -15,7 +17,6 @@ class StateTests {
     @Test
     fun `it should wait until a predicate is met`() {
 
-
         class Car : Component(process = Car::waitForGreen) {
 
             val trafficLight = get<State<String>>()
@@ -27,18 +28,21 @@ class StateTests {
             }
         }
 
-        val sim = createSimulation {
+        val sim = configureEnvironment {
             single { State("red") }
-            single { Car() }
         }
 
-        val trafficLight = sim.get<State<String>>()
-//        val car = sim.get<Car>()
         sim.apply{
+            Car()
+
+            val trafficLight = get<State<String>>()
+
             trafficLight.printInfo()
             //todo assert on waiters
 
             run(10.0)
+
+            trafficLight.info.waiters.size shouldBe  1
 
             // toogle state
             trafficLight.value = "green"
@@ -47,6 +51,8 @@ class StateTests {
 
             //todo assert on waiters
             trafficLight.printInfo()
+
+            trafficLight.info.waiters.shouldBeEmpty()
         }
     }
 }

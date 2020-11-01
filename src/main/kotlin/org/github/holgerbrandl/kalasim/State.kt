@@ -1,7 +1,8 @@
 package org.github.holgerbrandl.kalasim
 
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 /**
  * States together with the Component.wait() method provide a powerful way of process interaction.
@@ -13,24 +14,39 @@ Definition is simple, like dooropen=sim.State('dooropen'). The default initial v
  */
 class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
 
-    var value = initialValue
+    var value: T = initialValue
+        set(value) {
+            if (field == value) return
 
-    val waiters = ComponentQueue<Component>("waiters of ${name}")
+            field = value
+
+            // todo ensure that this is called also for the initial value
+            valueMonitor.addValue(value)
+            env.printTrace("set value to ${value}")
+            tryWait()
+        }
+
+
+
+    private val valueMonitor = FrequencyLevelMonitor<T>()
+
+    internal val waiters = ComponentQueue<Component>("waiters of ${this.name}")
 //    val waiters = PriorityQueue<Component>()
 
-    fun addWaiter(component: Component, priority: Int?) =
-        waiters.add(component, priority)
+    override fun toString(): String = super.toString() + "[${value}]"
 
-    fun removeWaiter(component: Component) =
-        waiters.remove(component)
-
-    fun trigger(max: Int) {
+    fun trigger(max: Int, value:T, valueAfter: T?=null) {
 //        waiters.
         TODO("Not yet implemented")
 
     }
 
-    override val info
+    // conf example
+    private fun tryWait(max: Int = Int.MAX_VALUE) {
+        waiters.q.map { it.c }.take(max).forEach { it.tryWait() }
+    }
+
+    public override val info
         get() = StateInfo(env.now, name, value.toString(), waiters.q.map { it.c.name })
 
 }
@@ -38,7 +54,7 @@ class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
 
 /** Captures the current state of a `State`*/
 @Serializable
-data class StateInfo(val time: Double, val name: String, val value: String, val waiters: List<String>) : Snapshot(){
+data class StateInfo(val time: Double, val name: String, val value: String, val waiters: List<String>) : Snapshot() {
     override fun toString(): String {
         return Json.encodeToString(this)
     }

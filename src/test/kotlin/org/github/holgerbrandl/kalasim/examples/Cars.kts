@@ -1,4 +1,5 @@
 import org.github.holgerbrandl.kalasim.Component
+import org.github.holgerbrandl.kalasim.configureEnvironment
 import org.github.holgerbrandl.kalasim.createSimulation
 
 class Car : Component() {

@@ -14,6 +14,7 @@ import kotlin.reflect.KFunction1
 
 internal val EPS = 1E-8
 
+typealias ProcContext = SequenceScope<Component>
 
 enum class ComponentState {
     DATA, CURRENT, STANDBY, PASSIVE, INTERRUPTED, SCHEDULED, REQUESTING, WAITING
@@ -34,7 +35,7 @@ open class Component(
     process: FunPointer? = Component::process,
     val priority: Int = 0,
     val delay: Int = 0
-) : KoinComponent, SimulationEntity(name){
+) : KoinComponent, SimulationEntity(name) {
 
     private var oneOfRequest: Boolean = false
 
@@ -114,9 +115,9 @@ open class Component(
     }
 
     /** Generator function that implements "process". This can be overwritten in component classes a convenience alternative to process itself.*/
-    open suspend fun SequenceScope<Component>.process(it: Component) {}
+    open suspend fun ProcContext.process(it: Component) {}
 
-    open suspend fun SequenceScope<Component>.process() {}
+    open suspend fun ProcContext.process() {}
 
 
 //    open suspend fun SequenceScope<Component>.process() {
@@ -419,7 +420,7 @@ open class Component(
                 if (rHonor.any { it.first == resource }) {
                     resource.claimedQuantity += quantity //this will also update the monitor
 
-                    if(!resource.anonymous) {
+                    if (!resource.anonymous) {
                         val thisPrio = resource.requesters.q.firstOrNull { it.c == this }?.priority
                         claims.merge(resource, quantity, Double::plus)
 
@@ -436,9 +437,9 @@ open class Component(
         requests.clear()
         remove()
 
-        val honorInfo = rHonor.firstOrNull()!!.first.name + (if(rHonor.size> 1) "++" else "")
+        val honorInfo = rHonor.firstOrNull()!!.first.name + (if (rHonor.size > 1) "++" else "")
 
-        reschedule(now(), 0,false, "request honor $honorInfo")
+        reschedule(now(), 0, false, "request honor $honorInfo")
 
         // process negative put requests (todo can't we handle them separately)
         rHonor.filter { it.first.anonymous }.forEach { it.first.tryRequest() }
@@ -572,7 +573,7 @@ open class Component(
             at + delay
         }
 
-        reschedule(scheduledTime, priority, urgent, "hold" +  extra)
+        reschedule(scheduledTime, priority, urgent, "hold" + extra)
 
         return (this)
     }
@@ -732,7 +733,7 @@ open class Component(
             // skip already tracked states
             .filterNot { sr -> waits.any { it.state == sr.state } }
             .forEach { (state, priority, _) ->
-                state.addWaiter(this, priority)
+                state.waiters.add(this, priority)
             }
 
         tryWait()
@@ -744,7 +745,7 @@ open class Component(
         return this
     }
 
-    private fun tryWait(): Boolean {
+    internal fun tryWait(): Boolean {
         if (status == INTERRUPTED) {
             return false
         }
@@ -761,7 +762,7 @@ open class Component(
         }
 
         if (honored) {
-            waits.forEach { sr -> sr.state.removeWaiter(this) }
+            waits.forEach { sr -> sr.state.waiters.remove(this) }
             waits.clear()
             reschedule(scheduledTime, 0, false, "wait")
         }

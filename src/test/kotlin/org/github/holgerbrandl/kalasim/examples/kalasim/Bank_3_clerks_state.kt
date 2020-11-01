@@ -1,6 +1,6 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package org.github.holgerbrandl.kalasim.examples.koiner
+package org.github.holgerbrandl.kalasim.examples.kalasim
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.github.holgerbrandl.kalasim.*
@@ -10,10 +10,10 @@ import org.koin.core.inject
 
 fun main() {
 
-    class Customer(val worktodo: State<*>, val waitingLine: ComponentQueue<Customer>) : Component() {
+    class Customer(val workTodo: State<Boolean>, val waitingLine: ComponentQueue<Customer>) : Component() {
         override suspend fun SequenceScope<Component>.process(it: Component) {
             waitingLine.add(this@Customer)
-            worktodo.trigger(max = 1)
+            workTodo.trigger(max = 1, true)
             yield(passivate())
         }
     }
@@ -30,10 +30,11 @@ fun main() {
 
     class Clerk : Component() {
         val waitingLine: ComponentQueue<Customer> by inject()
-        val worktodo: State<Any> by inject()
+        val workTodo: State<Any> by inject()
 
         override suspend fun SequenceScope<Component>.process() {
-            while (waitingLine.isEmpty()) this@Clerk.wait(worktodo, true)
+            while (waitingLine.isEmpty())
+                yield(this@Clerk.wait(workTodo, true))
 
             val customer = waitingLine.poll()
 
@@ -42,9 +43,7 @@ fun main() {
         }
     }
 
-    val env = createSimulation {
-
-        repeat(3) { add { Clerk() } }
+    val env = configureEnvironment {
         add { ComponentQueue<Customer>("waitingline") }
         add { State<Any>("worktodo") }
 
@@ -55,6 +54,8 @@ fun main() {
 
 //        single { HelloServiceImpl(get()) as HelloService }
     }.apply {
+        repeat(3) { Clerk() }
+
         // register other components by simpliy
         CustomerGenerator()
     }.run(50000.0)

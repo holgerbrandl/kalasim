@@ -40,28 +40,32 @@ abstract class Monitor<T>(name: String? = null) : KoinComponent {
  *
  * @sample org.github.holgerbrandl.kalasim.examples.DokkaExamplesKt.freqLevelDemo
  */
-open class FrequencyMonitor<T : Comparable<T>>(name: String? = null) : Monitor<T>(name) {
-    val frequencies = Frequency()
+open class FrequencyMonitor<T>(name: String? = null) : Monitor<T>(name) {
+    val frequencies = mutableMapOf<T, Int>()
 
-    open fun addValue(value: Comparable<T>) {
-        frequencies.addValue(value)
+    open fun addValue(value: T) {
+        frequencies.merge(value, 1, Int::plus)
     }
+
+     val total: Int
+        get() = frequencies.values.sum()
 
     override fun reset() = frequencies.clear()
 
    open fun printHistogram() {
         println(name)
         println("----")
-        println("# Records: ${frequencies.getSumFreq()}")
+        println("# Records: ${total}")
         println()
         println("value\t%\tcount")
        // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
-        frequencies.valuesIterator().asSequence().map {
-            println("${it}\t${frequencies.getPct(it)}\t${frequencies.getCount(it)}")
+
+        frequencies.keys.asSequence().map {
+            println("${it}\t${getPct(it)}\t${frequencies[it]}")
         }
     }
 
-    open fun getPct(value: T): Double = frequencies.getPct(value)
+    open fun getPct(value: T): Double = frequencies[value]!!.toDouble()/total
 }
 
 /**
@@ -69,14 +73,13 @@ open class FrequencyMonitor<T : Comparable<T>>(name: String? = null) : Monitor<T
  *
  * @sample org.github.holgerbrandl.kalasim.examples.DokkaExamplesKt.freqLevelDemo
  */
-class FrequencyLevelMonitor<T : Comparable<T>>(name: String? = null) : FrequencyMonitor<T>(name) {
+class FrequencyLevelMonitor<T>(name: String? = null) : FrequencyMonitor<T>(name) {
     private val timestamps = listOf<Double>().toMutableList()
-    private val values = listOf<Comparable<T>>().toMutableList()
+    private val values = listOf<T>().toMutableList()
 
-    override fun addValue(value: Comparable<T>) {
+    override fun addValue(value: T) {
         timestamps.add(env.now)
         values.add(value)
-//        super.addValue(value)
     }
 
     override fun getPct(value: T): Double {

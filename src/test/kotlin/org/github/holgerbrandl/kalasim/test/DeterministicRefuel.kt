@@ -59,7 +59,7 @@ object DeterministicRefuel {
             //            val gasStation : Resource by inject(qualifier = named("gas_station"))
             val fuelPump: Resource by inject(qualifier = named(FUEL_PUMP))
 
-            override suspend fun SequenceScope<Component>.process(it: Component) {
+            override suspend fun ProcContext.process(it: Component) {
                 val fuelTankLevel = FUEL_TANK_LEVEL.sample()
 
                 yield(it.request(gasStation))
@@ -85,7 +85,7 @@ object DeterministicRefuel {
             }
         }
 
-        createSimulation {
+        configureEnvironment {
 
 //            single(qualifier = named("gas_station")) { Resource("gas_station", 2) }
 

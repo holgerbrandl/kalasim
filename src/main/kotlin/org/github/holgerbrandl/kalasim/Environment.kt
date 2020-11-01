@@ -12,9 +12,17 @@ import java.util.*
 
 const val MAIN = "main"
 
-fun createSimulation(builder: org.koin.core.module.Module.() -> Unit): Environment =
+// https://github.com/InsertKoinIO/koin/issues/801
+fun configureEnvironment(builder: org.koin.core.module.Module.() -> Unit): Environment =
     Environment(module(createdAtStart = true) { builder() })
 
+
+fun createSimulation(builder: Environment.() -> Unit): Environment =
+    Environment( ).apply(builder)
+
+fun Environment.createSimulation(builder: Environment.() -> Unit){
+    this.apply(builder)
+}
 
 class Environment(koins: org.koin.core.module.Module = module(createdAtStart = true) { }) : KoinComponent {
 

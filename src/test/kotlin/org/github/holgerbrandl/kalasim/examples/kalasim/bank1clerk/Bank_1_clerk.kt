@@ -6,7 +6,6 @@ import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.github.holgerbrandl.kalasim.*
 import org.koin.core.get
 import org.koin.core.inject
-import org.koin.dsl.module
 
 
 class Customer(val waitingLine: ComponentQueue<Customer>, val clerk: Clerk) : Component() {
@@ -61,7 +60,7 @@ class Clerk : Component() {
 
 fun main() {
 
-    val env = createSimulation {
+    val env = configureEnvironment {
 
         add { Clerk() }
         add { ComponentQueue<Customer>() }

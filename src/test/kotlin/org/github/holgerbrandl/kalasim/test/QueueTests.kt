@@ -3,7 +3,7 @@ package org.github.holgerbrandl.kalasim.test
 import org.github.holgerbrandl.kalasim.Component
 import org.github.holgerbrandl.kalasim.ComponentQueue
 import org.github.holgerbrandl.kalasim.add
-import org.github.holgerbrandl.kalasim.createSimulation
+import org.github.holgerbrandl.kalasim.configureEnvironment
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -17,7 +17,7 @@ class QueueTests {
         val tc = TraceCollector()
         val waitingLine by lazy { ComponentQueue<Foo>() }
 
-        val env = createSimulation {
+        val env = configureEnvironment {
             add { waitingLine }
         }
 

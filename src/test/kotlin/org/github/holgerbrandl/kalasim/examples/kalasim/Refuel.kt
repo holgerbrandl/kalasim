@@ -71,7 +71,7 @@ object Refuel {
             }
         }
 
-        createSimulation {
+        configureEnvironment {
 
 //            single(qualifier = named("gas_station")) { Resource("gas_station", 2) }
 
