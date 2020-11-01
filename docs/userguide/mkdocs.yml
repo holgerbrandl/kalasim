@@ -23,7 +23,9 @@ nav:
     - Introduction: index.md
     - Technicalities: setup.md
     - Technicalities: setup.md
+    - FAQ: faq.md
   - Concepts:
+    - Overview: concepts.md
     - Components: components.md
     - Resources: resources.md
     - States: state.md
@@ -32,7 +34,8 @@ nav:
     - Visualization: visual.md
   - Advanced:
     - Livemode: visual.md
-  - About: about.md
+  - About:
+    - about.md
 
 extra:
   social:
