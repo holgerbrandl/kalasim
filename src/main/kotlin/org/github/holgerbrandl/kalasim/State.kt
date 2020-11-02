@@ -55,12 +55,11 @@ class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
 
     // conf example
     private fun tryWait(max: Int = Int.MAX_VALUE) {
-        waiters.q.map { it.c }.take(max).forEach { it.tryWait() }
+        waiters.q.map { it.component }.take(max).forEach { it.tryWait() }
     }
 
     public override val info
-        get() = StateInfo(env.now, name, value.toString(), waiters.q.map { it.c.name })
-
+        get() = StateInfo(env.now, name, value.toString(), waiters.q.map { it.component.name })
 }
 
 
@@ -70,8 +69,4 @@ data class StateInfo(val time: Double, val name: String, val value: String, val 
     override fun toString(): String {
         return Json.encodeToString(this)
     }
-}
-
-fun main() {
-    State("foo").printInfo()
 }

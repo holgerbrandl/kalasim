@@ -2,6 +2,7 @@ package org.github.holgerbrandl.kalasim.test
 
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.yield
 import org.github.holgerbrandl.kalasim.*
 import org.junit.Test
 import org.koin.core.get
@@ -21,10 +22,10 @@ class StateTests {
 
             val trafficLight = get<State<String>>()
 
-            fun waitForGreen() {
-                wait(trafficLight, "green")
+            fun waitForGreen() = sequence {
+                yield(wait(trafficLight, "green"))
                 printTrace("passing crossing")
-                terminate()
+                yield(terminate())
             }
         }
 

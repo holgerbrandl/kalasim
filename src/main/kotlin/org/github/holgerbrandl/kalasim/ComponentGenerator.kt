@@ -59,6 +59,4 @@ class ComponentGenerator<T : Component>(
 }
 
 
-class ComponentGeneratorInfo<T:Component>(cg: ComponentGenerator<T>): ComponentInfo(cg) {
-
-}
+class ComponentGeneratorInfo<T:Component>(cg: ComponentGenerator<T>): ComponentInfo(cg)

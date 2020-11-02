@@ -8,7 +8,6 @@ import org.apache.commons.math3.distribution.RealDistribution
 import org.github.holgerbrandl.kalasim.ComponentState.*
 import org.koin.core.KoinComponent
 import java.util.*
-import kotlin.reflect.KFunction
 import kotlin.reflect.KFunction1
 
 
@@ -34,7 +33,7 @@ open class Component(
     name: String? = null,
     process: FunPointer? = Component::process,
     val priority: Int = 0,
-    val delay: Int = 0
+    private val delay: Int = 0
 ) : KoinComponent, SimulationEntity(name) {
 
     private var oneOfRequest: Boolean = false
@@ -46,7 +45,7 @@ open class Component(
     private var failed: Boolean = false
     private var waitAll: Boolean = false
 
-    private var process: SimProcess? = null
+    private var simProcess: SimProcess? = null
 
 
     var scheduledTime = Double.MAX_VALUE
@@ -62,7 +61,7 @@ open class Component(
 
 
         // if its a generator treat it as such
-        this.process = ingestFunPointer(process)
+        this.simProcess = ingestFunPointer(process)
 
         if (process != null) {
             scheduledTime = env.now + delay
@@ -105,6 +104,9 @@ open class Component(
     fun now() = env.now
 //    fun now() = env.now()
 
+    val now: Double
+        get() = now()
+
     open fun process() = this.let {
         sequence {
 //            while (true) { // disabled because too much abstraction
@@ -125,8 +127,35 @@ open class Component(
 //            yield(hold(1.0))
 //    }
 
+    /** @return `true` if status is `PASSIVE`, `false` otherwise. */
     val isPassive: Boolean
         get() = status == PASSIVE
+
+    /** @return `true` if status is `CURRENT`, `false` otherwise. */
+    val isCurrent: Boolean
+        get() = status == CURRENT
+
+    /** @return `true` if status is `STANDBY`, `false` otherwise. */
+    val isStandby: Boolean
+        get() = status == STANDBY
+
+    /** @return `true` if status is `INTERRUPTED`, `false` otherwise. */
+    val isInterrrupted: Boolean
+        get() = status == INTERRUPTED
+
+    /** @return `true` if status is `DATA`, `false` otherwise. */
+    val isData: Boolean
+        get() = status == DATA
+
+    /** @return `true` if status is `REQUESTING`, `false` otherwise. */
+    val isRequesting: Boolean
+        get() = requests.isNotEmpty()
+
+
+    /** @return `true` if waiting for a state to be honored, `false` otherwise. */
+    val isWaiting: Boolean
+        get() = waits.isNotEmpty()
+
 
     /** Passivate a component
      *
@@ -163,7 +192,7 @@ open class Component(
             //todo checkFail
         }
 
-        process = null
+        simProcess = null
         scheduledTime = Double.MAX_VALUE
 
         status = DATA
@@ -228,7 +257,7 @@ open class Component(
 //
     fun Double.asConstantDist() = ConstantRealDistribution(this)
 
-    fun fixed(value:Double) =  ConstantRealDistribution(value)
+    fun fixed(value: Double) = ConstantRealDistribution(value)
 
     /**
      * Request from a resource or resources
@@ -347,14 +376,14 @@ open class Component(
                     }
 
                     // check if prior of component
-                    if (priority != null && priority >= (thisClaimers.find { it.c == this }?.priority
+                    if (priority != null && priority >= (thisClaimers.find { it.component == this }?.priority
                             ?: Int.MIN_VALUE)
                     ) {
                         break
                     }
 
                     av += quantity
-                    bumpCandidates.add(cqe.c)
+                    bumpCandidates.add(cqe.component)
                 }
 
                 if (av >= 0) {
@@ -423,11 +452,11 @@ open class Component(
                     resource.claimedQuantity += quantity //this will also update the monitor
 
                     if (!resource.anonymous) {
-                        val thisPrio = resource.requesters.q.firstOrNull { it.c == this }?.priority
+                        val thisPrio = resource.requesters.q.firstOrNull { it.component == this }?.priority
                         claims.merge(resource, quantity, Double::plus)
 
                         //also register as claimer in resource if not yet present
-                        if (resource.claimers.q.none { it.c == this }) {
+                        if (resource.claimers.q.none { it.component == this }) {
                             resource.claimers.add(this, thisPrio)
                         }
                     }
@@ -455,6 +484,7 @@ open class Component(
 //    }
 
 
+    // TODO what is happening here
     private fun remove() {
         val queueElem = env.eventQueue.firstOrNull {
             it.component == this
@@ -477,7 +507,7 @@ open class Component(
 
         status = DATA
         scheduledTime = Double.MAX_VALUE
-        process = null
+        simProcess = null
 
         printTrace(now(), env.curComponent, this, "ended")
 
@@ -535,8 +565,8 @@ open class Component(
     ): Component {
 
         val p = if (process == null) {
-            if (status == DATA) require(this.process != null) { "no process for data component" }
-            this.process
+            if (status == DATA) require(this.simProcess != null) { "no process for data component" }
+            this.simProcess
         } else {
             ingestFunPointer(process)
         }
@@ -544,7 +574,7 @@ open class Component(
         var extra = ""
 
         if (p != null) {
-            this.process = p
+            this.simProcess = p
 
             extra = "process ${process}"
         }
@@ -634,7 +664,7 @@ open class Component(
     }
 
 
-    fun callProcess() = process!!.call()
+    fun callProcess() = simProcess!!.call()
 
     /**
      *   release a quantity from a resource or resources
@@ -735,8 +765,10 @@ open class Component(
         stateRequests
             // skip already tracked states
             .filterNot { sr -> waits.any { it.state == sr.state } }
-            .forEach { (state, priority, _) ->
+            .forEach { sr ->
+                val (state, priority, _) = sr
                 state.waiters.add(this, priority)
+                waits.add(sr)
             }
 
         tryWait()
@@ -765,9 +797,12 @@ open class Component(
         }
 
         if (honored) {
-            waits.forEach { sr -> sr.state.waiters.remove(this) }
+            waits.forEach {
+                    sr -> sr.state.waiters.remove(this)
+            }
             waits.clear()
-            reschedule(scheduledTime, 0, false, "wait")
+            remove()
+            reschedule(now, 0, false, "wait")
         }
 
         return honored
@@ -826,7 +861,7 @@ internal data class ComponentInfo2(val time: Double, val name: String, val value
 // Abstract component process to be either generator or simple function
 //
 
-typealias FunPointer = KFunction<*>
+typealias FunPointer = KFunction1<*, Sequence<Component>>
 typealias GenProcess = KFunction1<*, Sequence<Component>>
 
 

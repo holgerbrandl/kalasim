@@ -5,7 +5,7 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics
 import org.koin.core.KoinComponent
 import java.util.*
 
-data class CQElement<C : Component>(val c: C, val enterTime: Double, val priority: Int? = null)
+data class CQElement<C : Component>(val component: C, val enterTime: Double, val priority: Int? = null)
 
 //TODO add opt-out for queue monitoring
 
@@ -43,14 +43,16 @@ class ComponentQueue<T : Component>(
     }
 
     fun remove(elem: T): T {
-        val (component, enterTime) = q.first { it.c == elem }
+        val cqe = q.first { it.component == elem }
 
         printTrace("leaving $name")
 
-        lengthOfStayStats.addValue(enterTime)
+        lengthOfStayStats.addValue(cqe.enterTime)
         queueLengthStats.addValue(q.size)
 
-        return component
+        q.remove(cqe)
+
+        return cqe.component
     }
 
     fun isEmpty() = size == 0

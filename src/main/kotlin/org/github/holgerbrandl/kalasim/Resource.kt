@@ -63,7 +63,7 @@ open class Resource(
             // TODO trying not implemented
 
             iterator.forEach {
-                it.c.tryRequest()
+                it.component.tryRequest()
             }
         } else {
             while (iterator.hasNext()) {
@@ -71,7 +71,7 @@ open class Resource(
                 if (minq > (capacity - claimedQuantity + EPS)) {
                     break
                 }
-                iterator.next().c.tryRequest()
+                iterator.next().component.tryRequest()
             }
         }
 
@@ -119,8 +119,8 @@ open class ResourceInfo : Snapshot {
     constructor(c: Resource) : super() {
         this.name = c.name
         this.creationTime = c.creationTime
-        this.claimers = c.claimers.q.toList().map { it.c.name to it.priority }
-        this.requesters = c.requesters.q.toList().map { it.c.name to it.priority }
+        this.claimers = c.claimers.q.toList().map { it.component.name to it.priority }
+        this.requesters = c.requesters.q.toList().map { it.component.name to it.priority }
     }
 
     val name: String
