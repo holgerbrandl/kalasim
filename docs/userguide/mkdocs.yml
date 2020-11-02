@@ -30,9 +30,9 @@ nav:
     - States: state.md
     - Examples: examples.md
   - Analysis:
-    - Visualization: visual.md
+    - analysis.md
   - Advanced:
-    - Livemode: visual.md
+    - Livemode: livemode.md
   - About:
     - about.md
 

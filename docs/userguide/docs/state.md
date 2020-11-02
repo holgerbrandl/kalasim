@@ -42,37 +42,48 @@ States support generics, so we could equally well use a string (or any type) to 
 States can be used also for non values other than bool type. E.g.
 
 ```
-light=sim.State('light', value='red')
+val light = State("red")
 ...
-light.state.set('green')
+light.value = "green"
 ```
 
 Or define a int/float state ::
 
 ```
-level=sim.State('level', value=0)
-...
-level.set(level()+10)
+val level = State(0.0)
+        
+level.value += 10
 ```
+
+Since `State<T>` is a generic type, the compile will reject invalid level associations such as
+```
+level.value = "foo"
+```
+This won't compile because the type of level is `Double`.
+
 
 States have a number of monitors:
 
-* value, where all the values are collected over time
-* waiters().length
-* waiters().length_of_stay
+* `valueMonitor`, where all the values are collected over time
+* info.queueLengthStats,
+* info.lengthOfStayStats
 
 ## Process interaction with `wait()`
+
 A component can wait for a state to get a certain value. In its most simple form ::
 
-    yield self.wait(dooropen)
+```kotlin
+yield(wait(dooropen, true))
+```
 
 Once the dooropen state is True, the component will continue.
 
 As with request() it is possible to set a timeout with fail_at or fail_delay ::
 
-    yield self.wait(dooropen, fail_delay=10)
-    if self.failed:
-        print('impatient ...')
+```kotlin
+yield(wait(dooropen, true, failDelay=10.0))
+if(failed) print("impatient ...")
+```
 
 In the above example we tested for a state to be True.
 
@@ -82,16 +93,16 @@ Scalar testing
 ~~~~~~~~~~~~~~
 It is possible to test for a certain value ::
 
-    yield self.wait((light, 'green'))
+    yield self.wait((light, "green"))
     
 Or more states at once ::
     
-    yield self.wait((light, 'green'), night)  # honored as soon as light is green OR it's night
-    yield self.wait((light, 'green'), (light, 'yellow'))  # honored as soon is light is green OR yellow
+    yield self.wait((light, "green"), night)  # honored as soon as light is green OR it"s night
+    yield self.wait((light, "green"), (light, "yellow"))  # honored as soon is light is green OR yellow
     
 It is also possible to wait for all conditions to be satisfied, by adding ``all=True``::
 
-    yield self.wait((light,'green'), enginerunning, all=True)  # honored as soon as light is green AND engine is running
+    yield self.wait((light,"green"), enginerunning, all=True)  # honored as soon as light is green AND engine is running
     
 Evaluation testing
 ~~~~~~~~~~~~~~~~~~
@@ -99,16 +110,16 @@ Here, we use a string containing an expression that can evaluate to True or Fals
 done by specifying at least one ``$`` in the test-string. This ``$`` will be replaced at run time by
 ``state.value()``, where state is the state under test. Here are some examples ::
 
-    yield self.wait((light, '$ in ("green","yellow")')) 
-        # if at run time light.value() is 'green', test for eval(state.value() in ("green,"yellow")) ==> True
-    yield self.wait((level, '$ < 30'))
+    yield self.wait((light, "$ in ("green","yellow")")) 
+        # if at run time light.value() is "green", test for eval(state.value() in ("green,"yellow")) ==> True
+    yield self.wait((level, "$ < 30"))
         # if at run time level.value() is 50, test for eval(state.value() < 30) ==> False
 
 During the evaluation, ``self`` refers to the component under test and ``state`` to the state under test.
 E.g. ::
 
     self.limit = 30
-    yield self.wait((level, 'self.limit >= $'))
+    yield self.wait((level, "self.limit >= $"))
         # if at run time level.value() is 10, test for eval(self.limit >= state.get()) ==> True, so honored
 
 Function testing
@@ -123,10 +134,10 @@ arguments:
 
 E.g.::
         
-    yield self.wait((light, lambda x, component, state x in ('green', 'yellow'))
+    yield self.wait((light, lambda x, component, state x in ("green", "yellow"))
         # x is light.get()
     yield self.wait((level, lambda x, *_: x >= 30))
-        # x is level.get(), other two parameters are 'dummied'
+        # x is level.get(), other two parameters are "dummied"
         
 And, of course, it is possible to define a function ::
 
@@ -140,5 +151,5 @@ And, of course, it is possible to define a function ::
     
 Combination of testing methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-It is possible to mix scalar, evaluation and function testing. And it's also possible to specify all=True
+It is possible to mix scalar, evaluation and function testing. And it"s also possible to specify all=True
 in any case.
