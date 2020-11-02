@@ -912,7 +912,7 @@ data class ResourceRequest(val r: Resource, val quantity: Double, val priority: 
 infix fun Resource.withQuantity(quantity: Double) = ResourceRequest(this, quantity)
 
 //    data class StateRequest<T>(val s: State<T>, val value: T? = null, val priority: Int? = null)
-data class StateRequest<T>(val state: State<T>, val priority: Int? = null, val predicate: (State<T>) -> Boolean) {
+data class StateRequest<T>(val state: State<T>, val priority: Int? = null, val predicate: (T) -> Boolean) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

@@ -11,8 +11,8 @@ class StateTests {
 
     @Test
     fun testPredicate() {
-        val (state, _, predicate) = StateRequest(State("foo")) { it.value == "House" }
-        predicate(state)
+        val (state, _, predicate) = StateRequest(State("foo")) { it == "House" }
+        predicate(state.value)
     }
 
     @Test
@@ -24,6 +24,7 @@ class StateTests {
 
             fun waitForGreen() = sequence {
                 yield(wait(trafficLight, "green"))
+                yield(wait(StateRequest(trafficLight){ it == "green"}))
                 printTrace("passing crossing")
                 yield(terminate())
             }
