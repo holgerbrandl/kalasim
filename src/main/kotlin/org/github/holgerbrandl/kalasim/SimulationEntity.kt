@@ -8,17 +8,45 @@ abstract class SimulationEntity(name: String?) : KoinComponent {
     var name: String
         private set
 
-    val creationTime  = env.now
+    val creationTime = env.now
+
+    var monitor = true;
 
     init {
         this.name = nameOrDefault(name)
     }
 
-//    abstract fun getSnapshot(): Snapshot
+    //    abstract fun getSnapshot(): Snapshot
     protected abstract val info: Snapshot
 
     fun printInfo() = info.println()
     override fun toString(): String = "${javaClass.simpleName}($name)"
+
+
+    fun printTrace(info: String) = env.apply { printTrace(now, curComponent, null, info) }
+
+    fun <T : Component> printTrace(element: T, info: String) =
+        env.apply { printTrace(now, curComponent, element, info) }
+
+    /**
+     * Prints a trace line
+     *
+     *  @param curComponent  Modification consuming component
+     *  @param component Modification causing component
+     *  @param info Detailing out the nature of the modification
+     */
+    fun printTrace(
+        time: Double,
+        curComponent: Component?,
+        component: Component?,
+        info: String? = null
+    ) {
+        if(!monitor) return
+
+        val tr = TraceElement(time, curComponent, component, info)
+
+        env.publishTraceRecord(tr)
+    }
 }
 
 

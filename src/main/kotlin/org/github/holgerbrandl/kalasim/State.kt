@@ -22,10 +22,9 @@ class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
 
             // todo ensure that this is called also for the initial value
             valueMonitor.addValue(value)
-            env.printTrace("set value to ${value}")
+            printTrace("set value to ${value}")
             tryWait()
         }
-
 
 
     private val valueMonitor = FrequencyLevelMonitor<T>()
@@ -35,9 +34,18 @@ class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
 
     override fun toString(): String = super.toString() + "[${value}]"
 
-    fun trigger(max: Int, value:T, valueAfter: T?=null) {
-//        waiters.
-        TODO("Not yet implemented")
+    /**
+     * Sets the value `value` and triggers any components waiting,
+     * then at most max waiting components for this state  will be honored and next
+     * the value will be set to value_after and again checked for possible honors.
+     *
+     * @param value the new value
+     * @param valueAfter After the trigger this will be the new value. If omitted, return to the value before the trigger
+     * @param max Maximum number of components to be honored for the trigger value
+     */
+    fun trigger(value: T, valueAfter: T? = value, max: Int = Int.MAX_VALUE) {
+
+        printTrace(" value = ${value} --> ${valueAfter} allow $max components")
 
     }
 

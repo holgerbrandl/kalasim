@@ -13,7 +13,7 @@ fun main() {
     class Customer(val workTodo: State<Boolean>, val waitingLine: ComponentQueue<Customer>) : Component() {
         override suspend fun SequenceScope<Component>.process(it: Component) {
             waitingLine.add(this@Customer)
-            workTodo.trigger(max = 1, true)
+            workTodo.trigger(true, max = 1)
             yield(passivate())
         }
     }

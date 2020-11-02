@@ -136,7 +136,7 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
             time to c
         } else {
             val t = if (endOnEmptyEventlist) {
-                printTrace(now, curComponent, null, "run end; no events left")
+                publishTraceRecord(TraceElement(now, curComponent, null, "run end; no events left"))
                 now
             } else {
                 Double.MAX_VALUE
@@ -165,7 +165,7 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
 
         curComponent = c
 
-        printTrace(now, curComponent, c, info)
+        c.printTrace(c,info ?: "")
     }
 
 
@@ -184,26 +184,7 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
     fun removeTraceListener(tr: TraceListener) = traceListeners.remove(tr)
 
 
-    fun printTrace(info: String) = printTrace(now, curComponent, null, info)
-
-    fun <T : Component> printTrace(element: T, info: String) = printTrace(now, curComponent, element, info)
-
-
-    /**
-     * Prints a trace line
-     *
-     *  @param curComponent  Modification consuming component
-     *  @param component Modification causing component
-     *  @param info Detailing out the nature of the modification
-     */
-    fun printTrace(
-        time: Double,
-        curComponent: Component?,
-        component: Component?,
-        info: String? = null
-    ) {
-        val tr = TraceElement(time, curComponent, component, info)
-
+    internal fun publishTraceRecord(tr: TraceElement) {
         traceListeners.forEach {
             it.processTrace(tr)
         }

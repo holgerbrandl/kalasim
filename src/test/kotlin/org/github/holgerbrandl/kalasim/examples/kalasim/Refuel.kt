@@ -62,7 +62,7 @@ object Refuel {
 
                 // order a new Tank if the fuelpump runs of out fuel
                 if ((fuelPump.availableQuantity() - litersRequired) / fuelPump.capacity * 100 < THRESHOLD) {
-                    env.printTrace("running out of fuel at $gasStation. Ordering new fuel truck...")
+                    printTrace("running out of fuel at $gasStation. Ordering new fuel truck...")
                     TankTruck()
                 }
 

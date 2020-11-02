@@ -23,7 +23,7 @@ class StateTests {
 
             fun waitForGreen() {
                 wait(trafficLight, "green")
-                env.printTrace("passing crossing")
+                printTrace("passing crossing")
                 terminate()
             }
         }

@@ -24,7 +24,7 @@ class ComponentQueue<T : Component>(
 
 
     fun add(element: T, priority: Int? = null): Boolean {
-        env.printTrace(element, "entering $name")
+        printTrace(element, "entering $name")
 
         queueLengthStats.addValue(q.size)
 
@@ -34,7 +34,7 @@ class ComponentQueue<T : Component>(
     fun poll(): T {
         val (element, enterTime) = q.poll()
 
-        env.printTrace(element, "leaving $name")
+        printTrace(element, "leaving $name")
 
         lengthOfStayStats.addValue(enterTime)
         queueLengthStats.addValue(q.size)
@@ -45,7 +45,7 @@ class ComponentQueue<T : Component>(
     fun remove(elem: T): T {
         val (component, enterTime) = q.first { it.c == elem }
 
-        env.printTrace("leaving $name")
+        printTrace("leaving $name")
 
         lengthOfStayStats.addValue(enterTime)
         queueLengthStats.addValue(q.size)

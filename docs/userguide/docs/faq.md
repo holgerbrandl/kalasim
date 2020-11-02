@@ -1,4 +1,4 @@
-# F.A.Q
+# F.A.Q.
 
 ## Why rebuilding `salabim`?
 

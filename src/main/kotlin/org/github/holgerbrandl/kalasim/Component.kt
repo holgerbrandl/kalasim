@@ -58,7 +58,7 @@ open class Component(
     init {
         val dataSuffix = if (process == null && this.name != MAIN) " data" else ""
         env.addComponent(this)
-        env.printTrace(now(), env.curComponent, this, "create" + dataSuffix)
+        printTrace(now(), env.curComponent, this, "create" + dataSuffix)
 
 
         // if its a generator treat it as such
@@ -144,7 +144,7 @@ open class Component(
 
         scheduledTime = Double.MAX_VALUE
         status = PASSIVE
-        env.printTrace(now(), env.curComponent, this)
+        printTrace(now(), env.curComponent, this)
 
 
         return this
@@ -168,7 +168,7 @@ open class Component(
 
         status = DATA
 
-        env.printTrace(now(), env.curComponent, this, "cancel")
+        printTrace(now(), env.curComponent, this, "cancel")
     }
 
     /**
@@ -190,7 +190,7 @@ open class Component(
         env.addStandBy(this)
 
         status = STANDBY
-        env.printTrace(now(), env.curComponent, this)
+        printTrace(now(), env.curComponent, this)
 
     }
 
@@ -224,9 +224,11 @@ open class Component(
 
 
     //todo we should just support one here
-    fun fixed(value: Double) = value.asConstantDist()
+//    fun fixed(value: Double) = value.asConstantDist()
+//
     fun Double.asConstantDist() = ConstantRealDistribution(this)
 
+    fun fixed(value:Double) =  ConstantRealDistribution(value)
 
     /**
      * Request from a resource or resources
@@ -324,7 +326,7 @@ open class Component(
 //            enterSorted(r.requesters, priority)
             r.requesters.add(this, priority)
 
-            env.printTrace(
+            printTrace(
                 now(),
                 env.curComponent,
                 this,
@@ -358,7 +360,7 @@ open class Component(
                 if (av >= 0) {
                     bumpCandidates.forEach {
                         it.releaseInternal(r)
-                        env.printTrace("$it bumped from $r by $this")
+                        printTrace("$it bumped from $r by $this")
                         it.activate()
                     }
                 }
@@ -477,7 +479,7 @@ open class Component(
         scheduledTime = Double.MAX_VALUE
         process = null
 
-        env.printTrace(now(), env.curComponent, this, "ended")
+        printTrace(now(), env.curComponent, this, "ended")
 
         return (this)
     }
@@ -509,7 +511,7 @@ open class Component(
         }
 
         // print trace
-        env.printTrace(now(), env.curComponent, this, "$caller $delta $extra")
+        printTrace(now(), env.curComponent, this, "$caller $delta $extra")
     }
 
     /**
@@ -580,11 +582,11 @@ open class Component(
 
     private fun checkFail() {
         if (requests.isNotEmpty()) {
-            env.printTrace("request failed")
+            printTrace("request failed")
             requests.clear()
         }
         if (waits.isNotEmpty()) {
-            env.printTrace("request failed")
+            printTrace("request failed")
             waits.clear()
         }
 
@@ -673,6 +675,7 @@ open class Component(
             leave(resource.claimers)
         }
     }
+
 
     // todo states may have different types so this methods does not make real sense here. Either remove type from state or enforce the user to call wait multiple times
     fun <T> wait(
@@ -776,7 +779,7 @@ open class Component(
      * @param q Queue queue to leave
      */
     fun leave(q: ComponentQueue<Component>) {
-        env.printTrace("leave ${q.name}")
+        printTrace("leave ${q.name}")
         q.remove(this)
     }
 

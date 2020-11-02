@@ -4,15 +4,15 @@ package org.github.holgerbrandl.kalasim.scratch
 
 //https://stackoverflow.com/questions/40138923/difference-between-and-any-in-kotlin-generics
 
-class State<T>(initialValue: T) {
+class DestructState<T>(initialValue: T) {
     var value: T = initialValue
 }
 
-data class StateRequest<T>(val state: State<T>, val predicate: (State<T>) -> Boolean, val priority: Int? = null)
+data class DestructStateRequest<T>(val state: DestructState<T>, val predicate: (DestructState<T>) -> Boolean, val priority: Int? = null)
 
 fun main() {
 //    val stateRequest: StateRequest<*> = StateRequest(State("foo"), {
-    val stateRequest: StateRequest<Any> = StateRequest(State("foo"), {
+    val stateRequest: DestructStateRequest<Any> = DestructStateRequest(DestructState("foo"), {
         println("predicate called")
         true
     })
@@ -25,7 +25,7 @@ fun main() {
 
 
     // call it the hard way with lots of casting
-    (stateRequest as StateRequest<Any>).predicate(state as State<Any>)
+    (stateRequest as DestructStateRequest<Any>).predicate(state as DestructState<Any>)
 
     predicate(state)
 }

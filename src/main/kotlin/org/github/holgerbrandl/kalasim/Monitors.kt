@@ -21,7 +21,7 @@ abstract class Monitor<T>(name: String? = null) : KoinComponent {
     init {
         this.name = nameOrDefault(name)
 
-//        env.printTrace("create ${this.name}")
+//        printTrace("create ${this.name}")
     }
 
     abstract fun reset()
