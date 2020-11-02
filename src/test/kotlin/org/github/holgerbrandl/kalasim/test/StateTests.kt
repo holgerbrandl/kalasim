@@ -13,6 +13,10 @@ class StateTests {
     fun testPredicate() {
         val (state, _, predicate) = StateRequest(State("foo")) { it == "House" }
         predicate(state.value)
+        predicate(state.value)
+
+//        StateRequest(State("foo")) { listOf("bar", "test").contains(it) }
+//        StateRequest(State(3.0)) { it*3 < 42 }
     }
 
     @Test

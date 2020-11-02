@@ -9,7 +9,7 @@ Definition is simple, like `val doorOpen = State(false)`. The initial value is F
 the door is closed.
 
 
-Now we can say ::
+Now we can say :
 
 ```kotlin
 doorOpen.value = true
@@ -17,7 +17,7 @@ doorOpen.value = true
 
 to open the door.
 
-If we want a person to wait for an open door, we could say ::
+If we want a person to wait for an open door, we could say :
 
 ```kotlin
 yield(wait(doorOpen, true))
@@ -47,7 +47,7 @@ val light = State("red")
 light.value = "green"
 ```
 
-Or define a int/float state ::
+Or define a int/float state :
 
 ```
 val level = State(0.0)
@@ -70,86 +70,53 @@ States have a number of monitors:
 
 ## Process interaction with `wait()`
 
-A component can wait for a state to get a certain value. In its most simple form ::
+A component can wait for a state to get a certain value. In its most simple form :
 
 ```kotlin
 yield(wait(dooropen, true))
 ```
 
-Once the dooropen state is True, the component will continue.
+Once the dooropen state is `true`, the component will continue.
 
-As with request() it is possible to set a timeout with fail_at or fail_delay ::
+As with request() it is possible to set a timeout with fail_at or fail_delay :
 
 ```kotlin
 yield(wait(dooropen, true, failDelay=10.0))
 if(failed) print("impatient ...")
 ```
 
-In the above example we tested for a state to be True.
+In the above example we tested for a state to be true.
 
 There are three ways to test for a value:
 
-Scalar testing
-~~~~~~~~~~~~~~
-It is possible to test for a certain value ::
+### Value testing
 
-    yield self.wait((light, "green"))
+It is possible to test for a certain value :
+
+```kotlin
+yield(wait(light, "green"))
+```
     
-Or more states at once ::
+Or more states at once :
     
-    yield self.wait((light, "green"), night)  # honored as soon as light is green OR it"s night
-    yield self.wait((light, "green"), (light, "yellow"))  # honored as soon is light is green OR yellow
+```kotlin
+yield(wait(light turns "green", light turns "yellow"))  // honored as soon is light is green OR yellow
+```
     
-It is also possible to wait for all conditions to be satisfied, by adding ``all=True``::
+It is also possible to wait for all conditions to be satisfied, by adding `all=true`:
 
-    yield self.wait((light,"green"), enginerunning, all=True)  # honored as soon as light is green AND engine is running
-    
-Evaluation testing
-~~~~~~~~~~~~~~~~~~
-Here, we use a string containing an expression that can evaluate to True or False. This is
-done by specifying at least one ``$`` in the test-string. This ``$`` will be replaced at run time by
-``state.value()``, where state is the state under test. Here are some examples ::
+```kotlin
+yield(wait((light turns "green"), enginerunning turns true, all=true)) // honored as soon as light is green AND engine is running
+```
 
-    yield self.wait((light, "$ in ("green","yellow")")) 
-        # if at run time light.value() is "green", test for eval(state.value() in ("green,"yellow")) ==> True
-    yield self.wait((level, "$ < 30"))
-        # if at run time level.value() is 50, test for eval(state.value() < 30) ==> False
 
-During the evaluation, ``self`` refers to the component under test and ``state`` to the state under test.
-E.g. ::
+### Predicate testing
 
-    self.limit = 30
-    yield self.wait((level, "self.limit >= $"))
-        # if at run time level.value() is 10, test for eval(self.limit >= state.get()) ==> True, so honored
+This is a more complicated but also more versatile way of specifying the honor-condition. In that case, a predicate function `(T) -> Boolean` is required to specify the condition.
 
-Function testing
-~~~~~~~~~~~~~~~~
-This is a more complicated but also more versatile way of specifying the honor-condition.
-In that case, a function is required to specify the condition. The function needs to accept three
-arguments:
-
-* x = state.get()
-* component component under test
-* state under test
-
-E.g.::
+E.g.:
         
-    yield self.wait((light, lambda x, component, state x in ("green", "yellow"))
-        # x is light.get()
-    yield self.wait((level, lambda x, *_: x >= 30))
-        # x is level.get(), other two parameters are "dummied"
-        
-And, of course, it is possible to define a function ::
-
-    def levelreached(value, component, state):
-        return value < component.limit
-        
-    ...
-    
-    self.limit = 30
-    yield self.wait((level, levelreached))
-    
-Combination of testing methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-It is possible to mix scalar, evaluation and function testing. And it"s also possible to specify all=True
-in any case.
+```kotlin
+yield(wait(StateRequest(State("foo")) { listOf("bar", "test").contains(it) })
+yield(wait(StateRequest(State(3.0)) { it*3 < 42 }))
+```
