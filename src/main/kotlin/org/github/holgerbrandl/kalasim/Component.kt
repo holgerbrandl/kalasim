@@ -796,9 +796,10 @@ open class Component(
             }
         }
 
+
         if (honored) {
-            waits.forEach {
-                    sr -> sr.state.waiters.remove(this)
+            waits.forEach { sr ->
+                sr.state.waiters.remove(this)
             }
             waits.clear()
             remove()
@@ -908,6 +909,7 @@ data class QueueElement(val time: Double, val priority: Int, val seq: Int, val c
 
 data class ResourceRequest(val r: Resource, val quantity: Double, val priority: Int? = null)
 
+infix fun Resource.withQuantity(quantity: Double) = ResourceRequest(this, quantity)
 
 //    data class StateRequest<T>(val s: State<T>, val value: T? = null, val priority: Int? = null)
 data class StateRequest<T>(val state: State<T>, val priority: Int? = null, val predicate: (State<T>) -> Boolean) {
@@ -930,5 +932,4 @@ data class StateRequest<T>(val state: State<T>, val priority: Int? = null, val p
     }
 }
 
-
-infix fun Resource.withQuantity(quantity: Double) = ResourceRequest(this, quantity)
+infix fun <T> State<T>.turns(value: T) = StateRequest(this) { it == value }

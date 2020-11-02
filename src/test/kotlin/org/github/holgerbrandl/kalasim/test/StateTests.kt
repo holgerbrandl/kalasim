@@ -39,7 +39,6 @@ class StateTests {
             val trafficLight = get<State<String>>()
 
             trafficLight.printInfo()
-            //todo assert on waiters
 
             run(10.0)
 
@@ -50,10 +49,62 @@ class StateTests {
 
             run(10.0)
 
-            //todo assert on waiters
             trafficLight.printInfo()
 
             trafficLight.info.waiters.shouldBeEmpty()
+        }
+    }
+
+
+    @Test
+    fun `it should wait until multiple predicates are honored`() {
+
+        class Car : Component() {
+
+            val trafficLight = get<State<String>>()
+            val engine = get<State<Boolean>>()
+
+            override suspend fun ProcContext.process() {
+                yield(wait(trafficLight turns "green", engine turns true, all = true))
+                printTrace("passing crossing")
+                yield(terminate())
+            }
+        }
+
+        val sim = configureEnvironment {
+            single { State("red") }
+            single { State(false) }
+        }
+
+        sim.apply{
+            val car = Car()
+
+            val trafficLight = get<State<String>>()
+            val engine = get<State<Boolean>>()
+
+            trafficLight.printInfo()
+
+            run(10.0)
+
+            trafficLight.info.waiters.size shouldBe  1
+
+            // toogle state
+            trafficLight.value = "green"
+
+            run(10.0)
+
+            trafficLight.printInfo()
+
+            trafficLight.info.waiters.shouldBeEmpty()
+
+            car.isWaiting shouldBe true
+
+            // now honor the engine
+            engine.value = true
+
+            car.printInfo()
+            car.isWaiting shouldBe false
+            car.isData shouldBe true
         }
     }
 }
