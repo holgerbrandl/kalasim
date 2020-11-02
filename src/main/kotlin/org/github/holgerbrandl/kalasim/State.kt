@@ -43,10 +43,14 @@ class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
      * @param valueAfter After the trigger this will be the new value. If omitted, return to the value before the trigger
      * @param max Maximum number of components to be honored for the trigger value
      */
-    fun trigger(value: T, valueAfter: T? = value, max: Int = Int.MAX_VALUE) {
-
+    fun trigger(value: T, valueAfter: T = value, max: Int = Int.MAX_VALUE) {
         printTrace(" value = ${value} --> ${valueAfter} allow $max components")
 
+        this.value = value
+        tryWait(max)
+
+        this.value = valueAfter
+        tryWait()
     }
 
     // conf example
