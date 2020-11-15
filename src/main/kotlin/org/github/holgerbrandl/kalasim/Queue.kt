@@ -21,15 +21,15 @@ class ComponentQueue<T : Component>(
         get() = q.size
 
     //    val ass = AggregateSummaryStatistics()
-    val queueLengthStats = NumericLevelMonitor("Length of $name")
-    val lengthOfStayStats = NumericStatisticMonitor("Length of stay in $name")
+    val queueLengthMonitor = NumericLevelMonitor("Length of $name")
+    val lengthOfStayMonitor = NumericStatisticMonitor("Length of stay in $name")
 
     fun add(element: T, priority: Int? = null): Boolean {
         printTrace(element, "entering $name")
 
         val added = q.add(CQElement(element, env.now, priority))
 
-        queueLengthStats.addValue(q.size.toDouble())
+        queueLengthMonitor.addValue(q.size.toDouble())
 
         return added
     }
@@ -39,8 +39,8 @@ class ComponentQueue<T : Component>(
 
         printTrace(element, "leaving $name")
 
-        lengthOfStayStats.addValue(enterTime)
-        queueLengthStats.addValue(q.size.toDouble())
+        lengthOfStayMonitor.addValue(enterTime)
+        queueLengthMonitor.addValue(q.size.toDouble())
 
         return element
     }
@@ -52,8 +52,8 @@ class ComponentQueue<T : Component>(
 
         q.remove(cqe)
 
-        lengthOfStayStats.addValue(cqe.enterTime)
-        queueLengthStats.addValue(q.size.toDouble())
+        lengthOfStayMonitor.addValue(cqe.enterTime)
+        queueLengthMonitor.addValue(q.size.toDouble())
 
         return cqe.component
     }
@@ -77,14 +77,14 @@ class QueueStatistics(cq: ComponentQueue<*>) {
 
     val name = cq.name
 
-    val lengthStats = NumericLevelMonitorStats(cq.queueLengthStats)
-    val lengthStatsExclZeros = NumericLevelMonitorStats(cq.queueLengthStats, excludeZeros = true)
+    val lengthStats = NumericLevelMonitorStats(cq.queueLengthMonitor)
+    val lengthStatsExclZeros = NumericLevelMonitorStats(cq.queueLengthMonitor, excludeZeros = true)
 
     val lengthOfStayStats =
-        SummaryStatistics().apply { cq.lengthOfStayStats.values.forEach { addValue(it) } }
+        SummaryStatistics().apply { cq.lengthOfStayMonitor.values.forEach { addValue(it) } }
 
     val lengthOfStayStatsExclZeros =
-        SummaryStatistics().apply { cq.lengthOfStayStats.values.filter { it > 0 }.forEach { addValue(it) } }
+        SummaryStatistics().apply { cq.lengthOfStayMonitor.values.filter { it > 0 }.forEach { addValue(it) } }
 
     // Partial support for weighted percentiles was added in https://github.com/apache/commons-math/tree/fe29577cdbcf8d321a0595b3ef7809c8a3ce0166
     // Update once released, use jitpack or publish manually

@@ -61,7 +61,6 @@ class CustomerGenerator : Component() {
 }
 
 
-
 fun main() {
 
     val env = configureEnvironment {
@@ -83,5 +82,5 @@ fun main() {
     val waitingLine: ComponentQueue<Customer> = env.get()
 
     waitingLine.stats.print()
-    waitingLine.queueLengthStats.display()
+    waitingLine.queueLengthMonitor.display()
 }

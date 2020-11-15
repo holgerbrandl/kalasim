@@ -111,8 +111,8 @@ object DeterministicRefuel {
             }
 
 
-            get<GasStation>().requesters.queueLengthStats.println()
-            get<GasStation>().requesters.lengthOfStayStats.println()
+            get<GasStation>().requesters.queueLengthMonitor.println()
+            get<GasStation>().requesters.lengthOfStayMonitor.println()
 
             // save the simulation state to file
 //            Json.encodeToString(this).println()
