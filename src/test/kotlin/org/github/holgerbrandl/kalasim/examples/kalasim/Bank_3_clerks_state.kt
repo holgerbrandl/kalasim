@@ -23,7 +23,7 @@ fun main() {
         override fun process() = sequence {
             while (true) {
                 Customer(get(), get())
-                yield(hold(UniformRealDistribution(5.0, 15.0).sample()))
+                yield(hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample()))
             }
         }
     }

@@ -3,21 +3,20 @@ package org.github.holgerbrandl.kalasim.examples
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.github.holgerbrandl.kalasim.Environment
 import org.github.holgerbrandl.kalasim.FrequencyLevelMonitor
-import org.github.holgerbrandl.kalasim.test.MonitorTests
 import org.github.holgerbrandl.kalasim.test.asCM
 import org.junit.Test
 
 
 // Adopted from example in https://www.salabim.org/manual/Monitor.html
 fun freqLevelDemo() {
-    val data = listOf<Pair<String, Double>>(
+    val data = listOf(
         "foo" to 0.1,
         "bar" to 0.9
     )
 
     val dist = EnumeratedDistribution(data.asCM())
 
-    val dm = FrequencyLevelMonitor<String>()
+    val dm = FrequencyLevelMonitor("bla")
 
     repeat(1000) { dm.addValue(dist.sample()); dm.env.now += 1 }
 

@@ -27,7 +27,7 @@ class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
         }
 
 
-    private val valueMonitor = FrequencyLevelMonitor<T>()
+    private val valueMonitor = FrequencyLevelMonitor<T>(initialValue=value)
 
     internal val waiters = ComponentQueue<Component>("waiters of ${this.name}")
 //    val waiters = PriorityQueue<Component>()

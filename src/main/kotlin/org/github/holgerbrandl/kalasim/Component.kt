@@ -6,6 +6,8 @@ import kotlinx.serialization.json.Json
 import org.apache.commons.math3.distribution.ConstantRealDistribution
 import org.apache.commons.math3.distribution.RealDistribution
 import org.github.holgerbrandl.kalasim.ComponentState.*
+import org.github.holgerbrandl.kalasim.misc.TRACE_DF
+import org.github.holgerbrandl.kalasim.misc.println
 import org.koin.core.KoinComponent
 import java.util.*
 import kotlin.reflect.KFunction1
@@ -53,6 +55,13 @@ open class Component(
     private var remainingDuration = 0.0
 
     var status: ComponentState = DATA
+        set(value) {
+                field = value
+                statusMonitor.addValue(value)
+            }
+
+    val statusMonitor = FrequencyLevelMonitor<ComponentState>(status, "status of ${name}")
+
 
     init {
         val dataSuffix = if (process == null && this.name != MAIN) " data" else ""
@@ -86,9 +95,9 @@ open class Component(
             if (isGenerator) {
                 @Suppress("UNCHECKED_CAST")
                 val sequence = process.call(this) as Sequence<Component>
-                GenProcessInternal(this, sequence)
+                GenProcessInternal(this, sequence, process.name)
             } else {
-                SimpleProcessInternal(this, process)
+                SimpleProcessInternal(this, process, process.name)
             }
         } else {
             null
@@ -533,11 +542,11 @@ open class Component(
         if (this.scheduledTime != Double.MAX_VALUE) push(this.scheduledTime, priority, urgent)
 
         //todo implement extra
-        val extra = ""
+        val extra = "scheduled for ${TRACE_DF.format(scheduledTime)}"
 
         // calculate scheduling delta
         val delta = if (this.scheduledTime == env.now || (this.scheduledTime == Double.MAX_VALUE)) "" else {
-            "+" + (this.scheduledTime - env.now)
+            "+" + TRACE_DF.format(this.scheduledTime - env.now)
         }
 
         // print trace
@@ -576,8 +585,10 @@ open class Component(
         if (p != null) {
             this.simProcess = p
 
-            extra = "process ${process}"
+            extra = "process=${p.name}"
         }
+
+
         //todo
 //            if inspect.isgeneratorfunction(p):
 //            self._process = p(**kwargs)
@@ -605,7 +616,7 @@ open class Component(
             at + delay
         }
 
-        reschedule(scheduledTime, priority, urgent, "hold" + extra)
+        reschedule(scheduledTime, priority, urgent, "activate " + extra)
 
         return (this)
     }
@@ -613,19 +624,21 @@ open class Component(
     private fun checkFail() {
         if (requests.isNotEmpty()) {
             printTrace("request failed")
+            requests.forEach {
+                it.key.requesters.remove(this)
+                if (it.key.requesters.isEmpty()) it.key.minq = Double.MAX_VALUE
+            }
             requests.clear()
-        }
-        if (waits.isNotEmpty()) {
-            printTrace("request failed")
-            waits.clear()
+            failed = true
         }
 
-        TODO("Not yet implemented")
-//        if(requests.isNotEmpty()){
-//            requests.forEach{ leave()}
-//        }
-//        wai
-//    wai
+        if (waits.isNotEmpty()) {
+            printTrace("wait failed")
+            waits.forEach { it.state.waiters.remove(this) }
+
+            waits.clear()
+            failed = true
+        }
     }
 
 
@@ -868,9 +881,11 @@ typealias GenProcess = KFunction1<*, Sequence<Component>>
 
 interface SimProcess {
     fun call()
+
+    val name: String
 }
 
-class GenProcessInternal(val component: Component, seq: Sequence<Component>) : SimProcess {
+class GenProcessInternal(val component: Component, seq: Sequence<Component>, override val name: String) : SimProcess {
 
     val iterator = seq.iterator()
 
@@ -888,7 +903,8 @@ class GenProcessInternal(val component: Component, seq: Sequence<Component>) : S
     }
 }
 
-class SimpleProcessInternal(val component: Component, val funPointer: FunPointer) : SimProcess {
+class SimpleProcessInternal(val component: Component, val funPointer: FunPointer, override val name: String) :
+    SimProcess {
     override fun call() {
         funPointer.call(component)
     }

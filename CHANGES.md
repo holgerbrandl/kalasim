@@ -1,11 +1,9 @@
 krangl Release History
 ======================
 
-v0.1 (Initial Release
----------------------
+v0.1 (Initial Release)
+----------------------
 
-Major:
-**TBD**
-
-Minor:
-**TBD**
+* Reimplement core salabim examples in kotlin
+* Port all salabim examples
+* Add timing API

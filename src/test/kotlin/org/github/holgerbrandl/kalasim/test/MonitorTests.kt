@@ -2,7 +2,6 @@ package org.github.holgerbrandl.kalasim.test
 
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
-import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.github.holgerbrandl.kalasim.FrequencyLevelMonitor
 import org.github.holgerbrandl.kalasim.Environment
 import org.github.holgerbrandl.kalasim.NumericLevelMonitor
@@ -30,9 +29,8 @@ class MonitorTests {
 
     @Test
     fun `Frequency stats should be correct`() {
-        val m = FrequencyLevelMonitor<Car>()
-
-        m.addValue(AUDI)
+        val m = FrequencyLevelMonitor<Car>(AUDI)
+//        m.addValue(AUDI)
         env.now = 2.0
 
         m.addValue(VW)
@@ -44,9 +42,7 @@ class MonitorTests {
 
    @Test
     fun `Frequency level stats should be correct`() {
-        val m = FrequencyLevelMonitor<Car>()
-
-       m.addValue(AUDI)
+        val m = FrequencyLevelMonitor<Car>(AUDI)
        env.now = 2.0
 
        m.addValue(VW)
@@ -66,8 +62,10 @@ class MonitorTests {
             addValue(6)
             env.now += 4
 
+//            expected value 0 -2-> 2 -2-> 6 -4-> (0+4+24)/8
+
             println("mean is ${mean()}")
-        }.mean() shouldBe 4.6.plusOrMinus(.1)
+        }.mean() shouldBe 3.5.plusOrMinus(.1)
     }
 
     @Test
@@ -83,6 +81,7 @@ class MonitorTests {
             println("mean is ${mean()}")
         }.mean() shouldBe 4.0
     }
+
 }
 
 typealias   CMPair<K, V> = org.apache.commons.math3.util.Pair<K, V>

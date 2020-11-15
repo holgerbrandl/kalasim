@@ -1,11 +1,14 @@
 package org.github.holgerbrandl.kalasim
 
-import org.apache.commons.math3.random.EmpiricalDistribution
-import org.apache.commons.math3.stat.Frequency
+import com.systema.analytics.es.misc.json
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.moment.Mean
+import org.apache.commons.math3.stat.descriptive.moment.Variance
+import org.github.holgerbrandl.kalasim.misc.printHistogram
+import org.github.holgerbrandl.kalasim.misc.println
 import org.koin.core.KoinComponent
 import kotlin.math.roundToInt
+import kotlin.math.sqrt
 
 
 // See https://commons.apache.org/proper/commons-math/userguide/stat.html
@@ -26,14 +29,16 @@ abstract class Monitor<T>(name: String? = null) : KoinComponent {
 
     abstract fun reset()
 
+}
+
+
+interface LevelMonitor<T>  {
+
     /**
      * When Monitor.get() is called with a time parameter or a direct call with a time parameter, the value at that time will be returned.
      * */
-    operator fun get(time: Double = env.now): T {
-        TODO("Not yet implemented")
-    }
+     operator fun get(time: Double): T
 }
-
 
 /**
  * Frequency tally levels irrespective of current (simulation) time.
@@ -47,25 +52,26 @@ open class FrequencyMonitor<T>(name: String? = null) : Monitor<T>(name) {
         frequencies.merge(value, 1, Int::plus)
     }
 
-     val total: Int
+    val total: Int
         get() = frequencies.values.sum()
 
     override fun reset() = frequencies.clear()
 
-   open fun printHistogram() {
+    open fun printHistogram() {
         println(name)
         println("----")
         println("# Records: ${total}")
         println()
         println("value\t%\tcount")
-       // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
+        // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
 
         frequencies.keys.asSequence().map {
             println("${it}\t${getPct(it)}\t${frequencies[it]}")
         }
     }
 
-    open fun getPct(value: T): Double = frequencies[value]!!.toDouble()/total
+    open fun getPct(value: T): Double = frequencies[value]!!.toDouble() / total
+
 }
 
 /**
@@ -73,9 +79,14 @@ open class FrequencyMonitor<T>(name: String? = null) : Monitor<T>(name) {
  *
  * @sample org.github.holgerbrandl.kalasim.examples.DokkaExamplesKt.freqLevelDemo
  */
-class FrequencyLevelMonitor<T>(name: String? = null) : FrequencyMonitor<T>(name) {
+class FrequencyLevelMonitor<T>(initialValue: T, name: String? = null) : FrequencyMonitor<T>(name), LevelMonitor<T> {
+
     private val timestamps = listOf<Double>().toMutableList()
     private val values = listOf<T>().toMutableList()
+
+    init{
+        addValue(initialValue)
+    }
 
     override fun addValue(value: T) {
         timestamps.add(env.now)
@@ -104,16 +115,13 @@ class FrequencyLevelMonitor<T>(name: String? = null) : FrequencyMonitor<T>(name)
     }
 
 
-    override fun printHistogram() {
-        super.printHistogram()
-    }
+    override fun get(time: Double): T = TODO("Not yet implemented")
 }
 
 open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name) {
-    //    val sumStats = SummaryStatistics()
-    val sumStats = DescriptiveStatistics()
+    private val sumStats = DescriptiveStatistics()
 
-    val values: DoubleArray
+    internal val values: DoubleArray
         get() = sumStats.values
 
     open fun addValue(value: Number) {
@@ -121,89 +129,94 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
     }
 
     /** Increment the current value by 1 and add it as value. Autostart with 0 if there is no prior value. */
-    fun inc(){
+    fun inc() {
         val roundToInt = (values.lastOrNull() ?: 0.0).roundToInt()
-        addValue((roundToInt+1).toDouble())
+        addValue((roundToInt + 1).toDouble())
     }
 
+    override fun reset(): Unit = TODO("Not yet implemented")
 
-    override fun reset() {
-        TODO("Not yet implemented")
-    }
-
-    fun printStats() = sumStats.run {
-        println(
-            """
-       |name
-       |entries\t\t${n}
-       |minimum\t\t${min}
-       |mean\t\t${mean()}
-       |minimum\t\t${min}
-       |maximum\t\t${max}
-       |""".trimMargin()
-        )
-
-        // also print histogram
-        val hist = sumStats.buildHistogram().map{ 1000*it.toDouble()/ sumStats.sum}
-        hist.forEachIndexed{ idx, value ->
-            idx.toString()+"\t"+ "*".repeat(value.toInt()).padEnd(120,' ').println()
-        }
+    fun printStats() {
+        sumStats.printHistogram(name)
     }
 
     open fun mean(): Double? = sumStats.mean
+    open fun standardDeviation(): Double? = sumStats.mean
 }
 
-class NumericLevelMonitor(name: String? = null) : NumericStatisticMonitor(name) {
+
+/**
+ * Allows to track a numeric quantity over time.
+ *
+ * @param initialValue initial value for a level monitor. It is important to set the value correctly. Default: 0
+ */
+class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : NumericStatisticMonitor(name), LevelMonitor<Number> {
     val timestamps = listOf<Double>().toMutableList()
+
+    init {
+        addValue(initialValue)
+    }
 
     override fun addValue(value: Number) {
         timestamps.add(env.now)
-//        if (sumStats.n == 0L){
-//            durations.addValue(Double.MAX_VALUE)
-//        }else{
-//            durations.addValue(env.now - durations.values.last())
-//        }
-
         super.addValue(value)
     }
 
-    override fun mean(): Double? {
-        val durations = xDuration()
+    override fun get(time: Double): Number = timestamps.zip(values.toList()).first { it.first > time }.second
 
-        if(sumStats.values.isEmpty()) return null
+    internal fun valuesUntilNow(excludeZeros: Boolean = false): NLMStatsData {
+        val valuesLst = values.toList()
 
-        return Mean().evaluate(sumStats.values, durations)
-    }
-
-    private fun xDuration() =
-        timestamps.toMutableList().apply { add(env.now) }.zipWithNext { first, second -> second - first }
+        val timepointsExt = timestamps + env.now
+        val durations  = timepointsExt.toMutableList().zipWithNext { first, second -> second - first }
             .toDoubleArray()
+
+        return if(excludeZeros) {
+            val (durFilt, valFilt) = durations.zip(valuesLst).filter { it.second > 0 }.unzip()
+            val (_, timestampsFilt) = timestamps.zip(valuesLst).filter { it.second > 0 }.unzip()
+
+            NLMStatsData(valFilt, timestampsFilt, durFilt.toDoubleArray() )
+        }else{
+            NLMStatsData(valuesLst, timestamps, durations)
+        }
+    }
 }
 
 
-fun main() {
-//    DiscreteStatisticMonitor<String>().addValue("sdf")
-//    DiscreteLevelMonitor<String>().addValue("sdf")
-    Environment()
+internal data class NLMStatsData(val values: List<Double>, val timepoints: List<Double>, val durations: DoubleArray)
 
-}
+class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean = false) {
+    val duration : Double
 
+    val mean: Double?
+    val standardDeviation: Double?
 
-// https://stackoverflow.com/questions/10786465/how-to-generate-bins-for-histogram-using-apache-math-3-0-in-java
-internal fun DescriptiveStatistics.buildHistogram(binCount: Int=30): LongArray {
-    val data = values
+    val min: Double?
+    val max: Double?
 
-    val histogram = LongArray(binCount)
-    val distribution = EmpiricalDistribution(binCount)
-    distribution.load(data)
-    var k = 0
-    for (stats in distribution.binStats) {
-        histogram[k++] = stats.n
+//    val median :Double = TODO()
+//    val ninetyfivePercentile :Double = TODO()
+//    val ninetyninePercentile :Double = TODO()
+
+    init{
+        val data = nlm.valuesUntilNow(excludeZeros)
+
+        min = data.values.minOrNull()
+        max = data.values.maxOrNull()
+
+        mean = Mean().evaluate(data.values.toDoubleArray(), data.durations)
+        standardDeviation = sqrt(Variance().evaluate(data.values.toDoubleArray(), data.durations))
+        // weights not supported
+        // mean = Median().evaluate(data.values.toDoubleArray(), data.timepoints.toDoubleArray())
+
+        duration = data.durations.sum()
     }
 
-    return histogram;
-}
-
-internal fun Any.println(){
-    println(toString())
+    fun toJson() = json {
+        "duration" to duration
+        "mean" to mean.roundAny()
+        "standard_deviation" to standardDeviation.roundAny()
+        "min" to min.roundAny()
+        "max" to max.roundAny()
+    }
 }

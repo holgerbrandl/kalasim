@@ -2,6 +2,7 @@ package org.github.holgerbrandl.kalasim.examples.kalasim
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.github.holgerbrandl.kalasim.*
+import org.github.holgerbrandl.kalasim.misc.println
 import org.koin.core.get
 import org.koin.core.inject
 import org.koin.core.qualifier.named

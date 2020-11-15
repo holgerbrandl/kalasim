@@ -4,6 +4,7 @@ package org.github.holgerbrandl.kalasim.examples.koiner
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.github.holgerbrandl.kalasim.*
+import org.github.holgerbrandl.kalasim.test.display
 import org.koin.core.get
 import org.koin.core.inject
 
@@ -21,25 +22,11 @@ class Customer(val waitingLine: ComponentQueue<Customer>, val clerk: Clerk) : Co
 //    }
 
     override fun process() = sequence {
-        while (true) {
             waitingLine.add(this@Customer)
 
             if (clerk.isPassive) clerk.activate()
 
             yield(passivate())
-        }
-    }
-}
-class CustomerGenerator : Component() {
-
-    //    var numCreated  = 0
-    override fun process() = sequence {
-//        if(numCreated++ >5 ) return@sequence
-        while (true) {
-            Customer(get(), get())
-
-            yield(hold(UniformRealDistribution(5.0, 15.0).sample()))
-        }
     }
 }
 
@@ -49,21 +36,38 @@ class Clerk : Component() {
     val waitingLine: ComponentQueue<Customer> by inject()
 
     override suspend fun SequenceScope<Component>.process() {
-        while (waitingLine.isEmpty()) yield(passivate())
+        while(true) {
+            while (waitingLine.isEmpty()) yield(passivate())
 
-        val customer = waitingLine.poll()
+            val customer = waitingLine.poll()
 
-        yield(hold(30.0)) // bearbeitungszeit
-        customer.activate()
+            yield(hold(10.0)) // bearbeitungszeit
+            customer.activate()
+        }
     }
 }
+
+class CustomerGenerator : Component() {
+
+    //    var numCreated  = 0
+    override fun process() = sequence {
+//        if(numCreated++ >5 ) return@sequence
+        while (true) {
+            Customer(get(), get())
+
+            yield(hold(UniformRealDistribution(env.rg,5.0, 15.0).sample()))
+        }
+    }
+}
+
+
 
 fun main() {
 
     val env = configureEnvironment {
 
         add { Clerk() }
-        add { ComponentQueue<Customer>() }
+        add { ComponentQueue<Customer>("waiting line") }
 
 //        repeat(10) { add{ Customer(get(), get()) } }
         // register components needed for dependency injection
@@ -79,4 +83,5 @@ fun main() {
     val waitingLine: ComponentQueue<Customer> = env.get()
 
     waitingLine.stats.print()
+    waitingLine.queueLengthStats.display()
 }

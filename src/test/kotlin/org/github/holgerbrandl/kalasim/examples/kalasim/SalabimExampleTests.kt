@@ -6,7 +6,7 @@ class SalabimExampleTests {
 
 
     @Test
-    fun `Bank_1_clerk`(){
+    fun Bank_1_clerk(){
 
     }
 }

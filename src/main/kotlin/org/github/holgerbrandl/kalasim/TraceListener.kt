@@ -1,11 +1,9 @@
 package org.github.holgerbrandl.kalasim
 
-import java.text.DecimalFormat
+import org.github.holgerbrandl.kalasim.misc.TRACE_DF
 
 
-private val TRACE_DF = DecimalFormat("###.00")
 private val TRACE_COL_WIDTHS = listOf(10, 25, 25, 12, 30)
-
 
 data class TraceElement(
     val time: Double,

@@ -39,7 +39,8 @@ class StateTests {
         }
 
         sim.apply{
-            Car()
+            val car = Car()
+            car.activate()
 
             val trafficLight = get<State<String>>()
 

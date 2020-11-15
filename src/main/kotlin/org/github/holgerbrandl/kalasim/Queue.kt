@@ -1,7 +1,9 @@
 package org.github.holgerbrandl.kalasim
 
-import org.apache.commons.math3.stat.Frequency
+import com.systema.analytics.es.misc.json
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics
+import org.apache.commons.math3.util.Precision
+import org.github.holgerbrandl.kalasim.misc.println
 import org.koin.core.KoinComponent
 import java.util.*
 
@@ -19,16 +21,17 @@ class ComponentQueue<T : Component>(
         get() = q.size
 
     //    val ass = AggregateSummaryStatistics()
-    val lengthOfStayStats = SummaryStatistics()
-    val queueLengthStats = Frequency()
-
+    val queueLengthStats = NumericLevelMonitor("Length of $name")
+    val lengthOfStayStats = NumericStatisticMonitor("Length of stay in $name")
 
     fun add(element: T, priority: Int? = null): Boolean {
         printTrace(element, "entering $name")
 
-        queueLengthStats.addValue(q.size)
+        val added = q.add(CQElement(element, env.now, priority))
 
-        return q.add(CQElement(element, env.now, priority))
+        queueLengthStats.addValue(q.size.toDouble())
+
+        return added
     }
 
     fun poll(): T {
@@ -37,7 +40,7 @@ class ComponentQueue<T : Component>(
         printTrace(element, "leaving $name")
 
         lengthOfStayStats.addValue(enterTime)
-        queueLengthStats.addValue(q.size)
+        queueLengthStats.addValue(q.size.toDouble())
 
         return element
     }
@@ -47,10 +50,10 @@ class ComponentQueue<T : Component>(
 
         printTrace("leaving $name")
 
-        lengthOfStayStats.addValue(cqe.enterTime)
-        queueLengthStats.addValue(q.size)
-
         q.remove(cqe)
+
+        lengthOfStayStats.addValue(cqe.enterTime)
+        queueLengthStats.addValue(q.size.toDouble())
 
         return cqe.component
     }
@@ -62,23 +65,59 @@ class ComponentQueue<T : Component>(
     fun printStats() = stats.print()
 
     val stats: QueueStatistics
-        get() = QueueStatistics(queueLengthStats, lengthOfStayStats)
+        get() = QueueStatistics(this)
 
     override val info: Snapshot
         get() = TODO()
 }
 
-@Suppress("MemberVisibilityCanBePrivate")
-class QueueStatistics(val queueLengthStats: Frequency, val lengthOfStayStats: SummaryStatistics) {
-    fun print() {
-        println("Queue Length:")
-        println(queueLengthStats)
 
-        println("Length of Stay:")
-        println(lengthOfStayStats)
+@Suppress("MemberVisibilityCanBePrivate")
+class QueueStatistics(cq: ComponentQueue<*>) {
+
+    val name = cq.name
+
+    val lengthStats = NumericLevelMonitorStats(cq.queueLengthStats)
+    val lengthStatsExclZeros = NumericLevelMonitorStats(cq.queueLengthStats, excludeZeros = true)
+
+    val lengthOfStayStats =
+        SummaryStatistics().apply { cq.lengthOfStayStats.values.forEach { addValue(it) } }
+
+    val lengthOfStayStatsExclZeros =
+        SummaryStatistics().apply { cq.lengthOfStayStats.values.filter { it > 0 }.forEach { addValue(it) } }
+
+    // Partial support for weighted percentiles was added in https://github.com/apache/commons-math/tree/fe29577cdbcf8d321a0595b3ef7809c8a3ce0166
+    // Update once released, use jitpack or publish manually
+//    val nintyfivePercentile = Percentile(0.95).setData()evaluate()
+
+
+    fun toJson() = json {
+        "type" to "queue statistics"
+        "name" to name
+
+        "length_of_stay" to {
+            "all" to lengthOfStayStats.toJson()
+            "excl_zeros" to lengthOfStayStatsExclZeros.toJson()
+        }
+
+        "queue_length" to {
+            "all" to lengthStats.toJson()
+            "excl_zeros" to lengthStatsExclZeros.toJson()
+        }
     }
 
-//    todo serialize to json etc
-
-    // add listener for live streaming
+    fun print() = toJson().toString(3).println()
 }
+
+private fun SummaryStatistics.toJson(): Any {
+    return json {
+        "entries" to n
+        "mean" to mean.roundAny()
+        "standard_deviation" to standardDeviation.roundAny()
+        // TODO percentiles
+    }
+}
+
+//private fun DoubleArray.standardDeviation(): Double = StandardDeviation(false).evaluate(this)
+
+internal fun Double?.roundAny(n: Int = 3) = if (this == null) this else Precision.round(this, n)

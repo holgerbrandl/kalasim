@@ -1,5 +1,7 @@
 package org.github.holgerbrandl.kalasim
 
+import org.apache.commons.math3.random.JDKRandomGenerator
+import org.apache.commons.math3.random.RandomGenerator
 import org.github.holgerbrandl.kalasim.ComponentState.CURRENT
 import org.github.holgerbrandl.kalasim.ComponentState.STANDBY
 import org.koin.core.KoinComponent
@@ -30,6 +32,8 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
 
 
     private var running: Boolean = false
+
+    val rg: RandomGenerator = JDKRandomGenerator(42)
 
     val eventQueue = PriorityQueue<QueueElement>()
 
@@ -123,7 +127,6 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
                     setCurrent(it, "standby")
                     it.callProcess()
                 }
-
         }
 
         pendingStandBy += standBy

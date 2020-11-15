@@ -3,6 +3,7 @@ package org.github.holgerbrandl.kalasim.test
 import kravis.*
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.github.holgerbrandl.kalasim.*
+import org.github.holgerbrandl.kalasim.misc.println
 import org.koin.core.get
 import org.koin.core.inject
 import org.koin.core.qualifier.named
@@ -131,7 +132,7 @@ internal fun NumericLevelMonitor.display() {
         data.plot(
             x =  Pair<Double,Double>::first,
             y =  Pair<Double,Double>::second
-        ).xLabel("time").yLabel("").geomLine().title(name).show()
+        ).xLabel("time").yLabel("").geomStep().title(name).show()
     }
 
 }

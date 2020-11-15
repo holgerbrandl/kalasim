@@ -56,4 +56,16 @@ class StateTransitionTests {
             Customer()
         }.run(1.0)
     }
+
+    @Test
+    fun `it should correctly keep track of the state`(){
+        var c :Component? = null
+        createSimulation {c =  Component() }.apply {
+            run(10.0)
+            c!!.status = ComponentState.WAITING
+            run(10.0)
+        }
+
+        c!!.statusMonitor.printHistogram()
+    }
 }

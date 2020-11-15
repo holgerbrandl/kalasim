@@ -1,5 +1,6 @@
 package org.github.holgerbrandl.kalasim
 
+import org.github.holgerbrandl.kalasim.misc.println
 import org.koin.core.KoinComponent
 
 abstract class SimulationEntity(name: String?) : KoinComponent {
