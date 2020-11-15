@@ -1,6 +1,5 @@
 package org.github.holgerbrandl.kalasim.examples.kalasim
 
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import org.github.holgerbrandl.kalasim.ComponentQueue
 import org.github.holgerbrandl.kalasim.add
@@ -8,7 +7,6 @@ import org.github.holgerbrandl.kalasim.configureEnvironment
 import org.github.holgerbrandl.kalasim.examples.koiner.Clerk
 import org.github.holgerbrandl.kalasim.examples.koiner.Customer
 import org.github.holgerbrandl.kalasim.examples.koiner.CustomerGenerator
-import org.github.holgerbrandl.kalasim.test.display
 import org.json.JSONObject
 import org.koin.core.get
 import kotlin.test.Test
@@ -27,7 +25,7 @@ class SalabimExampleTests {
 
         val waitingLine: ComponentQueue<Customer> = env.get()
 
-        val expextedStats = JSONObject(
+        val expectedStats = JSONObject(
             """
             {
                "queue_length": {
@@ -64,6 +62,6 @@ class SalabimExampleTests {
         """
         )
 
-        waitingLine.stats.toJson().toString(2) shouldBe expextedStats.toString(2)
+        waitingLine.stats.toJson().toString(2) shouldBe expectedStats.toString(2)
     }
 }
