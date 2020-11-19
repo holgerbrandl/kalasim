@@ -62,6 +62,8 @@ class SalabimExampleTests {
         """
         )
 
+        //https://github.com/stleary/JSON-java/issues/573
         waitingLine.stats.toJson().toString(2) shouldBe expectedStats.toString(2)
+//        waitingLine.stats.toJson().similar(expectedStats) shouldBe true
     }
 }

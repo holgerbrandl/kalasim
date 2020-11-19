@@ -21,30 +21,32 @@ abstract class SimulationEntity(name: String?) : KoinComponent {
     protected abstract val info: Snapshot
 
     fun printInfo() = info.println()
+
     override fun toString(): String = "${javaClass.simpleName}($name)"
 
 
-    fun printTrace(info: String) = env.apply { printTrace(now, curComponent, null, info) }
+    fun printTrace(info: String) = env.apply { printTrace(now, curComponent, null, null, info) }
 
-    fun <T : Component> printTrace(element: T, info: String) =
-        env.apply { printTrace(now, curComponent, element, info) }
+    fun <T : Component> printTrace(element: T, info: String?) =
+        env.apply { printTrace(now, curComponent, element, null, info) }
 
     /**
      * Prints a trace line
      *
      *  @param curComponent  Modification consuming component
-     *  @param component Modification causing component
+     *  @param source Modification causing simulation entity
      *  @param info Detailing out the nature of the modification
      */
     fun printTrace(
         time: Double,
         curComponent: Component?,
-        component: Component?,
+        source: SimulationEntity?,
+        actionDetails: String?,
         info: String? = null
     ) {
-        if(!monitor) return
+        if (!monitor) return
 
-        val tr = TraceElement(time, curComponent, component, info)
+        val tr = TraceElement(time, curComponent, source, actionDetails, info)
 
         env.publishTraceRecord(tr)
     }

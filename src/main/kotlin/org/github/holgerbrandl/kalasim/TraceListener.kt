@@ -3,12 +3,14 @@ package org.github.holgerbrandl.kalasim
 import org.github.holgerbrandl.kalasim.misc.TRACE_DF
 
 
-private val TRACE_COL_WIDTHS = listOf(10, 25, 25, 12, 30)
+private val TRACE_COL_WIDTHS = listOf(10, 25, 35, 35)
 
+//todo we should provide an api to resolve these references into a more slim log representation
 data class TraceElement(
     val time: Double,
     val curComponent: Component?,
-    val component: Component?,
+    val source: SimulationEntity?,
+    val actionDetails: String?,
     val info: String?
 ) {
     override fun toString(): String {
@@ -16,8 +18,8 @@ data class TraceElement(
         return listOf(
             TRACE_DF.format(time),
             curComponent?.name,
-            component?.name,
-            component?.status?.toString() ?: "",
+            ((source?.name ?: "") + " " + (actionDetails ?: "")).trim(),
+//            if(source is Component) source.status.toString() else "",
             info
         ).renderTraceLine().trim()
     }
@@ -45,7 +47,7 @@ class ConsoleTraceLogger(val diffRecords: Boolean) : TraceListener {
             val header = listOf(
                 "time",
                 "current component",
-                "component",
+//                "state",
                 "action",
                 "info"
             )
@@ -57,7 +59,7 @@ class ConsoleTraceLogger(val diffRecords: Boolean) : TraceListener {
         val printElement = if(diffRecords && lastElement !=null){
             with(traceElement){
                 val ccChanged = curComponent != lastElement!!.curComponent
-                TraceElement(time, if(ccChanged) curComponent else null, if(ccChanged) null else component, info)
+                TraceElement(time, if(ccChanged) curComponent else null, if(ccChanged) null else source, actionDetails, info)
             }
         }else{
             traceElement

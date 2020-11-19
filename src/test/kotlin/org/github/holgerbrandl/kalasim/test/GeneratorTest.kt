@@ -30,7 +30,7 @@ class GeneratorTest {
         }.run(100.0)
 
         val customers = tc.traces
-                .map { it.component }
+                .map { it.source }
                 .filterNotNull().distinct()
                 .filter { it.name.startsWith("Customer") }
 

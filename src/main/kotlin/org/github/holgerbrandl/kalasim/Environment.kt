@@ -139,7 +139,7 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
             time to c
         } else {
             val t = if (endOnEmptyEventlist) {
-                publishTraceRecord(TraceElement(now, curComponent, null, "run end; no events left"))
+                publishTraceRecord(TraceElement(now, curComponent, null, null, "run end; no events left"))
                 now
             } else {
                 Double.MAX_VALUE
@@ -168,7 +168,7 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
 
         curComponent = c
 
-        c.printTrace(c,info ?: "")
+        c.printTrace(c,info)
     }
 
 

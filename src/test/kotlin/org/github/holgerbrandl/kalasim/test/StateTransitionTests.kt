@@ -33,12 +33,12 @@ class StateTransitionTests {
 //        traces.forEach { println(it) }
 
         // make sure multiple cars are created
-        val cars = traces.map { it.component }.filterNotNull().distinct().filter { it.name.startsWith("Car") }
+        val cars = traces.map { it.source }.filterNotNull().distinct().filter { it.name.startsWith("Car") }
         assertEquals(5, cars.size, "expected cars count does not match")
 
-        assert(traces[0].component!!.name == MAIN)
-        assert(traces[1].component!!.name == MAIN)
-        assert(traces[2].component!!.name == MAIN)
+        assert(traces[0].source!!.name == MAIN)
+        assert(traces[1].source!!.name == MAIN)
+        assert(traces[2].source!!.name == MAIN)
     }
 
 

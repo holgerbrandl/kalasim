@@ -66,7 +66,7 @@ open class Component(
     init {
         val dataSuffix = if (process == null && this.name != MAIN) " data" else ""
         env.addComponent(this)
-        printTrace(now(), env.curComponent, this, "create" + dataSuffix)
+        printTrace(now(), env.curComponent, this, "create", dataSuffix)
 
 
         // if its a generator treat it as such
@@ -182,7 +182,7 @@ open class Component(
 
         scheduledTime = Double.MAX_VALUE
         status = PASSIVE
-        printTrace(now(), env.curComponent, this)
+        printTrace(now(), env.curComponent, this, "passivate")
 
 
         return this
@@ -206,7 +206,7 @@ open class Component(
 
         status = DATA
 
-        printTrace(now(), env.curComponent, this, "cancel")
+        printTrace(now(), env.curComponent, this, null, "cancel")
     }
 
     /**
@@ -228,7 +228,7 @@ open class Component(
         env.addStandBy(this)
 
         status = STANDBY
-        printTrace(now(), env.curComponent, this)
+        printTrace(now(), env.curComponent, this, null)
 
     }
 
@@ -369,6 +369,7 @@ open class Component(
                 env.curComponent,
                 this,
 //                REQUESTING.toString() + " " + r.name
+                null,
                 reqText
             )
 
@@ -518,7 +519,7 @@ open class Component(
         scheduledTime = Double.MAX_VALUE
         simProcess = null
 
-        printTrace(now(), env.curComponent, this, "ended")
+        printTrace(now(), env.curComponent, this, null, "ended")
 
         return (this)
     }
@@ -544,13 +545,18 @@ open class Component(
         //todo implement extra
         val extra = "scheduled for ${TRACE_DF.format(scheduledTime)}"
 
+        // line_no: reference to source position
+        // 9+ --> continnue generator
+        // 13 --> no plus means: generator start
+
+
         // calculate scheduling delta
         val delta = if (this.scheduledTime == env.now || (this.scheduledTime == Double.MAX_VALUE)) "" else {
-            "+" + TRACE_DF.format(this.scheduledTime - env.now)
+            "+" + TRACE_DF.format(this.scheduledTime - env.now) +" "
         }
 
         // print trace
-        printTrace(now(), env.curComponent, this, "$caller $delta $extra")
+        printTrace(now(), env.curComponent, this, caller + delta, "$extra")
     }
 
     /**

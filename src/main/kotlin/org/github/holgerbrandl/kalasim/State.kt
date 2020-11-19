@@ -22,17 +22,21 @@ class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
 
             // todo ensure that this is called also for the initial value
             valueMonitor.addValue(value)
-            printTrace("set value to ${value}")
-            tryWait()
+
+            if (Thread.currentThread().getStackTrace()[2].methodName != "trigger") {
+                tryWait()
+            }
         }
 
 
-    private val valueMonitor = FrequencyLevelMonitor<T>(initialValue=value)
+    private val valueMonitor = FrequencyLevelMonitor<T>(initialValue = value)
 
     internal val waiters = ComponentQueue<Component>("waiters of ${this.name}")
 //    val waiters = PriorityQueue<Component>()
 
     override fun toString(): String = super.toString() + "[${value}]"
+
+    private var isTrigger: Boolean = false
 
     /**
      * Sets the value `value` and triggers any components waiting,
@@ -43,8 +47,8 @@ class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
      * @param valueAfter After the trigger this will be the new value. If omitted, return to the value before the trigger
      * @param max Maximum number of components to be honored for the trigger value
      */
-    fun trigger(value: T, valueAfter: T = value, max: Int = Int.MAX_VALUE) {
-        printTrace(" value = ${value} --> ${valueAfter} allow $max components")
+    fun trigger(value: T, valueAfter: T = this.value, max: Int = Int.MAX_VALUE) {
+        printTrace(env.now, env.curComponent, this,  "trigger", "value = ${value} --> ${valueAfter} allow $max components")
 
         this.value = value
         tryWait(max)
@@ -53,9 +57,13 @@ class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
         tryWait()
     }
 
-    // conf example
     private fun tryWait(max: Int = Int.MAX_VALUE) {
-        waiters.q.map { it.component }.take(max).forEach { it.tryWait() }
+        var mx = max
+        waiters.q.map { it.component }.takeWhile {
+            // wait max times but consider honor return state of tryWait
+            if (it.tryWait()) mx--;
+            mx > 0
+        }
     }
 
     public override val info

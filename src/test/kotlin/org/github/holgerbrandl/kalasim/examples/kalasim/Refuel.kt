@@ -93,8 +93,10 @@ object Refuel {
                 availableQuantityMonitor.printStats()
             }
 
-            get<GasStation>().requesters.queueLengthMonitor.println()
-            get<GasStation>().requesters.lengthOfStayMonitor.println()
+            get<GasStation>().requesters.apply{
+                queueLengthMonitor.println()
+                lengthOfStayMonitor.println()
+            }
         }
     }
 }

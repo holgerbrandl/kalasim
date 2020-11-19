@@ -51,7 +51,7 @@ class ComponentGenerator<T : Component>(
     }
 
     fun doFinalize(): Sequence<Component> = sequence {
-        printTrace(now(), env.curComponent, this@ComponentGenerator, "till reached")
+        printTrace(now(), env.curComponent, this@ComponentGenerator, null, "till reached")
     }
 
     override val info: Snapshot
