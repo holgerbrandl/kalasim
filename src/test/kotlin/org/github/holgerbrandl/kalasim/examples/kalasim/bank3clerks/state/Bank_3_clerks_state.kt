@@ -4,6 +4,7 @@ package org.github.holgerbrandl.kalasim.examples.kalasim.bank3clerks.state
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.github.holgerbrandl.kalasim.*
+import org.github.holgerbrandl.kalasim.test.display
 import org.koin.core.get
 import org.koin.core.inject
 
@@ -30,14 +31,16 @@ class Clerk : Component() {
     val waitingLine: ComponentQueue<Customer> by inject()
     val workTodo: State<Boolean> by inject()
 
-    override fun process() = sequence{
-        if (waitingLine.isEmpty())
-            yield(this@Clerk.wait(workTodo, true))
+    override fun process() = sequence {
+        while (true) {
+            if (waitingLine.isEmpty())
+                yield(this@Clerk.wait(workTodo, true))
 
-        val customer = waitingLine.poll()
+            val customer = waitingLine.poll()
 
-        yield(hold(30.0)) // bearbeitungszeit
-        customer.activate()
+            yield(hold(32.0)) // bearbeitungszeit
+            customer.activate()
+        }
     }
 }
 
@@ -51,8 +54,12 @@ fun main() {
         // register other components to  be present when starting the simulation
         repeat(3) { Clerk() }
         CustomerGenerator()
-    }.run(50000.0)
+    }.run(500.0)
 
     env.get<ComponentQueue<Customer>>().printStats()
     env.get<State<Boolean>>().printInfo()
+
+//    val waitingLine: ComponentQueue<Customer> = env.get()
+//    waitingLine.stats.print()
+//    waitingLine.queueLengthMonitor.display()
 }

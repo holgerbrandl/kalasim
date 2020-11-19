@@ -32,12 +32,12 @@ abstract class Monitor<T>(name: String? = null) : KoinComponent {
 }
 
 
-interface LevelMonitor<T>  {
+interface LevelMonitor<T> {
 
     /**
      * When Monitor.get() is called with a time parameter or a direct call with a time parameter, the value at that time will be returned.
      * */
-     operator fun get(time: Double): T
+    operator fun get(time: Double): T
 }
 
 /**
@@ -84,7 +84,7 @@ class FrequencyLevelMonitor<T>(initialValue: T, name: String? = null) : Frequenc
     private val timestamps = listOf<Double>().toMutableList()
     private val values = listOf<T>().toMutableList()
 
-    init{
+    init {
         addValue(initialValue)
     }
 
@@ -150,7 +150,8 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
  *
  * @param initialValue initial value for a level monitor. It is important to set the value correctly. Default: 0
  */
-class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : NumericStatisticMonitor(name), LevelMonitor<Number> {
+class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : NumericStatisticMonitor(name),
+    LevelMonitor<Number> {
     val timestamps = listOf<Double>().toMutableList()
 
     init {
@@ -168,15 +169,15 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : Nume
         val valuesLst = values.toList()
 
         val timepointsExt = timestamps + env.now
-        val durations  = timepointsExt.toMutableList().zipWithNext { first, second -> second - first }
+        val durations = timepointsExt.toMutableList().zipWithNext { first, second -> second - first }
             .toDoubleArray()
 
-        return if(excludeZeros) {
+        return if (excludeZeros) {
             val (durFilt, valFilt) = durations.zip(valuesLst).filter { it.second > 0 }.unzip()
             val (_, timestampsFilt) = timestamps.zip(valuesLst).filter { it.second > 0 }.unzip()
 
-            NLMStatsData(valFilt, timestampsFilt, durFilt.toDoubleArray() )
-        }else{
+            NLMStatsData(valFilt, timestampsFilt, durFilt.toDoubleArray())
+        } else {
             NLMStatsData(valuesLst, timestamps, durations)
         }
     }
@@ -186,7 +187,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : Nume
 internal data class NLMStatsData(val values: List<Double>, val timepoints: List<Double>, val durations: DoubleArray)
 
 class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean = false) {
-    val duration : Double
+    val duration: Double
 
     val mean: Double?
     val standardDeviation: Double?
@@ -198,14 +199,20 @@ class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean =
 //    val ninetyfivePercentile :Double = TODO()
 //    val ninetyninePercentile :Double = TODO()
 
-    init{
+    init {
         val data = nlm.valuesUntilNow(excludeZeros)
 
         min = data.values.minOrNull()
         max = data.values.maxOrNull()
 
-        mean = Mean().evaluate(data.values.toDoubleArray(), data.durations)
-        standardDeviation = sqrt(Variance().evaluate(data.values.toDoubleArray(), data.durations))
+        if (data.durations.any { it != 0.0 }) {
+            mean = Mean().evaluate(data.values.toDoubleArray(), data.durations)
+            standardDeviation = sqrt(Variance().evaluate(data.values.toDoubleArray(), data.durations))
+        }else{
+            // this happens if all there is in total no duration associated once 0s are removed
+            mean = null
+            standardDeviation = null
+        }
         // weights not supported
         // mean = Median().evaluate(data.values.toDoubleArray(), data.timepoints.toDoubleArray())
 
