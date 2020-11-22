@@ -2,7 +2,6 @@ package org.github.holgerbrandl.kalasim.test
 
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.yield
 import org.github.holgerbrandl.kalasim.*
 import org.junit.Test
 import org.koin.core.get
