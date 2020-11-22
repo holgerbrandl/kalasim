@@ -11,10 +11,10 @@ data class CQElement<C : Component>(val component: C, val enterTime: Double, val
 
 //TODO add opt-out for queue monitoring
 
-class ComponentQueue<T : Component>(
+class ComponentQueue<C : Component>(
     name: String? = null,
 //    val q: Queue<CQElement<T>> = LinkedList()
-    val q: Queue<CQElement<T>> = PriorityQueue { o1, o2 -> compareValuesBy(o1, o2, { it.priority }) }
+    val q: Queue<CQElement<C>> = PriorityQueue { o1, o2 -> compareValuesBy(o1, o2, { it.priority }) }
 ) : KoinComponent, SimulationEntity(name) {
 
     val size: Int
@@ -24,7 +24,7 @@ class ComponentQueue<T : Component>(
     val queueLengthMonitor = NumericLevelMonitor("Length of $name")
     val lengthOfStayMonitor = NumericStatisticMonitor("Length of stay in $name")
 
-    fun add(element: T, priority: Int? = null): Boolean {
+    fun add(element: C, priority: Int? = null): Boolean {
         printTrace(element, "entering $name")
 
         val added = q.add(CQElement(element, env.now, priority))
@@ -34,7 +34,7 @@ class ComponentQueue<T : Component>(
         return added
     }
 
-    fun poll(): T {
+    fun poll(): C {
         val (element, enterTime) = q.poll()
 
         printTrace(element, "leaving $name")
@@ -45,7 +45,7 @@ class ComponentQueue<T : Component>(
         return element
     }
 
-    fun remove(elem: T): T {
+    fun remove(elem: C): C {
         val cqe = q.first { it.component == elem }
 
         printTrace("leaving $name")
@@ -58,11 +58,20 @@ class ComponentQueue<T : Component>(
         return cqe.component
     }
 
+    fun contains(t: C): Boolean =  q.any { it.component == t }
+
+
     fun isEmpty() = size == 0
 
     fun isNotEmpty() = !isEmpty()
 
     fun printStats() = stats.print()
+
+    /** Makes the argument leaving this queue. */
+    fun leave(c: C) {
+        printTrace(c, "leaving $name")
+        q.find {  it.component ==c }?.let { q.remove(it)}
+    }
 
     val stats: QueueStatistics
         get() = QueueStatistics(this)

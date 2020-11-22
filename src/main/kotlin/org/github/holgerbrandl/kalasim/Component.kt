@@ -56,9 +56,9 @@ open class Component(
 
     var status: ComponentState = DATA
         set(value) {
-                field = value
-                statusMonitor.addValue(value)
-            }
+            field = value
+            statusMonitor.addValue(value)
+        }
 
     val statusMonitor = FrequencyLevelMonitor<ComponentState>(status, "status of ${name}")
 
@@ -94,7 +94,7 @@ open class Component(
 
             if (isGenerator) {
                 @Suppress("UNCHECKED_CAST")
-                val sequence = process.call(this) as Sequence<Component>
+                val sequence = process.call(this)
                 GenProcessInternal(this, sequence, process.name)
             } else {
                 SimpleProcessInternal(this, process, process.name)
@@ -176,9 +176,10 @@ open class Component(
         } else {
             requireNotData()
             remove()
-            //todo checkFail
+            checkFail()
             remainingDuration = scheduledTime - env.now
         }
+
 
         scheduledTime = Double.MAX_VALUE
         status = PASSIVE
@@ -194,7 +195,7 @@ open class Component(
      *
      * See https://www.salabim.org/manual/Component.html#cancel
      */
-    fun cancel() {
+    fun cancel(): Component {
         if (status != CURRENT) {
             requireNotData()
             remove()
@@ -207,6 +208,8 @@ open class Component(
         status = DATA
 
         printTrace(now(), env.curComponent, this, null, "cancel")
+
+        return this
     }
 
     /**
@@ -229,7 +232,6 @@ open class Component(
 
         status = STANDBY
         printTrace(now(), env.curComponent, this, null)
-
     }
 
     fun put(
@@ -264,6 +266,7 @@ open class Component(
     //todo we should just support one here
 //    fun fixed(value: Double) = value.asConstantDist()
 //
+    @Suppress("unused")
     fun Double.asConstantDist() = ConstantRealDistribution(this)
 
     fun fixed(value: Double) = ConstantRealDistribution(value)
@@ -490,24 +493,12 @@ open class Component(
 
 //    @Deprecated("no longer needed, handled by queue directly")
 //    private fun enterSorted(requesters: Queue<Component>, priority: Int) {
-//        TODO("Not yet implemented")
 //    }
 
 
-    // TODO what is happening here
+    // kept in Component API for api compatibility with salabim
     private fun remove() {
-        val queueElem = env.eventQueue.firstOrNull {
-            it.component == this
-        }
-
-        if (queueElem != null) {
-            env.eventQueue.remove(queueElem)
-        }
-
-        if (status == STANDBY) {
-            env.addStandBy(this)
-            env.addPendingStandBy(this)
-        }
+        env.remove(this)
     }
 
     fun terminate(): Component {
@@ -540,7 +531,9 @@ open class Component(
 
         this.scheduledTime = scheduledTime
 
-        if (this.scheduledTime != Double.MAX_VALUE) push(this.scheduledTime, priority, urgent)
+        if (this.scheduledTime != Double.MAX_VALUE) {
+            env.push(this, this.scheduledTime, priority, urgent)
+        }
 
         //todo implement extra
         val extra = "scheduled for ${TRACE_DF.format(scheduledTime)}"
@@ -552,11 +545,11 @@ open class Component(
 
         // calculate scheduling delta
         val delta = if (this.scheduledTime == env.now || (this.scheduledTime == Double.MAX_VALUE)) "" else {
-            "+" + TRACE_DF.format(this.scheduledTime - env.now) +" "
+            "+" + TRACE_DF.format(this.scheduledTime - env.now) + " "
         }
 
         // print trace
-        printTrace(now(), env.curComponent, this, caller + delta, "$extra")
+        printTrace(now(), env.curComponent, this, caller + delta, extra)
     }
 
     /**
@@ -580,7 +573,10 @@ open class Component(
     ): Component {
 
         val p = if (process == null) {
-            if (status == DATA) require(this.simProcess != null) { "no process for data component" }
+            if (status == DATA) {
+                require(this.simProcess != null) { "no process for data component" }
+            }
+
             this.simProcess
         } else {
             ingestFunPointer(process)
@@ -593,17 +589,6 @@ open class Component(
 
             extra = "process=${p.name}"
         }
-
-
-        //todo
-//            if inspect.isgeneratorfunction(p):
-//            self._process = p(**kwargs)
-//            self._process_isgenerator = True
-//            else:
-//            self._process = p
-//            self._process_isgenerator = False
-//            self._process_kwargs = kwargs
-
 
         if (status != CURRENT) {
             remove()
@@ -622,7 +607,7 @@ open class Component(
             at + delay
         }
 
-        reschedule(scheduledTime, priority, urgent, "activate " + extra)
+        reschedule(scheduledTime, priority, urgent, "activate $extra")
 
         return (this)
     }
@@ -672,17 +657,6 @@ open class Component(
     }
 
 
-    var seq: Int = 0
-
-    private fun push(scheduledTime: Double, priority: Int, urgent: Boolean) {
-        seq++
-        val heapSeq = if (urgent) -seq else seq
-
-//        https://bezkoder.com/kotlin-priority-queue/
-        env.eventQueue.add(QueueElement(scheduledTime, priority, heapSeq, this))
-    }
-
-
     fun callProcess() = simProcess!!.call()
 
     /**
@@ -694,15 +668,14 @@ open class Component(
      * @param  quantity  quantity to be released. If not specified, the resource will be emptied completely.
      * For non-anonymous resources, all components claiming from this resource will be released.
      */
-    fun release(resource: Resource) {
+    fun release(resource: Resource, quantity:Double? = null) {
         require(!resource.anonymous) { " It is not possible to release from an anonymous resource, this way.            Use Resource.release() in that case." }
 
-        // TODO Incomplete implementation in case of arguments
+        TODO("Incomplete implementation in case of arguments")
 
         if (claims.containsKey(resource)) {
             releaseInternal(resource)
         }
-
     }
 
     private fun releaseInternal(resource: Resource, q: Double? = null) {
@@ -745,7 +718,7 @@ open class Component(
      *
      * @sample TODO
      *
-     * @param args Sequence of items, where each item can be
+     * @param stateRequests Sequence of items, where each item can be
     - a state, where value=True, priority=tail of waiters queue)
     - a tuple/list containing
     state, a value and optionally a priority.
@@ -915,19 +888,6 @@ class SimpleProcessInternal(val component: Component, val funPointer: FunPointer
         funPointer.call(component)
     }
 }
-
-
-data class QueueElement(val time: Double, val priority: Int, val seq: Int, val component: Component) :
-    Comparable<QueueElement> {
-    override fun compareTo(other: QueueElement): Int {
-        return compareValuesBy(this, other, { it.priority }, { it.time })
-    }
-
-    override fun toString(): String {
-        return "${component.javaClass.simpleName}(${component.name}, $time, $priority, $seq)"
-    }
-}
-
 
 data class ResourceRequest(val r: Resource, val quantity: Double, val priority: Int? = null)
 

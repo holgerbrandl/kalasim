@@ -18,6 +18,10 @@ abstract class Monitor<T>(name: String? = null) : KoinComponent {
 
     val env by lazy { getKoin().get<Environment>() }
 
+    /** Disable or enable data collection in a monitor. */
+    //TODO implement this function
+    var enabled: Boolean = true
+
     var name: String
         private set
 
@@ -136,7 +140,7 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
 
     override fun reset(): Unit = TODO("Not yet implemented")
 
-    fun printStats() {
+    fun printHistogram() {
         sumStats.printHistogram(name)
     }
 
@@ -208,7 +212,7 @@ class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean =
         if (data.durations.any { it != 0.0 }) {
             mean = Mean().evaluate(data.values.toDoubleArray(), data.durations)
             standardDeviation = sqrt(Variance().evaluate(data.values.toDoubleArray(), data.durations))
-        }else{
+        } else {
             // this happens if all there is in total no duration associated once 0s are removed
             mean = null
             standardDeviation = null

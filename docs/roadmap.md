@@ -3,6 +3,8 @@
 
 ## Pre-release
 
+**{todo}** impelemnt `enabled` disabled for monitors
+
 **{todo}**  replace scheduledTime = Double.MAX_VALUE with null which is semantically more meaningful here
 
 **{todo}** update logs example in docs intro

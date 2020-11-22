@@ -28,6 +28,7 @@ fun Environment.createSimulation(builder: Environment.() -> Unit){
 
 class Environment(koins: org.koin.core.module.Module = module(createdAtStart = true) { }) : KoinComponent {
 
+    @Deprecated("serves no purposes and creates a memory leaks as objects are nowhere releases")
     private val components: MutableList<Component> = listOf<Component>().toMutableList()
 
 
@@ -35,7 +36,12 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
 
     val rg: RandomGenerator = JDKRandomGenerator(42)
 
-    val eventQueue = PriorityQueue<QueueElement>()
+    private val eventQueue = PriorityQueue<QueueElement>()
+
+    /** Unmodifiable view on `eventQueue`. */
+    val queue: List<Component>
+        get() = eventQueue.map{ it.component }
+
 
     private val traceListeners = listOf<TraceListener>().toMutableList()
 
@@ -86,6 +92,7 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
         return (this)
     }
 
+    @Deprecated("not really needed and shall be removed")
     fun addComponent(c: Component): Boolean {
         require(!components.contains(c)) { "we must not add a component twice" }
         return components.add(c)
@@ -96,9 +103,7 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
      * Start execution of the simulation
      */
     fun run(duration: Double? = null, until: Double? = null, priority: Int = 0, urgent: Boolean = false): Environment {
-
         if (duration == null) endOnEmptyEventlist = true
-
 
         val scheduledTime = calcScheduleTime(until, duration)
 
@@ -134,7 +139,7 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
 
 
         val (time, component) = if (eventQueue.isNotEmpty()) {
-            val (time, _, _, c) = eventQueue.poll()
+            val (c, time, _, _) = eventQueue.poll()
 
             time to c
         } else {
@@ -200,7 +205,59 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
     operator fun plus(component: Component): Environment {
         addComponent(component); return (this)
     }
+
+    fun remove(c: Component) {
+        val queueElem = eventQueue.firstOrNull {
+            it.component == c
+        }
+
+        if (queueElem != null) {
+            eventQueue.remove(queueElem)
+        }
+
+        // TODO what is happening here, can we simplify that?
+        if (c.status == STANDBY) {
+            addStandBy(c)
+            addPendingStandBy(c)
+        }
+    }
+
+    var queueCounter: Int = 0
+
+    fun push(component: Component, scheduledTime: Double, priority: Int, urgent: Boolean) {
+        queueCounter++
+
+//        https://bezkoder.com/kotlin-priority-queue/
+        eventQueue.add(QueueElement(component, scheduledTime, priority, queueCounter, urgent))
+
+        // consistency checks
+        require(queue.none(Component::isPassive)) { "passive component must not be in event queue" }
+    }
 }
+
+
+
+
+data class QueueElement(
+    val component: Component,
+    val time: Double,
+    val priority: Int,
+    val queueCounter: Int,
+    val urgent: Boolean
+) :
+    Comparable<QueueElement> {
+    override fun compareTo(other: QueueElement): Int =
+        compareValuesBy(this, other, { it.time }, { it.priority }, {it.queueCounter })
+
+    val heapSeq = if (urgent) -queueCounter else queueCounter
+
+
+    override fun toString(): String {
+//        return "${component.javaClass.simpleName}(${component.name}, $time, $priority, $seq)"
+        return "${component.javaClass.simpleName}(${component.name}, $time, $priority, $queueCounter) : ${component.status}"
+    }
+}
+
 
 fun Environment.calcScheduleTime(till: Double?, duration: Double?): Double {
     return if (till == null) {
