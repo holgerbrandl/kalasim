@@ -3,11 +3,13 @@ package org.github.holgerbrandl.kalasim.examples.kalasim.bank3clerks.reneging
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.github.holgerbrandl.kalasim.*
+import org.github.holgerbrandl.kalasim.analytics.display
+import org.github.holgerbrandl.kalasim.misc.println
 import org.koin.core.get
 import org.koin.core.inject
 
 
-//**{todo}** use monitors here
+//**{todo}** use monitors here and maybe even inject them
 var numBalked: Int = 0
 var numReneged: Int = 0
 
@@ -49,12 +51,10 @@ class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
 
             numReneged++
             printTrace("reneged")
-        }else {
+        } else {
             // if customer no longer in waiting line, serving has started meanwhile
             yield(passivate())
         }
-
-        println("done $name")
     }
 }
 
@@ -70,7 +70,6 @@ class Clerk : Component() {
             val customer = waitingLine.poll()
             customer.activate() // get the customer out of it's hold(50)
 
-
             yield(hold(30.0)) // bearbeitungszeit
             customer.activate() // signal the customer that's all's done
         }
@@ -84,13 +83,17 @@ fun main() {
         add { ComponentQueue<Customer>("waitingline") }
         add { State(false, "worktodo") }
         add { (0..2).map { Clerk() } }
-    }.apply {
+    }
+
+    env.apply {
         // register other components to  be present when starting the simulation
         CustomerGenerator()
 
         val waitingLine: ComponentQueue<Customer> = get()
+
         waitingLine.lengthOfStayMonitor.enabled = false
         run(1500.0)
+
         waitingLine.lengthOfStayMonitor.enabled = true
         run(500.0)
 
@@ -99,5 +102,10 @@ fun main() {
 
         println("number reneged: $numReneged")
         println("number balked: $numBalked")
+
+        waitingLine.queueLengthMonitor.display()
+        waitingLine.lengthOfStayMonitor.display()
+
+        waitingLine.stats.toJson().toString(2).println()
     }
 }

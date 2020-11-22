@@ -3,6 +3,7 @@ package org.github.holgerbrandl.kalasim.test
 import kravis.*
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.github.holgerbrandl.kalasim.*
+import org.github.holgerbrandl.kalasim.analytics.*
 import org.github.holgerbrandl.kalasim.misc.println
 import org.koin.core.get
 import org.koin.core.inject
@@ -124,15 +125,4 @@ object DeterministicRefuel {
             get<NumericLevelMonitor>(named(TRUCKS_ORDERED)).display()
         }
     }
-}
-
-internal fun NumericLevelMonitor.display() {
-    apply {
-        val data = timestamps.zip(values.toList())
-        data.plot(
-            x =  Pair<Double,Double>::first,
-            y =  Pair<Double,Double>::second
-        ).xLabel("time").yLabel("").geomStep().title(name).show()
-    }
-
 }

@@ -5,7 +5,7 @@
 
 **{todo}** impelemnt `enabled` disabled for monitors
 
-**{todo}**  replace scheduledTime = Double.MAX_VALUE with null which is semantically more meaningful here
+**{todo}**  make `scheduledTime` nullable: replace scheduledTime = Double.MAX_VALUE with null which is semantically more meaningful here
 
 **{todo}** update logs example in docs intro
 

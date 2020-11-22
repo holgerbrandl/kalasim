@@ -4,7 +4,7 @@ package org.github.holgerbrandl.kalasim.examples.koiner
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.github.holgerbrandl.kalasim.*
-import org.github.holgerbrandl.kalasim.test.display
+import org.github.holgerbrandl.kalasim.analytics.display
 import org.koin.core.get
 import org.koin.core.inject
 

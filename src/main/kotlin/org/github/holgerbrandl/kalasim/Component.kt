@@ -75,7 +75,7 @@ open class Component(
         if (process != null) {
             scheduledTime = env.now + delay
 
-            reschedule(scheduledTime, priority, false, "activate")
+            reschedule(scheduledTime, priority, false, "activate", SCHEDULED)
         }
 
         @Suppress("LeakingThis")
@@ -345,7 +345,6 @@ open class Component(
         resourceRequests.forEach { (r, quantity, priority) ->
             var q = quantity
 
-
             if (r.preemptive && resourceRequests.size > 1) {
                 throw IllegalArgumentException("preemptive resources do not support multiple resource requests")
             }
@@ -417,7 +416,7 @@ open class Component(
         tryRequest()
 
         if (requests.isNotEmpty()) {
-            reschedule(scheduledTime, 0, false, "request")
+            reschedule(scheduledTime, 0, false, "request", REQUESTING)
         }
 
         return this
@@ -483,7 +482,7 @@ open class Component(
 
         val honorInfo = rHonor.firstOrNull()!!.first.name + (if (rHonor.size > 1) "++" else "")
 
-        reschedule(now(), 0, false, "request honor $honorInfo")
+        reschedule(now(), 0, false, "request honor $honorInfo", SCHEDULED)
 
         // process negative put requests (todo can't we handle them separately)
         rHonor.filter { it.first.anonymous }.forEach { it.first.tryRequest() }
@@ -526,8 +525,12 @@ open class Component(
         priority: Int = 0,
         urgent: Boolean = false,
         caller: String? = null,
+        newStatus: ComponentState,
     ) {
         require(scheduledTime >= env.now) { "scheduled time (${scheduledTime}) before now (${env.now})" }
+        require(this !in env.queue ) { "component must not be in queue when reschudling but must be removed already at this point" }
+
+        status = newStatus
 
         this.scheduledTime = scheduledTime
 
@@ -607,7 +610,7 @@ open class Component(
             at + delay
         }
 
-        reschedule(scheduledTime, priority, urgent, "activate $extra")
+        reschedule(scheduledTime, priority, urgent, "activate $extra", SCHEDULED)
 
         return (this)
     }
@@ -651,7 +654,7 @@ open class Component(
 
         val scheduledTime = env.calcScheduleTime(till, duration)
 
-        reschedule(scheduledTime, priority, urgent, "hold")
+        reschedule(scheduledTime, priority, urgent, "hold", SCHEDULED)
 
         return (this)
     }
@@ -668,7 +671,7 @@ open class Component(
      * @param  quantity  quantity to be released. If not specified, the resource will be emptied completely.
      * For non-anonymous resources, all components claiming from this resource will be released.
      */
-    fun release(resource: Resource, quantity:Double? = null) {
+    fun release(resource: Resource, quantity: Double? = null) {
         require(!resource.anonymous) { " It is not possible to release from an anonymous resource, this way.            Use Resource.release() in that case." }
 
         TODO("Incomplete implementation in case of arguments")
@@ -766,7 +769,7 @@ open class Component(
         tryWait()
 
         if (waits.isNotEmpty()) {
-            reschedule(scheduledTime, 0, false, "wait")
+            reschedule(scheduledTime, 0, false, "wait", WAITING)
         }
 
         return this
@@ -795,7 +798,7 @@ open class Component(
             }
             waits.clear()
             remove()
-            reschedule(now, 0, false, "wait")
+            reschedule(now, 0, false, "wait", SCHEDULED)
         }
 
         return honored

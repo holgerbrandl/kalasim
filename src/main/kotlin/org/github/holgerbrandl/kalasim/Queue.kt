@@ -35,27 +35,30 @@ class ComponentQueue<C : Component>(
     }
 
     fun poll(): C {
-        val (element, enterTime) = q.poll()
+        val cqe = q.poll()
 
-        printTrace(element, "leaving $name")
-
-        lengthOfStayMonitor.addValue(enterTime)
-        queueLengthMonitor.addValue(q.size.toDouble())
-
-        return element
-    }
-
-    fun remove(elem: C): C {
-        val cqe = q.first { it.component == elem }
-
-        printTrace("leaving $name")
-
-        q.remove(cqe)
-
-        lengthOfStayMonitor.addValue(cqe.enterTime)
-        queueLengthMonitor.addValue(q.size.toDouble())
+        updateExitStats(cqe)
+        printTrace(cqe.component, "leaving $name")
 
         return cqe.component
+    }
+
+    fun remove(component: C): C {
+        val cqe = q.first { it.component == component }
+        q.remove(cqe)
+
+        updateExitStats(cqe)
+
+        printTrace(cqe.component,"removed from $name")
+
+        return cqe.component
+    }
+
+    private fun updateExitStats(cqe: CQElement<C>) {
+        val (_, enterTime) = cqe
+
+        lengthOfStayMonitor.addValue(env.now - enterTime)
+        queueLengthMonitor.addValue(q.size.toDouble())
     }
 
     fun contains(t: C): Boolean =  q.any { it.component == t }
@@ -89,11 +92,8 @@ class QueueStatistics(cq: ComponentQueue<*>) {
     val lengthStats = NumericLevelMonitorStats(cq.queueLengthMonitor)
     val lengthStatsExclZeros = NumericLevelMonitorStats(cq.queueLengthMonitor, excludeZeros = true)
 
-    val lengthOfStayStats =
-        SummaryStatistics().apply { cq.lengthOfStayMonitor.values.forEach { addValue(it) } }
-
-    val lengthOfStayStatsExclZeros =
-        SummaryStatistics().apply { cq.lengthOfStayMonitor.values.filter { it > 0 }.forEach { addValue(it) } }
+    val lengthOfStayStats = cq.lengthOfStayMonitor.summary()
+    val lengthOfStayStatsExclZeros = cq.lengthOfStayMonitor.summary(excludeZeros = true)
 
     // Partial support for weighted percentiles was added in https://github.com/apache/commons-math/tree/fe29577cdbcf8d321a0595b3ef7809c8a3ce0166
     // Update once released, use jitpack or publish manually
@@ -118,7 +118,7 @@ class QueueStatistics(cq: ComponentQueue<*>) {
     fun print() = toJson().toString(3).println()
 }
 
-private fun SummaryStatistics.toJson(): Any {
+fun SummaryStatistics.toJson(): Any {
     return json {
         "entries" to n
         "mean" to mean.roundAny()

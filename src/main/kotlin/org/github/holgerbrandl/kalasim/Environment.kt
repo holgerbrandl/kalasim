@@ -2,8 +2,7 @@ package org.github.holgerbrandl.kalasim
 
 import org.apache.commons.math3.random.JDKRandomGenerator
 import org.apache.commons.math3.random.RandomGenerator
-import org.github.holgerbrandl.kalasim.ComponentState.CURRENT
-import org.github.holgerbrandl.kalasim.ComponentState.STANDBY
+import org.github.holgerbrandl.kalasim.ComponentState.*
 import org.koin.core.KoinComponent
 import org.koin.core.context.startKoin
 import org.koin.core.definition.Definition
@@ -107,7 +106,7 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
 
         val scheduledTime = calcScheduleTime(until, duration)
 
-        main.reschedule(scheduledTime, priority, urgent, "run")
+        main.reschedule(scheduledTime, priority, urgent, "run",SCHEDULED)
 
         running = true
         while (running) {
@@ -207,18 +206,22 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
     }
 
     fun remove(c: Component) {
+        unschedule(c)
+
+        // TODO what is happening here, can we simplify that?
+        if (c.status == STANDBY) {
+            addStandBy(c)
+            addPendingStandBy(c)
+        }
+    }
+
+    internal fun unschedule(c: Component) {
         val queueElem = eventQueue.firstOrNull {
             it.component == c
         }
 
         if (queueElem != null) {
             eventQueue.remove(queueElem)
-        }
-
-        // TODO what is happening here, can we simplify that?
-        if (c.status == STANDBY) {
-            addStandBy(c)
-            addPendingStandBy(c)
         }
     }
 
@@ -247,7 +250,7 @@ data class QueueElement(
 ) :
     Comparable<QueueElement> {
     override fun compareTo(other: QueueElement): Int =
-        compareValuesBy(this, other, { it.time }, { it.priority }, {it.queueCounter })
+        compareValuesBy(this, other, { it.time }, { it.priority }, { -it.queueCounter })
 
     val heapSeq = if (urgent) -queueCounter else queueCounter
 

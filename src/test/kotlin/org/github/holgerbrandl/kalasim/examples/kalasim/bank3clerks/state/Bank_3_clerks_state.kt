@@ -4,7 +4,6 @@ package org.github.holgerbrandl.kalasim.examples.kalasim.bank3clerks.state
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.github.holgerbrandl.kalasim.*
-import org.github.holgerbrandl.kalasim.test.display
 import org.koin.core.get
 import org.koin.core.inject
 
