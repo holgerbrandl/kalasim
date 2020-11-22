@@ -14,6 +14,11 @@ plugins {
 group = "com.github.holgerbrandl"
 version = "0.2-SNAPSHOT"
 
+application {
+    mainClassName = "foo.Bar" // not needed technically but makes gradle happy
+}
+
+
 repositories {
     mavenCentral()
     jcenter()
