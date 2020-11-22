@@ -88,9 +88,9 @@ object Refuel {
             val fuelPump = get<Resource>(qualifier = named(FUEL_PUMP))
 
             fuelPump.apply {
-                capacityMonitor.printStats()
-                claimedQuantityMonitor.printStats()
-                availableQuantityMonitor.printStats()
+                capacityMonitor.printHistogram()
+                claimedQuantityMonitor.printHistogram()
+                availableQuantityMonitor.printHistogram()
             }
 
             get<GasStation>().requesters.apply{

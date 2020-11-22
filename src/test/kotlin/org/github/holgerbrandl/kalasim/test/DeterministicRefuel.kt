@@ -75,7 +75,7 @@ object DeterministicRefuel {
                     // track number of trucks
                     get<NumericLevelMonitor>(named(TRUCKS_ORDERED)).inc()
                     get<NumericLevelMonitor>(named(TRUCKS_EN_ROUTE)).addValue(
-                        env.eventQueue.map{ it.component}.count { it is TankTruck }
+                        env.queue.count { it is TankTruck }
                     )
                 }
 
@@ -105,9 +105,9 @@ object DeterministicRefuel {
             val fuelPump = get<Resource>(qualifier = named(FUEL_PUMP))
 
             fuelPump.apply {
-                capacityMonitor.printStats()
-                claimedQuantityMonitor.printStats()
-                availableQuantityMonitor.printStats()
+                capacityMonitor.printHistogram()
+                claimedQuantityMonitor.printHistogram()
+                availableQuantityMonitor.printHistogram()
             }
 
 
