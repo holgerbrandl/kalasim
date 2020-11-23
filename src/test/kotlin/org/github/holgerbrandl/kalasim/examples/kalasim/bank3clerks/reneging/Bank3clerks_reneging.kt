@@ -10,6 +10,7 @@ import org.koin.core.inject
 
 
 //**{todo}** use monitors here and maybe even inject them
+//to inject use data class Counter(var value: Int)
 var numBalked: Int = 0
 var numReneged: Int = 0
 

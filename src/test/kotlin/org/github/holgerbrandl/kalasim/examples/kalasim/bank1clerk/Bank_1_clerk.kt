@@ -83,4 +83,5 @@ fun main() {
 
     waitingLine.stats.print()
     waitingLine.queueLengthMonitor.display()
+    waitingLine.lengthOfStayMonitor.display()
 }
