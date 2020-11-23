@@ -24,10 +24,10 @@ class ComponentQueue<C : Component>(
     val queueLengthMonitor = NumericLevelMonitor("Length of $name")
     val lengthOfStayMonitor = NumericStatisticMonitor("Length of stay in $name")
 
-    fun add(element: C, priority: Int? = null): Boolean {
-        printTrace(element, "entering $name")
+    fun add(component: C, priority: Int? = null): Boolean {
+        printTrace(component, "entering $name")
 
-        val added = q.add(CQElement(element, env.now, priority))
+        val added = q.add(CQElement(component, env.now, priority))
 
         queueLengthMonitor.addValue(q.size.toDouble())
 
@@ -49,7 +49,7 @@ class ComponentQueue<C : Component>(
 
         updateExitStats(cqe)
 
-        printTrace(cqe.component,"removed from $name")
+        printTrace(cqe.component, "removed from $name")
 
         return cqe.component
     }
@@ -61,7 +61,7 @@ class ComponentQueue<C : Component>(
         queueLengthMonitor.addValue(q.size.toDouble())
     }
 
-    fun contains(t: C): Boolean =  q.any { it.component == t }
+    fun contains(c: C): Boolean = q.any { it.component == c }
 
 
     fun isEmpty() = size == 0
@@ -73,7 +73,7 @@ class ComponentQueue<C : Component>(
     /** Makes the argument leaving this queue. */
     fun leave(c: C) {
         printTrace(c, "leaving $name")
-        q.find {  it.component ==c }?.let { q.remove(it)}
+        q.find { it.component == c }?.let { q.remove(it) }
     }
 
     val stats: QueueStatistics
@@ -121,11 +121,13 @@ class QueueStatistics(cq: ComponentQueue<*>) {
 fun SummaryStatistics.toJson(): Any {
     return json {
         "entries" to n
-        "mean" to mean.roundAny()
-        "standard_deviation" to standardDeviation.roundAny()
+        "mean" to mean.roundAny().nanAsNull()
+        "standard_deviation" to standardDeviation.roundAny().nanAsNull()
         // TODO percentiles
     }
 }
+
+internal fun Double?.nanAsNull(): Double? = if (this != null && isNaN()) null else this
 
 //private fun DoubleArray.standardDeviation(): Double = StandardDeviation(false).evaluate(this)
 
