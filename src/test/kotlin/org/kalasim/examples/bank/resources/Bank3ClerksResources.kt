@@ -2,9 +2,11 @@ package org.kalasim.examples.bank.resources
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
+import org.kalasim.analytics.display
 import org.koin.core.get
 
-class Customer(val clerks: Resource) : Component() {
+
+class Customer(private val clerks: Resource) : Component() {
 
     override fun process() = sequence {
         yield(request(clerks))
@@ -23,6 +25,12 @@ fun main() {
 
     env.get<Resource>().apply{
         printInfo()
+
+//        get<Resource>().claimedQuantityMonitor.display()
+//        get<Resource>().capacityMonitor.display()
+//        get<Resource>().availableQuantityMonitor.display()
+//        get<Resource>().occupancyMonitor.display()
+        get<Resource>().requesters.queueLengthMonitor.display()
         printStatistics()
     }
 }
