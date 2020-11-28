@@ -1,7 +1,5 @@
 package org.kalasim;
 
-import kotlinx.serialization.Serializable
-
 /**
  * @param preemptive If a component requests from a preemptive resource, it may bump component(s) that are claiming from
 the resource, provided these have a lower priority = higher value). If component is bumped, it releases the resource and is the activated, thus essentially stopping the current action (usually hold or passivate). Therefore, it is necessary that a component claiming from a preemptive resource should check
@@ -28,6 +26,7 @@ open class Resource(
             claimedQuantityMonitor.addValue(x)
             availableQuantityMonitor.addValue(capacity - claimedQuantity)
             occupancyMonitor.addValue(if (capacity < 0) 0 else claimedQuantity / capacity)
+            capacityMonitor.addValue(capacity)
 
             printTrace("claim ${claimedQuantity} from $name")
         }
@@ -40,13 +39,13 @@ open class Resource(
         }
 
 
-    val claimedQuantityMonitor = NumericLevelMonitor("Claimed quantity of $name")
-    val availableQuantityMonitor = NumericLevelMonitor("Available quantity of $name")
-    val occupancyMonitor = NumericLevelMonitor("Occupancy of $name")
+    // todo TBD should we initialize these monitoring by tallying the intial state?
+    val capacityMonitor = NumericLevelMonitor("Capacity of ${super.name}", initialValue = capacity)
 
-    val capacityMonitor = NumericLevelMonitor("Capacity of ${name}").apply {
-        addValue(capacity)
-    }
+    val claimedQuantityMonitor = NumericLevelMonitor("Claimed quantity of ${this.name}")
+    val availableQuantityMonitor = NumericLevelMonitor("Available quantity of ${this.name}", initialValue = capacity)
+    val occupancyMonitor = NumericLevelMonitor("Occupancy of ${this.name}")
+
 
     init {
         printTrace("create ${this.name} with capcacity ${capacity} " + if (anonymous) "anonymous" else "")
@@ -118,19 +117,18 @@ open class Resource(
         get() = ResourceInfo(this)
 }
 
-@Serializable
-open class ResourceInfo : Snapshot {
+class ResourceInfo(resource: Resource) : Snapshot() {
+    val name: String = resource.name
+    val creationTime: Double = resource.creationTime
 
-    constructor(c: Resource) : super() {
-        this.name = c.name
-        this.creationTime = c.creationTime
-        this.claimers = c.claimers.q.toList().map { it.component.name to it.priority }
-        this.requesters = c.requesters.q.toList().map { it.component.name to it.priority }
+    val claimedQuantity: Double = resource.claimedQuantity
+    val capacity = resource.capacity
+
+    // use a dedicated type here to see null prios in json
+    val claimedBy = resource.claimers.q.toList().map { it.component.name to it.priority }
+
+    data class ReqComp(val component:String, val quantity:Double?)
+    val requestingComponents = resource.requesters.q.toList().map {
+        ReqComp(it.component.name,it.component.requests[resource])
     }
-
-    val name: String
-    val creationTime: Double
-
-    val claimers: List<Pair<String, Int?>>
-    val requesters: List<Pair<String, Int?>>
 }
