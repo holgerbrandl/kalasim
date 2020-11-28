@@ -2,7 +2,7 @@ package org.github.holgerbrandl.kalasim
 
 import com.systema.analytics.es.misc.json
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics
+import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.moment.Variance
 import org.github.holgerbrandl.kalasim.misc.printHistogram
@@ -149,10 +149,23 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
         sumStats.printHistogram(name)
     }
 
-    fun summary(excludeZeros: Boolean = false): SummaryStatistics = if (excludeZeros) {
-        SummaryStatistics().apply { values.filter { it > 0 }.forEach { addValue(it) } }
-    } else {
-        SummaryStatistics().apply { values.forEach { addValue(it) } }
+
+    fun summary(excludeZeros: Boolean = false, rollingStats: Boolean = false): StatisticalSummary {
+        require(!rollingStats){TODO()}
+
+//        val stats: StatisticalSummary = if(rollingStats) SummaryStatistics() else DescriptiveStatistics()
+        val stats = DescriptiveStatistics()
+
+        if (excludeZeros) {
+            values.filter { it > 0 }.forEach {
+                stats.addValue(it)
+            }
+            //        SummaryStatistics().apply { values.filter { it > 0 }.forEach { addValue(it) } }
+        } else {
+            values.forEach { stats.addValue(it) }
+        }
+
+        return stats
     }
 }
 

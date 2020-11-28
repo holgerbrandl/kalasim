@@ -1,7 +1,8 @@
 package org.github.holgerbrandl.kalasim
 
 import com.systema.analytics.es.misc.json
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
+import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.apache.commons.math3.util.Precision
 import org.github.holgerbrandl.kalasim.misc.println
 import org.koin.core.KoinComponent
@@ -118,12 +119,17 @@ class QueueStatistics(cq: ComponentQueue<*>) {
     fun print() = toJson().toString(3).println()
 }
 
-fun SummaryStatistics.toJson(): Any {
+fun StatisticalSummary.toJson(): Any {
     return json {
         "entries" to n
         "mean" to mean.roundAny().nanAsNull()
         "standard_deviation" to standardDeviation.roundAny().nanAsNull()
-        // TODO percentiles
+
+        if( this@toJson is DescriptiveStatistics){
+            "median" to standardDeviation.roundAny().nanAsNull()
+            "ninty_pct_quantile" to getPercentile(90.0)
+            "nintyfive_pct_quantile" to getPercentile(95.0)
+        }
     }
 }
 

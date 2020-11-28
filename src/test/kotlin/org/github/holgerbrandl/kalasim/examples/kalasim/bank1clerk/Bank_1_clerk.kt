@@ -1,6 +1,6 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package org.github.holgerbrandl.kalasim.examples.koiner
+package org.github.holgerbrandl.kalasim.examples.kalasim.bank1clerk
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.github.holgerbrandl.kalasim.*
@@ -56,6 +56,7 @@ class CustomerGenerator : Component() {
             Customer(get(), get())
 
             yield(hold(UniformRealDistribution(env.rg,5.0, 15.0).sample()))
+//            yield(hold(10.0))
         }
     }
 }

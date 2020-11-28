@@ -3,6 +3,7 @@ package org.github.holgerbrandl.kalasim.misc
 import com.systema.analytics.es.misc.json
 import org.apache.commons.math3.random.EmpiricalDistribution
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
+import org.apache.commons.math3.stat.descriptive.rank.Median
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
@@ -57,3 +58,9 @@ var JSON_DF = DecimalFormat("###.00")
 
 // move away from main namespace
 var TRACE_DF = DecimalFormat("###.00")
+
+
+
+// MATH UTILS
+
+internal fun Collection<Double>.median() = Median().evaluate(toDoubleArray())

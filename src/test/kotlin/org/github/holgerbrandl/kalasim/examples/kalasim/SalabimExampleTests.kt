@@ -1,19 +1,25 @@
 package org.github.holgerbrandl.kalasim.examples.kalasim
 
+import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
+import org.apache.commons.math3.stat.descriptive.rank.Median
 import org.github.holgerbrandl.kalasim.ComponentQueue
 import org.github.holgerbrandl.kalasim.State
 import org.github.holgerbrandl.kalasim.add
-import org.github.holgerbrandl.kalasim.analytics.display
 import org.github.holgerbrandl.kalasim.configureEnvironment
-import org.github.holgerbrandl.kalasim.examples.kalasim.bank3clerks.reneging.numBalked
-import org.github.holgerbrandl.kalasim.examples.kalasim.bank3clerks.reneging.numReneged
-import org.github.holgerbrandl.kalasim.examples.koiner.Clerk
-import org.github.holgerbrandl.kalasim.examples.koiner.Customer
-import org.github.holgerbrandl.kalasim.examples.koiner.CustomerGenerator
+import org.github.holgerbrandl.kalasim.examples.kalasim.bank1clerk.Clerk
+import org.github.holgerbrandl.kalasim.examples.kalasim.bank1clerk.Customer
+import org.github.holgerbrandl.kalasim.examples.kalasim.bank1clerk.CustomerGenerator
+import org.github.holgerbrandl.kalasim.misc.median
 import org.json.JSONObject
+import org.junit.Test
+import org.koin.core.context.stopKoin
 import org.koin.core.get
-import kotlin.test.Test
+
+
+private val DescriptiveStatistics.median: Double
+    get() = Median().evaluate(values)
 
 class SalabimExampleTests {
 
@@ -71,6 +77,41 @@ class SalabimExampleTests {
 //        waitingLine.stats.toJson().similar(expectedStats) shouldBe true
     }
 
+
+    @Test
+    fun `average waiting should be constant in bank with 1 clerk`() {
+//        val avgQueueMeans = listOf(100, 500, 1000, 2000, 3000, 4000, 5000, 10000, 15000, 20000).map { runtime ->
+        val avgQueueMeans = (1..100).map { 1000.0 * it }.map { runtime ->
+            runtime to configureEnvironment(false) {
+                add { Clerk() }
+                add { ComponentQueue<Customer>("waiting line") }
+            }.run {
+
+                CustomerGenerator()
+                run(runtime.toDouble())
+
+                val losStats = get<ComponentQueue<Customer>>().stats.lengthOfStayStats
+//                print(losStats)
+//                Median().evaluate()
+                val queueLengthAv = losStats
+                stopKoin()
+
+                queueLengthAv
+            }
+        }
+
+        print(avgQueueMeans)
+
+        avgQueueMeans.map { (it.second as DescriptiveStatistics).median }.median() shouldBe 13.0.plusOrMinus(0.3)
+
+//        avgQueueMeans
+//            .plot(x = { it.first }, y = { (it.second as DescriptiveStatistics).median })
+//            .geomPoint()
+//            .geomLine()
+//            .show()
+//        Thread.sleep(100000)
+    }
+
     @Test
     fun `Bank3clerks_reneging should work as expected`() {
         val env = configureEnvironment {
@@ -101,7 +142,8 @@ class SalabimExampleTests {
         )
 
         waitingLine.stats.toJson().toString(2) shouldBe expectedStats.toString(2)
+
+        listOf(1.0).toDoubleArray()
+
     }
-
-
 }

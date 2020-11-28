@@ -13,19 +13,27 @@ import java.util.*
 
 const val MAIN = "main"
 
+//internal class EnvBuildContext : org.koin.core.module.Module() {
+//    var enableTraceLogger: Boolean = true
+//}
+// --> not possible because Module is not open
+
 // https://github.com/InsertKoinIO/koin/issues/801
-fun configureEnvironment(builder: org.koin.core.module.Module.() -> Unit): Environment =
-    Environment(module(createdAtStart = true) { builder() })
+fun configureEnvironment(enableTraceLogger: Boolean = true, builder: org.koin.core.module.Module.() -> Unit): Environment =
+    Environment(module(createdAtStart = true) { builder() }, enableTraceLogger)
 
 
 fun createSimulation(builder: Environment.() -> Unit): Environment =
-    Environment( ).apply(builder)
+    Environment().apply(builder)
 
-fun Environment.createSimulation(builder: Environment.() -> Unit){
+fun Environment.createSimulation(builder: Environment.() -> Unit) {
     this.apply(builder)
 }
 
-class Environment(koins: org.koin.core.module.Module = module(createdAtStart = true) { }) : KoinComponent {
+class Environment(
+    koins: org.koin.core.module.Module = module(createdAtStart = true) { },
+    enableTraceLogger: Boolean = true
+) : KoinComponent {
 
     @Deprecated("serves no purposes and creates a memory leaks as objects are nowhere releases")
     private val components: MutableList<Component> = listOf<Component>().toMutableList()
@@ -39,7 +47,7 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
 
     /** Unmodifiable view on `eventQueue`. */
     val queue: List<Component>
-        get() = eventQueue.map{ it.component }
+        get() = eventQueue.map { it.component }
 
 
     private val traceListeners = listOf<TraceListener>().toMutableList()
@@ -58,7 +66,9 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
         // start console logger
 
 //        addTraceListener { print(it) }
-        addTraceListener(ConsoleTraceLogger(true))
+        if (enableTraceLogger) {
+            addTraceListener(ConsoleTraceLogger(true))
+        }
 
         startKoin { modules(module { single { this@Environment } }) }
 
@@ -106,7 +116,7 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
 
         val scheduledTime = calcScheduleTime(until, duration)
 
-        main.reschedule(scheduledTime, priority, urgent, "run",SCHEDULED)
+        main.reschedule(scheduledTime, priority, urgent, "run", SCHEDULED)
 
         running = true
         while (running) {
@@ -172,7 +182,7 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
 
         curComponent = c
 
-        c.printTrace(c,info)
+        c.printTrace(c, info)
     }
 
 
@@ -237,8 +247,6 @@ class Environment(koins: org.koin.core.module.Module = module(createdAtStart = t
         require(queue.none(Component::isPassive)) { "passive component must not be in event queue" }
     }
 }
-
-
 
 
 data class QueueElement(
