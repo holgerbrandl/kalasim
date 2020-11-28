@@ -27,7 +27,7 @@ open class Resource(
 
             claimedQuantityMonitor.addValue(x)
             availableQuantityMonitor.addValue(capacity - claimedQuantity)
-            occupancyMonitor.addValue(if (capacity < 0) 0 else claimedQuantity/capacity)
+            occupancyMonitor.addValue(if (capacity < 0) 0 else claimedQuantity / capacity)
 
             printTrace("claim ${claimedQuantity} from $name")
         }
@@ -49,11 +49,10 @@ open class Resource(
     }
 
     init {
-        printTrace("create ${this.name} with capcacity ${capacity} "+ if(anonymous) "anonymous" else "")
+        printTrace("create ${this.name} with capcacity ${capacity} " + if (anonymous) "anonymous" else "")
     }
 
     fun availableQuantity(): Double = capacity - claimedQuantity
-
 
 
     fun tryRequest(): Boolean {
@@ -107,6 +106,12 @@ open class Resource(
     fun removeRequester(component: Component) {
         requesters.remove(component)
         if (requesters.isEmpty()) minq = Double.MAX_VALUE
+    }
+
+    /** prints a summary of statistics of a resource */
+    fun printStatistics() {
+        TODO()
+
     }
 
     override val info: Snapshot

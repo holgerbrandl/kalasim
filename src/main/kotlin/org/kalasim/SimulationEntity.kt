@@ -20,6 +20,7 @@ abstract class SimulationEntity(name: String?) : KoinComponent {
     //    abstract fun getSnapshot(): Snapshot
     protected abstract val info: Snapshot
 
+    /** Print info about this resource */
     fun printInfo() = info.println()
 
     override fun toString(): String = "${javaClass.simpleName}($name)"

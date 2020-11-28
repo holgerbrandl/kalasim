@@ -248,7 +248,26 @@ open class Component(
      *
      *  Not allowed for data components or main.
 
-     * @sample org.kalasim.examples.kalasim.Refuel.main
+     * @sample org.kalasim.examples.Refuel.main
+     */
+    fun request(
+        resources: Collection<Resource>,
+        failAt: RealDistribution? = null,
+        failDelay: RealDistribution? = null,
+        oneOf: Boolean = false,
+    ) = request(
+        *resources.map { it withQuantity 1.0 }.toTypedArray(),
+        failAt = failAt,
+        failDelay = failDelay,
+        oneOf = oneOf
+    )
+
+    /**
+     * Request from a resource or resources
+     *
+     *  Not allowed for data components or main.
+     *
+     * @sample org.kalasim.examples.Refuel.main
      */
     fun request(
         vararg resources: Resource,
@@ -298,7 +317,7 @@ open class Component(
      *
      * The parameter failed will be reset by a calling request or wait
      *
-     * @sample org.kalasim.examples.kalasim.Refuel.main
+     * @sample org.kalasim.examples.Refuel.main
      *
      * @param resourceRequests sequence of items where each item can be:
      * - resource, where quantity=1, priority=tail of requesters queue
@@ -530,7 +549,7 @@ open class Component(
         newStatus: ComponentState,
     ) {
         require(scheduledTime >= env.now) { "scheduled time (${scheduledTime}) before now (${env.now})" }
-        require(this !in env.queue ) { "component must not be in queue when reschudling but must be removed already at this point" }
+        require(this !in env.queue) { "component must not be in queue when reschudling but must be removed already at this point" }
 
         status = newStatus
 
@@ -665,21 +684,47 @@ open class Component(
     fun callProcess() = simProcess!!.call()
 
     /**
-     *   release a quantity from a resource or resources
+     * Release a quantity from a resource or resources.
      *
      * It is not possible to release from an anonymous resource, this way.
-    Use Resource.release() in that case.
+     * Use Resource.release() in that case.
      *
      * @param  quantity  quantity to be released. If not specified, the resource will be emptied completely.
      * For non-anonymous resources, all components claiming from this resource will be released.
      */
-    fun release(resource: Resource, quantity: Double? = null) {
-        require(!resource.anonymous) { " It is not possible to release from an anonymous resource, this way.            Use Resource.release() in that case." }
+    fun release(resource: Resource, quantity: Double = Double.MAX_VALUE) = release(ResourceRequest(resource, quantity))
 
-        TODO("Incomplete implementation in case of arguments")
 
-        if (claims.containsKey(resource)) {
-            releaseInternal(resource)
+    /**
+     * Request from a resource or resources
+     *
+     *  Not allowed for data components or main.
+     */
+    fun release(vararg resources: Resource) = release(*resources.map { it withQuantity 1.0 }.toTypedArray())
+
+
+    /**
+     * Release a quantity from a resource or resources.
+     *
+     * It is not possible to release from an anonymous resource, this way.
+     * Use Resource.release() in that case.
+     *
+     * @param  quantity  quantity to be released. If not specified, the resource will be emptied completely.
+     * For non-anonymous resources, all components claiming from this resource will be released.
+     */
+    fun release(vararg releaseRequests: ResourceRequest) {
+        for((resource, quantity) in releaseRequests) {
+            require(!resource.anonymous) { " It is not possible to release from an anonymous resource, this way. Use Resource.release() in that case." }
+
+            releaseInternal(resource, quantity)
+        }
+
+        if (releaseRequests.isEmpty()) {
+            printTrace("Releasing all claimed resources ${claims}")
+
+            for ((r, _) in claims) {
+                releaseInternal(r)
+            }
         }
     }
 

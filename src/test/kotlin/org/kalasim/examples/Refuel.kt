@@ -1,4 +1,4 @@
-package org.kalasim.examples.kalasim
+package org.kalasim.examples
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*

@@ -1,4 +1,4 @@
-package org.kalasim.examples.kalasim
+package org.kalasim.examples
 
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
@@ -8,12 +8,10 @@ import org.kalasim.ComponentQueue
 import org.kalasim.State
 import org.kalasim.add
 import org.kalasim.configureEnvironment
-import org.kalasim.examples.kalasim.bank1clerk.Clerk
-import org.kalasim.examples.kalasim.bank1clerk.Customer
-import org.kalasim.examples.kalasim.bank1clerk.CustomerGenerator
 import org.kalasim.misc.median
 import org.json.JSONObject
 import org.junit.Test
+import org.kalasim.examples.bank.reneging.CustomerGenerator
 import org.koin.core.context.stopKoin
 import org.koin.core.get
 
@@ -27,13 +25,13 @@ class SalabimExampleTests {
     @Test
     fun `Bank_1_clerk should result in correct waiting line statistics`() {
         val env = configureEnvironment {
-            add { Clerk() }
-            add { ComponentQueue<Customer>("waiting line") }
+            add { org.kalasim.examples.bank.oneclerk.Clerk() }
+            add { ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer>("waiting line") }
         }.apply {
-            CustomerGenerator()
+            org.kalasim.examples.bank.oneclerk.CustomerGenerator()
         }.run(50.0)
 
-        val waitingLine: ComponentQueue<Customer> = env.get()
+        val waitingLine: ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer> = env.get()
 
         val expectedStats = JSONObject(
             """
@@ -80,23 +78,19 @@ class SalabimExampleTests {
 
     @Test
     fun `average waiting should be constant in bank with 1 clerk`() {
-//        val avgQueueMeans = listOf(100, 500, 1000, 2000, 3000, 4000, 5000, 10000, 15000, 20000).map { runtime ->
         val avgQueueMeans = (1..100).map { 1000.0 * it }.map { runtime ->
             runtime to configureEnvironment(false) {
-                add { Clerk() }
-                add { ComponentQueue<Customer>("waiting line") }
+                add { org.kalasim.examples.bank.oneclerk.Clerk() }
+                add { ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer>("waiting line") }
             }.run {
 
-                CustomerGenerator()
+                org.kalasim.examples.bank.oneclerk.CustomerGenerator()
                 run(runtime.toDouble())
 
-                val losStats = get<ComponentQueue<Customer>>().stats.lengthOfStayStats
-//                print(losStats)
-//                Median().evaluate()
-                val queueLengthAv = losStats
+                val losStats = get<ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer>>().stats.lengthOfStayStats
                 stopKoin()
 
-                queueLengthAv
+                losStats
             }
         }
 
@@ -116,16 +110,16 @@ class SalabimExampleTests {
     fun `Bank3clerks_reneging should work as expected`() {
         val env = configureEnvironment {
             // register components needed for dependency injection
-            add { ComponentQueue<org.kalasim.examples.kalasim.bank3clerks.reneging.Customer>("waitingline") }
+            add { ComponentQueue<org.kalasim.examples.bank.reneging.Customer>("waitingline") }
             add { State(false, "worktodo") }
-            add { (0..2).map { org.kalasim.examples.kalasim.bank3clerks.reneging.Clerk() } }
+            add { (0..2).map { org.kalasim.examples.bank.reneging.Clerk() } }
         }
 
         env.apply {
             // register other components to  be present when starting the simulation
-            org.kalasim.examples.kalasim.bank3clerks.reneging.CustomerGenerator()
+            CustomerGenerator()
 
-            val waitingLine: ComponentQueue<org.kalasim.examples.kalasim.bank3clerks.reneging.Customer> =
+            val waitingLine: ComponentQueue<org.kalasim.examples.bank.reneging.Customer> =
                 get()
 
             waitingLine.lengthOfStayMonitor.enabled = false
@@ -135,7 +129,7 @@ class SalabimExampleTests {
             run(500.0)
         }
 
-        val waitingLine: ComponentQueue<Customer> = env.get()
+        val waitingLine: ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer> = env.get()
 
         val expectedStats = JSONObject(
             """{"queue_length":{"all": {"duration": 2000, "min":0, "max": 3, "mean": 0.45,"standard_deviation": 0.672}, "excl_zeros": {"duration":702.6821809949577, "min": 1, "max": 3,"mean": 1.28, "standard_deviation": 0.474}},"name": "waitingline", "length_of_stay": {"all": {"entries": 193, "mean": 4.353, "standard_deviation":5.429}, "excl_zeros": {"entries": 125,"mean": 6.721, "standard_deviation": 5.44}},"type": "queue statistics"}"""

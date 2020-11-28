@@ -1,6 +1,6 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package org.kalasim.examples.kalasim.bank3clerks.state
+package org.kalasim.examples.bank.state
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*

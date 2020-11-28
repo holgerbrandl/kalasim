@@ -1,4 +1,4 @@
-package org.kalasim.examples
+package org.kalasim.misc
 
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.kalasim.Environment
