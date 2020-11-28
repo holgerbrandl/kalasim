@@ -51,7 +51,7 @@ For each (active) component we (can) define a type such as:
 class Car : Component()
 ```
 
-The class inherits from `org.github.holgerbrandl.kalasim.Component`.
+The class inherits from `org.kalasim.Component`.
 
 Although it is possible to define other processes within a class,
 the standard way is to define a generator function called `process` in the class.
