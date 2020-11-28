@@ -72,9 +72,9 @@ class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
 
 
 /** Captures the current state of a `State`*/
-@Serializable
+//@Serializable
 data class StateInfo(val time: Double, val name: String, val value: String, val waiters: List<String>) : Snapshot() {
-    override fun toString(): String {
-        return Json.encodeToString(this)
-    }
+//    override fun toString(): String {
+//        return Json.encodeToString(this)
+//    }
 }

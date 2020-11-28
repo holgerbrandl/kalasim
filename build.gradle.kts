@@ -30,17 +30,22 @@ dependencies {
     implementation("org.apache.commons:commons-math3:3.6.1")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.10")
     implementation("com.github.holgerbrandl:jsonbuilder:0.7")
+    implementation("com.google.code.gson:gson:2.8.6")
 
-    //https://github.com/InsertKoinIO/koin/issues/939
+    //cant upgrade because of https://github.com/InsertKoinIO/koin/issues/939
     implementation("org.koin:koin-core:2.1.6")
 //    implementation("org.koin:koin-core:2.2.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
+//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
+//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
 
     testImplementation(kotlin("test-junit"))
     testImplementation("io.kotest:kotest-assertions-core:4.2.6")
-    testImplementation( "com.github.holgerbrandl: :0.5.2")
+
+    testImplementation( "com.github.holgerbrandl:kravis:0.5.2")
+
+    //experimental dependencies  use for experimentation
+    testImplementation( "com.thoughtworks.xstream:xstream:1.4.14")
 
     testImplementation(kotlin("script-runtime"))
 }
