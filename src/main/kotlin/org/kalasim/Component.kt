@@ -1,5 +1,6 @@
 package org.kalasim
 
+import com.google.gson.Gson
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -728,6 +729,7 @@ open class Component(
         }
     }
 
+    // todo move this function into Resource
     private fun releaseInternal(resource: Resource, q: Double? = null) {
         require(resource in claims) { "$name not claiming from resource ${resource.name}" }
 
@@ -745,7 +747,12 @@ open class Component(
 
         if (claims[resource]!! < EPS) {
             leave(resource.claimers)
+            claims.remove(resource)
         }
+
+        // check for rounding errors salabim.py:12290
+        require(!resource.claimers.isEmpty() || resource.claimedQuantity == 0.0){ "rounding error in claimed quantity"}
+        // fix if(claimers.isEmpty()) field= 0.0
     }
 
 
@@ -869,16 +876,16 @@ open class Component(
 }
 
 
-@Serializable
+//@Serializable
 abstract class Snapshot {
     override fun toString(): String {
-        return Json.encodeToString(this)
+        return Gson().toJson(this)
+//        return Json.encodeToString(this)
     }
 }
 
 /** Captures the current state of a `State`*/
 open class ComponentInfo(c: Component) : Snapshot() {
-
     val name = c.name
     val status = c.status
     val creationTime = c.creationTime
