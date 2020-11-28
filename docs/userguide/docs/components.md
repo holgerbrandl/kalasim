@@ -51,6 +51,10 @@ or
 See the example script demo wait.py for a demonstration of the trigger and time out functionality.
 
 
+## Execution Order
+
+Order is defined by scheduled time.  To avoid race conditions exeution order be fintuned usin `priority` and `urgent` which are supported for all methods that result in a rescheduling of a component, namely  `wait`, `request`,  `activate` and `reschedule`
+
 ## Generator
 
 Def
