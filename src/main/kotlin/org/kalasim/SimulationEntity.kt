@@ -6,16 +6,18 @@ import org.koin.core.KoinComponent
 abstract class SimulationEntity(name: String?) : KoinComponent {
     val env by lazy { getKoin().get<Environment>() }
 
-    var name: String
-        private set
+//    var name: String
+//        private set
+
+    val name = nameOrDefault(name)
 
     val creationTime = env.now
 
     var monitor = true;
 
-    init {
-        this.name = nameOrDefault(name)
-    }
+//    init {
+//        this.name = nameOrDefault(name)
+//    }
 
     //    abstract fun getSnapshot(): Snapshot
     protected abstract val info: Snapshot
