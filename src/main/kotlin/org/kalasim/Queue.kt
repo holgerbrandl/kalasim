@@ -22,8 +22,8 @@ class ComponentQueue<C : Component>(
         get() = q.size
 
     //    val ass = AggregateSummaryStatistics()
-    val queueLengthMonitor = NumericLevelMonitor("Length of $name")
-    val lengthOfStayMonitor = NumericStatisticMonitor("Length of stay in $name")
+    val queueLengthMonitor = NumericLevelMonitor("Length of ${this.name}")
+    val lengthOfStayMonitor = NumericStatisticMonitor("Length of stay in ${this.name}")
 
     fun add(component: C, priority: Int? = null): Boolean {
         printTrace(component, "entering $name")
