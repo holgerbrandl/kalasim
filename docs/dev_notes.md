@@ -12,3 +12,5 @@ Just one cname per domain is allowed -> https://serverfault.com/questions/574072
 many votes https://stackoverflow.com/questions/9082499/custom-domain-for-github-project-pages --> worked
 ![](.dev_notes_images/domaincom.png)
 ![](.dev_notes_images/domaincomwww.png)
+
+To support CNAME in mkdocs see https://www.mkdocs.org/user-guide/deploying-your-docs/
