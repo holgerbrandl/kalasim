@@ -18,5 +18,6 @@ In contrast to many other simulation tools, `kalasim` is neither low-code nor no
 
 ## Documentation
 
-### >> [kalasim user guide](https://holgerbrandl.github.io/kalasim) <<
+<!--### >> [kalasim user guide](https://holgerbrandl.github.io/kalasim) <<-->
+All docs are hosted under <http://www.kalasim.org/>
 
