@@ -43,7 +43,7 @@ class ComponentGenerator<T : Component>(
             val t = env.now + iat.sample()
 
             if (t > till) {
-                yield((this@ComponentGenerator).activate(process = ComponentGenerator<T>::doFinalize, at = till))
+                yield((this@ComponentGenerator).activate(at = till, process = ComponentGenerator<T>::doFinalize))
             }
 
             yield(hold(till=t))

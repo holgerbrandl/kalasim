@@ -315,6 +315,8 @@ open class Component(
      */
     fun request(
         vararg resourceRequests: ResourceRequest,
+        priority: Int = 0,
+        urgent: Boolean = false,
         //todo change to support distribution parameters instead
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null,
@@ -416,7 +418,7 @@ open class Component(
         tryRequest()
 
         if (requests.isNotEmpty()) {
-            reschedule(scheduledTime, 0, false, "request", REQUESTING)
+            reschedule(scheduledTime, priority, urgent, "request", REQUESTING)
         }
 
         return this
@@ -569,9 +571,9 @@ open class Component(
     fun activate(
         at: Double? = null,
         priority: Int = 0,
+        urgent: Boolean = false,
         keepRequest: Boolean = false,
         keepWait: Boolean = false,
-        urgent: Boolean = false,
         process: FunPointer? = null
     ): Component {
 
@@ -738,6 +740,8 @@ open class Component(
     fun wait(
         vararg stateRequests: StateRequest<*>,
         //todo change to support distribution parameters instead
+        priority: Int = 0,
+        urgent: Boolean = false,
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null,
         all: Boolean = false
@@ -769,7 +773,7 @@ open class Component(
         tryWait()
 
         if (waits.isNotEmpty()) {
-            reschedule(scheduledTime, 0, false, "wait", WAITING)
+            reschedule(scheduledTime, priority, urgent, "wait", WAITING)
         }
 
         return this
