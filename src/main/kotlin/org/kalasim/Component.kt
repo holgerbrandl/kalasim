@@ -5,7 +5,6 @@ import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.ComponentState.*
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
-import org.kalasim.misc.println
 import org.koin.core.KoinComponent
 import java.util.*
 import kotlin.reflect.KFunction1
@@ -26,13 +25,12 @@ enum class ComponentState {
  *
  * @param process  of process to be started.  if None (default), it will try to start self.process()
  * @param name name of the component.  if the name ends with a period (.), auto serializing will be applied  if the name end with a comma, auto serializing starting at 1 will be applied  if omitted, the name will be derived from the class it is defined in (lowercased)
-
  */
 open class Component(
     name: String? = null,
     process: FunPointer? = Component::process,
     val priority: Int = 0,
-    private val delay: Int = 0
+    private val delay: Int = 0 //todo should be Number
 ) : KoinComponent, SimulationEntity(name) {
 
     private var oneOfRequest: Boolean = false
@@ -395,7 +393,7 @@ open class Component(
 
             // TODO build test case (current implementation seems incorrect & incomplete
             if (r.preemptive) {
-                var av = r.availableQuantity()
+                var av = r.availableQuantity
                 val thisClaimers = r.claimers.q
 
                 val bumpCandidates = mutableListOf<Component>()
@@ -658,8 +656,8 @@ open class Component(
      * hold the component. See https://www.salabim.org/manual/Component.html#hold
      */
     fun hold(
-        duration: Double? = null,
-        till: Double? = null,
+        duration: Number? = null,
+        till: Number? = null,
         priority: Int = 0,
         urgent: Boolean = false
     ): Component {

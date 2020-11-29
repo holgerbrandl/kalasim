@@ -111,7 +111,7 @@ class Environment(
     /**
      * Start execution of the simulation
      */
-    fun run(duration: Double? = null, until: Double? = null, priority: Int = 0, urgent: Boolean = false): Environment {
+    fun run(duration: Number? = null, until: Number? = null, priority: Int = 0, urgent: Boolean = false): Environment {
         if (duration == null) endOnEmptyEventlist = true
 
         val scheduledTime = calcScheduleTime(until, duration)
@@ -270,14 +270,16 @@ data class QueueElement(
 }
 
 
-fun Environment.calcScheduleTime(till: Double?, duration: Double?): Double {
-    return if (till == null) {
-        if (duration == null) now else {
-            now + duration
+fun Environment.calcScheduleTime(till: Number?, duration: Number?): Double {
+    return (till?.toDouble() to duration?.toDouble()).let { (till, duration) ->
+        if (till == null) {
+            if (duration == null) now else {
+                now + duration
+            }
+        } else {
+            require(duration == null) { "both duration and till specified" }
+            till
         }
-    } else {
-        require(duration == null) { "both duration and till specified" }
-        till
     }
 }
 

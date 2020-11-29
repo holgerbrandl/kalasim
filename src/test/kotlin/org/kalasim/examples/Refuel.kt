@@ -33,7 +33,7 @@ object Refuel {
     @JvmStatic
     fun main(args: Array<String>) {
 
-        class GasStation : Resource(capacity = 2.0)
+        class GasStation : Resource(capacity = 2)
 
         class TankTruck : Component() {
             val fuelPump: Resource by inject(qualifier = named(FUEL_PUMP))
@@ -62,7 +62,7 @@ object Refuel {
                 val litersRequired = FUEL_TANK_SIZE - fuelTankLevel
 
                 // order a new Tank if the fuelpump runs of out fuel
-                if ((fuelPump.availableQuantity() - litersRequired) / fuelPump.capacity * 100 < THRESHOLD) {
+                if ((fuelPump.availableQuantity - litersRequired) / fuelPump.capacity * 100 < THRESHOLD) {
                     printTrace("running out of fuel at $gasStation. Ordering new fuel truck...")
                     TankTruck()
                 }

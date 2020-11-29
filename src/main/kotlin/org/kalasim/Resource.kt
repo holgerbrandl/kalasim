@@ -10,7 +10,7 @@ whether the component is bumped or still claiming at any point where they can be
  */
 open class Resource(
     name: String? = null,
-    var capacity: Double = 1.0,
+    capacity: Number = 1,
     val preemptive: Boolean = false,
     val anonymous: Boolean = false
 ) : SimulationEntity(name = name) {
@@ -21,6 +21,11 @@ open class Resource(
     // should we this make readonly from outside?
     val requesters = ComponentQueue<Component>("requesters of ${this.name}")
     val claimers = ComponentQueue<Component>("claimers of ${this.name}")
+
+    var capacity = capacity.toDouble()
+        set(value) {
+            field = value
+        }
 
     var claimedQuantity = 0.0
         set(x) {
@@ -35,26 +40,20 @@ open class Resource(
         }
 
 
-    var availableQuantity = 0
-        set(x) {
-            field = x
-            availableQuantityMonitor.addValue(x)
-        }
+    val availableQuantity: Double
+        get() = capacity - claimedQuantity
 
 
     // todo TBD should we initialize these monitoring by tallying the intial state?
     val capacityMonitor = NumericLevelMonitor("Capacity of ${super.name}", initialValue = capacity)
     val claimedQuantityMonitor = NumericLevelMonitor("Claimed quantity of ${this.name}")
-    val availableQuantityMonitor = NumericLevelMonitor("Available quantity of ${this.name}", initialValue = capacity)
+    val availableQuantityMonitor = NumericLevelMonitor("Available quantity of ${this.name}", initialValue = availableQuantity)
     val occupancyMonitor = NumericLevelMonitor("Occupancy of ${this.name}")
 
 
     init {
         printTrace("create ${this.name} with capacity $capacity " + if (anonymous) "anonymous" else "")
     }
-
-    fun availableQuantity(): Double = capacity - claimedQuantity
-
 
     fun tryRequest(): Boolean {
         val iterator = requesters.q.iterator()
