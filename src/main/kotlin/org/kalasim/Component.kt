@@ -416,7 +416,7 @@ open class Component(
 
                 if (av >= 0) {
                     bumpCandidates.forEach {
-                        it.releaseInternal(r)
+                        it.releaseInternal(r, bumpedBy=this)
                         printTrace("$it bumped from $r by $this")
                         it.activate()
                     }
@@ -634,10 +634,7 @@ open class Component(
     private fun checkFail() {
         if (requests.isNotEmpty()) {
             printTrace("request failed")
-            requests.forEach {
-                it.key.requesters.remove(this)
-                if (it.key.requesters.isEmpty()) it.key.minq = Double.MAX_VALUE
-            }
+            requests.forEach { it.key.removeRequester(this) }
             requests.clear()
             failed = true
         }
@@ -724,7 +721,7 @@ open class Component(
     }
 
     // todo move this function into Resource
-    private fun releaseInternal(resource: Resource, q: Double? = null) {
+    private fun releaseInternal(resource: Resource, q: Double? = null, bumpedBy: Component? = null) {
         require(resource in claims) { "$name not claiming from resource ${resource.name}" }
 
         val quantity = if (q == null) {
@@ -747,6 +744,8 @@ open class Component(
         // check for rounding errors salabim.py:12290
         require(!resource.claimers.isEmpty() || resource.claimedQuantity == 0.0) { "rounding error in claimed quantity" }
         // fix if(claimers.isEmpty()) field= 0.0
+
+        if(bumpedBy == null) resource.tryRequest()
     }
 
 

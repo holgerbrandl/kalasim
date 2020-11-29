@@ -10,7 +10,7 @@ class Customer(private val clerks: Resource) : Component() {
 
     override fun process() = sequence {
         yield(request(clerks))
-        yield(hold(30.0))
+        yield(hold(30))
         release(clerks) // not really required
     }
 }
@@ -21,7 +21,7 @@ fun main() {
         add { Resource("clerks", capacity = 3) }
     }.apply {
         ComponentGenerator(iat = UniformRealDistribution(rg, 5.0, 15.0)) { Customer(get()) }
-    }.run(500)
+    }.run(3000)
 
     env.get<Resource>().apply {
         printInfo()

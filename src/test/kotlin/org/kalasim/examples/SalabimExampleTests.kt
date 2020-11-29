@@ -1,17 +1,16 @@
 package org.kalasim.examples
 
+import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
+import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.rank.Median
-import org.kalasim.ComponentQueue
-import org.kalasim.State
-import org.kalasim.add
-import org.kalasim.configureEnvironment
-import org.kalasim.misc.median
 import org.json.JSONObject
 import org.junit.Test
+import org.kalasim.*
 import org.kalasim.examples.bank.reneging.CustomerGenerator
+import org.kalasim.misc.median
 import org.koin.core.context.stopKoin
 import org.koin.core.get
 
@@ -87,7 +86,8 @@ class SalabimExampleTests {
                 org.kalasim.examples.bank.oneclerk.CustomerGenerator()
                 run(runtime.toDouble())
 
-                val losStats = get<ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer>>().stats.lengthOfStayStats
+                val losStats =
+                    get<ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer>>().stats.lengthOfStayStats
                 stopKoin()
 
                 losStats
@@ -139,5 +139,32 @@ class SalabimExampleTests {
 
         listOf(1.0).toDoubleArray()
 
+    }
+
+
+    @Test
+    fun `bank with resource clerks should result in correct statistics`() {
+        // same logic as in Bank3ClerksResources.kt
+        val env = configureEnvironment(false) {
+            add { Resource("clerks", capacity = 3) }
+        }.apply {
+            ComponentGenerator(
+                iat = UniformRealDistribution(
+                    rg,
+                    5.0,
+                    15.0
+                )
+            ) { org.kalasim.examples.bank.resources.Customer(get()) }
+        }.run(5000)
+
+        val clerks  = env.get<Resource>()
+        clerks.apply{
+            requesters.size shouldBeLessThan 10
+
+            requesters.stats.lengthStats.mean!! shouldBeLessThan 10.0
+//            (requesters.stats.lengthStats as DescriptiveStatistics).getPercentile(.9) shouldBeLessThan  10.0
+
+            claimers.stats.lengthOfStayStats.mean shouldBe 30.0.plusOrMinus(0.1)
+        }
     }
 }

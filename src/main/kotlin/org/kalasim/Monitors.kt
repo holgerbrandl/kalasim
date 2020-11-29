@@ -5,6 +5,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.moment.Variance
+import org.apache.commons.math3.stat.descriptive.rank.Median
 import org.kalasim.misc.printHistogram
 import org.kalasim.misc.println
 import org.koin.core.KoinComponent
@@ -238,6 +239,7 @@ class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean =
         if (data.durations.any { it != 0.0 }) {
             mean = Mean().evaluate(data.values.toDoubleArray(), data.durations)
             standardDeviation = sqrt(Variance().evaluate(data.values.toDoubleArray(), data.durations))
+//            val median = Median().evaluate(data.values.toDoubleArray(), data.durations) // not supported by commons3
         } else {
             // this happens if all there is in total no duration associated once 0s are removed
             mean = null
