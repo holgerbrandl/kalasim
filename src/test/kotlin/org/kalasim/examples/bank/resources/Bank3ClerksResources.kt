@@ -23,14 +23,19 @@ fun main() {
         ComponentGenerator(iat = UniformRealDistribution(rg, 5.0, 15.0)) { Customer(get()) }
     }.run(50000.0)
 
-    env.get<Resource>().apply{
+    env.get<Resource>().apply {
         printInfo()
 
-//        get<Resource>().claimedQuantityMonitor.display()
-//        get<Resource>().capacityMonitor.display()
-//        get<Resource>().availableQuantityMonitor.display()
-//        get<Resource>().occupancyMonitor.display()
-        get<Resource>().requesters.queueLengthMonitor.display()
+        if (System.getenv("KALASIM_ANALYSIS") != null) {
+            get<Resource>().apply {
+                claimedQuantityMonitor.display()
+                capacityMonitor.display()
+                availableQuantityMonitor.display()
+                occupancyMonitor.display()
+                requesters.queueLengthMonitor.display()
+            }
+        }
+
         printStatistics()
     }
 }

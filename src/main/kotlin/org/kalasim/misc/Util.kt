@@ -30,6 +30,7 @@ internal fun buildHistogram(stats: DescriptiveStatistics, binCount: Int = 30): L
 internal fun DescriptiveStatistics.printHistogram(name: String) {
     json {
         "name" to name
+        "type" to this@printHistogram.javaClass.simpleName //"queue statistics"
         "entries" to n
         "mean" to mean
         "minimum" to min

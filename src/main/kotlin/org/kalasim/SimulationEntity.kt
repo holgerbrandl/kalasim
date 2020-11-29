@@ -20,7 +20,7 @@ abstract class SimulationEntity(name: String?) : KoinComponent {
 //    }
 
     //    abstract fun getSnapshot(): Snapshot
-    protected abstract val info: Snapshot
+    protected abstract val info: JsonToString
 
     /** Print info about this resource */
     fun printInfo() = info.println()

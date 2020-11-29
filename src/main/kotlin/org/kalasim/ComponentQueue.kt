@@ -80,7 +80,7 @@ class ComponentQueue<C : Component>(
     val stats: QueueStatistics
         get() = QueueStatistics(this)
 
-    override val info: Snapshot
+    override val info: JsonToString
         get() = TODO()
 }
 
@@ -89,6 +89,7 @@ class ComponentQueue<C : Component>(
 class QueueStatistics(cq: ComponentQueue<*>) {
 
     val name = cq.name
+    val timestamp = cq.env.now
 
     val lengthStats = NumericLevelMonitorStats(cq.queueLengthMonitor)
     val lengthStatsExclZeros = NumericLevelMonitorStats(cq.queueLengthMonitor, excludeZeros = true)
@@ -102,8 +103,8 @@ class QueueStatistics(cq: ComponentQueue<*>) {
 
 
     fun toJson() = json {
-        "type" to "queue statistics"
         "name" to name
+        "type" to this@QueueStatistics.javaClass.simpleName //"queue statistics"
 
         "length_of_stay" to {
             "all" to lengthOfStayStats.toJson()
@@ -116,7 +117,7 @@ class QueueStatistics(cq: ComponentQueue<*>) {
         }
     }
 
-    fun print() = toJson().toString(3).println()
+    fun print() = toJson().toString(JSON_INDENT).println()
 }
 
 fun StatisticalSummary.toJson(): Any {
@@ -127,8 +128,8 @@ fun StatisticalSummary.toJson(): Any {
 
         if( this@toJson is DescriptiveStatistics){
             "median" to standardDeviation.roundAny().nanAsNull()
-            "ninty_pct_quantile" to getPercentile(90.0)
-            "nintyfive_pct_quantile" to getPercentile(95.0)
+            "ninty_pct_quantile" to getPercentile(90.0).nanAsNull()
+            "nintyfive_pct_quantile" to getPercentile(95.0).nanAsNull()
         }
     }
 }

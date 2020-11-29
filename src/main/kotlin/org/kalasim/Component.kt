@@ -1,9 +1,6 @@
 package org.kalasim
 
-import com.google.gson.Gson
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import com.google.gson.GsonBuilder
 import org.apache.commons.math3.distribution.ConstantRealDistribution
 import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.ComponentState.*
@@ -714,7 +711,7 @@ open class Component(
      * For non-anonymous resources, all components claiming from this resource will be released.
      */
     fun release(vararg releaseRequests: ResourceRequest) {
-        for((resource, quantity) in releaseRequests) {
+        for ((resource, quantity) in releaseRequests) {
             require(!resource.anonymous) { " It is not possible to release from an anonymous resource, this way. Use Resource.release() in that case." }
 
             releaseInternal(resource, quantity)
@@ -751,7 +748,7 @@ open class Component(
         }
 
         // check for rounding errors salabim.py:12290
-        require(!resource.claimers.isEmpty() || resource.claimedQuantity == 0.0){ "rounding error in claimed quantity"}
+        require(!resource.claimers.isEmpty() || resource.claimedQuantity == 0.0) { "rounding error in claimed quantity" }
         // fix if(claimers.isEmpty()) field= 0.0
     }
 
@@ -871,21 +868,25 @@ open class Component(
     }
 
 
-    public override val info: Snapshot
+    public override val info: JsonToString
         get() = ComponentInfo(this)
 }
 
 
+// https://futurestud.io/tutorials/gson-builder-special-values-of-floats-doubles
+// https://github.com/google/gson/blob/master/UserGuide.md#null-object-support
+internal val GSON by lazy { GsonBuilder().serializeSpecialFloatingPointValues().setPrettyPrinting().serializeNulls().create() }
+
 //@Serializable
-abstract class Snapshot {
+abstract class JsonToString {
     override fun toString(): String {
-        return Gson().toJson(this)
+        return GSON.toJson(this)
 //        return Json.encodeToString(this)
     }
 }
 
 /** Captures the current state of a `State`*/
-open class ComponentInfo(c: Component) : Snapshot() {
+open class ComponentInfo(c: Component) : JsonToString() {
     val name = c.name
     val status = c.status
     val creationTime = c.creationTime
@@ -900,13 +901,16 @@ fun main() {
     Component("foo").info.println()
 }
 
-/** Captures the current state of a `State`*/
-@Serializable
-internal data class ComponentInfo2(val time: Double, val name: String, val value: String, val waiters: List<String>) {
-    override fun toString(): String {
-        return Json.encodeToString(this)
-    }
-}
+
+// todo clarify intent or remove
+///** Captures the current state of a `State`*/
+////@Serializable
+//internal data class ComponentInfo2(val time: Double, val name: String, val value: String, val waiters: List<String>) {
+//    override fun toString(): String {
+////        return Json.encodeToString(this)
+//        return GSON.toJson(this)
+//    }
+//}
 
 
 //

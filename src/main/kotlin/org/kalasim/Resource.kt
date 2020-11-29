@@ -1,5 +1,7 @@
 package org.kalasim;
 
+import com.systema.analytics.es.misc.json
+
 /**
  * @param preemptive If a component requests from a preemptive resource, it may bump component(s) that are claiming from
 the resource, provided these have a lower priority = higher value). If component is bumped, it releases the resource and is the activated, thus essentially stopping the current action (usually hold or passivate). Therefore, it is necessary that a component claiming from a preemptive resource should check
@@ -109,15 +111,18 @@ open class Resource(
 
     /** prints a summary of statistics of a resource */
     fun printStatistics() {
-        TODO()
-
+        println(statistics.toString())
     }
 
-    override val info: Snapshot
+    override val info: JsonToString
         get() = ResourceInfo(this)
+
+    val statistics: ResourceStatistics
+        get() = ResourceStatistics(this)
 }
 
-class ResourceInfo(resource: Resource) : Snapshot() {
+
+class ResourceInfo(resource: Resource) : JsonToString() {
     val name: String = resource.name
     val creationTime: Double = resource.creationTime
 
@@ -132,3 +137,42 @@ class ResourceInfo(resource: Resource) : Snapshot() {
         ReqComp(it.component.name,it.component.requests[resource])
     }
 }
+
+
+
+@Suppress("MemberVisibilityCanBePrivate")
+class ResourceStatistics(resource: Resource) : JsonToString() {
+
+    val name = resource.name
+    val timestamp = resource.env.now
+
+    val requesterStats = resource.requesters.stats
+    val claimerStats = resource.claimers.stats
+
+    val capacity = NumericLevelMonitorStats(resource.capacityMonitor)
+    val availableQuantity = NumericLevelMonitorStats(resource.availableQuantityMonitor)
+    val claimedQuantity = NumericLevelMonitorStats(resource.claimedQuantityMonitor)
+    val occupancy = NumericLevelMonitorStats(resource.occupancyMonitor)
+
+
+    fun toJson() = json {
+        "name" to name
+        "timestamp" to timestamp
+        "type" to this@ResourceStatistics.javaClass.simpleName
+
+        "requesterStats" to requesterStats.toJson()
+        "claimerStats" to claimerStats.toJson()
+        
+        "capacity" to capacity.toJson()
+        "availableQuantity" to availableQuantity.toJson()
+        "claimedQuantity" to claimedQuantity.toJson()
+        "occupancy" to occupancy.toJson()
+    }
+
+
+    override fun toString(): String {
+        return toJson().toString(JSON_INDENT)
+    }
+}
+
+var JSON_INDENT= 2

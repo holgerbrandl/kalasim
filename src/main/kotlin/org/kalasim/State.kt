@@ -1,9 +1,5 @@
 package org.kalasim
 
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-
 /**
  * States together with the Component.wait() method provide a powerful way of process interaction.
 
@@ -73,7 +69,7 @@ class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
 
 /** Captures the current state of a `State`*/
 //@Serializable
-data class StateInfo(val time: Double, val name: String, val value: String, val waiters: List<String>) : Snapshot() {
+data class StateInfo(val time: Double, val name: String, val value: String, val waiters: List<String>) : JsonToString() {
 //    override fun toString(): String {
 //        return Json.encodeToString(this)
 //    }

@@ -54,7 +54,7 @@ class ComponentGenerator<T : Component>(
         printTrace(now(), env.curComponent, this@ComponentGenerator, null, "till reached")
     }
 
-    override val info: Snapshot
+    override val info: JsonToString
         get() = ComponentGeneratorInfo(this)
 }
 
