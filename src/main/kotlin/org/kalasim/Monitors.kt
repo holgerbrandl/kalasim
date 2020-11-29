@@ -191,6 +191,8 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : Nume
     override fun get(time: Double): Number = timestamps.zip(values.toList()).first { it.first > time }.second
 
     internal fun valuesUntilNow(excludeZeros: Boolean = false): NLMStatsData {
+        require(values.isNotEmpty()){"data must not be empty when preparing statistics of $name"}
+
         val valuesLst = values.toList()
 
         val timepointsExt = timestamps + env.now
@@ -209,7 +211,10 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : Nume
 }
 
 
-internal data class NLMStatsData(val values: List<Double>, val timepoints: List<Double>, val durations: DoubleArray)
+internal data class NLMStatsData(val values: List<Double>, val timepoints: List<Double>, val durations: DoubleArray) {
+    fun plotData(): List<Pair<Double, Double>> =
+        (this.timepoints + (timepoints.last() + durations.last())).zip(values.toList() + values.last())
+}
 
 class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean = false) {
     val duration: Double

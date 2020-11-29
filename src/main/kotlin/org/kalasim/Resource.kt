@@ -31,7 +31,7 @@ open class Resource(
             occupancyMonitor.addValue(if (capacity < 0) 0 else claimedQuantity / capacity)
             capacityMonitor.addValue(capacity)
 
-            printTrace("claim ${claimedQuantity} from $name")
+            printTrace("claim $claimedQuantity from $name")
         }
 
 
@@ -50,7 +50,7 @@ open class Resource(
 
 
     init {
-        printTrace("create ${this.name} with capacity ${capacity} " + if (anonymous) "anonymous" else "")
+        printTrace("create ${this.name} with capacity $capacity " + if (anonymous) "anonymous" else "")
     }
 
     fun availableQuantity(): Double = capacity - claimedQuantity
