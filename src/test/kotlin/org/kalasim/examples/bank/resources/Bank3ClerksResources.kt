@@ -33,6 +33,7 @@ fun main() {
                 availableQuantityMonitor.display()
                 occupancyMonitor.display()
                 requesters.queueLengthMonitor.display()
+                claimers.queueLengthMonitor.display()
             }
         }
 

@@ -4,6 +4,8 @@ import com.systema.analytics.es.misc.json
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.apache.commons.math3.util.Precision
+import org.kalasim.misc.JSON_INDENT
+import org.kalasim.misc.Jsonable
 import org.kalasim.misc.println
 import org.koin.core.KoinComponent
 import java.util.*
@@ -80,7 +82,7 @@ class ComponentQueue<C : Component>(
     val stats: QueueStatistics
         get() = QueueStatistics(this)
 
-    override val info: JsonToString
+    override val info: Jsonable
         get() = TODO()
 }
 

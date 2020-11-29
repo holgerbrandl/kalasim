@@ -1,6 +1,7 @@
 package org.kalasim
 
 import org.apache.commons.math3.distribution.RealDistribution
+import org.kalasim.misc.Jsonable
 
 /**
  * A component generator can be used to genetate components
@@ -54,7 +55,7 @@ class ComponentGenerator<T : Component>(
         printTrace(now(), env.curComponent, this@ComponentGenerator, null, "till reached")
     }
 
-    override val info: JsonToString
+    override val info: Jsonable
         get() = ComponentGeneratorInfo(this)
 }
 

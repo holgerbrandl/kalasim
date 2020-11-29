@@ -1,5 +1,6 @@
 package org.kalasim
 
+import org.kalasim.misc.Jsonable
 import org.kalasim.misc.println
 import org.koin.core.KoinComponent
 
@@ -20,7 +21,7 @@ abstract class SimulationEntity(name: String?) : KoinComponent {
 //    }
 
     //    abstract fun getSnapshot(): Snapshot
-    protected abstract val info: JsonToString
+    protected abstract val info: Jsonable
 
     /** Print info about this resource */
     fun printInfo() = info.println()

@@ -1,6 +1,7 @@
 package org.kalasim;
 
 import com.systema.analytics.es.misc.json
+import org.kalasim.misc.Jsonable
 
 /**
  * @param preemptive If a component requests from a preemptive resource, it may bump component(s) that are claiming from
@@ -18,8 +19,8 @@ open class Resource(
     var minq: Double = Double.MAX_VALUE
 
     // should we this make readonly from outside?
-    val requesters = ComponentQueue<Component>()
-    val claimers = ComponentQueue<Component>()
+    val requesters = ComponentQueue<Component>("requesters of ${this.name}")
+    val claimers = ComponentQueue<Component>("claimers of ${this.name}")
 
     var claimedQuantity = 0.0
         set(x) {
@@ -43,14 +44,13 @@ open class Resource(
 
     // todo TBD should we initialize these monitoring by tallying the intial state?
     val capacityMonitor = NumericLevelMonitor("Capacity of ${super.name}", initialValue = capacity)
-
     val claimedQuantityMonitor = NumericLevelMonitor("Claimed quantity of ${this.name}")
     val availableQuantityMonitor = NumericLevelMonitor("Available quantity of ${this.name}", initialValue = capacity)
     val occupancyMonitor = NumericLevelMonitor("Occupancy of ${this.name}")
 
 
     init {
-        printTrace("create ${this.name} with capcacity ${capacity} " + if (anonymous) "anonymous" else "")
+        printTrace("create ${this.name} with capacity ${capacity} " + if (anonymous) "anonymous" else "")
     }
 
     fun availableQuantity(): Double = capacity - claimedQuantity
@@ -114,7 +114,7 @@ open class Resource(
         println(statistics.toString())
     }
 
-    override val info: JsonToString
+    override val info: Jsonable
         get() = ResourceInfo(this)
 
     val statistics: ResourceStatistics
@@ -122,7 +122,7 @@ open class Resource(
 }
 
 
-class ResourceInfo(resource: Resource) : JsonToString() {
+class ResourceInfo(resource: Resource) : Jsonable() {
     val name: String = resource.name
     val creationTime: Double = resource.creationTime
 
@@ -141,13 +141,13 @@ class ResourceInfo(resource: Resource) : JsonToString() {
 
 
 @Suppress("MemberVisibilityCanBePrivate")
-class ResourceStatistics(resource: Resource) : JsonToString() {
+class ResourceStatistics(resource: Resource) : Jsonable() {
 
     val name = resource.name
     val timestamp = resource.env.now
 
-    val requesterStats = resource.requesters.stats
-    val claimerStats = resource.claimers.stats
+    val requesters = resource.requesters.stats
+    val claimers = resource.claimers.stats
 
     val capacity = NumericLevelMonitorStats(resource.capacityMonitor)
     val availableQuantity = NumericLevelMonitorStats(resource.availableQuantityMonitor)
@@ -155,24 +155,17 @@ class ResourceStatistics(resource: Resource) : JsonToString() {
     val occupancy = NumericLevelMonitorStats(resource.occupancyMonitor)
 
 
-    fun toJson() = json {
+    override fun toJson() = json {
         "name" to name
         "timestamp" to timestamp
         "type" to this@ResourceStatistics.javaClass.simpleName
 
-        "requesterStats" to requesterStats.toJson()
-        "claimerStats" to claimerStats.toJson()
+        "requesterStats" to requesters.toJson()
+        "claimerStats" to claimers.toJson()
         
         "capacity" to capacity.toJson()
         "availableQuantity" to availableQuantity.toJson()
         "claimedQuantity" to claimedQuantity.toJson()
         "occupancy" to occupancy.toJson()
     }
-
-
-    override fun toString(): String {
-        return toJson().toString(JSON_INDENT)
-    }
 }
-
-var JSON_INDENT= 2

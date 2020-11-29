@@ -1,5 +1,7 @@
 package org.kalasim
 
+import org.kalasim.misc.Jsonable
+
 /**
  * States together with the Component.wait() method provide a powerful way of process interaction.
 
@@ -69,7 +71,7 @@ class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
 
 /** Captures the current state of a `State`*/
 //@Serializable
-data class StateInfo(val time: Double, val name: String, val value: String, val waiters: List<String>) : JsonToString() {
+data class StateInfo(val time: Double, val name: String, val value: String, val waiters: List<String>) : Jsonable() {
 //    override fun toString(): String {
 //        return Json.encodeToString(this)
 //    }

@@ -1,9 +1,9 @@
 package org.kalasim
 
-import com.google.gson.GsonBuilder
 import org.apache.commons.math3.distribution.ConstantRealDistribution
 import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.ComponentState.*
+import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
 import org.kalasim.misc.println
 import org.koin.core.KoinComponent
@@ -21,9 +21,8 @@ enum class ComponentState {
 
 
 /**
- * A salabim component is used as component (primarily for queueing)
-or as a component with a process
-Usually, a component will be defined as a subclass of Component.
+ * A kalasim component is used as component (primarily for queueing) or as a component with a process.
+ * Usually, a component will be defined as a subclass of Component.
  *
  * @param process  of process to be started.  if None (default), it will try to start self.process()
  * @param name name of the component.  if the name ends with a period (.), auto serializing will be applied  if the name end with a comma, auto serializing starting at 1 will be applied  if omitted, the name will be derived from the class it is defined in (lowercased)
@@ -868,25 +867,13 @@ open class Component(
     }
 
 
-    public override val info: JsonToString
+    public override val info: Jsonable
         get() = ComponentInfo(this)
 }
 
 
-// https://futurestud.io/tutorials/gson-builder-special-values-of-floats-doubles
-// https://github.com/google/gson/blob/master/UserGuide.md#null-object-support
-internal val GSON by lazy { GsonBuilder().serializeSpecialFloatingPointValues().setPrettyPrinting().serializeNulls().create() }
-
-//@Serializable
-abstract class JsonToString {
-    override fun toString(): String {
-        return GSON.toJson(this)
-//        return Json.encodeToString(this)
-    }
-}
-
 /** Captures the current state of a `State`*/
-open class ComponentInfo(c: Component) : JsonToString() {
+open class ComponentInfo(c: Component) : Jsonable() {
     val name = c.name
     val status = c.status
     val creationTime = c.creationTime
@@ -895,12 +882,6 @@ open class ComponentInfo(c: Component) : JsonToString() {
     val claims = c.claims.toList()
     val requests = c.requests.toMap()
 }
-
-
-fun main() {
-    Component("foo").info.println()
-}
-
 
 // todo clarify intent or remove
 ///** Captures the current state of a `State`*/

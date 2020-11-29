@@ -48,7 +48,7 @@ interface LevelMonitor<T> {
 /**
  * Frequency tally levels irrespective of current (simulation) time.
  *
- * @sample org.kalasim.examples.DokkaExamplesKt.freqLevelDemo
+ * @sample org.kalasim.misc.DokkaExamplesKt.freqLevelDemo
  */
 open class FrequencyMonitor<T>(name: String? = null) : Monitor<T>(name) {
     val frequencies = mutableMapOf<T, Int>()

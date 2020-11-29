@@ -1,9 +1,11 @@
 package org.kalasim.misc
 
+import com.google.gson.GsonBuilder
 import com.systema.analytics.es.misc.json
 import org.apache.commons.math3.random.EmpiricalDistribution
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.rank.Median
+import org.json.JSONObject
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
@@ -65,3 +67,24 @@ var TRACE_DF = DecimalFormat("###.00")
 // MATH UTILS
 
 internal fun Collection<Double>.median() = Median().evaluate(toDoubleArray())
+
+//@Serializable
+abstract class Jsonable {
+
+    open fun toJson(): JSONObject = JSONObject(GSON.toJson(this))
+
+    override fun toString(): String {
+        return toJson().toString(JSON_INDENT)
+
+        // todo get rid of gson here to simplify dependency tree
+//        return GSON.toJson(this)
+//        return Json.encodeToString(this)
+    }
+}
+
+// https://futurestud.io/tutorials/gson-builder-special-values-of-floats-doubles
+// https://github.com/google/gson/blob/master/UserGuide.md#null-object-support
+internal val GSON by lazy {
+    GsonBuilder().serializeSpecialFloatingPointValues().setPrettyPrinting().serializeNulls().create()
+}
+var JSON_INDENT= 2
