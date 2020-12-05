@@ -82,10 +82,10 @@ open class Resource(
      * @param  quantity  quantity to be released. If not specified, the resource will be emptied completely.
      * For non-anonymous resources, all components claiming from this resource will be released.
      */
-    fun release(quantity: Double? = null) {
+    fun release(quantity: Number? = null) {
         // TODO Split resource types into QuantityResource and Resource or similar
         if (anonymous) {
-            val q = quantity ?: claimedQuantity
+            val q = quantity?.toDouble() ?: claimedQuantity
 
             claimedQuantity = -q
             if (claimedQuantity < EPS) claimedQuantity = 0.0
@@ -148,10 +148,10 @@ class ResourceStatistics(resource: Resource) : Jsonable() {
     val requesters = resource.requesters.stats
     val claimers = resource.claimers.stats
 
-    val capacity = NumericLevelMonitorStats(resource.capacityMonitor)
-    val availableQuantity = NumericLevelMonitorStats(resource.availableQuantityMonitor)
-    val claimedQuantity = NumericLevelMonitorStats(resource.claimedQuantityMonitor)
-    val occupancy = NumericLevelMonitorStats(resource.occupancyMonitor)
+    val capacity = resource.capacityMonitor.statistics(false)
+    val availableQuantity = resource.availableQuantityMonitor.statistics(false)
+    val claimedQuantity = resource.claimedQuantityMonitor.statistics(false)
+    val occupancy = resource.occupancyMonitor.statistics(false)
 
 
     override fun toJson() = json {

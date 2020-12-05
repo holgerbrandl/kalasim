@@ -3,12 +3,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 //val kotlinVersion = KotlinVersion.CURRENT
 
 plugins {
-    kotlin("jvm") version "1.4.10"
+    kotlin("jvm") version "1.4.20"
     application
     `maven-publish`
     id("com.jfrog.bintray") version "1.8.5"
 
-    kotlin("plugin.serialization") version "1.4.10"
+//    kotlin("plugin.serialization") version "1.4.20"
 }
 
 group = "com.github.holgerbrandl"
@@ -33,8 +33,8 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
 
     //cant upgrade because of https://github.com/InsertKoinIO/koin/issues/939
-    implementation("org.koin:koin-core:2.1.6")
-//    implementation("org.koin:koin-core:2.2.0")
+//    implementation("org.koin:koin-core:2.1.6")
+    implementation("org.koin:koin-core:2.2.1")
 
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")

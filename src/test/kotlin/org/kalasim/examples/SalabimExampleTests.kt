@@ -11,8 +11,8 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.examples.bank.reneging.CustomerGenerator
 import org.kalasim.misc.median
+import org.koin.core.component.get
 import org.koin.core.context.stopKoin
-import org.koin.core.get
 
 
 private val DescriptiveStatistics.median: Double
@@ -33,40 +33,38 @@ class SalabimExampleTests {
         val waitingLine: ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer> = env.get()
 
         val expectedStats = JSONObject(
-            """
-            {
-               "queue_length": {
-                  "all": {
-                     "duration": 50,
-                     "min": 0,
-                     "max": 1,
-                     "mean": 0.121,
-                     "standard_deviation": 0.33
-                  },
-                  "excl_zeros": {
-                     "duration": 6.054825992605437,
-                     "min": 1,
-                     "max": 1,
-                     "mean": 1,
-                     "standard_deviation": 0
-                  }
-               },
-               "name": "waiting line",
-               "length_of_stay": {
-                  "all": {
-                     "entries": 5,
-                     "mean": 21.709,
-                     "standard_deviation": 15.885
-                  },
-                  "excl_zeros": {
-                     "entries": 4,
-                     "mean": 27.136,
-                     "standard_deviation": 11.835
-                  }
-               },
-               "type": "queue statistics"
-            }
-        """
+            """{
+              "queue_length": {
+                "all": {
+                  "duration": 50,
+                  "min": 0,
+                  "max": 1,
+                  "mean": 0.121,
+                  "standard_deviation": 0.33
+                },
+                "excl_zeros": {
+                  "duration": 6.054825992605437,
+                  "min": 1,
+                  "max": 1,
+                  "mean": 1,
+                  "standard_deviation": 0
+                }
+              },
+              "name": "waiting line",
+              "length_of_stay": {
+                "all": {
+                  "entries": 5,
+                  "mean": 21.709,
+                  "standard_deviation": 15.885
+                },
+                "excl_zeros": {
+                  "entries": 4,
+                  "mean": 27.136,
+                  "standard_deviation": 11.835
+                }
+              },
+              "type": "queue statistics"
+            }"""
         )
 
         //https://github.com/stleary/JSON-java/issues/573
@@ -132,7 +130,44 @@ class SalabimExampleTests {
         val waitingLine: ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer> = env.get()
 
         val expectedStats = JSONObject(
-            """{"queue_length":{"all": {"duration": 2000, "min":0, "max": 3, "mean": 0.45,"standard_deviation": 0.672}, "excl_zeros": {"duration":702.6821809949577, "min": 1, "max": 3,"mean": 1.28, "standard_deviation": 0.474}},"name": "waitingline", "length_of_stay": {"all": {"entries": 193, "mean": 4.353, "standard_deviation":5.429}, "excl_zeros": {"entries": 125,"mean": 6.721, "standard_deviation": 5.44}},"type": "queue statistics"}"""
+            """{
+              "queue_length": {
+                "all": {
+                  "duration": 2000,
+                  "min": 0,
+                  "max": 3,
+                  "mean": 0.45,
+                  "standard_deviation": 0.672
+                },
+                "excl_zeros": {
+                  "duration": 702.6821809949577,
+                  "min": 1,
+                  "max": 3,
+                  "mean": 1.28,
+                  "standard_deviation": 0.474
+                }
+              },
+              "name": "waitingline",
+              "length_of_stay": {
+                "all": {
+                  "entries": 193,
+                  "ninty_pct_quantile": 12.347034907974557,
+                  "median": 5.429,
+                  "mean": 4.353,
+                  "nintyfive_pct_quantile": 15.530711589152576,
+                  "standard_deviation": 5.429
+                },
+                "excl_zeros": {
+                  "entries": 125,
+                  "ninty_pct_quantile": 14.667930815087677,
+                  "median": 5.44,
+                  "mean": 6.721,
+                  "nintyfive_pct_quantile": 17.61227679143471,
+                  "standard_deviation": 5.44
+                }
+              },
+              "type": "QueueStatistics"
+            }"""
         )
 
         waitingLine.stats.toJson().toString(2) shouldBe expectedStats.toString(2)
@@ -157,8 +192,8 @@ class SalabimExampleTests {
             ) { org.kalasim.examples.bank.resources.Customer(get()) }
         }.run(5000)
 
-        val clerks  = env.get<Resource>()
-        clerks.apply{
+        val clerks = env.get<Resource>()
+        clerks.apply {
             requesters.size shouldBeLessThan 10
 
             requesters.stats.lengthStats.mean!! shouldBeLessThan 10.0

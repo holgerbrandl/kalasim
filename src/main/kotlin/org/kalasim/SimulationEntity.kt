@@ -2,7 +2,7 @@ package org.kalasim
 
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.println
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
 
 abstract class SimulationEntity(name: String?) : KoinComponent {
     val env by lazy { getKoin().get<Environment>() }

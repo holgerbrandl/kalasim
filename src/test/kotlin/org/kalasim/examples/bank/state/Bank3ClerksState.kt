@@ -4,8 +4,8 @@ package org.kalasim.examples.bank.state
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
-import org.koin.core.get
-import org.koin.core.inject
+import org.koin.core.component.get
+import org.koin.core.component.inject
 
 class CustomerGenerator : Component() {
 

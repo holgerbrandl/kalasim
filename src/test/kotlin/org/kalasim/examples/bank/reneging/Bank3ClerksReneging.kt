@@ -5,8 +5,8 @@ import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
 import org.kalasim.analytics.display
 import org.kalasim.misc.println
-import org.koin.core.get
-import org.koin.core.inject
+import org.koin.core.component.get
+import org.koin.core.component.inject
 
 
 //**{todo}** use monitors here and maybe even inject them

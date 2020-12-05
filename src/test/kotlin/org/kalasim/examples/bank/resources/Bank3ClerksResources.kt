@@ -3,7 +3,7 @@ package org.kalasim.examples.bank.resources
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
 import org.kalasim.analytics.display
-import org.koin.core.get
+import org.koin.core.component.get
 
 
 class Customer(private val clerks: Resource) : Component() {

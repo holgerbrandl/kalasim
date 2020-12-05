@@ -5,10 +5,9 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.moment.Variance
-import org.apache.commons.math3.stat.descriptive.rank.Median
 import org.kalasim.misc.printHistogram
 import org.kalasim.misc.println
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
@@ -43,7 +42,7 @@ interface LevelMonitor<T> {
     /**
      * When Monitor.get() is called with a time parameter or a direct call with a time parameter, the value at that time will be returned.
      * */
-    operator fun get(time: Double): T
+    operator fun get(time: Double): T?
 }
 
 /**
@@ -121,7 +120,12 @@ class FrequencyLevelMonitor<T>(initialValue: T, name: String? = null) : Frequenc
     }
 
 
-    override fun get(time: Double): T = TODO("Not yet implemented")
+    override fun get(time: Double): T? {
+        // https://youtrack.jetbrains.com/issue/KT-43776
+        val timeIndex = timestamps.withIndex().firstOrNull { it.value >= time }?.index
+
+        return timeIndex?.let{ values[it]}
+    }
 }
 
 open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name) {
@@ -143,16 +147,16 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
     override fun reset(): Unit = TODO("Not yet implemented")
 
 
-    open fun mean(): Double? = sumStats.mean
-    open fun standardDeviation(): Double? = sumStats.mean
+//    open fun mean(): Double? = sumStats.mean
+//    open fun standardDeviation(): Double? = sumStats.mean
 
     fun printHistogram() {
         sumStats.printHistogram(name)
     }
 
 
-    fun summary(excludeZeros: Boolean = false, rollingStats: Boolean = false): StatisticalSummary {
-        require(!rollingStats){TODO()}
+    fun statistics(excludeZeros: Boolean = false, rollingStats: Boolean = false): StatisticalSummary {
+        require(!rollingStats) { TODO() }
 
 //        val stats: StatisticalSummary = if(rollingStats) SummaryStatistics() else DescriptiveStatistics()
         val stats = DescriptiveStatistics()
@@ -178,7 +182,8 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
  */
 class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : NumericStatisticMonitor(name),
     LevelMonitor<Number> {
-    val timestamps = listOf<Double>().toMutableList()
+
+    private val timestamps = listOf<Double>().toMutableList()
 
     init {
         addValue(initialValue)
@@ -192,7 +197,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : Nume
     override fun get(time: Double): Number = timestamps.zip(values.toList()).first { it.first > time }.second
 
     internal fun valuesUntilNow(excludeZeros: Boolean = false): NLMStatsData {
-        require(values.isNotEmpty()){"data must not be empty when preparing statistics of $name"}
+        require(values.isNotEmpty()) { "data must not be empty when preparing statistics of $name" }
 
         val valuesLst = values.toList()
 
@@ -209,6 +214,8 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : Nume
             NLMStatsData(valuesLst, timestamps, durations)
         }
     }
+
+     fun statistics(excludeZeros: Boolean=false) = NumericLevelMonitorStats(this, excludeZeros)
 }
 
 

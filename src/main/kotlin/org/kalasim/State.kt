@@ -10,7 +10,7 @@ A state will have a certain value at a given time. In its simplest form a compon
 Definition is simple, like dooropen=sim.State('dooropen'). The default initial value is False, meaning the door is closed.
  * initial value of the state
  */
-class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
+open class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
 
     var value: T = initialValue
         set(value) {
@@ -55,8 +55,8 @@ class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
         tryWait()
     }
 
-    private fun tryWait(max: Int = Int.MAX_VALUE) {
-        var mx = max
+    private fun tryWait(maxHonor: Int = Int.MAX_VALUE) {
+        var mx = maxHonor
         waiters.q.map { it.component }.takeWhile {
             // wait max times but consider honor return state of tryWait
             if (it.tryWait()) mx--;

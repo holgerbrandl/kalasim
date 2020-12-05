@@ -14,3 +14,15 @@ many votes https://stackoverflow.com/questions/9082499/custom-domain-for-github-
 ![](.dev_notes_images/domaincomwww.png)
 
 To support CNAME in mkdocs see https://www.mkdocs.org/user-guide/deploying-your-docs/
+
+
+
+
+## Koin pointers
+
+https://medium.com/mobile-app-development-publication/kotlin-koin-scope-illustrated-3bfa6c7ae98
+
+
+## salabim
+
+doc sources --> https://www.salabim.org/manual/ view page sources

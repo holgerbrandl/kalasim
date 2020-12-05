@@ -2,86 +2,77 @@ package org.kalasim.test
 
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
-import org.kalasim.FrequencyLevelMonitor
-import org.kalasim.Environment
-import org.kalasim.NumericLevelMonitor
-import org.kalasim.NumericStatisticMonitor
+import org.junit.Test
+import org.kalasim.*
 import org.kalasim.test.MonitorTests.Car.AUDI
 import org.kalasim.test.MonitorTests.Car.VW
-import org.junit.BeforeClass
-import org.junit.Test
 
-class MonitorTests {
-
-    companion object {
-        private lateinit var env: Environment
-
-        @BeforeClass
-        @JvmStatic
-        fun setup() {
-            env = Environment()
-        }
-    }
+//class MonitorTests : KoinStopper() {
+class MonitorTests  {
 
     private enum class Car {
         AUDI, PORSCHE, VW
     }
 
     @Test
-    fun `Frequency stats should be correct`() {
+    fun `Frequency stats should be correct`() = createTestSimulation {
         val m = FrequencyLevelMonitor<Car>(AUDI)
 //        m.addValue(AUDI)
-        env.now = 2.0
+        now = 2.0
 
         m.addValue(VW)
-        env.now = 8.0
+        now = 8.0
 
-        m.getPct(AUDI) shouldBe 0.5
+        m.getPct(AUDI) shouldBe 0.25
     }
 
 
-   @Test
-    fun `Frequency level stats should be correct`() {
-        val m = FrequencyLevelMonitor<Car>(AUDI)
-       env.now = 2.0
-
-       m.addValue(VW)
-       env.now = 8.0
-
-       m.getPct(AUDI) shouldBe 0.25
+    private fun createTestSimulation(builder: Environment.() -> Unit) {
+        createSimulation(builder)
+        Environment().apply(builder)
     }
 
 
     @Test
-    fun `it should correctly calculate numeric level stats`() {
-        NumericLevelMonitor().apply {
-            env.now += 2
-            addValue(2)
+    fun `Frequency level stats should be correct`() = createTestSimulation {
+        val m: FrequencyLevelMonitor<Car> = FrequencyLevelMonitor(AUDI)
+        now = 2.0
 
-            env.now += 2
-            addValue(6)
-            env.now += 4
+        m.addValue(VW)
+        now = 8.0
 
-//            expected value 0 -2-> 2 -2-> 6 -4-> (0+4+24)/8
+        m.getPct(AUDI) shouldBe 0.25
+    }
 
-            println("mean is ${mean()}")
-        }.mean() shouldBe 3.5.plusOrMinus(.1)
+
+    @Test
+    fun `it should correctly calculate numeric level stats`() = createTestSimulation {
+        val nlm = NumericLevelMonitor()
+
+        now += 2
+        nlm.addValue(2)
+
+        now += 2
+        nlm.addValue(6)
+        now += 4
+
+//            expected value (2*0 + 2*2 + 4*6)/8
+        nlm.statistics().mean shouldBe 3.5.plusOrMinus(.1)
     }
 
     @Test
-    fun `it should correctly calculate numeric  stats`() {
-        NumericStatisticMonitor().apply {
-            env.now += 2
-            addValue(2)
+    fun `it should correctly calculate numeric  stats`() = createTestSimulation {
+        val nsm = NumericStatisticMonitor()
 
-            env.now += 2
-            addValue(6)
-            env.now += 4
+        now += 2
+        nsm.addValue(2)
 
-            println("mean is ${mean()}")
-        }.mean() shouldBe 4.0
+        now += 2
+        nsm.addValue(6)
+        now += 4
+
+        nsm.statistics().mean shouldBe 4.0
     }
-
 }
 
 typealias   CMPair<K, V> = org.apache.commons.math3.util.Pair<K, V>

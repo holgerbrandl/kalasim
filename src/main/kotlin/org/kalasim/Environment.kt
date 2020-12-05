@@ -3,11 +3,18 @@ package org.kalasim
 import org.apache.commons.math3.random.JDKRandomGenerator
 import org.apache.commons.math3.random.RandomGenerator
 import org.kalasim.ComponentState.*
-import org.koin.core.KoinComponent
+import org.kalasim.misc.CustomContext
+import org.koin.core.Koin
+import org.koin.core.KoinApplication
+import org.koin.core.component.KoinComponent
+import org.koin.core.context.GlobalContext
+import org.koin.core.context.KoinContext
 import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
 import org.koin.core.definition.Definition
 import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.module
+import org.koin.java.KoinJavaComponent.getKoin
 import java.util.*
 
 
@@ -26,9 +33,9 @@ fun configureEnvironment(enableTraceLogger: Boolean = true, builder: org.koin.co
 fun createSimulation(builder: Environment.() -> Unit): Environment =
     Environment().apply(builder)
 
-fun Environment.createSimulation(builder: Environment.() -> Unit) {
-    this.apply(builder)
-}
+//fun Environment.createSimulation(builder: Environment.() -> Unit) {
+//    this.apply(builder)
+//}
 
 class Environment(
     koins: org.koin.core.module.Module = module(createdAtStart = true) { },
@@ -70,14 +77,17 @@ class Environment(
             addTraceListener(ConsoleTraceLogger(true))
         }
 
-        startKoin { modules(module { single { this@Environment } }) }
+        GlobalContext.stop()
+        // https://github.com/InsertKoinIO/koin/issues/972
+//        CustomContext.startKoin(koinContext = CustomContext()) { modules(module { single { this@Environment } }) }
+        startKoin() { modules(module { single { this@Environment } }) }
 
         main = Component(name = "main", process = null)
         setCurrent(main)
 
-        require(koins.createAtStart) {
-            "createAtStart must be enabled by convention to instantiate injected components before starting the simulation"
-        }
+//        require(koins.createAtStart) {
+//            "createAtStart must be enabled by convention to instantiate injected components before starting the simulation"
+//        }
 
         getKoin().loadModules(listOf(koins))
 //        KoinContextHandler.get()._scopeRegistry.rootScope.createEagerInstances()

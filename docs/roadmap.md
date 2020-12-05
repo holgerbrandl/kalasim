@@ -36,13 +36,10 @@ env.apply {
 
 ## 0.3
 
+**{todo}** ensure that just yieldable methods are used in yield by checking stacktrace
+
 Slicing of monitors https://www.salabim.org/manual/Monitor.html#slicing-of-monitors
 
 ## Later
 
 Register project at awesome-kotlin
-
-
-## Koin pointers
-
-https://medium.com/mobile-app-development-publication/kotlin-koin-scope-illustrated-3bfa6c7ae98

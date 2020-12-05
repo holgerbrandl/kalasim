@@ -5,8 +5,8 @@ package org.kalasim.examples.bank.oneclerk
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
 import org.kalasim.analytics.display
-import org.koin.core.get
-import org.koin.core.inject
+import org.koin.core.component.get
+import org.koin.core.component.inject
 
 
 class Customer(val waitingLine: ComponentQueue<Customer>, val clerk: Clerk) : Component() {

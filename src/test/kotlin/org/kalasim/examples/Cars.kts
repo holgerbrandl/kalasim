@@ -1,5 +1,4 @@
 import org.kalasim.Component
-import org.kalasim.configureEnvironment
 import org.kalasim.createSimulation
 
 class Car : Component() {

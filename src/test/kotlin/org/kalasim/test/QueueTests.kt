@@ -11,37 +11,36 @@ class QueueTests {
 
     @Test
     fun testWaitingLine() {
-
         class Foo : Component()
 
-        val tc = TraceCollector()
-        val waitingLine by lazy { ComponentQueue<Foo>() }
+        val waitingLine by lazy {
+            ComponentQueue<Foo>()
+        }
 
         val env = configureEnvironment {
             add { waitingLine }
         }
 
-        env.addTraceListener(tc)
+        env.addTraceListener(TraceCollector())
 
         waitingLine.add(Foo())
         waitingLine.add(Foo())
         waitingLine.add(Foo())
 
-        // consume it
-        assertEquals(4, waitingLine.size, "expected 3 items in queue")
-
+        assertEquals(3, waitingLine.size, "expected 3 items in queue")
 
         // add a consumer
-        env.addComponent(object : Component() {
+        object : Component() {
             override suspend fun SequenceScope<Component>.process(it: Component) {
                 while (waitingLine.isNotEmpty()) {
-                    yield(waitingLine.poll())
+                    waitingLine.poll()
+                    // wait for it...
                     yield(hold(5.0))
                 }
 
                 yield(it.passivate())
             }
-        })
+        }
 
         env.run(50.0)
 

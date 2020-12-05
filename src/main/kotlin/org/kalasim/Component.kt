@@ -5,7 +5,7 @@ import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.ComponentState.*
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
 import java.util.*
 import kotlin.reflect.KFunction1
 
@@ -940,7 +940,7 @@ class SimpleProcessInternal(val component: Component, val funPointer: FunPointer
 
 data class ResourceRequest(val r: Resource, val quantity: Double, val priority: Int? = null)
 
-infix fun Resource.withQuantity(quantity: Double) = ResourceRequest(this, quantity)
+infix fun Resource.withQuantity(quantity: Number) = ResourceRequest(this, quantity.toDouble())
 
 //    data class StateRequest<T>(val s: State<T>, val value: T? = null, val priority: Int? = null)
 data class StateRequest<T>(val state: State<T>, val priority: Int? = null, val predicate: (T) -> Boolean) {

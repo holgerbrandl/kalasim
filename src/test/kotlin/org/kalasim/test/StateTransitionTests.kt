@@ -1,7 +1,7 @@
 package org.kalasim.test
 
-import org.kalasim.*
 import org.junit.Test
+import org.kalasim.*
 import kotlin.test.assertEquals
 
 
@@ -10,35 +10,33 @@ class StateTransitionTests {
     @Test
     fun testCars() {
         class TestCar : Component() {
-            override suspend fun SequenceScope<Component>.process() {
-                while (true) {
-                    yield(hold(1.0))
-                }
-            }
+
         }
 
         val traces = mutableListOf<TraceElement>()
 
-
         Environment().apply {
-            addTraceListener(object : TraceListener {
-                override fun processTrace(traceElement: TraceElement) {
-                    traces.add(traceElement)
-                }
-            })
+            addTraceListener { traceElement -> traces.add(traceElement) }
 
-            TestCar()
+            object : Component() {
+                override suspend fun SequenceScope<Component>.process() {
+                    while (true) {
+                        TestCar()
+                        yield(hold(1.0))
+                    }
+                }
+            }
         }.run(5.0)
 
 //        traces.forEach { println(it) }
 
         // make sure multiple cars are created
-        val cars = traces.map { it.source }.filterNotNull().distinct().filter { it.name.startsWith("Car") }
-        assertEquals(5, cars.size, "expected cars count does not match")
+        val cars = traces.mapNotNull { it.source }.distinct().filter { it.name.startsWith("TestCar") }
+        assertEquals(6, cars.size, "expected cars count does not match")
 
-        assert(traces[0].source!!.name == MAIN)
-        assert(traces[1].source!!.name == MAIN)
-        assert(traces[2].source!!.name == MAIN)
+        assert(traces[0].curComponent!!.name == MAIN)
+        assert(traces[1].curComponent!!.name == MAIN)
+        assert(traces[2].curComponent!!.name == MAIN)
     }
 
 
@@ -58,9 +56,9 @@ class StateTransitionTests {
     }
 
     @Test
-    fun `it should correctly keep track of the state`(){
-        var c :Component? = null
-        createSimulation {c =  Component() }.apply {
+    fun `it should correctly keep track of the state`() {
+        var c: Component? = null
+        createSimulation { c = Component() }.apply {
             run(10.0)
             c!!.status = ComponentState.WAITING
             run(10.0)

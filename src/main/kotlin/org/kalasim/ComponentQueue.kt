@@ -7,7 +7,7 @@ import org.apache.commons.math3.util.Precision
 import org.kalasim.misc.JSON_INDENT
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.println
-import org.koin.core.KoinComponent
+import org.koin.core.component.KoinComponent
 import java.util.*
 
 data class CQElement<C : Component>(val component: C, val enterTime: Double, val priority: Int? = null)
@@ -93,11 +93,11 @@ class QueueStatistics(cq: ComponentQueue<*>) {
     val name = cq.name
     val timestamp = cq.env.now
 
-    val lengthStats = NumericLevelMonitorStats(cq.queueLengthMonitor)
+    val lengthStats = cq.queueLengthMonitor.statistics(false)
     val lengthStatsExclZeros = NumericLevelMonitorStats(cq.queueLengthMonitor, excludeZeros = true)
 
-    val lengthOfStayStats = cq.lengthOfStayMonitor.summary()
-    val lengthOfStayStatsExclZeros = cq.lengthOfStayMonitor.summary(excludeZeros = true)
+    val lengthOfStayStats = cq.lengthOfStayMonitor.statistics()
+    val lengthOfStayStatsExclZeros = cq.lengthOfStayMonitor.statistics(excludeZeros = true)
 
     // Partial support for weighted percentiles was added in https://github.com/apache/commons-math/tree/fe29577cdbcf8d321a0595b3ef7809c8a3ce0166
     // Update once released, use jitpack or publish manually
