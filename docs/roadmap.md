@@ -3,9 +3,11 @@
 
 ## Pre-release
 
-**{todo}** impelemnt `enabled` disabled for monitors
+**{todo}** use kontext isolation if possibel https://github.com/InsertKoinIO/koin/blob/master/koin-projects/docs/reference/koin-core/start-koin.md#koin-context-isolation
 
-**{todo}**  make `scheduledTime` nullable: replace scheduledTime = Double.MAX_VALUE with null which is semantically more meaningful here
+**{todo}** implement `enabled` disabled for monitors
+
+**{todo}**  make `scheduledTime` nullable: replace scheduledTime = Double.MAX_VALUE with `null` which is semantically more meaningful here
 
 **{todo}** update logs example in docs intro
 

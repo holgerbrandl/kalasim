@@ -45,6 +45,7 @@ open class Component(
     private var simProcess: SimProcess? = null
 
 
+    // **{todo}** 0.6 get rid of this field (not needed because can be always retrieved from eventList if needed
     var scheduledTime = Double.MAX_VALUE
 
     private var remainingDuration = 0.0
@@ -416,7 +417,7 @@ open class Component(
 
                 if (av >= 0) {
                     bumpCandidates.forEach {
-                        it.releaseInternal(r, bumpedBy=this)
+                        it.releaseInternal(r, bumpedBy = this)
                         printTrace("$it bumped from $r by $this")
                         it.activate()
                     }
@@ -701,8 +702,11 @@ open class Component(
      * It is not possible to release from an anonymous resource, this way.
      * Use Resource.release() in that case.
      *
-     * @param  quantity  quantity to be released. If not specified, the resource will be emptied completely.
-     * For non-anonymous resources, all components claiming from this resource will be released.
+     * @param  releaseRequests  A list of resource requests. Each request is formed by a
+     *  * resource
+     *  * an optional priority
+     *  * an optional quantity to be requested from the resource
+     *     </ul>
      */
     fun release(vararg releaseRequests: ResourceRequest) {
         for ((resource, quantity) in releaseRequests) {
@@ -745,7 +749,7 @@ open class Component(
         require(!resource.claimers.isEmpty() || resource.claimedQuantity == 0.0) { "rounding error in claimed quantity" }
         // fix if(claimers.isEmpty()) field= 0.0
 
-        if(bumpedBy == null) resource.tryRequest()
+        if (bumpedBy == null) resource.tryRequest()
     }
 
 
@@ -810,8 +814,8 @@ open class Component(
             // skip already tracked states
             .filterNot { sr -> waits.any { it.state == sr.state } }
             .forEach { sr ->
-                val (state, priority, _) = sr
-                state.waiters.add(this, priority)
+                val (state, srPriority, _) = sr
+                state.waiters.add(this, srPriority)
                 waits.add(sr)
             }
 
@@ -832,11 +836,15 @@ open class Component(
         @Suppress("UNCHECKED_CAST")
         val honored = if (waitAll) {
             waits.all { sr ->
-                (sr as StateRequest<Any>).predicate(sr.state)
+                (sr as StateRequest<Any>).let {
+                    it.predicate(it.state.value)
+                }
             }
         } else {
             waits.any { sr ->
-                (sr as StateRequest<Any>).predicate(sr.state)
+                (sr as StateRequest<Any>).let {
+                    it.predicate(it.state.value)
+                }
             }
         }
 

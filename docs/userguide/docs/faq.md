@@ -24,7 +24,7 @@ Not planned
 
 We went through multiple iterations to come up with this great name:
 
-1. `desimuk` - {d}iscrete {e}vent {simu}lation with {k}otlin seem liked a very natural and great fit. Unfortunately, Google seemed more convinced  - for reasons that were outside the scope of this project - that this name related mostly with indian porn
+1. `desimuk` - {d}iscrete {e}vent {simu}lation with {k}otlin seemed a very natural and great fit. Unfortunately, Google seemed more convinced  - for reasons that were outside the scope of this project - that this name related mostly with indian porn.
 2. `desim` - seemed fine initially, until we discovered another simulation engine <https://github.com/aybabtme/desim> with the same name.
 3. `kalasim`  honors its origin by being somewhat phonetically similar to `salabim` while stressing Kotlin with the `k`, and the simulation scope with the `sim` instead of the `bim`.
 
