@@ -40,6 +40,8 @@ env.apply {
 
 Slicing of monitors https://www.salabim.org/manual/Monitor.html#slicing-of-monitors
 
+revise data prep and rendering of histogram get more similar to kalasim https://www.salabim.org/manual/Monitor.html
+
 ## Later
 
 Register project at awesome-kotlin

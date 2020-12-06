@@ -1,14 +1,18 @@
 package org.kalasim
 
 import com.systema.analytics.es.misc.json
+import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.moment.Variance
+import org.kalasim.misc.asCM
+import org.kalasim.misc.buildHistogram
 import org.kalasim.misc.printHistogram
-import org.kalasim.misc.println
+import org.kalasim.misc.printThis
 import org.koin.core.component.KoinComponent
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 import kotlin.math.sqrt
 
 
@@ -27,7 +31,7 @@ abstract class Monitor<T>(name: String? = null) : KoinComponent {
         private set
 
     init {
-        this.name = nameOrDefault(name)
+        this.name = nameOrDefault(name, env.nameCache)
 
 //        printTrace("create ${this.name}")
     }
@@ -62,17 +66,19 @@ open class FrequencyMonitor<T>(name: String? = null) : Monitor<T>(name) {
 
     override fun reset() = frequencies.clear()
 
-    open fun printHistogram() {
-        println(name)
-        println("----")
+    open fun printHistogram(values: List<T>? = null, sortByWeight: Boolean = false) {
+        println("Summary of: '${name}'")
         println("# Records: ${total}")
+        println("# Levels: ${frequencies.keys.size}")
         println()
-        println("value\t%\tcount")
-        // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
 
-        frequencies.keys.asSequence().map {
-            println("${it}\t${getPct(it)}\t${frequencies[it]}")
-        }
+        // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
+        println("Histogram of: '${name}'")
+        frequencies.mapValues { it.value.toLong() }.toList()
+            .printHistogram(values = values, sortByWeight = sortByWeight)
+//        frequencies.keys.asSequence().map {
+//            println("${it}\t${getPct(it)}\t${frequencies[it]}")
+//        }
     }
 
     open fun getPct(value: T): Double = frequencies[value]!!.toDouble() / total
@@ -124,7 +130,23 @@ class FrequencyLevelMonitor<T>(initialValue: T, name: String? = null) : Frequenc
         // https://youtrack.jetbrains.com/issue/KT-43776
         val timeIndex = timestamps.withIndex().firstOrNull { it.value >= time }?.index
 
-        return timeIndex?.let{ values[it]}
+        return timeIndex?.let { values[it] }
+    }
+
+    override fun printHistogram(values: List<T>?, sortByWeight: Boolean) {
+        println("Summary of: '${name}'")
+        println("# Records: ${total}")
+        println("# Levels: ${frequencies.keys.size}")
+        println()
+
+        val hist: List<Pair<T, Long>> =
+            xDuration().zip(this.values).groupBy { (_, value) -> value }
+                .map { it.key to it.value.sumOf { (it.first * 100).roundToLong() } }
+
+//        val ed = EnumeratedDistribution(hist.asCM())
+//        repeat(1000){ ed.sample()}.c
+
+        hist.printHistogram(sortByWeight = sortByWeight)
     }
 }
 
@@ -144,14 +166,36 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
         addValue((roundToInt + 1).toDouble())
     }
 
-    override fun reset(): Unit = TODO("Not yet implemented")
+    override fun reset() = sumStats.clear()
 
 
 //    open fun mean(): Double? = sumStats.mean
 //    open fun standardDeviation(): Double? = sumStats.mean
 
-    fun printHistogram() {
-        sumStats.printHistogram(name)
+//    fun statistics(): DescriptiveStatistics = DescriptiveStatistics(sumStats.values)
+
+    open fun printHistogram(sortByWeight: Boolean = false, binCount: Int = 10, valueBins: Boolean = true) {
+        //    val histJson = JSONArray(GSON.toJson(histogramScaled))
+
+        //    json {
+        //        "name" to name
+        //        "type" to this@printHistogram.javaClass.simpleName //"queue statistics"
+        //        "entries" to n
+        //        "mean" to mean
+        //        "minimum" to min
+        //        "maximum" to max
+        //    }.toString(2).println()
+
+
+//        val histogram = sumStats.buildHistogram()
+//        val colWidth = 40.0
+//
+//        val histogramScaled = histogram.map { (range, value) -> range to colWidth * value / sumStats.n }
+        println("Summary of: '${name}'")
+        statistics().printThis()
+
+        println("Histogram of: '${name}'")
+        sumStats.buildHistogram(binCount).printHistogram(sortByWeight = sortByWeight)
     }
 
 
@@ -215,7 +259,28 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : Nume
         }
     }
 
-     fun statistics(excludeZeros: Boolean=false) = NumericLevelMonitorStats(this, excludeZeros)
+    fun statistics(excludeZeros: Boolean = false) = NumericLevelMonitorStats(this, excludeZeros)
+
+    override fun printHistogram(sortByWeight: Boolean, binCount: Int, valueBins: Boolean) {
+//        println("Summary of: '${name}'")
+//        println("# Records: ${total}")
+//        println("# Levels: ${frequencies.keys.size}")
+//        println()
+
+        // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
+        println("Histogram of: '${name}'")
+        val hist: List<Pair<Double, Double>> = statistics().data.run {
+            val aggregatedMonitor: List<Pair<Double, Double>> =
+                durations.zip(values).groupBy { (_, value) -> value }.map { it.key to it.value.sumOf { it.first } }
+
+            aggregatedMonitor
+        }
+
+        val stats =
+            DescriptiveStatistics(EnumeratedDistribution(hist.asCM()).sample(1000, arrayOf<Double>()).toDoubleArray())
+
+        stats.buildHistogram(binCount, valueBins = valueBins).printHistogram(sortByWeight = sortByWeight)
+    }
 }
 
 
@@ -233,13 +298,13 @@ class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean =
     val min: Double?
     val max: Double?
 
+    internal val data: NLMStatsData = nlm.valuesUntilNow(excludeZeros)
+
 //    val median :Double = TODO()
 //    val ninetyfivePercentile :Double = TODO()
 //    val ninetyninePercentile :Double = TODO()
 
     init {
-        val data = nlm.valuesUntilNow(excludeZeros)
-
         min = data.values.minOrNull()
         max = data.values.maxOrNull()
 

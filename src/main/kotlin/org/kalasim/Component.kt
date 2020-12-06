@@ -5,6 +5,7 @@ import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.ComponentState.*
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
+import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import java.util.*
 import kotlin.reflect.KFunction1

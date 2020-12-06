@@ -2,6 +2,7 @@ package org.kalasim;
 
 import com.systema.analytics.es.misc.json
 import org.kalasim.misc.Jsonable
+import org.koin.core.component.KoinApiExtension
 
 /**
  * @param preemptive If a component requests from a preemptive resource, it may bump component(s) that are claiming from
@@ -119,6 +120,7 @@ open class Resource(
 }
 
 
+@KoinApiExtension
 class ResourceInfo(resource: Resource) : Jsonable() {
     val name: String = resource.name
     val creationTime: Double = resource.creationTime

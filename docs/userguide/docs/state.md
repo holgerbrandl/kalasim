@@ -120,3 +120,8 @@ E.g.:
 yield(wait(StateRequest(State("foo")) { listOf("bar", "test").contains(it) })
 yield(wait(StateRequest(State(3.0)) { it*3 < 42 }))
 ```
+
+
+## Further Reading
+
+* <https://www.salabim.org/manual/State.html>

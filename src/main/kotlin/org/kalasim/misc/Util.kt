@@ -1,7 +1,6 @@
 package org.kalasim.misc
 
 import com.google.gson.GsonBuilder
-import com.systema.analytics.es.misc.json
 import org.apache.commons.math3.random.EmpiricalDistribution
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.rank.Median
@@ -9,16 +8,24 @@ import org.json.JSONObject
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
-internal fun Any.println() {
+internal fun Any.printThis() {
     println(toString())
 }
 
+//class Histogram()
+
 // https://stackoverflow.com/questions/10786465/how-to-generate-bins-for-histogram-using-apache-math-3-0-in-java
-internal fun buildHistogram(stats: DescriptiveStatistics, binCount: Int = 30): List<Pair<Pair<Double, Double>, Long>> {
+internal fun DescriptiveStatistics.buildHistogram(
+    binCount: Int = 30,
+    lowerBound: Double? = null,
+    upperBound: Double? = null,
+): List<Pair<Pair<Double, Double>, Long>> {
+
+    require(lowerBound == null && upperBound == null) { ImplementMe() }
 
     val histogram = LongArray(binCount)
     val distribution = EmpiricalDistribution(binCount)
-    distribution.load(stats.values)
+    distribution.load(values)
     var k = 0
     for (ss in distribution.binStats) {
         histogram[k++] = ss.n
@@ -29,39 +36,74 @@ internal fun buildHistogram(stats: DescriptiveStatistics, binCount: Int = 30): L
     return intervals.zip(distribution.binStats.map { it.n })
 }
 
-internal fun DescriptiveStatistics.printHistogram(name: String) {
-    json {
-        "name" to name
-        "type" to this@printHistogram.javaClass.simpleName //"queue statistics"
-        "entries" to n
-        "mean" to mean
-        "minimum" to min
-        "maximum" to max
-    }.toString().println()
 
-    // also print histogram
-    val histogram = buildHistogram(this, 10)
+internal fun ImplementMe() {
+    TODO("not yet implementd. Please file a ticket under https://github.com/holgerbrandl/kalasim/issues")
+}
 
-    // rescale max to column width
-    val colWidth = 40.0
-//    val total = histogram.sumOf { it.second.toDouble() }
 
-    val histogramScaled = histogram.map { (range, value) -> range to colWidth * value / n }
+internal typealias  Histogram<T> = List<Pair<T, Long>>
 
-    histogramScaled.forEach { (binInterval, binHeight) ->
-        val range = "[${JSON_DF.format(binInterval.first)}, ${JSON_DF.format(binInterval.second)}]"
-        val pct = JSON_DF.format(binHeight)
-        val stars = "*".repeat(binHeight.roundToInt()).padEnd(colWidth.roundToInt(), ' ')
-        (range.padEnd(15, ' ')  +pct.padStart(5) +" |" + stars + "|").println()
+internal fun DescriptiveStatistics.printHistogram() {
+    buildHistogram()
+        // pretty print ranges
+        .printHistogram()
+
+}
+
+internal fun <T> Histogram<T>.printHistogram(
+    colWidth: Double = 40.0,
+    sortByWeight: Boolean = false,
+    values: List<T>? = null
+) {
+
+    // if value range is provided adopt it
+    var hist = if (values != null) {
+        val parList = this.partition { (bin, _) -> values.contains(bin) }
+        // also complement missing values
+
+        val valueExt = parList.first.toMutableList().apply {
+            values.minus(this.toMap().keys).forEach {
+                add(it to 0.toLong())
+            }
+        }
+
+        (valueExt as List<Pair<Any, Long>>) + ("rest" to parList.second.sumOf { it.second })
+    } else {
+        this
+    }.run {
+        if (sortByWeight) {
+            sortedByDescending { it.second }
+        } else this
     }
-    kotlin.io.println()
+
+    val n = hist.sumOf { it.second }
+
+    listOf("bin", "entries", "pct", "").zip(listOf(17, 7, 4, colWidth.toInt())).map { it.first.padStart(it.second) }
+        .joinToString(" | ").printThis()
+
+    hist.forEach { (bin, binValue) ->
+        val scaledValue = binValue.toDouble() / n
+
+        val range = if (bin is Pair<*, *>) {
+            "[${JSON_DF.format(bin.first)}, ${JSON_DF.format(bin.second)}]"
+        } else {
+            bin.toString()
+        }
+
+        val pct = JSON_DF.format(scaledValue)
+        val stars = "*".repeat((scaledValue * colWidth).roundToInt()).padEnd(colWidth.roundToInt(), ' ')
+        listOf(range.padEnd(17), binValue.toString().padStart(7), pct.padStart(4), stars).joinToString(" | ")
+            .printThis()
+    }
+
+    println()
 }
 
 var JSON_DF = DecimalFormat("###.00")
 
 // move away from main namespace
 var TRACE_DF = DecimalFormat("###.00")
-
 
 
 // MATH UTILS
@@ -87,4 +129,8 @@ abstract class Jsonable {
 internal val GSON by lazy {
     GsonBuilder().serializeSpecialFloatingPointValues().setPrettyPrinting().serializeNulls().create()
 }
-var JSON_INDENT= 2
+var JSON_INDENT = 2
+
+typealias   CMPair<K, V> = org.apache.commons.math3.util.Pair<K, V>
+
+fun <T, S> List<Pair<T, S>>.asCM(): List<CMPair<T, S>> = map { CMPair(it.first, it.second) }

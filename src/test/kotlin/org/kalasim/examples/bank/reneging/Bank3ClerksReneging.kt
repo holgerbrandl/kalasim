@@ -4,7 +4,7 @@ package org.kalasim.examples.bank.reneging
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
 import org.kalasim.analytics.display
-import org.kalasim.misc.println
+import org.kalasim.misc.printThis
 import org.koin.core.component.get
 import org.koin.core.component.inject
 
@@ -107,6 +107,6 @@ fun main() {
         waitingLine.queueLengthMonitor.display()
         waitingLine.lengthOfStayMonitor.display()
 
-        waitingLine.stats.toJson().toString(2).println()
+        waitingLine.stats.toJson().toString(2).printThis()
     }
 }

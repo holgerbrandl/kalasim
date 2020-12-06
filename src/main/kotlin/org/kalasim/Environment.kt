@@ -50,6 +50,8 @@ class Environment(
 
     val rg: RandomGenerator = JDKRandomGenerator(42)
 
+    internal val nameCache = mapOf<String, Int>().toMutableMap()
+
     private val eventQueue = PriorityQueue<QueueElement>()
 
     /** Unmodifiable view on `eventQueue`. */
@@ -78,6 +80,7 @@ class Environment(
         }
 
         GlobalContext.stop()
+
         // https://github.com/InsertKoinIO/koin/issues/972
 //        CustomContext.startKoin(koinContext = CustomContext()) { modules(module { single { this@Environment } }) }
         startKoin() { modules(module { single { this@Environment } }) }

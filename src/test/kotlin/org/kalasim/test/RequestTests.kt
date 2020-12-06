@@ -1,9 +1,9 @@
 package org.kalasim.test
 
 import org.apache.commons.math3.distribution.EnumeratedDistribution
-import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
+import org.kalasim.misc.asCM
 
 class RequestTests {
 

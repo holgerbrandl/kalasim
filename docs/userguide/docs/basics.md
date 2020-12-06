@@ -5,10 +5,9 @@ The beauty of discrete event simulation is its very limited vocabulary which sti
 
 * [Components](component.md)
 * [Generators](component.md#generator)
-<!--(https://www.salabim.org/manual/ComponentGenerator.html)-->
 * [Queues](component.md#queue)
-* [States](https://www.salabim.org/manual/State.html)
-* [Monitors]() (via apache-commons-math)
+* [States](state.md)
+* [Monitors](monitors.md)
 
 
 ## Event Loop

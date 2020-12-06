@@ -2,7 +2,7 @@ package org.kalasim.examples
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
-import org.kalasim.misc.println
+import org.kalasim.misc.printThis
 import org.koin.core.component.get
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -94,8 +94,8 @@ object Refuel {
             }
 
             get<GasStation>().requesters.apply{
-                queueLengthMonitor.println()
-                lengthOfStayMonitor.println()
+                queueLengthMonitor.printThis()
+                lengthOfStayMonitor.printThis()
             }
         }
     }

@@ -21,7 +21,7 @@ We want to build a simulation where a single car is driving around for a some ti
 ```kotlin
 class Car : Component() {
     override suspend fun ProcContext.process() {
-            // drive around for 1 second
+            // drive around for an hour
             yield(hold(1.0))
             // and terminate when reaching the destination
             yield(terminate())

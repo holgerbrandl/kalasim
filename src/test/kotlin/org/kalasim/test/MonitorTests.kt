@@ -4,18 +4,67 @@ import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.*
-import org.kalasim.test.MonitorTests.Car.AUDI
-import org.kalasim.test.MonitorTests.Car.VW
+import org.kalasim.test.MonitorTests.Car.*
 
 //class MonitorTests : KoinStopper() {
-class MonitorTests  {
+class MonitorTests {
 
     private enum class Car {
-        AUDI, PORSCHE, VW
+        AUDI, PORSCHE, VW, TOYOTA
     }
+
 
     @Test
     fun `Frequency stats should be correct`() = createTestSimulation {
+        val m = FrequencyMonitor<Car>()
+        m.addValue(AUDI)
+        m.addValue(AUDI)
+        m.addValue(VW)
+        repeat(4) { m.addValue(PORSCHE) }
+
+        m.printHistogram()
+        m.printHistogram()
+
+        captureOutput { m.printHistogram() }.stdout shouldBe """
+                Summary of: 'FrequencyMonitor.1'
+                # Records: 7
+                # Levels: 3
+                
+                Histogram of: 'FrequencyMonitor.1'
+                              bin | entries |  pct |                                         
+                AUDI              |       2 |  .29 | ***********                             
+                VW                |       1 |  .14 | ******                                  
+                PORSCHE           |       4 |  .57 | ***********************
+                """.trimAndReline()
+
+        captureOutput { m.printHistogram(values = listOf(AUDI, TOYOTA)) }.stdout shouldBe """
+                Summary of: 'FrequencyMonitor.1'
+                # Records: 7
+                # Levels: 3
+                
+                Histogram of: 'FrequencyMonitor.1'
+                              bin | entries |  pct |                                         
+                AUDI              |       2 |  .29 | ***********                             
+                TOYOTA            |       0 |  .00 |                                         
+                rest              |       5 |  .71 | *****************************
+                """.trimAndReline()
+
+        captureOutput { m.printHistogram(sortByWeight = true) }.stdout shouldBe """
+                Summary of: 'FrequencyMonitor.1'
+                # Records: 7
+                # Levels: 3
+                
+                Histogram of: 'FrequencyMonitor.1'
+                              bin | entries |  pct |                                         
+                PORSCHE           |       4 |  .57 | ***********************                 
+                AUDI              |       2 |  .29 | ***********                             
+                VW                |       1 |  .14 | ******
+                """.trimAndReline()
+    }
+
+
+    @Test
+    fun `Frequency level stats should be correct`() = createTestSimulation {
         val m = FrequencyLevelMonitor<Car>(AUDI)
 //        m.addValue(AUDI)
         now = 2.0
@@ -24,24 +73,7 @@ class MonitorTests  {
         now = 8.0
 
         m.getPct(AUDI) shouldBe 0.25
-    }
 
-
-    private fun createTestSimulation(builder: Environment.() -> Unit) {
-        createSimulation(builder)
-        Environment().apply(builder)
-    }
-
-
-    @Test
-    fun `Frequency level stats should be correct`() = createTestSimulation {
-        val m: FrequencyLevelMonitor<Car> = FrequencyLevelMonitor(AUDI)
-        now = 2.0
-
-        m.addValue(VW)
-        now = 8.0
-
-        m.getPct(AUDI) shouldBe 0.25
     }
 
 
@@ -58,6 +90,8 @@ class MonitorTests  {
 
 //            expected value (2*0 + 2*2 + 4*6)/8
         nlm.statistics().mean shouldBe 3.5.plusOrMinus(.1)
+
+        nlm.printHistogram()
     }
 
     @Test
@@ -75,6 +109,7 @@ class MonitorTests  {
     }
 }
 
-typealias   CMPair<K, V> = org.apache.commons.math3.util.Pair<K, V>
 
-fun <T, S> List<Pair<T, S>>.asCM(): List<CMPair<T, S>> = map { CMPair(it.first, it.second) }
+internal fun createTestSimulation(builder: Environment.() -> Unit) {
+    createSimulation(builder)
+}

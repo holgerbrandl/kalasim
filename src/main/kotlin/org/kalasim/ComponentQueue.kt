@@ -6,7 +6,7 @@ import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.apache.commons.math3.util.Precision
 import org.kalasim.misc.JSON_INDENT
 import org.kalasim.misc.Jsonable
-import org.kalasim.misc.println
+import org.kalasim.misc.printThis
 import org.koin.core.component.KoinComponent
 import java.util.*
 
@@ -119,7 +119,7 @@ class QueueStatistics(cq: ComponentQueue<*>) {
         }
     }
 
-    fun print() = toJson().toString(JSON_INDENT).println()
+    fun print() = toJson().toString(JSON_INDENT).printThis()
 }
 
 fun StatisticalSummary.toJson(): Any {

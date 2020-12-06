@@ -1,10 +1,9 @@
 package org.kalasim.test
 
-import kravis.*
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
 import org.kalasim.analytics.*
-import org.kalasim.misc.println
+import org.kalasim.misc.printThis
 import org.koin.core.component.get
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -112,8 +111,8 @@ object DeterministicRefuel {
             }
 
 
-            get<GasStation>().requesters.queueLengthMonitor.println()
-            get<GasStation>().requesters.lengthOfStayMonitor.println()
+            get<GasStation>().requesters.queueLengthMonitor.printThis()
+            get<GasStation>().requesters.lengthOfStayMonitor.printThis()
 
             // save the simulation state to file
 //            Json.encodeToString(this).println()

@@ -1,16 +1,19 @@
 package org.kalasim
 
 import org.kalasim.misc.Jsonable
-import org.kalasim.misc.println
+import org.kalasim.misc.printThis
+import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 
+
+@Suppress("EXPERIMENTAL_API_USAGE")
 abstract class SimulationEntity(name: String?) : KoinComponent {
     val env by lazy { getKoin().get<Environment>() }
 
 //    var name: String
 //        private set
 
-    val name = nameOrDefault(name)
+    val name = nameOrDefault(name, env.nameCache)
 
     val creationTime = env.now
 
@@ -24,7 +27,7 @@ abstract class SimulationEntity(name: String?) : KoinComponent {
     protected abstract val info: Jsonable
 
     /** Print info about this resource */
-    fun printInfo() = info.println()
+    fun printInfo() = info.printThis()
 
     override fun toString(): String = "${javaClass.simpleName}($name)"
 
@@ -61,11 +64,10 @@ abstract class SimulationEntity(name: String?) : KoinComponent {
 // Auto-Naming
 //
 
-private val componentCounters = mapOf<String, Int>().toMutableMap()
 
-private fun getComponentCounter(className: String) = componentCounters.merge(className, 1, Int::plus)
+private fun getComponentCounter(className: String, nameCache: MutableMap<String, Int>) = nameCache.merge(className, 1, Int::plus)
 
-internal fun Any.nameOrDefault(name: String?) =
-    name ?: this.javaClass.defaultName()
+internal fun Any.nameOrDefault(name: String?, nameCache: MutableMap<String, Int>) =
+    name ?: this.javaClass.defaultName(nameCache)
 
-internal fun Class<Any>.defaultName() = simpleName + "." + getComponentCounter(simpleName)
+internal fun Class<Any>.defaultName(nameCache: MutableMap<String, Int>) = simpleName + "." + getComponentCounter(simpleName, nameCache)
