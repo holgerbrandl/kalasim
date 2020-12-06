@@ -91,7 +91,10 @@ class MonitorTests {
 //            expected value (2*0 + 2*2 + 4*6)/8
         nlm.statistics().mean shouldBe 3.5.plusOrMinus(.1)
 
-        nlm.printHistogram()
+        nlm.printHistogram(valueBins = false)
+        nlm.printHistogram(valueBins = true)
+
+        //TODO add test assertions here
     }
 
     @Test

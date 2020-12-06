@@ -33,6 +33,8 @@ Monitors can be enabled or disabled by setting the boolean flag `m.enabled`.
 m.enabled = false  // disable monitoring
 m.enabled = true   // enable monitoring
 ```
+
+
 ## Non level monitors
 
 Non level monitors collects values which do not reflect a level, e.g. the processing time of a part.
@@ -47,6 +49,49 @@ Besides, it is possible to get all collected values as list with `m.statistics()
 
 
 Calling `m.reset()` will clear all tallied values.
+
+## Level monitor
+
+Level monitors tally levels along with the current (simulation) time. E.g. the number of parts a machine is working on.
+
+There are  2 implementations to support categorical and numerical attributes
+
+* `org.kalasim.FrequencyLevelMonitor`
+* `org.kalasim.NumericLevelMonitor`
+
+
+Level monitors allow to query the value at a specific time
+```
+val nlm = NumericLevelMonitor()
+// ... collecting some data ...
+nlm[4]  # will print the value at time 4
+```
+
+In addition to standard statistics, level monitor support the following statistics
+
+* duration
+
+For all statistics, it is possible to exclude zero entries, e.g. `m.statistics(excludeZeros=true).mean` returns the mean, excluding zero entries.
+
+
+**{todo}** implement off tallying
+<!--When monitoring is disabled, an off value (see table above) will be tallied. All statistics will ignore the periods from this-->
+<!--off to a non-off value. This also holds for the xduration() method, but NOT for xt() and tx(). Thus,-->
+<!--the x-arrays of xduration() are not necessarily the same as the x-arrays in xt() and tx(). This is-->
+<!--the reason why there's no x() or t() method. |n|-->
+<!--It is easy to get just the x-array with `xduration()[0]` or `xt()[0]`.-->
+
+<!--It is important that a user *never* tallies an off value! Instead use Monitor.monitor(False)-->
+
+<!--With the monitor method, a level monitor can be enbled or disabled.-->
+
+<!--Also, the current monitor status (enabled/disabled) can be retrieved.-->
+
+Calling `m.reset()` will clear all tallied values and timestamps.
+
+The statistics of a level monitor can be printed with `m.printStatistics()`.
+
+## Histograms
 
 The statistics of a monitor can be printed with `printStatistics()`.
 E.g: `waitingLine.lengthOfStayMonitor.printStatistics()`:
@@ -72,11 +117,11 @@ E.g: `waitingLine.lengthOfStayMonitor.printStatistics()`:
 }
 ```
 
-And, a histogram can be printed with `print_histogram()`. E.g.
-`waitingline.length_of_stay.print_histogram(30, 0, 10)`:
+And, a histogram can be printed with `printHistogram()`. E.g.
+`waitingLine.lengthOfStayMonitor.printHistogram()`:
 
-
-```Histogram of: 'Available quantity of fuel_pump'
+```
+Histogram of: 'Available quantity of fuel_pump'
               bin | entries |  pct |                                         
 [146.45, 151.81]  |       1 |  .33 | *************                           
 [151.81, 157.16]  |       0 |  .00 |                                         
@@ -161,213 +206,203 @@ AUDI              |       2 |  .29 | ***********
 VW                |       1 |  .14 | ******
 ```
 
-## Level monitor
-
-Level monitors tally levels along with the current (simulation) time. E.g. the number of parts a machine is working on.
-
-There are  2 implementations to support categorical and numerical attributes
-
-* `org.kalasim.FrequencyLevelMonitor`
-* `org.kalasim.NumericLevelMonitor`
-
-
-Level monitors allow to query the value at a specific time
-```
+For numeric monitors it is possible to show values instead of ranges as bins
+```kotln
 val nlm = NumericLevelMonitor()
-// ... collecting some data ...
-nlm[4]  # will print the value at time 4
+
+now += 2
+nlm.addValue(2)
+
+now += 2
+nlm.addValue(6)
+now += 4
+
+nlm.printHistogram(valueBins = false)
+nlm.printHistogram(valueBins = true)
 ```
 
-In addition to standard statistics, level monitor support the following statistics
+which will result by default in
 
-* duration
+```
+Histogram of: 'NumericLevelMonitor.1'
+              bin | entries |  pct |                                         
+[.00, .60]        |     232 |  .23 | *********                               
+[.60, 1.20]       |       0 |  .00 |                                         
+[1.20, 1.80]      |       0 |  .00 |                                         
+[1.80, 2.40]      |     233 |  .23 | *********                               
+[2.40, 3.00]      |       0 |  .00 |                                         
+[3.00, 3.60]      |       0 |  .00 |                                         
+[3.60, 4.20]      |       0 |  .00 |                                         
+[4.20, 4.80]      |       0 |  .00 |                                         
+[4.80, 5.40]      |       0 |  .00 |                                         
+[5.40, 6.00]      |     535 |  .54 | *********************                   
 
-For all statistics, it is possible to exclude zero entries, e.g. `m.statistics(excludeZeros=true).mean` returns the mean, excluding zero entries.
+```
+However when valueBins is enabled the histogram becomes
+
+```
+Histogram of: 'NumericLevelMonitor.1'
+              bin | entries |  pct |                                         
+0.0               |       2 |  .25 | **********                              
+2.0               |       2 |  .25 | **********                              
+6.0               |       4 |  .50 | ********************
+```
 
 
-**{todo}** implement off tallying
-<!--When monitoring is disabled, an off value (see table above) will be tallied. All statistics will ignore the periods from this-->
-<!--off to a non-off value. This also holds for the xduration() method, but NOT for xt() and tx(). Thus,-->
-<!--the x-arrays of xduration() are not necessarily the same as the x-arrays in xt() and tx(). This is-->
-<!--the reason why there's no x() or t() method. |n|-->
-<!--It is easy to get just the x-array with `xduration()[0]` or `xt()[0]`.-->
-
-<!--It is important that a user *never* tallies an off value! Instead use Monitor.monitor(False)-->
-
-<!--With the monitor method, a level monitor can be enbled or disabled.-->
-
-<!--Also, the current monitor status (enabled/disabled) can be retrieved.-->
-
-Calling `m.reset()` will clear all tallied values and timestamps.
-
-The statistics of a level monitor can be printed with `m.printStatistics()`.
 
 ##  Merging of monitors
 
-Monitors can be merged, to create a new monitor, nearly always to collect aggregated data.
+<!-- **{TODO}** Write tests for merging of monitors-->
+In contrast to `salabim` Monitors can not be directly merged (yet) in `kalasim`. However it is possible to merge the resulting `DescriptiveStatistics`
 
-The method Monitor.merge() is used for that, like:
+<!--The method Monitor.merge() is used for that, like:-->
 
-```
-mc = m0.merge(m1, m2)
-```
+<!--```-->
+<!--mc = m0.merge(m1, m2)-->
+<!--```-->
 
-Then we can just get the mean of the monitors m0, m1 and m2 combined by:
+<!--Then we can just get the mean of the monitors m0, m1 and m2 combined by:-->
 
-```
-mc.mean()
-```
+<!--```-->
+<!--mc.mean()-->
+<!--```-->
 
-,but also directly with :
+<!--,but also directly with :-->
 
-```
-m0.merge(m1, m2).mean()
-```
+<!--```-->
+<!--m0.merge(m1, m2).mean()-->
+<!--```-->
 
-Alternatively, monitors can be merged with the + operator, like:
+<!--Alternatively, monitors can be merged with the + operator, like:-->
 
-```
-mc = m0 + m1 + m2  
-```
+<!--```-->
+<!--mc = m0 + m1 + m2  -->
+<!--```-->
 
-And then get the mean of the aggregated monitors with:
+<!--And then get the mean of the aggregated monitors with:-->
 
-```
-mc.mean()
-```
+<!--```-->
+<!--mc.mean()-->
+<!--```-->
 
-, but also with
+<!--, but also with-->
 
-```
-(m0 + m1 + m2).mean()
-```
+<!--```-->
+<!--(m0 + m1 + m2).mean()-->
+<!--```-->
 
-It is also possible to use the sum function to merge a number of monitors. So:
+<!--It is also possible to use the sum function to merge a number of monitors. So:-->
 
-```
-print(sum((m0, m1, m2)).mean())
-```
+<!--```-->
+<!--print(sum((m0, m1, m2)).mean())-->
+<!--```-->
 
-Finally, if ms = (m0, m1, m2), it is also possible to use:
+<!--Finally, if ms = (m0, m1, m2), it is also possible to use:-->
 
-```
-print(sum(ms).mean())
-```
+<!--```-->
+<!--print(sum(ms).mean())-->
+<!--```-->
 
-A practical example of this is the case where the list waitinglines contains a number of queues.
+<!--A practical example of this is the case where the list waitinglines contains a number of queues.-->
 
-Then to get the aggregated statistics of the length of all these queues, use:
+<!--Then to get the aggregated statistics of the length of all these queues, use:-->
 
-```
-sum(waitingline.length for waitingline in waitinglines).print_statistics()
-```
+<!--```-->
+<!--sum(waitingline.length for waitingline in waitinglines).print_statistics()-->
+<!--```-->
 
 
-For non level monitors, all of the tallied x-values are copied from the to be merged monitors.
-For level monitors, the x-values are summed, for all the periods where all the monitors were on.
-Periods where one or more monitors were disabled, are excluded.
-Note that the merge only takes place at creation of the (timestamped) monitor and not dynamically later.
+<!--For non level monitors, all of the tallied x-values are copied from the to be merged monitors.-->
+<!--For level monitors, the x-values are summed, for all the periods where all the monitors were on.-->
+<!--Periods where one or more monitors were disabled, are excluded.-->
+<!--Note that the merge only takes place at creation of the (timestamped) monitor and not dynamically later.-->
 
-Sample usage:
+<!--Sample usage:-->
 
-Suppose we have three types of products (a, b, c) and that each have a queue for processing, so
-a.processing, b.processing, c.processing.
-If we want to print the histogram of the combined (=summed) length of these queues:
+<!--Suppose we have three types of products (a, b, c) and that each have a queue for processing, so-->
+<!--a.processing, b.processing, c.processing.-->
+<!--If we want to print the histogram of the combined (=summed) length of these queues:-->
 
-```
-a.processing.length.merge(b.processing.length, c.processing.length, name='combined processing length')).print_histogram()
-```
+<!--```-->
+<!--a.processing.length.merge(b.processing.length, c.processing.length, name='combined processing length')).print_histogram()-->
+<!--```-->
 
-and to get the minimum of the length_of_stay for all queues:
+<!--and to get the minimum of the length_of_stay for all queues:-->
 
-```
-(a.processing.length_of_stay + b.processing.length_of_stay + c.processing.length_of_stay).minimum()
-```
+<!--```-->
+<!--(a.processing.length_of_stay + b.processing.length_of_stay + c.processing.length_of_stay).minimum()-->
+<!--```-->
 
-Note that it is possible to rename a merged monitor (particularly those created with + or sum) with the rename() method::
+<!--Note that it is possible to rename a merged monitor (particularly those created with + or sum) with the rename() method::-->
 
-```
-sum(waitingline.length for waitingline in waitinglines).rename('aggregated length of waitinglines').print_statistics()
-```
+<!--```-->
+<!--sum(waitingline.length for waitingline in waitinglines).rename('aggregated length of waitinglines').print_statistics()-->
+<!--```-->
 
-Merged monitors are disabled and cannot be enabled again.
+<!--Merged monitors are disabled and cannot be enabled again.-->
 
 ## Slicing of monitors
 
-It is possible to slice a monitor with Monitor.slice(), which has two applications:
+**Note**: Slicing of monitors is planned but not yet supported
 
-* to get statistics on a monitor with respect to a given time period, most likely a subrun
-* to get statistics on a monitor with respect to a recurring time period, like hour 0-1, hour 0-2, etc.
+<!--It is possible to slice a monitor with Monitor.slice(), which has two applications:-->
 
-Examples:
-```
-for i in range(10):
-   start = i * 1000
-   stop = (i+1) * 1000
-   print(f'mean length of q in [{start},{stop})={q.length.slice(start,stop).mean()}'
-   print(f'mean length of stay in [{start},{stop})={q.length_of_stay.slice(start,stop).mean()}'
+<!--* to get statistics on a monitor with respect to a given time period, most likely a subrun-->
+<!--* to get statistics on a monitor with respect to a recurring time period, like hour 0-1, hour 0-2, etc.-->
 
-for i in range(24):
-   print(f'mean length of q in hour {i}={q.length.slice(i, i+1, 24).mean()}'
-   print(f'mean length of stay of q in hour {i}={q.length_of_stay.slice(i, i+1, 24).mean()}'
-```
+<!--Examples:-->
+<!--```-->
+<!--for i in range(10):-->
+<!--   start = i * 1000-->
+<!--   stop = (i+1) * 1000-->
+<!--   print(f'mean length of q in [{start},{stop})={q.length.slice(start,stop).mean()}'-->
+<!--   print(f'mean length of stay in [{start},{stop})={q.length_of_stay.slice(start,stop).mean()}'-->
 
-Instead of slice(), a monitor can be sliced as well with the standard slice operator [], like:
+<!--for i in range(24):-->
+<!--   print(f'mean length of q in hour {i}={q.length.slice(i, i+1, 24).mean()}'-->
+<!--   print(f'mean length of stay of q in hour {i}={q.length_of_stay.slice(i, i+1, 24).mean()}'-->
+<!--```-->
 
-```
-q.length[1000:2000].print_histogram()
-q.length[2:3:24].print_histogram()
-print(q.length[1000].mean())
-```
+<!--Instead of slice(), a monitor can be sliced as well with the standard slice operator [], like:-->
 
-Note that it is possible to rename a sliced monitor (particularly those created []) with the rename() method::
+<!--```-->
+<!--q.length[1000:2000].print_histogram()-->
+<!--q.length[2:3:24].print_histogram()-->
+<!--print(q.length[1000].mean())-->
+<!--```-->
 
-    waitingline.length[1000:2000].rename('length of waitingline between t=1000 and t-2000').print_statistics()   
+<!--Note that it is possible to rename a sliced monitor (particularly those created []) with the rename() method::-->
 
-Sliced monitors are disabled and cannot be enabled again.
+<!--    waitingline.length[1000:2000].rename('length of waitingline between t=1000 and t-2000').print_statistics()   -->
 
-## Using monitored values in other packages, like matplotlib
+<!--Sliced monitors are disabled and cannot be enabled again.-->
 
-For high quality, reproduction ready, graphs, it can be useful to use additional packages, most notably matplotlib.
+## Using monitored values in other packages, like kravis
 
-The sampled values from a non level monitor can be retrieved with Monitor.x(). If the moment of the sample is required as well, either Monitor.xt() or Monitor.tx() can be used.
+For high quality, reproduction ready, graphs, it can be useful to use additional packages, most notably kravis.
 
-For level monitors, there is choice of :
+`kalasim` integrates nicely with `kravis` to visualize monitorin data. For examples see `src/test/kotlin/org/kalasim/analytics/KravisVis.kt`
 
-* Monitor.xt()
-* Monitor.tx()
-* Monitor.xduration()
 
-To get a proper display of a level monitor, we advise something like:
+<!--The sampled values from a non level monitor can be retrieved with Monitor.x(). If the moment of the sample is required as well, either Monitor.xt() or Monitor.tx() can be used.-->
 
-```
-plt.plot(*waitingline.length.tx(), drawstyle="steps-post") 
-```
+<!--For level monitors, there is choice of :-->
+
+<!--* Monitor.xt()-->
+<!--* Monitor.tx()-->
+<!--* Monitor.xduration()-->
+
+<!--To get a proper display of a level monitor, we advise something like:-->
+
+<!--```-->
+<!--plt.plot(*waitingline.length.tx(), drawstyle="steps-post") -->
+<!--```-->
 
 ##  Pickling a monitor
 
-Monitor.freeze() returns a 'frozen' monitor that can be used to store the results not
+`Monitor.statistics()`  returns a 'frozen' monitor that can be used to store the results not
 depending on the current environment.
 
-This is particularly useful for pickling a monitor.
-
-E.g. use:
-
-```
-with open("mon.pickle", "wb") as f:
-    pickle.dump(f, mon.freeze())
-```
-
-to save the monitor mon, and:
-
-```
-with open("mon.pickle", "rb") as f:
-    mon_retrieved = pickle.load(f)
-```
-
-to retrieve the monitor, later.
-
-Both level and non level monitors are supported.
-Frozen monitors get the name of the original monitor padded with '.frozen' unless specified differently.
+This is particularly useful for persisting monitor statistics for later analysis.
 
 For further background information see <https://www.salabim.org/manual/Monitor.html>

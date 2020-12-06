@@ -2,6 +2,7 @@ package org.kalasim
 
 import com.systema.analytics.es.misc.json
 import org.apache.commons.math3.distribution.EnumeratedDistribution
+import org.apache.commons.math3.stat.Frequency
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.apache.commons.math3.stat.descriptive.moment.Mean
@@ -267,19 +268,42 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : Nume
 //        println("# Levels: ${frequencies.keys.size}")
 //        println()
 
-        // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
         println("Histogram of: '${name}'")
-        val hist: List<Pair<Double, Double>> = statistics().data.run {
-            val aggregatedMonitor: List<Pair<Double, Double>> =
-                durations.zip(values).groupBy { (_, value) -> value }.map { it.key to it.value.sumOf { it.first } }
 
-            aggregatedMonitor
+        if (valueBins) {
+            val freq = Frequency()
+
+            values.forEach { freq.addValue(it) }
+
+            val byValueHist: List<Pair<Double, Long>> = statistics().data.run {
+                durations.zip(values).groupBy { (_, value) -> value }.map { it.key to it.value.sumOf { it.first }.roundToLong() }
+            }
+
+
+            // inherently wrong because does not take into account durations
+//            val byValueHist = freq
+//                .valuesIterator().iterator().asSequence().toList()
+//                .map { it to freq.getCount(it) }
+
+            byValueHist.printHistogram(sortByWeight = sortByWeight)
+
+        } else {
+
+            // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
+            val hist: List<Pair<Double, Double>> = statistics().data.run {
+                val aggregatedMonitor: List<Pair<Double, Double>> =
+                    durations.zip(values).groupBy { (_, value) -> value }.map { it.key to it.value.sumOf { it.first } }
+
+                aggregatedMonitor
+            }
+
+            val stats =
+                DescriptiveStatistics(
+                    EnumeratedDistribution(hist.asCM()).sample(1000, arrayOf<Double>()).toDoubleArray()
+                )
+
+            stats.buildHistogram(binCount).printHistogram(sortByWeight = sortByWeight)
         }
-
-        val stats =
-            DescriptiveStatistics(EnumeratedDistribution(hist.asCM()).sample(1000, arrayOf<Double>()).toDoubleArray())
-
-        stats.buildHistogram(binCount, valueBins = valueBins).printHistogram(sortByWeight = sortByWeight)
     }
 }
 
