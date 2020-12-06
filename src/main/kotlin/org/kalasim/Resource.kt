@@ -109,9 +109,7 @@ open class Resource(
     }
 
     /** prints a summary of statistics of a resource */
-    fun printStatistics() {
-        println(statistics.toString())
-    }
+    fun printStatistics() = println(statistics.toString())
 
     override val info: Jsonable
         get() = ResourceInfo(this)

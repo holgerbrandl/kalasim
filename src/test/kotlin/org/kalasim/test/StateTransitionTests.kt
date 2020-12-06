@@ -9,9 +9,7 @@ class StateTransitionTests {
 
     @Test
     fun testCars() {
-        class TestCar : Component() {
-
-        }
+        class TestCar : Component()
 
         val traces = mutableListOf<TraceElement>()
 

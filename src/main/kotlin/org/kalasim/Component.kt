@@ -282,7 +282,7 @@ open class Component(
 //    fun fixed(value: Double) = value.asConstantDist()
 //
     @Suppress("unused")
-    fun Double.asConstantDist() = ConstantRealDistribution(this)
+    fun Number.asConstantDist() = ConstantRealDistribution(this.toDouble())
 
     fun fixed(value: Double) = ConstantRealDistribution(value)
 
@@ -506,6 +506,36 @@ open class Component(
 
         return true
     }
+
+
+    /**
+     * Check whether component is bumped from a resource
+     *
+     * @param resource - resource to be checked; if omitted, checks whether component belongs to any resource claimers
+     *
+     * @return `true` if this component is not in the resource claimers
+     */
+    fun isBumped(resource: Resource? = null): Boolean = !isClaiming(resource)
+
+    /**
+     * Check whether component is claiming from a resource
+     *
+     * @param resource resource to be checked; if omitted, checks whether component belongs to any resource claimers
+     *
+     * @return `true` if this component is in the resource claimers
+     */
+    fun isClaiming(resource: Resource? = null): Boolean {
+        return if (resource == null) {
+            TODO("claiming test without resouce is not yet implemented as this would require a registry in SimulationEntity")
+//            env.queue.filter{ it is ComponentQueue<*> }.map{(it as ComponentQueue<*>).contains(this)}
+//            for q in self._qmembers:
+//            if hasattr(q, "_isclaimers"): True
+//            return False
+        } else {
+            resource.claimers.contains(this)
+        }
+    }
+
 
 //    @Deprecated("no longer needed, handled by queue directly")
 //    private fun enterSorted(requesters: Queue<Component>, priority: Int) {
@@ -941,6 +971,8 @@ class SimpleProcessInternal(val component: Component, val funPointer: FunPointer
 data class ResourceRequest(val r: Resource, val quantity: Double, val priority: Int? = null)
 
 infix fun Resource.withQuantity(quantity: Number) = ResourceRequest(this, quantity.toDouble())
+
+infix fun ResourceRequest.andPriority(priority: Int) = ResourceRequest(this.r, this.quantity, priority)
 
 //    data class StateRequest<T>(val s: State<T>, val value: T? = null, val priority: Int? = null)
 data class StateRequest<T>(val state: State<T>, val priority: Int? = null, val predicate: (T) -> Boolean) {
