@@ -59,3 +59,9 @@ Order is defined by scheduled time.  To avoid race conditions exeution order be 
 
 Def
 > A `Component` that contains at least one yield.
+
+
+# Queue
+
+Kalasim implements a priotiy queue to model waiting lines etc. Conceptual our implementatoin is very similar to salabim's [queue](
+https://www.salabim.org/manual/Queue.html)

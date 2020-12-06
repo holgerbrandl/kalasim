@@ -6,7 +6,9 @@ See https://squidfunk.github.io/mkdocs-material/creating-your-site/
 pip install mkdocs-material
 cd  /c/brandl_data/projects/scheduling/kalasim/docs/userguide
 
-mkdocs new .
+pip install markdown-include
+
+#mkdocs new .
 
 mkdocs serve
 
@@ -16,3 +18,6 @@ mkdocs build
 For publishing options see https://squidfunk.github.io/mkdocs-material/publishing-your-site/
 
 Nice options overview https://github.com/squidfunk/mkdocs-material/blob/master/mkdocs.yml
+
+include code into mkdocs  https://github.com/mkdocs/mkdocs/issues/777 https://github.com/cmacmackin/markdown-include
+

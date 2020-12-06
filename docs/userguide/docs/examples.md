@@ -1,3 +1,7 @@
 # Examples
 
 TBD
+
+```
+{!test.kts!}
+```

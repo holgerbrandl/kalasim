@@ -21,14 +21,16 @@ theme:
 nav:
   - Home:
     - Introduction: index.md
+    - Theory: theory.md
     - Setup: setup.md
     - FAQ: faq.md
-  - Concepts:
-    - Overview: concepts.md
-    - Components: components.md
-    - Resources: resources.md
-    - States: state.md
     - Examples: examples.md
+  - Basics:
+    - Overview: basics.md
+    - Components: component.md
+    - Resources: resource.md
+    - States: state.md
+    - Monitors: monitors.md
   - Analysis:
     - analysis.md
   - Advanced:
@@ -46,3 +48,7 @@ extra:
       link: https://twitter.com/holgerbrandl
     - icon: fontawesome/brands/linkedin
       link: https://linkedin.com/in/holgerbrandl/
+
+markdown_extensions:
+  - markdown_include.include:
+      base_path: examples
