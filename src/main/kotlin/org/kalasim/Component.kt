@@ -526,8 +526,9 @@ open class Component(
      * @return `true` if this component is in the resource claimers
      */
     fun isClaiming(resource: Resource? = null): Boolean {
+        @Suppress("IfThenToElvis")
         return if (resource == null) {
-            TODO("claiming test without resouce is not yet implemented as this would require a registry in SimulationEntity")
+            TODO("claiming test without resource is not yet implemented as this would require a registry in SimulationEntity")
 //            env.queue.filter{ it is ComponentQueue<*> }.map{(it as ComponentQueue<*>).contains(this)}
 //            for q in self._qmembers:
 //            if hasattr(q, "_isclaimers"): True

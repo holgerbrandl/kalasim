@@ -1,13 +1,10 @@
-##  Overview
-
-
 The beauty of discrete event simulation is its very limited vocabulary which still allow expressing complex system dynamics. In essence, `kalasim` relies on just a handful of types to model a simulation.
 
 * [Components](component.md)
-* [Generators](component.md#generator)
+* [Resources](resource.md)
 * [Queues](component.md#queue)
 * [States](state.md)
-* [Monitors](monitors.md)
+* [Generators](component.md#generator)
 
 
 ## Event Loop
@@ -33,4 +30,4 @@ The API also include some convenience wrappers to provide fixed values for argum
 val r = Resource()
 c.request(r, failAt = 3.asConstantDist())
 ```
-Here, 3 is converted into a `ConstantRealDistribution`. By doing so we can provide a more typed signatures across the entire API.
+Here, `3` is converted into a `org.apache.commons.math3.distribution.ConstantRealDistribution`. By doing so, we can provide more typed signatures across the entire API. Instead of support methods that accept fixed values for waiting times etc, we simply rely on fixed random distribution to reduce API complexity while maintaining full flexibility.

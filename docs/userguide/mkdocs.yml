@@ -26,13 +26,14 @@ nav:
     - FAQ: faq.md
     - Examples: examples.md
   - Basics:
-    - Overview: basics.md
+    - Simulation Basics: basics.md
     - Components: component.md
     - Resources: resource.md
     - States: state.md
-    - Monitors: monitors.md
   - Analysis:
     - analysis.md
+    - Monitors: monitors.md
+
   - Advanced:
     - Livemode: livemode.md
   - About:

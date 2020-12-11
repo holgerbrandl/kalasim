@@ -30,10 +30,13 @@ class StateTests {
 
             fun waitForGreen() = sequence {
                 yield(wait(trafficLight, "green"))
+
                 val stateRequest: StateRequest<String> = StateRequest(trafficLight) { it == "green" }
-                val (state: State<String>, bar: Int?, predicate: (String) -> Boolean) = stateRequest
+//                val (state: State<String>, bar: Int?, predicate: (String) -> Boolean) = stateRequest
+
                 yield(wait(stateRequest))
                 printTrace("passing crossing")
+
                 yield(terminate())
             }
         }
