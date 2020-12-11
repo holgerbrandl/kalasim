@@ -15,4 +15,4 @@ jdk:
 install: ./gradlew install
 
 # https://stackoverflow.com/questions/50104666/gradle-difference-between-test-and-check
-script: ./gradlew clean check --stacktrace
+script: ./gradlew clean check --stacktrace --info
