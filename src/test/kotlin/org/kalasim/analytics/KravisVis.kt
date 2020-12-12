@@ -19,6 +19,7 @@ internal fun NumericLevelMonitor.display() {
     }
 }
 
+
 internal fun NumericStatisticMonitor.display() {
     apply {
         val data = values.toList()

@@ -6,13 +6,10 @@ import org.kalasim.*
 import org.kalasim.analytics.display
 import org.koin.core.component.get
 import org.koin.core.component.inject
+import java.awt.GraphicsEnvironment.isHeadless
 
 
 class CustomerGenerator : Component() {
-
-    init {
-        println("")
-    }
 
     override fun process() = sequence {
         while (true) {
@@ -73,6 +70,7 @@ fun main() {
 
         val waitingLine: ComponentQueue<Customer> = get()
 
+        if(!isHeadless())
 //        waitingLine.lengthOfStayMonitor.printHistogram()
 //        waitingLine.queueLengthMonitor.printHistogram()
 

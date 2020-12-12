@@ -3,18 +3,12 @@ package org.kalasim
 import org.apache.commons.math3.random.JDKRandomGenerator
 import org.apache.commons.math3.random.RandomGenerator
 import org.kalasim.ComponentState.*
-import org.kalasim.misc.CustomContext
-import org.koin.core.Koin
-import org.koin.core.KoinApplication
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.GlobalContext
-import org.koin.core.context.KoinContext
 import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
 import org.koin.core.definition.Definition
 import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.module
-import org.koin.java.KoinJavaComponent.getKoin
 import java.util.*
 
 
@@ -26,7 +20,10 @@ const val MAIN = "main"
 // --> not possible because Module is not open
 
 // https://github.com/InsertKoinIO/koin/issues/801
-fun configureEnvironment(enableTraceLogger: Boolean = true, builder: org.koin.core.module.Module.() -> Unit): Environment =
+fun configureEnvironment(
+    enableTraceLogger: Boolean = true,
+    builder: org.koin.core.module.Module.() -> Unit
+): Environment =
     Environment(module(createdAtStart = true) { builder() }, enableTraceLogger)
 
 
@@ -83,7 +80,13 @@ class Environment(
 
         // https://github.com/InsertKoinIO/koin/issues/972
 //        CustomContext.startKoin(koinContext = CustomContext()) { modules(module { single { this@Environment } }) }
-        startKoin() { modules(module { single { this@Environment } }) }
+        startKoin() {
+            modules(module {
+                single {
+                    this@Environment
+                }
+            })
+        }
 
         main = Component(name = "main", process = null)
         setCurrent(main)
@@ -92,7 +95,7 @@ class Environment(
 //            "createAtStart must be enabled by convention to instantiate injected components before starting the simulation"
 //        }
 
-        getKoin().loadModules(listOf(koins))
+        getKoin().loadModules(listOf(koins), createEagerInstances = true)
 //        KoinContextHandler.get()._scopeRegistry.rootScope.createEagerInstances()
 //        startKoin { modules(koins) }
 

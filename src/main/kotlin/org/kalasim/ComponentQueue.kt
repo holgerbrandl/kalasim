@@ -83,9 +83,25 @@ class ComponentQueue<C : Component>(
         get() = QueueStatistics(this)
 
     override val info: Jsonable
-        get() = TODO()
+        get() = QueueInfo(this)
 }
 
+
+class QueueInfo(cq: ComponentQueue<*>): Jsonable() {
+
+    data class Entry(val component: String, val enterTime: Double, val priority: Int?)
+
+    val name = cq.name
+    val timestamp = cq.env.now
+    val queue = cq.q.map { Entry(it.component.toString(), it.enterTime, it.priority) }.toList()
+
+    // salabim example
+//    Queue 0x2522b637580
+//    name=waitingline
+//    component(s):
+//    customer.4995        enter_time 49978.472 priority=0
+//    customer.4996        enter_time 49991.298 priority=0
+}
 
 @Suppress("MemberVisibilityCanBePrivate")
 class QueueStatistics(cq: ComponentQueue<*>) {
@@ -106,6 +122,7 @@ class QueueStatistics(cq: ComponentQueue<*>) {
 
     fun toJson() = json {
         "name" to name
+        "timestamp" to timestamp
         "type" to this@QueueStatistics.javaClass.simpleName //"queue statistics"
 
         "length_of_stay" to {
@@ -128,7 +145,7 @@ fun StatisticalSummary.toJson(): Any {
         "mean" to mean.roundAny().nanAsNull()
         "standard_deviation" to standardDeviation.roundAny().nanAsNull()
 
-        if( this@toJson is DescriptiveStatistics){
+        if (this@toJson is DescriptiveStatistics) {
             "median" to standardDeviation.roundAny().nanAsNull()
             "ninty_pct_quantile" to getPercentile(90.0).nanAsNull()
             "nintyfive_pct_quantile" to getPercentile(95.0).nanAsNull()

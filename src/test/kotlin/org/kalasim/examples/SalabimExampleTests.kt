@@ -23,7 +23,7 @@ class SalabimExampleTests {
 
     @Test
     fun `Bank_1_clerk should result in correct waiting line statistics`() {
-        val env = configureEnvironment {
+        val env = configureEnvironment(false) {
             add { org.kalasim.examples.bank.oneclerk.Clerk() }
             add { ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer>("waiting line") }
         }.apply {
@@ -69,8 +69,9 @@ class SalabimExampleTests {
                       "standard_deviation": 1.576
                     }
                   },
-                  "type": "QueueStatistics"
-                }"""
+                  "type": "QueueStatistics",
+                  "timestamp": 50
+              }"""
         )
 
         //https://github.com/stleary/JSON-java/issues/573
@@ -98,7 +99,7 @@ class SalabimExampleTests {
             }
         }
 
-        print(avgQueueMeans)
+//        print(avgQueueMeans)
 
         avgQueueMeans.map { (it.second as DescriptiveStatistics).median }.median() shouldBe 13.0.plusOrMinus(0.3)
 
@@ -112,7 +113,7 @@ class SalabimExampleTests {
 
     @Test
     fun `Bank3clerks_reneging should work as expected`() {
-        val env = configureEnvironment {
+        val env = configureEnvironment(false) {
             // register components needed for dependency injection
             add { ComponentQueue<org.kalasim.examples.bank.reneging.Customer>("waitingline") }
             add { State(false, "worktodo") }
@@ -172,7 +173,8 @@ class SalabimExampleTests {
                   "standard_deviation": 5.44
                 }
               },
-              "type": "QueueStatistics"
+              "type": "QueueStatistics",
+              "timestamp": 2000
             }"""
         )
 
