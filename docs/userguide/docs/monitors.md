@@ -1,7 +1,6 @@
 # Monitor
 
-Monitors are a way to collect data from the simulation. They are automatically collected
-for resources, queues and states. On top of that the user can define its own monitors.
+Monitors are a way to collect data from the simulation. They are automatically collected for [resources](resource.md), [components](component.md), [states](state.md) and [queues](component.md#queue). On top of that the user can define her own monitors.
 
 Monitors can be used to get statistics and as a feed for graphical tools.
 
@@ -9,7 +8,7 @@ There are two types of monitors:
 
 * **Level monitors** are useful to collect data about a variable that keeps its value over a certain length
   of time, such as the length of a queue orcthe colour of a traffic light.
-* **Non level monitors** are useful to collect data about a values that occur just once. Examples, are the length of stay in a queue and
+* **Non level monitors** are useful to collect data about  that occur just once. Examples, are the length of stay in a queue, or
   the number of processing steps of a part.
 
 For both types, the time is always collected, along with the value.
@@ -343,7 +342,7 @@ In contrast to `salabim` Monitors can not be directly merged (yet) in `kalasim`.
 
 ## Slicing of monitors
 
-**Note**: Slicing of monitors is planned but not yet supported
+**Note**: Slicing of monitors is planned but not yet supported.
 
 <!--It is possible to slice a monitor with Monitor.slice(), which has two applications:-->
 
@@ -377,13 +376,6 @@ In contrast to `salabim` Monitors can not be directly merged (yet) in `kalasim`.
 
 <!--Sliced monitors are disabled and cannot be enabled again.-->
 
-## Using monitored values in other packages, like kravis
-
-For high quality, reproduction ready, graphs, it can be useful to use additional packages, most notably kravis.
-
-`kalasim` integrates nicely with `kravis` to visualize monitorin data. For examples see `src/test/kotlin/org/kalasim/analytics/KravisVis.kt`
-
-
 <!--The sampled values from a non level monitor can be retrieved with Monitor.x(). If the moment of the sample is required as well, either Monitor.xt() or Monitor.tx() can be used.-->
 
 <!--For level monitors, there is choice of :-->
@@ -406,3 +398,29 @@ depending on the current environment.
 This is particularly useful for persisting monitor statistics for later analysis.
 
 For further background information see <https://www.salabim.org/manual/Monitor.html>
+
+
+##
+
+## Visualization
+
+
+`kalasim` integrates nicely with [`kravis`](https://github.com/holgerbrandl/kravis) to visualize monitor data. For examples see `src/test/kotlin/org/kalasim/analytics/KravisVis.kt`.
+
+ **Prerequisite**
+ > To visualize data with kravis, [R](https://www.r-project.org/) must be installed on the system. See [here](https://github.com/holgerbrandl/kravis)) for details.
+
+
+
+It is possible to render monitors with the following extension functions
+```kotlin
+NumericStatisticMonitor.display() 
+NumericLevelMonitor.display()
+```
+
+![](monitors_images/monitor.png)
+
+In particular multiple outputs are supported here by the underlying `kravis` visualization windows, which allows forward backward navigation (via the arrow buttons). See `org.kalasim.examples.bank.resources.Bank3ClerksResources` for an example where multiple visualziaiton are combined to inspect the internal state of the simulation.
+
+
+Note that, currently monitor visualization just works in retrospect, and it is not (yet) possible to view the progression while a simulation is still running.

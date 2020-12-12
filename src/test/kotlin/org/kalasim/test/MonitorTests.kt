@@ -113,6 +113,6 @@ class MonitorTests {
 }
 
 
-internal fun createTestSimulation(builder: Environment.() -> Unit) {
-    createSimulation(builder)
+internal fun createTestSimulation(enableTraceLogger: Boolean = true, builder: Environment.() -> Unit) {
+    createSimulation(enableTraceLogger, builder)
 }

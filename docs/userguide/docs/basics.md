@@ -2,17 +2,21 @@ The beauty of discrete event simulation is its very limited vocabulary which sti
 
 * [Components](component.md)
 * [Resources](resource.md)
-* [Queues](component.md#queue)
 * [States](state.md)
+* [Queues](component.md#queue)
 * [Generators](component.md#generator)
 
 
-## Event Loop
+## Execution & Process Model
 
 The core of kalasim is a an event-loop. Components are actively and passively scheduled for reevaluating their state. Technically this relates to the component's continued with `process()` generator or execution function.
 
-**{tbd}** image here
 
+<!--https://stackoverflow.com/questions/19331362/using-an-image-caption-in-markdown-jekyll-->
+<figure>
+  <img src="../basics_images/event_loop.png"  alt="kalasim event model"/>
+  <figcaption>Kalasim Execution Model</figcaption>
+</figure>
 
 ## Randomness & Distributions
 

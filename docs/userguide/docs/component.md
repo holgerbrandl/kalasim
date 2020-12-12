@@ -53,7 +53,7 @@ See the example script demo wait.py for a demonstration of the trigger and time 
 
 ## Execution Order
 
-Order is defined by scheduled time.  To avoid race conditions exeution order be fintuned usin `priority` and `urgent` which are supported for all methods that result in a rescheduling of a component, namely  `wait`, `request`,  `activate` and `reschedule`
+Order is defined by scheduled time. To avoid race conditions execution order be fine-tuned using `priority` and `urgent` which are supported for all methods that result in a rescheduling of a component, namely  `wait`, `request`,  `activate` and `reschedule`
 
 ## Generator
 
@@ -61,7 +61,7 @@ Def
 > A `Component` that contains at least one yield.
 
 
-# Queue
+## Queue
 
-Kalasim implements a priotiy queue to model waiting lines etc. Conceptual our implementatoin is very similar to salabim's [queue](
+Kalasim builds on top of the JVM's [PriorityQueue](https://docs.oracle.com/javase/7/docs/api/java/util/PriorityQueue.html)  to model waiting lines etc. Conceptual our implementation is very similar to salabim's [queue](
 https://www.salabim.org/manual/Queue.html)

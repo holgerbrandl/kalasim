@@ -30,8 +30,8 @@ fun configureEnvironment(enableTraceLogger: Boolean = true, builder: org.koin.co
     Environment(module(createdAtStart = true) { builder() }, enableTraceLogger)
 
 
-fun createSimulation(builder: Environment.() -> Unit): Environment =
-    Environment().apply(builder)
+fun createSimulation(enableTraceLogger: Boolean = true, builder: Environment.() -> Unit): Environment =
+    Environment(enableTraceLogger = enableTraceLogger).apply(builder)
 
 //fun Environment.createSimulation(builder: Environment.() -> Unit) {
 //    this.apply(builder)
