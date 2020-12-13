@@ -1,5 +1,8 @@
 # Welcome to `kalasim`
 
+https://api.bintray.com/packages/holgerbrandl/github/kalasim/images/download.svg
+https://api.bintray.com/packages/holgerbrandl/mpicbg-scicomp/krangl/images/download.svg
+
 [ ![Download](https://api.bintray.com/packages/holgerbrandl/github/kalasim/images/download.svg) ](https://bintray.com/holgerbrandl/github/kalasim/_latestVersion)  [![Build Status](https://travis-ci.org/holgerbrandl/kalasim.svg?branch=master)](https://travis-ci.org/holgerbrandl/kalasim) [![Gitter](https://badges.gitter.im/kalasim.svg)](https://gitter.im/kalasim/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 `kalasim` is a discrete event simulator with type support, dependency injection, modern persistence and logging to enable large-scale, industrial-ready simulations.

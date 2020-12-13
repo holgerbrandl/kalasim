@@ -60,7 +60,7 @@ There are  2 implementations to support categorical and numerical attributes
 
 
 Level monitors allow to query the value at a specific time
-```
+```kotlin
 val nlm = NumericLevelMonitor()
 // ... collecting some data ...
 nlm[4]  # will print the value at time 4
@@ -206,7 +206,7 @@ VW                |       1 |  .14 | ******
 ```
 
 For numeric monitors it is possible to show values instead of ranges as bins
-```kotln
+```kotlin
 val nlm = NumericLevelMonitor()
 
 now += 2
@@ -237,7 +237,7 @@ Histogram of: 'NumericLevelMonitor.1'
 [5.40, 6.00]      |     535 |  .54 | *********************                   
 
 ```
-However when valueBins is enabled the histogram becomes
+However, when valueBins is enabled the histogram becomes
 
 ```
 Histogram of: 'NumericLevelMonitor.1'
@@ -249,7 +249,7 @@ Histogram of: 'NumericLevelMonitor.1'
 
 
 
-##  Merging of monitors
+##  Merging of Monitors
 
 <!-- **{TODO}** Write tests for merging of monitors-->
 In contrast to `salabim` Monitors can not be directly merged (yet) in `kalasim`. However it is possible to merge the resulting `DescriptiveStatistics`

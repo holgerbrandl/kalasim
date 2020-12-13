@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "com.github.holgerbrandl"
-version = "0.2-SNAPSHOT"
+version = "0.2.2"
 
 application {
     mainClassName = "foo.Bar" // not needed technically but makes gradle happy
@@ -65,6 +65,12 @@ java {
     withSourcesJar()
 }
 
+java {
+    sourceSets["test"].java {
+        srcDir("docs/userguide/examples/kotlin")
+    }
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
@@ -99,8 +105,8 @@ bintray {
         desc = description
 
         version = VersionConfig().apply{
-            name  = project.name
-            description = "."
+            name  = project.version.toString()
+            description = "v" + project.version + " of kalasim"
             vcsTag = "v" + project.version
 //            released = java.util.Date().toString()
         }

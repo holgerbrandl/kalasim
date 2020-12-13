@@ -68,7 +68,7 @@ Def
 ## Queue
 
 Kalasim builds on top of the JVM's [PriorityQueue](https://docs.oracle.com/javase/7/docs/api/java/util/PriorityQueue.html)  to model waiting lines etc. Conceptual our implementation is very similar to salabim's [queue](
-https://www.salabim.org/manual/Queue.html)
+https://www.salabim.org/manual/Queue.html).
 
 
 A typical usecase would be a generator process (materal, customers, etc.) that is consumed by other components. In the following example a [`Generator`](#generator) is creating new `Customer`s which are entering a waiting line `Queue`. This queue is consumed by a clerk which take one customer at a time and goes on [`hold`](#hold) for processing. See [here](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/examples/bank/oneclerk/Bank1clerk.kt) for the complete implementation.
@@ -80,6 +80,6 @@ CustomerGenerator->>Customer: Create new Customer
 CustomerGenerator-->>EventLoop: Reschedule for later
 
 Customer->>Queue: Enter waiting line
-Clerk->>Queue: Pull next customers
+Clerk->>Queue: Pull next customer
 Clerk-->>EventLoop: hold vor n time units for processing
 ```
