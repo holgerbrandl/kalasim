@@ -11,6 +11,7 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.examples.bank.reneging.CustomerGenerator
 import org.kalasim.misc.median
+import org.kalasim.test.captureOutput
 import org.koin.core.component.get
 import org.koin.core.context.stopKoin
 
@@ -209,5 +210,22 @@ class SalabimExampleTests {
 
             claimers.stats.lengthOfStayStats.mean shouldBe 30.0.plusOrMinus(0.1)
         }
+    }
+
+
+    @Test
+    fun `it should run all examples without exception`() {
+
+        captureOutput {
+            org.kalasim.examples.bank.oneclerk.main()
+            org.kalasim.examples.bank.reneging.main()
+            org.kalasim.examples.bank.resources.main()
+            org.kalasim.examples.bank.state.main()
+            org.kalasim.examples.bank.threeclerks.main()
+        }
+        // todo finish kts
+        //  see https://kotlinexpertise.com/run-kotlin-scripts-from-kotlin-programs/
+        //  see https://github.com/s1monw1/KtsRunner)
+        // org.kalasim.examples.Cars..main()
     }
 }
