@@ -7,7 +7,8 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.moment.Variance
-import org.kalasim.misc.asCM
+import org.json.JSONObject
+import org.kalasim.misc.*
 import org.kalasim.misc.buildHistogram
 import org.kalasim.misc.printHistogram
 import org.kalasim.misc.printThis
@@ -200,7 +201,7 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
     }
 
 
-    fun statistics(excludeZeros: Boolean = false, rollingStats: Boolean = false): StatisticalSummary {
+    fun statistics(excludeZeros: Boolean = false, rollingStats: Boolean = false): NumericStatisticMonitorStats  {
         require(!rollingStats) { TODO() }
 
 //        val stats: StatisticalSummary = if(rollingStats) SummaryStatistics() else DescriptiveStatistics()
@@ -215,8 +216,12 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
             values.forEach { stats.addValue(it) }
         }
 
-        return stats
+        return NumericStatisticMonitorStats(stats)
     }
+}
+
+class NumericStatisticMonitorStats(private val ss: StatisticalSummary) : StatisticalSummary by ss, Jsonable(){
+    override fun toJson(): JSONObject = ss.toJson()
 }
 
 
@@ -263,10 +268,8 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : Nume
     fun statistics(excludeZeros: Boolean = false) = NumericLevelMonitorStats(this, excludeZeros)
 
     override fun printHistogram(sortByWeight: Boolean, binCount: Int, valueBins: Boolean) {
-//        println("Summary of: '${name}'")
-//        println("# Records: ${total}")
-//        println("# Levels: ${frequencies.keys.size}")
-//        println()
+        println("Summary of: '${name}'")
+        statistics().toJson().printThis()
 
         println("Histogram of: '${name}'")
 
@@ -276,7 +279,8 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : Nume
             values.forEach { freq.addValue(it) }
 
             val byValueHist: List<Pair<Double, Long>> = statistics().data.run {
-                durations.zip(values).groupBy { (_, value) -> value }.map { it.key to it.value.sumOf { it.first }.roundToLong() }
+                durations.zip(values).groupBy { (_, value) -> value }
+                    .map { it.key to it.value.sumOf { it.first }.roundToLong() }
             }
 
 
@@ -308,12 +312,35 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : Nume
 }
 
 
+class LevelMonitoredInt(initialValue: Int = 0, name: String? = null) {
+    var value: Int = initialValue
+        set(value) {
+            field = value
+            monitor.addValue(value)
+        }
+
+    val monitor by lazy { NumericLevelMonitor(name) }
+
+    override fun toString(): String = value.toString()
+}
+
+
+//**{todo}** use monitors here and maybe even inject them
+//to inject use data class Counter(var value: Int)
+//val numBalkedMonitor by lazy { NumericLevelMonitor() }
+//var numBalked: Int = 0
+//    set(value) {
+//        field = value
+//        numBalkedMonitor.addValue(value)
+//    }
+
+
 internal data class NLMStatsData(val values: List<Double>, val timepoints: List<Double>, val durations: DoubleArray) {
     fun plotData(): List<Pair<Double, Double>> =
         (this.timepoints + (timepoints.last() + durations.last())).zip(values.toList() + values.last())
 }
 
-class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean = false) {
+class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean = false) : Jsonable() {
     val duration: Double
 
     val mean: Double?
@@ -347,7 +374,7 @@ class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean =
         duration = data.durations.sum()
     }
 
-    fun toJson() = json {
+    override fun toJson() = json {
         "duration" to duration
         "mean" to mean.roundAny()
         "standard_deviation" to standardDeviation.roundAny()
