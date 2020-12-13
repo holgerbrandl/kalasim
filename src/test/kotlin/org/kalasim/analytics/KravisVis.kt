@@ -17,7 +17,7 @@ fun hasR(): Boolean {
     return proc.exitValue() == 0
 }
 
-internal fun warnNoDisplay(): Boolean = if (canDisplay()) {
+internal fun warnNoDisplay(): Boolean = if (!canDisplay()) {
     printWarning(" No display or R not found")
     true
 } else {

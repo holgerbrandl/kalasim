@@ -4,6 +4,7 @@ import com.systema.analytics.es.misc.json
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.apache.commons.math3.util.Precision
+import org.json.JSONObject
 import org.kalasim.misc.JSON_INDENT
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.printThis
@@ -139,7 +140,7 @@ class QueueStatistics(cq: ComponentQueue<*>) {
     fun print() = toJson().toString(JSON_INDENT).printThis()
 }
 
-fun StatisticalSummary.toJson(): Any {
+fun StatisticalSummary.toJson(): JSONObject {
     return json {
         "entries" to n
         "mean" to mean.roundAny().nanAsNull()

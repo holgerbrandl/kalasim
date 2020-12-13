@@ -64,7 +64,7 @@ class CustomerGenerator : Component() {
 
 fun main() {
 
-    val env = configureEnvironment {
+    val env = configureEnvironment(true) {
 
         add { Clerk() }
         add { ComponentQueue<Customer>("waiting line") }

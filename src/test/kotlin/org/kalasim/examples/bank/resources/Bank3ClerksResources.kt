@@ -17,7 +17,7 @@ class Customer(private val clerks: Resource) : Component() {
 
 
 fun main() {
-    val env = configureEnvironment(false) {
+    val env = configureEnvironment {
         add { Resource("clerks", capacity = 3) }
     }.apply {
         ComponentGenerator(iat = UniformRealDistribution(rg, 5.0, 15.0)) { Customer(get()) }

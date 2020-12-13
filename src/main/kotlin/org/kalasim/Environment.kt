@@ -21,13 +21,16 @@ const val MAIN = "main"
 
 // https://github.com/InsertKoinIO/koin/issues/801
 fun configureEnvironment(
-    enableTraceLogger: Boolean = true,
+    enableTraceLogger: Boolean = false,
     builder: org.koin.core.module.Module.() -> Unit
 ): Environment =
     Environment(module(createdAtStart = true) { builder() }, enableTraceLogger)
 
 
-fun createSimulation(enableTraceLogger: Boolean = true, builder: Environment.() -> Unit): Environment =
+fun createSimulation(
+    enableTraceLogger: Boolean = false,
+    builder: Environment.() -> Unit
+): Environment =
     Environment(enableTraceLogger = enableTraceLogger).apply(builder)
 
 //fun Environment.createSimulation(builder: Environment.() -> Unit) {
@@ -36,7 +39,7 @@ fun createSimulation(enableTraceLogger: Boolean = true, builder: Environment.() 
 
 class Environment(
     koins: org.koin.core.module.Module = module(createdAtStart = true) { },
-    enableTraceLogger: Boolean = true
+    enableTraceLogger: Boolean = false
 ) : KoinComponent {
 
     @Deprecated("serves no purposes and creates a memory leaks as objects are nowhere releases")

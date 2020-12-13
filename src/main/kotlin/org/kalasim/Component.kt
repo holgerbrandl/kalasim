@@ -5,7 +5,6 @@ import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.ComponentState.*
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import java.util.*
 import kotlin.reflect.KFunction1
@@ -40,7 +39,9 @@ open class Component(
     private val waits = listOf<StateRequest<*>>().toMutableList()
     val claims = mapOf<Resource, Double>().toMutableMap()
 
-    private var failed: Boolean = false
+    var failed: Boolean = false
+        private set
+
     private var waitAll: Boolean = false
 
     private var simProcess: SimProcess? = null
@@ -196,7 +197,7 @@ open class Component(
         if (status != CURRENT) {
             requireNotData()
             remove()
-            //todo checkFail
+            checkFail()
         }
 
         simProcess = null
@@ -268,6 +269,7 @@ open class Component(
      */
     fun request(
         vararg resources: Resource,
+        // todo review if this should rather be a number (and dist at call site)
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null,
         oneOf: Boolean = false,
@@ -284,6 +286,8 @@ open class Component(
 //
     @Suppress("unused")
     fun Number.asConstantDist() = ConstantRealDistribution(this.toDouble())
+
+    fun Number.asDist() = ConstantRealDistribution(this.toDouble())
 
     fun fixed(value: Double) = ConstantRealDistribution(value)
 

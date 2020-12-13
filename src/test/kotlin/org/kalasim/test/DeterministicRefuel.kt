@@ -86,7 +86,7 @@ object DeterministicRefuel {
             }
         }
 
-        configureEnvironment {
+        configureEnvironment(true) {
 
 //            single(qualifier = named("gas_station")) { Resource("gas_station", 2) }
 

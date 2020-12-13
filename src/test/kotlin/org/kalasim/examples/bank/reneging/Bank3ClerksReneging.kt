@@ -79,7 +79,7 @@ class Clerk : Component() {
 
 
 fun main() {
-    val env = configureEnvironment {
+    val env = configureEnvironment(true) {
         // register components needed for dependency injection
         add { ComponentQueue<Customer>("waitingline") }
         add { State(false, "worktodo") }

@@ -28,7 +28,7 @@ class Car : Component() {
     }
 }
 
-createSimulation{
+createSimulation(enableTraceLogger = true){
     Car()
 }.run(5.0)
 ```
@@ -40,10 +40,11 @@ Although the example lacks dynamic aspects that make simulations fun, it demonst
 
 The main body of every `kalasim` model usually starts with:
 ```
-createSimulation{
+createSimulation(enableTraceLogger = true){
 ...
 }
 ```
+Here, we enable trace logging of state changes to see the status of simulation on the console.
 
 For each (active) component we (can) define a type such as:
 

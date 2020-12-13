@@ -41,7 +41,7 @@ class StateTests {
             }
         }
 
-        val sim = configureEnvironment {
+        val sim = configureEnvironment(true) {
             single { State("red") }
         }
 
@@ -86,7 +86,7 @@ class StateTests {
             }
         }
 
-        val sim = configureEnvironment {
+        val sim = configureEnvironment(true) {
             single { TrafficLight() }
             single { Engine() }
         }
@@ -130,9 +130,9 @@ class StateTests {
 
     @Test
     @Ignore("because its unclear how to nicely")
-// https://kotlinlang.slack.com/archives/C67HDJZ2N/p1607195460178600
-// D:\projects\misc\koin_test\src\main\kotlin\com\github\holgerbrandl\Test.kt
-    fun `resolve and honor multiple predicates without subclassing`() {
+    // https://kotlinlang.slack.com/archives/C67HDJZ2N/p1607195460178600
+    // https://github.com/InsertKoinIO/koin/issues/976
+    fun `resolve generic parameters and honor multiple predicates without subclassing`() {
 
         class Car : Component() {
 
@@ -148,7 +148,7 @@ class StateTests {
             }
         }
 
-        val sim = configureEnvironment {
+        val sim = configureEnvironment(true) {
 //            single(TypeQualifier(String::class)) { State("red") }
 //            single(TypeQualifier(Boolean::class)) { State(false) }
             single { State("red") }

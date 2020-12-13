@@ -28,7 +28,7 @@ time      current component        component                action      info
 Process finished with exit code 0
 ```
 
-This output is the default logging mechanism.
+This output is not active by default, but must be enabled when creating the simulation with `createSimulation(enableTraceLogger = true)`
 
 For larger simulations, console logging might not scale. Also, users may want to consume state changes for analysis and visualization. To support these use-cases, default logging can be disabled and custom log handlers can be added.
 

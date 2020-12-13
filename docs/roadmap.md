@@ -44,4 +44,13 @@ revise data prep and rendering of histogram get more similar to kalasim https://
 
 ## Later
 
+Review if request and wait should really need
+```
+failAt: RealDistribution? = null,
+failDelay: RealDistribution? = null,
+```
+and why the distribution can not be used at the call site?
+
+---
+
 Register project at awesome-kotlin

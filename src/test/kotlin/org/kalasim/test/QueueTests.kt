@@ -17,7 +17,7 @@ class QueueTests {
             ComponentQueue<Foo>()
         }
 
-        val env = configureEnvironment {
+        val env = configureEnvironment(true) {
             add { waitingLine }
         }
 

@@ -24,7 +24,7 @@ class SalabimExampleTests {
 
     @Test
     fun `Bank_1_clerk should result in correct waiting line statistics`() {
-        val env = configureEnvironment(false) {
+        val env = configureEnvironment {
             add { org.kalasim.examples.bank.oneclerk.Clerk() }
             add { ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer>("waiting line") }
         }.apply {
@@ -84,7 +84,7 @@ class SalabimExampleTests {
     @Test
     fun `average waiting should be constant in bank with 1 clerk`() {
         val avgQueueMeans = (1..100).map { 1000.0 * it }.map { runtime ->
-            runtime to configureEnvironment(false) {
+            runtime to configureEnvironment {
                 add { org.kalasim.examples.bank.oneclerk.Clerk() }
                 add { ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer>("waiting line") }
             }.run {
@@ -114,7 +114,7 @@ class SalabimExampleTests {
 
     @Test
     fun `Bank3clerks_reneging should work as expected`() {
-        val env = configureEnvironment(false) {
+        val env = configureEnvironment {
             // register components needed for dependency injection
             add { ComponentQueue<org.kalasim.examples.bank.reneging.Customer>("waitingline") }
             add { State(false, "worktodo") }
@@ -189,7 +189,7 @@ class SalabimExampleTests {
     @Test
     fun `bank with resource clerks should result in correct statistics`() {
         // same logic as in Bank3ClerksResources.kt
-        val env = configureEnvironment(false) {
+        val env = configureEnvironment {
             add { Resource("clerks", capacity = 3) }
         }.apply {
             ComponentGenerator(

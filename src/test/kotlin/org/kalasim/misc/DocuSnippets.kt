@@ -49,7 +49,7 @@ object EventLog{
     @JvmStatic
     fun main(args: Array<String>) {
         // create simulation with no default logging
-        val sim = createSimulation(enableTraceLogger = false) {  }
+        val sim = createSimulation{  }
 
         // add custom log consumer
         sim.addTraceListener(TraceListener { traceElement -> TODO("do something with")  })
