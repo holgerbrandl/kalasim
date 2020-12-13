@@ -217,7 +217,7 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
     }
 }
 
-class NumericStatisticMonitorStats(private val ss: StatisticalSummary) : StatisticalSummary by ss, Jsonable() {
+class NumericStatisticMonitorStats(internal val ss: StatisticalSummary) : StatisticalSummary by ss, Jsonable() {
     override fun toJson(): JSONObject = ss.toJson()
 }
 

@@ -102,7 +102,7 @@ class SalabimExampleTests {
 
 //        print(avgQueueMeans)
 
-        avgQueueMeans.map { (it.second as DescriptiveStatistics).median }.median() shouldBe 13.0.plusOrMinus(0.3)
+        avgQueueMeans.map { (it.second.ss as DescriptiveStatistics).median }.median() shouldBe 13.0.plusOrMinus(0.3)
 
 //        avgQueueMeans
 //            .plot(x = { it.first }, y = { (it.second as DescriptiveStatistics).median })

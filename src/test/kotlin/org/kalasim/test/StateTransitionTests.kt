@@ -9,11 +9,12 @@ class StateTransitionTests {
 
     @Test
     fun testCars() {
-        class TestCar : Component()
 
         val traces = mutableListOf<TraceElement>()
 
         Environment().apply {
+            class TestCar : Component()
+
             addTraceListener { traceElement -> traces.add(traceElement) }
 
             object : Component() {
