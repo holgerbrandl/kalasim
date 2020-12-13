@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 //val kotlinVersion = KotlinVersion.CURRENT
 
 plugins {
-    kotlin("jvm") version "1.4.20"
+    kotlin("jvm") version "1.4.21"
     application
     `maven-publish`
     id("com.jfrog.bintray") version "1.8.5"
