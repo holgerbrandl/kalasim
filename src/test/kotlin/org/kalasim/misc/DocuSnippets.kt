@@ -1,16 +1,12 @@
 package org.kalasim.scratch
 
-import org.kalasim.Component
-import org.kalasim.Resource
-import org.kalasim.TraceListener
-import org.kalasim.createSimulation
-import org.kalasim.withQuantity
+import org.kalasim.*
 
-class ResourceDocu{
+class ResourceDocu {
 
     fun main() {
-        val clerks = Resource("clerks", capacity=3)
-        val assistence = Resource("assistence", capacity=3)
+        val clerks = Resource("clerks", capacity = 3)
+        val assistence = Resource("assistence", capacity = 3)
 
         Component().request(clerks withQuantity 2)
 
@@ -18,7 +14,7 @@ class ResourceDocu{
 
 
 // release
-        val r = Resource("clerks", capacity=3)
+        val r = Resource("clerks", capacity = 3)
         r.release(2.0)
         Component().release(r)
 
@@ -27,7 +23,7 @@ class ResourceDocu{
 }
 
 
-object ProcessGraph{
+object ProcessGraph {
 
     class Customer(val clerk: Resource) : Component() {
 
@@ -44,13 +40,14 @@ object ProcessGraph{
     }
 }
 
-object EventLog{
+object EventLog {
 
     @JvmStatic
     fun main(args: Array<String>) {
         // create simulation with no default logging
-        val sim = createSimulation{  }
+        val sim = createSimulation { }
 
         // add custom log consumer
-        sim.addTraceListener(TraceListener { traceElement -> TODO("do something with")  })
-    }}
+        sim.addTraceListener(TraceListener { traceElement -> TODO("do something with") })
+    }
+}

@@ -20,7 +20,7 @@ open class KoinStopper {
 
 
     @BeforeTest
-    fun stopKoin(){
+    fun stopKoin() {
         org.koin.core.context.GlobalContext.stop()
     }
 

@@ -8,7 +8,7 @@ import org.kalasim.misc.asCM
 class RequestTests {
 
     @Test
-    fun `preemptive resources should bump claims`(){
+    fun `preemptive resources should bump claims`() {
         // see version 19.0.9  2019-10-08 in salabim change log for code snippets
 
         /**
@@ -27,17 +27,17 @@ class RequestTests {
         createSimulation {
             val resource = Resource(preemptive = true)
 
-            val prioPDF =  EnumeratedDistribution(listOf(1,2,3).map{ it to 1.0/3.0}.asCM())
+            val prioPDF = EnumeratedDistribution(listOf(1, 2, 3).map { it to 1.0 / 3.0 }.asCM())
 
-            object : Component(){
+            object : Component() {
 
                 override suspend fun ProcContext.process() {
-                    while(true){
-                       yield(request(resource withQuantity 1 andPriority prioPDF.sample()))
+                    while (true) {
+                        yield(request(resource withQuantity 1 andPriority prioPDF.sample()))
                         yield(hold(1))
-                        if(!isClaiming(resource)){
+                        if (!isClaiming(resource)) {
                             break
-                        }else{
+                        } else {
                             release(resource)
                         }
                     }

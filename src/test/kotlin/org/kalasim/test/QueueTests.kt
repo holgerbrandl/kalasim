@@ -1,10 +1,10 @@
 package org.kalasim.test
 
+import org.junit.Test
 import org.kalasim.Component
 import org.kalasim.ComponentQueue
 import org.kalasim.add
 import org.kalasim.configureEnvironment
-import org.junit.Test
 import kotlin.test.assertEquals
 
 class QueueTests {

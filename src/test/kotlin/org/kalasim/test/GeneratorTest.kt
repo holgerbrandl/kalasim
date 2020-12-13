@@ -1,8 +1,8 @@
 package org.kalasim.test
 
 import org.apache.commons.math3.distribution.ExponentialDistribution
-import org.kalasim.*
 import org.junit.Test
+import org.kalasim.*
 import kotlin.test.assertEquals
 
 class TraceCollector : TraceListener {
@@ -15,7 +15,7 @@ class TraceCollector : TraceListener {
 
 class GeneratorTest {
 
-    class Customer : Component(){}
+    class Customer : Component() {}
 
     @Test
     fun testCustomerGenerator() {
@@ -30,9 +30,9 @@ class GeneratorTest {
         }.run(100.0)
 
         val customers = tc.traces
-                .map { it.source }
-                .filterNotNull().distinct()
-                .filter { it.name.startsWith("Customer") }
+            .map { it.source }
+            .filterNotNull().distinct()
+            .filter { it.name.startsWith("Customer") }
 
         assertEquals(4, customers.size, "incorrect expected customer cont")
     }

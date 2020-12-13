@@ -2,7 +2,6 @@ package org.kalasim
 
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.printThis
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 
 
@@ -65,9 +64,11 @@ abstract class SimulationEntity(name: String?) : KoinComponent {
 //
 
 
-private fun getComponentCounter(className: String, nameCache: MutableMap<String, Int>) = nameCache.merge(className, 1, Int::plus)
+private fun getComponentCounter(className: String, nameCache: MutableMap<String, Int>) =
+    nameCache.merge(className, 1, Int::plus)
 
 internal fun Any.nameOrDefault(name: String?, nameCache: MutableMap<String, Int>) =
     name ?: this.javaClass.defaultName(nameCache)
 
-internal fun Class<Any>.defaultName(nameCache: MutableMap<String, Int>) = simpleName + "." + getComponentCounter(simpleName, nameCache)
+internal fun Class<Any>.defaultName(nameCache: MutableMap<String, Int>) =
+    simpleName + "." + getComponentCounter(simpleName, nameCache)

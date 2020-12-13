@@ -56,12 +56,18 @@ class ConsoleTraceLogger(val diffRecords: Boolean) : TraceListener {
         }
 
         // do a diff for logging
-        val printElement = if(diffRecords && lastElement !=null){
-            with(traceElement){
+        val printElement = if (diffRecords && lastElement != null) {
+            with(traceElement) {
                 val ccChanged = curComponent != lastElement!!.curComponent
-                TraceElement(time, if(ccChanged) curComponent else null, if(ccChanged) null else source, actionDetails, info)
+                TraceElement(
+                    time,
+                    if (ccChanged) curComponent else null,
+                    if (ccChanged) null else source,
+                    actionDetails,
+                    info
+                )
             }
-        }else{
+        } else {
             traceElement
         }
 

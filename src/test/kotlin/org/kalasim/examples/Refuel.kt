@@ -24,7 +24,8 @@ object Refuel {
     val REFUELING_SPEED = 2.0  // liters / second
     val TANK_TRUCK_TIME = 300.0  // Seconds it takes the tank truck to arrive
     val T_INTER = UniformRealDistribution(10.0, 100.0)  // Create a car every [min, max] seconds
-//    val SIM_TIME = 200000.0  // Original Simulation time in seconds
+
+    //    val SIM_TIME = 200000.0  // Original Simulation time in seconds
     val SIM_TIME = 20000.0  // Simulation time in seconds
 
 
@@ -93,7 +94,7 @@ object Refuel {
                 availableQuantityMonitor.printHistogram()
             }
 
-            get<GasStation>().requesters.apply{
+            get<GasStation>().requesters.apply {
                 queueLengthMonitor.printThis()
                 lengthOfStayMonitor.printThis()
             }

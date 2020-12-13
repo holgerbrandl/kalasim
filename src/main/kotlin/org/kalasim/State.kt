@@ -46,7 +46,13 @@ open class State<T>(initialValue: T, name: String? = null) : SimulationEntity(na
      * @param max Maximum number of components to be honored for the trigger value
      */
     fun trigger(value: T, valueAfter: T = this.value, max: Int = Int.MAX_VALUE) {
-        printTrace(env.now, env.curComponent, this,  "trigger", "value = ${value} --> ${valueAfter} allow $max components")
+        printTrace(
+            env.now,
+            env.curComponent,
+            this,
+            "trigger",
+            "value = ${value} --> ${valueAfter} allow $max components"
+        )
 
         this.value = value
         tryWait(max)

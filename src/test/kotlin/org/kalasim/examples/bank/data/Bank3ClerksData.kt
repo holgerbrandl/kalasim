@@ -1,4 +1,4 @@
-package org.kalasim.examples.bank.threeclerks
+package org.kalasim.examples.bank.data
 
 
 import org.apache.commons.math3.distribution.UniformRealDistribution

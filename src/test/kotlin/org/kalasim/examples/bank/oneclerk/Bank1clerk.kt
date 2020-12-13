@@ -22,21 +22,20 @@ class Customer(val waitingLine: ComponentQueue<Customer>, val clerk: Clerk) : Co
 //    }
 
     override fun process() = sequence {
-            waitingLine.add(this@Customer)
+        waitingLine.add(this@Customer)
 
-            if (clerk.isPassive) clerk.activate()
+        if (clerk.isPassive) clerk.activate()
 
-            yield(passivate())
+        yield(passivate())
     }
 }
-
 
 
 class Clerk : Component() {
     val waitingLine: ComponentQueue<Customer> by inject()
 
     override suspend fun SequenceScope<Component>.process() {
-        while(true) {
+        while (true) {
             while (waitingLine.isEmpty()) yield(passivate())
 
             val customer = waitingLine.poll()
@@ -55,7 +54,7 @@ class CustomerGenerator : Component() {
         while (true) {
             Customer(get(), get())
 
-            yield(hold(UniformRealDistribution(env.rg,5.0, 15.0).sample()))
+            yield(hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample()))
 //            yield(hold(10.0))
         }
     }

@@ -3,7 +3,6 @@ package org.kalasim.analytics
 import kravis.geomHistogram
 import kravis.geomStep
 import kravis.plot
-import kravis.render.RUtils.isInPath
 import org.kalasim.NumericLevelMonitor
 import org.kalasim.NumericStatisticMonitor
 import java.awt.GraphicsEnvironment

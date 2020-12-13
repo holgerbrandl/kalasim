@@ -48,7 +48,8 @@ open class Resource(
     // todo TBD should we initialize these monitoring by tallying the intial state?
     val capacityMonitor = NumericLevelMonitor("Capacity of ${super.name}", initialValue = capacity)
     val claimedQuantityMonitor = NumericLevelMonitor("Claimed quantity of ${this.name}")
-    val availableQuantityMonitor = NumericLevelMonitor("Available quantity of ${this.name}", initialValue = availableQuantity)
+    val availableQuantityMonitor =
+        NumericLevelMonitor("Available quantity of ${this.name}", initialValue = availableQuantity)
     val occupancyMonitor = NumericLevelMonitor("Occupancy of ${this.name}")
 
 
@@ -131,12 +132,12 @@ class ResourceInfo(resource: Resource) : Jsonable() {
     // use a dedicated type here to see null prios in json
     val claimedBy = resource.claimers.q.toList().map { it.component.name to it.priority }
 
-    data class ReqComp(val component:String, val quantity:Double?)
+    data class ReqComp(val component: String, val quantity: Double?)
+
     val requestingComponents = resource.requesters.q.toList().map {
-        ReqComp(it.component.name,it.component.requests[resource])
+        ReqComp(it.component.name, it.component.requests[resource])
     }
 }
-
 
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -161,7 +162,7 @@ class ResourceStatistics(resource: Resource) : Jsonable() {
 
         "requesterStats" to requesters.toJson()
         "claimerStats" to claimers.toJson()
-        
+
         "capacity" to capacity.toJson()
         "availableQuantity" to availableQuantity.toJson()
         "claimedQuantity" to claimedQuantity.toJson()

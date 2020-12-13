@@ -9,9 +9,6 @@ import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.moment.Variance
 import org.json.JSONObject
 import org.kalasim.misc.*
-import org.kalasim.misc.buildHistogram
-import org.kalasim.misc.printHistogram
-import org.kalasim.misc.printThis
 import org.koin.core.component.KoinComponent
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
@@ -201,7 +198,7 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
     }
 
 
-    fun statistics(excludeZeros: Boolean = false, rollingStats: Boolean = false): NumericStatisticMonitorStats  {
+    fun statistics(excludeZeros: Boolean = false, rollingStats: Boolean = false): NumericStatisticMonitorStats {
         require(!rollingStats) { TODO() }
 
 //        val stats: StatisticalSummary = if(rollingStats) SummaryStatistics() else DescriptiveStatistics()
@@ -220,7 +217,7 @@ open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name)
     }
 }
 
-class NumericStatisticMonitorStats(private val ss: StatisticalSummary) : StatisticalSummary by ss, Jsonable(){
+class NumericStatisticMonitorStats(private val ss: StatisticalSummary) : StatisticalSummary by ss, Jsonable() {
     override fun toJson(): JSONObject = ss.toJson()
 }
 

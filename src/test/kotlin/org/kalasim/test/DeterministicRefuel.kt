@@ -2,7 +2,7 @@ package org.kalasim.test
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
-import org.kalasim.analytics.*
+import org.kalasim.analytics.display
 import org.kalasim.misc.printThis
 import org.koin.core.component.get
 import org.koin.core.component.inject
@@ -21,11 +21,16 @@ object DeterministicRefuel {
     val GAS_STATION_SIZE = 2000.0  // liters
     val THRESHOLD = 25.0  // Threshold for calling the tank truck (in %)
     val FUEL_TANK_SIZE = 50.0  // liters
-    val FUEL_TANK_LEVEL = UniformRealDistribution(5.0, 25.0).apply {  reseedRandomGenerator(1) }// Min/max levels of fuel tanks (in liters)
+    val FUEL_TANK_LEVEL =
+        UniformRealDistribution(5.0, 25.0).apply { reseedRandomGenerator(1) }// Min/max levels of fuel tanks (in liters)
     val REFUELING_SPEED = 2.0  // liters / second
     val TANK_TRUCK_TIME = 300.0  // Seconds it takes the tank truck to arrive
-    val T_INTER = UniformRealDistribution(100.0, 200.0).apply{reseedRandomGenerator(1)}  // Create a car every [min, max] seconds
-//    val SIM_TIME = 200000.0  // Original Simulation time in seconds
+    val T_INTER = UniformRealDistribution(
+        100.0,
+        200.0
+    ).apply { reseedRandomGenerator(1) }  // Create a car every [min, max] seconds
+
+    //    val SIM_TIME = 200000.0  // Original Simulation time in seconds
     val SIM_TIME = 20000.0  // Simulation time in seconds
 
 

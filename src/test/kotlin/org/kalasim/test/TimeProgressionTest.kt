@@ -1,13 +1,13 @@
 package org.kalasim.test
 
+import org.junit.Test
 import org.kalasim.Component
 import org.kalasim.Environment
-import org.junit.Test
 
 class TimeProgressionTest {
 
     @Test
-    fun `time should progress along with simulatio`(){
+    fun `time should progress along with simulatio`() {
         val tr = TraceCollector()
 
         class Car : Component() {

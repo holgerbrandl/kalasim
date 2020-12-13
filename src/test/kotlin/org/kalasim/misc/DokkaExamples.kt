@@ -1,10 +1,9 @@
 package org.kalasim.misc
 
 import org.apache.commons.math3.distribution.EnumeratedDistribution
+import org.junit.Test
 import org.kalasim.Environment
 import org.kalasim.FrequencyLevelMonitor
-import org.kalasim.misc.asCM
-import org.junit.Test
 
 
 // Adopted from example in https://www.salabim.org/manual/Monitor.html

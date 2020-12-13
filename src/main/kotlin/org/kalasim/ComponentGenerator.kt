@@ -47,7 +47,7 @@ class ComponentGenerator<T : Component>(
                 yield((this@ComponentGenerator).activate(at = till, process = ComponentGenerator<T>::doFinalize))
             }
 
-            yield(hold(till=t))
+            yield(hold(till = t))
         }
     }
 
@@ -60,4 +60,4 @@ class ComponentGenerator<T : Component>(
 }
 
 
-class ComponentGeneratorInfo<T:Component>(cg: ComponentGenerator<T>): ComponentInfo(cg)
+class ComponentGeneratorInfo<T : Component>(cg: ComponentGenerator<T>) : ComponentInfo(cg)

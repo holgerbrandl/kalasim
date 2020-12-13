@@ -88,7 +88,7 @@ class ComponentQueue<C : Component>(
 }
 
 
-class QueueInfo(cq: ComponentQueue<*>): Jsonable() {
+class QueueInfo(cq: ComponentQueue<*>) : Jsonable() {
 
     data class Entry(val component: String, val enterTime: Double, val priority: Int?)
 
