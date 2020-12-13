@@ -18,6 +18,26 @@ The core of kalasim is a an event-loop. Components are actively and passively sc
   <figcaption>Kalasim Execution Model</figcaption>
 </figure>
 
+## Dependency Injection
+
+Kalasim is building on top of koin to inject dependencies between elements of a simulation.
+
+Koin does not allow to inject simple types. To inject simple variables, consider using a wrappe class. Example
+``` python
+# Python Program to convert temperature in celsius to fahrenheit
+
+# change this value for a different result
+celsius = 37.5
+
+# calculate fahrenheit
+fahrenheit = (celsius * 1.8) + 32
+print('%0.1f degree Celsius is equal to %0.1f degree Fahrenheit' %(celsius,fahrenheit))
+```
+
+```kotlin
+{!kotlin/SimpleInject.kts!}
+```
+
 ## Randomness & Distributions
 
 Experimentation in a simulation context relates to large part to controlling randomess. Here, this is achieved by using probabilistc

@@ -82,7 +82,6 @@ fun main() {
     val env = configureEnvironment(true) {
         // register components needed for dependency injection
         add { ComponentQueue<Customer>("waitingline") }
-        add { State(false, "worktodo") }
         add { (0..2).map { Clerk() } }
     }
 
@@ -98,15 +97,17 @@ fun main() {
         waitingLine.lengthOfStayMonitor.enabled = true
         run(500.0)
 
+        // with console
         waitingLine.lengthOfStayMonitor.printHistogram()
         waitingLine.queueLengthMonitor.printHistogram()
 
-        println("number reneged: $numReneged")
-        println("number balked: $numBalked")
-
-        waitingLine.queueLengthMonitor.display()
-        waitingLine.lengthOfStayMonitor.display()
+        // with kravis
+//        waitingLine.queueLengthMonitor.display()
+//        waitingLine.lengthOfStayMonitor.display()
 
         waitingLine.stats.toJson().toString(2).printThis()
+
+        println("number reneged: $numReneged")
+        println("number balked: $numBalked")
     }
 }

@@ -54,3 +54,12 @@ and why the distribution can not be used at the call site?
 ---
 
 Register project at awesome-kotlin
+
+
+---
+
+pluggable backend for visualization functions
+```
+env.visEngine = KRAVIS
+nlm.printHistogram()
+```

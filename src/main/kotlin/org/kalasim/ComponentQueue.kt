@@ -80,6 +80,11 @@ class ComponentQueue<C : Component>(
         q.find { it.component == c }?.let { q.remove(it) }
     }
 
+    fun printHistogram() {
+        lengthOfStayMonitor.printHistogram()
+        queueLengthMonitor.printHistogram()
+    }
+
     val stats: QueueStatistics
         get() = QueueStatistics(this)
 

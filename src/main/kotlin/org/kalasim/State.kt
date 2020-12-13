@@ -70,6 +70,11 @@ open class State<T>(initialValue: T, name: String? = null) : SimulationEntity(na
         }
     }
 
+    fun printHistograms() {
+        waiters.printHistogram()
+        valueMonitor.printHistogram()
+    }
+
     public override val info
         get() = StateInfo(env.now, name, value.toString(), waiters.q.map { it.component.name })
 }
