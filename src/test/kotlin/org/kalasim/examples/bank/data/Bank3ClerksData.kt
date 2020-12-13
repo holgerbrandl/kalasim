@@ -2,52 +2,45 @@ package org.kalasim.examples.bank.data
 
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
-import org.kalasim.*
-import org.kalasim.analytics.display
+import org.kalasim.Component
+import org.kalasim.ComponentQueue
+import org.kalasim.add
+import org.kalasim.configureEnvironment
 import org.koin.core.component.get
 import org.koin.core.component.inject
-import java.awt.GraphicsEnvironment.isHeadless
 
 
-class CustomerGenerator : Component() {
+class CustomerGenerator(val waitingLine: ComponentQueue<Customer>) : Component() {
+    private val clerks: List<Clerk> by inject()
 
     override fun process() = sequence {
         while (true) {
-            Customer(get())
+            waitingLine.add(Customer())
+
+            for (clerk in clerks) {
+                if (clerk.isPassive) {
+                    clerk.activate()
+                    break
+                }
+            }
+
             yield(hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample()))
         }
     }
 }
 
-class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
-    private val clerks: List<Clerk> by inject()
-
-    override suspend fun SequenceScope<Component>.process(it: Component) {
-        waitingLine.add(this@Customer)
-
-        for (c in clerks) {
-            if (c.isPassive) {
-                c.activate()
-                break // activate only one clerk
-            }
-        }
-
-        yield(passivate())
-    }
-}
+class Customer : Component()
 
 
-class Clerk : Component() {
-    private val waitingLine: ComponentQueue<Customer> by inject()
+class Clerk(val waitingLine: ComponentQueue<Customer>) : Component() {
 
     override fun process() = sequence {
         while (true) {
             if (waitingLine.isEmpty())
                 yield(passivate())
 
-            val customer = waitingLine.poll()
+            waitingLine.poll() // returns next customer (value ignored here)
             yield(hold(30.0)) // bearbeitungszeit
-            customer.activate() // signal the customer that's all's done
         }
     }
 }
@@ -57,27 +50,15 @@ fun main() {
     val env = configureEnvironment {
         // register components needed for dependency injection
         add { ComponentQueue<Customer>("waitingline") }
-        add { State(false, "worktodo") }
-        add { CustomerGenerator() }
-        add { (1..3).map { Clerk() } }
+        add { CustomerGenerator(get()) }
+        add { (1..3).map { Clerk(get()) } }
     }
 
     env.apply {
-        // register other components to  be present when starting the simulation
-//        CustomerGenerator()
-
         run(50000.0)
 
         val waitingLine: ComponentQueue<Customer> = get()
 
-        if (!isHeadless())
-//        waitingLine.lengthOfStayMonitor.printHistogram()
-//        waitingLine.queueLengthMonitor.printHistogram()
-
-            waitingLine.queueLengthMonitor.display()
-        waitingLine.lengthOfStayMonitor.display()
-
-//        waitingLine.stats.toJson().toString(2).printThis()
-        waitingLine.printInfo()
+        waitingLine.printStats()
     }
 }
