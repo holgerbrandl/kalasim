@@ -23,6 +23,8 @@ enum class ComponentState {
  * A kalasim component is used as component (primarily for queueing) or as a component with a process.
  * Usually, a component will be defined as a subclass of Component.
  *
+ * @param at schedule time
+ * @param delay schedule with a delay if omitted, no delay
  * @param process  of process to be started.  if None (default), it will try to start self.process()
  * @param name name of the component.  if the name ends with a period (.), auto serializing will be applied  if the name end with a comma, auto serializing starting at 1 will be applied  if omitted, the name will be derived from the class it is defined in (lowercased)
  */
@@ -30,7 +32,7 @@ open class Component(
     name: String? = null,
     process: FunPointer? = Component::process,
     val priority: Int = 0,
-    private val delay: Int = 0 //todo should be Number
+    delay: Int = 0
 ) : KoinComponent, SimulationEntity(name) {
 
     private var oneOfRequest: Boolean = false
@@ -613,6 +615,8 @@ open class Component(
      *
      * See https://www.salabim.org/manual/Component.html#activate
      *
+     * @param at schedule time
+     * @param delay schedule with a delay if omitted, no delay
      * @param process name of process to be started.
      * * if None (default), process will not be changed
      * * if the component is a data component, the
@@ -620,7 +624,8 @@ open class Component(
      * * note that the function *must* be a generator, i.e. contains at least one yield.
      */
     fun activate(
-        at: Double? = null,
+        at: Number? = null,
+        delay: Number = 0,
         priority: Int = 0,
         urgent: Boolean = false,
         keepRequest: Boolean = false,
@@ -658,9 +663,9 @@ open class Component(
         }
 
         val scheduledTime = if (at == null) {
-            env.now + delay
+            env.now + delay.toDouble()
         } else {
-            at + delay
+            at.toDouble() + delay.toDouble()
         }
 
         reschedule(scheduledTime, priority, urgent, "activate $extra", SCHEDULED)
