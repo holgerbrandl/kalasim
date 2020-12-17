@@ -32,7 +32,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>, val workToDo: State<Bo
             printTrace("reneged")
 
         } else {
-            passivate()
+            yield(passivate())
         }
     }
 }
@@ -47,8 +47,13 @@ class Clerk(val workToDo: State<Boolean>) : Component() {
                 yield(wait(workToDo, true))
             }
 
+            println("WAITLENGTH "+ waitingLine.size)
+            waitingLine.printInfo()
+
             val customer = waitingLine.poll()
             yield(hold(30.0)) // process customer
+
+//            require(customer.isPassive){ "not passive"}
             customer.activate() // signal the customer that's all's done
         }
     }
@@ -65,7 +70,8 @@ fun main() {
 
     // register other components to  be present when starting the simulation
     ComponentGenerator(iat = UniformRealDistribution(env.rg, 5.0, 15.0)) {
-        Customer(get(), get())
+        val customer = Customer(get(), get())
+        customer
     }
 
     val waitingLine: ComponentQueue<Customer> = env.get()
