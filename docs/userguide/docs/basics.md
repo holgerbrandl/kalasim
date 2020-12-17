@@ -22,17 +22,7 @@ The core of kalasim is a an event-loop. Components are actively and passively sc
 
 Kalasim is building on top of koin to inject dependencies between elements of a simulation.
 
-Koin does not allow to inject simple types. To inject simple variables, consider using a wrappe class. Example
-``` python
-# Python Program to convert temperature in celsius to fahrenheit
-
-# change this value for a different result
-celsius = 37.5
-
-# calculate fahrenheit
-fahrenheit = (celsius * 1.8) + 32
-print('%0.1f degree Celsius is equal to %0.1f degree Fahrenheit' %(celsius,fahrenheit))
-```
+Koin does not allow injecting simple types. To inject simple variables, consider using a wrapper class. Example
 
 ```kotlin
 {!kotlin/SimpleInject.kts!}
@@ -50,8 +40,9 @@ yield(hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample()))
 
 The API also include some convenience wrappers to provide fixed values for argument of `RealDistribution`. E.g. consider the  time until a request is considered as failed:
 
-```
+```kotlin
 val r = Resource()
 c.request(r, failAt = 3.asConstantDist())
 ```
+
 Here, `3` is converted into a `org.apache.commons.math3.distribution.ConstantRealDistribution`. By doing so, we can provide more typed signatures across the entire API. Instead of support methods that accept fixed values for waiting times etc, we simply rely on fixed random distribution to reduce API complexity while maintaining full flexibility.

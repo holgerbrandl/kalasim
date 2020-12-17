@@ -1,19 +1,12 @@
 # Welcome to `kalasim`
 
-https://api.bintray.com/packages/holgerbrandl/github/kalasim/images/download.svg
-https://api.bintray.com/packages/holgerbrandl/mpicbg-scicomp/krangl/images/download.svg
-
 [ ![Download](https://api.bintray.com/packages/holgerbrandl/github/kalasim/images/download.svg) ](https://bintray.com/holgerbrandl/github/kalasim/_latestVersion)  [![Build Status](https://travis-ci.org/holgerbrandl/kalasim.svg?branch=master)](https://travis-ci.org/holgerbrandl/kalasim) [![Gitter](https://badges.gitter.im/kalasim.svg)](https://gitter.im/kalasim/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 `kalasim` is a discrete event simulator with type support, dependency injection, modern persistence and logging to enable large-scale, industrial-ready simulations.
 
+`kalsim` is written in [Kotlin](https://kotlinlang.org/), designed on top of [koin](https://github.com/InsertKoinIO/koin) as dependency injection framework, is using [common-math](https://commons.apache.org/proper/commons-math/) for stats and distributions, modern event tracking and persistence, and [plotly.kt](https://github.com/mipt-npm/plotly.kt), [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) as well as [`kravis`](https://github.com/holgerbrandl/kravis) for visualization.
 
-`kalasim` started off as a blunt rewrite of [salabim](https://www.salabim.org/). `kalasim` reimplements all core APIs of `salabim` in a more typesafe API while also providing better test coverage, real-time capabilities and (arguably) more modern built-in support for visualization.
-
-
-`kalsim` is written in [Kotlin](https://kotlinlang.org/), designed on top of [koin](https://github.com/InsertKoinIO/koin) as dependency injection framework, is using [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) for event tracking and persistence, and [plotly.kt](https://github.com/mipt-npm/plotly.kt) as well as [`kravis`](https://github.com/holgerbrandl/kravis) for visualization.
-
-In contrast to many other simulation tools, `kalasim` is neither low-code nor no-code. It is _just-code_ to enable change tracking, scaling, refactoring, CI/CD, unit-tests, and the rest of the gang that makes development fun.
+In contrast to many other simulation tools, `kalasim` is neither low-code nor no-code. It is _code-first_ to enable change tracking, scaling, refactoring, CI/CD, unit-tests, and the rest of the gang that makes simulation development fun.
 
 
 ## First Example
@@ -39,7 +32,7 @@ createSimulation(enableTraceLogger = true){
 <!--This example corresponds to the `Cars` `salabim` example https://www.salabim.org/manual/Modeling.html-->
 
 
-Although the example lacks dynamic aspects that make simulations fun, it demonstrates the main mode of operation, the core API and the state model implemented in `kalasim`.
+Although the example lacks dynamic aspects such as [states](state.md), [resources](resource.md) or [queues](component.md#queue) that make simulations fun, it demonstrates the main mode of operation, the core API and the component state model implemented in `kalasim`.
 
 The main body of every `kalasim` model usually starts with:
 ```
@@ -51,7 +44,7 @@ Here, we enable trace logging of state changes to see the status of simulation o
 
 For each (active) component we (can) define a type such as:
 
-```
+```kotlin
 class Car : Component()
 ```
 
@@ -75,7 +68,7 @@ As there is a generator function called process in Car, this process description
 
 With :
 
-```
+```kotlin
 run(5.0)
 ```
 
@@ -114,10 +107,4 @@ We always welcome pull requests. :-)
 Feel welcome to post questions and ideas in the project's [gitter chat](https://gitter.im/holgerbrandl/kalasim)
 
 Feel also invited to chat with us in the [kotlinlang.slack.com](http://kotlinlang.slack.com) in the `#datascience` channel.
-
-
-## Acknowledgements
-
-
-`kalasim` started off as a blunt rewrite of [salabim](https://www.salabim.org/). The latter provided a great path into simulation, states and resources. Its excellent documentation and wonderful examples made this project possible after all.
 

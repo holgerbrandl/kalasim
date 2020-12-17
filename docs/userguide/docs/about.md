@@ -1,13 +1,15 @@
 # About
 
 
-## License & References
+## License
 
 `kalasim` is licensed under MIT License.
 
 
-The project started off as a blunt clone of [`salabim`](https://www.salabim.org/), and we are deeply thankful for its permissive licence that enabled setting up this project. A great starting point was in particular the wonderful article [salabim: discrete event simulation and animation in Python](https://www.semanticscholar.org/paper/salabim%3A-discrete-event-simulation-and-animation-in-Ham/b513ce3d7cd56c478bb045d7080f7e34c0eb20de).
+## Acknowledgements
 
+
+`kalasim` started off as a blunt rewrite of [salabim](https://www.salabim.org/). and we are deeply thankful for its permissive licence that enabled setting up this project. A great starting point was in particular the wonderful article [salabim: discrete event simulation and animation in Python](https://www.semanticscholar.org/paper/salabim%3A-discrete-event-simulation-and-animation-in-Ham/b513ce3d7cd56c478bb045d7080f7e34c0eb20de). `salabims`s excellent documentation and wonderful examples made this project possible after all. `kalasim` reimplements all core APIs of `salabim` in a more typesafe API while also providing better test coverage, real-time capabilities and (arguably) more modern built-in support for visualization.
 
 `kalasim`  is built on top of some great libraries. It was derived as merger of ideas, implementation and documentation from the following projects
 
