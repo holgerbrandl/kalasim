@@ -60,7 +60,38 @@ ship1.activate(at=100)
 ship2.activate(delay=50)
 ```
 
-## Process interaction
+
+## Creation of a component
+
+Although it is possible to create a component directly with `x=sim.Component()`, this
+makes it very hard to make that component into an active component,
+because thereâ€™s no process method. So, nearly always we define a class based on
+sim.Component ::
+
+```kotlin
+    def Car(sim.Component):
+        def process(self):
+            ...
+```
+
+If we then say ``car=Car()``, a component is created and it activated from process. This
+process is nearly always, but not necessarily a generator method (i.e. it has at least one yield (or yield from) statement.
+
+The result is that car is put on the future event list (for time now) and when itâ€™s its
+turn, the component becomes current.
+
+It is also possible to set a time at which the component (car) becomes active, like `car=Car(at=10)`.
+
+And instead of starting at process, the component may be initialized to start at another (generator) method,
+like ``car=Car(process='wash')``.
+
+And, finally, if there is a process method, you can disable the automatic activation (i.e.
+make it a data component) , by specifying ``process=''``.
+
+If there is no process method, and process= is not given, the component will be a data component.
+
+
+## Lifecycle
 
 A component may be in one of the following states modelled by `org.kalasim.ComponentState`:
 
@@ -101,36 +132,8 @@ The scheme below shows how components can go from state to state.
 1. [7] state at time of interrupt
 1. [8] increases the interrupt_level
 
-## Creation of a component
 
-Although it is possible to create a component directly with `x=sim.Component()`, this 
-makes it very hard to make that component into an active component,
-because thereâ€™s no process method. So, nearly always we define a class based on
-sim.Component ::
-
-```kotlin
-    def Car(sim.Component):
-        def process(self):
-            ...
-```
-
-If we then say ``car=Car()``, a component is created and it activated from process. This
-process is nearly always, but not necessarily a generator method (i.e. it has at least one yield (or yield from) statement.
-
-The result is that car is put on the future event list (for time now) and when itâ€™s its
-turn, the component becomes current.
-
-It is also possible to set a time at which the component (car) becomes active, like `car=Car(at=10)`.
-
-And instead of starting at process, the component may be initialized to start at another (generator) method,
-like ``car=Car(process='wash')``.
-
-And, finally, if there is a process method, you can disable the automatic activation (i.e.
-make it a data component) , by specifying ``process=''``.
-
-If there is no process method, and process= is not given, the component will be a data component.
-
-## activate
+### activate
 
 Activate is the way to turn a data component into a live component. If you do not specify a process,
 the (usually generator) function process is assumed. So you can say ::
