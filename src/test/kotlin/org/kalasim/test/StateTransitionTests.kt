@@ -1,5 +1,6 @@
 package org.kalasim.test
 
+import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
 import kotlin.test.assertEquals
@@ -7,6 +8,7 @@ import kotlin.test.assertEquals
 
 class StateTransitionTests {
 
+    @Ignore
     @Test
     fun testCars() {
 

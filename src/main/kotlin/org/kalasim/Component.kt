@@ -189,6 +189,46 @@ open class Component(
         return this
     }
 
+    /** interrupt level of an interrupted component  non interrupted components return 0. */
+    var interruptLevel = 0
+        private set
+
+    /** Interrupt the component. */
+    fun interrupt() {
+        require(status != CURRENT) { "Current component can no be interrupted" }
+
+        if (status == INTERRUPTED) {
+            interruptLevel++
+        } else {
+            requireNotData()
+            remove()
+            remainingDuration = scheduledTime - env.now
+            interruptLevel = 1
+            status = INTERRUPTED
+        }
+
+        printTrace("interrupt (level=$interruptLevel)")
+    }
+
+    /** resumes an interrupted component
+     * @param if `true`, the component returns to the original status, regardless of the number of interrupt levels if
+     * `false` (default), the interrupt level will be decremented and if the level reaches 0, the component will return
+     * to the original status.
+     * @param if a component has the same time on the event list, this component is sorted accoring to
+    the priority.
+     */
+    fun resume(all: Boolean = false, priority: Int = 0) {
+        // not part of original impl
+        require(status == INTERRUPTED)
+        require(interruptLevel <0)
+
+
+        interruptLevel--
+
+
+
+
+    }
 
     /**
      * cancel component (makes the component data)

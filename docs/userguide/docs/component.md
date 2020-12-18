@@ -1,6 +1,6 @@
 # Component
 
-Components are the key elements of simulation.
+Components are the key elements of a simulation.
 
 Components can be either `data` or `active`. An `active` component has one or more process descriptions and is activated
 at some point of time. You can make a data component `active` with `activate()`. An active component can become
@@ -60,62 +60,22 @@ ship1.activate(at=100)
 ship2.activate(delay=50)
 ```
 
-
-At time of creation it is sometimes useful to be able to set attributes, prepare for actions, etc.
-This is possible in salabim by defining an __init__ and/or a setup method:
-
-If the __init__ method is used, it is required to call the Component.__init__ method from within the
-overridden method:
-
-```kotlin
-   class Ship(sim.Component):
-       def __init__(self, length, *args, **kwargs):
-           sim.Component.__init__(self, *args, **kwargs)
-           self.length = length
-
-   ship = Ship(length=250)
-```
-
-
-This sets ship.length to 250.
-
-In most cases, the setup method is preferred, however. This method is called after ALL initialization code
-of Component is executed.
-
-```kotlin
-   class Ship(sim.Component):
-       def setup(self, length):
-           self.length = length
-
-   ship = Ship(length=250)
-```
-
-
-Now, ship.length will be 250.
-
-Note that setup gets all arguments and keyword arguments, that are not 'consumed'  by __init__ and/or
-the process call.
-
-Only in very specific cases, __init__ will be necessary.
-
-Note that the setup code can be used for data components as well.
-
 ## Process interaction
 
-A component may be in one of the following states:
+A component may be in one of the following states modelled by `org.kalasim.ComponentState`:
 
-* data
-* current
-* scheduled
-* passive
-* requesting
-* waiting
-* standby
-* interrupted
+* `DATA`
+* `CURRENT`
+* `SCHEDULED`
+* `PASSIVE`
+* `REQUESTING`
+* `WAITING`
+* `STANDBY`
+* `INTERRUPTED`
 
 The scheme below shows how components can go from state to state.
 
-|    rom/to   |     data     |   current   |    scheduled   |     passive     |   requesting  |   waiting   |    standby    |  interrupted |
+|    from/to   |     data     |   current   |    scheduled   |     passive     |   requesting  |   waiting   |    standby    |  interrupted |
 |:-----------:|:------------:|:-----------:|:--------------:|:---------------:|:-------------:|:-----------:|:-------------:|:------------:|
 | data        |              | activate[1] | activate       |                 |               |             |               |              |
 | current     | process end  |             | yield hold     | yield passivate | yield request | yield wait  | yield standby |              |
@@ -132,14 +92,14 @@ The scheme below shows how components can go from state to state.
 | interrupted | cancel       |             | resume[7]      | resume[7]       | resume[7]     | resume[7]   | resume[7]     | interrupt[8] |
 | .           |              |             | activate       | passivate       | request       | wait        | standby       |              |
 
-1. [1] via scheduled |n|
-1. [2] not recommended |n|
-1. [3] with keep_request=False (default) |n|
-1. [4] with keep_request=True. This allows to set a new time out |n|
-1. [5] with keep_wait=False (default) |n|
-1. [6] with keep_wait=True. This allows to set a new time out |n|
-1. [7] state at time of interrupt |n|
-1. [8] increases the interrupt_level |n|
+1. [1] via `scheduled()`
+1. [2] not recommended
+1. [3] with `keepRequest=false` (default)
+1. [4] with `keepRequest=true`. This allows to set a new time out
+1. [5] with `keepWait=false` (default)
+1. [6] with `keepWait=true`. This allows to set a new timeout
+1. [7] state at time of interrupt
+1. [8] increases the interrupt_level
 
 ## Creation of a component
 
@@ -198,6 +158,7 @@ the (usually generator) function process is assumed. So you can say ::
 * If the component is interrupted, the component will be activated at the specified time.
   
 ### hold
+
 Hold is the way to make a, usually current, component scheduled.
 
 
