@@ -1,6 +1,6 @@
 site_name: kalasim - discrete event simulator
 
-site_url: https://kalasim.org
+site_url: https://www.kalasim.org
 site_author: Holger Brandl
 site_description: >-
   Discrete event simulator with type support, dependency injection, modern persistence and logging to enable large-scale, industrial-ready simulations
