@@ -15,18 +15,7 @@ Let’s start with a very simple model, to demonstrate the basic structure, proc
 
 We want to build a simulation where a single car is driving around for a some time before arriving at its destination.
 ```kotlin
-class Car : Component() {
-    override suspend fun ProcContext.process() {
-            // drive around for an hour
-            yield(hold(1.0))
-            // and terminate when reaching the destination
-            yield(terminate())
-    }
-}
-
-createSimulation(enableTraceLogger = true){
-    Car()
-}.run(5.0)
+//{!IndexCars.kts!}
 ```
 
 <!--This example corresponds to the `Cars` `salabim` example https://www.salabim.org/manual/Modeling.html-->

@@ -46,7 +46,7 @@ As pragmatic approach, it is using a global application context by default, but 
 Koin does not allow injecting simple types. To inject simple variables, consider using a wrapper class. Example
 
 ```kotlin
-{!SimpleInject.kts!}
+//{!SimpleInject.kts!}
 ```
 
 For details about how to use lazy injection with `inject<T>()` and instance retrieval with `get<T>()` see [koin reference](https://doc.insert-koin.io/#/koin-core/injection-parameters).

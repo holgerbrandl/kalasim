@@ -1,3 +1,4 @@
+//SimpleInject.kts
 import org.kalasim.*
 
 data class Counter(var value: Int)

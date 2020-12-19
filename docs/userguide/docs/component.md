@@ -2,9 +2,9 @@
 
 Components are the key elements of a simulation.
 
-Components can be either in state `data` or `active`. An `active` component has one or more process descriptions and is activated
+Components can be either in state `DATA` or `ACTIVE`. An `ACTIVE` component has one or more process descriptions and is activated
 at some point of time. You can make a data component `active` with `activate()`. An active component can become
-`data` either with a `cancel()` or by reaching the end of its process method.
+`DATA` either with a `cancel()` or by reaching the end of its process method.
 
 It is easy to create a data component by:
 
@@ -45,7 +45,7 @@ If no process method is found for `Ship`, the ship will be a data component.
 In that case, it may become active by means of an `activate()` statement:
 
 ```kotlin
-{!CraneProcess.kts!}
+//{!CraneProcess.kts!}
 ```
 
 Effectively, creation and start of `crane1` and `crane2` is the same.
