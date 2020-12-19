@@ -19,7 +19,9 @@ To support CNAME in mkdocs see https://www.mkdocs.org/user-guide/deploying-your-
 
 https://medium.com/mobile-app-development-publication/kotlin-koin-scope-illustrated-3bfa6c7ae98
 
-
+<https://medium.com/koin-developers/ready-for-koin-2-0-2722ab59cac3>
+>  startKoin declaration function which declare your Koin instance into the GlobalContext, use the koinApplication function to declare a local Koin instance.
+>
 ## salabim
 
 doc sources --> https://www.salabim.org/manual/ view page sources

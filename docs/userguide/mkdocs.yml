@@ -1,6 +1,6 @@
 site_name: kalasim - discrete event simulator
 
-site_url: https://squidfunk.github.io/mkdocs-material/
+site_url: https://kalasim.org
 site_author: Holger Brandl
 site_description: >-
   Discrete event simulator with type support, dependency injection, modern persistence and logging to enable large-scale, industrial-ready simulations
@@ -28,7 +28,6 @@ nav:
     - Theory: theory.md
     - Setup: setup.md
     - FAQ: faq.md
-    - Examples: examples.md
   - Basics:
     - Simulation Basics: basics.md
     - Components: component.md
@@ -38,8 +37,10 @@ nav:
     - analysis.md
     - Monitors: monitors.md
 
+  - Examples:
+    - Extended Cars: examples.md
   - Advanced:
-    - Livemode: livemode.md
+    - advanced.md
   - About:
     - about.md
 
@@ -56,7 +57,7 @@ extra:
 
 markdown_extensions:
   - markdown_include.include:
-      base_path: examples
+      base_path: examples/kotlin
   - pymdownx.highlight:
 #      linenums: true
   - pymdownx.superfences:

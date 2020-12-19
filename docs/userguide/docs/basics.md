@@ -9,7 +9,7 @@ The beauty of discrete event simulation is its very limited vocabulary which sti
 
 ## Execution & Process Model
 
-The core of kalasim is a an event-loop. Components are actively and passively scheduled for reevaluating their state. Technically this relates to the component's continued with `process()` generator or execution function.
+The core of *kalasim* is an event-loop. Components are actively and passively scheduled for reevaluating their state. Technically this relates to the component's continued with `process()` generator or execution function.
 
 
 <!--https://stackoverflow.com/questions/19331362/using-an-image-caption-in-markdown-jekyll-->
@@ -18,15 +18,37 @@ The core of kalasim is a an event-loop. Components are actively and passively sc
   <figcaption>Kalasim Execution Model</figcaption>
 </figure>
 
+## Simulation Runtime Environment
+
+The execution context of a kalasim simulation is an `Environment`, which can be created with
+
+```kotlin
+val env : Environment = createSimulation(enableTraceLogger = true){
+    // Create components in here 
+    Car()
+    
+    // To disambiguate between multiple simulations, provide a reference to the koin context
+    // The koin argument can be omitted if just a single simulation is being used
+    Component(koin=getKoin())
+}.run(5.0)
+```
+
+To configure references, an `Environment` can also be instantiated by configuring dependencies first with `configureEnvironment`. Check out the  [Extended Cars](examples.md#extended-cars) example to learn how that works.
+
+
 ## Dependency Injection
 
-Kalasim is building on top of koin to inject dependencies between elements of a simulation.
+Kalasim is building on top of [koin](https://insert-koin.io/) to inject dependencies between elements of a simulation.
+
+As pragmatic approach, it is using a global application context by default, but does allow for parallel simulations with [Koin Isolation](https://medium.com/koin-developers/ready-for-koin-2-0-2722ab59cac3). For a simulation example with multiple `Environment` see `https://github.com/holgerbrandl/kalasim/tree/master/src/test/kotlin/org/kalasim/test/EnvTests.kt`
+
 
 Koin does not allow injecting simple types. To inject simple variables, consider using a wrapper class. Example
 
 ```kotlin
-{!kotlin/SimpleInject.kts!}
+{!SimpleInject.kts!}
 ```
+
 
 ## Randomness & Distributions
 

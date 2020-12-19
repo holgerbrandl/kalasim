@@ -31,8 +31,8 @@ createSimulation(enableTraceLogger = true){
 
 <!--This example corresponds to the `Cars` `salabim` example https://www.salabim.org/manual/Modeling.html-->
 
+The example demonstrates the main mode of operation, the core API and the component state model implemented in `kalasim`. In the examples section you can find an [extended cars example](examples.md#extended-cars) that ded-cars) that is integrating more elaborate  `kalasim` concepts such as [states](state.md) and [resources](resource.md).
 
-Although the example lacks dynamic aspects such as [states](state.md), [resources](resource.md) or [queues](component.md#queue) that make simulations fun, it demonstrates the main mode of operation, the core API and the component state model implemented in `kalasim`.
 
 The main body of every `kalasim` model usually starts with:
 ```

@@ -2,7 +2,7 @@
 
 Components are the key elements of a simulation.
 
-Components can be either `data` or `active`. An `active` component has one or more process descriptions and is activated
+Components can be either in state `data` or `active`. An `active` component has one or more process descriptions and is activated
 at some point of time. You can make a data component `active` with `activate()`. An active component can become
 `data` either with a `cancel()` or by reaching the end of its process method.
 
@@ -63,30 +63,32 @@ ship2.activate(delay=50)
 
 ## Creation of a component
 
-Although it is possible to create a component directly with `x=sim.Component()`, this
+Although it is possible to create a component directly with `val x = Component()`, this
 makes it very hard to make that component into an active component,
-because thereâ€™s no process method. So, nearly always we define a class based on
-sim.Component ::
+because there's no process method. So, nearly always we define a class based on
+`org.kalasim.Component`:
 
 ```kotlin
-    def Car(sim.Component):
-        def process(self):
-            ...
+class Car: Component(){
+    override fun process() = sequence {
+        yield(hold(1)) // or whatever
+    }
+}
 ```
 
-If we then say ``car=Car()``, a component is created and it activated from process. This
-process is nearly always, but not necessarily a generator method (i.e. it has at least one yield (or yield from) statement.
+If we then say `car = Car()`, a component is created and it activated from process. This
+process is nearly always, but not necessarily a *generator method*  (i.e. it has at least one yield (or yield from) statement.
 
-The result is that car is put on the future event list (for time now) and when itâ€™s its
+The result is that car is put on the future event list (for time now) and when it's its
 turn, the component becomes current.
 
-It is also possible to set a time at which the component (car) becomes active, like `car=Car(at=10)`.
+It is also possible to set a time at which the component (car) becomes active, like `car = Car(at=10)`. This requires an additional constructor argument to be passed on to `Component` as in `class Car(at:Number): Component(delay=at)`.
 
 And instead of starting at process, the component may be initialized to start at another (generator) method,
-like ``car=Car(process='wash')``.
+like `car=Car(process=Car::wash)`.
 
 And, finally, if there is a process method, you can disable the automatic activation (i.e.
-make it a data component) , by specifying ``process=''``.
+make it a data component) , by specifying `process=null`.
 
 If there is no process method, and process= is not given, the component will be a data component.
 
@@ -130,7 +132,7 @@ The scheme below shows how components can go from state to state.
 1. [5] with `keepWait=false` (default)
 1. [6] with `keepWait=true`. This allows to set a new timeout
 1. [7] state at time of interrupt
-1. [8] increases the interrupt_level
+1. [8] increases the ``interrupt_level``
 
 
 ### activate
@@ -139,14 +141,14 @@ Activate is the way to turn a data component into a live component. If you do no
 the (usually generator) function process is assumed. So you can say ::
 
 ```kotlin
-    car0 = Car(process='')  # data component
-    car0.activate()  # activate @ process if exists, otherwise error
-    car1 = Car(process='')  # data component
-    car1.activate(process='wash')  # activate @ wash
+val car0 = Car(process=null)  // data component
+val car0.activate()  // activate @ process if exists, otherwise error
+
+val car1 = Car(process=null)  // data component
+val car1.activate(process=null) //  activate @ wash
 ```
 
-
-* If the component to be activated is current, always use yield self.activate. The effect is that the
+* If the component to be activated is current, always use yield activate. The effect is that the
   component becomes scheduled, thus this is essentially equivalent to the preferred hold method.
 * If the component to be activated is passive, the component will be activated at the specified time.
 * If the component to be activated is scheduled, the component will get a new scheduled time.
@@ -166,7 +168,7 @@ Hold is the way to make a, usually current, component scheduled.
 
 
 * If the component to be held is current, the component becomes scheduled for the specified time. Always
-  use yield self.hold() is this case.
+  use yield hold() is this case.
 * If the component to be held is passive, the component becomes scheduled for the specified time.
 * If the component to be held is scheduled, the component will be rescheduled for the specified time, thus
   essentially the same as activate.
@@ -184,7 +186,7 @@ Passivate is the way to make a, usually current, component passive. This is esse
 same as scheduling for time=inf.
 
 * If the component to be passivated is current, the component becomes passive. Always
-  use yield self.passivate() is this case.
+  use yield passivate() is this case.
 * If the component to be passivated is passive, the component remains passive.
 * If the component to be passivated is scheduled, the component becomes passive.
 * If the component to be held is standby, the component becomes passive.
@@ -199,7 +201,7 @@ same as scheduling for time=inf.
 
 Cancel has the effect that the component becomes a data component.
 
-* If the component to be cancelled is current, always use yield self.cancel().
+* If the component to be cancelled is current, always use yield cancel().
 * If the component to be cancelled is passive, scheduled, interrupted  or standby, the component
   becomes a data component.
 * If the component to be cancelled is requesting, the request will be terminated, the attribute failed 
@@ -211,7 +213,7 @@ Cancel has the effect that the component becomes a data component.
 
 Standby has the effect that the component will be triggered on the next simulation event.
 
-* If the component is current, use always yield self.standby()
+* If the component is current, use always yield standby()
 * Although theoretically possible, it is not recommended to use standby for non current components.
 
 ### request
@@ -227,7 +229,7 @@ The code should then check whether the request had failed. That can be checked w
 
 If the component is canceled, activated, passivated, interrupted or held the failed flag will be set as well.
 
-* If the component is current, always use yield self.request()
+* If the component is current, always use yield request()
 * Although theoretically possible it is not recommended to use request for non current components.
 
 ### wait
@@ -241,7 +243,7 @@ The code should then check whether the wait had failed. That can be checked with
 
 If the component is canceled, activated, passivated, interrupted or held the failed flag will be set as well.
 
-* If the component is current, use always yield self.wait()
+* If the component is current, use always yield wait()
 * Although theoretically possible it is not recommended to use wait for non current components.
 
 ### interrupt
@@ -263,15 +265,15 @@ We start with a not so elegant solution: ::
 ```kotlin
     class X(sim.Component):
         def process(self):
-            yield self.hold(60 * 2)
-            yield self.hold(60 * 5)
+            yield hold(60 * 2)
+            yield hold(60 * 5)
 ```
 
 Now we just addd a method hold_minutes: ::
 
 ```kotlin
         def hold_minutes(self, minutes):
-            yield self.hold(60 * minutes)
+            yield hold(60 * minutes)
 ```
 
 Direct calling hold_minutes is not possible. Instead we have to say: ::
@@ -279,11 +281,11 @@ Direct calling hold_minutes is not possible. Instead we have to say: ::
 ```kotlin
     class X(sim.Component):
        def hold_minutes(self, minutes):
-            yield self.hold(60 * minutes)
+            yield hold(60 * minutes)
  
        def process(self):
-            yield from self.hold_minutes(2)
-            yield from self.hold_minutes(5)
+            yield from hold_minutes(2)
+            yield from hold_minutes(5)
 ```
 
 All process interaction statements including passivate, request and wait can be used that way!
