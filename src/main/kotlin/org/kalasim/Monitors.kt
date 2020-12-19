@@ -9,7 +9,9 @@ import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.moment.Variance
 import org.json.JSONObject
 import org.kalasim.misc.*
+import org.koin.core.Koin
 import org.koin.core.component.KoinComponent
+import org.koin.core.context.GlobalContext
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 import kotlin.math.sqrt
@@ -18,9 +20,15 @@ import kotlin.math.sqrt
 // See https://commons.apache.org/proper/commons-math/userguide/stat.html
 
 
-abstract class Monitor<T>(name: String? = null) : KoinComponent {
+abstract class Monitor<T>(
+    name: String? = null,
+    private val simKoin: Koin = GlobalContext.get()
+) : KoinComponent {
 
     val env by lazy { getKoin().get<Environment>() }
+
+
+    override fun getKoin(): Koin = simKoin
 
     /** Disable or enable data collection in a monitor. */
     //TODO implement this function
@@ -53,7 +61,10 @@ interface LevelMonitor<T> {
  *
  * @sample org.kalasim.misc.DokkaExamplesKt.freqLevelDemo
  */
-open class FrequencyMonitor<T>(name: String? = null) : Monitor<T>(name) {
+open class FrequencyMonitor<T>(
+    name: String? = null,
+    koin: Koin = GlobalContext.get()
+) : Monitor<T>(name, koin) {
     val frequencies = mutableMapOf<T, Int>()
 
     open fun addValue(value: T) {
@@ -89,7 +100,11 @@ open class FrequencyMonitor<T>(name: String? = null) : Monitor<T>(name) {
  *
  * @sample org.kalasim.examples.DokkaExamplesKt.freqLevelDemo
  */
-class FrequencyLevelMonitor<T>(initialValue: T, name: String? = null) : FrequencyMonitor<T>(name), LevelMonitor<T> {
+class FrequencyLevelMonitor<T>(
+    initialValue: T,
+    name: String? = null,
+    koin: Koin = GlobalContext.get()
+) : FrequencyMonitor<T>(name, koin), LevelMonitor<T> {
 
     private val timestamps = listOf<Double>().toMutableList()
     private val values = listOf<T>().toMutableList()
@@ -149,7 +164,7 @@ class FrequencyLevelMonitor<T>(initialValue: T, name: String? = null) : Frequenc
     }
 }
 
-open class NumericStatisticMonitor(name: String? = null) : Monitor<Number>(name) {
+open class NumericStatisticMonitor(name: String? = null, koin : Koin = GlobalContext.get()) : Monitor<Number>(name, koin) {
     private val sumStats = DescriptiveStatistics()
 
     internal val values: DoubleArray
@@ -227,7 +242,7 @@ class NumericStatisticMonitorStats(internal val ss: StatisticalSummary) : Statis
  *
  * @param initialValue initial value for a level monitor. It is important to set the value correctly. Default: 0
  */
-class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : NumericStatisticMonitor(name),
+class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin : Koin = GlobalContext.get()) : NumericStatisticMonitor(name, koin),
     LevelMonitor<Number> {
 
     private val timestamps = listOf<Double>().toMutableList()
@@ -309,14 +324,14 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0) : Nume
 }
 
 
-class LevelMonitoredInt(initialValue: Int = 0, name: String? = null) {
+class LevelMonitoredInt(initialValue: Int = 0, name: String? = null, koin : Koin = GlobalContext.get()) {
     var value: Int = initialValue
         set(value) {
             field = value
             monitor.addValue(value)
         }
 
-    val monitor by lazy { NumericLevelMonitor(name) }
+    val monitor by lazy { NumericLevelMonitor(name, koin = koin) }
 
     override fun toString(): String = value.toString()
 }

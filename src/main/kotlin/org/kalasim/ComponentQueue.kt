@@ -8,7 +8,8 @@ import org.json.JSONObject
 import org.kalasim.misc.JSON_INDENT
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.printThis
-import org.koin.core.component.KoinComponent
+import org.koin.core.Koin
+import org.koin.core.context.GlobalContext
 import java.util.*
 
 data class CQElement<C : Component>(val component: C, val enterTime: Double, val priority: Int? = null)
@@ -18,15 +19,16 @@ data class CQElement<C : Component>(val component: C, val enterTime: Double, val
 class ComponentQueue<C : Component>(
     name: String? = null,
 //    val q: Queue<CQElement<T>> = LinkedList()
-    val q: Queue<CQElement<C>> = PriorityQueue { o1, o2 -> compareValuesBy(o1, o2, { it.priority }) }
-) : KoinComponent, SimulationEntity(name) {
+    val q: Queue<CQElement<C>> = PriorityQueue { o1, o2 -> compareValuesBy(o1, o2, { it.priority }) },
+    koin: Koin = GlobalContext.get()
+) : SimulationEntity(name, koin) {
 
     val size: Int
         get() = q.size
 
     //    val ass = AggregateSummaryStatistics()
-    val queueLengthMonitor = NumericLevelMonitor("Length of ${this.name}")
-    val lengthOfStayMonitor = NumericStatisticMonitor("Length of stay in ${this.name}")
+    val queueLengthMonitor = NumericLevelMonitor("Length of ${this.name}", koin= koin)
+    val lengthOfStayMonitor = NumericStatisticMonitor("Length of stay in ${this.name}", koin= koin )
 
     fun add(component: C, priority: Int? = null): Boolean {
         printTrace(component, "entering $name")

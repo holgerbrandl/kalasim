@@ -1,6 +1,8 @@
 package org.kalasim
 
 import org.kalasim.misc.Jsonable
+import org.koin.core.Koin
+import org.koin.core.context.GlobalContext
 
 /**
  * States together with the Component.wait() method provide a powerful way of process interaction.
@@ -10,7 +12,11 @@ A state will have a certain value at a given time. In its simplest form a compon
 Definition is simple, like dooropen=sim.State('dooropen'). The default initial value is False, meaning the door is closed.
  * initial value of the state
  */
-open class State<T>(initialValue: T, name: String? = null) : SimulationEntity(name) {
+open class State<T>(
+    initialValue: T,
+    name: String? = null,
+    koin : Koin = GlobalContext.get()
+) : SimulationEntity(name,koin) {
 
     var value: T = initialValue
         set(value) {
@@ -27,9 +33,9 @@ open class State<T>(initialValue: T, name: String? = null) : SimulationEntity(na
         }
 
 
-    private val valueMonitor = FrequencyLevelMonitor<T>(initialValue = value)
+    private val valueMonitor = FrequencyLevelMonitor<T>(initialValue = value, koin= koin)
 
-    internal val waiters = ComponentQueue<Component>("waiters of ${this.name}")
+    internal val waiters = ComponentQueue<Component>("waiters of ${this.name}", koin= koin)
 //    val waiters = PriorityQueue<Component>()
 
     override fun toString(): String = super.toString() + "[${value}]"

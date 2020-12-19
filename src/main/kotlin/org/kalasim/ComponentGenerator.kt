@@ -2,6 +2,8 @@ package org.kalasim
 
 import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.misc.Jsonable
+import org.koin.core.Koin
+import org.koin.core.context.GlobalContext
 
 /**
  * A component generator can be used to genetate components
@@ -23,8 +25,9 @@ class ComponentGenerator<T : Component>(
     name: String? = null,
     priority: Int = 0,
     @Suppress("UNUSED_PARAMETER") urgent: Boolean = false,
+    koin : Koin = GlobalContext.get(),
     val builder: Environment.() -> T
-) : Component(name, priority = priority, process = ComponentGenerator<T>::doIat) {
+) : Component(name, priority = priority, process = ComponentGenerator<T>::doIat, koin=koin) {
 
 
     init {

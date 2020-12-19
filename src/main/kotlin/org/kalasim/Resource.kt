@@ -2,7 +2,9 @@ package org.kalasim;
 
 import com.systema.analytics.es.misc.json
 import org.kalasim.misc.Jsonable
+import org.koin.core.Koin
 import org.koin.core.component.KoinApiExtension
+import org.koin.core.context.GlobalContext
 
 /**
  * @param preemptive If a component requests from a preemptive resource, it may bump component(s) that are claiming from
@@ -13,15 +15,16 @@ open class Resource(
     name: String? = null,
     capacity: Number = 1,
     val preemptive: Boolean = false,
-    val anonymous: Boolean = false
-) : SimulationEntity(name = name) {
+    val anonymous: Boolean = false,
+    koin : Koin = GlobalContext.get()
+) : SimulationEntity(name = name, simKoin=koin) {
 
 
     var minq: Double = Double.MAX_VALUE
 
     // should we this make readonly from outside?
-    val requesters = ComponentQueue<Component>("requesters of ${this.name}")
-    val claimers = ComponentQueue<Component>("claimers of ${this.name}")
+    val requesters = ComponentQueue<Component>("requesters of ${this.name}", koin= koin)
+    val claimers = ComponentQueue<Component>("claimers of ${this.name}", koin= koin)
 
     var capacity = capacity.toDouble()
         set(value) {
@@ -46,11 +49,11 @@ open class Resource(
 
 
     // todo TBD should we initialize these monitoring by tallying the intial state?
-    val capacityMonitor = NumericLevelMonitor("Capacity of ${super.name}", initialValue = capacity)
-    val claimedQuantityMonitor = NumericLevelMonitor("Claimed quantity of ${this.name}")
+    val capacityMonitor = NumericLevelMonitor("Capacity of ${super.name}", initialValue = capacity, koin= koin)
+    val claimedQuantityMonitor = NumericLevelMonitor("Claimed quantity of ${this.name}", koin= koin)
     val availableQuantityMonitor =
-        NumericLevelMonitor("Available quantity of ${this.name}", initialValue = availableQuantity)
-    val occupancyMonitor = NumericLevelMonitor("Occupancy of ${this.name}")
+        NumericLevelMonitor("Available quantity of ${this.name}", initialValue = availableQuantity, koin= koin)
+    val occupancyMonitor = NumericLevelMonitor("Occupancy of ${this.name}", koin= koin)
 
 
     init {

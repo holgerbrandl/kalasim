@@ -5,7 +5,9 @@ import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.ComponentState.*
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
+import org.koin.core.Koin
 import org.koin.core.component.KoinComponent
+import org.koin.core.context.GlobalContext
 import java.util.*
 import kotlin.reflect.KFunction1
 
@@ -32,8 +34,11 @@ open class Component(
     name: String? = null,
     process: FunPointer? = Component::process,
     val priority: Int = 0,
-    delay: Int = 0
-) : KoinComponent, SimulationEntity(name) {
+    delay: Number = 0,
+    koin : Koin = GlobalContext.get()
+) :
+//    KoinComponent,
+    SimulationEntity(name, koin) {
 
     private var oneOfRequest: Boolean = false
 
@@ -60,7 +65,7 @@ open class Component(
             statusMonitor.addValue(value)
         }
 
-    val statusMonitor = FrequencyLevelMonitor<ComponentState>(status, "status of ${name}")
+    val statusMonitor = FrequencyLevelMonitor<ComponentState>(status, "status of ${name}", koin)
 
 
     init {
@@ -73,7 +78,7 @@ open class Component(
         this.simProcess = ingestFunPointer(process)
 
         if (process != null) {
-            scheduledTime = env.now + delay
+            scheduledTime = env.now + delay.toDouble()
 
             reschedule(scheduledTime, priority, false, "activate", SCHEDULED)
         }

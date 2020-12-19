@@ -2,12 +2,17 @@ package org.kalasim
 
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.printThis
+import org.koin.core.Koin
 import org.koin.core.component.KoinComponent
+import org.koin.core.context.GlobalContext
 
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-abstract class SimulationEntity(name: String?) : KoinComponent {
-    val env by lazy { getKoin().get<Environment>() }
+abstract class SimulationEntity(name: String?, val simKoin : Koin = GlobalContext.get())
+    :    KoinComponent
+{
+//    val env by lazy { getKoin().get<Environment>() }
+    val env = getKoin().get<Environment>()
 
 //    var name: String
 //        private set
@@ -29,6 +34,10 @@ abstract class SimulationEntity(name: String?) : KoinComponent {
     fun printInfo() = info.printThis()
 
     override fun toString(): String = "${javaClass.simpleName}($name)"
+
+
+    //https://medium.com/koin-developers/ready-for-koin-2-0-2722ab59cac3
+    final override fun getKoin(): Koin = simKoin
 
 
     fun printTrace(info: String) = env.apply { printTrace(now, curComponent, null, null, info) }
