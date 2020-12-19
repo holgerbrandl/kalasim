@@ -10,5 +10,16 @@ class ComponentTests {
     fun `it should create components outside of an environment`() {
         Component("foo").info.printThis()
     }
+
+    @Test
+    fun `it should track status changes`() = createTestSimulation {
+        val component = Component("foo")
+
+
+        run(2)
+
+
+
+    }
 }
 

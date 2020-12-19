@@ -55,4 +55,5 @@ val env: Environment = configureEnvironment(true) {
     // assess the state of the simulation entities
     car2.statusMonitor.printHistogram()
     get<GasStation>().printStatistics()
+
 }

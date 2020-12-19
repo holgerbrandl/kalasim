@@ -1,3 +1,5 @@
+@file:Suppress("EXPERIMENTAL_OVERRIDE")
+
 package org.kalasim
 
 import org.kalasim.misc.Jsonable

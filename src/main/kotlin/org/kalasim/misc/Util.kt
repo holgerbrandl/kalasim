@@ -38,7 +38,7 @@ internal fun DescriptiveStatistics.buildHistogram(
 
 
 internal fun ImplementMe() {
-    TODO("not yet implementd. Please file a ticket under https://github.com/holgerbrandl/kalasim/issues")
+    TODO("Not yet implemented. Please file a ticket under https://github.com/holgerbrandl/kalasim/issues")
 }
 
 

@@ -49,6 +49,7 @@ Koin does not allow injecting simple types. To inject simple variables, consider
 {!SimpleInject.kts!}
 ```
 
+For details about how to use lazy injection with `inject<T>()` and instance retrieval with `get<T>()` see [koin reference](https://doc.insert-koin.io/#/koin-core/injection-parameters).
 
 ## Randomness & Distributions
 

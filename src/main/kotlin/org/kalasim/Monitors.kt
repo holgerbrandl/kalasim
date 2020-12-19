@@ -1,3 +1,5 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE", "EXPERIMENTAL_OVERRIDE")
+
 package org.kalasim
 
 import com.systema.analytics.es.misc.json
@@ -39,14 +41,18 @@ abstract class Monitor<T>(
 
     init {
         this.name = nameOrDefault(name, env.nameCache)
-
-//        printTrace("create ${this.name}")
     }
-
-    abstract fun reset()
 
 }
 
+
+interface StatisticMonitor<T> {
+
+    /** Resets the monitor. */
+    fun reset()
+
+    fun addValue(value: T)
+}
 
 interface LevelMonitor<T> {
 
@@ -54,6 +60,12 @@ interface LevelMonitor<T> {
      * When Monitor.get() is called with a time parameter or a direct call with a time parameter, the value at that time will be returned.
      * */
     operator fun get(time: Double): T?
+
+
+    /** Resets the monitor to a new initial at the current simulation clock. */
+    fun reset(initial: T)
+
+    fun addValue(value: T)
 }
 
 /**
@@ -64,10 +76,10 @@ interface LevelMonitor<T> {
 open class FrequencyMonitor<T>(
     name: String? = null,
     koin: Koin = GlobalContext.get()
-) : Monitor<T>(name, koin) {
+) : Monitor<T>(name, koin), StatisticMonitor<T> {
     val frequencies = mutableMapOf<T, Int>()
 
-    open fun addValue(value: T) {
+    override fun addValue(value: T) {
         frequencies.merge(value, 1, Int::plus)
     }
 
@@ -92,7 +104,6 @@ open class FrequencyMonitor<T>(
     }
 
     open fun getPct(value: T): Double = frequencies[value]!!.toDouble() / total
-
 }
 
 /**
@@ -104,13 +115,20 @@ class FrequencyLevelMonitor<T>(
     initialValue: T,
     name: String? = null,
     koin: Koin = GlobalContext.get()
-) : FrequencyMonitor<T>(name, koin), LevelMonitor<T> {
+) : Monitor<T>(name, koin), LevelMonitor<T> {
 
     private val timestamps = listOf<Double>().toMutableList()
     private val values = listOf<T>().toMutableList()
 
     init {
-        addValue(initialValue)
+        reset(initialValue)
+    }
+
+    override fun reset(initial: T) {
+        values.clear()
+        timestamps.clear()
+
+        addValue(initial)
     }
 
     override fun addValue(value: T) {
@@ -118,7 +136,7 @@ class FrequencyLevelMonitor<T>(
         values.add(value)
     }
 
-    override fun getPct(value: T): Double {
+    fun getPct(value: T): Double {
         val durations = xDuration()
 
         val freqHist = durations
@@ -147,10 +165,10 @@ class FrequencyLevelMonitor<T>(
         return timeIndex?.let { values[it] }
     }
 
-    override fun printHistogram(values: List<T>?, sortByWeight: Boolean) {
+    fun printHistogram(values: List<T>? = null, sortByWeight: Boolean = false) {
         println("Summary of: '${name}'")
-        println("# Records: ${total}")
-        println("# Levels: ${frequencies.keys.size}")
+        println("Duration: ${env.now - timestamps[0]}")
+        println("# Levels: ${this.values.distinct().size}")
         println()
 
         val hist: List<Pair<T, Long>> =
@@ -160,17 +178,20 @@ class FrequencyLevelMonitor<T>(
 //        val ed = EnumeratedDistribution(hist.asCM())
 //        repeat(1000){ ed.sample()}.c
 
-        hist.printHistogram(sortByWeight = sortByWeight)
+        hist.printHistogram(sortByWeight = sortByWeight, values = values)
     }
 }
 
-open class NumericStatisticMonitor(name: String? = null, koin : Koin = GlobalContext.get()) : Monitor<Number>(name, koin) {
+private val NUM_HIST_BINS = 10
+
+class NumericStatisticMonitor(name: String? = null, koin: Koin = GlobalContext.get()) :
+    Monitor<Number>(name, koin) {
     private val sumStats = DescriptiveStatistics()
 
     internal val values: DoubleArray
         get() = sumStats.values
 
-    open fun addValue(value: Number) {
+    fun addValue(value: Number) {
         sumStats.addValue(value.toDouble())
     }
 
@@ -180,7 +201,7 @@ open class NumericStatisticMonitor(name: String? = null, koin : Koin = GlobalCon
         addValue((roundToInt + 1).toDouble())
     }
 
-    override fun reset() = sumStats.clear()
+    fun reset() = sumStats.clear()
 
 
 //    open fun mean(): Double? = sumStats.mean
@@ -188,7 +209,7 @@ open class NumericStatisticMonitor(name: String? = null, koin : Koin = GlobalCon
 
 //    fun statistics(): DescriptiveStatistics = DescriptiveStatistics(sumStats.values)
 
-    open fun printHistogram(sortByWeight: Boolean = false, binCount: Int = 10, valueBins: Boolean = true) {
+    fun printHistogram(sortByWeight: Boolean = false, binCount: Int = NUM_HIST_BINS, valueBins: Boolean = false) {
         //    val histJson = JSONArray(GSON.toJson(histogramScaled))
 
         //    json {
@@ -242,10 +263,12 @@ class NumericStatisticMonitorStats(internal val ss: StatisticalSummary) : Statis
  *
  * @param initialValue initial value for a level monitor. It is important to set the value correctly. Default: 0
  */
-class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin : Koin = GlobalContext.get()) : NumericStatisticMonitor(name, koin),
+class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: Koin = GlobalContext.get()) :
+    SimulationEntity(name, koin),
     LevelMonitor<Number> {
 
     private val timestamps = listOf<Double>().toMutableList()
+    private val values = listOf<Double>().toMutableList()
 
     init {
         addValue(initialValue)
@@ -253,7 +276,14 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin :
 
     override fun addValue(value: Number) {
         timestamps.add(env.now)
-        super.addValue(value)
+        values.add(value.toDouble())
+    }
+
+
+    /** Increment the current value by 1 and add it as value. Autostart with 0 if there is no prior value. */
+    fun inc() {
+        val roundToInt = (values.lastOrNull() ?: 0.0).roundToInt()
+        addValue((roundToInt + 1).toDouble())
     }
 
     override fun get(time: Double): Number = timestamps.zip(values.toList()).first { it.first > time }.second
@@ -279,7 +309,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin :
 
     fun statistics(excludeZeros: Boolean = false) = NumericLevelMonitorStats(this, excludeZeros)
 
-    override fun printHistogram(sortByWeight: Boolean, binCount: Int, valueBins: Boolean) {
+    fun printHistogram(sortByWeight: Boolean=false, binCount: Int= NUM_HIST_BINS, valueBins: Boolean=false) {
         println("Summary of: '${name}'")
         statistics().toJson().printThis()
 
@@ -321,10 +351,17 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin :
             stats.buildHistogram(binCount).printHistogram(sortByWeight = sortByWeight)
         }
     }
+
+    override val info: Jsonable
+        get() = TODO("Not yet implemented")
+
+    override fun reset(initial: Number) {
+        TODO("Not yet implemented")
+    }
 }
 
 
-class LevelMonitoredInt(initialValue: Int = 0, name: String? = null, koin : Koin = GlobalContext.get()) {
+class LevelMonitoredInt(initialValue: Int = 0, name: String? = null, koin: Koin = GlobalContext.get()) {
     var value: Int = initialValue
         set(value) {
             field = value

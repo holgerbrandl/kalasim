@@ -76,19 +76,19 @@ class Car: Component(){
 }
 ```
 
-If we then say `car = Car()`, a component is created and it activated from process. This
+If we then say `val car = Car()`, a component is created and it activated from process. This
 process is nearly always, but not necessarily a *generator method*  (i.e. it has at least one yield (or yield from) statement.
 
 The result is that car is put on the future event list (for time now) and when it's its
 turn, the component becomes current.
 
-It is also possible to set a time at which the component (car) becomes active, like `car = Car(at=10)`. This requires an additional constructor argument to be passed on to `Component` as in `class Car(at:Number): Component(delay=at)`.
+It is also possible to set a time at which the component (car) becomes active, like `val car = Car(at=10)`. This requires an additional constructor argument to be passed on to `Component` as in `class Car(at:Number): Component(delay=at)`.
 
 And instead of starting at process, the component may be initialized to start at another (generator) method,
 like `car=Car(process=Car::wash)`.
 
 And, finally, if there is a process method, you can disable the automatic activation (i.e.
-make it a data component) , by specifying `process=null`.
+make it a data component), by specifying `process = null`.
 
 If there is no process method, and process= is not given, the component will be a data component.
 
@@ -105,6 +105,16 @@ A component may be in one of the following states modelled by `org.kalasim.Compo
 * `WAITING`
 * `STANDBY`
 * `INTERRUPTED`
+
+
+A component's status is automatically tracked in the status level monitor `component.statusMonitor`. Thus, it possible
+to check how long a component has been in passive state with
+
+```kotlin
+passive_duration = component.status.value("passive")
+```
+
+And it is possible to print a histogram with all the statuses a component has been in with ::
 
 The scheme below shows how components can go from state to state.
 
@@ -142,10 +152,10 @@ the (usually generator) function process is assumed. So you can say ::
 
 ```kotlin
 val car0 = Car(process=null)  // data component
-val car0.activate()  // activate @ process if exists, otherwise error
+car0.activate()  // activate @ process if exists, otherwise error
 
 val car1 = Car(process=null)  // data component
-val car1.activate(process=null) //  activate @ wash
+car1.activate(process=null) //  activate @ wash
 ```
 
 * If the component to be activated is current, always use yield activate. The effect is that the
@@ -168,7 +178,7 @@ Hold is the way to make a, usually current, component scheduled.
 
 
 * If the component to be held is current, the component becomes scheduled for the specified time. Always
-  use yield hold() is this case.
+  use `yield(hold())` is this case.
 * If the component to be held is passive, the component becomes scheduled for the specified time.
 * If the component to be held is scheduled, the component will be rescheduled for the specified time, thus
   essentially the same as activate.
@@ -186,7 +196,7 @@ Passivate is the way to make a, usually current, component passive. This is esse
 same as scheduling for time=inf.
 
 * If the component to be passivated is current, the component becomes passive. Always
-  use yield passivate() is this case.
+  use `yield(passivate())` is this case.
 * If the component to be passivated is passive, the component remains passive.
 * If the component to be passivated is scheduled, the component becomes passive.
 * If the component to be held is standby, the component becomes passive.
@@ -201,11 +211,11 @@ same as scheduling for time=inf.
 
 Cancel has the effect that the component becomes a data component.
 
-* If the component to be cancelled is current, always use yield cancel().
+* If the component to be cancelled is current, always use `yield(cancel())`.
 * If the component to be cancelled is passive, scheduled, interrupted  or standby, the component
   becomes a data component.
 * If the component to be cancelled is requesting, the request will be terminated, the attribute failed 
-  set and the component becomes a data component.
+  set, and the component becomes a data component.
 * If the component to be cancelled is waiting, the wait will be terminated, the attribute failed 
   set and the component becomes a data component.
 
@@ -213,7 +223,7 @@ Cancel has the effect that the component becomes a data component.
 
 Standby has the effect that the component will be triggered on the next simulation event.
 
-* If the component is current, use always yield standby()
+* If the component is current, use always `yield(standby())`
 * Although theoretically possible, it is not recommended to use standby for non current components.
 
 ### request
@@ -229,7 +239,7 @@ The code should then check whether the request had failed. That can be checked w
 
 If the component is canceled, activated, passivated, interrupted or held the failed flag will be set as well.
 
-* If the component is current, always use yield request()
+* If the component is current, always use `yield(request())`
 * Although theoretically possible it is not recommended to use request for non current components.
 
 ### wait
@@ -243,7 +253,7 @@ The code should then check whether the wait had failed. That can be checked with
 
 If the component is canceled, activated, passivated, interrupted or held the failed flag will be set as well.
 
-* If the component is current, use always yield wait()
+* If the component is current, use always `yield(wait())`
 * Although theoretically possible it is not recommended to use wait for non current components.
 
 ### interrupt
@@ -263,10 +273,10 @@ So we need a method to wait 60 times the given parameter
 We start with a not so elegant solution: ::
 
 ```kotlin
-    class X(sim.Component):
-        def process(self):
-            yield hold(60 * 2)
-            yield hold(60 * 5)
+class X(sim.Component):
+    def process(self):
+        yield hold(60 * 2)
+        yield hold(60 * 5)
 ```
 
 Now we just addd a method hold_minutes: ::
@@ -290,13 +300,13 @@ Direct calling hold_minutes is not possible. Instead we have to say: ::
 
 All process interaction statements including passivate, request and wait can be used that way!
 
-So remember if the method contains a yield statement (technically speaking that's a generator method), it should be called with ``yield from``.
+So remember if the method contains a `yield` statement (technically speaking that's a generator method), it should be called with ``yield from``.
 
 ##  Using priority and urgent to control order of execution
 
 All process interaction methods supports a priority and urgent parameter:
 
-With priority it is possible to sort a component before or after other components, scheduled for the same time.
+With priority, it is possible to sort a component before or after other components, scheduled for the same time.
 Note that the urgent parameters only applies to components scheduled with the same time and same priority.
 
 The priority is 0 by default.
@@ -305,26 +315,6 @@ This is particularly useful for race conditions. It is possible to change the pr
 by cancelling it prior to activating it with another priority.
 
 The priority can be accessed with the new Component.scheduled_priority() method.
-
-## Status of a component
-
-The status of a component can be any of:
-
-* sim.data = "data"
-* sim.current = "current"
-* sim.standby = "standby"
-* sim.passive = "passive"
-* sim.interrupted = "interrupted"
-* sim.scheduled = "scheduled"
-* sim.requesting = "requesting"
-* sim.waiting = "waiting"
-
-The status is automatically tracked in the status level monitor. Thus it possible
-to check how long a component has been in passive state with ::
-
-    passive_duration = component.status.value_duration("passive")
-  
-And it is possible to print a histogram with all the statuses a component has been in with ::
 
 ## Execution Order
 
