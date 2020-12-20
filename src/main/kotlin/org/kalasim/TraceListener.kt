@@ -27,7 +27,10 @@ data class TraceElement(
 
 private fun List<String?>.renderTraceLine(): String = map { (it ?: "") }
     .zip(TRACE_COL_WIDTHS)
-    .map { (str, padLength) -> str.padEnd(padLength) }
+    .map { (str, padLength) ->
+        val padded = str.padEnd(padLength)
+        if(str.length >= padLength){ padded.dropLast(5) + "... "} else padded
+    }
     .joinToString("")
 
 
