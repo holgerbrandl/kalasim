@@ -10,6 +10,8 @@ on:
 
 name: Create Release
 
+# https://github.community/t/accessing-commit-message-in-pull-request-event/17158/8
+
 jobs:
   build:
     name: Create Release
@@ -18,10 +20,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: get commit message
-          run: |
-            echo ::set-env name=commitmsg::$(git log --format=%B -n 1 ${{ github.event.after }})
+        run: |
+          echo ::set-env name=commitmsg::$(git log --format=%B -n 1 ${{ github.event.after }})
       - name: show commit message
-          run: echo $commitmsg
+        run: echo $commitmsg
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1

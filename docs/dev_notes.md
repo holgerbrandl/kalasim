@@ -25,3 +25,15 @@ https://medium.com/mobile-app-development-publication/kotlin-koin-scope-illustra
 ## salabim
 
 doc sources --> https://www.salabim.org/manual/ view page sources
+
+
+## gihub actions
+
+revert remote tags that prevent pushing because of
+> error: dst refspec refs/heads/master matches more than one
+
+https://github.com/actions/create-release/issues/13
+
+```bash
+git push origin :refs/tags/refs/heads/master
+```
