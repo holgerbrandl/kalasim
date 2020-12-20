@@ -656,15 +656,13 @@ open class Component(
     /**
      * Activate component
      *
-     * See https://www.salabim.org/manual/Component.html#activate
+     * For the full contract definition see https://www.kalasim.org/component/#activate
      *
-     * @param at schedule time
-     * @param delay schedule with a delay if omitted, no delay
-     * @param process name of process to be started.
+     * @param at Schedule time
+     * @param delay Schedule with a delay if omitted, no delay is used
+     * @param process Name of process to be started.
      * * if None (default), process will not be changed
-     * * if the component is a data component, the
-     * * generator function process will be used as the default process.
-     * * note that the function *must* be a generator, i.e. contains at least one yield.
+     * * if the component is a data component, the generator function `process` will be used as the default process.
      */
     fun activate(
         at: Number? = null,
@@ -678,20 +676,23 @@ open class Component(
 
     ): Component {
 
-        val p = if (process == null) {
-            if (status == DATA) {
-                require(this.simProcess != null) { "no process for data component" }
-            }
+        var p: ProcessPointer? = null
 
-            this.simProcess
+        if (process == null) {
+            if (status == DATA) {
+                //                require(this.simProcess != null) { "no process for data component" }
+                // note: not applicable, becuase the test would be if Component has a method called process, which it does by design
+
+                p = Component::process
+            }
         } else {
-            ingestFunPointer(process)
+            p = process
         }
 
         var extra = ""
 
         if (p != null) {
-            this.simProcess = p
+            this.simProcess = ingestFunPointer(p)
 
             extra = "process=${p.name}"
         }
