@@ -6,7 +6,6 @@ import org.kalasim.ComponentState.*
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
 import org.koin.core.Koin
-import org.koin.core.component.KoinComponent
 import org.koin.core.context.GlobalContext
 import java.util.*
 import kotlin.reflect.KFunction1
@@ -32,10 +31,10 @@ enum class ComponentState {
  */
 open class Component(
     name: String? = null,
-    process: FunPointer? = Component::process,
+    process: ProcessPointer? = Component::process,
     val priority: Int = 0,
     delay: Number = 0,
-    koin : Koin = GlobalContext.get()
+    koin: Koin = GlobalContext.get()
 ) :
 //    KoinComponent,
     SimulationEntity(name, koin) {
@@ -88,7 +87,7 @@ open class Component(
     }
 
 
-    private fun ingestFunPointer(process: FunPointer?): SimProcess? {
+    private fun ingestFunPointer(process: ProcessPointer?): SimProcess? {
 //        if(process != null ){
 //            print("param type is " + process!!.returnType)
 //            if(process!!.returnType.toString().startsWith("kotlin.sequences.Sequence"))
@@ -102,6 +101,7 @@ open class Component(
                 val sequence = process.call(this)
                 GenProcessInternal(this, sequence, process.name)
             } else {
+                TODO("add test coverage here")
                 SimpleProcessInternal(this, process, process.name)
             }
         } else {
@@ -225,12 +225,10 @@ open class Component(
     fun resume(all: Boolean = false, priority: Int = 0) {
         // not part of original impl
         require(status == INTERRUPTED)
-        require(interruptLevel <0)
+        require(interruptLevel < 0)
 
 
         interruptLevel--
-
-
 
 
     }
@@ -652,7 +650,7 @@ open class Component(
         }
 
         // print trace
-        printTrace(now(), env.curComponent, this, caller + delta, extra)
+        printTrace(now(), env.curComponent, this, caller + " " + delta, extra)
     }
 
     /**
@@ -675,7 +673,9 @@ open class Component(
         urgent: Boolean = false,
         keepRequest: Boolean = false,
         keepWait: Boolean = false,
-        process: FunPointer? = null
+        process: ProcessPointer? = null
+//        process: ProcessPointer? = Component::process
+
     ): Component {
 
         val p = if (process == null) {
@@ -989,8 +989,8 @@ open class ComponentInfo(c: Component) : Jsonable() {
 // Abstract component process to be either generator or simple function
 //
 
-typealias FunPointer = KFunction1<*, Sequence<Component>>
-typealias GenProcess = KFunction1<*, Sequence<Component>>
+typealias ProcessPointer = KFunction1<*, Sequence<Component>>
+//typealias GenProcess = KFunction1<*, Sequence<Component>>
 
 
 interface SimProcess {
@@ -1009,15 +1009,10 @@ class GenProcessInternal(val component: Component, seq: Sequence<Component>, ove
         } catch (e: NoSuchElementException) {
             component.terminate()
         }
-
-        //todo reenable
-//        if(!iterator.hasNext()) {
-//
-//        }
     }
 }
 
-class SimpleProcessInternal(val component: Component, val funPointer: FunPointer, override val name: String) :
+class SimpleProcessInternal(val component: Component, val funPointer: ProcessPointer, override val name: String) :
     SimProcess {
     override fun call() {
         funPointer.call(component)

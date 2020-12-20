@@ -1,9 +1,9 @@
 //CraneProcess.kts
 import org.kalasim.Component
-import org.kalasim.FunPointer
+import org.kalasim.ProcessPointer
 import org.kalasim.createSimulation
 
-class Crane(process: FunPointer? = Component::process) : Component(process=process){
+class Crane(process: ProcessPointer? = Component::process) : Component(process=process){
     fun unload() = sequence<Component>{
         // yield ...
     }
