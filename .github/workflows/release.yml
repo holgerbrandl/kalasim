@@ -10,7 +10,6 @@ on:
 
 name: Create Release
 
-# https://github.community/t/accessing-commit-message-in-pull-request-event/17158/8
 
 jobs:
   build:
@@ -19,19 +18,20 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: get commit message
-        run: |
-          echo ::set-env name=commitmsg::$(git log --format=%B -n 1 ${{ github.event.after }})
-      - name: show commit message
-        run: echo $commitmsg
+        # https://github.community/t/accessing-commit-message-in-pull-request-event/17158/8
+#      - name: get commit message
+#        run: |
+#          echo ::set-env name=commitmsg::$(git log --format=%B -n 1 ${{ github.event.after }})
+#      - name: show commit message
+#        run: echo $commitmsg
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ github.event.head_commit.message }}
+          release_name: ${{ github.event.head_commit.message }}
           body: |
             See [CHANGES.md](https://github.com/holgerbrandl/kalasim/blob/master/CHANGES.md) for new features, bug-fixes and changes.
           draft: false
