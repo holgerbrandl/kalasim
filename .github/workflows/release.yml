@@ -17,6 +17,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: get commit message
+          run: |
+            echo ::set-env name=commitmsg::$(git log --format=%B -n 1 ${{ github.event.after }})
+      - name: show commit message
+          run: echo $commitmsg
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -26,6 +31,6 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           body: |
-            See [CHANGES.md](https://github.com/holgerbrandl/kscript/blob/master/CHANGES.md) for new feautres, fixes and changes.
+            See [CHANGES.md](https://github.com/holgerbrandl/kalasim/blob/master/CHANGES.md) for new features, bug-fixes and changes.
           draft: false
           prerelease: false
