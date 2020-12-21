@@ -2,12 +2,21 @@
 
 [ ![Download](https://api.bintray.com/packages/holgerbrandl/github/kalasim/images/download.svg) ](https://bintray.com/holgerbrandl/github/kalasim/_latestVersion)  [![Build Status](https://travis-ci.org/holgerbrandl/kalasim.svg?branch=master)](https://travis-ci.org/holgerbrandl/kalasim) [![Gitter](https://badges.gitter.im/kalasim.svg)](https://gitter.im/kalasim/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-`kalasim` is a discrete event simulator with type support, dependency injection, modern persistence and logging to enable large-scale, industrial-ready simulations.
+`kalasim` is a discrete event simulator that enables  complex, dynamic process models. It provides a statically typed API, dependency injection, modern persistence, logging and automation capabilities.
 
-`kalsim` is written in [Kotlin](https://kotlinlang.org/), designed on top of [koin](https://github.com/InsertKoinIO/koin) as dependency injection framework, is using [common-math](https://commons.apache.org/proper/commons-math/) for stats and distributions, modern event tracking and persistence, and [plotly.kt](https://github.com/mipt-npm/plotly.kt), [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) as well as [`kravis`](https://github.com/holgerbrandl/kravis) for visualization.
+`kalsim` is written in [Kotlin](https://kotlinlang.org/), designed on top of [koin](https://github.com/InsertKoinIO/koin) as dependency injection framework, is using [common-math](https://commons.apache.org/proper/commons-math/) for stats and distributions, modern event tracking and persistence, and [plotly.kt](https://github.com/mipt-npm/plotly.kt), [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) as well as [kravis](https://github.com/holgerbrandl/kravis) for visualization.
 
 In contrast to many other simulation tools, `kalasim` is neither low-code nor no-code. It is _code-first_ to enable change tracking, scaling, refactoring, CI/CD, unit-tests, and the rest of the gang that makes simulation development fun.
 
+
+## Basic principle
+
+
+* [Components](component.md) (a.k.a.) agents with a generative process description that defined the interplay between simulation entities
+* Well-defined process interaction via various methods such as [hold](component.md#hold), [request](component.md#request), [wait](component.md#wait) or [passivate](component.md#passivate)
+* Future [event trigger queue](basics.md#execution--process-model) as main driver to progress states
+
+Find out more about the [basics](basics.md) of a kalasim simulation.
 
 ## First Example
 

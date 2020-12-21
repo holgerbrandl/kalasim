@@ -15,3 +15,12 @@ The example illustrates how to establish a simple interplay of  [states](state.m
 ```
 
 Here,  we use both lazy injection with `inject<T>()` and instance retrieval with `get<T>()`. For details see [koin reference](https://doc.insert-koin.io/#/koin-core/injection-parameters)
+
+
+## Elevators
+
+Parameters
+
+* Origin/destination distribution of visitors
+* Number of elevators
+* Capacity of each elevator
