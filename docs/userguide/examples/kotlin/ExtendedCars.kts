@@ -40,7 +40,8 @@ val env: Environment = configureEnvironment(true) {
     add { Car(get()) }
 
 }.apply {
-    // ... but since a car is not used as dependency elsewhere we can also create them in here
+    // ... but since a car is not used as dependency elsewhere we
+    //     can also create them in here
     val car2 = Car(get())
     val car3 = Car(get())
 
