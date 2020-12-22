@@ -215,11 +215,15 @@ open class Component(
         printTrace("interrupt (level=$interruptLevel)")
     }
 
-    /** resumes an interrupted component
-     * @param if `true`, the component returns to the original status, regardless of the number of interrupt levels if
+    /** Resumes an interrupted component.
+     *
+     * For the full contract definition see https://www.kalasim.org/component/#resume
+
+
+     * @param all If `true`, the component returns to the original status, regardless of the number of interrupt levels if
      * `false` (default), the interrupt level will be decremented and if the level reaches 0, the component will return
      * to the original status.
-     * @param if a component has the same time on the event list, this component is sorted accoring to
+     * @param priority If a component has the same time on the event list, this component is sorted accoring to
     the priority.
      */
     fun resume(all: Boolean = false, priority: Int = 0) {

@@ -4,7 +4,7 @@ In simulation a clear distinction is made between real time and simulation time.
 
 To support use cases where a simulation may drive a demonstration or system check, the `kalasim` API allows to run a simulation at a defined clock speed.
 
-Clearly, it may happen that a simulation is too complex to run at a defined clock. In such a situation, it will throw a `ClockOverloadException`. TBD continue this!
+Clearly, it may happen that a simulation is too complex to run at a defined clock. In such a situation, it will throw a `ClockOverloadException`. TBD continue this! <https://simpy.readthedocs.io/en/latest/topical_guides/real-time-simulations.html>
 
 ## Operational Control
 

@@ -15,6 +15,7 @@
 
 `salabims`s excellent documentation and wonderful examples made this project possible after all. `kalasim` reimplements all core APIs of `salabim` in a more typesafe API while also providing better test coverage, real-time capabilities and (arguably) more modern built-in support for visualization.
 
+* [SimPy](https://simpy.readthedocs.io/) inspired the development of `salabim`. The latter is more opinionated, provides a more complete ecosystem for simulation, ships with visualization, and a more consistent process interaction model
 * [Salabim, Discrete Event Simulation In Python](https://www.youtube.com/watch?v=I74j2KtGouA) - PyCon 2018 Talk
 * [Python.__init__ Podcast: Salabim](https://www.pythonpodcast.com/salabim-with-ruud-van-der-ham-episode-151/) - Great podcast episode with [Ruud van der Ham](https://www.linkedin.com/in/ruudvanderham/)
 

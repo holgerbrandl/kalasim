@@ -10,6 +10,8 @@ There are two of types resources:
 * standard resources, where each claim is associated with a component (the claimer). It is not necessary that the claimed quantities are integer.
 * anonymous resources, where only the claimed quantity is registered. This is most useful for dealing with levels, lengths, etc.
 
+<!-- todo consider to add a dedicated container type instead of anonymous resources https://simpy.readthedocs.io/en/latest/topical_guides/resources.html#containers-->
+
 Resources are defined like:
 
 ```kotlin
@@ -247,6 +249,8 @@ The model below illustrates the use of get and put. See the [gas station](https:
 
 It is possible to specify that a resource is to be preemptive, by adding `preemptive = true` when the resource is created.
 
+<!--todo learn from https://simpy.readthedocs.io/en/latest/topical_guides/resources.html#preemptiveresource-->
+
 If a component requests from a preemptive resource, it may bump component(s) that are claiming from
 the resource, provided these have a lower priority = higher value). If component is bumped, it releases the resource and is the activated, thus essentially stopping the current
 action (usually hold or passivate).
@@ -254,8 +258,3 @@ action (usually hold or passivate).
 Therefore, a component claiming from a preemptive resource should check
 whether the component is bumped or still claiming at any point where they can be bumped.
 This can be done with the method `Component.isClaiming()` which is `true` if the component is claiming from the resource, or the opposite (Component.isBumped) which is True is the component is not claiming from te resource.
-
-
-## Further reading
-
-* Salabim's documentation about [resources](https://www.salabim.org/manual/Resource.html)

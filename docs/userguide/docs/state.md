@@ -70,28 +70,31 @@ States have a number of monitors:
 
 ## Process interaction with `wait()`
 
-A component can wait for a state to get a certain value. In its most simple form :
+A component can [wait](component.md#wait) for a state to get a certain value. In its most simple form this is done with
 
 ```kotlin
 yield(wait(dooropen, true))
 ```
 
-Once the dooropen state is `true`, the component will continue.
+Once the `dooropen` state is `true`, the component will continue.
 
-As with request() it is possible to set a timeout with fail_at or fail_delay :
+As with [`request`](component.md#request) it is possible to set a timeout with `failAt` or `failDelay` :
 
 ```kotlin
 yield(wait(dooropen, true, failDelay=10.0))
 if(failed) print("impatient ...")
 ```
 
-In the above example we tested for a state to be true.
+In the above example we tested for a state to be `true`.
 
-There are three ways to test for a value:
+There are two ways to test for a value
 
-### Value testing
+* Value testing
+* Predicate testing
 
-It is possible to test for a certain value :
+### Value Testing
+
+It is possible to test for a certain value:
 
 ```kotlin
 yield(wait(light, "green"))
@@ -100,28 +103,33 @@ yield(wait(light, "green"))
 Or more states at once :
     
 ```kotlin
-yield(wait(light turns "green", light turns "yellow"))  // honored as soon is light is green OR yellow
+yield(wait(light turns "green", light turns "yellow"))  
 ```
+where the wait is honored as soon is light is `green` OR `yellow`.
     
 It is also possible to wait for all conditions to be satisfied, by adding `all=true`:
 
 ```kotlin
-yield(wait((light turns "green"), enginerunning turns true, all=true)) // honored as soon as light is green AND engine is running
+yield(wait((light turns "green"), enginerunning turns true, all=true)) 
 ```
+Here, the wait is honored as soon as light is `green` AND engine is `running`.
 
 
 ### Predicate testing
 
 This is a more complicated but also more versatile way of specifying the honor-condition. In that case, a predicate function `(T) -> Boolean` is required to specify the condition.
 
-E.g.:
-        
+#### Example 1
+
 ```kotlin
-yield(wait(StateRequest(State("foo")) { listOf("bar", "test").contains(it) })
+yield(wait(StateRequest(State("foo")) { listOf("bar", "test").contains(it) }))
+```
+The wait is honored if the `Strin` State becomes either `bar` or `test`.
+
+#### Example 2
+
+```kotlin
 yield(wait(StateRequest(State(3.0)) { it*3 < 42 }))
 ```
 
-
-## Further Reading
-
-* <https://www.salabim.org/manual/State.html>
+In this last example the wait is honored as soon as the value fulfils `it*3 < 42`.

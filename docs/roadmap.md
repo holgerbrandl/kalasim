@@ -1,13 +1,34 @@
 # Development Roadmap
 
 
-## Pre-release
+## Next steps
 
-**{todo}** use kontext isolation if possibel https://github.com/InsertKoinIO/koin/blob/master/koin-projects/docs/reference/koin-core/start-koin.md#koin-context-isolation
+continue here
+https://simpy.readthedocs.io/en/latest/topical_guides/monitoring.html
+
+https://www.pythonpodcast.com/salabim-with-ruud-van-der-ham-episode-151/
+* 15:08 https://www.scribd.com/listen/podcast/419047861
+
+simmer https://github.com/r-simmer/simmer/
+* in particular https://r-simmer.org/articles/simmer-08-philosophers.html
+
+https://cran.r-project.org/web/packages/DES/README.html
+
+## v0.4
+
+**{todo}** implement support for real-time simulations
+
 
 **{todo}** implement `enabled` disabled for monitors
 
+
+**{todo}** ensure that just yieldable methods are used in yield by checking stacktrace
+
 **{todo}**  make `scheduledTime` nullable: replace scheduledTime = Double.MAX_VALUE with `null` which is semantically more meaningful here
+
+
+## Pre-release
+
 
 **{todo}** update logs example in docs intro
 
@@ -15,16 +36,26 @@
 
 **{todo}** ingest
 
+**{todo}** port interesting examples from <https://simjuliajl.readthedocs.io/en/stable/examples/index.html>
 
-## 0.3
 
-**{todo}** ensure that just yieldable methods are used in yield by checking stacktrace
+**{todo}** port interesing simmer examples
+* https://r-simmer.org/articles/simmer-08-philosophers.html
+
+
+
+**{todo}** port interesting SimPy examples from https://simpy.readthedocs.io/en/latest/examples/index.html
+
+## Later
+
 
 Slicing of monitors https://www.salabim.org/manual/Monitor.html#slicing-of-monitors
 
-revise data prep and rendering of histogram get more similar to kalasim https://www.salabim.org/manual/Monitor.html
+---
 
-## Later
+consider modeling `Store` Using Stores you can model the production and consumption of concrete objects as in <https://simpy.readthedocs.io/en/latest/topical_guides/resources.html#stores>
+
+---
 
 Review if request and wait should really need
 ```

@@ -146,6 +146,12 @@ class Environment(
      * Start execution of the simulation
      */
     fun run(duration: Number? = null, until: Number? = null, priority: Int = 0, urgent: Boolean = false): Environment {
+        // TODO https://simpy.readthedocs.io/en/latest/topical_guides/environments.html
+        //  If you call it without any argument (env.run()), it steps through the simulation until there are
+        //  no more events left.
+
+        // TODO add test coverage for `until`
+
         if (duration == null) endOnEmptyEventlist = true
 
         val scheduledTime = calcScheduleTime(until, duration)
