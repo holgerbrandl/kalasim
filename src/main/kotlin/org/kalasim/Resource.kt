@@ -5,8 +5,9 @@ package org.kalasim;
 import com.systema.analytics.es.misc.json
 import org.kalasim.misc.Jsonable
 import org.koin.core.Koin
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.context.GlobalContext
+
+// TODO Analyze we we support the same preemptible contract as simmer (Ucar2019, p11) (in particular restart)
 
 /**
  * @param preemptive If a component requests from a preemptive resource, it may bump component(s) that are claiming from
@@ -50,7 +51,7 @@ open class Resource(
         get() = capacity - claimedQuantity
 
 
-    // todo TBD should we initialize these monitoring by tallying the intial state?
+    // TBD Should we initialize these monitoring by tallying the initial state?
     val capacityMonitor = NumericLevelMonitor("Capacity of ${super.name}", initialValue = capacity, koin= koin)
     val claimedQuantityMonitor = NumericLevelMonitor("Claimed quantity of ${this.name}", koin= koin)
     val availableQuantityMonitor =
@@ -84,7 +85,7 @@ open class Resource(
         return true
     }
 
-    /** releases all claims or a specified quantity
+    /** Releases all claims or a specified quantity
      *
      * @param  quantity  quantity to be released. If not specified, the resource will be emptied completely.
      * For non-anonymous resources, all components claiming from this resource will be released.
@@ -115,7 +116,7 @@ open class Resource(
         if (requesters.isEmpty()) minq = Double.MAX_VALUE
     }
 
-    /** prints a summary of statistics of a resource */
+    /** Prints a summary of statistics of a resource. */
     fun printStatistics() = println(statistics.toString())
 
     override val info: Jsonable
@@ -126,7 +127,6 @@ open class Resource(
 }
 
 
-@KoinApiExtension
 class ResourceInfo(resource: Resource) : Jsonable() {
     val name: String = resource.name
     val creationTime: Double = resource.creationTime

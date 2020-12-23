@@ -1,3 +1,5 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package org.kalasim
 
 import org.apache.commons.math3.random.JDKRandomGenerator

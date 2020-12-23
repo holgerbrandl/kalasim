@@ -333,12 +333,6 @@ open class Component(
     //todo we should just support one here
 //    fun fixed(value: Double) = value.asConstantDist()
 //
-    @Suppress("unused")
-    fun Number.asConstantDist() = ConstantRealDistribution(this.toDouble())
-
-    fun Number.asDist() = ConstantRealDistribution(this.toDouble())
-
-    fun fixed(value: Double) = ConstantRealDistribution(value)
 
     /**
      * Request from a resource or resources
@@ -773,6 +767,7 @@ open class Component(
      * It is not possible to release from an anonymous resource, this way.
      * Use Resource.release() in that case.
      *
+     * @param resource The resource to be released
      * @param  quantity  quantity to be released. If not specified, the resource will be emptied completely.
      * For non-anonymous resources, all components claiming from this resource will be released.
      */
@@ -784,7 +779,7 @@ open class Component(
      *
      *  Not allowed for data components or main.
      */
-    fun release(vararg resources: Resource) = release(*resources.map { it withQuantity 1.0 }.toTypedArray())
+    fun release(vararg resources: Resource) = release(*resources.map { it withQuantity Double.MAX_VALUE }.toTypedArray())
 
 
     /**
@@ -1052,3 +1047,10 @@ data class StateRequest<T>(val state: State<T>, val priority: Int? = null, val p
 }
 
 infix fun <T> State<T>.turns(value: T) = StateRequest(this) { it == value }
+
+@Suppress("unused")
+fun Number.asConstantDist() = ConstantRealDistribution(this.toDouble())
+
+fun Number.asDist() = ConstantRealDistribution(this.toDouble())
+
+fun fixed(value: Double) = ConstantRealDistribution(value)
