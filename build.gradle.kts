@@ -71,11 +71,13 @@ java {
     withSourcesJar()
 }
 
-java {
-    sourceSets["test"].java {
-        srcDir("docs/userguide/examples/kotlin")
-    }
-}
+
+// disabled because docs examples were moved back into tests
+//java {
+//    sourceSets["test"].java {
+//        srcDir("docs/userguide/examples/kotlin")
+//    }
+//}
 
 publishing {
     publications {

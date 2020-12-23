@@ -26,7 +26,7 @@ Let’s start with a very simple model, to demonstrate the basic structure, proc
 We want to build a simulation where a single car is driving around for a some time before arriving at its destination.
 
 ```kotlin
-//{!IndexCars.kts!}
+//{!Cars.kts!}
 ```
 
 <!--This example corresponds to the `Cars` `salabim` example https://www.salabim.org/manual/Modeling.html-->

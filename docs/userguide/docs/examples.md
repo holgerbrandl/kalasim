@@ -24,3 +24,13 @@ Parameters
 * Origin/destination distribution of visitors
 * Number of elevators
 * Capacity of each elevator
+
+
+## ATM Queue
+
+The ATM example from the simmer paper [Ucar et al. 2019](https://www.jstatsoft.org/article/view/v090i02)
+
+
+```kotlin
+//{!AtmQueue.kt!}
+```

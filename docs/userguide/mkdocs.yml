@@ -6,7 +6,7 @@ site_description: >-
   Discrete event simulator with type support, dependency injection, modern persistence and logging to enable large-scale, industrial-ready simulations
 repo_name: holgerbrandl/kalasim
 repo_url: https://github.com/holgerbrandl/kalasim
-edit_uri: ""
+#edit_uri: "tree/master/docs/userguide/docs"
 
 # Copyright
 copyright: Copyright &copy; 2020 Holger Brandl
@@ -57,7 +57,8 @@ extra:
 
 markdown_extensions:
   - markdown_include.include:
-      base_path: examples/kotlin
+#      base_path: examples/kotlin
+      base_path: ../../src/test/kotlin/org/kalasim/examples
   - footnotes
   - pymdownx.highlight:
 #      linenums: true
