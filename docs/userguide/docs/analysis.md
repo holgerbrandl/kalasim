@@ -52,9 +52,9 @@ See chapter about monitors
 
 ## Replication
 
-Running a simulation just once, often does not provide sufficient insights into the dynamics of the system under consideration. Often, the user may want to execute a model many times with altered initial conditions, and then perform a statistical analysis over the output. This is also considered as *what-if* analyis.
+Running a simulation just once, often does not provide sufficient insights into the dynamics of the system under consideration. Often, the user may want to execute a model many times with altered initial conditions, and then perform a statistical analysis over the output. This is also considered as *what-if* analyis. See [ClassicWhatIfAtm.kt](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/examples/ClassicWhatIfAtm.kt) for simple example.
 
-By design `kalasim` does not make use of parallelism. So when scaling up execution to run in paralell, we need to be careful, that the internal [dependency injection](basics.md#dependency-injection) (which relates by default to a global context variable) does cause trouble.
+By design `kalasim` does not make use of parallelism. So when scaling up execution to run in paralell, we need to be careful, that the internal [dependency injection](basics.md#dependency-injection) (which relates by default to a global context variable) does cause trouble. See [ParallelWhatIfAtm.kt](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/examples/ParallelWhatIfAtm.kt) for an example that defines a parameter grid to be assessed with a simulation run per hyper-parameter.
 
 
 

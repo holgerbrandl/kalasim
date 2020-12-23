@@ -11,6 +11,7 @@ import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 import org.koin.core.definition.Definition
 import org.koin.core.qualifier.Qualifier
+import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 import java.util.*
 
@@ -34,9 +35,13 @@ fun configureEnvironment(
 
 fun createSimulation(
     enableTraceLogger: Boolean = false,
+    useCustomKoin: Boolean = false,
     builder: Environment.() -> Unit
 ): Environment =
-    Environment(enableTraceLogger = enableTraceLogger).apply(builder)
+    Environment(
+        enableTraceLogger = enableTraceLogger,
+        koin = if (useCustomKoin) koinApplication { }.koin else null
+    ).apply(builder)
 
 //fun Environment.createSimulation(builder: Environment.() -> Unit) {
 //    this.apply(builder)
