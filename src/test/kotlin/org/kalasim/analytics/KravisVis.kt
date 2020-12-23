@@ -27,7 +27,7 @@ internal fun printWarning(msg: String) {
     System.err.println("[kalasim] $msg")
 }
 
-internal fun NumericLevelMonitor.display() {
+fun NumericLevelMonitor.display() {
     if (warnNoDisplay()) return
 
     apply {
@@ -43,7 +43,7 @@ internal fun NumericLevelMonitor.display() {
 }
 
 
-internal fun NumericStatisticMonitor.display() {
+fun NumericStatisticMonitor.display() {
     if (warnNoDisplay()) return
 
     apply {
