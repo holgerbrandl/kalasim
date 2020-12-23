@@ -9,7 +9,11 @@ The beauty of discrete event simulation is its very limited vocabulary which sti
 
 ## Execution & Process Model
 
-The core of *kalasim* is an event-loop. Components are actively and passively scheduled for reevaluating their state. Technically this relates to the component's continued with `process()` generator or execution function.
+The core of *kalasim* is an event queue ordered by scheduled execution time, that maintains a list of events to be executed. To provide good insert, delete and update performance, `kalasim` is using internally a [`PriorityQueue`](https://docs.oracle.com/javase/7/docs/api/java/util/PriorityQueue.html). Components are actively and passively scheduled for reevaluating their state. Technically this relates to the component's continued with `process()` generator or execution function.
+
+<!--NOTE simmer is also using time and pririty in its queue -->
+
+<!--TODO simmer Ucar2019,p8 is mentioneing unscheduling as important use-case. Do we need/support that?-->
 
 
 <!--https://stackoverflow.com/questions/19331362/using-an-image-caption-in-markdown-jekyll-->
@@ -17,6 +21,26 @@ The core of *kalasim* is an event-loop. Components are actively and passively sc
   <img src="../basics_images/event_loop.png"  alt="kalasim event model"/>
   <figcaption>Kalasim Execution Model</figcaption>
 </figure>
+
+
+As pointed out in [Urcar, 2019](https://www.jstatsoft.org/article/view/v090i02), there are many situations where simultaneous events may occur. To provide a well-defined behavior in such situations, all process interaction methods support a `priority` and a `urgent` parameter:
+
+With `priority` which is 0 by default, it is possible to sort a component before or after other components, scheduled for the same time.
+
+<!--The `urgent` parameters only applies to components scheduled with the same time and same `priority`.-->
+
+This is particularly useful for race conditions. It is possible to change the priority of a component
+by cancelling it prior to activating it with another priority.
+
+In contrast to other DSE implementations, the user does not need to make sure that a resource `release()` is prioritized over a simultaneous `request()`. The egine will automatically reschedule tasks accordingly.
+<!-- Also see Ucar2019,p9 (table 1)-->
+
+<!--The priority can be accessed with the new Component.scheduled_priority() method.-->
+
+## Execution Order
+
+Order is defined by scheduled time. To avoid race conditions execution order be fine-tuned using `priority` and `urgent` which are supported for all methods that result in a rescheduling of a component, namely  `wait`, `request`,  `activate` and `reschedule`
+
 
 ## Simulation Runtime Environment
 

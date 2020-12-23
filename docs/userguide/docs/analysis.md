@@ -40,12 +40,23 @@ val sim = createSimulation(enableTraceLogger = false) {  }
 sim.addTraceListener(TraceListener { traceElement -> TODO("do something with")  })
 ```
 
+<!-- TODO detail out monitoring backends https://github.com/r-simmer/simmer.mon-->
 
 ## Monitors
 
 See chapter about monitors
 
 ## Visualization
+
+
+
+## Replication
+
+Running a simulation just once, often does not provide sufficient insights into the dynamics of the system under consideration. Often, the user may want to execute a model many times with altered initial conditions, and then perform a statistical analysis over the output. This is also considered as *what-if* analyis.
+
+By design `kalasim` does not make use of parallelism. So when scaling up execution to run in paralell, we need to be careful, that the internal [dependency injection](basics.md#dependency-injection) (which relates by default to a global context variable) does cause trouble.
+
+
 
 
 

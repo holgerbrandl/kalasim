@@ -2,9 +2,7 @@
 
 Components are the key elements of a simulation.
 
-Components can be either in state `DATA` or `ACTIVE`. An `ACTIVE` component has one or more process descriptions and is activated
-at some point of time. You can make a data component `active` with `activate()`. An active component can become
-`DATA` either with a `cancel()` or by reaching the end of its process method.
+Components can be either in state `DATA` or `ACTIVE`. An `ACTIVE` component has one or more process descriptions and is activated at some point of time. You can make a data component `active` with `activate()`. An active component can become `DATA` either with a `cancel()` or by reaching the end of its process method.
 
 It is easy to create a data component by:
 
@@ -52,21 +50,19 @@ Effectively, creation and start of `crane1` and `crane2` is the same.
 
 In most practical scenarios, the `process` parameter is omitted in the method signature.
 
-Although not very common, it is possible to activate a component at a certain time or with a
-specified delay:
+Although not very common, it is possible to activate a component at a certain time or with a specified delay:
 
 ```kotlin
 ship1.activate(at=100)
 ship2.activate(delay=50)
 ```
 
+<!--TODO consider if we should use the notion of a trajectory as done in simmer-->
 
 ## Creation of a component
 
 Although it is possible to create a component directly with `val x = Component()`, this
-makes it very hard to make that component into an active component,
-because there's no process method. So, nearly always we define a class based on
-`org.kalasim.Component`:
+makes it very hard to make that component into an active component, because there's no process method. So, nearly always we define a class based on `org.kalasim.Component`:
 
 ```kotlin
 class Car: Component(){
@@ -76,19 +72,16 @@ class Car: Component(){
 }
 ```
 
-If we then say `val car = Car()`, a component is created and it activated from process. This
-process is nearly always, but not necessarily a *generator method*  (i.e. it has at least one yield (or yield from) statement.
+If we then say `val car = Car()`, a component is created and it activated from process. This process is nearly always, but not necessarily a *generator method*  (i.e. it has at least one yield (or yield from) statement.
 
-The result is that car is put on the future event list (for time now) and when it's its
-turn, the component becomes current.
+The result is that car is put on the future event list (for time now) and when it's its turn, the component becomes current.
 
 It is also possible to set a time at which the component (car) becomes active, like `val car = Car(at=10)`. This requires an additional constructor argument to be passed on to `Component` as in `class Car(at:Number): Component(delay=at)`.
 
 And instead of starting at process, the component may be initialized to start at another (generator) method,
 like `car=Car(process=Car::wash)`.
 
-And, finally, if there is a process method, you can disable the automatic activation (i.e.
-make it a data component), by specifying `process = null`.
+And, finally, if there is a process method, you can disable the automatic activation (i.e. make it a data component), by specifying `process = null`.
 
 If there is no process method, and process= is not given, the component will be a data component.
 
@@ -110,45 +103,55 @@ A component may be in one of the following states modelled by `org.kalasim.Compo
 A component's status is automatically tracked in the status level monitor `component.statusMonitor`. Thus, it possible
 to check how long a component has been in passive state with
 
+<!-- TODO finish this part -->
+
 ```kotlin
 passive_duration = component.status.value("passive")
 ```
 
-And it is possible to print a histogram with all the statuses a component has been in with ::
+It is possible to print a histogram with all the statuses a component has been in with
 
-The scheme below shows how components can go from state to state.
+```kotlin
+component.statusMonitor.printHistogram()
+```
 
-|    from/to   |     data     |   current   |    scheduled   |     passive     |   requesting  |   waiting   |    standby    |  interrupted |
-|:-----------:|:------------:|:-----------:|:--------------:|:---------------:|:-------------:|:-----------:|:-------------:|:------------:|
-| data        |              | activate[1] | activate       |                 |               |             |               |              |
-| current     | process end  |             | yield hold     | yield passivate | yield request | yield wait  | yield standby |              |
-| .           | yield cancel |             | yield activate |                 |               |             |               |              |
-| scheduled   | cancel       | next event  | hold           | passivate       | request       | wait        | standby       | interrupt    |
-| .           |              |             | activate       |                 |               |             |               |              |
-| passive     | cancel       | activate[1] | activate       |                 | request       | wait        | standby       | interrupt    |
-| .           |              |             | hold[2]        |                 |               |             |               |              |
-| requesting  | cancel       | claim honor | activate[3]    | passivate       | request       | wait        | standby       | interrupt    |
-| .           |              | time out    |                |                 | activate[4]   |             |               |              |
-| waiting     | cancel       | wait honor  | activate[5]    | passivate       | wait          | wait        | standby       | interrupt    |
-| .           |              | timeout     |                |                 |               | activate[6] |               |              |
-| standby     | cancel       | next event  | activate       | passivate       | request       | wait        |               | interrupt    |
-| interrupted | cancel       |             | resume[7]      | resume[7]       | resume[7]     | resume[7]   | resume[7]     | interrupt[8] |
-| .           |              |             | activate       | passivate       | request       | wait        | standby       |              |
+The scheme below shows how interaction relate to component state transitions:
 
-1. [1] via `scheduled()`
-1. [2] not recommended
-1. [3] with `keepRequest=false` (default)
-1. [4] with `keepRequest=true`. This allows to set a new time out
-1. [5] with `keepWait=false` (default)
-1. [6] with `keepWait=true`. This allows to set a new timeout
-1. [7] state at time of interrupt
-1. [8] increases the ``interrupt_level``
+|   from/to   |     data     |           current           |      scheduled       |      passive       |      requesting      |       waiting        |      standby       |      interrupted      |
+|:-----------:|:------------:|:---------------------------:|:--------------------:|:------------------:|:--------------------:|:--------------------:|:------------------:|:---------------------:|
+|    data     |              | activate<sup>[1](#f1)</sup> |       activate       |                    |                      |                      |                    |                       |
+|   current   | process end  |                             |      yield hold      |  yield passivate   |    yield request     |      yield wait      |   yield standby    |                       |
+|      .      | yield cancel |                             |    yield activate    |                    |                      |                      |                    |                       |
+|  scheduled  |    cancel    |         next event          |         hold         |     passivate      |       request        |         wait         |      standby       |       interrupt       |
+|      .      |              |                             |       activate       |                    |                      |                      |                    |                       |
+|   passive   |    cancel    |    activate<sup>1</sup>     |       activate       |                    |       request        |         wait         |      standby       |       interrupt       |
+|      .      |              |                             |   hold<sup>2</sup>   |                    |                      |                      |                    |                       |
+| requesting  |    cancel    |         claim honor         | activate<sup>3</sup> |     passivate      |       request        |         wait         |      standby       |       interrupt       |
+|      .      |              |          time out           |                      |                    | activate<sup>4</sup> |                      |                    |                       |
+|   waiting   |    cancel    |         wait honor          | activate<sup>5</sup> |     passivate      |         wait         |         wait         |      standby       |       interrupt       |
+|      .      |              |           timeout           |                      |                    |                      | activate<sup>6</sup> |                    |                       |
+|   standby   |    cancel    |         next event          |       activate       |     passivate      |       request        |         wait         |                    |       interrupt       |
+| interrupted |    cancel    |                             |  resume<sup>7</sup>  | resume<sup>7</sup> |  resume<sup>7</sup>  |  resume<sup>7</sup>  | resume<sup>7</sup> | interrupt<sup>8</sup> |
+|      .      |              |                             |       activate       |     passivate      |       request        |         wait         |      standby       |                       |
+
+<!--https://stackoverflow.com/questions/25579868/how-to-add-footnotes-to-github-flavoured-markdown-->
+
+<!-- to enable achnor link parsing in markdown navigator enable "inline html a tag" -->
+
+1. <a id="f1"></a> Via `scheduled()`
+1. <a id="f2"></a> Not recommended
+1. <a id="f3"></a> With `keepRequest = false` (default)
+1. <a id="f4"></a> With `keepRequest = true`. This allows to set a new time out
+1. <a id="f5"></a> With `keepWait = false` (default)
+1. <a id="f6"></a> With `keepWait = true`. This allows to set a new timeout
+1. <a id="f7"></a> State at time of interrupt
+1. <a id="f8"></a> Increases the `interruptLevel`
 
 
 ### activate
 
 Activate is the way to turn a data component into a live component. If you do not specify a process,
-the (usually generator) function process is assumed. So you can say ::
+the (usually generator) function process is assumed. So you can say:
 
 ```kotlin
 val car0 = Car(process=null)  // data component
@@ -171,10 +174,10 @@ car1.activate(process=null) //  activate @ wash
 * If the component to be activated is standby, the component will get a new scheduled time and become
   scheduled.
 * If the component is interrupted, the component will be activated at the specified time.
-  
+
 ### hold
 
-Hold is the way to make a, usually current, component scheduled.
+Hold is the way to make a - usually `current` - component `scheduled`.
 
 
 * If the component to be held is current, the component becomes scheduled for the specified time. Always
@@ -183,7 +186,7 @@ Hold is the way to make a, usually current, component scheduled.
 * If the component to be held is scheduled, the component will be rescheduled for the specified time, thus
   essentially the same as activate.
 * If the component to be held is standby, the component becomes scheduled for the specified time.
-* If the component to be activated is requesting, the request will be terminated, the attribute failed 
+* If the component to be activated is requesting, the request will be terminated, the attribute failed
   set and the component will become scheduled. It is recommended to use the more versatile activate method.
 * If the component to be activated is waiting, the wait will be
   terminated, the attribute failed set and the component will become scheduled. It is recommended to
@@ -192,15 +195,16 @@ Hold is the way to make a, usually current, component scheduled.
 
 ### passivate
 
-Passivate is the way to make a, usually current, component passive. This is essentially the
+Passivate is the way to make a - usually `current` - component `passive`. This is essentially the
 same as scheduling for time=inf.
+<!--TODO rework time=inf-->
 
 * If the component to be passivated is current, the component becomes passive. Always
   use `yield(passivate())` is this case.
-* If the component to be passivated is passive, the component remains passive.
-* If the component to be passivated is scheduled, the component becomes passive.
-* If the component to be held is standby, the component becomes passive.
-* If the component to be activated is requesting, the request will be terminated, the attribute failed 
+* If the component to be passivated is `passive`, the component remains `passive`.
+* If the component to be passivated is `scheduled`, the component becomes `passive`.
+* If the component to be held is `standby`, the component becomes `passive`.
+* If the component to be activated is requesting, the request will be terminated, the attribute failed
   set and the component becomes passive. It is recommended to use the more versatile activate method.
 * If the component to be activated is waiting, the wait will be
   terminated, the attribute failed set and the component becomes passive. It is recommended to
@@ -211,12 +215,12 @@ same as scheduling for time=inf.
 
 Cancel has the effect that the component becomes a data component.
 
-* If the component to be cancelled is current, always use `yield(cancel())`.
-* If the component to be cancelled is passive, scheduled, interrupted  or standby, the component
+* If the component to be cancelled is `current`, always use `yield(cancel())`.
+* If the component to be cancelled is `passive`, scheduled, interrupted  or standby, the component
   becomes a data component.
-* If the component to be cancelled is requesting, the request will be terminated, the attribute failed 
+* If the component to be cancelled is `requesting`, the request will be terminated, the attribute failed
   set, and the component becomes a data component.
-* If the component to be cancelled is waiting, the wait will be terminated, the attribute failed 
+* If the component to be cancelled is waiting, the wait will be terminated, the attribute failed
   set and the component becomes a data component.
 
 ### standby
@@ -228,19 +232,23 @@ Standby has the effect that the component will be triggered on the next simulati
 
 ### request
 
-Request has the effect that the component will check whether the requested quantity from a resource is available. It is
-possible to check for multiple availability of a certain quantity from several resources.
+Request has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
 
-Instead of checking for all of number of resources, it is also possible to check for any of a number of resources, by setting the oneof parameter to True.
+Instead of checking for all of number of resources, it is also possible to check for any of a number of resources, by setting the `oneOf` parameter to `true`.
 
-By default, there is no limit on the time to wait for the resource(s) to become available. But, it is possible to set
-a time with fail_at at which the condition has to be met. If that failed, the component becomes current at the given point of time.
-The code should then check whether the request had failed. That can be checked with the Component.failed() method.
+By default, there is no limit on the time to wait for the resource(s) to become available. However, it is possible to set a time with `failAt` at which the condition has to be met. If that failed, the component becomes `CURRENT` at the given point of time. This is also known as *reneging*.
+<!--The code should then check whether the request had failed. That can be checked with the `Component.failed` property.-->
 
-If the component is canceled, activated, passivated, interrupted or held the failed flag will be set as well.
+If the component is canceled, activated, passivated, interrupted or held the `failed` flag will be set as well.
 
 * If the component is current, always use `yield(request())`
 * Although theoretically possible it is not recommended to use request for non current components.
+
+<!-- TODO describe better what happens if request is rejected or fails to be fulfilled-->
+
+<!--TBD support simmer::renege_if?-->
+
+A component can also actively renege a pending request by calling `release(resource)`. See `Bank3ClerksRenegingResources` for an example (as well as `Bank3ClerksReneging` `Bank3ClerksRenegingState` for other supported reneging modes).
 
 ### wait
 
@@ -267,10 +275,10 @@ the remaining fail_at duration).
 There is a way to put process interaction statement in another function or method.
 This requires a slightly different way than just calling the method.
 
-As an example, let's assume that we want a method that holds a component for a number of minutes and that the time unit is actually seconds. 
+As an example, let's assume that we want a method that holds a component for a number of minutes and that the time unit is actually seconds.
 So we need a method to wait 60 times the given parameter
 
-We start with a not so elegant solution: ::
+We start with a not so elegant solution::
 
 ```kotlin
 class X(sim.Component):
@@ -278,15 +286,16 @@ class X(sim.Component):
         yield hold(60 * 2)
         yield hold(60 * 5)
 ```
+```
 
-Now we just addd a method hold_minutes: ::
+Now we just addd a method hold_minutes:
 
 ```kotlin
         def hold_minutes(self, minutes):
             yield hold(60 * minutes)
 ```
 
-Direct calling hold_minutes is not possible. Instead we have to say: ::
+Direct calling hold_minutes is not possible. Instead we have to say:
 
 ```kotlin
     class X(sim.Component):
@@ -301,24 +310,6 @@ Direct calling hold_minutes is not possible. Instead we have to say: ::
 All process interaction statements including passivate, request and wait can be used that way!
 
 So remember if the method contains a `yield` statement (technically speaking that's a generator method), it should be called with ``yield from``.
-
-##  Using priority and urgent to control order of execution
-
-All process interaction methods supports a priority and urgent parameter:
-
-With priority, it is possible to sort a component before or after other components, scheduled for the same time.
-Note that the urgent parameters only applies to components scheduled with the same time and same priority.
-
-The priority is 0 by default.
-
-This is particularly useful for race conditions. It is possible to change the priority of a component
-by cancelling it prior to activating it with another priority.
-
-The priority can be accessed with the new Component.scheduled_priority() method.
-
-## Execution Order
-
-Order is defined by scheduled time. To avoid race conditions execution order be fine-tuned using `priority` and `urgent` which are supported for all methods that result in a rescheduling of a component, namely  `wait`, `request`,  `activate` and `reschedule`
 
 ## Generator
 

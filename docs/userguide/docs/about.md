@@ -29,6 +29,23 @@
 * [opentrafficsim](https://opentrafficsim.org/manual/) is a traffic simulation built with DSOL3
 
 
+### simmer
+
+[simmer](https://r-simmer.org/) is a process-oriented and trajectory-based Discrete-Event Simulation (DES) package for R.
+
+It centres around the concept of a *trajectory* that defines a component lifecycle. To enable scale it is built on top of Rcpp (C++ backend for R)
+
+```r
+traj <- trajectory() %>%
+ log_("Entering the trajectory") %>%
+ timeout(10) %>%
+ log_("Leaving the trajectory")
+```
+
+* Great overview [simmer: Discrete-Event Simulation for R](https://www.jstatsoft.org/article/view/v090i02), Ucar et al, 2019
+* Support for optimization in [simmer.optim](https://github.com/r-simmer/simmer.optim)
+
+
 ### Other discrete simulation engines
 
 *  <https://github.com/aybabtme/desim> - Discrete event simulation framework written in GO that implements a similar API as `kalasim`

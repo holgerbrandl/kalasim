@@ -9,20 +9,22 @@
 In contrast to many other simulation tools, `kalasim` is neither low-code nor no-code. It is _code-first_ to enable change tracking, scaling, refactoring, CI/CD, unit-tests, and the rest of the gang that makes simulation development fun.
 
 
-## Basic principle
+## Core Features
 
+`kalasim` is a generic [process-oriented](theory.md) discrete event simulation (DES) engine.
 
-* [Components](component.md) (a.k.a.) agents with a generative process description that defined the interplay between simulation entities
-* Well-defined process interaction via various methods such as [hold](component.md#hold), [request](component.md#request), [wait](component.md#wait) or [passivate](component.md#passivate)
-* Future [event trigger queue](basics.md#execution--process-model) as main driver to progress states
+* [Simulation entities](component.md) have a generative process description that defines the interplay with other entities
+* There is a well-defined rich process interaction vocabulary, including [hold](component.md#hold), [request](component.md#request), [wait](component.md#wait) or [passivate](component.md#passivate)
+* An [event trigger queue](basics.md#execution--process-model) maintains future action triggers and acts as sole driver to progress simulation state
 
-Find out more about the [basics](basics.md) of a kalasim simulation.
+Find out more about the [basics](basics.md) of a `kalasim` simulation.
 
 ## First Example
 
 Let’s start with a very simple model, to demonstrate the basic structure, process interaction, component definition and output.
 
 We want to build a simulation where a single car is driving around for a some time before arriving at its destination.
+
 ```kotlin
 //{!IndexCars.kts!}
 ```

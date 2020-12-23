@@ -55,7 +55,7 @@ val level = State(0.0)
 level.value += 10
 ```
 
-Since `State<T>` is a generic type, the compile will reject invalid level associations such as
+Since `State<T>` is a generic type, the compiler will reject invalid level associations such as
 ```
 level.value = "foo"
 ```
