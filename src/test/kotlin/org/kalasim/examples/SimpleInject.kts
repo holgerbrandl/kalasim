@@ -3,7 +3,7 @@ import org.kalasim.*
 
 data class Counter(var value: Int)
 
-class Something(val counter: Counter): Component(){
+class Something(val counter: Counter): Component() {
 
     override suspend fun ProcContext.process() {
         counter.value++

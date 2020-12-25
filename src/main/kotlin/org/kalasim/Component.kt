@@ -24,16 +24,20 @@ enum class ComponentState {
  * A kalasim component is used as component (primarily for queueing) or as a component with a process.
  * Usually, a component will be defined as a subclass of Component.
  *
+ *
+ *  @param name name of the component.  if the name ends with a period (.), auto serializing will be applied  if the name end with a comma, auto serializing starting at 1 will be applied  if omitted, the name will be derived from the class it is defined in (lowercased)
  * @param at schedule time
  * @param delay schedule with a delay if omitted, no delay
+ * @param priority If a component has the same time on the event list, this component is sorted according to the priority.
  * @param process  of process to be started.  if None (default), it will try to start self.process()
- * @param name name of the component.  if the name ends with a period (.), auto serializing will be applied  if the name end with a comma, auto serializing starting at 1 will be applied  if omitted, the name will be derived from the class it is defined in (lowercased)
+ * @param koin The dependency resolution context to be used to resolve the `org.kalasim.Environment`
  */
 open class Component(
     name: String? = null,
-    process: ProcessPointer? = Component::process,
-    val priority: Int = 0,
+    at: Number? = null,
     delay: Number = 0,
+    val priority: Int = 0,
+    process: ProcessPointer? = Component::process,
     koin: Koin = GlobalContext.get()
 ) :
 //    KoinComponent,
@@ -77,7 +81,11 @@ open class Component(
         this.simProcess = ingestFunPointer(process)
 
         if (process != null) {
-            scheduledTime = env.now + delay.toDouble()
+            val scheduledTime = if (at == null) {
+                env.now + delay.toDouble()
+            } else {
+                at.toDouble() + delay.toDouble()
+            }
 
             reschedule(scheduledTime, priority, false, "activate", SCHEDULED)
         }
@@ -115,11 +123,9 @@ open class Component(
     open fun setup() {}
 
     /**         the current simulation time : float */
-    fun now() = env.now
+    private fun now() = env.now
 //    fun now() = env.now()
 
-    val now: Double
-        get() = now()
 
     open fun process() = this.let {
         sequence {
@@ -223,7 +229,7 @@ open class Component(
      * @param all If `true`, the component returns to the original status, regardless of the number of interrupt levels if
      * `false` (default), the interrupt level will be decremented and if the level reaches 0, the component will return
      * to the original status.
-     * @param priority If a component has the same time on the event list, this component is sorted accoring to
+     * @param priority If a component has the same time on the event list, this component is sorted according to
     the priority.
      */
     fun resume(all: Boolean = false, priority: Int = 0) {
@@ -779,7 +785,8 @@ open class Component(
      *
      *  Not allowed for data components or main.
      */
-    fun release(vararg resources: Resource) = release(*resources.map { it withQuantity Double.MAX_VALUE }.toTypedArray())
+    fun release(vararg resources: Resource) =
+        release(*resources.map { it withQuantity Double.MAX_VALUE }.toTypedArray())
 
 
     /**
@@ -941,7 +948,7 @@ open class Component(
             }
             waits.clear()
             remove()
-            reschedule(now, 0, false, "wait", SCHEDULED)
+            reschedule(env.now, 0, false, "wait", SCHEDULED)
         }
 
         return honored

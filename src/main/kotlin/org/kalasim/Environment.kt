@@ -282,13 +282,15 @@ class Environment(
         }
     }
 
-    var queueCounter: Int = 0
+    private var queueCounter: Int = 0
 
     fun push(component: Component, scheduledTime: Double, priority: Int, urgent: Boolean) {
         queueCounter++
 
 //        https://bezkoder.com/kotlin-priority-queue/
-        eventQueue.add(QueueElement(component, scheduledTime, priority, queueCounter, urgent))
+        // Remove an element from the Priority Queue => Dequeue the least element. The front of the Priority Queue
+        // contains the least element according to the ordering, and the rear contains the greatest element.
+        eventQueue.add(QueueElement(component, scheduledTime, -priority, queueCounter, urgent))
 
         // consistency checks
         require(queue.none(Component::isPassive)) { "passive component must not be in event queue" }
@@ -304,8 +306,10 @@ data class QueueElement(
     val urgent: Boolean
 ) :
     Comparable<QueueElement> {
+    //TODO clarify if we need/want to also support urgent
+
     override fun compareTo(other: QueueElement): Int =
-        compareValuesBy(this, other, { it.time }, { it.priority }, { -it.queueCounter })
+        compareValuesBy(this, other, { it.time }, { it.priority }, { it.queueCounter })
 
     val heapSeq = if (urgent) -queueCounter else queueCounter
 

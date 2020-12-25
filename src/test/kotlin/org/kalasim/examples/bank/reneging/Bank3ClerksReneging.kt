@@ -3,7 +3,6 @@ package org.kalasim.examples.bank.reneging
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
-import org.kalasim.analytics.display
 import org.kalasim.misc.printThis
 import org.koin.core.component.get
 import org.koin.core.component.inject

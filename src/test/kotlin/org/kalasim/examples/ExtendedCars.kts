@@ -1,12 +1,13 @@
 //ExtendedCars.kts
 import org.kalasim.*
-import org.koin.core.component.*
+import org.koin.core.component.get
+import org.koin.core.component.inject
 
 class TrafficLight : State<String>("red")
 
-class GasStation(numPumps:Int=6) : Resource(capacity = numPumps)
+class GasStation(numPumps: Int = 6) : Resource(capacity = numPumps)
 
-class Car(val trafficLight: TrafficLight) : Component(){
+class Car(val trafficLight: TrafficLight) : Component() {
 
     val gasStation by inject<GasStation>()
 
@@ -57,5 +58,4 @@ val env: Environment = configureEnvironment(true) {
     // assess the state of the simulation entities
     car2.statusMonitor.printHistogram()
     get<GasStation>().printStatistics()
-
 }
