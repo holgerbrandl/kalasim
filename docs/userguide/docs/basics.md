@@ -7,9 +7,9 @@ The beauty of discrete event simulation is its very limited vocabulary which sti
 * [Generators](component.md#generator)
 
 
-## Execution & Process Model
+## Event Queue
 
-The core of *kalasim* is an event queue ordered by scheduled execution time, that maintains a list of events to be executed. To provide good insert, delete and update performance, `kalasim` is using internally a [`PriorityQueue`](https://docs.oracle.com/javase/7/docs/api/java/util/PriorityQueue.html). Components are actively and passively scheduled for reevaluating their state. Technically this relates to the component's continued with `process()` generator or execution function.
+The core of *kalasim* is an event queue ordered by scheduled execution time, that maintains a list of events to be executed. To provide good insert, delete and update performance, `kalasim` is using a [`PriorityQueue`](https://docs.oracle.com/javase/7/docs/api/java/util/PriorityQueue.html) internally. Components are actively and passively scheduled for reevaluating their state. Technically, event execution refers to the continuation of a component's generator or execution function.
 
 <!--NOTE simmer is also using time and pririty in its queue -->
 
@@ -23,23 +23,28 @@ The core of *kalasim* is an event queue ordered by scheduled execution time, tha
 </figure>
 
 
-As pointed out in [Urcar, 2019](https://www.jstatsoft.org/article/view/v090i02), there are many situations where simultaneous events may occur. To provide a well-defined behavior in such situations, all process interaction methods support a `priority` and a `urgent` parameter:
+## Execution Order
 
-With `priority` which is 0 by default, it is possible to sort a component before or after other components, scheduled for the same time.
+In the real world, events often appear to happen *at the same time*. However, in fact events always occur at slightly differing times. Clearly the notion of *same* depends on the resolution of the used time axis. Birthdays will happen on the *same day* whereas the precise birth events will always differ in absolute timing.
 
-<!--The `urgent` parameters only applies to components scheduled with the same time and same `priority`.-->
+Even if real-world processes may run "in parallel", a simulation is processed sequentially and deterministically. With the same random-generator initialization,  you will always get the same simulation results when running your simulation multiple times.
 
-This is particularly useful for race conditions. It is possible to change the priority of a component
-by cancelling it prior to activating it with another priority.
+Although, `kalasim` supports double-precision to schedule events, events will inevitably arise that are scheduled for the *same time*. Because of its  single-threaded, deterministic execution model (like most DES frameworks),  `kalasim`  processes events sequentially – one after another. If two events are scheduled at the same time, the one scheduled first will also be the processed first (FIFO).
 
-In contrast to other DSE implementations, the user does not need to make sure that a resource `release()` is prioritized over a simultaneous `request()`. The egine will automatically reschedule tasks accordingly.
+As pointed out in [Urcar, 2019](https://www.jstatsoft.org/article/view/v090i02), there are many situations where simultaneous events may occur in simulation. To provide a well-defined behavior in such situations, process interaction methods (namely  `wait`, `request`,  `activate` and `reschedule`) support a `priority`  parameter. With `priority` which is 0 by default, it is possible to sort a component before or after other components, scheduled for the same time. Events with higher priority are executed first in situtations where multiple events are scheduled for the same simulation time.
+
+<!--The `urgent` parameters only applies to components scheduled with the same time and same `priority`. TBD do we need it?-->
+
+In contrast to other DSE implementations, the user does not need to make sure that a resource `release()` is prioritized over a simultaneous `request()`. The engine will automatically reschedule tasks accordingly.
 <!-- Also see Ucar2019,p9 (table 1)-->
 
 <!--The priority can be accessed with the new Component.scheduled_priority() method.-->
 
-## Execution Order
+So the key points to recall are
 
-Order is defined by scheduled time. To avoid race conditions execution order be fine-tuned using `priority` and `urgent` which are supported for all methods that result in a rescheduling of a component, namely  `wait`, `request`,  `activate` and `reschedule`
+* Real world events may appear to happen at the same discretized simulation time
+* Simulation events are processed one after another, even if they are scheduled for the same time
+* Race-conditions between events can be avoided by setting a `priority`
 
 
 ## Simulation Runtime Environment

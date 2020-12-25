@@ -2,7 +2,7 @@
 
 ## Extended Cars
 
-The following example is integratin three simulation entities
+The following example integrates three simulation entities
 
 * A gas station with a limited number of pumps
 * A traffic light that prevents cars from driving
