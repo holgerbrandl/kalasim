@@ -1,4 +1,4 @@
-//AtmQueue.kt
+//Atm.kt
 package org.kalasim.examples
 
 import org.apache.commons.math3.distribution.ExponentialDistribution
@@ -9,6 +9,7 @@ import org.kalasim.analytics.display
 import org.kalasim.createSimulation
 
 //https://youtrack.jetbrains.com/issue/KT-44062
+
 
 fun main() {
 
@@ -42,6 +43,7 @@ fun main() {
         atm.occupancyMonitor.display()
         atm.requesters.queueLengthMonitor.display()
         atm.requesters.lengthOfStayMonitor.display()
+
         println(atm.requesters.lengthOfStayMonitor.statistics())
     }
 }

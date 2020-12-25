@@ -2,7 +2,7 @@
 
 A core aspect when building simulations is to understand, define and modulate the inherent system dynamics. To build a correct simulation, the designer/developer must carefully analyze how states progress over time.
 
-To facilitate this process, it offers various means to analyze data created by a simulation
+To facilitate this process, `kalasim` offers various means to analyze data created by a simulation
 
 * [Event Log](#event-log) - to track state changes
 * [Monitors](monitors.md) - to track state and statistics of the [basic](basics.md) elements within a simulation
@@ -10,7 +10,10 @@ To facilitate this process, it offers various means to analyze data created by a
 
 ## Event Log
 
-While a simulation is running, we get the following output (displayed as table for convenience):
+To analyze a simulation, you may want to trace entity creation and process progression. You may also want to trace which process caused an event or which processes waited for an event. `kalasim` is collecting these data across all basic [simulation entities](basics.md) and in particular in the support process [interaction model](component.md#process-interaction).
+
+
+With console logging being enabled, we get the following output (displayed as table for convenience):
 
 ```
 time      current component        component                action      info                          
@@ -40,14 +43,19 @@ val sim = createSimulation(enableTraceLogger = false) {  }
 sim.addTraceListener(TraceListener { traceElement -> TODO("do something with")  })
 ```
 
+By supporting a pub-sub pattern, users can easily attach different monitoring backends such as files, databases, or in-place-analytics.
+
 <!-- TODO detail out monitoring backends https://github.com/r-simmer/simmer.mon-->
+
+Trace logs a suitable for standard kotlin collection processing. E.g. we can setup a [coroutines channel](https://kotlinlang.org/docs/reference/coroutines/channels.html) for log events that is is consumed asynchronously ([example](https://github.com/holgerbrandl/kalasim/tree/master/src/test/kotlin/org/kalasim/examples/analysis/LogChannelConsumer.kts#L47-L47)).
 
 ## Monitors
 
-See chapter about monitors
+See chapter about [monitors](monitors.md).
 
 ## Visualization
 
+**{TBD}**
 
 
 ## Replication
@@ -56,6 +64,7 @@ Running a simulation just once, often does not provide sufficient insights into 
 
 By design `kalasim` does not make use of parallelism. So when scaling up execution to run in paralell, we need to be careful, that the internal [dependency injection](basics.md#dependency-injection) (which relates by default to a global context variable) does cause trouble. See [ParallelWhatIfAtm.kt](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/examples/ParallelWhatIfAtm.kt) for an example that defines a parameter grid to be assessed with a simulation run per hyper-parameter.
 
+<!--See also 4.2 in Ucar2019-->
 
 
 

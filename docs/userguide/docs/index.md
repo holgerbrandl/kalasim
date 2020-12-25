@@ -16,6 +16,7 @@ In contrast to many other simulation tools, `kalasim` is neither low-code nor no
 * [Simulation entities](component.md) have a generative process description that defines the interplay with other entities
 * There is a well-defined rich process interaction vocabulary, including [hold](component.md#hold), [request](component.md#request), [wait](component.md#wait) or [passivate](component.md#passivate)
 * An [event trigger queue](basics.md#execution--process-model) maintains future action triggers and acts as sole driver to progress simulation state
+* Built-in monitoring and statistics gathering across the entire API
 
 Find out more about the [basics](basics.md) of a `kalasim` simulation.
 

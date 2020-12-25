@@ -26,7 +26,7 @@ class ComponentGenerator<T : Component>(
     priority: Int = 0,
     @Suppress("UNUSED_PARAMETER") urgent: Boolean = false,
     koin : Koin = GlobalContext.get(),
-    val builder: Environment.() -> T
+    val builder: Environment.(counter:Int) -> T
 ) : Component(name, priority = priority, process = ComponentGenerator<T>::doIat, koin=koin) {
 
 
@@ -39,7 +39,7 @@ class ComponentGenerator<T : Component>(
         var numGenerated = 0
 
         while (true) {
-            builder(env)
+            builder(env, numGenerated)
             numGenerated++
 
             if (numGenerated >= total) break

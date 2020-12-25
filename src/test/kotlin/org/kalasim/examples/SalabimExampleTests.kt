@@ -7,6 +7,7 @@ import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.rank.Median
 import org.json.JSONObject
+import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.examples.bank.reneging.CustomerGenerator
@@ -212,6 +213,12 @@ class SalabimExampleTests {
         }
     }
 
+
+    @Test
+    @Ignore
+    fun `the atm queue should have known properties`() {
+// TODO build tests using properties from https://en.wikipedia.org/wiki/M/M/1_queue
+    }
 
     @Test
     fun `it should run all examples without exception`() {

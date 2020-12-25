@@ -115,6 +115,8 @@ It is possible to print a histogram with all the statuses a component has been i
 component.statusMonitor.printHistogram()
 ```
 
+## Process Interaction
+
 The scheme below shows how interaction relate to component state transitions:
 
 |   from/to   |     data     |           current           |      scheduled       |      passive       |      requesting      |       waiting        |      standby       |      interrupted      |

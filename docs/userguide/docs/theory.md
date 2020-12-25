@@ -3,7 +3,7 @@
 As defined by Shannon (1975),
 > a simulation is the process of designing a model of a real system and conducting experiments with this model for the
 purpose either of understanding the behavior of the system or of evaluating various strategies
-(within the limits imposed by a criterion or a set of criteria) for the operation of the system
+(within the limits imposed by a criterion or a set of criteria) for the operation of the system.
 
 
 ## What is discrete event simulation?
@@ -49,7 +49,7 @@ For  in-depth primers about simulation see [here](https://simulation.tudelft.nl/
 ## Other Simulation Tools
 
 There are too many to be listed. In generally there are graphical tools and APIs
- . Graphical tools, such as [AnyLogic](https://www.anylogic.com/) excel by providing a flat learning curve, great visuals but often lack interfaces for extensibility or automation. APIs are more usually highly flexible but often lack an intuitive approach to actually build simulations.
+ . Graphical tools, such as [AnyLogic](https://www.anylogic.com/) excel by providing a flat learning curve, great visuals but often lack interfaces for extensibility or automation. APIs are usually much more flexible but often lack an intuitive approach to actually build simulations.
 
 Out of the great number of APIs, we [pinpoint](about.md#acknowledgements) just  those projects/products which served as source of inspiration when developing `kalasim`.
 
