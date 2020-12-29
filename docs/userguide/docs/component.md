@@ -14,6 +14,7 @@ Data components may be placed in a queue. This component will not be activated a
 
 In order to make an active component it is necessary to first define a class. There has to be at least one sequence generator method, normally called `process`:
 
+
 ```
 class Ship: Component(){
     override fun process() = sequence {
@@ -254,23 +255,16 @@ A component can also actively renege a pending request by calling `release(resou
 
 ### wait
 
-Wait has the effect that the component will check whether the value of a state meets a given condition.
-available. It is
-possible to check for multiple states.
-By default, there is no limit on the time to wait for the condition(s) to be met. But, it is possible to set
-a time with fail_at at which the condition has to be met. If that failed, the component becomes current at the given point of time.
-The code should then check whether the wait had failed. That can be checked with the Component.failed() method.
+Wait has the effect that the component will check whether the value of a state meets a given condition. It is possible to check for multiple states. By default, there is no limit on the time to wait for the condition(s) to be met. However, it is possible to set a time with `failAt` at which the condition has to be met. If that failed, the component becomes `CURRENT` at the given point of time. The code should then check whether the wait had failed. That can be checked with the `Component.failed` property.
 
-If the component is canceled, activated, passivated, interrupted or held the failed flag will be set as well.
+If the component is [canceled](#cancel), [activated](#activate), [passivated](#passivate), [interrupted](#interrupt) or [held](#hold) the failed flag will be set as well.
 
-* If the component is current, use always `yield(wait())`
+* If the component is current, always use `yield(wait())`
 * Although theoretically possible it is not recommended to use wait for non current components.
 
 ### interrupt
 
-With interrupt components that are not current or data can be temporarily be interrupted. Once a resume is called for
-the component, the component will continue (for scheduled with the remaining time, for waiting or requesting possibly with
-the remaining fail_at duration).
+With interrupt components that are not current or data can be temporarily be interrupted. Once a resume is called for the component, the component will continue (for scheduled with the remaining time, for waiting or requesting possibly with the remaining fail_at duration).
 
 ## Usage of process interaction methods within a function or method
 
@@ -278,54 +272,62 @@ There is a way to put process interaction statement in another function or metho
 This requires a slightly different way than just calling the method.
 
 As an example, let's assume that we want a method that holds a component for a number of minutes and that the time unit is actually seconds.
-So we need a method to wait 60 times the given parameter
+So we need a method to wait 60 times the given parameter.
 
-We start with a not so elegant solution::
-
-```kotlin
-class X(sim.Component):
-    def process(self):
-        yield hold(60 * 2)
-        yield hold(60 * 5)
-```
-```
-
-Now we just addd a method hold_minutes:
+We start with a not so elegant solution:
 
 ```kotlin
-        def hold_minutes(self, minutes):
-            yield hold(60 * minutes)
+object : Component() {
+    override fun process() = sequence<Component>{
+        yield(hold(5.0))
+        yield(hold(5.0))
+    }
+}
 ```
 
-Direct calling hold_minutes is not possible. Instead we have to say:
+Now we just add a method `holdMinutes`. Direct calling `holdMinutes` is not possible. Instead, we have to define an extension function on `SequenceScope<Component>`:
 
 ```kotlin
-    class X(sim.Component):
-       def hold_minutes(self, minutes):
-            yield hold(60 * minutes)
- 
-       def process(self):
-            yield from hold_minutes(2)
-            yield from hold_minutes(5)
+object : Component() {
+    override fun process() = sequence {
+        holdMinutes()
+        holdMinutes()
+    }
+
+    private suspend fun SequenceScope<Component>.holdMinutes() {
+        yield(hold(5.0))
+    }
+}
 ```
 
-All process interaction statements including passivate, request and wait can be used that way!
+All process interaction statements including `passivate`, `request` and `wait` can be used that way!
 
-So remember if the method contains a `yield` statement (technically speaking that's a generator method), it should be called with ``yield from``.
+So remember if the method contains a `yield` statement (technically speaking iss a generator method), it should be called with from an extension function.
 
-## Generator
+## Component Generator
 
-Def
-> A `Component` that contains at least one yield.
+Since creation/generation of components is a very common element of most simulations, there is a dedicated utility called `ComponentGenerator` to do so
 
+```kotlin
+ComponentGenerator(iat = exponential(lambda, rg)) {
+    Customer()
+}
+```
+
+It requires 2 main parameters
+1. a builder pattern
+2. an inter-arrival distribution
+
+See [here](https://github.com/holgerbrandl/kalasim/blob/master/src/main/kotlin/org/kalasim/ComponentGenerator.kt#L20) for a complete listing of supported arguments.
 
 ## Queue
 
-Kalasim builds on top of the JVM's [PriorityQueue](https://docs.oracle.com/javase/7/docs/api/java/util/PriorityQueue.html)  to model waiting lines etc. Conceptual our implementation is very similar to salabim's [queue](
+Kalasim builds on top of the JVM's [PriorityQueue](https://docs.oracle.com/javase/7/docs/api/java/util/PriorityQueue.html)  to model waiting lines etc. Conceptual our implementation is very similar to `salabim`'s [queue](
 https://www.salabim.org/manual/Queue.html).
 
 
-A typical usecase would be a generator process (materal, customers, etc.) that is consumed by other components. In the following example a [`Generator`](#generator) is creating new `Customer`s which are entering a waiting line `Queue`. This queue is consumed by a clerk which take one customer at a time and goes on [`hold`](#hold) for processing. See [here](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/examples/bank/oneclerk/Bank1clerk.kt) for the complete implementation.
+A typical use case would be a generator process (material, customers, etc.) that is consumed by other components. By definition, a *generator* is a `Component` that contains at least one yield in its process definition.
+ In the following example a generator is creating new `Customer`s which are entering a waiting line `Queue`. This queue is consumed by a clerk which take one customer at a time and goes on [`hold`](#hold) for processing. See [here](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/examples/bank/oneclerk/Bank1clerk.kt) for the complete implementation.
 
 ```mermaid
 sequenceDiagram

@@ -2,7 +2,7 @@
 
 ## Why rebuilding `salabim`?
 
-Great question! Initial development was driven by curiosity about the `salabim` internals. Also, it lacked (arguably) a modern touch which made some of our usecases more tricky to implement.
+Great question! Initial development was driven by curiosity about the `salabim` internals. Also, it lacked (arguably) a modern touch which made some of our use cases more tricky to implement.
 
 
 `kalasim` implements the great majority of `salabim` features as documented under https://www.salabim.org/manual/ including
@@ -11,7 +11,7 @@ Great question! Initial development was driven by curiosity about the `salabim` 
 * [ComponentGenerator](https://www.salabim.org/manual/ComponentGenerator.html)
 * [Queue](https://www.salabim.org/manual/Queue.html)
 * [Distributions](https://www.salabim.org/manual/Distributions.html) (via apache-commons-math)
-* [Monitor](https://www.salabim.org/manual/Monitor.html) (via apache-commons-math)
+* [Monitor](https://www.salabim.org/manual/Monitor.html)
 * [Resource](https://www.salabim.org/manual/Resource.html)
 * [State](https://www.salabim.org/manual/State.html)
 

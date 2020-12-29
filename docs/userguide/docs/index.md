@@ -15,7 +15,7 @@ In contrast to many other simulation tools, `kalasim` is neither low-code nor no
 
 * [Simulation entities](component.md) have a generative process description that defines the interplay with other entities
 * There is a well-defined rich process interaction vocabulary, including [hold](component.md#hold), [request](component.md#request), [wait](component.md#wait) or [passivate](component.md#passivate)
-* An [event trigger queue](basics.md#execution--process-model) maintains future action triggers and acts as sole driver to progress simulation state
+* An [event trigger queue](basics.md#event-queue) maintains future action triggers and acts as sole driver to progress simulation state
 * Built-in monitoring and statistics gathering across the entire API
 
 Find out more about the [basics](basics.md) of a `kalasim` simulation.
@@ -32,7 +32,7 @@ We want to build a simulation where a single car is driving around for a some ti
 
 <!--This example corresponds to the `Cars` `salabim` example https://www.salabim.org/manual/Modeling.html-->
 
-The example demonstrates the main mode of operation, the core API and the component state model implemented in `kalasim`. In the examples section you can find an [extended cars example](examples.md#extended-cars) that ded-cars) that is integrating more elaborate  `kalasim` concepts such as [states](state.md) and [resources](resource.md).
+The example demonstrates the main mode of operation, the core API and the component state model implemented in `kalasim`. In the examples section you can find the [traffic example model](examples/Traffic.md) that is integrating more elaborate  `kalasim` concepts such as [states](state.md) and [resources](resource.md).
 
 
 The main body of every `kalasim` model usually starts with:

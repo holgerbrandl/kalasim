@@ -44,6 +44,7 @@ nav:
     - Car Wash: examples/CarWash.md
     - Machine Parts: examples/MachineParts.md
     - Machine Shop: examples/MachineShop.md
+    - Customer Queue: examples/customer_queue.md
   - Advanced:
     - advanced.md
   - About:

@@ -51,3 +51,28 @@ object EventLog {
         sim.addTraceListener(TraceListener { traceElement -> TODO("do something with") })
     }
 }
+
+object Hold1 {
+    @JvmStatic
+    fun main(args: Array<String>) {
+
+        object : Component() {
+            override fun process() = sequence<Component>{
+                yield(hold(5.0))
+                yield(hold(5.0))
+            }
+        }
+
+        object : Component() {
+            override fun process() = sequence {
+                holdMinutes()
+                holdMinutes()
+            }
+
+            private suspend fun SequenceScope<Component>.holdMinutes() {
+                yield(hold(5.0))
+            }
+        }
+
+    }
+}

@@ -35,14 +35,14 @@
 
 It centres around the concept of a *trajectory* that defines a component lifecycle. To enable scale it is built on top of Rcpp (C++ backend for R)
 
-```r
-traj <- trajectory() %>%
- log_("Entering the trajectory") %>%
- timeout(10) %>%
- log_("Leaving the trajectory")
-```
+<!--```r-->
+<!--traj <- trajectory() %>%-->
+<!-- log_("Entering the trajectory") %>%-->
+<!-- timeout(10) %>%-->
+<!-- log_("Leaving the trajectory")-->
+<!--```-->
 
-* Great overview [simmer: Discrete-Event Simulation for R](https://www.jstatsoft.org/article/view/v090i02), Ucar et al, 2019
+* Great overview [simmer: Discrete-Event Simulation for R](https://www.jstatsoft.org/article/view/v090i02), Ucar et al., 2019
 * Support for optimization in [simmer.optim](https://github.com/r-simmer/simmer.optim)
 
 
