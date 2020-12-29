@@ -55,6 +55,7 @@ trajectory: anonymous, 3 activities
 
 **{todo}**  implement `Demo preemptive resource animated.py`
 
+**{todo}** finish elevator example
 
 ## v0.5
 

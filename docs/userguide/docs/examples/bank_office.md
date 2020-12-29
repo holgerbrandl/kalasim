@@ -1,6 +1,12 @@
 <!--## Customer Queue: A bank example-->
 
-Now let's move to a more realistic model. Here customers are arriving in a bank, where there is one clerk. This clerk handles the customers in *first in first out* (FIFO) order.
+Queue problems are common-place application of [discrete event simulation](../theory.md#what-is-discrete-event-simulation).
+
+Often there are multiple solutions for a model. Here we model similar problems - a customer queue -  differently using resources, states and queues in various configurations and interaction patterns.
+
+## Simple Bank Office (1 clerk)
+
+Lets start with a bank office where customers are arriving in a bank, where there is **one** clerk. This clerk handles the customers in a *first in first out* (FIFO) order.
 
 We see the following processes:
 
@@ -58,6 +64,96 @@ yield(hold(uniform(5.0, 15.0).sample()))
 
 will do the statistical sampling and wait for that time till the next customer is created.
 
+Since logging is enabled when creating the simulation with `createSimulation` the following log trace is being produced
+
+```
+time      current component        action                                       info                               
+--------- ------------------------ -------------------------------------------- ----------------------------------
+.00                                main create
+.00       main
+.00                                Clerk.1 create
+.00                                Clerk.1 activate                             scheduled for .00
+.00                                CustomerGenerator.1 create
+.00                                CustomerGenerator.1 activate                 scheduled for .00
+.00                                main run +50.00                              scheduled for 50.00
+.00       Clerk.1
+.00                                Clerk.1 passivate
+.00       CustomerGenerator.1
+.00                                Customer.1 create
+.00                                Customer.1 activate                          scheduled for .00
+.00                                CustomerGenerator.1 hold +11.95              scheduled for 11.95
+.00       Customer.1
+.00                                Customer.1 entering waiting line
+.00                                Clerk.1 activate                             scheduled for .00
+.00                                Customer.1 passivate
+.00       Clerk.1
+.00                                Customer.1 leaving waiting line
+.00                                Clerk.1 hold +10.00                          scheduled for 10.00
+10.00                              Clerk.1
+10.00                              Customer.1 activate                          scheduled for 10.00
+10.00                              Clerk.1 passivate
+10.00     Customer.1
+10.00                              Customer.1 ended
+11.95     CustomerGenerator.1
+11.95                              Customer.2 create
+11.95                              Customer.2 activate                          scheduled for 11.95
+11.95                              CustomerGenerator.1 hold +7.73               scheduled for 19.68
+11.95     Customer.2
+11.95                              Customer.2 entering waiting line
+11.95                              Clerk.1 activate                             scheduled for 11.95
+11.95                              Customer.2 passivate
+11.95     Clerk.1
+11.95                              Customer.2 leaving waiting line
+11.95                              Clerk.1 hold +10.00                          scheduled for 21.95
+19.68     CustomerGenerator.1
+19.68                              Customer.3 create
+19.68                              Customer.3 activate                          scheduled for 19.68
+19.68                              CustomerGenerator.1 hold +10.32              scheduled for 30.00
+19.68     Customer.3
+19.68                              Customer.3 entering waiting line
+19.68                              Customer.3 passivate
+21.95     Clerk.1
+21.95                              Customer.2 activate                          scheduled for 21.95
+21.95                              Customer.3 leaving waiting line
+21.95                              Clerk.1 hold +10.00                          scheduled for 31.95
+21.95     Customer.2
+21.95                              Customer.2 ended
+30.00     CustomerGenerator.1
+30.00                              Customer.4 create
+30.00                              Customer.4 activate                          scheduled for 30.00
+30.00                              CustomerGenerator.1 hold +10.63              scheduled for 40.63
+30.00     Customer.4
+30.00                              Customer.4 entering waiting line
+30.00                              Customer.4 passivate
+31.95     Clerk.1
+31.95                              Customer.3 activate                          scheduled for 31.95
+31.95                              Customer.4 leaving waiting line
+31.95                              Clerk.1 hold +10.00                          scheduled for 41.95
+31.95     Customer.3
+31.95                              Customer.3 ended
+40.63     CustomerGenerator.1
+40.63                              Customer.5 create
+40.63                              Customer.5 activate                          scheduled for 40.63
+40.63                              CustomerGenerator.1 hold +5.31               scheduled for 45.95
+40.63     Customer.5
+40.63                              Customer.5 entering waiting line
+40.63                              Customer.5 passivate
+41.95     Clerk.1
+41.95                              Customer.4 activate                          scheduled for 41.95
+41.95                              Customer.5 leaving waiting line
+41.95                              Clerk.1 hold +10.00                          scheduled for 51.95
+41.95     Customer.4
+41.95                              Customer.4 ended
+45.95     CustomerGenerator.1
+45.95                              Customer.6 create
+45.95                              Customer.6 activate                          scheduled for 45.95
+45.95                              CustomerGenerator.1 hold +12.68              scheduled for 58.63
+45.95     Customer.6
+45.95                              Customer.6 entering waiting line
+45.95                              Customer.6 passivate
+50.00     main
+```
+
 After the simulation is finished, the statistics of the queue are presented with:
 
 ```kotlin
@@ -73,11 +169,11 @@ The statistics output looks like
       "duration": 50,
       "min": 0,
       "max": 1,
-      "mean": 0.111,
-      "standard_deviation": 0.317
+      "mean": 0.15,
+      "standard_deviation": 0.361
     },
     "excl_zeros": {
-      "duration": 5.541386232954704,
+      "duration": 7.500540828621098,
       "min": 1,
       "max": 1,
       "mean": 1,
@@ -88,19 +184,19 @@ The statistics output looks like
   "length_of_stay": {
     "all": {
       "entries": 5,
-      "ninty_pct_quantile": 2.968653617609821,
-      "median": 1.524,
-      "mean": 1.108,
-      "nintyfive_pct_quantile": 2.968653617609821,
-      "standard_deviation": 1.524
+      "ninty_pct_quantile": 3.736,
+      "median": 1.684,
+      "mean": 1.334,
+      "nintyfive_pct_quantile": 3.736,
+      "standard_deviation": 1.684
     },
     "excl_zeros": {
-      "entries": 2,
-      "ninty_pct_quantile": 2.968653617609821,
-      "median": 0.28,
-      "mean": 2.771,
-      "nintyfive_pct_quantile": 2.968653617609821,
-      "standard_deviation": 0.28
+      "entries": 3,
+      "ninty_pct_quantile": 3.736,
+      "median": 1.645,
+      "mean": 2.223,
+      "nintyfive_pct_quantile": 3.736,
+      "standard_deviation": 1.645
     }
   },
   "type": "QueueStatistics",
@@ -109,31 +205,24 @@ The statistics output looks like
 ```
 
 
-## 3 Clerks
+## Bank Office with 3 Clerks
 
-Now, let's add more clerks. Here we have chosen to put the three clerks in a list:
+Now, let's add more clerks:
 
-```
-clerks = [Clerk() for _ in range(3)]
-```
-
-
-although in this case we could have also put them in a salabim queue, like:
-
-```
-clerks = sim.Queue('clerks')
-for _ in range(3):
-    Clerk().enter(clerks)
+```kotlin
+add { (1..3).map { Clerk() } }
 ```
 
 
-And, to restart a clerk:
+And, every time a customer enters the waiting line, we need to make sure at least one passive clerk (if any) is activated:
 
-```
-for clerk in clerks:
-    if clerk.ispassive():
-       clerk.activate()
-       break  # reactivate only one clerk
+```kotlin
+for (c in clerks) {
+    if (c.isPassive) {
+        c.activate()
+        break // activate at max one clerk
+    }
+}
 ```
 
 
@@ -145,48 +234,39 @@ The complete source of a three clerk post office:
 
 ## Bank Office with Resources
 
-The salabim package contains another useful concept for modelling: resources.
-Resources have a limited capacity and can be claimed by components and released later.
+`kalasim` contains another useful concept for modelling: [Resources](../resource.md). Resources have a limited capacity and can be claimed by components and released later.
 
-In the model of the bank with the same functionality as the above example, the
-clerks are defined as a resource with capacity 3.
+In the model of the bank with the same functionality as the above example, the clerks are defined as a resource with capacity 3.
 
 The model code is:
 
-```kotlin
+```kotlin hl_lines="12 21"
 //{!bank/resources/Bank3ClerksResources.kt!}
 ```
 
 Let's look at some details.:
 
-```
-clerks = sim.Resource('clerks', capacity=3)
-```
-
-
-This defines a resource with a capacity of 3.
-
-And then, a customer, just tries to claim one unit (=clerk) from the resource with:
-
-```
-yield self.request(clerks)
+```kotlin
+add { Resource("clerks", capacity = 3) }
 ```
 
+This defines a resource with a capacity of `3`.
 
-Here, we use the default of 1 unit. If the resource is not available, the customer just
-waits for it to become available (in order of arrival).
+Each customer tries to claim one unit (=clerk) from the resource with:
 
-In contrast with the previous example, the customer now holds itself for 30 time units.
-
-And after these 30 time units, the customer releases the resource with:
-
-```
-self.release()
+```kotlin
+yield(request(clerks))
 ```
 
+B default 1 unit will be requested. If the resource is not available, the customer needs to wait for it to become available (in order of arrival).
 
+In contrast with the previous example, the customer now holds itself for 30 time units (clicks). After this time, the customer releases the resource with:
 
-The effect is that salabim then tries to honor the next pending request, if any.
+```kotlin
+release(clerks)
+```
+
+The effect is that `kalasim` then tries to honor the next pending request, if any.
 
 `(actually, in this case this release statement is not required, as resources that were claimed are automatically
 released when a process terminates).`

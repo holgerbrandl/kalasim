@@ -19,7 +19,7 @@ val clerks = Resource("clerks", capacity=3)
 val customer = Component("clerks")
 ```
 
-And then the `customer` can request a clerk in its [process method](component.md#generator):
+The `customer` can request a clerk in its [process method](component.md#creation-of-a-component):
 
 ```kotlin
 yield(request(clerks))  // request 1 from clerks 
