@@ -6,7 +6,7 @@ site_description: >-
   Discrete event simulator with type support, dependency injection, modern persistence and logging to enable large-scale, industrial-ready simulations
 repo_name: holgerbrandl/kalasim
 repo_url: https://github.com/holgerbrandl/kalasim
-#edit_uri: "tree/master/docs/userguide/docs"
+edit_uri: "tree/master/docs/userguide/docs"
 
 # Copyright
 copyright: Copyright &copy; 2020 Holger Brandl
@@ -38,7 +38,12 @@ nav:
     - Monitors: monitors.md
 
   - Examples:
-    - Extended Cars: examples.md
+    - Overview: examples.md
+    - ATM Queue: examples/AtmQueue.md
+    - Traffic: examples/Traffic.md
+    - Car Wash: examples/CarWash.md
+    - Machine Parts: examples/MachineParts.md
+    - Machine Shop: examples/MachineShop.md
   - Advanced:
     - advanced.md
   - About:

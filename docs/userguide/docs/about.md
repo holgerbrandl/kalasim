@@ -49,6 +49,8 @@ traj <- trajectory() %>%
 ### Other discrete simulation engines
 
 *  <https://github.com/aybabtme/desim> - Discrete event simulation framework written in GO that implements a similar API as `kalasim`
+*  [SimPy](https://simpy.readthedocs.io/en/latest/index.html)is a process-based discrete-event simulation framework based on standard Python. Processes in SimPy are defined by Python generator functions. SimPy also provides various types of shared resources to model limited capacity congestion points (like servers, checkout counters and tunnels).
+
 
 ### Libraries used to build kalasim
 
