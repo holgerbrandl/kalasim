@@ -1,7 +1,9 @@
-//Bank3ClerksState.kt
+//Bank3ClerksStandby.kt
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package org.kalasim.examples.bank.state
+package org.kalasim.examples.bank.standby
+
+//TODO
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*

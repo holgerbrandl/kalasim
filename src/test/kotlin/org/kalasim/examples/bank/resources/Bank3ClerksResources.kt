@@ -1,3 +1,4 @@
+//Bank3ClerksResources.kt
 package org.kalasim.examples.bank.resources
 
 import org.apache.commons.math3.distribution.UniformRealDistribution

@@ -1,5 +1,5 @@
+//Bank3ClerksReneging.kt
 package org.kalasim.examples.bank.reneging
-
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
