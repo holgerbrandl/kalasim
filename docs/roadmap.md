@@ -51,6 +51,7 @@ trajectory: anonymous, 3 activities
 { Activity: Timeout | delay: 10 }
 ```
 
+**{todo}**  implement `Demo preemptive resource animated.py`
 ## v0.5
 
 **{todo}** Add equivalent of simmer::select (See Ucar2019,p12) with multiple select policies `List<Resource>.select()`; Also detail out how DI for multiple elements by type (see https://stackoverflow.com/questions/54374067/how-to-retrieve-all-instances-that-matches-a-given-type-using-koin-dependency-in)
