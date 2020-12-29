@@ -2,11 +2,8 @@
 package org.kalasim.examples
 
 import org.apache.commons.math3.distribution.ExponentialDistribution
-import org.kalasim.Component
-import org.kalasim.ComponentGenerator
-import org.kalasim.Resource
+import org.kalasim.*
 import org.kalasim.analytics.display
-import org.kalasim.createSimulation
 
 //https://youtrack.jetbrains.com/issue/KT-44062
 
@@ -36,7 +33,7 @@ fun main() {
             }
         }
 
-        ComponentGenerator(iat = ExponentialDistribution(rg, lambda)) {
+        ComponentGenerator(iat = exponential(lambda, rg)) {
             Customer()
         }
 
