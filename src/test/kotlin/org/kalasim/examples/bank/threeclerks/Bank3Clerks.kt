@@ -15,7 +15,7 @@ class CustomerGenerator : Component() {
     override fun process() = sequence {
         while (true) {
             Customer(get())
-            yield(hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample()))
+            yield(hold(uniform(5.0, 15.0).sample()))
         }
     }
 }
@@ -29,7 +29,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
         for (c in clerks) {
             if (c.isPassive) {
                 c.activate()
-                break // activate only one clerk
+                break // activate at max one clerk
             }
         }
 
@@ -64,9 +64,6 @@ fun main() {
     }
 
     env.apply {
-        // register other components to  be present when starting the simulation
-//        CustomerGenerator()
-
         run(50000.0)
 
         val waitingLine: ComponentQueue<Customer> = get()
