@@ -25,9 +25,9 @@ class ComponentGenerator<T : Component>(
     name: String? = null,
     priority: Int = 0,
     @Suppress("UNUSED_PARAMETER") urgent: Boolean = false,
-    koin : Koin = GlobalContext.get(),
-    val builder: Environment.(counter:Int) -> T
-) : Component(name, priority = priority, process = ComponentGenerator<T>::doIat, koin=koin) {
+    koin: Koin = GlobalContext.get(),
+    val builder: Environment.(counter: Int) -> T
+) : Component(name, priority = priority, process = ComponentGenerator<T>::doIat, koin = koin) {
 
 
     init {
@@ -55,7 +55,7 @@ class ComponentGenerator<T : Component>(
     }
 
     fun doFinalize(): Sequence<Component> = sequence {
-        printTrace(env.now, env.curComponent, this@ComponentGenerator, null, "till reached")
+        printTrace(env.now, env.curComponent, this@ComponentGenerator, "till reached")
     }
 
     override val info: Jsonable

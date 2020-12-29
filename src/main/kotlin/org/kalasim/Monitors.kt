@@ -309,7 +309,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
 
     fun statistics(excludeZeros: Boolean = false) = NumericLevelMonitorStats(this, excludeZeros)
 
-    fun printHistogram(sortByWeight: Boolean=false, binCount: Int= NUM_HIST_BINS, valueBins: Boolean=false) {
+    fun printHistogram(sortByWeight: Boolean = false, binCount: Int = NUM_HIST_BINS, valueBins: Boolean = false) {
         println("Summary of: '${name}'")
         statistics().toJson().printThis()
 

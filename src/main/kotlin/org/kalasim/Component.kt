@@ -1,6 +1,5 @@
 package org.kalasim
 
-import org.apache.commons.math3.distribution.ConstantRealDistribution
 import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.ComponentState.*
 import org.kalasim.misc.Jsonable
@@ -200,11 +199,16 @@ open class Component(
         return this
     }
 
+
+    private var interruptedStatus: ComponentState? = null
+
     /** interrupt level of an interrupted component  non interrupted components return 0. */
     var interruptLevel = 0
         private set
 
-    /** Interrupt the component. */
+    /** Interrupt the component.
+     *
+     * Can not be applied on the curent component. Use `resume()` to resume. */
     fun interrupt() {
         require(status != CURRENT) { "Current component can no be interrupted" }
 
@@ -215,16 +219,16 @@ open class Component(
             remove()
             remainingDuration = scheduledTime - env.now
             interruptLevel = 1
+            interruptedStatus = status
             status = INTERRUPTED
         }
 
         printTrace("interrupt (level=$interruptLevel)")
     }
 
-    /** Resumes an interrupted component.
+    /** Resumes an interrupted component. Can only be applied to interrupted components.
      *
-     * For the full contract definition see https://www.kalasim.org/component/#resume
-
+     * For the full contract definition see https://www.kalasim.org/component/#interrupt
 
      * @param all If `true`, the component returns to the original status, regardless of the number of interrupt levels if
      * `false` (default), the interrupt level will be decremented and if the level reaches 0, the component will return
@@ -234,12 +238,50 @@ open class Component(
      */
     fun resume(all: Boolean = false, priority: Int = 0) {
         // not part of original impl
-        require(status == INTERRUPTED)
-        require(interruptLevel < 0)
-
+        require(status == INTERRUPTED) { "Can only resume interrupted components" }
+        require(interruptLevel > 0) { "interrupt level is expected to be greater than 0" }
+        require(interruptedStatus != null) { "interrupt must be called before resume" }
 
         interruptLevel--
 
+        if (interruptLevel != 0 && !all) {
+            printTrace("resume stalled (interrupt level=$interruptLevel)")
+        } else {
+            status = interruptedStatus!!
+
+            printTrace("resume ($status)")
+
+            when (status) {
+                PASSIVE -> {
+                    printTrace("passivate")
+                }
+                STANDBY -> {
+                    scheduledTime = env.now
+                    env.addStandBy(this)
+                    printTrace("standby")
+                }
+                in listOf(SCHEDULED, WAITING, REQUESTING) -> {
+                    val reason = when (status) {
+                        WAITING -> {
+                            if (waits.isNotEmpty()) tryWait()
+                            "wait"
+                        }
+                        REQUESTING -> {
+                            tryRequest()
+                            "request"
+                        }
+                        SCHEDULED -> {
+                            "hold"
+                        }
+                        else -> "unknown"
+                    }
+
+                    reschedule(env.now + remainingDuration, priority, urgent = false, caller = reason, status)
+
+                }
+                else -> error("Unexpected interrupt status ${status} is $name")
+            }
+        }
 
     }
 
@@ -260,31 +302,32 @@ open class Component(
 
         status = DATA
 
-        printTrace(now(), env.curComponent, this, null, "cancel")
+        printTrace(now(), env.curComponent, this, "cancel")
 
         return this
     }
 
     /**
-     * puts the component in standby mode.
+     * Puts the component in standby mode.
      *
-     * Not allowed for data components or main.
+     * Not allowed for data components or main. If to be used for the current component (which will be nearly always the case),
+    `yield(standby())`.
      *
-     * See https://www.salabim.org/manual/Component.html#standby
+     * For the full contract definition see https://www.kalasim.org/component/#standby
      */
     fun standby() {
         if (status != CURRENT) {
             requireNotData()
             requireNotMain()
             remove()
-            //todo checkFail
+            checkFail()
         }
 
         scheduledTime = env.now
         env.addStandBy(this)
 
         status = STANDBY
-        printTrace(now(), env.curComponent, this, null)
+        printTrace(now(), env.curComponent, this)
     }
 
     fun put(
@@ -441,8 +484,6 @@ open class Component(
                 now(),
                 env.curComponent,
                 this,
-//                REQUESTING.toString() + " " + r.name
-                null,
                 reqText
             )
 
@@ -611,16 +652,16 @@ open class Component(
         scheduledTime = Double.MAX_VALUE
         simProcess = null
 
-        printTrace(now(), env.curComponent, this, null, "ended")
+        printTrace(now(), env.curComponent, this, "ended")
 
         return (this)
     }
 
     private fun requireNotData() =
-        require(status != DATA) { name + "data component not allowed" }
+        require(status != DATA) { "$name data component not allowed" }
 
     private fun requireNotMain() =
-        require(this != env.main) { name + "data component not allowed" }
+        require(this != env.main) { "$name data component not allowed" }
 
     fun reschedule(
         scheduledTime: Double,
@@ -641,8 +682,7 @@ open class Component(
         }
 
         //todo implement extra
-        val extra = "scheduled for ${TRACE_DF.format(scheduledTime)}"
-
+        val extra = "scheduled for ${formatWithInf(scheduledTime)}"
         // line_no: reference to source position
         // 9+ --> continnue generator
         // 13 --> no plus means: generator start
@@ -656,6 +696,7 @@ open class Component(
         // print trace
         printTrace(now(), env.curComponent, this, caller + " " + delta, extra)
     }
+
 
     /**
      * Activate component
@@ -1055,9 +1096,5 @@ data class StateRequest<T>(val state: State<T>, val priority: Int? = null, val p
 
 infix fun <T> State<T>.turns(value: T) = StateRequest(this) { it == value }
 
-@Suppress("unused")
-fun Number.asConstantDist() = ConstantRealDistribution(this.toDouble())
-
-fun Number.asDist() = ConstantRealDistribution(this.toDouble())
-
-fun fixed(value: Double) = ConstantRealDistribution(value)
+private fun formatWithInf(time: Double) =
+    if (time == Double.MAX_VALUE || time.isInfinite()) "<inf>" else TRACE_DF.format(time)

@@ -15,8 +15,8 @@ Definition is simple, like dooropen=sim.State('dooropen'). The default initial v
 open class State<T>(
     initialValue: T,
     name: String? = null,
-    koin : Koin = GlobalContext.get()
-) : SimulationEntity(name,koin) {
+    koin: Koin = GlobalContext.get()
+) : SimulationEntity(name, koin) {
 
     var value: T = initialValue
         set(value) {
@@ -33,9 +33,9 @@ open class State<T>(
         }
 
 
-    private val valueMonitor = FrequencyLevelMonitor<T>(initialValue = value, koin= koin)
+    private val valueMonitor = FrequencyLevelMonitor<T>(initialValue = value, koin = koin)
 
-    internal val waiters = ComponentQueue<Component>("waiters of ${this.name}", koin= koin)
+    internal val waiters = ComponentQueue<Component>("waiters of ${this.name}", koin = koin)
 //    val waiters = PriorityQueue<Component>()
 
     override fun toString(): String = super.toString() + "[${value}]"
@@ -56,8 +56,8 @@ open class State<T>(
             env.now,
             env.curComponent,
             this,
-            "trigger",
-            "value = ${value} --> ${valueAfter} allow $max components"
+            "value = ${value} --> ${valueAfter} allow $max components",
+            "trigger"
         )
 
         this.value = value

@@ -3,14 +3,14 @@ package org.kalasim
 import org.kalasim.misc.TRACE_DF
 
 
-private val TRACE_COL_WIDTHS = listOf(10, 25, 35, 35)
+private val TRACE_COL_WIDTHS = listOf(10, 25, 45, 35)
 
 //todo we should provide an api to resolve these references into a more slim log representation
 data class TraceElement(
     val time: Double,
     val curComponent: Component?,
     val source: SimulationEntity?,
-    val actionDetails: String?,
+    val action: String?,
     val info: String?
 ) {
     override fun toString(): String {
@@ -18,10 +18,12 @@ data class TraceElement(
         return listOf(
             TRACE_DF.format(time),
             curComponent?.name,
-            ((source?.name ?: "") + " " + (actionDetails ?: "")).trim(),
+            ((source?.name ?: "") + " " + (action ?: "")).trim(),
 //            if(source is Component) source.status.toString() else "",
             info
-        ).renderTraceLine().trim()
+        ).apply {
+            1 + 1
+        }.renderTraceLine().trim()
     }
 }
 
@@ -29,7 +31,9 @@ private fun List<String?>.renderTraceLine(): String = map { (it ?: "") }
     .zip(TRACE_COL_WIDTHS)
     .map { (str, padLength) ->
         val padded = str.padEnd(padLength)
-        if(str.length >= padLength){ padded.dropLast(5) + "... "} else padded
+        if (str.length >= padLength) {
+            padded.dropLast(str.length - padLength + 5) + "... "
+        } else padded
     }
     .joinToString("")
 
@@ -66,7 +70,7 @@ class ConsoleTraceLogger(val diffRecords: Boolean) : TraceListener {
                     time,
                     if (ccChanged) curComponent else null,
                     if (ccChanged) null else source,
-                    actionDetails,
+                    action,
                     info
                 )
             }

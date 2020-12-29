@@ -139,7 +139,7 @@ fun <T, S> List<Pair<T, S>>.asCM(): List<CMPair<T, S>> = map { CMPair(it.first, 
 // from https://stackoverflow.com/questions/46895140/how-to-perform-action-for-all-combinations-of-elements-in-lists
 // ternary and higher order: https://stackoverflow.com/questions/53749357/idiomatic-way-to-create-n-ary-cartesian-product-combinations-of-several-sets-of // todo simply add up to 8ary?
 /** Calculate all pairwise combination of 2 lists.*/
- fun <A, B> cartesianProduct(
+fun <A, B> cartesianProduct(
     listA: Iterable<A>,
     listB: Iterable<B>
 ): Sequence<Pair<A, B>> =

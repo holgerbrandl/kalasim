@@ -19,15 +19,15 @@ open class Resource(
     capacity: Number = 1,
     val preemptive: Boolean = false,
     val anonymous: Boolean = false,
-    koin : Koin = GlobalContext.get()
-) : SimulationEntity(name = name, simKoin=koin) {
+    koin: Koin = GlobalContext.get()
+) : SimulationEntity(name = name, simKoin = koin) {
 
 
     var minq: Double = Double.MAX_VALUE
 
     // should we this make readonly from outside?
-    val requesters = ComponentQueue<Component>("requesters of ${this.name}", koin= koin)
-    val claimers = ComponentQueue<Component>("claimers of ${this.name}", koin= koin)
+    val requesters = ComponentQueue<Component>("requesters of ${this.name}", koin = koin)
+    val claimers = ComponentQueue<Component>("claimers of ${this.name}", koin = koin)
 
     var capacity = capacity.toDouble()
         set(value) {
@@ -36,6 +36,8 @@ open class Resource(
 
     var claimedQuantity = 0.0
         set(x) {
+            val diffQuantity = field - x
+
             field = x
 
             claimedQuantityMonitor.addValue(x)
@@ -43,7 +45,8 @@ open class Resource(
             occupancyMonitor.addValue(if (capacity < 0) 0 else claimedQuantity / capacity)
             capacityMonitor.addValue(capacity)
 
-            printTrace("claim $claimedQuantity from $name")
+            val action = if (diffQuantity > 0) "released" else "claimed"
+            printTrace("$action with quantity $claimedQuantity")
         }
 
 
@@ -52,15 +55,21 @@ open class Resource(
 
 
     // TBD Should we initialize these monitoring by tallying the initial state?
-    val capacityMonitor = NumericLevelMonitor("Capacity of ${super.name}", initialValue = capacity, koin= koin)
-    val claimedQuantityMonitor = NumericLevelMonitor("Claimed quantity of ${this.name}", koin= koin)
+    val capacityMonitor = NumericLevelMonitor("Capacity of ${super.name}", initialValue = capacity, koin = koin)
+    val claimedQuantityMonitor = NumericLevelMonitor("Claimed quantity of ${this.name}", koin = koin)
     val availableQuantityMonitor =
-        NumericLevelMonitor("Available quantity of ${this.name}", initialValue = availableQuantity, koin= koin)
-    val occupancyMonitor = NumericLevelMonitor("Occupancy of ${this.name}", koin= koin)
+        NumericLevelMonitor("Available quantity of ${this.name}", initialValue = availableQuantity, koin = koin)
+    val occupancyMonitor = NumericLevelMonitor("Occupancy of ${this.name}", koin = koin)
 
 
     init {
-        printTrace("create ${this.name} with capacity $capacity " + if (anonymous) "anonymous" else "")
+        printTrace(
+            env.now,
+            env.curComponent,
+            this,
+            "create",
+            "capacity=$capacity " + if (anonymous) "anonymous" else ""
+        )
     }
 
     fun tryRequest(): Boolean {

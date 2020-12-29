@@ -5,6 +5,7 @@ package org.kalasim
 import org.apache.commons.math3.random.JDKRandomGenerator
 import org.apache.commons.math3.random.RandomGenerator
 import org.kalasim.ComponentState.*
+import org.kalasim.Defaults.DEFAULT_SEED
 import org.koin.core.Koin
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.GlobalContext
@@ -18,9 +19,9 @@ import java.util.*
 
 const val MAIN = "main"
 
-typealias CompRegistry = Koin
+typealias KoinModule = org.koin.core.module.Module
 
-//internal class EnvBuildContext : org.koin.core.module.Module() {
+//internal class EnvBuildContext : KoinModule() {
 //    var enableTraceLogger: Boolean = true
 //}
 // --> not possible because Module is not open
@@ -28,29 +29,56 @@ typealias CompRegistry = Koin
 // https://github.com/InsertKoinIO/koin/issues/801
 fun configureEnvironment(
     enableTraceLogger: Boolean = false,
-    builder: org.koin.core.module.Module.() -> Unit
+    builder: KoinModule.() -> Unit
 ): Environment =
-    Environment(module(createdAtStart = true) { builder() }, enableTraceLogger)
+    declareDependencies(builder).createSimulation(enableTraceLogger) {}
 
+fun declareDependencies(
+    builder: KoinModule.() -> Unit
+): KoinModule = module(createdAtStart = true) { builder() }
+
+
+fun KoinModule.createSimulation(
+    enableTraceLogger: Boolean = false,
+    useCustomKoin: Boolean = false,
+    randomSeed: Int = DEFAULT_SEED,
+    builder: Environment.() -> Unit
+): Environment = createSimulation(
+    enableTraceLogger = enableTraceLogger,
+    dependencies = this,
+    useCustomKoin = useCustomKoin,
+    randomSeed = randomSeed,
+    builder = builder
+)
 
 fun createSimulation(
     enableTraceLogger: Boolean = false,
+    dependencies: KoinModule? = null,
     useCustomKoin: Boolean = false,
+    randomSeed: Int = DEFAULT_SEED,
     builder: Environment.() -> Unit
 ): Environment =
     Environment(
         enableTraceLogger = enableTraceLogger,
+        dependencies = dependencies,
+        randomSeed = randomSeed,
         koin = if (useCustomKoin) koinApplication { }.koin else null
     ).apply(builder)
+
 
 //fun Environment.createSimulation(builder: Environment.() -> Unit) {
 //    this.apply(builder)
 //}
 
+object Defaults {
+    const val DEFAULT_SEED = 42
+}
+
 class Environment(
-    koins: org.koin.core.module.Module = module(createdAtStart = true) { },
     enableTraceLogger: Boolean = false,
-    koin: Koin? = null
+    dependencies: KoinModule? = null,
+    koin: Koin? = null,
+    randomSeed: Int = DEFAULT_SEED
 ) : KoinComponent {
 
     @Deprecated("serves no purposes and creates a memory leaks as objects are nowhere releases")
@@ -59,7 +87,7 @@ class Environment(
 
     private var running: Boolean = false
 
-    val rg: RandomGenerator = JDKRandomGenerator(42)
+    val rg: RandomGenerator = JDKRandomGenerator(randomSeed)
 
     internal val nameCache = mapOf<String, Int>().toMutableMap()
 
@@ -94,7 +122,7 @@ class Environment(
             addTraceListener(ConsoleTraceLogger(true))
         }
 
-        _koin =  koin ?: run{
+        _koin = koin ?: run {
             GlobalContext.stop()
 
             //https://medium.com/koin-developers/ready-for-koin-2-0-2722ab59cac3
@@ -120,9 +148,13 @@ class Environment(
         main = Component(name = "main", process = null, koin = getKoin())
         setCurrent(main)
 
-        getKoin().loadModules(listOf(koins), createEagerInstances = true)
+        // declare dependencies
+        if (dependencies != null) {
+//            val deps = dependencies ?: (module(createdAtStart = true) { })
+            getKoin().loadModules(listOf(dependencies), createEagerInstances = true)
 //        KoinContextHandler.get()._scopeRegistry.rootScope.createEagerInstances()
 //        startKoin { modules(koins) }
+        }
 
 //        curComponent = main
 
@@ -335,7 +367,7 @@ fun Environment.calcScheduleTime(till: Number?, duration: Number?): Double {
 }
 
 
-inline fun <reified T> org.koin.core.module.Module.add(
+inline fun <reified T> KoinModule.add(
     qualifier: Qualifier? = null,
     noinline definition: Definition<T>
 ) {
