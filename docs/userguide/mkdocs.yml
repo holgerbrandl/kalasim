@@ -39,12 +39,12 @@ nav:
 
   - Examples:
     - Overview: examples.md
-    - ATM Queue: examples/AtmQueue.md
-    - Traffic: examples/Traffic.md
-    - Car Wash: examples/CarWash.md
-    - Machine Parts: examples/MachineParts.md
-    - Machine Shop: examples/MachineShop.md
-    - Customer Queue: examples/customer_queue.md
+    - ATM Queue: examples/atm_queue.md
+    - Traffic: examples/traffic.md
+    - Car Wash: examples/car_wash.md
+    - Machine Parts: examples/machine_parts.md
+    - Machine Shop: examples/machine_shop.md
+    - Bank Office: examples/bank_office.md
   - Advanced:
     - advanced.md
   - About:

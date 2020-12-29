@@ -3,25 +3,16 @@
 
 package org.kalasim.examples.bank.oneclerk
 
-import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
 import org.kalasim.analytics.display
 import org.koin.core.component.get
 import org.koin.core.component.inject
 
 
-class Customer(val waitingLine: ComponentQueue<Customer>, val clerk: Clerk) : Component() {
-
-//    override fun process() = this.let {
-//        sequence {
-//            waitingLine.add(it)
-//
-//            if (clerk.isPassive) clerk.activate()
-//
-//            yield(passivate())
-//        }
-//    }
-
+class Customer(
+    val waitingLine: ComponentQueue<Customer>,
+    val clerk: Clerk
+) : Component() {
     override fun process() = sequence {
         waitingLine.add(this@Customer)
 
@@ -55,28 +46,19 @@ class CustomerGenerator : Component() {
         while (true) {
             Customer(get(), get())
 
-            yield(hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample()))
-//            yield(hold(10.0))
+            yield(hold(uniform(5.0, 15.0).sample()))
         }
     }
 }
 
 
 fun main() {
-
-    val env = configureEnvironment(true) {
-
+    val deps = declareDependencies {
         add { Clerk() }
         add { ComponentQueue<Customer>("waiting line") }
+    }
 
-//        repeat(10) { add{ Customer(get(), get()) } }
-        // register components needed for dependency injection
-//        single(createdAtStart = true) { ComponentQueue<Customer>() }
-//        single(createdAtStart = true) { Clerk() }
-
-//        single { HelloServiceImpl(get()) as HelloService }
-    }.apply {
-        // register other components by simpliy
+    val env = createSimulation(dependencies = deps) {
         CustomerGenerator()
     }.run(50.0)
 

@@ -15,18 +15,20 @@ simmer https://github.com/r-simmer/simmer/
 
 ## v0.4
 
+**{todo}** finish maschine shop
+
+
 **{todo}** implement support for real-time simulations
 
 
 **{todo}** implement `enabled` disabled for monitors
-
 
 **{todo}** ensure that just yieldable methods are used in yield by checking stacktrace
 
 **{todo}**  make `scheduledTime` nullable: replace scheduledTime = Double.MAX_VALUE with `null` which is semantically more meaningful here
 
 
-**{todo}** info for envirroment that render similar to simmer (Ucar 2019, p4)
+**{todo}** info for environment that render similar to simmer (Ucar 2019, p4)
 ```
 R> env %>%
 + add_resource("machine", 10) %>%
@@ -52,6 +54,8 @@ trajectory: anonymous, 3 activities
 ```
 
 **{todo}**  implement `Demo preemptive resource animated.py`
+
+
 ## v0.5
 
 **{todo}** Add equivalent of simmer::select (See Ucar2019,p12) with multiple select policies `List<Resource>.select()`; Also detail out how DI for multiple elements by type (see https://stackoverflow.com/questions/54374067/how-to-retrieve-all-instances-that-matches-a-given-type-using-koin-dependency-in)

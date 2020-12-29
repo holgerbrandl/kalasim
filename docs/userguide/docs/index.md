@@ -32,7 +32,7 @@ We want to build a simulation where a single car is driving around for a some ti
 
 <!--This example corresponds to the `Cars` `salabim` example https://www.salabim.org/manual/Modeling.html-->
 
-The example demonstrates the main mode of operation, the core API and the component state model implemented in `kalasim`. In the examples section you can find the [traffic example model](examples/Traffic.md) that is integrating more elaborate  `kalasim` concepts such as [states](state.md) and [resources](resource.md).
+The example demonstrates the main mode of operation, the core API and the component state model implemented in `kalasim`. In the examples section you can find the [traffic example model](examples/traffic.md) that is integrating more elaborate  `kalasim` concepts such as [states](state.md) and [resources](resource.md).
 
 
 The main body of every `kalasim` model usually starts with:

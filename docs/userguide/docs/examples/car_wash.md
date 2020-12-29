@@ -1,4 +1,4 @@
-## Car Wash
+<!--## Car Wash-->
 
 In this example, we'll learn how to wait for resources. The example is adopted from the [SimPy example](https://simpy.readthedocs.io/en/latest/examples/carwash.html).
 

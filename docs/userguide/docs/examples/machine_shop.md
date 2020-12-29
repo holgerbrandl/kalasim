@@ -1,4 +1,4 @@
-## Machine Shop
+<!--## Machine Shop-->
 
 In this example, we'll learn how to interrupt a process because of more important tasks. The example is adopted from the [SimPy example](https://simpy.readthedocs.io/en/latest/examples/machine_shop.htm).
 

@@ -1,4 +1,4 @@
-## Machine Parts
+<!--## Machine Parts-->
 
 This model demonstrates the use of *stacked* interrupts. It is adopted from [here](https://github.com/salabim/salabim/blob/master/sample%20models/Demo%20interrupt%20resume.py).
 

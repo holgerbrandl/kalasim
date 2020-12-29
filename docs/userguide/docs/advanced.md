@@ -8,7 +8,7 @@ Clearly, it may happen that a simulation is too complex to run at a defined cloc
 
 ## Best Practice Modeling
 
-Often there are multiple solutions for a model. See the [customer queue example](examples/customer_queue.md) where we model the same customer queue with differently using resources, states and queues.
+Often there are multiple solutions for a model. See the [customer queue example](examples/bank_office.md) where we model the same customer queue with differently using resources, states and queues.
 
 ## Operational Control
 

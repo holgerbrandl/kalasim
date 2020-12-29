@@ -62,7 +62,7 @@ val env : Environment = createSimulation(enableTraceLogger = true){
 }.run(5.0)
 ```
 
-To configure references, an `Environment` can also be instantiated by configuring dependencies first with `configureEnvironment`. Check out the [Traffic](examples/Traffic.md) example to learn how that works.
+To configure references, an `Environment` can also be instantiated by configuring dependencies first with `configureEnvironment`. Check out the [Traffic](examples/traffic.md) example to learn how that works.
 
 
 ## Dependency Injection

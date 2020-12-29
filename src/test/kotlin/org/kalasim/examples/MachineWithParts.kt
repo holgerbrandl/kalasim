@@ -9,7 +9,9 @@ val ttr = uniform(3, 6)  //  time to repair distribution
 
 
 class Part(val machine: Machine, partNo: Int) :
-    Component(name = machine.name.replace("Machine", "part") + ".${partNo + 1}") {
+    Component(
+        name = machine.name.replace("Machine", "part") + ".${partNo + 1}"
+    ) {
 
     override fun process() = sequence {
 
