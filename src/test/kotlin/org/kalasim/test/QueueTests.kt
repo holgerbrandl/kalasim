@@ -79,7 +79,7 @@ class QueueTests {
 
             run(10)
 
-            tc.traces.filter { it.info == "ended" }.apply {
+            tc.traces.filter { it.action == "ended" }.apply {
                 size shouldBe 2
                 get(0).source?.name shouldBe c1.name
             }
