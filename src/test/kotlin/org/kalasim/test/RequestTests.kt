@@ -1,5 +1,6 @@
 package org.kalasim.test
 
+import io.kotest.matchers.shouldBe
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.junit.Test
 import org.kalasim.*
@@ -44,6 +45,28 @@ class RequestTests {
                 }
             }
         }
+    }
+
+    @Test
+    fun `it should release resourced when terminating`() = createTestSimulation(true) {
+
+        // see bank office docs: By design resources that were claimed are automatically
+        // released when a process terminates
+
+        val resource = Resource()
+
+        object : Component("foo") {
+
+            override fun process() = sequence {
+                yield(request(resource))
+                yield(hold(1))
+                printTrace("finished process, terminating...")
+            }
+        }
+
+        run(10)
+
+        resource.claimers.size shouldBe 0
     }
 }
 

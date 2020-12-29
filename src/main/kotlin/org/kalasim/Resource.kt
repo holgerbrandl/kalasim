@@ -114,8 +114,8 @@ open class Resource(
         } else {
             require(quantity != null) { "quantity missing for non-anonymous resource" }
 
-            while (requesters.isNotEmpty()) {
-                requesters.poll().release(this)
+            while (claimers.isNotEmpty()) {
+                claimers.q.first().component.release(this)
             }
         }
     }

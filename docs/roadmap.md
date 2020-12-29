@@ -3,30 +3,21 @@
 
 ## Next steps
 
-continue here
-https://simpy.readthedocs.io/en/latest/topical_guides/monitoring.html
-
-https://www.pythonpodcast.com/salabim-with-ruud-van-der-ham-episode-151/
 * 15:08 https://www.scribd.com/listen/podcast/419047861
-
-simmer https://github.com/r-simmer/simmer/
-* in particular https://r-simmer.org/articles/simmer-08-philosophers.html
-
 
 ## v0.4
 
 **{todo}** finish maschine shop
 
+**{todo}** implement/finish standby
 
 **{todo}** implement support for real-time simulations
-
 
 **{todo}** implement `enabled` disabled for monitors
 
 **{todo}** ensure that just yieldable methods are used in yield by checking stacktrace
 
 **{todo}**  make `scheduledTime` nullable: replace scheduledTime = Double.MAX_VALUE with `null` which is semantically more meaningful here
-
 
 **{todo}** info for environment that render similar to simmer (Ucar 2019, p4)
 ```
@@ -58,6 +49,9 @@ trajectory: anonymous, 3 activities
 **{todo}** finish elevator example
 
 ## v0.5
+
+**{todo}**  <https://r-simmer.org/articles/simmer-08-philosophers.html>
+
 
 **{todo}** Add equivalent of simmer::select (See Ucar2019,p12) with multiple select policies `List<Resource>.select()`; Also detail out how DI for multiple elements by type (see https://stackoverflow.com/questions/54374067/how-to-retrieve-all-instances-that-matches-a-given-type-using-koin-dependency-in)
 
@@ -101,19 +95,17 @@ finished, that indicates whether the arrival exhausted its activities (or was re
 **{todo}** port interesting examples from <https://simjuliajl.readthedocs.io/en/stable/examples/index.html>
 
 
-**{todo}** port interesing simmer examples
+**{todo}** port interesting simmer examples
 * https://r-simmer.org/articles/simmer-08-philosophers.html
 
 **{todo}** port machine repair example from  <https://github.com/matloff/des>
-
-
 
 **{todo}** port interesting SimPy examples from https://simpy.readthedocs.io/en/latest/examples/index.html
 
 **{todo}** port  machine maintenance example from ucar 2019
 
-## Later
 
+## Later
 
 **{todo}** should we support a resource queue limit ` queue_size = Inf)` (as in simmer ucar209,p19)
 
