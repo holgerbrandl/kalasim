@@ -3,7 +3,10 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import krangl.cumSum
 import org.apache.commons.math3.distribution.ExponentialDistribution
-import org.kalasim.*
+import org.kalasim.Component
+import org.kalasim.ComponentGenerator
+import org.kalasim.Resource
+import org.kalasim.createSimulation
 import org.kalasim.misc.cartesianProduct
 import org.koin.core.Koin
 import org.koin.core.component.get
@@ -14,10 +17,10 @@ suspend fun main() {
 
     fun buildAtmSimulation(mu: Double, lambda: Double) = createSimulation(useCustomKoin = true) {
 
-        val atm = Resource("atm", 1, koin =  getKoin())
+        val atm = Resource("atm", 1, koin = getKoin())
         _koin.declare(atm)
 
-        class Customer(koin:Koin) : Component(koin=koin) {
+        class Customer(koin: Koin) : Component(koin = koin) {
             val ed = ExponentialDistribution(rg, mu)
 
             override fun process() = sequence {
@@ -28,7 +31,7 @@ suspend fun main() {
             }
         }
 
-        ComponentGenerator(iat = ExponentialDistribution(rg, lambda), koin=getKoin()) {
+        ComponentGenerator(iat = ExponentialDistribution(rg, lambda), koin = getKoin()) {
             Customer(getKoin())
         }
     }

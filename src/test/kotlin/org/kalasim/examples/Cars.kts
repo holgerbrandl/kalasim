@@ -1,5 +1,6 @@
 //Cars.kts
-import org.kalasim.*
+import org.kalasim.Component
+import org.kalasim.createSimulation
 
 class Car : Component() {
 

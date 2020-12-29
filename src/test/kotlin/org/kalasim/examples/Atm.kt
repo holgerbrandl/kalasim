@@ -18,8 +18,10 @@ fun main() {
         val lambda = 1.5
         val mu = 1.0
         val rho = lambda / mu
-        println("rho is ${rho}. With rho>1 the system would be unstable, " +
-                "because there are more arrivals then the atm can serve.")
+        println(
+            "rho is ${rho}. With rho>1 the system would be unstable, " +
+                    "because there are more arrivals then the atm can serve."
+        )
 
         val atm = Resource("atm", 1)
 

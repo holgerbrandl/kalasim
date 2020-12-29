@@ -85,13 +85,14 @@ class SalabimExampleTests {
     @Test
     fun `average waiting should be constant in bank with 1 clerk`() {
         val avgQueueMeans = (1..100).map { 1000.0 * it }.map { runtime ->
-            runtime to configureEnvironment {
+            runtime to declareDependencies {
                 add { org.kalasim.examples.bank.oneclerk.Clerk() }
                 add { ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer>("waiting line") }
-            }.run {
+            }.createSimulation {
 
                 org.kalasim.examples.bank.oneclerk.CustomerGenerator()
-                run(runtime.toDouble())
+                run(runtime)
+            }.run {
 
                 val losStats =
                     get<ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer>>().stats.lengthOfStayStats
@@ -115,14 +116,13 @@ class SalabimExampleTests {
 
     @Test
     fun `Bank3clerks_reneging should work as expected`() {
-        val env = configureEnvironment {
+        val env = declareDependencies {
             // register components needed for dependency injection
             add { ComponentQueue<org.kalasim.examples.bank.reneging.Customer>("waitingline") }
             add { State(false, "worktodo") }
             add { (0..2).map { org.kalasim.examples.bank.reneging.Clerk() } }
-        }
+        }.createSimulation {
 
-        env.apply {
             // register other components to  be present when starting the simulation
             CustomerGenerator()
 

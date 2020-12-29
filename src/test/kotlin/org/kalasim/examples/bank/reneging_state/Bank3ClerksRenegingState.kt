@@ -47,7 +47,7 @@ class Clerk(val workToDo: State<Boolean>) : Component() {
                 yield(wait(workToDo, true))
             }
 
-            println("WAITLENGTH "+ waitingLine.size)
+            println("WAITLENGTH " + waitingLine.size)
             waitingLine.printInfo()
 
             val customer = waitingLine.poll()

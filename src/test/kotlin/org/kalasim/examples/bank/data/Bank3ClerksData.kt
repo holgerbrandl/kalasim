@@ -2,10 +2,7 @@ package org.kalasim.examples.bank.data
 
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
-import org.kalasim.Component
-import org.kalasim.ComponentQueue
-import org.kalasim.add
-import org.kalasim.configureEnvironment
+import org.kalasim.*
 import org.koin.core.component.get
 import org.koin.core.component.inject
 
@@ -47,14 +44,14 @@ class Clerk(val waitingLine: ComponentQueue<Customer>) : Component() {
 
 
 fun main() {
-    val env = configureEnvironment {
+    val deps = declareDependencies {
         // register components needed for dependency injection
         add { ComponentQueue<Customer>("waitingline") }
         add { CustomerGenerator(get()) }
         add { (1..3).map { Clerk(get()) } }
     }
 
-    env.apply {
+    createSimulation(dependencies = deps) {
         run(50000.0)
 
         val waitingLine: ComponentQueue<Customer> = get()
