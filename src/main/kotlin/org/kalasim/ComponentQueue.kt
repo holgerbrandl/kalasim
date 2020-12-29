@@ -155,8 +155,8 @@ fun StatisticalSummary.toJson(): JSONObject {
 
         if (this@toJson is DescriptiveStatistics) {
             "median" to standardDeviation.roundAny().nanAsNull()
-            "ninty_pct_quantile" to getPercentile(90.0).nanAsNull()
-            "nintyfive_pct_quantile" to getPercentile(95.0).nanAsNull()
+            "ninty_pct_quantile" to getPercentile(90.0).roundAny().nanAsNull()
+            "nintyfive_pct_quantile" to getPercentile(95.0).roundAny().nanAsNull()
         }
     }
 }
