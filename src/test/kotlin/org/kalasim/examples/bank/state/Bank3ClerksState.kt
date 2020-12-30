@@ -1,5 +1,4 @@
 //Bank3ClerksState.kt
-@file:Suppress("MemberVisibilityCanBePrivate")
 
 package org.kalasim.examples.bank.state
 
@@ -46,14 +45,17 @@ class Clerk : Component() {
 
 
 fun main() {
-    val env = configureEnvironment(true) {
+    val env = declareDependencies {
         // register components needed for dependency injection
         add { ComponentQueue<Customer>("waitingline") }
         add { State(false, "worktodo") }
-    }.apply {
-        // register other components to  be present when starting the simulation
+
+    }.createSimulation(true) {
+        // register other components to  be present
+        // when starting the simulation
         repeat(3) { Clerk() }
         CustomerGenerator()
+
     }.run(500.0)
 
     env.get<ComponentQueue<Customer>>().printStats()

@@ -18,7 +18,7 @@ class CustomerGenerator : Component() {
     override fun process() = sequence {
         while (true) {
             Customer(get())
-            yield(hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample()))
+            yield(hold(uniform( 5.0, 15.0, env.rg).sample()))
         }
     }
 }
@@ -46,13 +46,14 @@ class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
         yield(hold(50.0)) // if not serviced within this time, renege
 
         if (waitingLine.contains(this@Customer)) {
-//            this@Customer.leave(waitingLine)
+            //  this@Customer.leave(waitingLine)
             waitingLine.leave(this@Customer)
 
             numReneged++
             printTrace("reneged")
         } else {
-            // if customer no longer in waiting line, serving has started meanwhile
+            // if customer no longer in waiting line,
+            // serving has started meanwhile
             yield(passivate())
         }
     }

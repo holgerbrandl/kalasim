@@ -66,6 +66,7 @@ markdown_extensions:
 #      base_path: examples/kotlin
       base_path: ../../src/test/kotlin/org/kalasim/examples
   - footnotes
+  - admonition
   - pymdownx.highlight:
 #      linenums: true
   - pymdownx.superfences:

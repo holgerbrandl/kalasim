@@ -2,7 +2,6 @@
 package org.kalasim.examples.bank.reneging_resources
 
 
-import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
 import org.koin.core.component.get
 
@@ -30,19 +29,17 @@ class Customer(val clerks: Resource) : Component() {
             yield(hold(30))
             release(clerks)
         }
-
     }
-
 }
 
 fun main() {
-    val env = configureEnvironment {
+    declareDependencies {
         add { Resource("clerks", capacity = 3) }
-    }
-
-    env.apply {
+    }.createSimulation {
         // register other components to  be present when starting the simulation
-        ComponentGenerator(iat = UniformRealDistribution(env.rg, 5.0, 15.0)) { Customer(get()) }
+        ComponentGenerator(iat = uniform(5.0, 15.0, rg)) {
+            Customer(get())
+        }
 
         run(50000.0)
 

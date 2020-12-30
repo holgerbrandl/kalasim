@@ -124,7 +124,7 @@ consider modeling `Store` Using Stores you can model the production and consumpt
 
 ---
 
-Review if request and wait should really need
+**{todo}** Remove distibution arguments ins `request`; Do we  really need
 ```
 failAt: RealDistribution? = null,
 failDelay: RealDistribution? = null,

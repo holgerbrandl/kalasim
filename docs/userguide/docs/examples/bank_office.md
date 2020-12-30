@@ -228,7 +228,7 @@ for (c in clerks) {
 
 The complete source of a three clerk post office:
 
-```kotlin
+```kotlin hl_lines="63"
 //{!bank/threeclerks/Bank3Clerks.kt!}
 ```
 
@@ -268,132 +268,117 @@ release(clerks)
 
 The effect is that `kalasim` then tries to honor the next pending request, if any.
 
-`(actually, in this case this release statement is not required, as resources that were claimed are automatically
-released when a process terminates).`
+In this case the release statement is not required, as resources that were claimed are automatically released when a process terminates).`
 
-The statistics are maintained in two system queue, called clerk.requesters() and clerk.claimers().
+The statistics are maintained in two system queues, called `clerk.requesters` and `clerk.claimers`.
 
 The output is very similar to the earlier example. The statistics are exactly the same.
 
 ##  Bank Office with Balking and Reneging
 
-Now, we assume that clients are not going to the queue when there are more than 5 clients
-waiting (balking). On top of that, if a client is waiting longer than 50, he/she will
-leave as well (reneging).
+Now, we assume that clients are not going to the queue when there are more than 5 clients waiting (balking). On top of that, if a client is waiting longer than 50, he/she will leave as well (reneging).
 
 The model code is:
 
-```kotlin
+```kotlin hl_lines="34 48-58 74 75"
 //{!bank/reneging/Bank3ClerksReneging.kt!}
 ```
 
-Let's look at some details.:
+Let's look at some details.
 
-```
-yield self.cancel()
-```
-
-
-This makes the current component (a customer) a data component (and be subject to
-garbage collection), if the queue length is 5 or more.
-
-The reneging is implemented by a hold of 50. If a clerk can service a customer, it will take
-the customer out of the waitingline and will activate it at that moment. The customer just has to check
-whether he/she is still in the waiting line. If so, he/she has not been serviced in time and thus will renege.:
-
-```
-yield self.hold(50)
-if self in waitingline:
-   self.leave(waitingline)
-   env.number_reneged += 1
-else:
-    self.passivate()
+```kotlin
+yield(cancel())
 ```
 
+This makes the current component (a customer) a `DATA` component (and be subject to garbage collection), if the queue length is `5` or more.
 
-All the clerk has to do when starting servicing a client is to get the next customer in line
-out of the queue (as before) and activate this customer (at time now). The effect is that the hold
-of the customer will end.:
+The *reneging* is implemented after a hold of `50`. If a clerk can service a customer, it will take the customer out of the waitingline and will activate it at that moment. The customer just has to check whether he/she is still in the waiting line. If so, he/she has not been serviced in time and thus will renege.
 
+```kotlin
+yield(hold(50.0))
+
+if (waitingLine.contains(this@Customer)) {
+    waitingLine.leave(this@Customer)
+
+    numReneged++
+    printTrace("reneged")
+} else {
+    yield(passivate())
+}
 ```
-self.customer = waitingline.pop()
-self.customer.activate()
+
+
+All the clerk has to do when starting servicing a client is to get the next customer in line out of the queue (as before) and activate this customer (at time now). The effect is that the hold of the customer will end.
+
+```kotlin
+yield(hold(30.0)) 
+customer.activate() // signal the customer that's all's done
 ```
 
 
 ##  Bank Office with Balking and Reneging (resources)
 
-Now we show how the balking and reneging is implemented with resources.
+Now we show how  balking and reneging can be implemented with resources.
 
 The model code is:
 
-```kotlin
+```kotlin hl_lines="24 26 27"
 //{!bank/reneging_resources/Bank3ClerksRenegingResources.kt!}
 ```
 
 As you can see, the balking part is exactly the same as in the example without resources.
 
-For the renenging, all we have to do is add a fail_delay:
+For the renenging, all we have to do is add a `failDelay`:
 
-```
-yield self.request(clerks, fail_delay=50)
-```
-
-
-If the request is not honored within 50 time units, the process continues after that request statement.
-And then, we just check whether the request has failed:
-
-```
-if self.failed():
-   env.number_reneged += 1
+```kotlin
+yield(request(clerks, failDelay = 50.asDist()))
 ```
 
+If the request is not honored within `50` time units (ticks), the process continues after that `request` statement. And then, we just check whether the request has failed with the built-in `Component` property
 
-This example shows clearly the advantage of the resource solution over the passivate/activate method, in this example.
+```kotlin
+iff (failed)
+    numReneged++
+```
+
+This example shows clearly the advantage of the resource solution over the `passivate`/`activate` method, in [former](#bank-office-with-3-clerks) example.
 
 ##  Bank Office with States
 
-The salabim package contains yet another useful concept for modelling: states.
-In this case, we define a state called worktodo.
+Another useful concept for modelling are [states](../state.md). In this case, we define a state called `worktodo`.
 
 The model code is:
 
-```kotlin
+```kotlin hl_lines="23 36 51"
 //{!bank/state/Bank3ClerksState.kt!}
 ```
 
-Let's look at some details.:
+Let's look at some details.
 
+```kotlin
+add { State(false, "worktodo") }
 ```
-worktodo = sim.State('worktodo')
-```
 
-
-This defines a state with an initial value False.
+This defines a state with an initial value `false` and registers it as a dependency.
 
 In the code of the customer, the customer tries to trigger one clerk with:
 
-```
-worktodo.trigger(max=1)
-```
-
-
-The effect is that if there are clerks waiting for worktodo, the first clerk's wait is honored and
-that clerk continues its process after:
-
-```
-yield self.wait(worktodo)
+```kotlin
+workTodo.trigger(true, max = 1)
 ```
 
+The effect is that if there are clerks waiting for worktodo, the first clerk's wait is honored and that clerk continues its process after:
 
-Note that the clerk is only going to wait for worktodo after completion of a job if there
-are no customers waiting.
+```kotlin
+yield(this@Clerk.wait(workTodo, true))
+```
+
+Note that the clerk is only going to wait for worktodo after completion of a job if there are no customers waiting.
+
 
 ## Bank Office with Standby
 
-The salabim package contains yet another powerful process mechanism, called standby. When a component
-is in standby mode, it will become current after *each* event. Normally, the standby will be
-used in a while loop where at every event one or more conditions are checked.
+The `kalasim` package contains yet another powerful process mechanism, called [standby](../component.md#standby). When a component is in [`STANDBY`](../component.md#lifecycle) mode, it will become current after *each* event. Normally, the standby will be used in a while loop where at every event one or more conditions are checked.
 
 The model with standby is:
 
@@ -411,12 +396,11 @@ while len(waitingline) == 0:
 
 The rest of the code is very similar to the version with states.
 
-.. warning:
+<!--https://squidfunk.github.io/mkdocs-material/reference/admonitions-->
 
-    It is very important to realize that this mechanism can have significant impact on the performance,
-    as after EACH event, the component becomes current and has to be checked.
-    In general it is recommended to try and use states or a more straightforward passivate/activate
-    construction.
+!!! warning
+
+    It is very important to realize that this mechanism can have significant impact on the performance, as after EACH event, the component becomes current and has to be checked. In general, it is recommended to try and use [state](../state.md)s or a more straightforward `passivate`/`activate` construction.
 
 
 **{todo}** Document `Bank3ClerksData.kt`
