@@ -56,24 +56,24 @@ class SalabimExampleTests {
                   "length_of_stay": {
                     "all": {
                       "entries": 5,
-                      "ninty_pct_quantile": 4.142020545932034,
+                      "ninty_pct_quantile": 4.142,
                       "median": 1.836,
                       "mean": 1.211,
-                      "nintyfive_pct_quantile": 4.142020545932034,
+                      "nintyfive_pct_quantile": 4.142,
                       "standard_deviation": 1.836
                     },
                     "excl_zeros": {
                       "entries": 2,
-                      "ninty_pct_quantile": 4.142020545932034,
+                      "ninty_pct_quantile": 4.142,
                       "median": 1.576,
                       "mean": 3.027,
-                      "nintyfive_pct_quantile": 4.142020545932034,
+                      "nintyfive_pct_quantile": 4.142,
                       "standard_deviation": 1.576
                     }
                   },
                   "type": "QueueStatistics",
                   "timestamp": 50
-              }"""
+                }"""
         )
 
         //https://github.com/stleary/JSON-java/issues/573
@@ -160,18 +160,18 @@ class SalabimExampleTests {
               "length_of_stay": {
                 "all": {
                   "entries": 193,
-                  "ninty_pct_quantile": 12.347034907974557,
+                  "ninty_pct_quantile": 12.347,
                   "median": 5.429,
                   "mean": 4.353,
-                  "nintyfive_pct_quantile": 15.530711589152576,
+                  "nintyfive_pct_quantile": 15.531,
                   "standard_deviation": 5.429
                 },
                 "excl_zeros": {
                   "entries": 125,
-                  "ninty_pct_quantile": 14.667930815087677,
+                  "ninty_pct_quantile": 14.668,
                   "median": 5.44,
                   "mean": 6.721,
-                  "nintyfive_pct_quantile": 17.61227679143471,
+                  "nintyfive_pct_quantile": 17.612,
                   "standard_deviation": 5.44
                 }
               },
