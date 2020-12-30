@@ -403,4 +403,4 @@ The rest of the code is very similar to the version with states.
     It is very important to realize that this mechanism can have significant impact on the performance, as after EACH event, the component becomes current and has to be checked. In general, it is recommended to try and use [state](../state.md)s or a more straightforward `passivate`/`activate` construction.
 
 
-**{todo}** Document `Bank3ClerksData.kt`
+<!--TODO Document `Bank3ClerksData.kt`-->

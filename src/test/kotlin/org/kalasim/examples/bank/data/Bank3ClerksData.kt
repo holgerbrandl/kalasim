@@ -22,7 +22,7 @@ class CustomerGenerator(val waitingLine: ComponentQueue<Customer>) : Component()
                 }
             }
 
-            yield(hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample()))
+            yield(hold(uniform( 5.0, 15.0,env.rg).sample()))
         }
     }
 }
@@ -30,9 +30,11 @@ class CustomerGenerator(val waitingLine: ComponentQueue<Customer>) : Component()
 class Customer : Component()
 
 
-class Clerk(val waitingLine: ComponentQueue<Customer>) : Component() {
+class Clerk() : Component() {
 
     override fun process() = sequence {
+        val waitingLine = get<ComponentQueue<Customer>>()
+
         while (true) {
             if (waitingLine.isEmpty())
                 yield(passivate())
@@ -49,7 +51,7 @@ fun main() {
         // register components needed for dependency injection
         add { ComponentQueue<Customer>("waitingline") }
         add { CustomerGenerator(get()) }
-        add { (1..3).map { Clerk(get()) } }
+        add { (1..3).map { Clerk() } }
     }
 
     createSimulation(dependencies = deps) {
