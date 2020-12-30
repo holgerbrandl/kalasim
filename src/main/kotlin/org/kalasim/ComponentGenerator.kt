@@ -18,9 +18,9 @@ import org.koin.core.context.GlobalContext
  *  @param till time up to which components should be generated. If omitted, no end
  */
 class ComponentGenerator<T : Component>(
+    val iat: RealDistribution,
     val from: Double? = 0.0,
     var till: Double = Double.MAX_VALUE,
-    val iat: RealDistribution,
     val total: Int = Int.MAX_VALUE,
     name: String? = null,
     priority: Int = 0,

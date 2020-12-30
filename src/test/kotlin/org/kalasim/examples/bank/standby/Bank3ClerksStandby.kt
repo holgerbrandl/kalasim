@@ -1,29 +1,13 @@
 //Bank3ClerksStandby.kt
-@file:Suppress("MemberVisibilityCanBePrivate")
-
-package org.kalasim.examples.bank.standby
-
-//TODO
-
-import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
+import org.kalasim.analytics.display
 import org.koin.core.component.get
 import org.koin.core.component.inject
 
-class CustomerGenerator : Component() {
 
-    override fun process() = sequence {
-        while (true) {
-            Customer(get(), get())
-            yield(hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample()))
-        }
-    }
-}
-
-class Customer(val workTodo: State<Boolean>, val waitingLine: ComponentQueue<Customer>) : Component() {
-    override suspend fun SequenceScope<Component>.process(it: Component) {
+class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
+    override fun process() = sequence{
         waitingLine.add(this@Customer)
-        workTodo.trigger(true, max = 1)
         yield(passivate())
     }
 }
@@ -31,15 +15,13 @@ class Customer(val workTodo: State<Boolean>, val waitingLine: ComponentQueue<Cus
 
 class Clerk : Component() {
     val waitingLine: ComponentQueue<Customer> by inject()
-    val workTodo: State<Boolean> by inject()
 
     override fun process() = sequence {
         while (true) {
-            if (waitingLine.isEmpty())
-                yield(this@Clerk.wait(workTodo, true))
+            while(waitingLine.isEmpty())
+                yield(standby())
 
             val customer = waitingLine.poll()
-
             yield(hold(32.0)) // bearbeitungszeit
             customer.activate()
         }
@@ -48,20 +30,21 @@ class Clerk : Component() {
 
 
 fun main() {
-    val env = configureEnvironment(true) {
-        // register components needed for dependency injection
+    val env = declareDependencies {
         add { ComponentQueue<Customer>("waitingline") }
-        add { State(false, "worktodo") }
-    }.apply {
-        // register other components to  be present when starting the simulation
+
+    }.createSimulation(true) {
         repeat(3) { Clerk() }
-        CustomerGenerator()
-    }.run(500.0)
 
-    env.get<ComponentQueue<Customer>>().printStats()
-    env.get<State<Boolean>>().printInfo()
+        ComponentGenerator(uniform(5,15)){ Customer(get()) }
 
-//    val waitingLine: ComponentQueue<Customer> = env.get()
-//    waitingLine.stats.print()
-//    waitingLine.queueLengthMonitor.display()
+    }
+
+    env.run(500.0)
+
+    env.get<ComponentQueue<Customer>>().apply {
+        printInfo()
+        printStats()
+        lengthOfStayMonitor.display()
+    }
 }

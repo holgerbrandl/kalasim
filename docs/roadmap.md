@@ -83,6 +83,10 @@ finished, that indicates whether the arrival exhausted its activities (or was re
 **{todo}** review simmer.plot
 > Ucar I, Smeets B (2019b). simmer.plot: Plotting Methods for simmer. R package version 0.1.15, URL https://CRAN.R-project.org/package=simmer.plot
 
+## v0.6
+
+Cleanup ComponentGenerator API --> take out from until into own constructor
+
 ## Pre-release
 
 

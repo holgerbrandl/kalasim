@@ -315,7 +315,7 @@ open class Component(
      *
      * For the full contract definition see https://www.kalasim.org/component/#standby
      */
-    fun standby() {
+    fun standby(): Component {
         if (status != CURRENT) {
             requireNotData()
             requireNotMain()
@@ -328,6 +328,8 @@ open class Component(
 
         status = STANDBY
         printTrace(now(), env.curComponent, this)
+
+        return this
     }
 
     fun put(
@@ -377,11 +379,6 @@ open class Component(
         failDelay = failDelay,
         oneOf = oneOf
     )
-
-
-    //todo we should just support one here
-//    fun fixed(value: Double) = value.asConstantDist()
-//
 
     /**
      * Request from a resource or resources
@@ -783,7 +780,17 @@ open class Component(
 
 
     /**
-     * hold the component. See https://www.salabim.org/manual/Component.html#hold
+     * Hold the component.
+     *
+     * For the full contract definition see https://www.kalasim.org/component/#hold
+     *
+     * @param duration Time to hold
+     * @param till Absolute time until the component should be held
+     * @param process Name of process to be started.
+     * * if None (default), process will not be changed
+     * * if the component is a data component, the generator function `process` will be used as the default process.
+     *
+     * Either `duration` or `till` must be specified.
      */
     fun hold(
         duration: Number? = null,
@@ -794,8 +801,7 @@ open class Component(
         if (status != DATA && status != CURRENT) {
             requireNotData()
             remove()
-            //todo
-//            _check_fail()
+            checkFail()
         }
 
         val scheduledTime = env.calcScheduleTime(till, duration)
@@ -1021,17 +1027,6 @@ open class ComponentInfo(c: Component) : Jsonable() {
     val claims = c.claims.toList()
     val requests = c.requests.toMap()
 }
-
-// todo clarify intent or remove
-///** Captures the current state of a `State`*/
-////@Serializable
-//internal data class ComponentInfo2(val time: Double, val name: String, val value: String, val waiters: List<String>) {
-//    override fun toString(): String {
-////        return Json.encodeToString(this)
-//        return GSON.toJson(this)
-//    }
-//}
-
 
 //
 // Abstract component process to be either generator or simple function

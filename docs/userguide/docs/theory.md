@@ -18,9 +18,9 @@ A discrete event simulation (DES) is a tool that allows studying the dynamic beh
 
 In fact, every process that is founded on discrete state changes is suitable to be simulated with a discrete event simulation such as `kalasim`.
 
-As described by [Urcar, 2019](https://www.jstatsoft.org/article/view/v090i02), the discrete nature of a given system arises as soon as its behavior can be described in terms of events, which is the most fundamental concept in DES. An event is an instantaneous occurrence that may change the state of the system, while, between events, all the state variables remain.
+As described by [Ucar, 2019](https://www.jstatsoft.org/article/view/v090i02), the discrete nature of a given system arises as soon as its behavior can be described in terms of events, which is the most fundamental concept in DES. An event is an instantaneous occurrence that may change the state of the system, while, between events, all the state variables remain.
 
-<!-- see Urcar, 2019 page 2-->
+<!-- see Ucar, 2019 page 2-->
 There are several main DES paradigms. In *activity-oriented*  DES the simulation clock advances in fixed time increments and all simulation entities are scanned and possibly reevaluated. Clearly, simulation performance degrades quickly with smaller increments and increasingly complex models.
 
 In *event-oriented* DES is built around a list of scheduled events ordered by future execution time. During simulation, the these events are processed seqeuentially to update the state of the model.
@@ -43,7 +43,7 @@ Typical applications of discrete event simulations are
 * Digital twin development
 * Project management
 
-For  in-depth primers about simulation see [here](https://simulation.tudelft.nl/dsol/manual/simulation-theory/introduction) or [Urcar, 2019](https://www.jstatsoft.org/article/view/v090i02).
+For  in-depth primers about simulation see [here](https://simulation.tudelft.nl/dsol/manual/simulation-theory/introduction) or [Ucar, 2019](https://www.jstatsoft.org/article/view/v090i02).
 
 
 ## Other Simulation Tools

@@ -208,20 +208,15 @@ class Environment(
     /** Executes the next step of the future event list */
     private fun step() {
 
-        if (pendingStandBy.isNotEmpty()) {
-            val notCancelled = pendingStandBy
-                // skip cancelled components
-                .filter { it.status == STANDBY }
+        pendingStandBy.removeIf { it.status != STANDBY }
 
-            pendingStandBy.clear()
-
-            notCancelled
-                .forEach {
-                    setCurrent(it, "standby")
-                    it.callProcess()
-                }
+        pendingStandBy.removeFirstOrNull()?.let {
+            setCurrent(it, "standby")
+            it.callProcess()
+            return
         }
 
+        // move previously standby to pending-standby
         pendingStandBy += standBy
         standBy.clear()
 
@@ -299,8 +294,8 @@ class Environment(
 
         // TODO what is happening here, can we simplify that?
         if (c.status == STANDBY) {
-            addStandBy(c)
-            addPendingStandBy(c)
+            standBy.remove(c)
+            pendingStandBy.remove(c)
         }
     }
 
