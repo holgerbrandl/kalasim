@@ -1,6 +1,4 @@
-# Examples
-
-Overview
+<!--# Examples-->
 
 There's nothing more intriguing than a good example. To provide guidance we tried to categorize our examples by difficulty. Categorization is opinionated and just tries to pave an entry path into `kalasim` API.
 
