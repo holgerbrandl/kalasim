@@ -233,6 +233,11 @@ Standby has the effect that the component will be triggered on the next simulati
 * If the component is current, use always `yield(standby())`
 * Although theoretically possible, it is not recommended to use standby for non current components.
 
+Examples
+
+* [Bank Office with Standby](examples/bank_office.md#bank-office-with-standby)
+
+
 ### request
 
 Request has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
@@ -265,6 +270,10 @@ If the component is [canceled](#cancel), [activated](#activate), [passivated](#p
 ### interrupt
 
 With interrupt components that are not current or data can be temporarily be interrupted. Once a resume is called for the component, the component will continue (for scheduled with the remaining time, for waiting or requesting possibly with the remaining fail_at duration).
+
+Examples
+
+* [Machine Parts](examples/machine_parts.md)
 
 ## Usage of process interaction methods within a function or method
 
@@ -320,6 +329,14 @@ It requires 2 main parameters
 
 See [here](https://github.com/holgerbrandl/kalasim/blob/master/src/main/kotlin/org/kalasim/ComponentGenerator.kt#L20) for a complete listing of supported arguments.
 
+
+Examples
+
+* [Car Wash](examples/car_wash.md)
+* [Gas Station](examples/gas_station.md)
+* [ATM Queue](examples/atm_queue.md)
+
+
 ## Queue
 
 Kalasim builds on top of the JVM's [PriorityQueue](https://docs.oracle.com/javase/7/docs/api/java/util/PriorityQueue.html)  to model waiting lines etc. Conceptual our implementation is very similar to `salabim`'s [queue](
@@ -339,3 +356,8 @@ Customer->>Queue: Enter waiting line
 Clerk->>Queue: Pull next customer
 Clerk-->>EventLoop: hold vor n time units for processing
 ```
+
+
+Examples
+
+* [ATM Queue](examples/atm_queue.md)

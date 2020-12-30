@@ -1,9 +1,6 @@
-import org.apache.commons.math3.distribution.UniformRealDistribution
+//CarWash.kt
 import org.kalasim.*
 import org.koin.core.component.get
-
-//CarWash.kt
-
 
 /**
  *  A carwash has a limited number of washing machines and defines
@@ -39,13 +36,13 @@ fun main() {
         repeat(3) { Car() }
 
         // Create more cars while the simulation is running
-        ComponentGenerator(iat = UniformRealDistribution(T_INTER - 2, T_INTER + 2)) { Car() }
+        ComponentGenerator(iat = uniform(T_INTER - 2, T_INTER + 2)) { Car() }
     }
 
 
     println("Carwash\n======\n")
     println("Check out http://youtu.be/fXXmeP9TvBg while simulating ... ;-)")
 
-// Start the simulation
+    // Start the simulation
     env.run(until = SIM_TIME)
 }

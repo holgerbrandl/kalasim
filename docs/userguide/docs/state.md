@@ -5,6 +5,14 @@ States together with the `Component.wait()` method provide a powerful way of pro
 A state will have a certain value at a given time. In its simplest form a component can then wait for
 a specific value of a state. Once that value is reached, the component will be resumed.
 
+## Examples
+
+* [Traffic](examples/traffic.md)
+* [Bank Office with 1 clerk](examples/bank_office.md#bank-office-with-states)
+* [Bank Office With Balking And Reneging](examples/bank_office.md#bank-office-with-balking-and-reneging)
+
+## Usage
+
 Definition is simple, like `val doorOpen = State(false)`. The initial value is False, meaning
 the door is closed.
 

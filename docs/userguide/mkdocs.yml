@@ -41,6 +41,7 @@ nav:
     - Overview: examples.md
     - ATM Queue: examples/atm_queue.md
     - Traffic: examples/traffic.md
+    - Gas Station: examples/gas_station.md
     - Car Wash: examples/car_wash.md
     - Machine Parts: examples/machine_parts.md
     - Machine Shop: examples/machine_shop.md

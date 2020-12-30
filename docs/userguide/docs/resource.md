@@ -7,10 +7,20 @@ may change over time.
 
 There are two of types resources:
 
-* standard resources, where each claim is associated with a component (the claimer). It is not necessary that the claimed quantities are integer.
-* anonymous resources, where only the claimed quantity is registered. This is most useful for dealing with levels, lengths, etc.
+* Standard resources, where each claim is associated with a component (the claimer). It is not necessary that the claimed quantities are integer.
+* Anonymous resources, where only the claimed quantity is registered. This is most useful for dealing with levels, lengths, etc.
 
 <!-- todo consider to add a dedicated container type instead of anonymous resources https://simpy.readthedocs.io/en/latest/topical_guides/resources.html#containers-->
+
+## Examples
+
+* [Bank Office with Resources](examples/bank_office.md#bank-office-with-resources)
+* [Car Wash](examples/car_wash.md)
+* [Traffic](examples/traffic.md)
+* [Gas Station](examples/gas_station.md)
+
+
+## Usage
 
 Resources are defined like:
 
@@ -235,12 +245,11 @@ Note that the occupancy is set to 0 if the capacity of the resource is <= 0.
 
 ##  Anonymous resources
 
-For anonymous resources, it may be not allowed to exceed the capacity and have a component wait for enough (claimed) capacity to be available. That may be accomplished by using a negative
-quantity in the `Component.request()` call.
+For anonymous resources, it may be not allowed to exceed the capacity and have a component wait for enough (claimed) capacity to be available. That may be accomplished by using a negative quantity in the `Component.request()` call.
 
-Alternatively, it possible to use the `Component.put()` method, where quantities of anonymous resources are negated. For symmetry reasons, kalasim also offers the `Component.get()` method, which is behaves exactly like `Component.request()`.
+Alternatively, it possible to use the `Component.put()` method, where quantities of anonymous resources are negated. For symmetry reasons, `kalasim` also offers the `Component.get()` method, which is behaves exactly like `Component.request()`.
 
-The model below illustrates the use of get and put. See the [gas station](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/examples/Refuel.kt) simulation for a living example.
+The model below illustrates the use of `get` and `put`. See the [Gas Station](examples/gas_station.md) simulation for a living example.
 
 
 ## Pre-emptive Resources
@@ -258,3 +267,8 @@ action (usually hold or passivate).
 Therefore, a component claiming from a preemptive resource should check
 whether the component is bumped or still claiming at any point where they can be bumped.
 This can be done with the method `Component.isClaiming()` which is `true` if the component is claiming from the resource, or the opposite (Component.isBumped) which is True is the component is not claiming from te resource.
+
+
+Examples
+
+* [Machine Shop](examples/machine_shop.md)

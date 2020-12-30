@@ -47,7 +47,7 @@ By supporting a pub-sub pattern, users can easily attach different monitoring ba
 
 <!-- TODO detail out monitoring backends https://github.com/r-simmer/simmer.mon-->
 
-Trace logs a suitable for standard kotlin collection processing. E.g. we can setup a [coroutines channel](https://kotlinlang.org/docs/reference/coroutines/channels.html) for log events that is is consumed asynchronously ([example](https://github.com/holgerbrandl/kalasim/tree/master/src/test/kotlin/org/kalasim/examples/analysis/LogChannelConsumer.kts#L47-L47)).
+Trace logs a suitable for standard kotlin collection processing. E.g. we can setup a [coroutines channel](https://kotlinlang.org/docs/reference/coroutines/channels.html) for log events that is is consumed asynchronously ([example](examples/misc.md#coroutine-channels)).
 
 ## Monitors
 
@@ -60,9 +60,9 @@ See chapter about [monitors](monitors.md).
 
 ## Replication
 
-Running a simulation just once, often does not provide sufficient insights into the dynamics of the system under consideration. Often, the user may want to execute a model many times with altered initial conditions, and then perform a statistical analysis over the output. This is also considered as *what-if* analyis. See [ClassicWhatIfAtm.kt](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/examples/ClassicWhatIfAtm.kt) for simple example.
+Running a simulation just once, often does not provide sufficient insights into the dynamics of the system under consideration. Often, the user may want to execute a model many times with altered initial conditions, and then perform a statistical analysis over the output. This is also considered as *what-if* analyis. See [here](examples/atm_queue.md#simple-what-if) for simple example.
 
-By design `kalasim` does not make use of parallelism. So when scaling up execution to run in paralell, we need to be careful, that the internal [dependency injection](basics.md#dependency-injection) (which relates by default to a global context variable) does cause trouble. See [ParallelWhatIfAtm.kt](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/examples/ParallelWhatIfAtm.kt) for an example that defines a parameter grid to be assessed with a simulation run per hyper-parameter.
+By design `kalasim` does not make use of parallelism. So when scaling up execution to run in paralell, we need to be careful, that the internal [dependency injection](basics.md#dependency-injection) (which relates by default to a global context variable) does cause trouble. See [here](examples/atm_queue.md#parallel-what-if) for an example that defines a parameter grid to be assessed with a simulation run per hyper-parameter.
 
 <!--See also 4.2 in Ucar2019-->
 

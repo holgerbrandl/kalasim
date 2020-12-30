@@ -80,6 +80,12 @@ Koin does not allow injecting simple types. To inject simple variables, consider
 
 For details about how to use lazy injection with `inject<T>()` and instance retrieval with `get<T>()` see [koin reference](https://doc.insert-koin.io/#/koin-core/injection-parameters).
 
+Examples
+
+* [Traffic](examples/traffic.md)
+* [Car Wash](examples/car_wash.md)
+* [Gas Station](examples/gas_station.md)
+
 ## Randomness & Distributions
 
 Experimentation in a simulation context relates to large part to controlling randomess. Here, this is achieved by using probabilistc

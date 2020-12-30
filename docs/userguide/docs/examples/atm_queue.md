@@ -1,5 +1,7 @@
 <!--## ATM Queue-->
 
+## Simple Queue Model
+
 Let's explore the expressiveness of `kalasim`s process description using a *traditional queuing* example, the [M/M/1](https://en.wikipedia.org/wiki/M/M/1_queue). This [Kendall's notation](https://en.wikipedia.org/wiki/Kendall%27s_notation) describes a single server - here a ATM - with exponentially distributed arrivals, exponential service time and an infinte queue.
 <!--see Ucar2019, 4.1 for more details-->
 
@@ -12,12 +14,28 @@ The basic parameters of the system are
 
 If  λ/µ > 1, the queue is referred to as *unstable* since there are more arrivals than the ATM can handle. The queue will grow indefinitely.
 
-
-
 ```kotlin
-//{!Atm.kt!}
+//{!atm/Atm.kt!}
 ```
 
 The ATM example is inspired from the `simmer` paper [Ucar et al. 2019](https://www.jstatsoft.org/article/view/v090i02).
 
 <!--TODO add analytics screenshots here-->
+
+
+## Simple What-If
+
+To
+
+```kotlin
+//{!atm/ClassicWhatIfAtm.kt!}
+```
+
+
+## Parallel What-If
+
+```kotlin
+//{!atm/ParallelWhatIfAtm.kt!}
+```
+
+

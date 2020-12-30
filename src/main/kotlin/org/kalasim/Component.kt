@@ -346,7 +346,7 @@ open class Component(
      *
      *  Not allowed for data components or main.
 
-     * @sample org.kalasim.examples.Refuel.main
+     * @sample org.kalasim.examples.Gasstation.main
      */
     fun request(
         resources: Collection<Resource>,
@@ -365,7 +365,7 @@ open class Component(
      *
      *  Not allowed for data components or main.
      *
-     * @sample org.kalasim.examples.Refuel.main
+     * @sample org.kalasim.examples.Gasstation.main
      */
     fun request(
         vararg resources: Resource,
@@ -407,7 +407,7 @@ open class Component(
      *
      * The parameter failed will be reset by a calling request or wait
      *
-     * @sample org.kalasim.examples.Refuel.main
+     * @sample org.kalasim.examples.Gasstation.main
      *
      * @param resourceRequests sequence of items where each item can be:
      * - resource, where quantity=1, priority=tail of requesters queue

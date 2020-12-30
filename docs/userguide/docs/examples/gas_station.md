@@ -9,7 +9,7 @@ The following example integrates three simulation entities
 The example illustrates how to establish a simple interplay of  [states](../state.md) and [resources](../resource.md). It is realized elegantly with [dependency injection](../basics.md#dependency-injection).
 
 ```kotlin
-//{!Traffic.kts!}
+//{!GasStation.kts!}
 ```
 
 Here,  we use both lazy injection with `inject<T>()` and instance retrieval with `get<T>()`. For details see [koin reference](https://doc.insert-koin.io/#/koin-core/injection-parameters)

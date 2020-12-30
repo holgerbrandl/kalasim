@@ -7,6 +7,7 @@
 
 ## v0.4
 
+
 **{todo}** finish maschine shop
 
 **{todo}** implement/finish standby
@@ -85,7 +86,12 @@ finished, that indicates whether the arrival exhausted its activities (or was re
 
 ## v0.6
 
-Cleanup ComponentGenerator API --> take out from until into own constructor
+**{todo}** https://simpy.readthedocs.io/en/latest/examples/movie_renege.html
+
+**{todo}** Cleanup ComponentGenerator API --> take out from until into own constructor
+
+**{todo}**  better document/discuss intent of `standby`
+* isn't it just like hold? What are the benefits?
 
 ## Pre-release
 
