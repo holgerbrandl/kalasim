@@ -1,6 +1,7 @@
 package org.kalasim
 
 import org.kalasim.misc.TRACE_DF
+import java.util.logging.Level
 
 
 private val TRACE_COL_WIDTHS = listOf(10, 25, 45, 35)
@@ -42,10 +43,22 @@ fun interface TraceListener {
     fun processTrace(traceElement: TraceElement)
 }
 
-class ConsoleTraceLogger(val diffRecords: Boolean) : TraceListener {
+fun interface TraceFilter {
+    fun accept(te: TraceElement): Boolean
+}
+
+class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.FINER) : TraceListener {
 
     var hasPrintedHeader = false
     var lastElement: TraceElement? = null
+
+    val filters = mutableListOf<TraceFilter>()
+
+    init {
+        filters.add(TraceFilter { it.action?.contains("entering requesters") ?: true })
+        filters.add(TraceFilter { it.action?.contains("removed from requesters") ?: true })
+        filters.add(TraceFilter { it.action?.contains("removed from claimers") ?: true })
+    }
 
     override fun processTrace(traceElement: TraceElement) {
         if (!hasPrintedHeader) {
@@ -61,6 +74,8 @@ class ConsoleTraceLogger(val diffRecords: Boolean) : TraceListener {
             println(header.renderTraceLine())
             println(TRACE_COL_WIDTHS.map { "-".repeat(it - 1) }.joinToString(separator = " "))
         }
+
+        if(!filters.all { it.accept(traceElement) }) return
 
         // do a diff for logging
         val printElement = if (diffRecords && lastElement != null) {

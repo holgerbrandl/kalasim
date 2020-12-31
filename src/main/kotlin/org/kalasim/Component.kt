@@ -354,7 +354,7 @@ open class Component(
         failDelay: RealDistribution? = null,
         oneOf: Boolean = false,
     ) = request(
-        *resources.map { it withQuantity 1.0 }.toTypedArray(),
+        *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
         failAt = failAt,
         failDelay = failDelay,
         oneOf = oneOf
@@ -374,7 +374,7 @@ open class Component(
         failDelay: RealDistribution? = null,
         oneOf: Boolean = false,
     ) = request(
-        *resources.map { it withQuantity 1.0 }.toTypedArray(),
+        *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
         failAt = failAt,
         failDelay = failDelay,
         oneOf = oneOf
@@ -1062,7 +1062,9 @@ class SimpleProcessInternal(val component: Component, val funPointer: ProcessPoi
     }
 }
 
-data class ResourceRequest(val r: Resource, val quantity: Double, val priority: Int? = null)
+internal const val DEFAULT_REQUEST_QUANTITY = 1.0
+
+data class ResourceRequest(val r: Resource, val quantity: Double = DEFAULT_REQUEST_QUANTITY, val priority: Int? = null)
 
 infix fun Resource.withQuantity(quantity: Number) = ResourceRequest(this, quantity.toDouble())
 
