@@ -51,6 +51,12 @@ trajectory: anonymous, 3 activities
 
 ## v0.5
 
+**{todo}** consider embed yield into hold/request (or add second verb to support that
+```
+yield(request(repairMan))
+yield(hold(REPAIR_TIME))
+```
+
 **{todo}**  <https://r-simmer.org/articles/simmer-08-philosophers.html>
 
 
@@ -92,6 +98,14 @@ finished, that indicates whether the arrival exhausted its activities (or was re
 
 **{todo}**  better document/discuss intent of `standby`
 * isn't it just like hold? What are the benefits?
+
+
+**{todo}** optional request context with auto-release
+```
+request(){
+    hold
+}
+```
 
 ## Pre-release
 
