@@ -26,13 +26,16 @@ Monitors support a wide range of statistical properties via `m.statistics()` inc
 For all these statistics, it is possible to exclude zero entries,
 e.g. `m.statistics(statistics=true)` returns the mean, excluding zero entries.
 
-Monitors can be enabled or disabled by setting the boolean flag `m.enabled`.
+Monitors can be disabled with `disable()` by setting the boolean flag ``.
 
 ```kotlin
-m.enabled = false  // disable monitoring
-m.enabled = true   // enable monitoring
+m.diable()  // disable monitoring
+
+m.reset()              // reenable statistics monitoring
+m.reset(initalValue)   // reenable level monitoring
 ```
 
+Continuation of a temporarily disabled monitor is currently not supported.
 
 ## Non level monitors
 

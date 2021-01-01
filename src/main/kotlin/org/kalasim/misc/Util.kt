@@ -37,9 +37,8 @@ internal fun DescriptiveStatistics.buildHistogram(
 }
 
 
-internal fun ImplementMe() {
+internal fun ImplementMe() : Nothing =
     TODO("Not yet implemented. Please file a ticket under https://github.com/holgerbrandl/kalasim/issues")
-}
 
 
 internal typealias  Histogram<T> = List<Pair<T, Long>>

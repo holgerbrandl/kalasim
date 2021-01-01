@@ -12,7 +12,6 @@ import org.apache.commons.math3.stat.descriptive.moment.Variance
 import org.json.JSONObject
 import org.kalasim.misc.*
 import org.koin.core.Koin
-import org.koin.core.component.KoinComponent
 import org.koin.core.context.GlobalContext
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
@@ -24,31 +23,31 @@ import kotlin.math.sqrt
 
 abstract class Monitor<T>(
     name: String? = null,
-    private val simKoin: Koin = GlobalContext.get()
-) : KoinComponent {
-
-    val env by lazy { getKoin().get<Environment>() }
-
-
-    override fun getKoin(): Koin = simKoin
+    koin: Koin = GlobalContext.get()
+) : SimulationEntity(name, koin) {
 
     /** Disable or enable data collection in a monitor. */
-    //TODO implement this function
     var enabled: Boolean = true
+        protected set
 
-    var name: String
-        private set
-
-    init {
-        this.name = nameOrDefault(name, env.nameCache)
+    fun disable() {
+        enabled = false
     }
 
+
+    fun <T> ifEnabled(query: () -> T): T {
+        if (!enabled) {
+            throw  IllegalArgumentException("can not query disabled monitor")
+        }
+
+        return query()
+    }
 }
 
 
 interface StatisticMonitor<T> {
 
-    /** Resets the monitor. */
+    /** Resets the monitor. This will also reenable it as a side-effect. */
     fun reset()
 
     fun addValue(value: T)
@@ -62,7 +61,7 @@ interface LevelMonitor<T> {
     operator fun get(time: Double): T?
 
 
-    /** Resets the monitor to a new initial at the current simulation clock. */
+    /** Resets the monitor to a new initial at the current simulation clock. This will also reenable it as a side-effect. */
     fun reset(initial: T)
 
     fun addValue(value: T)
@@ -77,9 +76,13 @@ open class FrequencyMonitor<T>(
     name: String? = null,
     koin: Koin = GlobalContext.get()
 ) : Monitor<T>(name, koin), StatisticMonitor<T> {
+
     val frequencies = mutableMapOf<T, Int>()
+        get() = ifEnabled { field }
 
     override fun addValue(value: T) {
+        if (!enabled) return
+
         frequencies.merge(value, 1, Int::plus)
     }
 
@@ -104,12 +107,15 @@ open class FrequencyMonitor<T>(
     }
 
     open fun getPct(value: T): Double = frequencies[value]!!.toDouble() / total
+
+    override val info: Jsonable
+        get() = ImplementMe()
 }
 
 /**
  * Level monitors tally levels along with the current (simulation) time. e.g. the number of parts a machine is working on.
  *
- * @sample org.kalasim.examples.DokkaExamplesKt.freqLevelDemo
+ * @sample org.kalasim.misc.DokkaExamplesKt.freqLevelDemo
  */
 class FrequencyLevelMonitor<T>(
     initialValue: T,
@@ -118,13 +124,15 @@ class FrequencyLevelMonitor<T>(
 ) : Monitor<T>(name, koin), LevelMonitor<T> {
 
     private val timestamps = listOf<Double>().toMutableList()
-    private val values = listOf<T>().toMutableList()
+    private val values = ifEnabled { listOf<T>().toMutableList() }
 
     init {
         reset(initialValue)
     }
 
     override fun reset(initial: T) {
+        enabled = true
+
         values.clear()
         timestamps.clear()
 
@@ -132,6 +140,8 @@ class FrequencyLevelMonitor<T>(
     }
 
     override fun addValue(value: T) {
+        if (!enabled) return
+
         timestamps.add(env.now)
         values.add(value)
     }
@@ -180,13 +190,16 @@ class FrequencyLevelMonitor<T>(
 
         hist.printHistogram(sortByWeight = sortByWeight, values = values)
     }
+
+    override val info: Jsonable
+        get() = ImplementMe()
 }
 
 private val NUM_HIST_BINS = 10
 
 class NumericStatisticMonitor(name: String? = null, koin: Koin = GlobalContext.get()) :
     Monitor<Number>(name, koin) {
-    private val sumStats = DescriptiveStatistics()
+    private val sumStats = ifEnabled { DescriptiveStatistics() }
 
     internal val values: DoubleArray
         get() = sumStats.values
@@ -251,6 +264,13 @@ class NumericStatisticMonitor(name: String? = null, koin: Koin = GlobalContext.g
 
         return NumericStatisticMonitorStats(stats)
     }
+
+    fun enable() {
+        enabled = true
+    }
+
+    override val info: Jsonable
+        get() = statistics(false)
 }
 
 class NumericStatisticMonitorStats(internal val ss: StatisticalSummary) : StatisticalSummary by ss, Jsonable() {
@@ -264,17 +284,19 @@ class NumericStatisticMonitorStats(internal val ss: StatisticalSummary) : Statis
  * @param initialValue initial value for a level monitor. It is important to set the value correctly. Default: 0
  */
 class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: Koin = GlobalContext.get()) :
-    SimulationEntity(name, koin),
+    Monitor<Number>(name, koin),
     LevelMonitor<Number> {
 
     private val timestamps = listOf<Double>().toMutableList()
-    private val values = listOf<Double>().toMutableList()
+    private val values = ifEnabled { listOf<Double>().toMutableList() }
 
     init {
         addValue(initialValue)
     }
 
     override fun addValue(value: Number) {
+        if (!enabled) return
+
         timestamps.add(env.now)
         values.add(value.toDouble())
     }
@@ -353,10 +375,15 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
     }
 
     override val info: Jsonable
-        get() = TODO("Not yet implemented")
+        get() = statistics(false)
 
     override fun reset(initial: Number) {
-        TODO("Not yet implemented")
+        enabled = true
+
+        values.clear()
+        timestamps.clear()
+
+        addValue(initial)
     }
 }
 

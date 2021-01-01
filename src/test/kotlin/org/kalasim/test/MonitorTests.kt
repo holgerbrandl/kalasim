@@ -1,5 +1,6 @@
 package org.kalasim.test
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import org.junit.Test
@@ -110,6 +111,36 @@ class MonitorTests {
 
         nsm.statistics().mean shouldBe 4.0
     }
+
+    @Test
+    fun `disabled monitor should error nicely when being queried`() = createTestSimulation {
+        //FrequencyMonitor
+        run {
+            val nsm = FrequencyMonitor<Int>()
+
+            nsm.addValue(2)
+
+
+            nsm.disable()
+
+            shouldThrow<IllegalArgumentException> {
+                nsm.frequencies.size
+            }
+
+            // should be silently ignores
+            nsm.addValue(2)
+
+
+
+            shouldThrow<IllegalArgumentException> {
+                nsm.printHistogram()
+            }
+        }
+    }
+
+    // TODO test the others
+
+
 }
 
 

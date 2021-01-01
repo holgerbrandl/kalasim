@@ -3,18 +3,15 @@
 
 ## Next steps
 
-* 15:08 https://www.scribd.com/listen/podcast/419047861
-
 ## v0.4
 
+**{done}** finish maschine shop
 
-**{todo}** finish maschine shop
-
-**{todo}** implement/finish standby
+**{done}** implement/finish `interrupt`/`standby`
 
 **{todo}** implement support for real-time simulations
 
-**{todo}** implement `enabled` disabled for monitors
+**{done}** implement `enabled` disabled for monitors
 
 **{todo}** ensure that just yieldable methods are used in yield by checking stacktrace
 
@@ -47,7 +44,7 @@ trajectory: anonymous, 3 activities
 
 **{todo}**  implement `Demo preemptive resource animated.py`
 
-**{todo}** finish elevator example
+**{todo}** finish elevator example with visualization
 
 ## v0.5
 

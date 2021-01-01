@@ -129,10 +129,10 @@ class SalabimExampleTests {
             val waitingLine: ComponentQueue<org.kalasim.examples.bank.reneging.Customer> =
                 get()
 
-            waitingLine.lengthOfStayMonitor.enabled = false
+            waitingLine.lengthOfStayMonitor.disable()
             run(1500.0)
 
-            waitingLine.lengthOfStayMonitor.enabled = true
+            waitingLine.lengthOfStayMonitor.enable()
             run(500.0)
         }
 
