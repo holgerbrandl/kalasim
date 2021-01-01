@@ -1,5 +1,6 @@
 package org.kalasim.test
 
+import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.Component
 import org.kalasim.misc.printThis
@@ -50,6 +51,35 @@ class ComponentTests {
         c.activate()
         run(1)
 
+    }
+
+
+    @Test
+    fun `it support resume after interrupt`() = createTestSimulation {
+
+
+        val tool = object : Component("tool"){
+            override fun process() = sequence<Component> {
+                yield(hold(10))
+                printTrace("production finished")
+            }
+        }
+
+        val mechanic = object : Component("tool"){
+            override fun process() = sequence<Component> {
+                yield(hold(1))
+                tool.interrupt()
+
+                // do maintenance
+                yield(hold(2))
+                tool.resume()
+            }
+        }
+
+        run(20)
+
+        tool.isData shouldBe true
+        mechanic.isData shouldBe true
     }
 }
 
