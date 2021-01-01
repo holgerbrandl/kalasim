@@ -44,7 +44,7 @@ fun interface TraceListener {
 }
 
 fun interface TraceFilter {
-    fun accept(te: TraceElement): Boolean
+    fun matches(te: TraceElement): Boolean
 }
 
 class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.FINER) : TraceListener {
@@ -55,9 +55,10 @@ class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.F
     val filters = mutableListOf<TraceFilter>()
 
     init {
-        filters.add(TraceFilter { it.action?.contains("entering requesters") ?: true })
-        filters.add(TraceFilter { it.action?.contains("removed from requesters") ?: true })
-        filters.add(TraceFilter { it.action?.contains("removed from claimers") ?: true })
+        filters.add(TraceFilter { it.action?.contains("entering requesters") ?: false })
+        filters.add(TraceFilter { it.action?.contains("entering claimers") ?: false })
+        filters.add(TraceFilter { it.action?.contains("removed from requesters") ?: false })
+        filters.add(TraceFilter { it.action?.contains("removed from claimers") ?: false })
     }
 
     override fun processTrace(traceElement: TraceElement) {
@@ -75,7 +76,7 @@ class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.F
             println(TRACE_COL_WIDTHS.map { "-".repeat(it - 1) }.joinToString(separator = " "))
         }
 
-        if(!filters.all { it.accept(traceElement) }) return
+        if(filters.any { it.matches(traceElement) }) return
 
         // do a diff for logging
         val printElement = if (diffRecords && lastElement != null) {

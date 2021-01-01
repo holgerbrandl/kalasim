@@ -1,6 +1,6 @@
 @file:Suppress("EXPERIMENTAL_API_USAGE")
 
-package org.kalasim;
+package org.kalasim
 
 import com.systema.analytics.es.misc.json
 import org.kalasim.misc.Jsonable
@@ -54,7 +54,6 @@ open class Resource(
         get() = capacity - claimedQuantity
 
 
-    // TBD Should we initialize these monitoring by tallying the initial state?
     val capacityMonitor = NumericLevelMonitor("Capacity of ${super.name}", initialValue = capacity, koin = koin)
     val claimedQuantityMonitor = NumericLevelMonitor("Claimed quantity of ${this.name}", koin = koin)
     val availableQuantityMonitor =
@@ -110,6 +109,8 @@ open class Resource(
             // done within decrementing claimedQuantity
 //            occupancyMonitor.addValue(if (capacity <= 0) 0 else claimedQuantity / capacity)
 //            availableQuantityMonitor.addValue(capacity - claimedQuantity)
+
+            tryRequest()
 
         } else {
             require(quantity != null) { "quantity missing for non-anonymous resource" }

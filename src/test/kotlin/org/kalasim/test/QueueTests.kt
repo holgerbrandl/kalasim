@@ -95,6 +95,8 @@ class QueueTests {
 
             queue.first() shouldBe c2
             queue.last() shouldBe c1
+
+            run(10)
         }
     }
 }

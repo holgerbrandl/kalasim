@@ -14,7 +14,7 @@ import org.koin.core.qualifier.named
  * desired amount of gas from it. If the stations reservoir is
  * depleted, the car has to wait for the tank truck to arrive.
  */
-object Gasstation {
+object GasStation {
 
     // based on SimPy example model
     val GAS_STATION_SIZE = 200.0  // liters

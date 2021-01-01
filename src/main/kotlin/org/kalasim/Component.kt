@@ -27,7 +27,7 @@ enum class ComponentState {
  *  @param name name of the component.  if the name ends with a period (.), auto serializing will be applied  if the name end with a comma, auto serializing starting at 1 will be applied  if omitted, the name will be derived from the class it is defined in (lowercased)
  * @param at schedule time
  * @param delay schedule with a delay if omitted, no delay
- * @param priority If a component has the same time on the event list, this component is sorted according to the priority.
+ * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
  * @param process  of process to be started.  if None (default), it will try to start self.process()
  * @param koin The dependency resolution context to be used to resolve the `org.kalasim.Environment`
  */
@@ -35,7 +35,7 @@ open class Component(
     name: String? = null,
     at: Number? = null,
     delay: Number = 0,
-    val priority: Int = 0,
+    priority: Int = 0,
     process: ProcessPointer? = Component::process,
     koin: Koin = GlobalContext.get()
 ) :
@@ -158,8 +158,13 @@ open class Component(
     val isStandby: Boolean
         get() = status == STANDBY
 
+
+    /** @return `true` if status is `SCHEDULED`, `false` otherwise. */
+    val isScheduled: Boolean
+        get() = status == SCHEDULED
+
     /** @return `true` if status is `INTERRUPTED`, `false` otherwise. */
-    val isInterrrupted: Boolean
+    val isInterrupted: Boolean
         get() = status == INTERRUPTED
 
     /** @return `true` if status is `DATA`, `false` otherwise. */
@@ -178,7 +183,7 @@ open class Component(
 
     /** Passivate a component
      *
-     * See https://www.salabim.org/manual/Component.html#passivate
+     * See https://www.kalasim.org/component/#passivate
      */
     fun passivate(): Component {
         if (status == CURRENT) {
@@ -286,9 +291,9 @@ open class Component(
     }
 
     /**
-     * cancel component (makes the component data)
+     * Cancel a component (makes the component `DATA`).
      *
-     * See https://www.salabim.org/manual/Component.html#cancel
+     * See https://www.kalasim.org/component/#cancel
      */
     fun cancel(): Component {
         if (status != CURRENT) {
@@ -332,6 +337,16 @@ open class Component(
         return this
     }
 
+    /**
+     * Request anonymous resources.
+     *
+     * For full documentation and examples see https://www.kalasim.org/resource
+     *
+     * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
+     * @param failDelay  if the request is not honored before now+fail_delay,
+     *
+     * @sample org.kalasim.scratch.ResourceDocu.main
+     */
     fun put(
         vararg resourceRequests: ResourceRequest,
         failAt: RealDistribution? = null,
@@ -342,11 +357,18 @@ open class Component(
     )
 
     /**
-     * Request from a resource or resources
+     * Request from a resource or resources.
      *
-     *  Not allowed for data components or main.
-
-     * @sample org.kalasim.examples.Gasstation.main
+     * For full documentation and examples see https://www.kalasim.org/resource
+     *
+     * @param resources Resources to be requested with a quantity of 1 and priority null.
+     * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
+     * @param failDelay  if the request is not honored before now+fail_delay,
+    the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
+     * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given.
+     * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
+     *
+     * @sample org.kalasim.scratch.ResourceDocu.main
      */
     fun request(
         resources: Collection<Resource>,
@@ -361,11 +383,18 @@ open class Component(
     )
 
     /**
-     * Request from a resource or resources
+     * Request from a resource or resources.
      *
-     *  Not allowed for data components or main.
+     * For full documentation and examples see https://www.kalasim.org/resource
      *
-     * @sample org.kalasim.examples.Gasstation.main
+     * @param resourceRequests Each `ResourceRequest` is a tuple of resource, quantity (default=1) and priority (default 0).
+     * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
+     * @param failDelay  if the request is not honored before now+fail_delay,
+    the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
+     * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given.
+     * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
+     *
+     * @sample org.kalasim.scratch.ResourceDocu.main
      */
     fun request(
         vararg resources: Resource,
@@ -381,58 +410,31 @@ open class Component(
     )
 
     /**
-     * Request from a resource or resources
+     * Request from a resource or resources.
      *
-     *  Not allowed for data components or main.
-
-     * Examples
-     * - `request(r1)` --> requests 1 from r1
-     * - `request(r1,r2)` --> requests 1 from r1 and 1 from r2
-     * - `request(r1,(r2,2),(r3,3,100))` --> requests 1 from r1, 2 from r2 and 3 from r3 with priority 100
-     * - `request((r1,1),(r2,2))` --> requests 1 from r1, 2 from r2
-     * - `request(r1, r2, r3, oneoff=True)` --> requests 1 from r1, r2 or r3
+     * For full documentation and examples see https://www.kalasim.org/resource
      *
-     *   `request` has the effect that the component will check whether the requested quantity from a resource is
-     *   available. It is possible to check for multiple availability of a certain quantity from several resources.
-     *
-     *  Not allowed for data components or main.
-     *
-     * If to be used for the current component
-     * (which will be nearly always the case),
-     * use `yield (request(...))`.
-     *
-     * If the same resource is specified more that once, the quantities are summed
-     *
-     * The requested quantity may exceed the current capacity of a resource
-     *
-     * The parameter failed will be reset by a calling request or wait
-     *
-     * @sample org.kalasim.examples.Gasstation.main
-     *
-     * @param resourceRequests sequence of items where each item can be:
-     * - resource, where quantity=1, priority=tail of requesters queue
-     * - tuples/list containing a resource, a quantity and optionally a priority. if the priority is not specified,
-     * the request for the resource be added to the tail of the requesters queue
-     *
+     * @param resourceRequests Each `ResourceRequest` is a tuple of resource, quantity (default=1) and priority (default 0).
      * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
-     *
      * @param failDelay  if the request is not honored before now+fail_delay,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
-
-    @param oneOf If `true`, just one of the requests has to be met (or condition),
-    where honoring follows the order given
+     * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given.
+     * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
+     *
+     * @sample org.kalasim.scratch.ResourceDocu.main
      */
     fun request(
         vararg resourceRequests: ResourceRequest,
-        priority: Int = 0,
-        urgent: Boolean = false,
         //todo change to support distribution parameters instead
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null,
         oneOf: Boolean = false,
         //todo use type here and not string
+        priority: Int = 0,
+        urgent: Boolean = false,
         // try to avoid argument by inferring from stacktrace
         calledFrom: String? = null
+
 
     ): Component {
 
@@ -444,6 +446,9 @@ open class Component(
             remove()
             checkFail()
         }
+
+        require(requests.isEmpty()) { "no pending requests are allowed when requesting" }
+        require(requests.isEmpty()) { "no open claims are allowed when requesting" }
 
         scheduledTime = env.now +
                 (failAt?.sample() ?: Double.MAX_VALUE) +
@@ -484,26 +489,23 @@ open class Component(
                 reqText
             )
 
-            // TODO build test case (current implementation seems incorrect & incomplete
             if (r.preemptive) {
                 var av = r.availableQuantity
                 val thisClaimers = r.claimers.q
 
                 val bumpCandidates = mutableListOf<Component>()
 //                val claimComponents = thisClaimers.map { it.c }
-                for (cqe in thisClaimers.reversed()) {
+                for (cqe in thisClaimers) {
                     if (av >= q) {
                         break
                     }
 
                     // check if prior of component
-                    if (priority != null && priority >= (thisClaimers.find { it.component == this }?.priority
-                            ?: Int.MIN_VALUE)
-                    ) {
+                    if ((priority ?: 0) <= (cqe.priority ?: 0)) {
                         break
                     }
 
-                    av += quantity
+                    av += cqe.component.claims.getOrDefault(r, 0.0)
                     bumpCandidates.add(cqe.component)
                 }
 
@@ -641,8 +643,8 @@ open class Component(
     }
 
     fun terminate(): Component {
-        claims.forEach { (resource, quantity) ->
-            resource.release(quantity)
+        claims.forEach { (resource, _) ->
+            release(resource)
         }
 
         status = DATA
@@ -1067,6 +1069,7 @@ internal const val DEFAULT_REQUEST_QUANTITY = 1.0
 data class ResourceRequest(val r: Resource, val quantity: Double = DEFAULT_REQUEST_QUANTITY, val priority: Int? = null)
 
 infix fun Resource.withQuantity(quantity: Number) = ResourceRequest(this, quantity.toDouble())
+infix fun Resource.withPriority(priority: Int) = ResourceRequest(this, priority = priority)
 
 infix fun ResourceRequest.andPriority(priority: Int) = ResourceRequest(this.r, this.quantity, priority)
 

@@ -29,17 +29,19 @@ val clerks = Resource("clerks", capacity=3)
 val customer = Component("clerks")
 ```
 
-The `customer` can request a clerk in its [process method](component.md#creation-of-a-component):
+The `customer` can `request` a clerk in its [process method](component.md#creation-of-a-component):
 
 ```kotlin
 yield(request(clerks))  // request 1 from clerks 
 yield(request(clerks withQuantity 2)) // request 2s from clerks
 ```
-    
-It is also possible to request for more resources at once:
+
+`request` has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
+
+It is also possible to request for more resources at once. In the following examples, we request 1 quantity from `clerks` AND 2 quantities from `assistance`.
 
 ```kotlin
-yield(request(clerks withQuantity 1, assistance withQuantity 2))  // request 1 from clerks AND 2 from assistance
+yield(request(clerks withQuantity 1, assistance withQuantity 2)) 
 ```
 
 Resources have a queue `requesters` containing all components trying to claim from the resource.
@@ -54,25 +56,39 @@ customer.release(2)  // release quantity 2 from r
     
 Alternatively, it is possible to release from a resource directly, e.g.
 
-```
-r.release()  // releases the total quantity from all claiming components
-r.release(10)  // releases 10 from the resource; only valid for anonymous resources
+```kotlin
+// releases the total quantity from all claiming components:
+r.release()  
+
+// releases 10 from the resource; only valid for anonymous resources
+r.release(10)
 ```
     
 After a release, all requesting components will be checked whether their claim can be honored.
 
+Notes
+
+* `request` is not allowed for data components or main.
+* If to be used for the current component (which will be nearly always the case), use `yield (request(...))`.
+* If the same resource is specified more that once, the quantities are summed.
+* The requested quantity may exceed the current capacity of a resource.
+* The parameter `failed` will be reset by a calling `request` or `wait`.
+
+
+## Monitors
+
 Resources have a number monitors:
 
 * claimers
-  * length
-  * length_of_stay
+  * `queueLength`
+  * `lengthOfStay`
 * requesters
-  * length
-  * length_of_stay
-* claimed_quantity
-* available_quantity
-* capacity
-* occupancy  (=claimed_quantity / capacity)
+  * `queueLength`
+  * `lengthOfStay`
+* `claimedQuantity`
+* `availableQuantity`
+* `capacity`
+* `occupancy`  (= claimed quantity / capacity)
 
 By default, all monitors are enabled.
 
@@ -254,20 +270,17 @@ The model below illustrates the use of `get` and `put`. See the [Gas Station](ex
 
 ## Pre-emptive Resources
 
-<!--see salabim changeog version 19.0.9  2019-10-08-->
+<!--see salabim change-log version 19.0.9  2019-10-08-->
 
 It is possible to specify that a resource is to be preemptive, by adding `preemptive = true` when the resource is created.
 
 <!--todo learn from https://simpy.readthedocs.io/en/latest/topical_guides/resources.html#preemptiveresource-->
 
 If a component requests from a preemptive resource, it may bump component(s) that are claiming from
-the resource, provided these have a lower priority = higher value). If component is bumped, it releases the resource and is the activated, thus essentially stopping the current
-action (usually hold or passivate).
+the resource, provided these have a lower priority = higher value). If component is bumped, it releases the resource and is then activated, thus essentially stopping the current
+action (usually `hold` or `passivate`).
 
-Therefore, a component claiming from a preemptive resource should check
-whether the component is bumped or still claiming at any point where they can be bumped.
-This can be done with the method `Component.isClaiming()` which is `true` if the component is claiming from the resource, or the opposite (Component.isBumped) which is True is the component is not claiming from te resource.
-
+Therefore, a component claiming from a preemptive resource should check whether the component is bumped or still claiming at any point where they can be bumped. This can be done with the method `Component.isClaiming(resource)` which is `true` if the component is claiming from the resource, or the opposite (Component.isBumped) which is `true` is the component is not claiming from the resource.
 
 Examples
 

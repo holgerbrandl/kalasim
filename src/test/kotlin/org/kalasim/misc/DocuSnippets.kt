@@ -6,19 +6,19 @@ class ResourceDocu {
 
     fun main() {
         val clerks = Resource("clerks", capacity = 3)
-        val assistence = Resource("assistence", capacity = 3)
+        val assistance = Resource("assistence", capacity = 3)
 
         Component().request(clerks withQuantity 2)
 
-        Component().request(clerks withQuantity 1, assistence withQuantity 2)
+        Component().request(clerks withQuantity 1, assistance withQuantity 2)
 
+        Component().request(clerks withPriority  1)
+        Component().request(clerks withQuantity 3.4 andPriority  1 )
 
-// release
         val r = Resource("clerks", capacity = 3)
         r.release(2.0)
+        // yield(request(r))
         Component().release(r)
-
-
     }
 }
 

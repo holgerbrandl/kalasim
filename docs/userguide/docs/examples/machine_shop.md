@@ -11,7 +11,7 @@ A machine has two processes:
 1. *working* implements the actual behaviour of the machine (producing parts).
 2. *break_machine*  periodically interrupts the working process to simulate the machine failure.
 
-In `kalasim` there can only be one generating proces per component. So to model the wear, we use a separate `MachineWear` which is `interrupt`ing the machine in case of failure.
+In `kalasim` there can only be one generating process per component. So to model the wear, we use a separate `MachineWear` which is `interrupt`ing the machine in case of failure.
 
 The repairman’s other job is also a process (implemented by otherJob). The repairman itself is a [preemptive resource]() with a capacity of `1`. The machine repairing has a priority of 1, while the other job has a priority of `2` (the smaller the number, the higher the priority).
 

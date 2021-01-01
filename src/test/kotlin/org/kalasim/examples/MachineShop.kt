@@ -7,7 +7,6 @@ val RANDOM_SEED: Int = 42
 val PT_MEAN: Double = 10.0 // Avg. processing time in minutes
 val PT_SIGMA: Double = 2.0 // Sigma of processing time
 val MTTF: Double = 300.0 // Mean time to failure in minutes
-val BREAK_MEAN: Double = 1 / MTTF  // Param. for expovariate distribution
 val REPAIR_TIME: Double = 30.0 // Time it takes to repair a machine in minutes
 val JOB_DURATION: Double = 30.0 // Duration of other jobs in minutes
 val NUM_MACHINES: Int = 10   // Number of machines in the machine shop
@@ -28,7 +27,7 @@ fun main() {
                 printTrace("building a new part")
                 yield(hold(timePerPart()))
                 printTrace("finished building part")
-
+                madeParts++
             }
         }
     }
@@ -39,22 +38,27 @@ fun main() {
         process = MachineWear::breakMachine
     ) {
 
-        val timeToFailure = exponential(BREAK_MEAN)
+        val timeToFailure = exponential(MTTF)
 
         fun breakMachine(): Sequence<Component> = sequence {
 
             while (true) {
                 yield(hold(timeToFailure()))
 
-//                if (!machine.isInterrrupted) {
+                // handle the rare case that the model
+                if(machine.isInterrupted) continue
+
                 machine.interrupt()
 
                 yield(request(repairMan))
                 yield(hold(REPAIR_TIME))
+
+                require(!isBumped(repairMan)) { "productive tools must not be bumped"}
+
                 release(repairMan)
 
                 machine.resume()
-//                }
+                require(!machine.isInterrupted) { "machine must not be interrupted at end of wear cycle"}
             }
         }
     }
@@ -75,7 +79,7 @@ fun main() {
         object : Component("side jobs") {
             override fun process() = sequence {
                 while (true) {
-                    yield(request(ResourceRequest(repairMan, priority = 2)))
+                    yield(request(ResourceRequest(repairMan, priority = -1)))
                     yield(hold(JOB_DURATION))
 
                     if (isBumped(repairMan)) {
@@ -89,6 +93,7 @@ fun main() {
         }
 
         // Run simulation
+        run(1000)
         run(SIM_TIME)
 
         // Analysis
