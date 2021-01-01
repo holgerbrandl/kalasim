@@ -252,7 +252,7 @@ class Environment(
 
     private fun setCurrent(c: Component, info: String? = null) {
         c.status = CURRENT
-        c.scheduledTime = Double.MAX_VALUE
+        c.scheduledTime = null
 
         curComponent = c
 

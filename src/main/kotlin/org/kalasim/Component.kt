@@ -56,8 +56,9 @@ open class Component(
     private var simProcess: SimProcess? = null
 
 
-    // **{todo}** 0.6 get rid of this field (not needed because can be always retrieved from eventList if needed
-    var scheduledTime = Double.MAX_VALUE
+    // TODO 0.6 get rid of this field (not needed because can be always retrieved from eventList if needed
+    //  What are performance implications?
+    var scheduledTime : Double? = null
 
     private var remainingDuration = 0.0
 
@@ -67,7 +68,7 @@ open class Component(
             statusMonitor.addValue(value)
         }
 
-    val statusMonitor = FrequencyLevelMonitor<ComponentState>(status, "status of ${name}", koin)
+    val statusMonitor = FrequencyLevelMonitor(status, "status of ${name}", koin)
 
 
     init {
@@ -192,11 +193,11 @@ open class Component(
             requireNotData()
             remove()
             checkFail()
-            remainingDuration = scheduledTime - env.now
+            remainingDuration = scheduledTime!! - env.now
         }
 
 
-        scheduledTime = Double.MAX_VALUE
+        scheduledTime = null
         status = PASSIVE
         printTrace(now(), env.curComponent, this, "passivate")
 
@@ -222,7 +223,7 @@ open class Component(
         } else {
             requireNotData()
             remove()
-            remainingDuration = scheduledTime - env.now
+            remainingDuration = scheduledTime!! - env.now
             interruptLevel = 1
             interruptedStatus = status
             status = INTERRUPTED
@@ -303,7 +304,7 @@ open class Component(
         }
 
         simProcess = null
-        scheduledTime = Double.MAX_VALUE
+        scheduledTime = null
 
         status = DATA
 
@@ -527,7 +528,7 @@ open class Component(
         tryRequest()
 
         if (requests.isNotEmpty()) {
-            reschedule(scheduledTime, priority, urgent, "request", REQUESTING)
+            reschedule(scheduledTime!!, priority, urgent, "request", REQUESTING)
         }
 
         return this
@@ -648,7 +649,7 @@ open class Component(
         }
 
         status = DATA
-        scheduledTime = Double.MAX_VALUE
+        scheduledTime = null
         simProcess = null
 
         printTrace(now(), env.curComponent, this, "ended")
@@ -676,8 +677,10 @@ open class Component(
 
         this.scheduledTime = scheduledTime
 
-        if (this.scheduledTime != Double.MAX_VALUE) {
-            env.push(this, this.scheduledTime, priority, urgent)
+        require(this.scheduledTime!=null){"reschedule with null time is unlikely to have meaningful semantics"}
+
+        if (this.scheduledTime != null) {
+            env.push(this, scheduledTime, priority, urgent)
         }
 
         //todo implement extra
@@ -689,7 +692,7 @@ open class Component(
 
         // calculate scheduling delta
         val delta = if (this.scheduledTime == env.now || (this.scheduledTime == Double.MAX_VALUE)) "" else {
-            "+" + TRACE_DF.format(this.scheduledTime - env.now) + " "
+            "+" + TRACE_DF.format(scheduledTime - env.now) + " "
         }
 
         // print trace
@@ -964,7 +967,7 @@ open class Component(
         tryWait()
 
         if (waits.isNotEmpty()) {
-            reschedule(scheduledTime, priority, urgent, "wait", WAITING)
+            reschedule(scheduledTime!!, priority, urgent, "wait", WAITING)
         }
 
         return this

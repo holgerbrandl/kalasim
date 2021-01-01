@@ -15,7 +15,7 @@
 
 **{todo}** ensure that just yieldable methods are used in yield by checking stacktrace
 
-**{todo}**  make `scheduledTime` nullable: replace scheduledTime = Double.MAX_VALUE with `null` which is semantically more meaningful here
+**{done}**  make `scheduledTime` nullable: replace scheduledTime = Double.MAX_VALUE with `null` which is semantically more meaningful here
 
 **{todo}** info for environment that render similar to simmer (Ucar 2019, p4)
 ```
