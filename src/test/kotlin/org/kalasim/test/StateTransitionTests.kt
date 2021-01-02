@@ -23,7 +23,7 @@ class StateTransitionTests {
                 override suspend fun SequenceScope<Component>.process() {
                     while (true) {
                         TestCar()
-                        yield(hold(1.0))
+                        hold(1.0)
                     }
                 }
             }

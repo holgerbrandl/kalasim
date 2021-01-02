@@ -29,13 +29,13 @@ object ProcessGraph {
 
         override fun process() = sequence {
             // do shopping
-            yield(hold(duration = 23.0))
+            hold(duration = 23.0)
 
             // wait for an empty counter
             request(clerk)
 
             // billing process
-            yield(hold(duration = 2.0, priority = 3))
+            hold(duration = 2.0, priority = 3)
         }
     }
 }
@@ -58,8 +58,8 @@ object Hold1 {
 
         object : Component() {
             override fun process() = sequence<Component>{
-                yield(hold(5.0))
-                yield(hold(5.0))
+                hold(5.0)
+                hold(5.0)
             }
         }
 
@@ -70,7 +70,7 @@ object Hold1 {
             }
 
             private suspend fun SequenceScope<Component>.holdMinutes() {
-                yield(hold(5.0))
+                hold(5.0)
             }
         }
 

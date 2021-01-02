@@ -38,7 +38,7 @@ class RequestTests {
                 override suspend fun ProcContext.process() {
                     while (true) {
                         yield(request(resource withQuantity 1 andPriority prioPDF.sample()))
-                        yield(hold(1))
+                        hold(1)
                         if (!isClaiming(resource)) {
                             break
                         } else {
@@ -62,7 +62,7 @@ class RequestTests {
 
             override fun process() = sequence {
                 yield(request(resource))
-                yield(hold(1))
+                hold(1)
                 printTrace("finished process, terminating...")
             }
         }
@@ -89,7 +89,7 @@ class RequestTests {
         ) : Component(name) {
 
             override fun process() = sequence {
-                yield(hold(preRequestHold))
+                hold(preRequestHold)
 
                 if (requestPriority != null) {
                     yield(request(resource withPriority requestPriority))
@@ -97,7 +97,7 @@ class RequestTests {
                     yield(request(resource))
                 }
 
-                yield(hold(postRequestHold))
+                hold(postRequestHold)
 
                 if (isBumped(resource)) {
                     printTrace("got bumped from $resource")
@@ -154,7 +154,7 @@ class RequestTests {
 
             override fun process() = sequence {
                 yield(request(r))
-                yield(hold(5))
+                hold(5)
                 printTrace("finished process, terminating...")
             }
         }
@@ -176,7 +176,7 @@ class RequestTests {
 
             override fun process() = sequence {
                 yield(request(r))
-                yield(hold(5))
+                hold(5)
                 printTrace("finished process, terminating...")
             }
         }

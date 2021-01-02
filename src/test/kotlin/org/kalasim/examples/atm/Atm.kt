@@ -27,7 +27,7 @@ fun main() {
             override fun process() = sequence {
                 yield(request(atm))
 
-                yield(hold(ed.sample()))
+                hold(ed.sample())
                 release(atm)
             }
         }

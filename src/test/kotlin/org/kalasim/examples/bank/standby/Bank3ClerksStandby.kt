@@ -22,7 +22,7 @@ class Clerk : Component() {
                 yield(standby())
 
             val customer = waitingLine.poll()
-            yield(hold(32.0)) // bearbeitungszeit
+            hold(32.0) // bearbeitungszeit
             customer.activate()
         }
     }

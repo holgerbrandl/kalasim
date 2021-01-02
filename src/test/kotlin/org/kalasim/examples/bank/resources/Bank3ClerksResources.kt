@@ -10,7 +10,7 @@ class Customer(private val clerks: Resource) : Component() {
 
     override fun process() = sequence {
         yield(request(clerks))
-        yield(hold(30))
+        hold(30)
         release(clerks) // not really required
     }
 }

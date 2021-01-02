@@ -14,7 +14,7 @@ class TimeProgressionTest {
             override suspend fun SequenceScope<Component>.process(it: Component) {
                 while (true) {
                     // wait for 1 sec
-                    yield(hold(1.0))
+                    hold(1.0)
                     // and terminate it
                     yield(terminate())
                 }

@@ -30,7 +30,7 @@ class Clerk : Component() {
 
             val customer = waitingLine.poll()
 
-            yield(hold(10.0)) // bearbeitungszeit
+            hold(10.0) // bearbeitungszeit
             customer.activate()
         }
     }
@@ -44,7 +44,7 @@ class CustomerGenerator : Component() {
         while (true) {
             Customer(get(), get())
 
-            yield(hold(uniform(5.0, 15.0, env.rg).sample()))
+            hold(uniform(5.0, 15.0, env.rg).sample())
         }
     }
 }

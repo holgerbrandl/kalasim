@@ -19,7 +19,7 @@ class Car(val trafficLight: TrafficLight) : Component() {
         yield(request(gasStation))
 
         // refill
-        yield(hold(5))
+        hold(5)
 
         // release pump
         release(gasStation)

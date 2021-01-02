@@ -33,7 +33,7 @@ class QueueTests {
                 while (waitingLine.isNotEmpty()) {
                     waitingLine.poll()
                     // wait for it...
-                    yield(hold(5.0))
+                    hold(5.0)
                 }
 
                 yield(it.passivate())

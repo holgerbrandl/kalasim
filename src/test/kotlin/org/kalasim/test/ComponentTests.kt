@@ -5,6 +5,7 @@ import org.junit.Test
 import org.kalasim.Component
 import org.kalasim.ComponentState
 import org.kalasim.Resource
+import org.kalasim.analytics.display
 import org.kalasim.misc.printThis
 
 class ComponentTests {
@@ -16,13 +17,42 @@ class ComponentTests {
 
     @Test
     fun `it should hold and terminate`() = createTestSimulation {
-        val c = object : Component("foo"){
-            override fun process()  = sequence<Component> {
-                yield(hold(2))
+        val c = object : Component("foo") {
+            override fun process() = sequence<Component> {
+                hold(2)
             }
         }
 
         run(5)
+        c.status shouldBe ComponentState.DATA
+    }
+
+
+    @Test
+    fun `it yield automatically`() = createTestSimulation {
+
+        val r = Resource()
+
+        val c = object : Component("foo") {
+            override fun process() = sequence {
+                hold(3)
+//                hold(2)
+//                hold(2)
+
+                closableRequest(r) {
+                    printTrace("request honored")
+                    hold(3)
+                    printTrace("auto-releaseing request")
+                }
+
+//                hold2(2)
+                hold(2)
+            }
+        }
+
+        run(10)
+
+//        c.statusMonitor.display()
         c.status shouldBe ComponentState.DATA
     }
 
@@ -73,20 +103,20 @@ class ComponentTests {
     fun `it support resume after interrupt`() = createTestSimulation {
 
 
-        val tool = object : Component("tool"){
+        val tool = object : Component("tool") {
             override fun process() = sequence<Component> {
-                yield(hold(10))
+                hold(10)
                 printTrace("production finished")
             }
         }
 
-        val mechanic = object : Component("tool"){
+        val mechanic = object : Component("tool") {
             override fun process() = sequence<Component> {
-                yield(hold(1))
+                hold(1)
                 tool.interrupt()
 
                 // do maintenance
-                yield(hold(2))
+                hold(2)
                 tool.resume()
             }
         }

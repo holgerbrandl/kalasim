@@ -22,7 +22,7 @@ fun main() {
         override fun process() = sequence {
             val carWash = get<Resource>()
             yield(request(carWash))
-            yield(hold(WASHTIME))
+            hold(WASHTIME)
             release(carWash)
         }
     }

@@ -40,7 +40,7 @@ object GasStation {
             val fuelPump: Resource by inject(qualifier = named(FUEL_PUMP))
 
             override suspend fun SequenceScope<Component>.process(it: Component) {
-                yield(hold(TANK_TRUCK_TIME))
+                hold(TANK_TRUCK_TIME)
                 val amount = fuelPump.claimedQuantity
                 yield(it.put(fuelPump withQuantity amount))
             }
@@ -69,7 +69,7 @@ object GasStation {
                 }
 
                 yield(request(fuelPump withQuantity litersRequired))
-                yield(hold(litersRequired / REFUELING_SPEED))
+                hold(litersRequired / REFUELING_SPEED)
             }
         }
 

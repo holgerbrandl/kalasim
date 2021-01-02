@@ -58,7 +58,7 @@ open class Component(
 
     // TODO 0.6 get rid of this field (not needed because can be always retrieved from eventList if needed
     //  What are performance implications?
-    var scheduledTime : Double? = null
+    var scheduledTime: Double? = null
 
     private var remainingDuration = 0.0
 
@@ -383,6 +383,27 @@ open class Component(
         oneOf = oneOf
     )
 
+
+    suspend fun SequenceScope<Component>.closableRequest(
+        resource: Resource,
+        builder: (suspend SequenceScope<Component>.() -> Any)
+    ) {
+        with(this@Component) {
+            yield(request(resource))
+//            suspend {
+            builder()
+//            }
+            release(resource)
+
+//            yieldAll(sequence {
+//                yield(request(resource))
+//                builder()
+//                release(resource)
+//            })
+        }
+    }
+
+
     /**
      * Request from a resource or resources.
      *
@@ -677,7 +698,7 @@ open class Component(
 
         this.scheduledTime = scheduledTime
 
-        require(this.scheduledTime!=null){"reschedule with null time is unlikely to have meaningful semantics"}
+        require(this.scheduledTime != null) { "reschedule with null time is unlikely to have meaningful semantics" }
 
         if (this.scheduledTime != null) {
             env.push(this, scheduledTime, priority, urgent)
@@ -783,7 +804,6 @@ open class Component(
         }
     }
 
-
     /**
      * Hold the component.
      *
@@ -797,12 +817,12 @@ open class Component(
      *
      * Either `duration` or `till` must be specified.
      */
-    fun hold(
+    suspend fun SequenceScope<Component>.hold(
         duration: Number? = null,
         till: Number? = null,
         priority: Int = 0,
         urgent: Boolean = false
-    ): Component {
+    ) {
         if (status != DATA && status != CURRENT) {
             requireNotData()
             remove()
@@ -813,7 +833,7 @@ open class Component(
 
         reschedule(scheduledTime, priority, urgent, "hold", SCHEDULED)
 
-        return (this)
+        yield (this@Component)
     }
 
 

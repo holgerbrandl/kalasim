@@ -16,7 +16,7 @@ class EnvTests {
 
         class TestComponent(koin: Koin) : Component(koin = koin) {
             override suspend fun ProcContext.process() {
-                yield(hold(2))
+                hold(2)
                 println("my env is ${env.getKoin()}")
             }
         }

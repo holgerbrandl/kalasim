@@ -17,6 +17,22 @@
 
 **{done}**  make `scheduledTime` nullable: replace scheduledTime = Double.MAX_VALUE with `null` which is semantically more meaningful here
 
+
+**{todo}** consider embed yield into hold/request (or add second verb to support that
+```
+yield(request(repairMan))
+yield(hold(REPAIR_TIME))
+```
+
+
+**{todo}** optional request context with auto-release
+```
+request(){
+    hold
+}
+```
+
+
 **{todo}** info for environment that render similar to simmer (Ucar 2019, p4)
 ```
 R> env %>%
@@ -47,12 +63,6 @@ trajectory: anonymous, 3 activities
 **{todo}** finish elevator example with visualization
 
 ## v0.5
-
-**{todo}** consider embed yield into hold/request (or add second verb to support that
-```
-yield(request(repairMan))
-yield(hold(REPAIR_TIME))
-```
 
 **{todo}**  <https://r-simmer.org/articles/simmer-08-philosophers.html>
 
@@ -97,11 +107,11 @@ finished, that indicates whether the arrival exhausted its activities (or was re
 * isn't it just like hold? What are the benefits?
 
 
-**{todo}** optional request context with auto-release
+
+**{todo}** pluggable backend for visualization functions
 ```
-request(){
-    hold
-}
+env.visEngine = KRAVIS
+nlm.printHistogram()
 ```
 
 ## Pre-release
@@ -111,10 +121,7 @@ request(){
 
 **{todo}** review docs for https://holgerbrandl.github.io/kalasim/state/
 
-**{todo}** ingest
-
 **{todo}** port interesting examples from <https://simjuliajl.readthedocs.io/en/stable/examples/index.html>
-
 
 **{todo}** port interesting simmer examples
 * https://r-simmer.org/articles/simmer-08-philosophers.html
@@ -158,9 +165,3 @@ Register project at awesome-kotlin
 
 
 ---
-
-pluggable backend for visualization functions
-```
-env.visEngine = KRAVIS
-nlm.printHistogram()
-```

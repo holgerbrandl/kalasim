@@ -2,7 +2,6 @@
 package org.kalasim.examples.bank.data
 
 
-import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
 import org.koin.core.component.get
 import org.koin.core.component.inject
@@ -22,7 +21,7 @@ class CustomerGenerator(val waitingLine: ComponentQueue<Customer>) : Component()
                 }
             }
 
-            yield(hold(uniform( 5.0, 15.0,env.rg).sample()))
+            hold(uniform( 5.0, 15.0,env.rg).sample())
         }
     }
 }
@@ -40,7 +39,7 @@ class Clerk() : Component() {
                 yield(passivate())
 
             waitingLine.poll() // returns next customer (value ignored here)
-            yield(hold(30.0)) // bearbeitungszeit
+            hold(30.0) // bearbeitungszeit
         }
     }
 }

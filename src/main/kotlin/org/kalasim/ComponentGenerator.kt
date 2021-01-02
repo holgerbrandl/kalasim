@@ -50,7 +50,7 @@ class ComponentGenerator<T : Component>(
                 yield((this@ComponentGenerator).activate(at = till, process = ComponentGenerator<T>::doFinalize))
             }
 
-            yield(hold(till = t))
+            hold(till = t)
         }
     }
 

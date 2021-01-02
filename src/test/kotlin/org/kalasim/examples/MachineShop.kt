@@ -25,7 +25,7 @@ fun main() {
             while (true) {
                 // start working on a new part
                 printTrace("building a new part")
-                yield(hold(timePerPart()))
+                hold(timePerPart())
                 printTrace("finished building part")
                 madeParts++
             }
@@ -43,7 +43,7 @@ fun main() {
         fun breakMachine(): Sequence<Component> = sequence {
 
             while (true) {
-                yield(hold(timeToFailure()))
+                hold(timeToFailure())
 
                 // handle the rare case that the model
                 if(machine.isInterrupted) continue
@@ -51,7 +51,7 @@ fun main() {
                 machine.interrupt()
 
                 yield(request(repairMan))
-                yield(hold(REPAIR_TIME))
+                hold(REPAIR_TIME)
 
                 require(!isBumped(repairMan)) { "productive tools must not be bumped"}
 
@@ -80,7 +80,7 @@ fun main() {
             override fun process() = sequence {
                 while (true) {
                     yield(request(ResourceRequest(repairMan, priority = -1)))
-                    yield(hold(JOB_DURATION))
+                    hold(JOB_DURATION)
 
                     if (isBumped(repairMan)) {
                         printTrace("other job was bumped")

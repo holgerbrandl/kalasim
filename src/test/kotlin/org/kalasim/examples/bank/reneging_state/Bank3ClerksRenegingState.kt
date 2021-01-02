@@ -25,7 +25,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>, val workToDo: State<Bo
 
         waitingLine.add(this@Customer)
         workToDo.trigger(true, false, max = 1)
-        yield(hold(50)) // if not serviced within this time, renege
+        hold(50) // if not serviced within this time, renege
 
         if (waitingLine.contains(this@Customer)) {
             waitingLine.leave(this@Customer)
@@ -52,7 +52,7 @@ class Clerk(val workToDo: State<Boolean>) : Component() {
             waitingLine.printInfo()
 
             val customer = waitingLine.poll()
-            yield(hold(30.0)) // process customer
+            hold(30.0) // process customer
 
 //            require(customer.isPassive){ "not passive"}
             customer.activate() // signal the customer that's all's done

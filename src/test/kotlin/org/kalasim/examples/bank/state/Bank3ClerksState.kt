@@ -12,7 +12,7 @@ class CustomerGenerator : Component() {
     override fun process() = sequence {
         while (true) {
             Customer(get(), get())
-            yield(hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample()))
+            hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample())
         }
     }
 }
@@ -37,7 +37,7 @@ class Clerk : Component() {
 
             val customer = waitingLine.poll()
 
-            yield(hold(32.0)) // bearbeitungszeit
+            hold(32.0) // bearbeitungszeit
             customer.activate()
         }
     }

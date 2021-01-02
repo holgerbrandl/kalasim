@@ -45,3 +45,8 @@ https://github.com/actions/create-release/issues/13
 ```bash
 git push origin :refs/tags/refs/heads/master
 ```
+
+## coroutines
+
+<https://medium.com/livefront/suspending-lambdas-in-kotlin-7319d2d7092a>
+> `(suspend () -> T)`

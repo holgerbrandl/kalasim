@@ -16,9 +16,9 @@ class Part(val machine: Machine, partNo: Int) :
     override fun process() = sequence {
 
         while (true) {
-            yield(hold(ttf()))
+            hold(ttf())
             machine.interrupt()
-            yield(hold(ttr()))
+            hold(ttr())
             machine.resume()
         }
     }
@@ -35,7 +35,7 @@ class Machine : Component() {
         while (true) {
             val r = get<Resource>()
             yield(request(r))
-            yield(hold(5))
+            hold(5)
             release(r)
         }
     }

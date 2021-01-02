@@ -15,7 +15,7 @@ class CustomerGenerator : Component() {
     override fun process() = sequence {
         while (true) {
             Customer(get())
-            yield(hold(uniform(5.0, 15.0).sample()))
+            hold(uniform(5.0, 15.0).sample())
         }
     }
 }
@@ -47,7 +47,7 @@ class Clerk : Component() {
                 yield(passivate())
 
             val customer = waitingLine.poll()
-            yield(hold(30.0)) // bearbeitungszeit
+            hold(30.0) // bearbeitungszeit
             customer.activate() // signal the customer that's all's done
         }
     }

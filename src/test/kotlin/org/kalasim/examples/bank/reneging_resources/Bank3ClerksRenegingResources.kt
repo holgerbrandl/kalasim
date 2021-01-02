@@ -26,7 +26,7 @@ class Customer(val clerks: Resource) : Component() {
             numReneged++
             printTrace("reneged")
         } else {
-            yield(hold(30))
+            hold(30)
             release(clerks)
         }
     }

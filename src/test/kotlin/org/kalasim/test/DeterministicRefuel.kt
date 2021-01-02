@@ -50,7 +50,7 @@ object DeterministicRefuel {
             val fuelPump: Resource by inject(qualifier = named(FUEL_PUMP))
 
             override suspend fun SequenceScope<Component>.process(it: Component) {
-                yield(hold(TANK_TRUCK_TIME))
+                hold(TANK_TRUCK_TIME)
                 val amount = fuelPump.claimedQuantity
                 yield(it.put(fuelPump withQuantity amount))
             }
@@ -85,7 +85,7 @@ object DeterministicRefuel {
                 }
 
                 yield(request(fuelPump withQuantity litersRequired))
-                yield(hold(litersRequired / REFUELING_SPEED))
+                hold(litersRequired / REFUELING_SPEED)
                 get<NumericLevelMonitor>(named(CAR_LEAVING)).inc()
 //                get<NumericLevelMonitor>(named(TRUCKS_EN_ROUTE)).inc()
             }
