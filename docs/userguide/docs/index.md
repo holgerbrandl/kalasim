@@ -58,7 +58,7 @@ A generator is a function with at least one `yield` statement. These are used in
 In this example,
 
 ```kotlin
-yield(hold(1.0))
+hold(1.0)
 ```
 
 gives control, to the sequence mechanism and *comes back* after 1 time unit. We will see later other uses of yield like `passivate`,

@@ -144,7 +144,7 @@ open class Component(
 
 //    open suspend fun SequenceScope<Component>.process() {
 //        while (true)
-//            yield(hold(1.0))
+//            hold(1.0)
 //    }
 
     /** @return `true` if status is `PASSIVE`, `false` otherwise. */

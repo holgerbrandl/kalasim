@@ -68,7 +68,7 @@ makes it very hard to make that component into an active component, because ther
 ```kotlin
 class Car: Component(){
     override fun process() = sequence {
-        yield(hold(1)) // or whatever
+        hold(1) // or whatever
     }
 }
 ```
@@ -184,7 +184,7 @@ Hold is the way to make a - usually `current` - component `scheduled`.
 
 
 * If the component to be held is current, the component becomes scheduled for the specified time. Always
-  use `yield(hold())` is this case.
+  use `hold()` is this case.
 * If the component to be held is passive, the component becomes scheduled for the specified time.
 * If the component to be held is scheduled, the component will be rescheduled for the specified time, thus
   essentially the same as activate.
@@ -264,8 +264,8 @@ Wait has the effect that the component will check whether the value of a state m
 
 If the component is [canceled](#cancel), [activated](#activate), [passivated](#passivate), [interrupted](#interrupt) or [held](#hold) the failed flag will be set as well.
 
-* If the component is current, always use `yield(wait())`
-* Although theoretically possible it is not recommended to use wait for non current components.
+!!! tip
+    Although theoretically possible it is not recommended to use wait for non current components. To so use `with(someComponent){ wait(someState) }`
 
 ### interrupt
 
@@ -288,8 +288,8 @@ We start with a not so elegant solution:
 ```kotlin
 object : Component() {
     override fun process() = sequence<Component>{
-        yield(hold(5.0))
-        yield(hold(5.0))
+        hold(5.0)
+        hold(5.0)
     }
 }
 ```
@@ -304,7 +304,7 @@ object : Component() {
     }
 
     private suspend fun SequenceScope<Component>.holdMinutes() {
-        yield(hold(5.0))
+        hold(5.0)
     }
 }
 ```

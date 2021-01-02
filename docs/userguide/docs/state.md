@@ -28,7 +28,7 @@ to open the door.
 If we want a person to wait for an open door, we could say :
 
 ```kotlin
-yield(wait(doorOpen, true))
+wait(doorOpen, true)
 ```
 
 If we just want at most one person to enter, we say `doorOpen.trigger(max=1)`.
@@ -81,7 +81,7 @@ States have a number of monitors:
 A component can [wait](component.md#wait) for a state to get a certain value. In its most simple form this is done with
 
 ```kotlin
-yield(wait(dooropen, true))
+wait(dooropen, true)
 ```
 
 Once the `dooropen` state is `true`, the component will continue.
@@ -89,7 +89,7 @@ Once the `dooropen` state is `true`, the component will continue.
 As with [`request`](component.md#request) it is possible to set a timeout with `failAt` or `failDelay` :
 
 ```kotlin
-yield(wait(dooropen, true, failDelay=10.0))
+wait(dooropen, true, failDelay=10.0)
 if(failed) print("impatient ...")
 ```
 
@@ -105,20 +105,20 @@ There are two ways to test for a value
 It is possible to test for a certain value:
 
 ```kotlin
-yield(wait(light, "green"))
+wait(light, "green")
 ```
     
 Or more states at once :
     
 ```kotlin
-yield(wait(light turns "green", light turns "yellow"))  
+wait(light turns "green", light turns "yellow")  
 ```
 where the wait is honored as soon is light is `green` OR `yellow`.
     
 It is also possible to wait for all conditions to be satisfied, by adding `all=true`:
 
 ```kotlin
-yield(wait((light turns "green"), enginerunning turns true, all=true)) 
+wait((light turns "green"), enginerunning turns true, all=true) 
 ```
 Here, the wait is honored as soon as light is `green` AND engine is `running`.
 
@@ -130,14 +130,14 @@ This is a more complicated but also more versatile way of specifying the honor-c
 #### Example 1
 
 ```kotlin
-yield(wait(StateRequest(State("foo")) { listOf("bar", "test").contains(it) }))
+wait(StateRequest(State("foo")) { listOf("bar", "test").contains(it) })
 ```
 The wait is honored if the `Strin` State becomes either `bar` or `test`.
 
 #### Example 2
 
 ```kotlin
-yield(wait(StateRequest(State(3.0)) { it*3 < 42 }))
+wait(StateRequest(State(3.0)) { it*3 < 42 })
 ```
 
 In this last example the wait is honored as soon as the value fulfils `it*3 < 42`.

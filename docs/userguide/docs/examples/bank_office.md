@@ -47,7 +47,7 @@ val customer = waitingLine.poll()
 and holds for 30 time units with:
 
 ```kotlin
-yield(hold(10.0))
+hold(10.0)
 ```
 
 After that hold the customer is activated and will terminate:
@@ -59,7 +59,7 @@ customer.activate()
 In the main section of the program, we create the `CustomerGenerator`, the `Clerk` and a [`ComponentQueue`](../component.md#queue) called waitingline. Here the customer generator is implemented as a custom instance of `Component` for educational puroposes. Using the provided [`ComponentGenerator`](../component.md#component-generator) API would be more concise.
 
 ```kotlin
-yield(hold(uniform(5.0, 15.0).sample()))
+hold(uniform(5.0, 15.0).sample())
 ```
 
 will do the statistical sampling and wait for that time till the next customer is created.
@@ -295,7 +295,7 @@ This makes the current component (a customer) a `DATA` component (and be subject
 The *reneging* is implemented after a hold of `50`. If a clerk can service a customer, it will take the customer out of the waitingline and will activate it at that moment. The customer just has to check whether he/she is still in the waiting line. If so, he/she has not been serviced in time and thus will renege.
 
 ```kotlin
-yield(hold(50.0))
+hold(50.0)
 
 if (waitingLine.contains(this@Customer)) {
     waitingLine.leave(this@Customer)
@@ -311,7 +311,7 @@ if (waitingLine.contains(this@Customer)) {
 All the clerk has to do when starting servicing a client is to get the next customer in line out of the queue (as before) and activate this customer (at time now). The effect is that the hold of the customer will end.
 
 ```kotlin
-yield(hold(30.0)) 
+hold(30.0) 
 customer.activate() // signal the customer that's all's done
 ```
 

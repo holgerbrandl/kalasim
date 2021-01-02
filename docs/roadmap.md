@@ -21,7 +21,7 @@
 **{todo}** consider embed yield into hold/request (or add second verb to support that
 ```
 yield(request(repairMan))
-yield(hold(REPAIR_TIME))
+hold(REPAIR_TIME)
 ```
 
 

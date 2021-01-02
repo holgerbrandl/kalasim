@@ -93,7 +93,7 @@ Experimentation in a simulation context relates to large part to controlling ran
 
 Example
 ```kotlin
-yield(hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample()))
+hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample())
 ```
 
 The API also include some convenience wrappers to provide fixed values for argument of `RealDistribution`. E.g. consider the  time until a request is considered as failed:
