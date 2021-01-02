@@ -1,8 +1,7 @@
 package org.kalasim.analytics
 
-import kravis.geomHistogram
-import kravis.geomStep
-import kravis.plot
+import kravis.*
+import org.kalasim.FrequencyLevelMonitor
 import org.kalasim.NumericLevelMonitor
 import org.kalasim.NumericStatisticMonitor
 import java.awt.GraphicsEnvironment
@@ -51,5 +50,34 @@ fun NumericStatisticMonitor.display() {
         data.plot(
             x = { it }
         ).geomHistogram().title(name).show()
+    }
+}
+
+fun <T> FrequencyLevelMonitor<T>.display() {
+    if (warnNoDisplay()) return
+
+    apply {
+        val nlmStatsData = valuesUntilNow()
+        val data = nlmStatsData.plotData()
+
+        data class Segment<T>(val value: T, val start:Double, val end:Double)
+
+        val segments = data.zipWithNext().map { Segment(
+            it.first.second,
+            it.first.first,
+            it.second.first
+        ) }
+
+        segments.plot(
+            x = Segment<T>::start,
+            y = Segment<T>::value,
+            xend=  Segment<T>::end,
+            yend =Segment<T>::value
+        )
+            .xLabel("time")
+            .yLabel("")
+            .geomSegment()
+            .geomPoint()
+            .title(name).show()
     }
 }

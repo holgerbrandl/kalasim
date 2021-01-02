@@ -42,7 +42,7 @@ dependencies {
     testImplementation(kotlin("test-junit"))
     testImplementation("io.kotest:kotest-assertions-core:4.2.6")
 
-    testImplementation( "com.github.holgerbrandl:kravis:0.5.2")
+    testImplementation( "com.github.holgerbrandl:kravis:0.6.1")
 
     //experimental dependencies  use for experimentation
     testImplementation( "com.thoughtworks.xstream:xstream:1.4.14")

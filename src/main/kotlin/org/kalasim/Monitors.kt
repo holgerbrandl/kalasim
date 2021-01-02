@@ -191,6 +191,20 @@ class FrequencyLevelMonitor<T>(
         hist.printHistogram(sortByWeight = sortByWeight, values = values)
     }
 
+
+    internal fun valuesUntilNow(): LevelStatsData<T> {
+        require(values.isNotEmpty()) { "data must not be empty when preparing statistics of $name" }
+
+        val valuesLst = values.toList()
+
+        val timepointsExt = timestamps + env.now
+        val durations = timepointsExt.toMutableList().zipWithNext { first, second -> second - first }
+            .toDoubleArray()
+
+        return LevelStatsData(valuesLst, timestamps, durations)
+    }
+
+
     override val info: Jsonable
         get() = ImplementMe()
 }
@@ -413,6 +427,15 @@ class LevelMonitoredInt(initialValue: Int = 0, name: String? = null, koin: Koin 
 
 internal data class NLMStatsData(val values: List<Double>, val timepoints: List<Double>, val durations: DoubleArray) {
     fun plotData(): List<Pair<Double, Double>> =
+        (this.timepoints + (timepoints.last() + durations.last())).zip(values.toList() + values.last())
+}
+
+internal data class LevelStatsData<T>(
+    val values: List<T>,
+    val timepoints: List<Double>,
+    val durations: DoubleArray
+) {
+    fun plotData(): List<Pair<Double, T>> =
         (this.timepoints + (timepoints.last() + durations.last())).zip(values.toList() + values.last())
 }
 
