@@ -33,7 +33,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
             }
         }
 
-        yield(passivate())
+        passivate()
     }
 }
 
@@ -44,7 +44,7 @@ class Clerk : Component() {
     override fun process() = sequence {
         while (true) {
             if (waitingLine.isEmpty())
-                yield(passivate())
+                passivate()
 
             val customer = waitingLine.poll()
             hold(30.0) // bearbeitungszeit

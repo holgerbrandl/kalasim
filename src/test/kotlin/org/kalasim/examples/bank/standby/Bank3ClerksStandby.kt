@@ -8,7 +8,7 @@ import org.koin.core.component.inject
 class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
     override fun process() = sequence{
         waitingLine.add(this@Customer)
-        yield(passivate())
+        passivate()
     }
 }
 

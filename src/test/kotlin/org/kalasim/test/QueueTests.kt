@@ -36,7 +36,7 @@ class QueueTests {
                     hold(5.0)
                 }
 
-                yield(it.passivate())
+                passivate()
             }
         }
 

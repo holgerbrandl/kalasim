@@ -33,7 +33,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>, val workToDo: State<Bo
             printTrace("reneged")
 
         } else {
-            yield(passivate())
+            passivate()
         }
     }
 }

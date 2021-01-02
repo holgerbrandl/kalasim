@@ -303,7 +303,7 @@ if (waitingLine.contains(this@Customer)) {
     numReneged++
     printTrace("reneged")
 } else {
-    yield(passivate())
+    passivate()
 }
 ```
 

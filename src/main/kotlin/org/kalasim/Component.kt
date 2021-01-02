@@ -186,7 +186,7 @@ open class Component(
      *
      * See https://www.kalasim.org/component/#passivate
      */
-    fun passivate(): Component {
+    suspend fun SequenceScope<Component>.passivate() {
         if (status == CURRENT) {
             remainingDuration = 0.0
         } else {
@@ -196,13 +196,11 @@ open class Component(
             remainingDuration = scheduledTime!! - env.now
         }
 
-
         scheduledTime = null
         status = PASSIVE
-        printTrace(now(), env.curComponent, this, "passivate")
+        printTrace(now(), env.curComponent, this@Component, "passivate")
 
-
-        return this
+        yield(this@Component)
     }
 
 

@@ -16,7 +16,7 @@ class Customer(
 
         if (clerk.isPassive) clerk.activate()
 
-        yield(passivate())
+        passivate()
     }
 }
 
@@ -26,7 +26,7 @@ class Clerk : Component() {
 
     override suspend fun SequenceScope<Component>.process() {
         while (true) {
-            while (waitingLine.isEmpty()) yield(passivate())
+            while (waitingLine.isEmpty()) passivate()
 
             val customer = waitingLine.poll()
 

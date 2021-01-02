@@ -36,7 +36,7 @@ class Clerk() : Component() {
 
         while (true) {
             if (waitingLine.isEmpty())
-                yield(passivate())
+                passivate()
 
             waitingLine.poll() // returns next customer (value ignored here)
             hold(30.0) // bearbeitungszeit

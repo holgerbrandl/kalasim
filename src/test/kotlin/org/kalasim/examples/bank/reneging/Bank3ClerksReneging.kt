@@ -54,7 +54,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
         } else {
             // if customer no longer in waiting line,
             // serving has started meanwhile
-            yield(passivate())
+            passivate()
         }
     }
 }
@@ -66,7 +66,7 @@ class Clerk : Component() {
     override fun process() = sequence {
         while (true) {
             if (waitingLine.isEmpty())
-                yield(passivate())
+                passivate()
 
             val customer = waitingLine.poll()
             customer.activate() // get the customer out of it's hold(50)

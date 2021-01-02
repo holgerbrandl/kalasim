@@ -202,8 +202,7 @@ Passivate is the way to make a - usually `current` - component `passive`. This i
 same as scheduling for time=inf.
 <!--TODO rework time=inf-->
 
-* If the component to be passivated is current, the component becomes passive. Always
-  use `yield(passivate())` is this case.
+* If the component to be passivated is current, the component becomes passive.
 * If the component to be passivated is `passive`, the component remains `passive`.
 * If the component to be passivated is `scheduled`, the component becomes `passive`.
 * If the component to be held is `standby`, the component becomes `passive`.

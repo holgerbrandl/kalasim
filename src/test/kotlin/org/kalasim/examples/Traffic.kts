@@ -25,7 +25,7 @@ class Car(val trafficLight: TrafficLight) : Component() {
         release(gasStation)
 
         // change state of car to DATA
-        yield(passivate())
+        passivate()
     }
 }
 
