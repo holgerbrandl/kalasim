@@ -3,6 +3,8 @@ package org.kalasim.test
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.Component
+import org.kalasim.ComponentState
+import org.kalasim.Resource
 import org.kalasim.misc.printThis
 
 class ComponentTests {
@@ -11,6 +13,19 @@ class ComponentTests {
     fun `it should create components outside of an environment`() {
         Component("foo").info.printThis()
     }
+
+    @Test
+    fun `it should hold and terminate`() = createTestSimulation {
+        val c = object : Component("foo"){
+            override fun process()  = sequence<Component> {
+                yield(hold(2))
+            }
+        }
+
+        run(5)
+        c.status shouldBe ComponentState.DATA
+    }
+
 
     @Test
     fun `it should track status changes`() = createTestSimulation {
