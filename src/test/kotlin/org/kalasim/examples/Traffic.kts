@@ -13,7 +13,7 @@ class Car(val trafficLight: TrafficLight) : Component() {
 
     override suspend fun ProcContext.process() {
         // wait until the traffic light is green
-        yield(wait(trafficLight, "green"))
+        wait(trafficLight, "green")
 
         // request a slot in the gas-station
         yield(request(gasStation))

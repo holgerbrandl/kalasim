@@ -1,6 +1,7 @@
 package org.kalasim.test
 
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import org.junit.Test
 import org.kalasim.Component
 import org.kalasim.ComponentState
@@ -13,6 +14,17 @@ class ComponentTests {
     @Test
     fun `it should create components outside of an environment`() {
         Component("foo").info.printThis()
+    }
+
+
+    @Test
+    fun `it should allow for an empty generator process`() = createTestSimulation(true){
+        val c = Component()
+//        object : Component(){}
+
+        run(20)
+
+        c.status shouldBe ComponentState.DATA
     }
 
     @Test
@@ -125,6 +137,31 @@ class ComponentTests {
 
         tool.isData shouldBe true
         mechanic.isData shouldBe true
+    }
+
+    @Test
+    fun `it should  hold on someones elses behalf`() = createTestSimulation(true){
+        val c = object:  Component("other") {
+            override fun process() = sequence<Component> {
+                println("huhu")
+                hold(1)
+//                yield(getThis())
+            }
+        }
+        val mechanic = object : Component("controller") {
+            override fun process() = sequence<Component> {
+                with(c) {
+                    hold(1)
+                }
+                println("huhu2")
+            }
+        }
+
+        val tc = TraceCollector().apply { addTraceListener(this) }
+
+        run(20)
+
+        tc[4].source!!.name shouldBe "other"
     }
 }
 

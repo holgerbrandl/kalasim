@@ -11,6 +11,8 @@ class TraceCollector : TraceListener {
     override fun processTrace(traceElement: TraceElement) {
         traces.add(traceElement)
     }
+
+    operator fun get(index: Int): TraceElement  = traces[index]
 }
 
 class GeneratorTest {

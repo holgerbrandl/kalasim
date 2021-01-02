@@ -29,12 +29,12 @@ class StateTests {
             val trafficLight = get<State<String>>()
 
             fun waitForGreen() = sequence {
-                yield(wait(trafficLight, "green"))
+                wait(trafficLight, "green")
 
                 val stateRequest: StateRequest<String> = StateRequest(trafficLight) { it == "green" }
 //                val (state: State<String>, bar: Int?, predicate: (String) -> Boolean) = stateRequest
 
-                yield(wait(stateRequest))
+                wait(stateRequest)
                 printTrace("passing crossing")
 
                 yield(terminate())
@@ -80,7 +80,7 @@ class StateTests {
             val engine = get<Engine>()
 
             override suspend fun ProcContext.process() {
-                yield(wait(trafficLight turns "green", engine turns true, all = true))
+                wait(trafficLight turns "green", engine turns true, all = true)
                 printTrace("passing crossing")
                 yield(terminate())
             }
@@ -142,7 +142,7 @@ class StateTests {
             val engine = get<State<Boolean>>()
 
             override suspend fun ProcContext.process() {
-                yield(wait(trafficLight turns "green", engine turns true, all = true))
+                wait(trafficLight turns "green", engine turns true, all = true)
                 printTrace("passing crossing")
                 yield(terminate())
             }

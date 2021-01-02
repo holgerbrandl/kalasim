@@ -33,7 +33,7 @@ class Clerk : Component() {
     override fun process() = sequence {
         while (true) {
             if (waitingLine.isEmpty())
-                yield(this@Clerk.wait(workTodo, true))
+                wait(workTodo, true)
 
             val customer = waitingLine.poll()
 

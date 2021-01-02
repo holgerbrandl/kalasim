@@ -45,7 +45,7 @@ class Clerk(val workToDo: State<Boolean>) : Component() {
     override fun process() = sequence {
         while (true) {
             if (waitingLine.isEmpty()) {
-                yield(wait(workToDo, true))
+                wait(workToDo, true)
             }
 
             println("WAITLENGTH " + waitingLine.size)

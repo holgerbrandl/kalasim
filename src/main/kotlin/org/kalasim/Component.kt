@@ -837,6 +837,8 @@ open class Component(
     }
 
 
+    fun getThis()  = this
+
     fun callProcess() = simProcess!!.call()
 
     /**
@@ -919,12 +921,12 @@ open class Component(
 
 
     // todo states may have different types so this methods does not make real sense here. Either remove type from state or enforce the user to call wait multiple times
-    fun <T> wait(
+    suspend fun <T> SequenceScope<Component>.wait(
         state: State<T>,
         waitFor: T,
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null
-    ): Component = wait(
+    ) = wait(
         StateRequest(state) { state.value == waitFor },
 //        *states.map { StateRequest(it) }.toTypedArray(),
         failAt = failAt,
@@ -951,7 +953,7 @@ open class Component(
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
 
      */
-    fun wait(
+    suspend fun SequenceScope<Component>.wait(
         vararg stateRequests: StateRequest<*>,
         //todo change to support distribution parameters instead
         priority: Int = 0,
@@ -959,7 +961,7 @@ open class Component(
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null,
         all: Boolean = false
-    ): Component {
+    ) {
 
         if (status != CURRENT) {
             requireNotData()
@@ -980,7 +982,7 @@ open class Component(
             .filterNot { sr -> waits.any { it.state == sr.state } }
             .forEach { sr ->
                 val (state, srPriority, _) = sr
-                state.waiters.add(this, srPriority)
+                state.waiters.add(this@Component, srPriority)
                 waits.add(sr)
             }
 
@@ -990,7 +992,7 @@ open class Component(
             reschedule(scheduledTime!!, priority, urgent, "wait", WAITING)
         }
 
-        return this
+        yield(this@Component)
     }
 
     internal fun tryWait(): Boolean {
