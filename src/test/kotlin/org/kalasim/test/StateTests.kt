@@ -37,7 +37,7 @@ class StateTests {
                 wait(stateRequest)
                 printTrace("passing crossing")
 
-                yield(terminate())
+//                terminate()
             }
         }
 
@@ -82,7 +82,7 @@ class StateTests {
             override suspend fun ProcContext.process() {
                 wait(trafficLight turns "green", engine turns true, all = true)
                 printTrace("passing crossing")
-                yield(terminate())
+//                terminate()
             }
         }
 
@@ -144,7 +144,7 @@ class StateTests {
             override suspend fun ProcContext.process() {
                 wait(trafficLight turns "green", engine turns true, all = true)
                 printTrace("passing crossing")
-                yield(terminate())
+//                terminate()
             }
         }
 

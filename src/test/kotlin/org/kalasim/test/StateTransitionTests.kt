@@ -46,9 +46,9 @@ class StateTransitionTests {
     fun customProc() {
         class Customer : Component(process = Customer::doSmthg) {
 
-            fun doSmthg() = sequence {
+            fun doSmthg() = sequence<Component> {
                 print("hello")
-                yield(terminate())
+//                terminate()
             }
         }
 

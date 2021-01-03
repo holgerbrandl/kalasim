@@ -10,8 +10,9 @@ import java.util.*
 import kotlin.reflect.KFunction1
 
 
-internal val EPS = 1E-8
+internal const val EPS = 1E-8
 
+@Deprecated("directly use sequence<Component>{}")
 typealias ProcContext = SequenceScope<Component>
 
 enum class ComponentState {
@@ -120,7 +121,9 @@ open class Component(
     /**  called immediately after initialization of a component.
      * by default this is a dummy method, but it can be overridden.
      * */
-    open fun setup() {}
+    @Deprecated("use inheritance instead and do additional setup bits in child class constructor")
+    open fun setup() {
+    }
 
     /**         the current simulation time : float */
     private fun now() = env.now
@@ -140,12 +143,6 @@ open class Component(
     open suspend fun ProcContext.process(it: Component) {}
 
     open suspend fun ProcContext.process() {}
-
-
-//    open suspend fun SequenceScope<Component>.process() {
-//        while (true)
-//            hold(1.0)
-//    }
 
     /** @return `true` if status is `PASSIVE`, `false` otherwise. */
     val isPassive: Boolean
@@ -186,7 +183,7 @@ open class Component(
      *
      * See https://www.kalasim.org/component/#passivate
      */
-    suspend fun SequenceScope<Component>.passivate() {
+    suspend fun SequenceScope<Component>.passivate() = yieldCurrent {
         if (status == CURRENT) {
             remainingDuration = 0.0
         } else {
@@ -198,9 +195,8 @@ open class Component(
 
         scheduledTime = null
         status = PASSIVE
-        printTrace(now(), env.curComponent, this@Component, "passivate")
 
-        yield(this@Component)
+        printTrace(now(), env.curComponent, this@Component, "passivate")
     }
 
 
@@ -294,7 +290,7 @@ open class Component(
      *
      * See https://www.kalasim.org/component/#cancel
      */
-    fun cancel(): Component {
+    suspend fun SequenceScope<Component>.cancel() = yieldCurrent {
         if (status != CURRENT) {
             requireNotData()
             remove()
@@ -306,20 +302,17 @@ open class Component(
 
         status = DATA
 
-        printTrace(now(), env.curComponent, this, "cancel")
-
-        return this
+        printTrace(now(), env.curComponent, this@Component, "cancel")
     }
 
     /**
      * Puts the component in standby mode.
      *
-     * Not allowed for data components or main. If to be used for the current component (which will be nearly always the case),
-    `yield(standby())`.
+     * Not allowed for data components or main.
      *
      * For the full contract definition see https://www.kalasim.org/component/#standby
      */
-    fun standby(): Component {
+    suspend fun SequenceScope<Component>.standby() = yieldCurrent {
         if (status != CURRENT) {
             requireNotData()
             requireNotMain()
@@ -328,12 +321,11 @@ open class Component(
         }
 
         scheduledTime = env.now
-        env.addStandBy(this)
+        env.addStandBy(this@Component)
 
         status = STANDBY
-        printTrace(now(), env.curComponent, this)
 
-        return this
+        printTrace(now(), env.curComponent, this@Component)
     }
 
     /**
@@ -662,7 +654,7 @@ open class Component(
         env.remove(this)
     }
 
-    fun terminate(): Component {
+    fun terminate() {
         claims.forEach { (resource, _) ->
             release(resource)
         }
@@ -672,8 +664,6 @@ open class Component(
         simProcess = null
 
         printTrace(now(), env.curComponent, this, "ended")
-
-        return (this)
     }
 
     private fun requireNotData() =
@@ -741,6 +731,12 @@ open class Component(
 //        process: ProcessPointer? = Component::process
 
     ): Component {
+
+        require(status != CURRENT){
+            // original contract
+            "if the component to be activated is current, always use `yield(activate())`. The effect is that the\n" +
+                    "  component becomes scheduled, thus this is essentially equivalent to the preferred hold method."
+        }
 
         var p: ProcessPointer? = null
 
@@ -820,7 +816,7 @@ open class Component(
         till: Number? = null,
         priority: Int = 0,
         urgent: Boolean = false
-    ) {
+    )  {
         if (status != DATA && status != CURRENT) {
             requireNotData()
             remove()
@@ -831,11 +827,11 @@ open class Component(
 
         reschedule(scheduledTime, priority, urgent, "hold", SCHEDULED)
 
-        yield (this@Component)
+        yieldCurrent()
     }
 
 
-    fun getThis()  = this
+    fun getThis() = this
 
     fun callProcess() = simProcess!!.call()
 
@@ -959,7 +955,7 @@ open class Component(
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null,
         all: Boolean = false
-    ) {
+    )  = yieldCurrent{
 
         if (status != CURRENT) {
             requireNotData()
@@ -989,8 +985,6 @@ open class Component(
         if (waits.isNotEmpty()) {
             reschedule(scheduledTime!!, priority, urgent, "wait", WAITING)
         }
-
-        yield(this@Component)
     }
 
     internal fun tryWait(): Boolean {
@@ -1039,6 +1033,17 @@ open class Component(
 
     public override val info: Jsonable
         get() = ComponentInfo(this)
+
+
+    private suspend fun SequenceScope<Component>.yieldCurrent(builder: () -> Unit = {}) {
+        val initialStatus = status
+
+        builder()
+
+//        if (initialStatus == CURRENT) {
+            yield(this@Component)
+//        }
+    }
 }
 
 

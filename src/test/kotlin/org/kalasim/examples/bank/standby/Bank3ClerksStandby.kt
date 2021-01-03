@@ -19,7 +19,7 @@ class Clerk : Component() {
     override fun process() = sequence {
         while (true) {
             while(waitingLine.isEmpty())
-                yield(standby())
+                standby()
 
             val customer = waitingLine.poll()
             hold(32.0) // bearbeitungszeit

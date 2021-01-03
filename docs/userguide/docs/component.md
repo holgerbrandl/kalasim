@@ -164,7 +164,7 @@ val car1 = Car(process=null)  // data component
 car1.activate(process=null) //  activate @ wash
 ```
 
-* If the component to be activated is current, always use yield activate. The effect is that the
+* If the component to be activated is current, always use `yield(activate())`. The effect is that the
   component becomes scheduled, thus this is essentially equivalent to the preferred hold method.
 * If the component to be activated is passive, the component will be activated at the specified time.
 * If the component to be activated is scheduled, the component will get a new scheduled time.
@@ -184,7 +184,7 @@ Hold is the way to make a - usually `current` - component `scheduled`.
 
 
 * If the component to be held is current, the component becomes scheduled for the specified time. Always
-  use `hold()` is this case.
+  use `yield(hold())` is this case.
 * If the component to be held is passive, the component becomes scheduled for the specified time.
 * If the component to be held is scheduled, the component will be rescheduled for the specified time, thus
   essentially the same as activate.
@@ -202,7 +202,8 @@ Passivate is the way to make a - usually `current` - component `passive`. This i
 same as scheduling for time=inf.
 <!--TODO rework time=inf-->
 
-* If the component to be passivated is current, the component becomes passive.
+* If the component to be passivated is current, the component becomes passive. Always
+  use `yield(passivate())` is this case.
 * If the component to be passivated is `passive`, the component remains `passive`.
 * If the component to be passivated is `scheduled`, the component becomes `passive`.
 * If the component to be held is `standby`, the component becomes `passive`.
@@ -263,8 +264,8 @@ Wait has the effect that the component will check whether the value of a state m
 
 If the component is [canceled](#cancel), [activated](#activate), [passivated](#passivate), [interrupted](#interrupt) or [held](#hold) the failed flag will be set as well.
 
-!!! tip
-    Although theoretically possible it is not recommended to use wait for non current components. To so use `with(someComponent){ wait(someState) }`
+* If the component is current, always use `yield(wait())`
+* Although theoretically possible it is not recommended to use wait for non current components.
 
 ### interrupt
 

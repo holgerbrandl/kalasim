@@ -8,7 +8,7 @@ class Car : Component() {
         // drive around for an hour
         hold(1.0)
         // and terminate when reaching the destination
-        yield(terminate())
+        terminate()
     }
 }
 

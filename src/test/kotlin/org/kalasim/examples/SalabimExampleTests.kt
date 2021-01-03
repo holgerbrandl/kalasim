@@ -84,7 +84,7 @@ class SalabimExampleTests {
 
     @Test
     fun `average waiting should be constant in bank with 1 clerk`() {
-        val avgQueueMeans = (1..100).map { 1000.0 * it }.map { runtime ->
+        val avgQueueMeans = (1..100 step 10).map { 1000.0 * it }.map { runtime ->
             runtime to declareDependencies {
                 add { org.kalasim.examples.bank.oneclerk.Clerk() }
                 add { ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer>("waiting line") }

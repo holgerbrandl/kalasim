@@ -17,7 +17,7 @@ class Customer(val clerks: Resource) : Component() {
         if (clerks.requesters.size >= 5) {
             numBalked++
             printTrace("balked")
-            yield(cancel())
+            cancel()
         }
 
         yield(request(clerks, failDelay = 50.asDist()))

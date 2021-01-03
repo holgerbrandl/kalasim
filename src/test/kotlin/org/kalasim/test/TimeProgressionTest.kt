@@ -16,7 +16,7 @@ class TimeProgressionTest {
                     // wait for 1 sec
                     hold(1.0)
                     // and terminate it
-                    yield(terminate())
+//                    terminate()
                 }
             }
         }

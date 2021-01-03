@@ -287,7 +287,7 @@ The model code is:
 Let's look at some details.
 
 ```kotlin
-yield(cancel())
+cancel()
 ```
 
 This makes the current component (a customer) a `DATA` component (and be subject to garbage collection), if the queue length is `5` or more.
@@ -334,7 +334,7 @@ For the renenging, all we have to do is add a `failDelay`:
 yield(request(clerks, failDelay = 50.asDist()))
 ```
 
-If the request is not honored within `50` time units (ticks), the process continues after that `request` statement. And then, we just check whether the request has failed with the built-in `Component` property
+If the request is not honored within `50` time units (ticks), the process continues after that `request` statement. We check whether the request has failed with the built-in `Component` property:
 
 ```kotlin
 iff (failed)
@@ -388,9 +388,9 @@ The model with standby is:
 
 In this case, the condition is checked frequently with:
 
-```
-while len(waitingline) == 0:
-    yield self.standby()
+```kotlin
+while(waitingLine.isEmpty())
+    standby()
 ```
 
 

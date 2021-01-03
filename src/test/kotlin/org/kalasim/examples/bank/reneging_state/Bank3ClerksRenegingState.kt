@@ -20,7 +20,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>, val workToDo: State<Bo
         if (waitingLine.size >= 5) {
             numBalked++
             printTrace("balked")
-            yield(cancel())
+            cancel()
         }
 
         waitingLine.add(this@Customer)

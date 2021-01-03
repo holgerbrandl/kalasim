@@ -31,7 +31,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
             numBalked++
 
             printTrace("balked")
-            yield(cancel())
+            cancel()
         }
 
         waitingLine.add(this@Customer)
