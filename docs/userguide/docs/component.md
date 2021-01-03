@@ -2,7 +2,7 @@
 
 Components are the key elements of a simulation.
 
-Components can be either in state `DATA` or `ACTIVE`. An `ACTIVE` component has one or more process descriptions and is activated at some point of time. You can make a data component `active` with `activate()`. An active component can become `DATA` either with a `cancel()` or by reaching the end of its process method.
+Components can be either  in *data* or an *active* [lifecycle](#lifecycle) state. An *active*  component has one or more *process*  descriptions and is activated at some point of time. We can [transition](#process-interaction) a *data*  component to *active* with [`activate()`](#activate). An *active* component can become `DATA` either with a [`cancel()`](#cancel) or by reaching the end of a process method.
 
 It is easy to create a data component by:
 
@@ -10,9 +10,9 @@ It is easy to create a data component by:
 val component = Component()
 ```
 
-Data components may be placed in a queue. This component will not be activated as there is no associated process method.
+*Data*  components may be placed in a queue. This component will not be activated as there is no associated process method.
 
-In order to make an active component it is necessary to first define a class. There has to be at least one sequence generator method, normally called `process`:
+In order to make an *active*  component it is necessary to first define a class. There has to be at least one sequence generator method, normally called `process`:
 
 
 ```
@@ -25,7 +25,11 @@ class Ship: Component(){
 }
 ```
 
+
 Normally, the process will contain at least one [`yield`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence-scope/yield.html) statement. But that's not a requirement.
+
+
+Typically, the user must not use `yield` directly, but rather the provided [process interaction](#process-interaction) methods.
 
 Creation and activation can be combined by making a new instance of the class:
 
@@ -34,7 +38,6 @@ val ship1 = Ship()
 val ship2 = Ship()
 val ship3 = Ship()
 ```
-
 
 This causes three Ships to be created and to start them at Sim.process().
 The ships will be named automatically `Ship.0` unless a name
@@ -63,7 +66,7 @@ ship2.activate(delay=50)
 ## Creation of a component
 
 Although it is possible to create a component directly with `val x = Component()`, this
-makes it very hard to make that component into an active component, because there's no process method. So, nearly always we define a class based on `org.kalasim.Component`:
+makes it very hard to make that component into an active component, because there's no process method. So, nearly always we define our simulation entities by extending `org.kalasim.Component`:
 
 ```kotlin
 class Car: Component(){
@@ -73,9 +76,9 @@ class Car: Component(){
 }
 ```
 
-If we then say `val car = Car()`, a component is created and it activated from process. This process is nearly always, but not necessarily a *generator method*  (i.e. it has at least one yield (or yield from) statement.
+If we then say `val car = Car()`, a component is created, and it activated from process. This process is nearly always, but not necessarily a *generator method*  (i.e. it has at least one `yield` statement).
 
-The result is that car is put on the future event list (for time now) and when it's its turn, the component becomes current.
+The result is that car is put on the future [event list](basics.md#event-queue) (for time `now`) and when it's its turn, the component becomes `CURRENT`.
 
 It is also possible to set a time at which the component (car) becomes active, like `val car = Car(at=10)`. This requires an additional constructor argument to be passed on to `Component` as in `class Car(at:Number): Component(delay=at)`.
 
@@ -89,25 +92,22 @@ If there is no process method, and process= is not given, the component will be 
 
 ## Lifecycle
 
-A component may be in one of the following states modelled by `org.kalasim.ComponentState`:
+A component is always in one of the following states modelled by `org.kalasim.ComponentState`:
 
-* `DATA`
-* `CURRENT`
-* `SCHEDULED`
-* `PASSIVE`
-* `REQUESTING`
-* `WAITING`
-* `STANDBY`
-* `INTERRUPTED`
+* `CURRENT` - The component's process is currently being executed by the [event queue](basics.md#event-queue)
+* `SCHEDULED` - The component is [scheduled](basics.md#event-queue) for future execution
+* `PASSIVE` - The component is idle
+* `REQUESTING` - The component is waiting for a [resource](resource.md) requirement to be met
+* `WAITING` - The component is [waiting](#wait) for a [state](state.md) predicate to be met
+* `STANDBY` - The component was put on [standby](#standby)
+* `INTERRUPTED` - The component was [interrupted](#interrupt)
+* `DATA` - The component is non of the _active_ states above. Components without a `process` definition are always in this state.
 
 
-A component's status is automatically tracked in the status level monitor `component.statusMonitor`. Thus, it possible
-to check how long a component has been in passive state with
-
-<!-- TODO finish this part -->
+A component's status is automatically tracked in the status level monitor `component.statusMonitor`. Thus, it possible to check how long a component has been in passive state with
 
 ```kotlin
-passive_duration = component.status.value("passive")
+val passive_duration = component.statusMonitor[ComponentState.PASSIVE]
 ```
 
 It is possible to print a histogram with all the statuses a component has been in with
@@ -183,8 +183,7 @@ car1.activate(process=null) //  activate @ wash
 Hold is the way to make a - usually `current` - component `scheduled`.
 
 
-* If the component to be held is current, the component becomes scheduled for the specified time. Always
-  use `yield(hold())` is this case.
+* If the component is `CURRENT`, it will suspend execution internally, and the component becomes scheduled for the specified time
 * If the component to be held is passive, the component becomes scheduled for the specified time.
 * If the component to be held is scheduled, the component will be rescheduled for the specified time, thus
   essentially the same as activate.
@@ -202,8 +201,7 @@ Passivate is the way to make a - usually `current` - component `passive`. This i
 same as scheduling for time=inf.
 <!--TODO rework time=inf-->
 
-* If the component to be passivated is current, the component becomes passive. Always
-  use `yield(passivate())` is this case.
+* If the component to be passivated is `CURRENT`, the component becomes passive, and it will suspend execution internally.
 * If the component to be passivated is `passive`, the component remains `passive`.
 * If the component to be passivated is `scheduled`, the component becomes `passive`.
 * If the component to be held is `standby`, the component becomes `passive`.
@@ -218,7 +216,7 @@ same as scheduling for time=inf.
 
 Cancel has the effect that the component becomes a data component.
 
-* If the component to be cancelled is `current`, always use `yield(cancel())`.
+* If the component to be cancelled is `CURRENT`, it will suspend execution internally.
 * If the component to be cancelled is `passive`, scheduled, interrupted  or standby, the component
   becomes a data component.
 * If the component to be cancelled is `requesting`, the request will be terminated, the attribute failed
@@ -230,7 +228,7 @@ Cancel has the effect that the component becomes a data component.
 
 Standby has the effect that the component will be triggered on the next simulation event.
 
-* If the component is current, use always `yield(standby())`
+* If the component is `CURRENT`, it will suspend execution internally.
 * Although theoretically possible, it is not recommended to use standby for non current components.
 
 Examples
@@ -249,7 +247,7 @@ By default, there is no limit on the time to wait for the resource(s) to become 
 
 If the component is canceled, activated, passivated, interrupted or held the `failed` flag will be set as well.
 
-* If the component is current, always use `yield(request())`
+* If the component is `CURRENT`, it will suspend execution internally
 * Although theoretically possible it is not recommended to use request for non current components.
 
 <!-- TODO describe better what happens if request is rejected or fails to be fulfilled-->
@@ -264,7 +262,7 @@ Wait has the effect that the component will check whether the value of a state m
 
 If the component is [canceled](#cancel), [activated](#activate), [passivated](#passivate), [interrupted](#interrupt) or [held](#hold) the failed flag will be set as well.
 
-* If the component is current, always use `yield(wait())`
+* If the component is `CURRENT`, it will suspend execution internally
 * Although theoretically possible it is not recommended to use wait for non current components.
 
 ### interrupt

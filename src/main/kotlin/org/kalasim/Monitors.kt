@@ -61,6 +61,10 @@ interface LevelMonitor<T> {
     operator fun get(time: Double): T?
 
 
+    /** Get the total time for which a monitor was is state `value`*/
+    operator fun get(value: T): Double?
+
+
     /** Resets the monitor to a new initial at the current simulation clock. This will also reenable it as a side-effect. */
     fun reset(initial: T)
 
@@ -173,6 +177,11 @@ class FrequencyLevelMonitor<T>(
         val timeIndex = timestamps.withIndex().firstOrNull { it.value >= time }?.index
 
         return timeIndex?.let { values[it] }
+    }
+
+    override fun get(value: T): Double = valuesUntilNow().run {
+        // https://youtrack.jetbrains.com/issue/KT-43776
+        values.zip(durations.asList()).filter { it.first == value }.map { it.second }.sum()
     }
 
     fun printHistogram(values: List<T>? = null, sortByWeight: Boolean = false) {
@@ -323,6 +332,11 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
     }
 
     override fun get(time: Double): Number = timestamps.zip(values.toList()).first { it.first > time }.second
+
+    override fun get(value: Number): Double = valuesUntilNow().run {
+        // https://youtrack.jetbrains.com/issue/KT-43776
+        values.zip(durations.asList()).filter { it.first == value }.map { it.second }.sum()
+    }
 
     internal fun valuesUntilNow(excludeZeros: Boolean = false): NLMStatsData {
         require(values.isNotEmpty()) { "data must not be empty when preparing statistics of $name" }

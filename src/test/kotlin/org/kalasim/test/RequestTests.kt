@@ -189,6 +189,52 @@ class RequestTests {
         bc1.isData shouldBe true
         bc2.isScheduled shouldBe true
     }
+
+    @Test
+    fun `it should reevaluate requests upon capacity changes`() {
+
+        class Customer(val clerk: Resource) : Component() {
+
+            override fun process() = sequence {
+                hold(duration = 5.0)
+
+                yield(request(clerk))
+                hold(duration = 2.0, priority = 3)
+                release(clerk)
+
+                passivate()
+                hold(duration = 5.0)
+            }
+        }
+
+        createSimulation {
+            val clerk = Resource(capacity = 0)
+
+            val customer = Customer(clerk)
+
+            run(8)
+            clerk.capacity=1.0
+
+            run(10)
+            customer.activate()
+
+//            sequence<Component>{
+//                with(customer){
+//                    hold(3)
+//                }
+//            }.toList()
+
+            run(10)
+
+            // how long was the component in passive state
+            customer.statusMonitor.printHistogram()
+//                println(customer.statusMonitor[ComponentState.PASSIVE])
+
+            customer.statusMonitor[ComponentState.PASSIVE] shouldBe 8.0
+        }
+
+    }
+
 }
 
 

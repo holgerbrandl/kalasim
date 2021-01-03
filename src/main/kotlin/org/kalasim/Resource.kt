@@ -31,23 +31,38 @@ open class Resource(
 
     var capacity = capacity.toDouble()
         set(value) {
+            require( value >= claimedQuantity){ "can not reduce capacity below current claims"}
+
             field = value
+
+            updateCapacityMonitors()
+            tryRequest()
         }
 
     var claimedQuantity = 0.0
-        set(x) {
+        internal set(x) {
             val diffQuantity = field - x
 
             field = x
 
+            if (field < EPS)
+                field = 0.0
+
             claimedQuantityMonitor.addValue(x)
-            availableQuantityMonitor.addValue(capacity - claimedQuantity)
-            occupancyMonitor.addValue(if (capacity < 0) 0 else claimedQuantity / capacity)
-            capacityMonitor.addValue(capacity)
+            updateCapacityMonitors()
 
             val action = if (diffQuantity > 0) "released" else "claimed"
             printTrace("$action with quantity $claimedQuantity")
+
+            // it would seem natural to tryReqeust here, but since this is not done in case of bumping,
+            // we do it manually at the call-site instead
         }
+
+    private fun updateCapacityMonitors() {
+        availableQuantityMonitor.addValue(capacity - claimedQuantity)
+        occupancyMonitor.addValue(if (capacity < 0) 0 else claimedQuantity / capacity)
+        capacityMonitor.addValue(capacity)
+    }
 
 
     val availableQuantity: Double
@@ -104,7 +119,6 @@ open class Resource(
             val q = quantity?.toDouble() ?: claimedQuantity
 
             claimedQuantity = -q
-            if (claimedQuantity < EPS) claimedQuantity = 0.0
 
             // done within decrementing claimedQuantity
 //            occupancyMonitor.addValue(if (capacity <= 0) 0 else claimedQuantity / capacity)

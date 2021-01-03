@@ -2,13 +2,14 @@
 
 Resources are a powerful way of process interaction. 
 
-A resource has always a capacity (which can be zero and even negative). This capacity will be specified at time of creation, but
-may change over time.
+A resource has always a capacity (which can be zero and even negative). This capacity will be specified at time of creation, but can be changed later with `r.capacity = newCapacity`. Note that this may lead to requesting components to be honored if possible.
+
+<!--see org.kalasim.test.RequestTests#`it should reevaluate requests upon capacity changes`-->
 
 There are two of types resources:
 
-* Standard resources, where each claim is associated with a component (the claimer). It is not necessary that the claimed quantities are integer.
-* Anonymous resources, where only the claimed quantity is registered. This is most useful for dealing with levels, lengths, etc.
+* *Standard resources*, where each claim is associated with a component (the claimer). It is not necessary that the claimed quantities are integer.
+* *Anonymous resources*, where only the claimed quantity is registered. This is most useful for dealing with levels, lengths, etc.
 
 <!-- todo consider to add a dedicated container type instead of anonymous resources https://simpy.readthedocs.io/en/latest/topical_guides/resources.html#containers-->
 
@@ -241,8 +242,6 @@ With `r.printInfo()` a summary of the contents of the queues can be printed. E.g
   "capacity": 3
 }
 ```
-        
-The capacity may be changed with `r.capacity = x`. Note that this may lead to requesting components to be honored.
 
 Querying of the capacity, claimed quantity, available quantity and occupancy can be done with:
 `r.capacity`, `r.claimedQuantity`, `r.availableQuantity` and `r.occupancy`. All quantities are tracked by corresponding level monitors to provide statistics.

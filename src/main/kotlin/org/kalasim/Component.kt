@@ -734,8 +734,10 @@ open class Component(
 
         require(status != CURRENT){
             // original contract
-            "if the component to be activated is current, always use `yield(activate())`. The effect is that the\n" +
-                    "  component becomes scheduled, thus this is essentially equivalent to the preferred hold method."
+            "Can not activate the CURRENT component. If needed simply use hold method."
+            // technically we could use suspend here , but since activate is used
+            // outside of process definitions we don't want to overcomplete the API for this
+            // rare edge case
         }
 
         var p: ProcessPointer? = null
@@ -816,7 +818,7 @@ open class Component(
         till: Number? = null,
         priority: Int = 0,
         urgent: Boolean = false
-    )  {
+    ) = yieldCurrent  {
         if (status != DATA && status != CURRENT) {
             requireNotData()
             remove()
@@ -826,8 +828,6 @@ open class Component(
         val scheduledTime = env.calcScheduleTime(till, duration)
 
         reschedule(scheduledTime, priority, urgent, "hold", SCHEDULED)
-
-        yieldCurrent()
     }
 
 
@@ -1040,9 +1040,9 @@ open class Component(
 
         builder()
 
-//        if (initialStatus == CURRENT) {
+        if (initialStatus == CURRENT) {
             yield(this@Component)
-//        }
+        }
     }
 }
 
