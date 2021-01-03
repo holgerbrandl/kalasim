@@ -1,10 +1,8 @@
 //Bank3Clerks.kt
 package org.kalasim.examples.bank.threeclerks
 
-
-import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
-import org.kalasim.analytics.display
+import org.kalasim.misc.display
 import org.koin.core.component.get
 import org.koin.core.component.inject
 import java.awt.GraphicsEnvironment.isHeadless

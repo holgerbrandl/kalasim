@@ -1,12 +1,10 @@
 package org.kalasim.test
 
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
 import org.junit.Test
 import org.kalasim.Component
 import org.kalasim.ComponentState
 import org.kalasim.Resource
-import org.kalasim.analytics.display
 import org.kalasim.misc.printThis
 
 class ComponentTests {

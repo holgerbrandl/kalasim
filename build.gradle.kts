@@ -43,6 +43,7 @@ dependencies {
     testImplementation(kotlin("test-junit"))
     testImplementation("io.kotest:kotest-assertions-core:4.2.6")
 
+    compileOnly( "com.github.holgerbrandl:kravis:0.6.1")
     testImplementation( "com.github.holgerbrandl:kravis:0.6.1")
 
     //experimental dependencies  use for experimentation

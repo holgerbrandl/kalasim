@@ -1,5 +1,6 @@
-import kravis.*
+package org.kalasim.misc
 
+import kravis.*
 import org.kalasim.FrequencyLevelMonitor
 import org.kalasim.NumericLevelMonitor
 import org.kalasim.NumericStatisticMonitor

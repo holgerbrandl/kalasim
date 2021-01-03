@@ -2,7 +2,7 @@
 package org.kalasim.examples.bank.resources
 
 import org.kalasim.*
-import org.kalasim.analytics.display
+import org.kalasim.misc.display
 import org.koin.core.component.get
 
 

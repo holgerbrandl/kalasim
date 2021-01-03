@@ -56,6 +56,17 @@ trajectory: anonymous, 3 activities
 { Activity: Timeout | delay: 10 }
 ```
 
+
+**{todo}** it must be easy to use interaction methods on other component
+```
+//        sequence<Component>{
+//            person.let{
+//                passivate()
+//            }
+//        }.toList()
+```
+
+
 ## v0.5
 
 **{todo}**  implement `Demo preemptive resource animated.py`

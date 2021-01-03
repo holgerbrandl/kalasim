@@ -827,6 +827,14 @@ open class Component(
         }
     }
 
+    // TODO v0.4 reenable
+//     fun hold(
+//        duration: Number? = null,
+//        till: Number? = null,
+//        priority: Int = 0,
+//        urgent: Boolean = false
+//    ) {}
+
     /**
      * Hold the component.
      *
