@@ -11,6 +11,15 @@ class ResourceDocu {
 
         object : Component(){
             override fun process() = sequence<Component> {
+                // the recommended way is to use request that is released automatically
+                request(clerks){
+                    // consume it
+                    hold(2)
+                }
+                // no need to release it, if a `honorBlock` is provided it will be released automatically
+
+
+                // api to request resources with custom quantity and priorities
                 request(clerks withQuantity 2)
                 request(clerks withQuantity 1, assistance withQuantity 2)
                 request(clerks withPriority  1)
@@ -21,6 +30,8 @@ class ResourceDocu {
                 release(clerks, quantity= 2.0) // release some quantity
 
                 release(clerks) // release entiry claim
+
+
             }
         }
 

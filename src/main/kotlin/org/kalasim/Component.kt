@@ -366,6 +366,7 @@ open class Component(
      * @param failDelay  if the request is not honored before now+fail_delay,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
      * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given.
+     * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
      * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
@@ -375,11 +376,15 @@ open class Component(
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null,
         oneOf: Boolean = false,
+        priority: Int = DEFAULT_QUEUE_PRIORITY,
+        honorBlock: (suspend SequenceScope<Component>.() -> Any)? = null
     ) = request(
         *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
         failAt = failAt,
         failDelay = failDelay,
-        oneOf = oneOf
+        oneOf = oneOf,
+        priority = priority,
+        honorBlock=honorBlock
     )
 
 
@@ -413,6 +418,7 @@ open class Component(
      * @param failDelay  if the request is not honored before now+fail_delay,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
      * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given.
+     * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
      * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
@@ -422,12 +428,16 @@ open class Component(
         // todo review if this should rather be a number (and dist at call site)
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null,
-        oneOf: Boolean = false
+        oneOf: Boolean = false,
+        priority: Int = DEFAULT_QUEUE_PRIORITY,
+        honorBlock: (suspend SequenceScope<Component>.() -> Any)? = null
     ) = request(
         *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
         failAt = failAt,
         failDelay = failDelay,
-        oneOf = oneOf
+        oneOf = oneOf,
+        priority = priority,
+        honorBlock= honorBlock
     )
 
     /**
@@ -440,6 +450,7 @@ open class Component(
      * @param failDelay  if the request is not honored before now+fail_delay,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
      * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given.
+     * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
      * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
@@ -451,12 +462,12 @@ open class Component(
         failDelay: RealDistribution? = null,
         oneOf: Boolean = false,
         //todo use type here and not string
-        priority: Int = 0,
+        priority: Int = DEFAULT_QUEUE_PRIORITY,
         urgent: Boolean = false,
         // try to avoid argument by inferring from stacktrace
         calledFrom: String? = null,
         // see https://stackoverflow.com/questions/46098105/is-there-a-way-to-open-and-close-a-stream-easily-at-kotlin
-        closableBuilder: (suspend SequenceScope<Component>.() -> Any)? = null
+        honorBlock: (suspend SequenceScope<Component>.() -> Any)? = null
     ) {
         yieldCurrent {
 
@@ -553,9 +564,9 @@ open class Component(
             }
         }
 
-        if (closableBuilder != null) {
+        if (honorBlock != null) {
             // suspend{ ... }
-            closableBuilder()
+            honorBlock()
 
             release(*resourceRequests)
         }
@@ -690,7 +701,7 @@ open class Component(
 
     fun reschedule(
         scheduledTime: Double,
-        priority: Int = 0,
+        priority: Int = DEFAULT_QUEUE_PRIORITY,
         urgent: Boolean = false,
         caller: String? = null,
         newStatus: ComponentState,
@@ -1109,6 +1120,7 @@ class SimpleProcessInternal(val component: Component, val funPointer: ProcessPoi
 }
 
 internal const val DEFAULT_REQUEST_QUANTITY = 1.0
+internal const val DEFAULT_QUEUE_PRIORITY = 1
 
 data class ResourceRequest(val r: Resource, val quantity: Double = DEFAULT_REQUEST_QUANTITY, val priority: Int? = null)
 

@@ -113,6 +113,15 @@ env.visEngine = KRAVIS
 nlm.printHistogram()
 ```
 
+**{todo}** consider a more simplistic process definition pattern
+```kotlin
+val c = Component(){
+    hold(1)
+}
+```
+
+**{todo}** restrict more methods in Component from being overridden
+
 ## Pre-release
 
 
