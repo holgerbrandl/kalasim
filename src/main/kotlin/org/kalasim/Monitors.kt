@@ -181,7 +181,7 @@ class FrequencyLevelMonitor<T>(
 
     override fun get(value: T): Double = valuesUntilNow().run {
         // https://youtrack.jetbrains.com/issue/KT-43776
-        values.zip(durations.asList()).filter { it.first == value }.map { it.second }.sum()
+        values.zip(durations).filter { it.first == value }.map { it.second }.sum()
     }
 
     fun printHistogram(values: List<T>? = null, sortByWeight: Boolean = false) {
@@ -201,14 +201,13 @@ class FrequencyLevelMonitor<T>(
     }
 
 
-    internal fun valuesUntilNow(): LevelStatsData<T> {
+    fun valuesUntilNow(): LevelStatsData<T> {
         require(values.isNotEmpty()) { "data must not be empty when preparing statistics of $name" }
 
         val valuesLst = values.toList()
 
         val timepointsExt = timestamps + env.now
         val durations = timepointsExt.toMutableList().zipWithNext { first, second -> second - first }
-            .toDoubleArray()
 
         return LevelStatsData(valuesLst, timestamps, durations)
     }
@@ -224,7 +223,7 @@ class NumericStatisticMonitor(name: String? = null, koin: Koin = GlobalContext.g
     Monitor<Number>(name, koin) {
     private val sumStats = ifEnabled { DescriptiveStatistics() }
 
-    internal val values: DoubleArray
+    val values: DoubleArray
         get() = sumStats.values
 
     fun addValue(value: Number) {
@@ -326,34 +325,44 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
 
 
     /** Increment the current value by 1 and add it as value. Autostart with 0 if there is no prior value. */
-    fun inc() {
-        val roundToInt = (values.lastOrNull() ?: 0.0).roundToInt()
-        addValue((roundToInt + 1).toDouble())
+    fun inc(): NumericLevelMonitor {
+//        val roundToInt = (values.lastOrNull() ?: 0.0).roundToInt()
+        val roundToInt = values.last()
+        addValue((roundToInt + 1))
+
+        return this
+    }
+
+    fun dec(): NumericLevelMonitor {
+//        val roundToInt = (values.lastOrNull() ?: 0.0).roundToInt()
+        val roundToInt = values.last()
+        addValue((roundToInt - 1))
+
+        return this
     }
 
     override fun get(time: Double): Number = timestamps.zip(values.toList()).first { it.first > time }.second
 
     override fun get(value: Number): Double = valuesUntilNow().run {
         // https://youtrack.jetbrains.com/issue/KT-43776
-        values.zip(durations.asList()).filter { it.first == value }.map { it.second }.sum()
+        values.zip(durations).filter { it.first == value }.map { it.second }.sum()
     }
 
-    internal fun valuesUntilNow(excludeZeros: Boolean = false): NLMStatsData {
+    fun valuesUntilNow(excludeZeros: Boolean = false): LevelStatsData<Double> {
         require(values.isNotEmpty()) { "data must not be empty when preparing statistics of $name" }
 
         val valuesLst = values.toList()
 
         val timepointsExt = timestamps + env.now
         val durations = timepointsExt.toMutableList().zipWithNext { first, second -> second - first }
-            .toDoubleArray()
 
         return if (excludeZeros) {
             val (durFilt, valFilt) = durations.zip(valuesLst).filter { it.second > 0 }.unzip()
             val (_, timestampsFilt) = timestamps.zip(valuesLst).filter { it.second > 0 }.unzip()
 
-            NLMStatsData(valFilt, timestampsFilt, durFilt.toDoubleArray())
+            LevelStatsData(valFilt, timestampsFilt, durFilt)
         } else {
-            NLMStatsData(valuesLst, timestamps, durations)
+            LevelStatsData(valuesLst, timestamps, durations)
         }
     }
 
@@ -439,15 +448,15 @@ class LevelMonitoredInt(initialValue: Int = 0, name: String? = null, koin: Koin 
 //    }
 
 
-internal data class NLMStatsData(val values: List<Double>, val timepoints: List<Double>, val durations: DoubleArray) {
-    fun plotData(): List<Pair<Double, Double>> =
-        (this.timepoints + (timepoints.last() + durations.last())).zip(values.toList() + values.last())
-}
+//internal data class NLMStatsData(val values: List<Double>, val timepoints: List<Double>, val durations: DoubleArray) {
+//    fun plotData(): List<Pair<Double, Double>> =
+//        (this.timepoints + (timepoints.last() + durations.last())).zip(values.toList() + values.last())
+//}
 
-internal data class LevelStatsData<T>(
+data class LevelStatsData<T>(
     val values: List<T>,
     val timepoints: List<Double>,
-    val durations: DoubleArray
+    val durations: List<Double>
 ) {
     fun plotData(): List<Pair<Double, T>> =
         (this.timepoints + (timepoints.last() + durations.last())).zip(values.toList() + values.last())
@@ -462,7 +471,7 @@ class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean =
     val min: Double?
     val max: Double?
 
-    internal val data: NLMStatsData = nlm.valuesUntilNow(excludeZeros)
+    internal val data: LevelStatsData<Double> = nlm.valuesUntilNow(excludeZeros)
 
 //    val median :Double = TODO()
 //    val ninetyfivePercentile :Double = TODO()
@@ -473,8 +482,9 @@ class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean =
         max = data.values.maxOrNull()
 
         if (data.durations.any { it != 0.0 }) {
-            mean = Mean().evaluate(data.values.toDoubleArray(), data.durations)
-            standardDeviation = sqrt(Variance().evaluate(data.values.toDoubleArray(), data.durations))
+            val durationsArray = data.durations.toDoubleArray()
+            mean = Mean().evaluate(data.values.toDoubleArray(), durationsArray)
+            standardDeviation = sqrt(Variance().evaluate(data.values.toDoubleArray(), durationsArray))
 //            val median = Median().evaluate(data.values.toDoubleArray(), data.durations) // not supported by commons3
         } else {
             // this happens if all there is in total no duration associated once 0s are removed
