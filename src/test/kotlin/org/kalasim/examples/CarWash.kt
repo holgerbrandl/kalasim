@@ -21,7 +21,7 @@ fun main() {
     class Car : Component() {
         override fun process() = sequence {
             val carWash = get<Resource>()
-            yield(request(carWash))
+            request(carWash)
             hold(WASHTIME)
             release(carWash)
         }

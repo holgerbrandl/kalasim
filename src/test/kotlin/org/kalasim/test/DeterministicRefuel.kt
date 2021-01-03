@@ -51,8 +51,9 @@ object DeterministicRefuel {
 
             override fun process() = sequence {
                 hold(TANK_TRUCK_TIME)
+
                 val amount = fuelPump.claimedQuantity
-                yield(put(fuelPump withQuantity amount))
+                put(fuelPump withQuantity amount)
             }
         }
 
@@ -68,7 +69,7 @@ object DeterministicRefuel {
             override fun process() = sequence {
                 val fuelTankLevel = FUEL_TANK_LEVEL.sample()
 
-                yield(request(gasStation))
+                request(gasStation)
 
                 val litersRequired = FUEL_TANK_SIZE - fuelTankLevel
 
@@ -84,7 +85,7 @@ object DeterministicRefuel {
                     )
                 }
 
-                yield(request(fuelPump withQuantity litersRequired))
+                request(fuelPump withQuantity litersRequired)
                 hold(litersRequired / REFUELING_SPEED)
                 get<NumericLevelMonitor>(named(CAR_LEAVING)).inc()
 //                get<NumericLevelMonitor>(named(TRUCKS_EN_ROUTE)).inc()

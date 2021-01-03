@@ -20,7 +20,7 @@ class Customer(val clerks: Resource) : Component() {
             cancel()
         }
 
-        yield(request(clerks, failDelay = 50.asDist()))
+        request(clerks, failDelay = 50.asDist())
 
         if (failed) {
             numReneged++

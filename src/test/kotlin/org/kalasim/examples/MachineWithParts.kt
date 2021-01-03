@@ -34,7 +34,7 @@ class Machine : Component() {
     override fun process() = sequence {
         while (true) {
             val r = get<Resource>()
-            yield(request(r))
+            request(r)
             hold(5)
             release(r)
         }

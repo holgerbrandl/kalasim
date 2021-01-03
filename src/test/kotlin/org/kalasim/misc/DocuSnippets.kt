@@ -5,20 +5,29 @@ import org.kalasim.*
 class ResourceDocu {
 
     fun main() {
+
         val clerks = Resource("clerks", capacity = 3)
         val assistance = Resource("assistence", capacity = 3)
 
-        Component().request(clerks withQuantity 2)
+        object : Component(){
+            override fun process() = sequence<Component> {
+                request(clerks withQuantity 2)
+                request(clerks withQuantity 1, assistance withQuantity 2)
+                request(clerks withPriority  1)
+                request(clerks withQuantity 3.4 andPriority  1 )
 
-        Component().request(clerks withQuantity 1, assistance withQuantity 2)
+                hold(2) // consume it
 
-        Component().request(clerks withPriority  1)
-        Component().request(clerks withQuantity 3.4 andPriority  1 )
+                release(clerks, quantity= 2.0) // release some quantity
 
+                release(clerks) // release entiry claim
+            }
+        }
+
+        // we can also release all claims from the resource itself
         val r = Resource("clerks", capacity = 3)
         r.release(2.0)
-        // yield(request(r))
-        Component().release(r)
+
     }
 }
 

@@ -17,14 +17,13 @@
 
 **{done}**  make `scheduledTime` nullable: replace scheduledTime = Double.MAX_VALUE with `null` which is semantically more meaningful here
 
-**{todo}** consider embed yield into hold/request (or add second verb to support that)
+**{done}** consider embed yield into hold/request (or add second verb to support that)
 ```
-yield(request(repairMan))
+yield(hold(REPAIR_TIME)) // --> 
 hold(REPAIR_TIME)
 ```
 
-
-**{todo}** optional request context with auto-release
+**{done}** optional request context with auto-release
 ```
 request(){
     hold
@@ -57,11 +56,12 @@ trajectory: anonymous, 3 activities
 { Activity: Timeout | delay: 10 }
 ```
 
+## v0.5
+
 **{todo}**  implement `Demo preemptive resource animated.py`
 
 **{todo}** finish elevator example with visualization
 
-## v0.5
 
 **{todo}**  <https://r-simmer.org/articles/simmer-08-philosophers.html>
 

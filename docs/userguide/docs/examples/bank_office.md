@@ -255,7 +255,7 @@ This defines a resource with a capacity of `3`.
 Each customer tries to claim one unit (=clerk) from the resource with:
 
 ```kotlin
-yield(request(clerks))
+request(clerks)
 ```
 
 B default 1 unit will be requested. If the resource is not available, the customer needs to wait for it to become available (in order of arrival).
@@ -331,7 +331,7 @@ As you can see, the balking part is exactly the same as in the example without r
 For the renenging, all we have to do is add a `failDelay`:
 
 ```kotlin
-yield(request(clerks, failDelay = 50.asDist()))
+request(clerks, failDelay = 50.asDist())
 ```
 
 If the request is not honored within `50` time units (ticks), the process continues after that `request` statement. We check whether the request has failed with the built-in `Component` property:

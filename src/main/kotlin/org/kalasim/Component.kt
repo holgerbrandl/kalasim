@@ -2,6 +2,7 @@ package org.kalasim
 
 import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.ComponentState.*
+import org.kalasim.misc.ImplementMe
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
 import org.koin.core.Koin
@@ -329,6 +330,13 @@ open class Component(
         printTrace(now(), env.curComponent, this@Component)
     }
 
+
+    /** Equivalent to request.*/
+    //TODO seems redundant but is referred to in docs
+    // commented because conflicts with KoinComponent.get()
+//    suspend fun SequenceScope<Component>.get(): Nothing = ImplementMe()
+
+
     /**
      * Request anonymous resources.
      *
@@ -339,11 +347,11 @@ open class Component(
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
      */
-    fun put(
+    suspend fun SequenceScope<Component>.put(
         vararg resourceRequests: ResourceRequest,
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null,
-    ): Component = request(
+    ) = request(
         *resourceRequests.map { it.copy(quantity = -it.quantity) }.toTypedArray(),
         failAt = failAt, failDelay = failDelay
     )
@@ -362,7 +370,7 @@ open class Component(
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
      */
-    fun request(
+    suspend fun SequenceScope<Component>.request(
         resources: Collection<Resource>,
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null,
@@ -375,24 +383,24 @@ open class Component(
     )
 
 
-    suspend fun SequenceScope<Component>.closableRequest(
-        resource: Resource,
-        builder: (suspend SequenceScope<Component>.() -> Any)
-    ) {
-        with(this@Component) {
-            yield(request(resource))
-//            suspend {
-            builder()
-//            }
-            release(resource)
-
-//            yieldAll(sequence {
-//                yield(request(resource))
-//                builder()
-//                release(resource)
-//            })
-        }
-    }
+//    suspend fun SequenceScope<Component>.closableRequest(
+//        resource: Resource,
+//        builder: (suspend SequenceScope<Component>.() -> Any)
+//    ) {
+//        with(this@Component) {
+//            yield(request(resource))
+////            suspend {
+//            builder()
+////            }
+//            release(resource)
+//
+////            yieldAll(sequence {
+////                yield(request(resource))
+////                builder()
+////                release(resource)
+////            })
+//        }
+//    }
 
 
     /**
@@ -409,12 +417,12 @@ open class Component(
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
      */
-    fun request(
+    suspend fun SequenceScope<Component>.request(
         vararg resources: Resource,
         // todo review if this should rather be a number (and dist at call site)
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null,
-        oneOf: Boolean = false,
+        oneOf: Boolean = false
     ) = request(
         *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
         failAt = failAt,
@@ -436,7 +444,7 @@ open class Component(
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
      */
-    fun request(
+    suspend fun SequenceScope<Component>.request(
         vararg resourceRequests: ResourceRequest,
         //todo change to support distribution parameters instead
         failAt: RealDistribution? = null,
@@ -446,104 +454,111 @@ open class Component(
         priority: Int = 0,
         urgent: Boolean = false,
         // try to avoid argument by inferring from stacktrace
-        calledFrom: String? = null
+        calledFrom: String? = null,
+        // see https://stackoverflow.com/questions/46098105/is-there-a-way-to-open-and-close-a-stream-easily-at-kotlin
+        closableBuilder: (suspend SequenceScope<Component>.() -> Any)? = null
+    ) {
+        yieldCurrent {
 
+            //todo oneof_request
 
-    ): Component {
+            if (status != CURRENT) {
+                requireNotData()
+                requireNotMain()
+                remove()
+                checkFail()
+            }
 
-        //todo oneof_request
+            require(requests.isEmpty()) { "no pending requests are allowed when requesting" }
+            require(requests.isEmpty()) { "no open claims are allowed when requesting" }
 
-        if (status != CURRENT) {
-            requireNotData()
-            requireNotMain()
-            remove()
-            checkFail()
-        }
+            scheduledTime = env.now +
+                    (failAt?.sample() ?: Double.MAX_VALUE) +
+                    (failDelay?.sample() ?: 0.0)
 
-        require(requests.isEmpty()) { "no pending requests are allowed when requesting" }
-        require(requests.isEmpty()) { "no open claims are allowed when requesting" }
-
-        scheduledTime = env.now +
-                (failAt?.sample() ?: Double.MAX_VALUE) +
-                (failDelay?.sample() ?: 0.0)
-
-        failed = false
-        this.oneOfRequest = oneOf
+            failed = false
+            oneOfRequest = oneOf
 
 //        val rr = resourceRequests.first()
-        resourceRequests.forEach { (r, quantity, priority) ->
-            var q = quantity
+            resourceRequests.forEach { (r, quantity, priority) ->
+                var q = quantity
 
-            if (r.preemptive && resourceRequests.size > 1) {
-                throw IllegalArgumentException("preemptive resources do not support multiple resource requests")
-            }
+                if (r.preemptive && resourceRequests.size > 1) {
+                    throw IllegalArgumentException("preemptive resources do not support multiple resource requests")
+                }
 
 //            // TODO clarify intent here
 //            if (calledFrom == "put") {
 //                q = -q
 //            }
 
-            require(q >= 0 || r.anonymous) { "quantity <0" }
+                require(q >= 0 || r.anonymous) { "quantity <0" }
 
-            //  is same resource is specified several times, just add them up
-            //https://stackoverflow.com/questions/53826903/increase-value-in-mutable-map
-            requests.merge(r, q, Double::plus)
+                //  is same resource is specified several times, just add them up
+                //https://stackoverflow.com/questions/53826903/increase-value-in-mutable-map
+                requests.merge(r, q, Double::plus)
 
-            val reqText =
-                (calledFrom ?: "") + "requesting ${q} from ${r.name} with priority ${priority} and oneof=${oneOf}"
+                val reqText =
+                    (calledFrom ?: "") + "requesting ${q} from ${r.name} with priority ${priority} and oneof=${oneOf}"
 
 //            enterSorted(r.requesters, priority)
-            r.requesters.add(this, priority)
+                r.requesters.add(this@Component, priority)
 
-            printTrace(
-                now(),
-                env.curComponent,
-                this,
-                reqText
-            )
+                printTrace(
+                    now(),
+                    env.curComponent,
+                    this@Component,
+                    reqText
+                )
 
-            if (r.preemptive) {
-                var av = r.availableQuantity
-                val thisClaimers = r.claimers.q
+                if (r.preemptive) {
+                    var av = r.availableQuantity
+                    val thisClaimers = r.claimers.q
 
-                val bumpCandidates = mutableListOf<Component>()
+                    val bumpCandidates = mutableListOf<Component>()
 //                val claimComponents = thisClaimers.map { it.c }
-                for (cqe in thisClaimers) {
-                    if (av >= q) {
-                        break
+                    for (cqe in thisClaimers) {
+                        if (av >= q) {
+                            break
+                        }
+
+                        // check if prior of component
+                        if ((priority ?: 0) <= (cqe.priority ?: 0)) {
+                            break
+                        }
+
+                        av += cqe.component.claims.getOrDefault(r, 0.0)
+                        bumpCandidates.add(cqe.component)
                     }
 
-                    // check if prior of component
-                    if ((priority ?: 0) <= (cqe.priority ?: 0)) {
-                        break
-                    }
-
-                    av += cqe.component.claims.getOrDefault(r, 0.0)
-                    bumpCandidates.add(cqe.component)
-                }
-
-                if (av >= 0) {
-                    bumpCandidates.forEach {
-                        it.releaseInternal(r, bumpedBy = this)
-                        printTrace("$it bumped from $r by $this")
-                        it.activate()
+                    if (av >= 0) {
+                        bumpCandidates.forEach {
+                            it.releaseInternal(r, bumpedBy = this@Component)
+                            printTrace("$it bumped from $r by $this")
+                            it.activate()
+                        }
                     }
                 }
             }
+
+            requests.forEach { (resource, quantity) ->
+                if (quantity < resource.minq)
+                    resource.minq = quantity
+            }
+
+            tryRequest()
+
+            if (requests.isNotEmpty()) {
+                reschedule(scheduledTime!!, priority, urgent, "request", REQUESTING)
+            }
         }
 
-        requests.forEach { (resource, quantity) ->
-            if (quantity < resource.minq)
-                resource.minq = quantity
+        if (closableBuilder != null) {
+            // suspend{ ... }
+            closableBuilder()
+
+            release(*resourceRequests)
         }
-
-        tryRequest()
-
-        if (requests.isNotEmpty()) {
-            reschedule(scheduledTime!!, priority, urgent, "request", REQUESTING)
-        }
-
-        return this
     }
 
 
@@ -733,7 +748,7 @@ open class Component(
 
     ): Component {
 
-        require(status != CURRENT){
+        require(status != CURRENT) {
             // original contract
             "Can not activate the CURRENT component. If needed simply use hold method."
             // technically we could use suspend here , but since activate is used
@@ -819,7 +834,7 @@ open class Component(
         till: Number? = null,
         priority: Int = 0,
         urgent: Boolean = false
-    ) = yieldCurrent  {
+    ) = yieldCurrent {
         if (status != DATA && status != CURRENT) {
             requireNotData()
             remove()
@@ -956,7 +971,7 @@ open class Component(
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null,
         all: Boolean = false
-    )  = yieldCurrent{
+    ) = yieldCurrent {
 
         if (status != CURRENT) {
             requireNotData()

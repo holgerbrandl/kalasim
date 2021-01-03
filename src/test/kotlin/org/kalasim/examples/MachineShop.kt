@@ -50,7 +50,7 @@ fun main() {
 
                 machine.interrupt()
 
-                yield(request(repairMan))
+                request(repairMan)
                 hold(REPAIR_TIME)
 
                 require(!isBumped(repairMan)) { "productive tools must not be bumped"}
@@ -79,7 +79,7 @@ fun main() {
         object : Component("side jobs") {
             override fun process() = sequence {
                 while (true) {
-                    yield(request(ResourceRequest(repairMan, priority = -1)))
+                    request(ResourceRequest(repairMan, priority = -1))
                     hold(JOB_DURATION)
 
                     if (isBumped(repairMan)) {

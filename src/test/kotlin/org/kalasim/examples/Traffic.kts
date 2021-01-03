@@ -16,7 +16,7 @@ class Car(val trafficLight: TrafficLight) : Component() {
         wait(trafficLight, "green")
 
         // request a slot in the gas-station
-        yield(request(gasStation))
+        request(gasStation)
 
         // refill
         hold(5)

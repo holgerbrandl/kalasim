@@ -43,7 +43,7 @@ object GasStation {
                 hold(TANK_TRUCK_TIME)
 
                 val amount = fuelPump.claimedQuantity
-                yield(put(fuelPump withQuantity amount))
+                put(fuelPump withQuantity amount)
             }
         }
 
@@ -59,7 +59,7 @@ object GasStation {
             override fun process() = sequence {
                 val fuelTankLevel = FUEL_TANK_LEVEL.sample()
 
-                yield(request(gasStation))
+                request(gasStation)
 
                 val litersRequired = FUEL_TANK_SIZE - fuelTankLevel
 
@@ -69,7 +69,7 @@ object GasStation {
                     TankTruck()
                 }
 
-                yield(request(fuelPump withQuantity litersRequired))
+                request(fuelPump withQuantity litersRequired)
                 hold(litersRequired / REFUELING_SPEED)
             }
         }

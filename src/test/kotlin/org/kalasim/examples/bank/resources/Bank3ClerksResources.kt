@@ -9,7 +9,7 @@ import org.koin.core.component.get
 class Customer(private val clerks: Resource) : Component() {
 
     override fun process() = sequence {
-        yield(request(clerks))
+        request(clerks)
         hold(30)
         release(clerks) // not really required
     }

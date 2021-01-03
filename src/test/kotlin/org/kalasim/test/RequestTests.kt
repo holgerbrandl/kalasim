@@ -36,7 +36,7 @@ class RequestTests {
 
                 override fun process() = sequence {
                     while (true) {
-                        yield(request(resource withQuantity 1 andPriority prioPDF.sample()))
+                        request(resource withQuantity 1 andPriority prioPDF.sample())
                         hold(1)
                         if (!isClaiming(resource)) {
                             break
@@ -60,7 +60,7 @@ class RequestTests {
         object : Component("foo") {
 
             override fun process() = sequence {
-                yield(request(resource))
+                request(resource)
                 hold(1)
                 printTrace("finished process, terminating...")
             }
@@ -91,9 +91,9 @@ class RequestTests {
                 hold(preRequestHold)
 
                 if (requestPriority != null) {
-                    yield(request(resource withPriority requestPriority))
+                    request(resource withPriority requestPriority)
                 } else {
-                    yield(request(resource))
+                    request(resource)
                 }
 
                 hold(postRequestHold)
@@ -152,7 +152,7 @@ class RequestTests {
         class BumpComponent : Component() {
 
             override fun process() = sequence {
-                yield(request(r))
+                request(r)
                 hold(5)
                 printTrace("finished process, terminating...")
             }
@@ -174,7 +174,7 @@ class RequestTests {
         class BumpComponent : Component() {
 
             override fun process() = sequence {
-                yield(request(r))
+                request(r)
                 hold(5)
                 printTrace("finished process, terminating...")
             }
@@ -197,7 +197,7 @@ class RequestTests {
             override fun process() = sequence {
                 hold(duration = 5.0)
 
-                yield(request(clerk))
+                request(clerk)
                 hold(duration = 2.0, priority = 3)
                 release(clerk)
 
@@ -234,6 +234,28 @@ class RequestTests {
 
     }
 
+    @Test
+    fun `it should auto-release resources in builder`(){
+
+        createSimulation(true) {
+            val r = Resource()
+
+            object : Component(){
+                override fun process() = sequence {
+                    hold(2)
+
+                    request(ResourceRequest(r)){
+                        hold(1)
+                    }
+                }
+            }
+
+            run(5)
+
+            r.claimers.isEmpty() shouldBe true
+            r.requesters.isEmpty() shouldBe true
+        }
+    }
 }
 
 

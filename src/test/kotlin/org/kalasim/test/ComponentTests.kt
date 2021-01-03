@@ -28,7 +28,7 @@ class ComponentTests {
     }
 
     @Test
-    fun `it should hold and terminate`() = createTestSimulation {
+    fun `it should yield and terminate automagically`() = createTestSimulation {
         val c = object : Component("foo") {
             override fun process() = sequence<Component> {
                 hold(2)
@@ -36,35 +36,6 @@ class ComponentTests {
         }
 
         run(5)
-        c.status shouldBe ComponentState.DATA
-    }
-
-
-    @Test
-    fun `it yield automatically`() = createTestSimulation {
-
-        val r = Resource()
-
-        val c = object : Component("foo") {
-            override fun process() = sequence {
-                hold(3)
-//                hold(2)
-//                hold(2)
-
-                closableRequest(r) {
-                    printTrace("request honored")
-                    hold(3)
-                    printTrace("auto-releaseing request")
-                }
-
-//                hold2(2)
-                hold(2)
-            }
-        }
-
-        run(10)
-
-//        c.statusMonitor.display()
         c.status shouldBe ComponentState.DATA
     }
 

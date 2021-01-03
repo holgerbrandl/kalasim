@@ -25,7 +25,7 @@ suspend fun main() {
             val ed = ExponentialDistribution(rg, mu)
 
             override fun process() = sequence {
-                yield(request(atm))
+                request(atm)
 
                 hold(ed.sample())
                 release(atm)

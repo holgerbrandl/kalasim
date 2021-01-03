@@ -33,8 +33,8 @@ val customer = Component("clerks")
 The `customer` can `request` a clerk in its [process method](component.md#creation-of-a-component):
 
 ```kotlin
-yield(request(clerks))  // request 1 from clerks 
-yield(request(clerks withQuantity 2)) // request 2s from clerks
+request(clerks)  // request 1 from clerks 
+request(clerks withQuantity 2) // request 2s from clerks
 ```
 
 `request` has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
@@ -42,7 +42,7 @@ yield(request(clerks withQuantity 2)) // request 2s from clerks
 It is also possible to request for more resources at once. In the following examples, we request 1 quantity from `clerks` AND 2 quantities from `assistance`.
 
 ```kotlin
-yield(request(clerks withQuantity 1, assistance withQuantity 2)) 
+request(clerks withQuantity 1, assistance withQuantity 2) 
 ```
 
 Resources have a queue `requesters` containing all components trying to claim from the resource.
