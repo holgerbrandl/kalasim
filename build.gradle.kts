@@ -11,8 +11,9 @@ plugins {
 //    kotlin("plugin.serialization") version "1.4.20"
 }
 
-group = "com.github.holgerbrandl"
-version = "0.3"
+group = "org.kalasim"
+version = "0.4-SNAPSHOT"
+//version = "0.3"
 
 application {
     mainClassName = "foo.Bar" // not needed technically but makes gradle happy
@@ -22,19 +23,19 @@ application {
 repositories {
     mavenCentral()
     jcenter()
-
 }
 
 dependencies {
     // cant upgrade to 1.8 because of https://issues.apache.org/jira/browse/CSV-257
-    implementation("org.apache.commons:commons-math3:3.6.1")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.10")
-    implementation("com.github.holgerbrandl:jsonbuilder:0.7")
-    implementation("com.google.code.gson:gson:2.8.6")
+    api("org.apache.commons:commons-math3:3.6.1")
 
     //cant upgrade because of https://github.com/InsertKoinIO/koin/issues/939
 //    implementation("org.koin:koin-core:2.1.6")
-    implementation("org.koin:koin-core:2.2.1")
+    api ("org.koin:koin-core:2.2.1")
+
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.10")
+    implementation("com.github.holgerbrandl:jsonbuilder:0.7")
+    implementation("com.google.code.gson:gson:2.8.6")
 
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
