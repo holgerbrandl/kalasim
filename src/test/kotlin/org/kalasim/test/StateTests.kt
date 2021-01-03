@@ -79,7 +79,7 @@ class StateTests {
             val trafficLight = get<TrafficLight>()
             val engine = get<Engine>()
 
-            override suspend fun ProcContext.process() {
+            override fun process() = sequence {
                 wait(trafficLight turns "green", engine turns true, all = true)
                 printTrace("passing crossing")
 //                terminate()
@@ -141,7 +141,7 @@ class StateTests {
             val trafficLight = get<State<String>>()
             val engine = get<State<Boolean>>()
 
-            override suspend fun ProcContext.process() {
+            override fun process() = sequence {
                 wait(trafficLight turns "green", engine turns true, all = true)
                 printTrace("passing crossing")
 //                terminate()

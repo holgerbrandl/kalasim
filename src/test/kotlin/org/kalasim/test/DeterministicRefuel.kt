@@ -49,10 +49,10 @@ object DeterministicRefuel {
         class TankTruck : Component() {
             val fuelPump: Resource by inject(qualifier = named(FUEL_PUMP))
 
-            override suspend fun SequenceScope<Component>.process(it: Component) {
+            override fun process() = sequence {
                 hold(TANK_TRUCK_TIME)
                 val amount = fuelPump.claimedQuantity
-                yield(it.put(fuelPump withQuantity amount))
+                yield(put(fuelPump withQuantity amount))
             }
         }
 
@@ -65,10 +65,10 @@ object DeterministicRefuel {
             //            val gasStation : Resource by inject(qualifier = named("gas_station"))
             val fuelPump: Resource by inject(qualifier = named(FUEL_PUMP))
 
-            override suspend fun ProcContext.process(it: Component) {
+            override fun process() = sequence {
                 val fuelTankLevel = FUEL_TANK_LEVEL.sample()
 
-                yield(it.request(gasStation))
+                yield(request(gasStation))
 
                 val litersRequired = FUEL_TANK_SIZE - fuelTankLevel
 

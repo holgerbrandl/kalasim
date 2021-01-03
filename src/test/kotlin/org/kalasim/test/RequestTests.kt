@@ -1,6 +1,5 @@
 package org.kalasim.test
 
-import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import org.apache.commons.math3.distribution.EnumeratedDistribution
@@ -35,7 +34,7 @@ class RequestTests {
 
             object : Component() {
 
-                override suspend fun ProcContext.process() {
+                override fun process() = sequence {
                     while (true) {
                         yield(request(resource withQuantity 1 andPriority prioPDF.sample()))
                         hold(1)
@@ -213,7 +212,7 @@ class RequestTests {
             val customer = Customer(clerk)
 
             run(8)
-            clerk.capacity=1.0
+            clerk.capacity = 1.0
 
             run(10)
             customer.activate()

@@ -370,7 +370,7 @@ workTodo.trigger(true, max = 1)
 The effect is that if there are clerks waiting for worktodo, the first clerk's wait is honored and that clerk continues its process after:
 
 ```kotlin
-yield(this@Clerk.wait(workTodo, true))
+wait(workTodo, true)
 ```
 
 Note that the clerk is only going to wait for worktodo after completion of a job if there are no customers waiting.

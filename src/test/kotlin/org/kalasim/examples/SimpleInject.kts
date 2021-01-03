@@ -8,7 +8,7 @@ data class Counter(var value: Int)
 
 class Something(val counter: Counter) : Component() {
 
-    override suspend fun ProcContext.process() {
+    override fun process() = sequence<Component> {
         counter.value++
     }
 }

@@ -2,9 +2,11 @@
 
 [ ![Download](https://api.bintray.com/packages/holgerbrandl/github/kalasim/images/download.svg) ](https://bintray.com/holgerbrandl/github/kalasim/_latestVersion)  [![Build Status](https://travis-ci.org/holgerbrandl/kalasim.svg?branch=master)](https://travis-ci.org/holgerbrandl/kalasim) [![Gitter](https://badges.gitter.im/kalasim.svg)](https://gitter.im/kalasim/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-`kalasim` is a discrete event simulator that enables complex, dynamic process models. It provides a statically typed API, dependency injection, modern persistence, logging and automation capabilities.
+`kalasim` is a [discrete event simulator](theory.md.#what-is-discrete-event-simulation) that enables complex, dynamic process models. It provides a statically typed API, dependency injection, modern persistence, structured logging and automation capabilities.
 
-`kalsim` is written in [Kotlin](https://kotlinlang.org/), runs on the [JVM](https://github.com/openjdk/jdk) for performance and scale, is designed on top of [koin](https://github.com/InsertKoinIO/koin) as dependency injection framework, is using [common-math](https://commons.apache.org/proper/commons-math/) for stats and distributions, modern event tracking and persistence, and [plotly.kt](https://github.com/mipt-npm/plotly.kt), [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) as well as [kravis](https://github.com/holgerbrandl/kravis) for visualization.
+`kalasim` is written in [Kotlin](https://kotlinlang.org/), is designed around suspendable [coroutines](https://kotlinlang.org/docs/reference/coroutines-overview.html) for process definitions, runs on the [JVM](https://github.com/openjdk/jdk) for performance and scale, is built with [koin](https://github.com/InsertKoinIO/koin) as dependency wiring framework, is using [common-math](https://commons.apache.org/proper/commons-math/) for stats and distributions. See [acknowledgements](about.md#acknowledgements) for further references.
+
+One cornerstone of successful discrete event simulation is visualization. `kalasim` is agnostic regarding a  visualization frontend, but we provide bindings/examples using [plotly.kt](https://github.com/mipt-npm/plotly.kt), [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) as well as [kravis](https://github.com/holgerbrandl/kravis).
 
 In contrast to many other simulation tools, `kalasim` is neither low-code nor no-code. It is _code-first_ to enable change tracking, scaling, refactoring, CI/CD, unit-tests, and the rest of the gang that makes simulation development fun.
 

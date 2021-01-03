@@ -23,7 +23,7 @@ class CustomerGenerator : Component() {
 class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
     private val clerks: List<Clerk> by inject()
 
-    override suspend fun SequenceScope<Component>.process(it: Component) {
+    override fun process() = sequence {
         waitingLine.add(this@Customer)
 
         for (c in clerks) {

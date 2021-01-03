@@ -18,7 +18,7 @@ class CustomerGenerator : Component() {
 }
 
 class Customer(val workTodo: State<Boolean>, val waitingLine: ComponentQueue<Customer>) : Component() {
-    override suspend fun SequenceScope<Component>.process(it: Component) {
+    override fun process() = sequence {
         waitingLine.add(this@Customer)
         workTodo.trigger(true, max = 1)
         passivate()

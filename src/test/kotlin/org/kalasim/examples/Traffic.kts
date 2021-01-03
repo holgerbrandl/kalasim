@@ -11,7 +11,7 @@ class Car(val trafficLight: TrafficLight) : Component() {
 
     val gasStation by inject<GasStation>()
 
-    override suspend fun ProcContext.process() {
+    override fun process() = sequence {
         // wait until the traffic light is green
         wait(trafficLight, "green")
 

@@ -15,7 +15,7 @@ class EnvTests {
         GlobalContext.stop()
 
         class TestComponent(koin: Koin) : Component(koin = koin) {
-            override suspend fun ProcContext.process() {
+            override fun process() = sequence {
                 hold(2)
                 println("my env is ${env.getKoin()}")
             }

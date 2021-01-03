@@ -20,7 +20,7 @@ class StateTransitionTests {
             addTraceListener { traceElement -> traces.add(traceElement) }
 
             object : Component() {
-                override suspend fun SequenceScope<Component>.process() {
+                override fun process() = sequence {
                     while (true) {
                         TestCar()
                         hold(1.0)

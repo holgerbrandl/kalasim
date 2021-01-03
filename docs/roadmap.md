@@ -13,12 +13,11 @@
 
 **{done}** implement `enabled` disabled for monitors
 
-**{todo}** ensure that just yieldable methods are used in yield by checking stacktrace
+**{obsolete}** ensure that just yieldable methods are used in yield by checking stacktrace
 
 **{done}**  make `scheduledTime` nullable: replace scheduledTime = Double.MAX_VALUE with `null` which is semantically more meaningful here
 
-
-**{todo}** consider embed yield into hold/request (or add second verb to support that
+**{todo}** consider embed yield into hold/request (or add second verb to support that)
 ```
 yield(request(repairMan))
 hold(REPAIR_TIME)

@@ -29,7 +29,7 @@ class QueueTests {
 
         // add a consumer
         object : Component() {
-            override suspend fun SequenceScope<Component>.process(it: Component) {
+            override fun process() = sequence {
                 while (waitingLine.isNotEmpty()) {
                     waitingLine.poll()
                     // wait for it...

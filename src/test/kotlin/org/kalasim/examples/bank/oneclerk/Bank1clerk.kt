@@ -24,7 +24,7 @@ class Customer(
 class Clerk : Component() {
     val waitingLine: ComponentQueue<Customer> by inject()
 
-    override suspend fun SequenceScope<Component>.process() {
+    override fun process() = sequence {
         while (true) {
             while (waitingLine.isEmpty()) passivate()
 

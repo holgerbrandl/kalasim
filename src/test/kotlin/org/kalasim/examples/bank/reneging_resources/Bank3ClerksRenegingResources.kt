@@ -13,7 +13,7 @@ var numReneged = 0
 
 class Customer(val clerks: Resource) : Component() {
 
-    override suspend fun SequenceScope<Component>.process(it: Component) {
+    override fun process() = sequence {
         if (clerks.requesters.size >= 5) {
             numBalked++
             printTrace("balked")

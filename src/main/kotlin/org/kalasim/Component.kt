@@ -127,22 +127,23 @@ open class Component(
 
     /**         the current simulation time : float */
     private fun now() = env.now
-//    fun now() = env.now()
 
 
     open fun process() = this.let {
-        sequence {
+        sequence<Component> {
 //            while (true) { // disabled because too much abstraction
-            process(it)
-            process()
+//            process(it)
+//            process()
 //            }
         }
     }
 
     /** Generator function that implements "process". This can be overwritten in component classes a convenience alternative to process itself.*/
-    open suspend fun ProcContext.process(it: Component) {}
+    // no longer needed  and redundant API
+//    open suspend fun ProcContext.process(it: Component) {}
 
-    open suspend fun ProcContext.process() {}
+    // no longer needed  and redundant API
+//    open suspend fun ProcContext.process() {}
 
     /** @return `true` if status is `PASSIVE`, `false` otherwise. */
     val isPassive: Boolean

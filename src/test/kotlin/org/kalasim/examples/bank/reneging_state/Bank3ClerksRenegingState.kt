@@ -16,7 +16,7 @@ var numReneged: Int = 0
 class Customer(val waitingLine: ComponentQueue<Customer>, val workToDo: State<Boolean>) : Component() {
     private val clerks: List<Clerk> by inject()
 
-    override suspend fun SequenceScope<Component>.process(it: Component) {
+    override  fun process() = sequence {
         if (waitingLine.size >= 5) {
             numBalked++
             printTrace("balked")

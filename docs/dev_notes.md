@@ -50,3 +50,13 @@ git push origin :refs/tags/refs/heads/master
 
 <https://medium.com/livefront/suspending-lambdas-in-kotlin-7319d2d7092a>
 > `(suspend () -> T)`
+
+
+<https://stackoverflow.com/questions/40161956/kotlin-sequence-concatenation>
+
+
+## misc
+multiple receivers <https://youtrack.jetbrains.com/issue/KT-10468>
+
+
+consume sequence `seq.toList()`
