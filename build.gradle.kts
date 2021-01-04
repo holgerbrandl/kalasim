@@ -33,7 +33,8 @@ dependencies {
 //    implementation("org.koin:koin-core:2.1.6")
     api ("org.koin:koin-core:2.2.1")
 
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.10")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.21")
+
     implementation("com.github.holgerbrandl:jsonbuilder:0.7")
     implementation("com.google.code.gson:gson:2.8.6")
 
@@ -49,7 +50,11 @@ dependencies {
     //experimental dependencies  use for experimentation
     testImplementation( "com.thoughtworks.xstream:xstream:1.4.14")
 
+    //https://youtrack.jetbrains.com/issue/KT-44197
+
     testImplementation(kotlin("script-runtime"))
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
+
 }
 
 tasks.withType<KotlinCompile> {
