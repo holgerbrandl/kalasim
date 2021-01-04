@@ -1,4 +1,4 @@
-name: ci
+name: build
 
 # https://docs.github.com/en/free-pro-team@latest/actions/managing-workflow-runs/adding-a-workflow-status-badge
 
