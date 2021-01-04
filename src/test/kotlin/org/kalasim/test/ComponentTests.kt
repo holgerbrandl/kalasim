@@ -4,7 +4,6 @@ import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.Component
 import org.kalasim.ComponentState
-import org.kalasim.Resource
 import org.kalasim.misc.printThis
 
 class ComponentTests {

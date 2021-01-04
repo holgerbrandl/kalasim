@@ -224,12 +224,17 @@ Cancel has the effect that the component becomes a data component.
 * If the component to be cancelled is waiting, the wait will be terminated, the attribute failed
   set and the component becomes a data component.
 
+Examples
+
+* [Bank Office with Reneging](examples/bank_office.md#bank-office-with-balking-and-reneging)
+
 ### standby
 
 Standby has the effect that the component will be triggered on the next simulation event.
 
 * If the component is `CURRENT`, it will suspend execution internally.
 * Although theoretically possible, it is not recommended to use standby for non current components.
+* Not allowed for `DATA` components or `main`.
 
 Examples
 
@@ -238,7 +243,7 @@ Examples
 
 ### request
 
-Request has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
+Request has the effect that the component will check whether the requested quantity from a [resource](resource.md) is available. It is possible to check for multiple availability of a certain quantity from several resources.
 
 Instead of checking for all of number of resources, it is also possible to check for any of a number of resources, by setting the `oneOf` parameter to `true`.
 

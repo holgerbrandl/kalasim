@@ -68,4 +68,43 @@ class StateTransitionTests {
 
         c!!.statusMonitor.printHistogram()
     }
+
+
+    @Test
+    fun `it should allow main interaction verbs with component as receiver`() = createTestSimulation(true) {
+
+        val other = Component()
+        val r = Resource()
+        val s = State<String>("foo")
+
+        class Customer : Component(process = Customer::doSmthg) {
+
+            fun doSmthg() = sequence<Component> {
+                print("hello")
+                other.passivate()
+                passivate()
+
+                other.hold(1)
+                hold(1)
+
+                other.request(r)
+                other.request(r withQuantity 3)
+                request(r)
+                request(r withQuantity 3)
+
+                other.cancel()
+                cancel()
+
+                other.standby()
+                standby()
+
+                other.wait()
+                wait()
+            }
+        }
+
+
+        // note this is a compiler test only. the example is not meaningful
+
+    }
 }
