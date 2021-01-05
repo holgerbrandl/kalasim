@@ -83,7 +83,7 @@ cd $KALASIM_HOME
 trim() { while read -r line; do echo "$line"; done; }
 kalasim_version='v'$(grep '^version' ${KALASIM_HOME}/build.gradle.kts | cut -f3 -d' ' | tr -d '"' | trim)
 
-echo "new version is $kalasim_version"
+echo "new version is $kalasim_version !"
 
 if [[ $kalasim_version == *"-SNAPSHOT" ]]; then
   echo "ERROR: Won't publish snapshot build $kalasim_version}!" 1>&2
@@ -92,7 +92,7 @@ fi
 
 
 git diff
-git commit -m "v${krangl_version} release"
+git commit -am "v${krangl_version} release"
 #git diff --exit-code  || echo "There are uncomitted changes"
 
 git tag ${kalasim_version}
@@ -100,4 +100,13 @@ git tag ${kalasim_version}
 git push origin --tags
 
 
+### Build and publish the binary release to jcenter
+gradle install
+
+# careful with this one!
+gradle bintrayUpload
+
+#For released versions check:
+#- https://bintray.com/holgerbrandl/github/kalasim
+#- https://jcenter.bintray.com/de/github/kalasim
 ```

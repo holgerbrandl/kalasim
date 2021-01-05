@@ -5,7 +5,7 @@
 
 To get started simply add it as a dependency via Jcenter:
 ```
-implementation "com.github.holgerbrandl:kalasim:0.4"
+implementation "com.github.holgerbrandl:kalasim:0.4.2"
 ```
 
 
