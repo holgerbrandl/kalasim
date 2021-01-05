@@ -92,11 +92,12 @@ fi
 
 
 git status
-git commit -am "v${kalasim_version} release"
+git commit -am "${kalasim_version} release"
 #git diff --exit-code  || echo "There are uncomitted changes"
 
 git tag "${kalasim_version}"
 
+git push origin 
 git push origin --tags
 
 
