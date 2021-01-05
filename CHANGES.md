@@ -2,9 +2,10 @@
 
 ## v0.4
 
-Released
+Released 2021-01-21
 
-* Implemented interactions [`interrupt`](https://www.kalasim.org/component/#interrupt) and `resume`
+Major Enhancements
+* Implemented [`interrupt`](https://www.kalasim.org/component/#interrupt) interaction
 * Reworked documentation and examples
 * Implemented [`standby`](https://www.kalasim.org/component/#standby)
 * Implement disable/enable for [monitors](https://www.kalasim.org/monitors/)
@@ -45,7 +46,6 @@ object : Component() {
 ```
 * Implemented `Environment.toString` to provide json description
 * Various bug-fixes
-
 
 
 ## v0.3

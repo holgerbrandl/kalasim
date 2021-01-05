@@ -60,3 +60,9 @@ multiple receivers <https://youtrack.jetbrains.com/issue/KT-10468>
 
 
 consume sequence `seq.toList()`
+
+
+## How to do a release
+
+1. Make sure to increase version number in [setup](userguide/docs/setup.md)
+Simply commit with `v<VersionNumber>`.
