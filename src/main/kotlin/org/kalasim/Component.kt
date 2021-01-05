@@ -334,17 +334,6 @@ open class Component(
      * For `standby` contract see [user manual](https://www.kalasim.org/component/#standby)
      */
     suspend fun SequenceScope<Component>.standby():Unit = yieldCurrent {
-        this@Component.standby()
-    }
-
-    /**
-     * Puts the component in standby mode.
-     *
-     * Not allowed for data components or main.
-     *
-     * For `standby` contract see [user manual](https://www.kalasim.org/component/#standby)
-     */
-    fun standby() {
         if (status != CURRENT) {
             requireNotData()
             requireNotMain()
@@ -482,15 +471,96 @@ open class Component(
         honorBlock: (suspend SequenceScope<Component>.() -> Any)? = null
     ){
         yieldCurrent {
-            this@Component.request(
-                *resourceRequests,
-                failAt = failAt,
-                failDelay = failDelay,
-                oneOf = oneOf,
-                calledFrom = calledFrom,
-                priority = priority,
-                urgent = urgent
-            )
+            if (status != CURRENT) {
+                requireNotData()
+                requireNotMain()
+                remove()
+                checkFail()
+            }
+
+            require(requests.isEmpty()) { "no pending requests are allowed when requesting" }
+            require(requests.isEmpty()) { "no open claims are allowed when requesting" }
+
+            scheduledTime = env.now +
+                    (failAt?.sample() ?: Double.MAX_VALUE) +
+                    (failDelay?.sample() ?: 0.0)
+
+            failed = false
+            oneOfRequest = oneOf
+
+            resourceRequests.forEach { (r, quantity, priority) ->
+                var q = quantity
+
+                if (r.preemptive && resourceRequests.size > 1) {
+                    throw IllegalArgumentException("preemptive resources do not support multiple resource requests")
+                }
+
+                //            // TODO clarify intent here
+                //            if (calledFrom == "put") {
+                //                q = -q
+                //            }
+
+                require(q >= 0 || r.anonymous) { "quantity <0" }
+
+                //  is same resource is specified several times, just add them up
+                //https://stackoverflow.com/questions/53826903/increase-value-in-mutable-map
+                requests.merge(r, q, Double::plus)
+
+                val reqText =
+                    (calledFrom ?: "") + "requesting ${q} from ${r.name} with priority ${priority} and oneof=${oneOf}"
+
+                //            enterSorted(r.requesters, priority)
+                r.requesters.add(this@Component, priority = priority)
+
+                printTrace(
+                    now(),
+                    env.curComponent,
+                    this@Component,
+                    reqText
+                )
+
+                if (r.preemptive) {
+                    var av = r.availableQuantity
+                    val thisClaimers = r.claimers.q
+
+                    val bumpCandidates = mutableListOf<Component>()
+                    //                val claimComponents = thisClaimers.map { it.c }
+                    for (cqe in thisClaimers) {
+                        if (av >= q) {
+                            break
+                        }
+
+                        // check if prior of component
+                        if ((priority ?: 0) <= (cqe.priority ?: 0)) {
+                            break
+                        }
+
+                        av += cqe.component.claims.getOrDefault(r, 0.0)
+                        bumpCandidates.add(cqe.component)
+                    }
+
+                    if (av >= 0) {
+                        bumpCandidates.forEach {
+                            it.releaseInternal(r, bumpedBy = this@Component)
+                            printTrace("$it bumped from $r by ${this@Component}")
+                            it.activate()
+                        }
+                    }
+                }
+            }
+
+            requests.forEach { (resource, quantity) ->
+                if (quantity < resource.minq)
+                    resource.minq = quantity
+            }
+
+            tryRequest()
+
+            if (requests.isNotEmpty()) {
+                reschedule(scheduledTime!!, priority = priority, urgent = urgent,
+                    caller = "request", newStatus = REQUESTING
+                )
+            }
         }
 
         if (honorBlock != null) {
@@ -498,185 +568,6 @@ open class Component(
             honorBlock()
 
             release(*resourceRequests)
-        }
-    }
-
-    /**
-     * Request from a resource or resources.
-     *
-     * For `request` contract see [user manual](https://www.kalasim.org/component/#request)
-     *
-     * @param resources Resources to be requested with a quantity of 1 and priority null.
-     * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
-     * @param failDelay  if the request is not honored before now+fail_delay,
-    the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
-     * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given.
-     * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
-     * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
-     *
-     * @sample org.kalasim.scratch.ResourceDocu.main
-     */
-    fun request(
-        resources: Collection<Resource>,
-        failAt: RealDistribution? = null,
-        failDelay: RealDistribution? = null,
-        oneOf: Boolean = false,
-        priority: Int = DEFAULT_QUEUE_PRIORITY
-    ) = request(
-        *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
-        failAt = failAt,
-        failDelay = failDelay,
-        oneOf = oneOf,
-        priority = priority,
-    )
-
-    /**
-     * Request from a resource or resources.
-     *
-     * For `request` contract see [user manual](https://www.kalasim.org/component/#request)
-     *
-     * @param resources Resources to be requested with default quanity and default priority.
-     * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
-     * @param failDelay  if the request is not honored before now+fail_delay,
-    the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
-     * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given.
-     * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
-     * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
-     *
-     * @sample org.kalasim.scratch.ResourceDocu.main
-     */
-    fun request(
-        vararg resources: Resource,
-        // todo review if this should rather be a number (and dist at call site)
-        failAt: RealDistribution? = null,
-        failDelay: RealDistribution? = null,
-        oneOf: Boolean = false,
-        priority: Int = DEFAULT_QUEUE_PRIORITY,
-    ) {
-        request(
-            *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
-            failAt = failAt,
-            failDelay = failDelay,
-            oneOf = oneOf,
-            priority = priority,
-        )
-    }
-
-
-    /**
-     * Request from a resource or resources.
-     *
-     * For `request` contract see [user manual](https://www.kalasim.org/component/#request)
-     *
-     * @param resourceRequests Each `ResourceRequest` is a tuple of resource, quantity (default=1) and priority (default 0).
-     * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
-     * @param failDelay  if the request is not honored before now+fail_delay,
-    the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
-     * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given.
-     * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
-     * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
-     *
-     * @sample org.kalasim.scratch.ResourceDocu.main
-     */
-    fun request(
-        vararg resourceRequests: ResourceRequest,
-        failAt: RealDistribution? = null,
-        failDelay: RealDistribution? = null,
-        oneOf: Boolean = false,
-        calledFrom: String? = null,
-        priority: Int = DEFAULT_QUEUE_PRIORITY,
-        urgent: Boolean = false,
-    ) {
-        //todo oneof_request
-
-        if (status != CURRENT) {
-            requireNotData()
-            requireNotMain()
-            remove()
-            checkFail()
-        }
-
-        require(requests.isEmpty()) { "no pending requests are allowed when requesting" }
-        require(requests.isEmpty()) { "no open claims are allowed when requesting" }
-
-        scheduledTime = env.now +
-                (failAt?.sample() ?: Double.MAX_VALUE) +
-                (failDelay?.sample() ?: 0.0)
-
-        failed = false
-        oneOfRequest = oneOf
-
-        //        val rr = resourceRequests.first()
-        resourceRequests.forEach { (r, quantity, priority) ->
-            var q = quantity
-
-            if (r.preemptive && resourceRequests.size > 1) {
-                throw IllegalArgumentException("preemptive resources do not support multiple resource requests")
-            }
-
-    //            // TODO clarify intent here
-    //            if (calledFrom == "put") {
-    //                q = -q
-    //            }
-
-            require(q >= 0 || r.anonymous) { "quantity <0" }
-
-            //  is same resource is specified several times, just add them up
-            //https://stackoverflow.com/questions/53826903/increase-value-in-mutable-map
-            requests.merge(r, q, Double::plus)
-
-            val reqText =
-                (calledFrom ?: "") + "requesting ${q} from ${r.name} with priority ${priority} and oneof=${oneOf}"
-
-    //            enterSorted(r.requesters, priority)
-            r.requesters.add(this@Component, priority)
-
-            printTrace(
-                now(),
-                env.curComponent,
-                this@Component,
-                reqText
-            )
-
-            if (r.preemptive) {
-                var av = r.availableQuantity
-                val thisClaimers = r.claimers.q
-
-                val bumpCandidates = mutableListOf<Component>()
-    //                val claimComponents = thisClaimers.map { it.c }
-                for (cqe in thisClaimers) {
-                    if (av >= q) {
-                        break
-                    }
-
-                    // check if prior of component
-                    if ((priority ?: 0) <= (cqe.priority ?: 0)) {
-                        break
-                    }
-
-                    av += cqe.component.claims.getOrDefault(r, 0.0)
-                    bumpCandidates.add(cqe.component)
-                }
-
-                if (av >= 0) {
-                    bumpCandidates.forEach {
-                        it.releaseInternal(r, bumpedBy = this@Component)
-                        printTrace("$it bumped from $r by $this")
-                        it.activate()
-                    }
-                }
-            }
-        }
-
-        requests.forEach { (resource, quantity) ->
-            if (quantity < resource.minq)
-                resource.minq = quantity
-        }
-
-        tryRequest()
-
-        if (requests.isNotEmpty()) {
-            reschedule(scheduledTime!!, priority, urgent, "request", REQUESTING)
         }
     }
 
@@ -802,12 +693,12 @@ open class Component(
     }
 
     private fun requireNotData() =
-        require(status != DATA) { "$name data component not allowed" }
+        require(status != DATA) { "data component '$name' not allowed" }
 
     private fun requireNotMain() =
-        require(this != env.main) { "$name data component not allowed" }
+        require(this != env.main) { "main component not allowed" }
 
-    fun reschedule(
+    internal fun reschedule(
         scheduledTime: Double,
         priority: Int = DEFAULT_QUEUE_PRIORITY,
         urgent: Boolean = false,
@@ -847,7 +738,7 @@ open class Component(
     /**
      * Activate component
      *
-     * For the full contract definition see https://www.kalasim.org/component/#activate
+     * For `activate` contract see [user manual](https://www.kalasim.org/component/#activate)
      *
      * @param at Schedule time
      * @param delay Schedule with a delay if omitted, no delay is used
@@ -946,15 +837,12 @@ open class Component(
     /**
      * Hold the component.
      *
-     * For the full contract definition see https://www.kalasim.org/component/#hold
+     * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
      *
-     * @param duration Time to hold
+     * @param duration Time to hold. Either `duration` or `till` must be specified.
      * @param till Absolute time until the component should be held
-     * @param process Name of process to be started.
-     * * if None (default), process will not be changed
-     * * if the component is a data component, the generator function `process` will be used as the default process.
-     *
-     * Either `duration` or `till` must be specified.
+     * @param priority If a component has the same time on the event list, this component is sorted according to
+     * the priority. An event with a higher priority will be scheduled first.
      */
     suspend fun SequenceScope<Component>.hold(
         duration: Number? = null,
@@ -965,13 +853,23 @@ open class Component(
         this@Component.hold(duration, till, priority, urgent)
     }
 
+    /**
+     * Hold the component.
+     *
+     * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
+     *
+     * @param duration Time to hold. Either `duration` or `till` must be specified.
+     * @param till Absolute time until the component should be held
+     * @param priority If a component has the same time on the event list, this component is sorted according to
+     * the priority. An event with a higher priority will be scheduled first.
+     */
      fun hold(
          duration: Number? = null,
          till: Number? = null,
          priority: Int = 0,
          urgent: Boolean = false
      ) {
-        if (status != DATA && status != CURRENT) {
+        if (status != PASSIVE && status != CURRENT) {
             requireNotData()
             remove()
             checkFail()
@@ -1080,7 +978,8 @@ open class Component(
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
      * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      */
-    // todo states may have different types so this methods does not make real sense here. Either remove type from state or enforce the user to call wait multiple times
+    // todo states may have different types so this methods does not make real sense here. 
+    //  Either remove type from state or enforce the user to call wait multiple times
     suspend fun <T> SequenceScope<Component>.wait(
         state: State<T>,
         waitFor: T,
@@ -1116,39 +1015,6 @@ open class Component(
         failDelay: RealDistribution? = null,
         all: Boolean = false
     ) = yieldCurrent {
-
-        this@Component.wait(
-            *stateRequests,
-            priority = priority,
-            urgent = urgent,
-            failAt = failAt,
-            failDelay = failDelay,
-            all = all
-        )
-    }
-
-    /**
-     * Wait for any or all of the given state values are met
-     *
-     * For `wait` contract see [user manual](https://www.kalasim.org/component/#wait)
-     *
-     * @sample TODO
-     *
-     * @param stateRequests Requests indicating a state and a target condition or predicate for fulfilment
-     * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
-     * @param failDelay  If the request is not honored before now+fail_delay,
-    the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
-     * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
-     */
-    fun wait(
-        vararg stateRequests: StateRequest<*>,
-        //todo change to support distribution parameters instead
-        priority: Int = 0,
-        urgent: Boolean = false,
-        failAt: RealDistribution? = null,
-        failDelay: RealDistribution? = null,
-        all: Boolean = false
-    ) {
         if (status != CURRENT) {
             requireNotData()
             requireNotMain()
@@ -1157,11 +1023,7 @@ open class Component(
         }
 
         waitAll = all
-
-        scheduledTime = env.now +
-                (failAt?.sample() ?: Double.MAX_VALUE) +
-                (failDelay?.sample() ?: 0.0)
-
+        scheduledTime = env.now + (failAt?.sample() ?: Double.MAX_VALUE) + (failDelay?.sample() ?: 0.0)
 
         stateRequests
             // skip already tracked states
@@ -1175,7 +1037,7 @@ open class Component(
         tryWait()
 
         if (waits.isNotEmpty()) {
-            reschedule(scheduledTime!!, priority, urgent, "wait", WAITING)
+            reschedule(scheduledTime!!, priority = priority, urgent = urgent, caller = "wait", newStatus = WAITING)
         }
     }
 
@@ -1204,8 +1066,10 @@ open class Component(
             waits.forEach { sr ->
                 sr.state.waiters.remove(this)
             }
+
             waits.clear()
             remove()
+            
             reschedule(env.now, 0, false, "wait", SCHEDULED)
         }
 

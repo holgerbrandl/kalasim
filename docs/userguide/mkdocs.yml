@@ -9,7 +9,7 @@ repo_url: https://github.com/holgerbrandl/kalasim
 edit_uri: "tree/master/docs/userguide/docs"
 
 # Copyright
-copyright: Copyright &copy; 2020 Holger Brandl
+copyright: Copyright &copy; 2021 Holger Brandl
 
 theme:
   name: material

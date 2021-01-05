@@ -3,6 +3,8 @@
 
 ## Next steps
 
+https://github.com/denisvstepanov/lets-plot-examples
+
 ## v0.4
 
 **{done}** finish maschine shop

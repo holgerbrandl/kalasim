@@ -1,8 +1,10 @@
 package org.kalasim.test
 
+import io.kotest.matchers.shouldBe
 import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
+import org.kalasim.ComponentState.*
 import kotlin.test.assertEquals
 
 
@@ -62,7 +64,7 @@ class StateTransitionTests {
         var c: Component? = null
         createSimulation { c = Component() }.apply {
             run(10.0)
-            c!!.status = ComponentState.WAITING
+            c!!.status = WAITING
             run(10.0)
         }
 
@@ -70,41 +72,56 @@ class StateTransitionTests {
     }
 
 
-    @Test
-    fun `it should allow main interaction verbs with component as receiver`() = createTestSimulation(true) {
+    class ComponentReceiverInteractionTests {
 
-        val other = Component()
-        val r = Resource()
-        val s = State<String>("foo")
+        @Test
+        fun `it should passivate, cancel, hold and activate on behalf of another component`() =
+            createTestSimulation(true) {
 
-        class Customer : Component(process = Customer::doSmthg) {
+                val r = Resource()
+                val s = State<String>("foo")
 
-            fun doSmthg() = sequence<Component> {
-                print("hello")
-                other.passivate()
-                passivate()
+                val other = object : Component("other") {
+                    override fun process() = sequence<Component> {
+                        printTrace("starting process!")
+                        hold(100)
 
-                other.hold(1)
-                hold(1)
+                        printTrace("other process continued")
+                        hold(100)
+                    }
+                }
 
-                other.request(r)
-                other.request(r withQuantity 3)
-                request(r)
-                request(r withQuantity 3)
 
-                other.cancel()
-                cancel()
+                val comp = object : Component() {
 
-                other.standby()
-                standby()
+                    override fun process() = sequence<Component> {
+                        other.passivate()
+                        hold(4)
 
-                other.wait()
-                wait()
+                        other.activate()
+                        hold(4)
+
+                        other.cancel()
+                        hold(4)
+
+                        other.activate()
+                        other.hold(2)
+                        hold(4)
+                    }
+                }
+
+                // note this is a compiler test only. the example is not meaningful
+                run(1000)
+
+                comp.statusMonitor.valuesUntilNow().values shouldBe listOf(
+                    DATA, SCHEDULED, CURRENT, SCHEDULED, CURRENT, SCHEDULED, CURRENT, SCHEDULED,
+                    CURRENT, SCHEDULED, CURRENT, DATA
+                )
+
+                other.statusMonitor.valuesUntilNow().values shouldBe listOf(
+                    DATA, SCHEDULED, CURRENT, SCHEDULED, PASSIVE, SCHEDULED, CURRENT, SCHEDULED, DATA,
+                    SCHEDULED, SCHEDULED, CURRENT, SCHEDULED, CURRENT, SCHEDULED, CURRENT, DATA
+                )
             }
-        }
-
-
-        // note this is a compiler test only. the example is not meaningful
-
     }
 }
