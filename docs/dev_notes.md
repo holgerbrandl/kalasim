@@ -91,11 +91,11 @@ if [[ $kalasim_version == *"-SNAPSHOT" ]]; then
 fi
 
 
-git diff
-git commit -am "v${krangl_version} release"
+git status
+git commit -am "v${kalasim_version} release"
 #git diff --exit-code  || echo "There are uncomitted changes"
 
-git tag ${kalasim_version}
+git tag "${kalasim_version}"
 
 git push origin --tags
 
