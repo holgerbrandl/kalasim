@@ -232,9 +232,9 @@ Examples
 
 Standby has the effect that the component will be triggered on the next simulation event.
 
-* If the component is `CURRENT`, it will suspend execution internally.
-* Although theoretically possible, it is not recommended to use standby for non current components.
-* Not allowed for `DATA` components or `main`.
+* If the component is `CURRENT`, it will suspend execution internally
+* Although theoretically possible, it is not recommended to use standby for non current components. If needed to do so, the pattern to provide the correct receiver is `with(nonCurrent){ standby() }`
+* Not allowed for `DATA` components or `main`
 
 Examples
 
@@ -253,7 +253,7 @@ By default, there is no limit on the time to wait for the resource(s) to become 
 If the component is canceled, activated, passivated, interrupted or held the `failed` flag will be set as well.
 
 * If the component is `CURRENT`, it will suspend execution internally
-* Although theoretically possible it is not recommended to use request for non current components.
+* Although theoretically possible it is not recommended to use request for non current components. If needed to do so, the pattern to provide the correct receiver is `with(nonCurrent){ request(r) }`
 
 <!-- TODO describe better what happens if request is rejected or fails to be fulfilled-->
 
@@ -268,7 +268,12 @@ Wait has the effect that the component will check whether the value of a state m
 If the component is [canceled](#cancel), [activated](#activate), [passivated](#passivate), [interrupted](#interrupt) or [held](#hold) the failed flag will be set as well.
 
 * If the component is `CURRENT`, it will suspend execution internally
-* Although theoretically possible it is not recommended to use wait for non current components.
+* Although theoretically possible it is not recommended to use wait for non current components. If needed to do so, the pattern to provide the correct receiver is `with(nonCurrent){ wait() }`
+
+Examples
+
+* [Gas Station](examples/gas_station.md)
+
 
 ### interrupt
 

@@ -2,7 +2,7 @@
 
 package org.kalasim
 
-import com.systema.analytics.es.misc.json
+import com.github.holgerbrandl.jsonbuilder.json
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.apache.commons.math3.stat.Frequency
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics

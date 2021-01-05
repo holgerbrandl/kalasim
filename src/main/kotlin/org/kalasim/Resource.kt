@@ -2,7 +2,7 @@
 
 package org.kalasim
 
-import com.systema.analytics.es.misc.json
+import com.github.holgerbrandl.jsonbuilder.json
 import org.kalasim.misc.Jsonable
 import org.koin.core.Koin
 import org.koin.core.context.GlobalContext

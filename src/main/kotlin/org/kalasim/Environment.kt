@@ -2,10 +2,14 @@
 
 package org.kalasim
 
+import com.github.holgerbrandl.jsonbuilder.json
 import org.apache.commons.math3.random.JDKRandomGenerator
 import org.apache.commons.math3.random.RandomGenerator
+import org.json.JSONObject
 import org.kalasim.ComponentState.*
 import org.kalasim.Defaults.DEFAULT_SEED
+import org.kalasim.misc.GSON
+import org.kalasim.misc.JSON_INDENT
 import org.koin.core.Koin
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.GlobalContext
@@ -321,6 +325,17 @@ class Environment(
 
         // consistency checks
         require(queue.none(Component::isPassive)) { "passive component must not be in event queue" }
+    }
+
+    fun toJson(): JSONObject = json{
+        "components" to  components.map{ it.info.toJson() }
+        "num_components" to components.size
+        "now" to now
+        "queue" to queue.toList().map{it.name}.toTypedArray()
+    }
+
+    override fun toString(): String {
+        return toJson().toString(JSON_INDENT)
     }
 }
 

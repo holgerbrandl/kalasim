@@ -7,69 +7,11 @@ https://github.com/denisvstepanov/lets-plot-examples
 
 ## v0.4
 
-**{done}** finish maschine shop
-
-**{done}** implement/finish `interrupt`/`standby`
-
-**{todo}** implement support for real-time simulations
-
-**{done}** implement `enabled` disabled for monitors
-
-**{obsolete}** ensure that just yieldable methods are used in yield by checking stacktrace
-
-**{done}**  make `scheduledTime` nullable: replace scheduledTime = Double.MAX_VALUE with `null` which is semantically more meaningful here
-
-**{done}** consider embed yield into hold/request (or add second verb to support that)
-```
-yield(hold(REPAIR_TIME)) // --> 
-hold(REPAIR_TIME)
-```
-
-**{done}** optional request context with auto-release
-```
-request(){
-    hold
-}
-```
-
-
-**{todo}** info for environment that render similar to simmer (Ucar 2019, p4)
-```
-R> env %>%
-+ add_resource("machine", 10) %>%
-+ add_resource("operative", 5) %>%
-+ add_generator("job", job, NEW_JOB) %>%
-+ add_generator("task", task, NEW_TASK) %>%
-+ run(until = 1000)
-simmer environment: Job Shop | now: 1000 | next: 1000.11891377085
-{ Monitor: in memory }
-{ Resource: machine | monitored: TRUE | server status: 9(10) | queue... }
-{ Resource: operative | monitored: TRUE | server status: 4(5) | queue... }
-{ Source: job | monitored: 1 | n_generated: 4954 }
-{ Source: task | monitored: 1 | n_generated: 1041 }
-```
-
-**{todo}** provide log trajectory filter (see Ucar2019, p10)
-
-```
-trajectory: anonymous, 3 activities
-{ Activity: Timeout | delay: 10 }
-{ Activity: Log | message: Leaving th..., level: 0 }
-{ Activity: Timeout | delay: 10 }
-```
-
-
-**{todo}** it must be easy to use interaction methods on other component
-```
-//        sequence<Component>{
-//            person.let{
-//                passivate()
-//            }
-//        }.toList()
-```
 
 
 ## v0.5
+
+**{todo}** implement support for real-time simulations
 
 **{todo}**  implement `Demo preemptive resource animated.py`
 

@@ -1,6 +1,6 @@
 package org.kalasim
 
-import com.systema.analytics.es.misc.json
+import com.github.holgerbrandl.jsonbuilder.json
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.apache.commons.math3.util.Precision

@@ -250,7 +250,11 @@ class RequestTests {
                 }
             }
 
+            println(toString())
+
             run(5)
+
+            println(toString())
 
             r.claimers.isEmpty() shouldBe true
             r.requesters.isEmpty() shouldBe true
