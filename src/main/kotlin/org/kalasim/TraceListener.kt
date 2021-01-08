@@ -4,7 +4,7 @@ import org.kalasim.misc.TRACE_DF
 import java.util.logging.Level
 
 
-private val TRACE_COL_WIDTHS = listOf(10, 25, 45, 35)
+internal val TRACE_COL_WIDTHS = mutableListOf(10, 25, 45, 35)
 
 //todo we should provide an api to resolve these references into a more slim log representation
 data class TraceElement(

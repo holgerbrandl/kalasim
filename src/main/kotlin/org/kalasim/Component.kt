@@ -809,7 +809,7 @@ open class Component(
         return (this)
     }
 
-    private fun checkFail() {
+    internal fun checkFail() {
         if (requests.isNotEmpty()) {
             printTrace("request failed")
             requests.forEach { it.key.removeRequester(this) }

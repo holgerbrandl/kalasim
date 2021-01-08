@@ -251,6 +251,7 @@ class Environment(
             return
         }
 
+        component.checkFail()
         component.callProcess()
     }
 
