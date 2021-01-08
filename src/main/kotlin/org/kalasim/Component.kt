@@ -1110,8 +1110,8 @@ open class ComponentInfo(c: Component) : Jsonable() {
     val creationTime = c.creationTime
     val scheduledTime = c.scheduledTime
 
-    val claims = c.claims.toList()
-    val requests = c.requests.toMap()
+    val claims = c.claims.map{ it.key.name to it.value}.toMap()
+    val requests = c.requests.map{ it.key.name to it.value}.toMap()
 }
 
 //
