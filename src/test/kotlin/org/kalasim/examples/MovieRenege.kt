@@ -15,7 +15,8 @@ fun main() {
 
         // note: it's not really needed to model the theater (because it has no process), but we follow the julia model here
         val theater = object {
-            val tickets = MOVIES.map { it to DepletableResource(capacity = TICKETS) }.toMap()
+            val tickets =
+                MOVIES.map { it to DepletableResource("room ${MOVIES.indexOf(it)}", capacity = TICKETS) }.toMap()
             val numReneged = MOVIES.map { it to 0 }.toMap().toMutableMap()
             val counter = Resource("counter", capacity = 1)
         }
@@ -24,7 +25,6 @@ fun main() {
             override fun process() = sequence {
                 request(theater.counter) {
                     request(theater.tickets[movie]!! withQuantity numTickets, failAt = 0)
-                    printTrace("occupancy of '${theater.tickets[movie]}' ist ${theater.tickets[movie]!!.occupancy}")
                     if (failed) {
                         theater.numReneged.merge(movie, 1, Int::plus)
                     }
@@ -41,11 +41,11 @@ fun main() {
         MOVIES.forEach { movie ->
             val numLeftQueue = theater.numReneged[movie]!!
             val soldOutSince = theater.tickets[movie]!!.occupancyMonitor.stepFun()
-                // find the firs time when tickets were sold out
+                // find the first time when tickets were sold out
                 .first { it.second == 1.0 }.first.roundAny(2)
 
-            println("Movie $movie sold out $soldOutSince minutes after ticket counter opening.")
-            println("  Number of people leaving queue when film sold out: $numLeftQueue)")
+            println("Movie ${movie.name} sold out $soldOutSince minutes after ticket counter opening.")
+            println("$numLeftQueue walked away after film was sold out.")
         }
     }
 }
