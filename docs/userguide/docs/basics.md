@@ -88,19 +88,34 @@ Examples
 
 ## Randomness & Distributions
 
-Experimentation in a simulation context relates to large part to controlling randomess. Here, this is achieved by using probabilistc
-[distributions](https://commons.apache.org/proper/commons-math/userguide/distribution.html) which are provided via `apache-commons-math`. A simulation always allows deterministic execution while still supportin pseudo-random sampling. To do so, distributions need to be configured to use kalasim random generator.
+Experimentation in a simulation context relates to large part to controlling randomness. Here, this is achieved by using probabilistic
+[distributions](https://commons.apache.org/proper/commons-math/userguide/distribution.html) which are internally backed by [apache-commons-math](https://commons.apache.org/proper/commons-math/). A simulation always allows deterministic execution while still supporting pseudo-random sampling. When creating a new simulation [environment](#simulation-runtime-environment), the user can provide a random seed which is internally resolved to a random generator to be used in process definitions.
 
-Example
 ```kotlin
-hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample())
+createSimulation(randomSeed = 123){
+    val randomGenerator = rg // which is resolved by Environment receiver     
+}
+```
+
+With random generator, the following [distributions](https://github.com/holgerbrandl/kalasim/blob/master/src/main/kotlin/org/kalasim/Distributions.kt) are supported out of the box (with common defaults where possible) as extension functions on `Component` and `Environment`:
+
+* `uniform(lower=0, upper=1)`
+* `discreteUniform(lower, upper)`
+* `exponential(mean)`
+* `normal(mean=0, sd=1)`
+
+
+Whenever, distributions are needed in method signatures in `kalasim`, the more general interface `org.apache.commons.math3.distribution.RealDistribution` is being used to support a much [wider variety](https://commons.apache.org/proper/commons-math/javadocs/api-3.4/org/apache/commons/math3/distribution/RealDistribution.html) of distributions if needed. So we can also use other implementations as well. For example
+
+```kotlin
+ComponentGenerator(iat=NakagamiDistribution(1,0.3)){ Customer() }
 ```
 
 The API also include some convenience wrappers to provide fixed values for argument of `RealDistribution`. E.g. consider the  time until a request is considered as failed:
 
 ```kotlin
-val r = Resource()
-c.request(r, failAt = 3.asConstantDist())
+val dist =  3.asConstantDist()
+ComponentGenerator(iat=dist){ Customer() }
 ```
 
-Here, `3` is converted into a `org.apache.commons.math3.distribution.ConstantRealDistribution`. By doing so, we can provide more typed signatures across the entire API. Instead of support methods that accept fixed values for waiting times etc, we simply rely on fixed random distribution to reduce API complexity while maintaining full flexibility.
+Here, `3` is converted into a `org.apache.commons.math3.distribution.ConstantRealDistribution`.

@@ -4,14 +4,13 @@ import org.kalasim.*
 import org.koin.core.component.get
 
 
-val ttf = uniform(19, 20) // time to failure distribution
-val ttr = uniform(3, 6)  //  time to repair distribution
-
-
 class Part(val machine: Machine, partNo: Int) :
     Component(
         name = machine.name.replace("Machine", "part") + ".${partNo + 1}"
     ) {
+
+    val ttf = uniform(19, 20) // time to failure distribution
+    val ttr = uniform(3, 6)  //  time to repair distribution
 
     override fun process() = sequence {
 

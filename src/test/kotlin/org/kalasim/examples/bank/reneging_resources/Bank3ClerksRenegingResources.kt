@@ -20,7 +20,7 @@ class Customer(val clerks: Resource) : Component() {
             cancel()
         }
 
-        request(clerks, failDelay = 50.asDist())
+        request(clerks, failDelay = 50)
 
         if (failed) {
             numReneged++
@@ -37,7 +37,7 @@ fun main() {
         add { Resource("clerks", capacity = 3) }
     }.createSimulation {
         // register other components to  be present when starting the simulation
-        ComponentGenerator(iat = uniform(5.0, 15.0, rg)) {
+        ComponentGenerator(iat = uniform(5.0, 15.0)) {
             Customer(get())
         }
 

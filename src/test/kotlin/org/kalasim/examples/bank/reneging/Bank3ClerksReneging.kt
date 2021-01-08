@@ -18,7 +18,7 @@ class CustomerGenerator : Component() {
     override fun process() = sequence {
         while (true) {
             Customer(get())
-            hold(uniform( 5.0, 15.0, env.rg).sample())
+            hold(uniform( 5.0, 15.0).sample())
         }
     }
 }

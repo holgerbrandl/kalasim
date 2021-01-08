@@ -368,8 +368,8 @@ open class Component(
      */
     suspend fun SequenceScope<Component>.put(
         vararg resourceRequests: ResourceRequest,
-        failAt: RealDistribution? = null,
-        failDelay: RealDistribution? = null,
+        failAt: Number? = null,
+        failDelay: Number? = null,
     ) = request(
         *resourceRequests.map { it.copy(quantity = -it.quantity) }.toTypedArray(),
         failAt = failAt, failDelay = failDelay
@@ -392,8 +392,8 @@ open class Component(
      */
     suspend fun SequenceScope<Component>.request(
         resources: Collection<Resource>,
-        failAt: RealDistribution? = null,
-        failDelay: RealDistribution? = null,
+        failAt: Number? = null,
+        failDelay: Number? = null,
         oneOf: Boolean = false,
         priority: Int = DEFAULT_QUEUE_PRIORITY,
         honorBlock: (suspend SequenceScope<Component>.() -> Any)? = null
@@ -426,8 +426,8 @@ open class Component(
     suspend fun SequenceScope<Component>.request(
         vararg resources: Resource,
         // todo review if this should rather be a number (and dist at call site)
-        failAt: RealDistribution? = null,
-        failDelay: RealDistribution? = null,
+        failAt: Number? = null,
+        failDelay: Number? = null,
         oneOf: Boolean = false,
         priority: Int = DEFAULT_QUEUE_PRIORITY,
         honorBlock: (suspend SequenceScope<Component>.() -> Any)? = null
@@ -459,8 +459,8 @@ open class Component(
     suspend fun SequenceScope<Component>.request(
         vararg resourceRequests: ResourceRequest,
         //todo change to support distribution parameters instead
-        failAt: RealDistribution? = null,
-        failDelay: RealDistribution? = null,
+        failAt: Number? = null,
+        failDelay: Number? = null,
         oneOf: Boolean = false,
         //todo use type here and not string
         priority: Int = DEFAULT_QUEUE_PRIORITY,
@@ -482,8 +482,8 @@ open class Component(
             require(requests.isEmpty()) { "no open claims are allowed when requesting" }
 
             scheduledTime = env.now +
-                    (failAt?.sample() ?: Double.MAX_VALUE) +
-                    (failDelay?.sample() ?: 0.0)
+                    (failAt?.toDouble() ?: Double.MAX_VALUE) +
+                    (failDelay?.toDouble() ?: 0.0)
 
             failed = false
             oneOfRequest = oneOf

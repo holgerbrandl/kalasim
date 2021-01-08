@@ -31,7 +31,7 @@ open class Resource(
 
     var capacity = capacity.toDouble()
         set(value) {
-            require( value >= claimedQuantity){ "can not reduce capacity below current claims"}
+            require(value >= claimedQuantity) { "can not reduce capacity below current claims" }
 
             field = value
 

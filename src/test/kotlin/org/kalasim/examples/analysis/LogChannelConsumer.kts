@@ -38,7 +38,7 @@ GlobalScope.launch {
 
 // create simulation with no default logging
 val sim = createSimulation {
-    ComponentGenerator(iat = 1.asConstantDist()) { Component("Car.${it}") }
+    ComponentGenerator(iat = 1.asDist()) { Component("Car.${it}") }
 }
 
 // add custom log consumer

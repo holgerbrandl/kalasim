@@ -20,7 +20,7 @@ fun main() {
     val env = configureEnvironment {
         add { Resource("clerks", capacity = 3) }
     }.apply {
-        ComponentGenerator(iat = uniform(5.0, 15.0, rg)) { Customer(get()) }
+        ComponentGenerator(iat = uniform(5.0, 15.0)) { Customer(get()) }
     }.run(3000)
 
     env.get<Resource>().apply {

@@ -5,18 +5,22 @@
 
 https://github.com/denisvstepanov/lets-plot-examples
 
-## v0.4
-
-
 
 ## v0.5
+
+
+
+**{done}** Removed distribution arguments in `request`. Sampling can be done at call site
+```
+request(failAt=uniform().sample())
+```
+
 
 **{todo}** implement support for real-time simulations
 
 **{todo}**  implement `Demo preemptive resource animated.py`
 
 **{todo}** finish elevator example with visualization
-
 
 **{todo}**  <https://r-simmer.org/articles/simmer-08-philosophers.html>
 
@@ -38,7 +42,7 @@ roller <- trajectory() %>%
 
 
 ---
-generator should monitor generation, from Ucar
+**{todo}** generator should monitor generation, from Ucar
 >  Returns timing information per arrival: name of the arrival,
 start_time, end_time, activity_time (time not spent in resource queues) and a flag,
 finished, that indicates whether the arrival exhausted its activities (or was rejected)
@@ -79,6 +83,7 @@ val c = Component(){
 
 ## Pre-release
 
+**{todo}** lambda builder fro interrupt/release
 
 **{todo}** update logs example in docs intro
 
@@ -94,7 +99,6 @@ val c = Component(){
 **{todo}** port interesting SimPy examples from https://simpy.readthedocs.io/en/latest/examples/index.html
 
 **{todo}** port  machine maintenance example from ucar 2019
-
 
 ## Later
 
@@ -115,16 +119,4 @@ consider modeling `Store` Using Stores you can model the production and consumpt
 
 ---
 
-**{todo}** Remove distibution arguments ins `request`; Do we  really need
-```
-failAt: RealDistribution? = null,
-failDelay: RealDistribution? = null,
-```
-and why the distribution can not be used at the call site?
-
----
-
 Register project at awesome-kotlin
-
-
----

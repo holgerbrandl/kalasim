@@ -32,7 +32,7 @@ fun main() {
             }
         }
 
-        ComponentGenerator(iat = exponential(lambda, rg)) {
+        ComponentGenerator(iat = exponential(lambda)) {
             Customer()
         }
 

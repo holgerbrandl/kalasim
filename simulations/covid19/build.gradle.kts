@@ -10,12 +10,12 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    mavenLocal()
+//    mavenLocal()
     jcenter()
 }
 
 dependencies {
-    implementation("org.kalasim:kalasim:0.4-SNAPSHOT")
+    implementation("org.kalasim:kalasim:0.4.3")
 
     implementation( "com.github.holgerbrandl:kravis:0.6.1")
 

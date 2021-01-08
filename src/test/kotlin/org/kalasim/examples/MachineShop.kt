@@ -19,7 +19,7 @@ fun main() {
         var madeParts: Int = 0
             private set
 
-        val timePerPart: RealDistribution = normal(PT_MEAN, PT_SIGMA, env.rg)
+        val timePerPart: RealDistribution = normal(PT_MEAN, PT_SIGMA)
 
         override fun process(): Sequence<Component> = sequence {
             while (true) {
@@ -38,9 +38,9 @@ fun main() {
         process = MachineWear::breakMachine
     ) {
 
-        val timeToFailure = exponential(MTTF)
 
         fun breakMachine(): Sequence<Component> = sequence {
+            val timeToFailure = exponential(MTTF)
 
             while (true) {
                 hold(timeToFailure())

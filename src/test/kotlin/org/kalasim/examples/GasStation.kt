@@ -2,6 +2,7 @@ package org.kalasim.examples
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
+import org.kalasim.misc.display
 import org.kalasim.misc.printThis
 import org.koin.core.component.get
 import org.koin.core.component.inject
@@ -93,6 +94,10 @@ object GasStation {
                 capacityMonitor.printHistogram()
                 claimedQuantityMonitor.printHistogram()
                 availableQuantityMonitor.printHistogram()
+
+//                capacityMonitor.display()
+//                claimedQuantityMonitor.display()
+//                availableQuantityMonitor.display()
             }
 
             get<GasStation>().requesters.apply {
