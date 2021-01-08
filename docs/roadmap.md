@@ -16,6 +16,8 @@ request(failAt=uniform().sample())
 ```
 
 
+**{todo}** https://simpy.readthedocs.io/en/latest/examples/movie_renege.html && https://simjuliajl.readthedocs.io/en/stable/examples/2_movie_renege.html
+
 **{todo}** implement support for real-time simulations
 
 **{todo}**  implement `Demo preemptive resource animated.py`
@@ -55,9 +57,13 @@ finished, that indicates whether the arrival exhausted its activities (or was re
 **{todo}** review simmer.plot
 > Ucar I, Smeets B (2019b). simmer.plot: Plotting Methods for simmer. R package version 0.1.15, URL https://CRAN.R-project.org/package=simmer.plot
 
+
+---
+
+**{todo}** review simjulia <https://simjuliajl.readthedocs.io/en/stable/topical_guides/5_shared_resources.html#containers>
+
 ## v0.6
 
-**{todo}** https://simpy.readthedocs.io/en/latest/examples/movie_renege.html
 
 **{todo}** Cleanup ComponentGenerator API --> take out from until into own constructor
 
@@ -78,6 +84,9 @@ val c = Component(){
     hold(1)
 }
 ```
+
+
+**{todo}** it should track renege stats in resource directly
 
 **{todo}** restrict more methods in Component from being overridden
 

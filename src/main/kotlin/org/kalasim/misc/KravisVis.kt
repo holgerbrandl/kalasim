@@ -30,9 +30,7 @@ fun NumericLevelMonitor.display() {
     if (warnNoDisplay()) return
 
     apply {
-        val nlmStatsData = valuesUntilNow()
-
-        val data = nlmStatsData.plotData()
+        val data = stepFun()
 
         data.plot(
             x = Pair<Double, Double>::first,
@@ -57,8 +55,8 @@ fun <T> FrequencyLevelMonitor<T>.display() {
     if (warnNoDisplay()) return
 
     apply {
-        val nlmStatsData = valuesUntilNow()
-        val data = nlmStatsData.plotData()
+        val nlmStatsData = statsData()
+        val data = nlmStatsData.stepFun()
 
         data class Segment<T>(val value: T, val start:Double, val end:Double)
 

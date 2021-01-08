@@ -62,8 +62,11 @@ interface LevelMonitor<T> {
 
 
     /** Get the total time for which a monitor was is state `value`*/
-    operator fun get(value: T): Double?
+    fun total(value: T): Double?
 
+
+    /** Returns the step function of this monitored value along the time axis. */
+    fun stepFun(): List<Pair<Double, T>>
 
     /** Resets the monitor to a new initial at the current simulation clock. This will also reenable it as a side-effect. */
     fun reset(initial: T)
@@ -179,7 +182,7 @@ class FrequencyLevelMonitor<T>(
         return timeIndex?.let { values[it] }
     }
 
-    override fun get(value: T): Double = valuesUntilNow().run {
+    override fun total(value: T): Double = statsData().run {
         // https://youtrack.jetbrains.com/issue/KT-43776
         values.zip(durations).filter { it.first == value }.map { it.second }.sum()
     }
@@ -201,7 +204,7 @@ class FrequencyLevelMonitor<T>(
     }
 
 
-    fun valuesUntilNow(): LevelStatsData<T> {
+    fun statsData(): LevelStatsData<T> {
         require(values.isNotEmpty()) { "data must not be empty when preparing statistics of $name" }
 
         val valuesLst = values.toList()
@@ -211,6 +214,10 @@ class FrequencyLevelMonitor<T>(
 
         return LevelStatsData(valuesLst, timestamps, durations)
     }
+
+
+    /** Returns the step function of this monitored value along the time axis. */
+    override fun stepFun() = statsData().stepFun()
 
 
     override val info: Jsonable
@@ -343,12 +350,12 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
 
     override fun get(time: Double): Number = timestamps.zip(values.toList()).first { it.first > time }.second
 
-    override fun get(value: Number): Double = valuesUntilNow().run {
+    override fun total(value: Number): Double = statsData().run {
         // https://youtrack.jetbrains.com/issue/KT-43776
         values.zip(durations).filter { it.first == value }.map { it.second }.sum()
     }
 
-    fun valuesUntilNow(excludeZeros: Boolean = false): LevelStatsData<Double> {
+    fun statsData(excludeZeros: Boolean = false): LevelStatsData<Double> {
         require(values.isNotEmpty()) { "data must not be empty when preparing statistics of $name" }
 
         val valuesLst = values.toList()
@@ -365,6 +372,9 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
             LevelStatsData(valuesLst, timestamps, durations)
         }
     }
+
+    /** Returns the step function of this monitored value along the time axis. */
+    override fun stepFun() = statsData().stepFun()
 
     fun statistics(excludeZeros: Boolean = false) = NumericLevelMonitorStats(this, excludeZeros)
 
@@ -422,6 +432,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
 
         addValue(initial)
     }
+
 }
 
 
@@ -458,7 +469,8 @@ data class LevelStatsData<T>(
     val timepoints: List<Double>,
     val durations: List<Double>
 ) {
-    fun plotData(): List<Pair<Double, T>> =
+    /** Returns the step function of time, value pairs*/
+    fun stepFun(): List<Pair<Double, T>> =
         (this.timepoints + (timepoints.last() + durations.last())).zip(values.toList() + values.last())
 }
 
@@ -471,7 +483,7 @@ class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean =
     val min: Double?
     val max: Double?
 
-    internal val data: LevelStatsData<Double> = nlm.valuesUntilNow(excludeZeros)
+    internal val data: LevelStatsData<Double> = nlm.statsData(excludeZeros)
 
 //    val median :Double = TODO()
 //    val ninetyfivePercentile :Double = TODO()

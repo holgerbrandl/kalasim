@@ -1,3 +1,4 @@
+
 @file:Suppress("EXPERIMENTAL_API_USAGE")
 
 package org.kalasim
@@ -6,8 +7,25 @@ import com.github.holgerbrandl.jsonbuilder.json
 import org.kalasim.misc.Jsonable
 import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
+import kotlin.math.absoluteValue
 
 // TODO Analyze we we support the same preemptible contract as simmer (Ucar2019, p11) (in particular restart)
+
+
+class DepletableResource(
+    name: String? = null,
+    capacity: Number,
+    initialLevel: Number = capacity,
+    preemptive: Boolean = false,
+    koin: Koin = GlobalContext.get()
+) : Resource(name = name, capacity = capacity , preemptive = preemptive, anonymous = true, koin = koin) {
+
+    init {
+        //todo temporarily disable monitors
+
+        claimedQuantity = capacity.toDouble() - initialLevel.toDouble()
+    }
+}
 
 /**
  * @param preemptive If a component requests from a preemptive resource, it may bump component(s) that are claiming from
@@ -39,11 +57,16 @@ open class Resource(
             tryRequest()
         }
 
-    var claimedQuantity = 0.0
+
+    // https://stackoverflow.com/questions/41214452/why-dont-property-initializers-call-a-custom-setter
+    var claimedQuantity :Double = 0.0
         internal set(x) {
             val diffQuantity = field - x
 
             field = x
+
+            // this ugly hak is needed to avoid tracking of initialLevel setting in DR constructor
+            if(this is DepletableResource && diffQuantity == 0.0 && requesters.isEmpty()) return
 
             if (field < EPS)
                 field = 0.0
@@ -51,19 +74,24 @@ open class Resource(
             claimedQuantityMonitor.addValue(x)
             updateCapacityMonitors()
 
+//            if(this is DepletableResource && )
             val action = if (diffQuantity > 0) "released" else "claimed"
-            printTrace("$action with quantity $claimedQuantity")
+            printTrace("$action ${diffQuantity.absoluteValue} from '$name'")
 
             // it would seem natural to tryReqeust here, but since this is not done in case of bumping,
             // we do it manually at the call-site instead
         }
 
+
+
     private fun updateCapacityMonitors() {
-        availableQuantityMonitor.addValue(capacity - claimedQuantity)
-        occupancyMonitor.addValue(if (capacity < 0) 0 else claimedQuantity / capacity)
+        availableQuantityMonitor.addValue(availableQuantity)
+        occupancyMonitor.addValue(occupancy)
         capacityMonitor.addValue(capacity)
     }
 
+    val occupancy: Double
+        get() = if (capacity < 0) 0.0 else claimedQuantity / capacity
 
     val availableQuantity: Double
         get() = capacity - claimedQuantity

@@ -19,6 +19,10 @@
 * [Salabim, Discrete Event Simulation In Python](https://www.youtube.com/watch?v=I74j2KtGouA) - PyCon 2018 Talk
 * [Python.__init__ Podcast: Salabim](https://www.pythonpodcast.com/salabim-with-ruud-van-der-ham-episode-151/) - Great podcast episode with [Ruud van der Ham](https://www.linkedin.com/in/ruudvanderham/)
 
+### SimJulia
+
+[SimJulia](https://simjuliajl.readthedocs.io/en/stable/welcome.html) is a combined continuous time / discrete event process oriented simulation framework written in Julia inspired by the Simula library DISCO and the Python library SimPy.
+
 ### DSOL
 
 [DSOL3](https://simulation.tudelft.nl/simulation/index.php/dsol) which is an open source, Java based suite of Java classes for continuous and discrete event simulation

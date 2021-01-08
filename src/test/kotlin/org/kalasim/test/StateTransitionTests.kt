@@ -113,12 +113,12 @@ class StateTransitionTests {
                 // note this is a compiler test only. the example is not meaningful
                 run(1000)
 
-                comp.statusMonitor.valuesUntilNow().values shouldBe listOf(
+                comp.statusMonitor.statsData().values shouldBe listOf(
                     DATA, SCHEDULED, CURRENT, SCHEDULED, CURRENT, SCHEDULED, CURRENT, SCHEDULED,
                     CURRENT, SCHEDULED, CURRENT, DATA
                 )
 
-                other.statusMonitor.valuesUntilNow().values shouldBe listOf(
+                other.statusMonitor.statsData().values shouldBe listOf(
                     DATA, SCHEDULED, CURRENT, SCHEDULED, PASSIVE, SCHEDULED, CURRENT, SCHEDULED, DATA,
                     SCHEDULED, SCHEDULED, CURRENT, SCHEDULED, CURRENT, SCHEDULED, CURRENT, DATA
                 )

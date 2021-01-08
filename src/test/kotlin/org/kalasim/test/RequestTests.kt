@@ -229,9 +229,8 @@ class RequestTests {
             customer.statusMonitor.printHistogram()
 //                println(customer.statusMonitor[ComponentState.PASSIVE])
 
-            customer.statusMonitor[ComponentState.PASSIVE] shouldBe 8.0
+            customer.statusMonitor.total(ComponentState.PASSIVE) shouldBe 8.0
         }
-
     }
 
     @Test

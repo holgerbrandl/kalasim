@@ -66,7 +66,7 @@ Level monitors allow to query the value at a specific time
 ```kotlin
 val nlm = NumericLevelMonitor()
 // ... collecting some data ...
-nlm[4]  # will print the value at time 4
+nlm[4]  // will print the value at time 4
 ```
 
 In addition to standard statistics, level monitor support the following statistics
@@ -255,7 +255,7 @@ Histogram of: 'NumericLevelMonitor.1'
 ##  Merging of Monitors
 
 <!-- **{TODO}** Write tests for merging of monitors-->
-In contrast to `salabim` Monitors can not be directly merged (yet) in `kalasim`. However it is possible to merge the resulting `DescriptiveStatistics`
+In contrast to `salabim` Monitors cannot be directly merged (yet) in `kalasim`. However, it is possible to merge the resulting `DescriptiveStatistics`
 
 <!--The method Monitor.merge() is used for that, like:-->
 
