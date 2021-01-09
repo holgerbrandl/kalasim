@@ -37,7 +37,7 @@ object GasStation {
         class GasStation : Resource(capacity = 2)
 
         class TankTruck : Component() {
-            val fuelPump: Resource by inject(qualifier = named(FUEL_PUMP))
+            val fuelPump: DepletableResource by inject(qualifier = named(FUEL_PUMP))
 
             override fun process() = sequence {
                 hold(TANK_TRUCK_TIME)
@@ -54,7 +54,7 @@ object GasStation {
             // in particular useful for untypes resources and components
 
             //            val gasStation : Resource by inject(qualifier = named("gas_station"))
-            val fuelPump: Resource by inject(qualifier = named(FUEL_PUMP))
+            val fuelPump: DepletableResource by inject(qualifier = named(FUEL_PUMP))
 
             override fun process() = sequence {
                 val fuelTankLevel = FUEL_TANK_LEVEL.sample()
@@ -80,14 +80,14 @@ object GasStation {
 
             single { GasStation() }
 
-            single(qualifier = named(FUEL_PUMP)) { Resource(FUEL_PUMP, GAS_STATION_SIZE, anonymous = true) }
+            single(qualifier = named(FUEL_PUMP)) { DepletableResource(FUEL_PUMP, GAS_STATION_SIZE) }
         }.apply {
 
             ComponentGenerator(iat = T_INTER) { Car(get()) }
 
             run(SIM_TIME)
 
-            val fuelPump = get<Resource>(qualifier = named(FUEL_PUMP))
+            val fuelPump = get<DepletableResource>(qualifier = named(FUEL_PUMP))
 
             fuelPump.apply {
                 capacityMonitor.printHistogram()

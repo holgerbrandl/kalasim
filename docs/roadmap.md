@@ -18,7 +18,7 @@ request(failAt=uniform().sample())
 **{done}** https://simpy.readthedocs.io/en/latest/examples/movie_renege.html && https://simjuliajl.readthedocs.io/en/stable/examples/2_movie_renege.html
 
 
-**{todo}** implement support for real-time simulations
+**{done}** implement support for real-time simulations
 
 **{todo}**  implement `Demo preemptive resource animated.py`
 
@@ -64,6 +64,7 @@ finished, that indicates whether the arrival exhausted its activities (or was re
 
 ## v0.6
 
+**{todo}** hide ` anonymous` in resources
 
 **{todo}** Cleanup ComponentGenerator API --> take out from until into own constructor
 

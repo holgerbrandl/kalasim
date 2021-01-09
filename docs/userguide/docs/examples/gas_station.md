@@ -4,15 +4,14 @@ This example models a gas station and cars that arrive at the station for refuel
 
 Covers:
 
-*Resources: Resource
 * [Depletable Resources](../resource.md#)
-* Process Interaction, particular [waiting](../component.md#wait) for other processes
+* Process Interaction, in particular [waiting](../component.md#wait) for other processes
 
-The gas station has a limited number of fuel pumps and a fuel tank that is shared between the fuel pumps. The gas station is thus modeled as Resource. The shared fuel tank is modeled with a Container.
+The gas station has a limited number of fuel pumps, and a fuel tank that is shared between the fuel pumps. The gas station is thus modeled as `Resource`. The shared fuel tank is modeled with a `DepletableResource`.
 
 Vehicles arriving at the gas station first request a fuel pump from the station. Once they acquire one, they try to take the desired amount of fuel from the fuel pump. They leave when they are done.
 
-The gas stations fuel level is reqularly monitored by gas station control. When the level drops below a certain threshold, a tank truck is called to refuel the gas station itself.
+The gas stations fuel level is regularly monitored by gas station control. When the level drops below a certain threshold, a tank truck is called to refuel the gas station itself.
 
 ```kotlin
 //{!GasStation.kt!}
