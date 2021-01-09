@@ -12,7 +12,7 @@ class TraceCollector : TraceListener {
         traces.add(traceElement)
     }
 
-    operator fun get(index: Int): TraceElement  = traces[index]
+    operator fun get(index: Int): TraceElement = traces[index]
 }
 
 class GeneratorTest {

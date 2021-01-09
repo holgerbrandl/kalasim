@@ -46,19 +46,19 @@ fun main() {
                 hold(timeToFailure())
 
                 // handle the rare case that the model
-                if(machine.isInterrupted) continue
+                if (machine.isInterrupted) continue
 
                 machine.interrupt()
 
                 request(repairMan)
                 hold(REPAIR_TIME)
 
-                require(!isBumped(repairMan)) { "productive tools must not be bumped"}
+                require(!isBumped(repairMan)) { "productive tools must not be bumped" }
 
                 release(repairMan)
 
                 machine.resume()
-                require(!machine.isInterrupted) { "machine must not be interrupted at end of wear cycle"}
+                require(!machine.isInterrupted) { "machine must not be interrupted at end of wear cycle" }
             }
         }
     }

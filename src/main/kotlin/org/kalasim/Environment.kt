@@ -1,5 +1,3 @@
-@file:Suppress("EXPERIMENTAL_API_USAGE")
-
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
@@ -8,7 +6,6 @@ import org.apache.commons.math3.random.RandomGenerator
 import org.json.JSONObject
 import org.kalasim.ComponentState.*
 import org.kalasim.Defaults.DEFAULT_SEED
-import org.kalasim.misc.GSON
 import org.kalasim.misc.JSON_INDENT
 import org.koin.core.Koin
 import org.koin.core.component.KoinComponent
@@ -78,6 +75,7 @@ object Defaults {
     const val DEFAULT_SEED = 42
 }
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 class Environment(
     enableTraceLogger: Boolean = false,
     dependencies: KoinModule? = null,
@@ -104,6 +102,16 @@ class Environment(
 
     private val traceListeners = listOf<TraceListener>().toMutableList()
 
+
+    val traceFilters = mutableListOf<TraceFilter>()
+
+    init {
+        traceFilters.add(TraceFilter { it.action?.contains("entering requesters") ?: false })
+        traceFilters.add(TraceFilter { it.action?.contains("entering claimers") ?: false })
+        traceFilters.add(TraceFilter { it.action?.contains("removed from requesters") ?: false })
+        traceFilters.add(TraceFilter { it.action?.contains("removed from claimers") ?: false })
+    }
+
     var now = 0.0
         internal set
 
@@ -115,6 +123,7 @@ class Environment(
 
     val _koin: Koin
 
+    @Suppress("EXPERIMENTAL_OVERRIDE")
     override fun getKoin(): Koin = _koin
 
     init {
@@ -265,13 +274,8 @@ class Environment(
     }
 
 
-    fun addStandBy(component: Component) {
+    internal fun addStandBy(component: Component) {
         standBy.add(component)
-    }
-
-    fun addPendingStandBy(component: Component) {
-        pendingStandBy.add(component)
-
     }
 
     fun addTraceListener(tr: TraceListener) = traceListeners.add(tr)
@@ -280,9 +284,11 @@ class Environment(
     fun removeTraceListener(tr: TraceListener) = traceListeners.remove(tr)
 
 
-    internal fun publishTraceRecord(tr: TraceElement) {
+    internal fun publishTraceRecord(te: TraceElement) {
+        if (traceFilters.any { it.matches(te) }) return
+
         traceListeners.forEach {
-            it.processTrace(tr)
+            it.processTrace(te)
         }
     }
 
@@ -328,13 +334,14 @@ class Environment(
         require(queue.none(Component::isPassive)) { "passive component must not be in event queue" }
     }
 
-    fun toJson(): JSONObject = json{
-        "components" to  components.map{ it.info.toJson() }
+    fun toJson(): JSONObject = json {
+        "components" to components.map { it.info.toJson() }
         "num_components" to components.size
         "now" to now
-        "queue" to queue.toList().map{it.name}.toTypedArray()
+        "queue" to queue.toList().map { it.name }.toTypedArray()
     }
 
+    @Suppress("EXPERIMENTAL_OVERRIDE")
     override fun toString(): String {
         return toJson().toString(JSON_INDENT)
     }
@@ -354,8 +361,7 @@ data class QueueElement(
     override fun compareTo(other: QueueElement): Int =
         compareValuesBy(this, other, { it.time }, { it.priority }, { it.queueCounter })
 
-    val heapSeq = if (urgent) -queueCounter else queueCounter
-
+//    val heapSeq = if (urgent) -queueCounter else queueCounter
 
     override fun toString(): String {
 //        return "${component.javaClass.simpleName}(${component.name}, $time, $priority, $seq)"

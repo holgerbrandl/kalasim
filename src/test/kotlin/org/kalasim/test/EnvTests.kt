@@ -1,12 +1,16 @@
 package org.kalasim.test
 
+import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.doubles.plusOrMinus
+import io.kotest.matchers.shouldBe
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.junit.Test
 import org.kalasim.*
 import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
 import org.koin.dsl.koinApplication
+import java.time.Duration
 
 class EnvTests {
 
@@ -87,5 +91,40 @@ class EnvTests {
 
         println(env1._koin)
         println(env2._koin)
+    }
+
+    @Test
+    fun `it should allow to synchronize clock time`(){
+        val timeBefore = System.currentTimeMillis()
+
+        createSimulation(true) {
+            ClockSync(Duration.ofSeconds(1), speedUp = 2)
+
+            run(10)
+        }
+
+        (System.currentTimeMillis() - timeBefore)/1000.0 shouldBe 5.0.plusOrMinus(1.0)
+    }
+
+    @Test
+    fun `it should fail with exception if simulation is too slow `(){
+        createSimulation(true) {
+            object : Component() {
+                var waitCounter = 1
+                override fun process() = sequence {
+                    while(true) {
+                        hold(1)
+                        // doe something insanely complex that takes 2seconds
+                        Thread.sleep(waitCounter++ * 1000L)
+                    }
+                }
+            }
+
+            ClockSync(Duration.ofSeconds(1), maxDelay = Duration.ofSeconds(3))
+
+            shouldThrow<ClockOverloadException> {
+                run(10)
+            }
+        }
     }
 }

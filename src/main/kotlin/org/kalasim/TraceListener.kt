@@ -52,14 +52,6 @@ class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.F
     var hasPrintedHeader = false
     var lastElement: TraceElement? = null
 
-    val filters = mutableListOf<TraceFilter>()
-
-    init {
-        filters.add(TraceFilter { it.action?.contains("entering requesters") ?: false })
-        filters.add(TraceFilter { it.action?.contains("entering claimers") ?: false })
-        filters.add(TraceFilter { it.action?.contains("removed from requesters") ?: false })
-        filters.add(TraceFilter { it.action?.contains("removed from claimers") ?: false })
-    }
 
     override fun processTrace(traceElement: TraceElement) {
         if (!hasPrintedHeader) {
@@ -75,8 +67,6 @@ class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.F
             println(header.renderTraceLine())
             println(TRACE_COL_WIDTHS.map { "-".repeat(it - 1) }.joinToString(separator = " "))
         }
-
-        if(filters.any { it.matches(traceElement) }) return
 
         // do a diff for logging
         val printElement = if (diffRecords && lastElement != null) {

@@ -1,7 +1,6 @@
 package org.kalasim
 
 import org.apache.commons.math3.distribution.*
-import org.apache.commons.math3.random.RandomGenerator
 
 /** Distribution support API */
 
@@ -21,9 +20,10 @@ fun Environment.normal(mean: Number = 0, sd: Number = 1) = NormalDistribution(rg
 
 
 fun Component.discreteUniform(lower: Int, upper: Int) = env.discreteUniform(lower, upper)
-fun Environment.discreteUniform(lower: Int, upper: Int) = UniformIntegerDistribution(rg,lower, upper)
+fun Environment.discreteUniform(lower: Int, upper: Int) = UniformIntegerDistribution(rg, lower, upper)
 
 
-fun Component.uniform(lower: Number=0, upper: Number=1) = env.uniform(lower, upper)
-fun Environment.uniform(lower: Number=1, upper: Number=0) = UniformRealDistribution(rg,lower.toDouble(), upper.toDouble())
+fun Component.uniform(lower: Number = 0, upper: Number = 1) = env.uniform(lower, upper)
+fun Environment.uniform(lower: Number = 1, upper: Number = 0) =
+    UniformRealDistribution(rg, lower.toDouble(), upper.toDouble())
 

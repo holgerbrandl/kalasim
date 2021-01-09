@@ -6,7 +6,7 @@ import org.koin.core.component.inject
 
 
 class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
-    override fun process() = sequence{
+    override fun process() = sequence {
         waitingLine.add(this@Customer)
         passivate()
     }
@@ -18,7 +18,7 @@ class Clerk : Component() {
 
     override fun process() = sequence {
         while (true) {
-            while(waitingLine.isEmpty())
+            while (waitingLine.isEmpty())
                 standby()
 
             val customer = waitingLine.poll()
@@ -36,7 +36,7 @@ fun main() {
     }.createSimulation(true) {
         repeat(3) { Clerk() }
 
-        ComponentGenerator(uniform(5,15)){ Customer(get()) }
+        ComponentGenerator(uniform(5, 15)) { Customer(get()) }
 
     }
 

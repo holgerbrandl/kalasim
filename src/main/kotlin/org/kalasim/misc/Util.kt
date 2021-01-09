@@ -37,7 +37,7 @@ internal fun DescriptiveStatistics.buildHistogram(
 }
 
 
-internal fun ImplementMe() : Nothing =
+internal fun ImplementMe(): Nothing =
     TODO("Not yet implemented. Please file a ticket under https://github.com/holgerbrandl/kalasim/issues")
 
 

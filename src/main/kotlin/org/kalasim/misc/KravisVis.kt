@@ -58,19 +58,21 @@ fun <T> FrequencyLevelMonitor<T>.display() {
         val nlmStatsData = statsData()
         val data = nlmStatsData.stepFun()
 
-        data class Segment<T>(val value: T, val start:Double, val end:Double)
+        data class Segment<T>(val value: T, val start: Double, val end: Double)
 
-        val segments = data.zipWithNext().map { Segment(
-            it.first.second,
-            it.first.first,
-            it.second.first
-        ) }
+        val segments = data.zipWithNext().map {
+            Segment(
+                it.first.second,
+                it.first.first,
+                it.second.first
+            )
+        }
 
         segments.plot(
             x = Segment<T>::start,
             y = Segment<T>::value,
-            xend=  Segment<T>::end,
-            yend =Segment<T>::value
+            xend = Segment<T>::end,
+            yend = Segment<T>::value
         )
             .xLabel("time")
             .yLabel("")

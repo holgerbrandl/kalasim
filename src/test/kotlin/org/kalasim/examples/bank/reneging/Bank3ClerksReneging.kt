@@ -1,7 +1,6 @@
 //Bank3ClerksReneging.kt
 package org.kalasim.examples.bank.reneging
 
-import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
 import org.kalasim.misc.printThis
 import org.koin.core.component.get
@@ -18,7 +17,7 @@ class CustomerGenerator : Component() {
     override fun process() = sequence {
         while (true) {
             Customer(get())
-            hold(uniform( 5.0, 15.0).sample())
+            hold(uniform(5.0, 15.0).sample())
         }
     }
 }

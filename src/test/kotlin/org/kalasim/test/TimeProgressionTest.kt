@@ -12,8 +12,8 @@ class TimeProgressionTest {
         val tr = TraceCollector()
 
         class Car : Component() {
-//            override suspend fun SequenceScope<Component>.process(it: Component) {
-                override fun process() = sequence {
+            //            override suspend fun SequenceScope<Component>.process(it: Component) {
+            override fun process() = sequence {
 
                 while (true) {
                     // wait for 1 sec
@@ -31,7 +31,7 @@ class TimeProgressionTest {
 
             run(5.0)
 
-            now shouldNotBe  0.0
+            now shouldNotBe 0.0
         }
     }
 }

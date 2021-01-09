@@ -1,6 +1,5 @@
 //SimpleInject.kts
 import org.kalasim.Component
-import org.kalasim.ProcContext
 import org.kalasim.add
 import org.kalasim.configureEnvironment
 

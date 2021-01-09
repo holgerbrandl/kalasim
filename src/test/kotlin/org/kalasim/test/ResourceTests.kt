@@ -234,16 +234,16 @@ class ResourceTests {
     }
 
     @Test
-    fun `it should auto-release resources in builder`(){
+    fun `it should auto-release resources in builder`() {
 
         createSimulation(true) {
             val r = Resource()
 
-            object : Component(){
+            object : Component() {
                 override fun process() = sequence {
                     hold(2)
 
-                    request(ResourceRequest(r)){
+                    request(ResourceRequest(r)) {
                         hold(1)
                     }
                 }
@@ -261,13 +261,13 @@ class ResourceTests {
     }
 
     @Test
-    fun `it should correctly set failed after timeout`(){
+    fun `it should correctly set failed after timeout`() {
 
         createSimulation(true) {
             val r = Resource(capacity = 1)
             val dr = Resource(capacity = 1)
 
-            val c = object : Component(){
+            val c = object : Component() {
                 override fun process() = sequence {
                     request(r)
                     request(dr)
@@ -284,9 +284,9 @@ class ResourceTests {
                     request(dr, failDelay = 1)
                     failed shouldBe true
 
-                    request(r, failAt =  now + 1)
+                    request(r, failAt = now + 1)
                     failed shouldBe true
-                    request(dr, failAt =  now + 1)
+                    request(dr, failAt = now + 1)
                     failed shouldBe true
                 }
             }

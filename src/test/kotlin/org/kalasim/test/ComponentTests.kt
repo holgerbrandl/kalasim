@@ -15,7 +15,7 @@ class ComponentTests {
 
 
     @Test
-    fun `it should allow for an empty generator process`() = createTestSimulation(true){
+    fun `it should allow for an empty generator process`() = createTestSimulation(true) {
         val c = Component()
 //        object : Component(){}
 
@@ -108,8 +108,8 @@ class ComponentTests {
     }
 
     @Test
-    fun `it should  hold on someones elses behalf`() = createTestSimulation(true){
-        val c = object:  Component("other") {
+    fun `it should  hold on someones elses behalf`() = createTestSimulation(true) {
+        val c = object : Component("other") {
             override fun process() = sequence<Component> {
                 println("huhu")
                 hold(1)

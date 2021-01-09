@@ -1,4 +1,3 @@
-
 @file:Suppress("EXPERIMENTAL_API_USAGE")
 
 package org.kalasim
@@ -23,7 +22,7 @@ class DepletableResource(
     initialLevel: Number = capacity,
     preemptive: Boolean = false,
     koin: Koin = GlobalContext.get()
-) : Resource(name = name, capacity = capacity , preemptive = preemptive, anonymous = true, koin = koin) {
+) : Resource(name = name, capacity = capacity, preemptive = preemptive, anonymous = true, koin = koin) {
 
     init {
         //todo temporarily disable monitors
@@ -64,14 +63,14 @@ open class Resource(
 
 
     // https://stackoverflow.com/questions/41214452/why-dont-property-initializers-call-a-custom-setter
-    var claimedQuantity :Double = 0.0
+    var claimedQuantity: Double = 0.0
         internal set(x) {
             val diffQuantity = field - x
 
             field = x
 
             // this ugly hak is needed to avoid tracking of initialLevel setting in DR constructor
-            if(this is DepletableResource && diffQuantity == 0.0 && requesters.isEmpty()) return
+            if (this is DepletableResource && diffQuantity == 0.0 && requesters.isEmpty()) return
 
             if (field < EPS)
                 field = 0.0
@@ -86,7 +85,6 @@ open class Resource(
             // it would seem natural to tryReqeust here, but since this is not done in case of bumping,
             // we do it manually at the call-site instead
         }
-
 
 
     private fun updateCapacityMonitors() {
