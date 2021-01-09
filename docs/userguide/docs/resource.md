@@ -9,7 +9,7 @@ A resource has always a capacity (which can be zero and even negative). This cap
 There are two of types resources:
 
 * *Standard resources*, where each claim is associated with a component (the claimer). It is not necessary that the claimed quantities are integer.
-* *Anonymous resources*, where only the claimed quantity is registered. This is most useful for dealing with levels, lengths, etc.
+* [*Depletable resources*](#depletable-resources), where only the claimed quantity is registered. This is most useful for dealing with levels, lengths, etc.
 
 <!-- todo consider to add a dedicated container type instead of anonymous resources https://simpy.readthedocs.io/en/latest/topical_guides/resources.html#containers-->
 
@@ -258,9 +258,15 @@ to obtain the mean occupancy.
 
 Note that the occupancy is set to 0 if the capacity of the resource is <= 0.
 
-##  Anonymous resources
+##  Depletable Resources
 
-For anonymous resources, it may be not allowed to exceed the capacity and have a component wait for enough (claimed) capacity to be available. That may be accomplished by using a negative quantity in the `Component.request()` call.
+For depletable (which are also referred to as _anonymous_) resources, it may be not allowed to exceed the capacity and have a component wait for enough (claimed) capacity to be available. That may be accomplished by using a negative quantity in the `Component.request()` call.
+
+To create a depleteable resource we **{done}**
+```kotlin
+val tank = DepletableResource(capacity = 10, initialLevel = 5)
+```
+We can declare its maximum capacity and its initial fill level. The latter is optional and defaults to the capacity of the resource.
 
 Alternatively, it possible to use the `Component.put()` method, where quantities of anonymous resources are negated. For symmetry reasons, `kalasim` also offers the `Component.get()` method, which is behaves exactly like `Component.request()`.
 

@@ -12,6 +12,11 @@ import kotlin.math.absoluteValue
 // TODO Analyze we we support the same preemptible contract as simmer (Ucar2019, p11) (in particular restart)
 
 
+/**
+ * A resource with a maximum `capacity` and a fill level for which claims are not tracked and do not need to be released.
+ *
+ * For full contract and description see [user manual](https://www.kalasim.org/resource/#depletable-resource)
+ */
 class DepletableResource(
     name: String? = null,
     capacity: Number,

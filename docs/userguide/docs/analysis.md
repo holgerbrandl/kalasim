@@ -55,7 +55,9 @@ See chapter about [monitors](monitors.md).
 
 ## Visualization
 
-**{TBD}**
+There are two type of visualization
+
+* Statistical plots. See the [Movie Theater](examples/movie_theater.md)
 
 
 ## Replication
