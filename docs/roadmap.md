@@ -15,8 +15,8 @@ https://github.com/denisvstepanov/lets-plot-examples
 request(failAt=uniform().sample())
 ```
 
+**{done}** https://simpy.readthedocs.io/en/latest/examples/movie_renege.html && https://simjuliajl.readthedocs.io/en/stable/examples/2_movie_renege.html
 
-**{todo}** https://simpy.readthedocs.io/en/latest/examples/movie_renege.html && https://simjuliajl.readthedocs.io/en/stable/examples/2_movie_renege.html
 
 **{todo}** implement support for real-time simulations
 

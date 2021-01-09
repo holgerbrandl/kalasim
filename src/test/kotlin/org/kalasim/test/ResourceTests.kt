@@ -8,7 +8,7 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.misc.asCM
 
-class RequestTests {
+class ResourceTests {
 
     @Test
     fun `preemptive resources should bump claims`() {
@@ -257,6 +257,52 @@ class RequestTests {
 
             r.claimers.isEmpty() shouldBe true
             r.requesters.isEmpty() shouldBe true
+        }
+    }
+
+    @Test
+    fun `it should correctly set failed after timeout`(){
+
+        createSimulation(true) {
+            val r = Resource(capacity = 1)
+            val dr = Resource(capacity = 1)
+
+            val c = object : Component(){
+                override fun process() = sequence {
+                    request(r)
+                    request(dr)
+
+                    //now try again but since both resources are busy/depleted it should fail
+                    // irrespective of the delay or time
+                    request(r, failDelay = 0)
+                    failed shouldBe true
+                    request(dr, failDelay = 0)
+                    failed shouldBe true
+
+                    request(r, failDelay = 1)
+                    failed shouldBe true
+                    request(dr, failDelay = 1)
+                    failed shouldBe true
+
+                    request(r, failAt =  now + 1)
+                    failed shouldBe true
+                    request(dr, failAt =  now + 1)
+                    failed shouldBe true
+                }
+            }
+
+            run(5)
+
+            println(toString())
+
+            r.claimers.isEmpty() shouldBe true
+            r.requesters.isEmpty() shouldBe true
+
+            dr.claimers.isEmpty() shouldBe true
+            dr.requesters.isEmpty() shouldBe true
+
+            c.requests.shouldBeEmpty()
+            c.status shouldBe ComponentState.DATA
         }
     }
 }

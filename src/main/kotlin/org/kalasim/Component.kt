@@ -182,12 +182,11 @@ open class Component(
     // TODO v0.4 reenable
 
 
-
     /** Passivate a component.
      *
      * For `passivate` contract see [user manual](https://www.kalasim.org/component/#passivate)
      */
-    suspend fun SequenceScope<Component>.passivate() : Unit = yieldCurrent {
+    suspend fun SequenceScope<Component>.passivate(): Unit = yieldCurrent {
         this@Component.passivate()
     }
 
@@ -302,7 +301,7 @@ open class Component(
      *
      * For `cancel` contract see [user manual](https://www.kalasim.org/component/#cancel)
      */
-    suspend fun SequenceScope<Component>.cancel() : Unit = yieldCurrent {
+    suspend fun SequenceScope<Component>.cancel(): Unit = yieldCurrent {
         this@Component.cancel()
     }
 
@@ -333,7 +332,7 @@ open class Component(
      *
      * For `standby` contract see [user manual](https://www.kalasim.org/component/#standby)
      */
-    suspend fun SequenceScope<Component>.standby():Unit = yieldCurrent {
+    suspend fun SequenceScope<Component>.standby(): Unit = yieldCurrent {
         if (status != CURRENT) {
             requireNotData()
             requireNotMain()
@@ -403,9 +402,8 @@ open class Component(
         failDelay = failDelay,
         oneOf = oneOf,
         priority = priority,
-        honorBlock=honorBlock
+        honorBlock = honorBlock
     )
-
 
 
     /**
@@ -437,7 +435,7 @@ open class Component(
         failDelay = failDelay,
         oneOf = oneOf,
         priority = priority,
-        honorBlock= honorBlock
+        honorBlock = honorBlock
     )
 
 
@@ -469,7 +467,7 @@ open class Component(
         calledFrom: String? = null,
         // see https://stackoverflow.com/questions/46098105/is-there-a-way-to-open-and-close-a-stream-easily-at-kotlin
         honorBlock: (suspend SequenceScope<Component>.() -> Any)? = null
-    ){
+    ) {
         yieldCurrent {
             if (status != CURRENT) {
                 requireNotData()
@@ -481,9 +479,13 @@ open class Component(
             require(requests.isEmpty()) { "no pending requests are allowed when requesting" }
             require(requests.isEmpty()) { "no open claims are allowed when requesting" }
 
-            scheduledTime = env.now +
-                    (failAt?.toDouble() ?: Double.MAX_VALUE) +
-                    (failDelay?.toDouble() ?: 0.0)
+            require(failAt == null || failDelay == null) { "Either failAt or failDelay can be specified, not both together" }
+
+            scheduledTime = when {
+                failAt != null -> failAt.toDouble()
+                failDelay != null -> env.now + failDelay.toDouble()
+                else -> Double.MAX_VALUE
+            }
 
             failed = false
             oneOfRequest = oneOf
@@ -557,117 +559,119 @@ open class Component(
             tryRequest()
 
             if (requests.isNotEmpty()) {
-                reschedule(scheduledTime!!, priority = priority, urgent = urgent,
+                reschedule(
+                    scheduledTime!!, priority = priority, urgent = urgent,
                     caller = "request", newStatus = REQUESTING
                 )
             }
         }
 
-        if (honorBlock != null) {
-            // suspend{ ... }
-            honorBlock()
+    if (honorBlock != null)
+    {
+        // suspend{ ... }
+        honorBlock()
 
-            release(*resourceRequests)
+        release(*resourceRequests)
+    }
+}
+
+
+// TODO what is the reasoning here
+private fun honorAll(): List<Pair<Resource, Double>>? {
+    for ((r, requestedQuantity) in requests) {
+        if (requestedQuantity > r.capacity - r.claimedQuantity + EPS) {
+            return null
+        } else if (-requestedQuantity > r.claimedQuantity + EPS) {
+            return null
         }
     }
 
+    return requests.toList()
+}
 
-    // TODO what is the reasoning here
-    private fun honorAll(): List<Pair<Resource, Double>>? {
-        for ((r, requestedQuantity) in requests) {
-            if (requestedQuantity > r.capacity - r.claimedQuantity + EPS) {
-                return null
-            } else if (-requestedQuantity > r.claimedQuantity + EPS) {
-                return null
-            }
+private fun honorAny(): List<Pair<Resource, Double>>? {
+    for (request in requests) {
+        val (r, requestedQuantity) = request
+        if (requestedQuantity > r.capacity - r.claimedQuantity + EPS) {
+            return listOf(r to requestedQuantity)
+        } else if (-requestedQuantity <= r.claimedQuantity + EPS) {
+            return listOf(r to requestedQuantity)
         }
-
-        return requests.toList()
     }
 
-    private fun honorAny(): List<Pair<Resource, Double>>? {
-        for (request in requests) {
-            val (r, requestedQuantity) = request
-            if (requestedQuantity > r.capacity - r.claimedQuantity + EPS) {
-                return listOf(r to requestedQuantity)
-            } else if (-requestedQuantity <= r.claimedQuantity + EPS) {
-                return listOf(r to requestedQuantity)
-            }
-        }
+    return null
+}
 
-        return null
-    }
+internal open fun tryRequest(): Boolean {
+    if (status == INTERRUPTED) return false
 
-    internal open fun tryRequest(): Boolean {
-        if (status == INTERRUPTED) return false
+    val rHonor = if (oneOfRequest) honorAny() else honorAll()
 
-        val rHonor = if (oneOfRequest) honorAny() else honorAll()
+    if (rHonor.isNullOrEmpty()) return false
 
-        if (rHonor.isNullOrEmpty()) return false
-
-        requests
+    requests
 //            .filterNot { it.key.anonymous }
-            .forEach { (resource, quantity) ->
-                // proceed just if request was honored claim it
-                if (rHonor.any { it.first == resource }) {
-                    resource.claimedQuantity += quantity //this will also update the monitor
+        .forEach { (resource, quantity) ->
+            // proceed just if request was honored claim it
+            if (rHonor.any { it.first == resource }) {
+                resource.claimedQuantity += quantity //this will also update the monitor
 
-                    if (!resource.anonymous) {
-                        val thisPrio = resource.requesters.q.firstOrNull { it.component == this }?.priority
-                        claims.merge(resource, quantity, Double::plus)
+                if (!resource.anonymous) {
+                    val thisPrio = resource.requesters.q.firstOrNull { it.component == this }?.priority
+                    claims.merge(resource, quantity, Double::plus)
 
-                        //also register as claimer in resource if not yet present
-                        if (resource.claimers.q.none { it.component == this }) {
-                            resource.claimers.add(this, thisPrio)
-                        }
+                    //also register as claimer in resource if not yet present
+                    if (resource.claimers.q.none { it.component == this }) {
+                        resource.claimers.add(this, thisPrio)
                     }
                 }
-
-                resource.removeRequester(this)
             }
 
-        requests.clear()
-        remove()
+            resource.removeRequester(this)
+        }
 
-        val honorInfo = rHonor.firstOrNull()!!.first.name + (if (rHonor.size > 1) "++" else "")
+    requests.clear()
+    remove()
 
-        reschedule(now(), 0, false, "request honor $honorInfo", SCHEDULED)
+    val honorInfo = rHonor.firstOrNull()!!.first.name + (if (rHonor.size > 1) "++" else "")
 
-        // process negative put requests (todo can't we handle them separately)
-        rHonor.filter { it.first.anonymous }.forEach { it.first.tryRequest() }
+    reschedule(now(), 0, false, "request honor $honorInfo", SCHEDULED)
 
-        return true
-    }
+    // process negative put requests (todo can't we handle them separately)
+    rHonor.filter { it.first.anonymous }.forEach { it.first.tryRequest() }
+
+    return true
+}
 
 
-    /**
-     * Check whether component is bumped from a resource
-     *
-     * @param resource - resource to be checked; if omitted, checks whether component belongs to any resource claimers
-     *
-     * @return `true` if this component is not in the resource claimers
-     */
-    fun isBumped(resource: Resource? = null): Boolean = !isClaiming(resource)
+/**
+ * Check whether component is bumped from a resource
+ *
+ * @param resource - resource to be checked; if omitted, checks whether component belongs to any resource claimers
+ *
+ * @return `true` if this component is not in the resource claimers
+ */
+fun isBumped(resource: Resource? = null): Boolean = !isClaiming(resource)
 
-    /**
-     * Check whether component is claiming from a resource
-     *
-     * @param resource resource to be checked; if omitted, checks whether component belongs to any resource claimers
-     *
-     * @return `true` if this component is in the resource claimers
-     */
-    fun isClaiming(resource: Resource? = null): Boolean {
-        @Suppress("IfThenToElvis")
-        return if (resource == null) {
-            TODO("claiming test without resource is not yet implemented as this would require a registry in SimulationEntity")
+/**
+ * Check whether component is claiming from a resource
+ *
+ * @param resource resource to be checked; if omitted, checks whether component belongs to any resource claimers
+ *
+ * @return `true` if this component is in the resource claimers
+ */
+fun isClaiming(resource: Resource? = null): Boolean {
+    @Suppress("IfThenToElvis")
+    return if (resource == null) {
+        TODO("claiming test without resource is not yet implemented as this would require a registry in SimulationEntity")
 //            env.queue.filter{ it is ComponentQueue<*> }.map{(it as ComponentQueue<*>).contains(this)}
 //            for q in self._qmembers:
 //            if hasattr(q, "_isclaimers"): True
 //            return False
-        } else {
-            resource.claimers.contains(this)
-        }
+    } else {
+        resource.claimers.contains(this)
     }
+}
 
 
 //    @Deprecated("no longer needed, handled by queue directly")
@@ -675,158 +679,159 @@ open class Component(
 //    }
 
 
-    // kept in Component API for api compatibility with salabim
-    private fun remove() {
-        env.remove(this)
+// kept in Component API for api compatibility with salabim
+private fun remove() {
+    env.remove(this)
+}
+
+fun terminate() {
+    // we need to wrap claims as another map to avoid concurrent modification
+    claims.toMutableMap().forEach { (resource, _) ->
+        release(resource)
     }
 
-    fun terminate() {
-        claims.forEach { (resource, _) ->
-            release(resource)
-        }
+    status = DATA
+    scheduledTime = null
+    simProcess = null
 
-        status = DATA
-        scheduledTime = null
-        simProcess = null
+    printTrace(now(), env.curComponent, this, "ended")
+}
 
-        printTrace(now(), env.curComponent, this, "ended")
+private fun requireNotData() =
+    require(status != DATA) { "data component '$name' not allowed" }
+
+private fun requireNotMain() =
+    require(this != env.main) { "main component not allowed" }
+
+internal fun reschedule(
+    scheduledTime: Double,
+    priority: Int = DEFAULT_QUEUE_PRIORITY,
+    urgent: Boolean = false,
+    caller: String? = null,
+    newStatus: ComponentState,
+) {
+    require(scheduledTime >= env.now) { "scheduled time (${scheduledTime}) before now (${env.now})" }
+    require(this !in env.queue) { "component must not be in queue when reschudling but must be removed already at this point" }
+
+    status = newStatus
+
+    this.scheduledTime = scheduledTime
+
+    require(this.scheduledTime != null) { "reschedule with null time is unlikely to have meaningful semantics" }
+
+    if (this.scheduledTime != null) {
+        env.push(this, scheduledTime, priority, urgent)
     }
 
-    private fun requireNotData() =
-        require(status != DATA) { "data component '$name' not allowed" }
-
-    private fun requireNotMain() =
-        require(this != env.main) { "main component not allowed" }
-
-    internal fun reschedule(
-        scheduledTime: Double,
-        priority: Int = DEFAULT_QUEUE_PRIORITY,
-        urgent: Boolean = false,
-        caller: String? = null,
-        newStatus: ComponentState,
-    ) {
-        require(scheduledTime >= env.now) { "scheduled time (${scheduledTime}) before now (${env.now})" }
-        require(this !in env.queue) { "component must not be in queue when reschudling but must be removed already at this point" }
-
-        status = newStatus
-
-        this.scheduledTime = scheduledTime
-
-        require(this.scheduledTime != null) { "reschedule with null time is unlikely to have meaningful semantics" }
-
-        if (this.scheduledTime != null) {
-            env.push(this, scheduledTime, priority, urgent)
-        }
-
-        //todo implement extra
-        val extra = "scheduled for ${formatWithInf(scheduledTime)}"
-        // line_no: reference to source position
-        // 9+ --> continnue generator
-        // 13 --> no plus means: generator start
+    //todo implement extra
+    val extra = "scheduled for ${formatWithInf(scheduledTime)}"
+    // line_no: reference to source position
+    // 9+ --> continnue generator
+    // 13 --> no plus means: generator start
 
 
-        // calculate scheduling delta
-        val delta = if (this.scheduledTime == env.now || (this.scheduledTime == Double.MAX_VALUE)) "" else {
-            "+" + TRACE_DF.format(scheduledTime - env.now) + " "
-        }
-
-        // print trace
-        printTrace(now(), env.curComponent, this, caller + " " + delta, extra)
+    // calculate scheduling delta
+    val delta = if (this.scheduledTime == env.now || (this.scheduledTime == Double.MAX_VALUE)) "" else {
+        "+" + TRACE_DF.format(scheduledTime - env.now) + " "
     }
 
+    // print trace
+    printTrace(now(), env.curComponent, this, caller + " " + delta, extra)
+}
 
-    /**
-     * Activate component
-     *
-     * For `activate` contract see [user manual](https://www.kalasim.org/component/#activate)
-     *
-     * @param at Schedule time
-     * @param delay Schedule with a delay if omitted, no delay is used
-     * @param process Name of process to be started.
-     * * if None (default), process will not be changed
-     * * if the component is a data component, the generator function `process` will be used as the default process.
-     */
-    fun activate(
-        at: Number? = null,
-        delay: Number = 0,
-        priority: Int = 0,
-        urgent: Boolean = false,
-        keepRequest: Boolean = false,
-        keepWait: Boolean = false,
-        process: ProcessPointer? = null
+
+/**
+ * Activate component
+ *
+ * For `activate` contract see [user manual](https://www.kalasim.org/component/#activate)
+ *
+ * @param at Schedule time
+ * @param delay Schedule with a delay if omitted, no delay is used
+ * @param process Name of process to be started.
+ * * if None (default), process will not be changed
+ * * if the component is a data component, the generator function `process` will be used as the default process.
+ */
+fun activate(
+    at: Number? = null,
+    delay: Number = 0,
+    priority: Int = 0,
+    urgent: Boolean = false,
+    keepRequest: Boolean = false,
+    keepWait: Boolean = false,
+    process: ProcessPointer? = null
 //        process: ProcessPointer? = Component::process
 
-    ): Component {
+): Component {
 
-        require(status != CURRENT) {
-            // original contract
-            "Can not activate the CURRENT component. If needed simply use hold method."
-            // technically we could use suspend here , but since activate is used
-            // outside of process definitions we don't want to overcomplete the API for this
-            // rare edge case
+    require(status != CURRENT) {
+        // original contract
+        "Can not activate the CURRENT component. If needed simply use hold method."
+        // technically we could use suspend here , but since activate is used
+        // outside of process definitions we don't want to overcomplete the API for this
+        // rare edge case
+    }
+
+    var p: ProcessPointer? = null
+
+    if (process == null) {
+        if (status == DATA) {
+            //                require(this.simProcess != null) { "no process for data component" }
+            // note: not applicable, becuase the test would be if Component has a method called process, which it does by design
+
+            p = Component::process
         }
+    } else {
+        p = process
+    }
 
-        var p: ProcessPointer? = null
+    var extra = ""
 
-        if (process == null) {
-            if (status == DATA) {
-                //                require(this.simProcess != null) { "no process for data component" }
-                // note: not applicable, becuase the test would be if Component has a method called process, which it does by design
+    if (p != null) {
+        this.simProcess = ingestFunPointer(p)
 
-                p = Component::process
-            }
-        } else {
-            p = process
-        }
+        extra = "process=${p.name}"
+    }
 
-        var extra = ""
-
+    if (status != CURRENT) {
+        remove()
         if (p != null) {
-            this.simProcess = ingestFunPointer(p)
-
-            extra = "process=${p.name}"
-        }
-
-        if (status != CURRENT) {
-            remove()
-            if (p != null) {
-                if (!(keepRequest || keepWait)) {
-                    checkFail()
-                }
-            } else {
+            if (!(keepRequest || keepWait)) {
                 checkFail()
             }
-        }
-
-        val scheduledTime = if (at == null) {
-            env.now + delay.toDouble()
         } else {
-            at.toDouble() + delay.toDouble()
-        }
-
-        reschedule(scheduledTime, priority, urgent, "activate $extra", SCHEDULED)
-
-        return (this)
-    }
-
-    internal fun checkFail() {
-        if (requests.isNotEmpty()) {
-            printTrace("request failed")
-            requests.forEach { it.key.removeRequester(this) }
-            requests.clear()
-            failed = true
-        }
-
-        if (waits.isNotEmpty()) {
-            printTrace("wait failed")
-            waits.forEach { it.state.waiters.remove(this) }
-
-            waits.clear()
-            failed = true
+            checkFail()
         }
     }
 
-    // TODO v0.4 reenable
+    val scheduledTime = if (at == null) {
+        env.now + delay.toDouble()
+    } else {
+        at.toDouble() + delay.toDouble()
+    }
+
+    reschedule(scheduledTime, priority, urgent, "activate $extra", SCHEDULED)
+
+    return (this)
+}
+
+internal fun checkFail() {
+    if (requests.isNotEmpty()) {
+        printTrace("request failed")
+        requests.forEach { it.key.removeRequester(this) }
+        requests.clear()
+        failed = true
+    }
+
+    if (waits.isNotEmpty()) {
+        printTrace("wait failed")
+        waits.forEach { it.state.waiters.remove(this) }
+
+        waits.clear()
+        failed = true
+    }
+}
+
+// TODO v0.4 reenable
 //     fun hold(
 //        duration: Number? = null,
 //        till: Number? = null,
@@ -834,272 +839,272 @@ open class Component(
 //        urgent: Boolean = false
 //    ) {}
 
-    /**
-     * Hold the component.
-     *
-     * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
-     *
-     * @param duration Time to hold. Either `duration` or `till` must be specified.
-     * @param till Absolute time until the component should be held
-     * @param priority If a component has the same time on the event list, this component is sorted according to
-     * the priority. An event with a higher priority will be scheduled first.
-     */
-    suspend fun SequenceScope<Component>.hold(
-        duration: Number? = null,
-        till: Number? = null,
-        priority: Int = 0,
-        urgent: Boolean = false
-    ) = yieldCurrent {
-        this@Component.hold(duration, till, priority, urgent)
+/**
+ * Hold the component.
+ *
+ * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
+ *
+ * @param duration Time to hold. Either `duration` or `till` must be specified.
+ * @param till Absolute time until the component should be held
+ * @param priority If a component has the same time on the event list, this component is sorted according to
+ * the priority. An event with a higher priority will be scheduled first.
+ */
+suspend fun SequenceScope<Component>.hold(
+    duration: Number? = null,
+    till: Number? = null,
+    priority: Int = 0,
+    urgent: Boolean = false
+) = yieldCurrent {
+    this@Component.hold(duration, till, priority, urgent)
+}
+
+/**
+ * Hold the component.
+ *
+ * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
+ *
+ * @param duration Time to hold. Either `duration` or `till` must be specified.
+ * @param till Absolute time until the component should be held
+ * @param priority If a component has the same time on the event list, this component is sorted according to
+ * the priority. An event with a higher priority will be scheduled first.
+ */
+fun hold(
+    duration: Number? = null,
+    till: Number? = null,
+    priority: Int = 0,
+    urgent: Boolean = false
+) {
+    if (status != PASSIVE && status != CURRENT) {
+        requireNotData()
+        remove()
+        checkFail()
     }
 
-    /**
-     * Hold the component.
-     *
-     * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
-     *
-     * @param duration Time to hold. Either `duration` or `till` must be specified.
-     * @param till Absolute time until the component should be held
-     * @param priority If a component has the same time on the event list, this component is sorted according to
-     * the priority. An event with a higher priority will be scheduled first.
-     */
-     fun hold(
-         duration: Number? = null,
-         till: Number? = null,
-         priority: Int = 0,
-         urgent: Boolean = false
-     ) {
-        if (status != PASSIVE && status != CURRENT) {
-            requireNotData()
-            remove()
-            checkFail()
-        }
+    val scheduledTime = env.calcScheduleTime(till, duration)
 
-        val scheduledTime = env.calcScheduleTime(till, duration)
+    reschedule(scheduledTime, priority, urgent, "hold", SCHEDULED)
+}
 
-        reschedule(scheduledTime, priority, urgent, "hold", SCHEDULED)
+
+fun getThis() = this
+
+fun callProcess() = simProcess!!.call()
+
+/**
+ * Release a quantity from a resource or resources.
+ *
+ * It is not possible to release from an anonymous resource, this way.
+ * Use Resource.release() in that case.
+ *
+ * @param resource The resource to be released
+ * @param  quantity  quantity to be released. If not specified, the resource will be emptied completely.
+ * For non-anonymous resources, all components claiming from this resource will be released.
+ */
+fun release(resource: Resource, quantity: Double = Double.MAX_VALUE) = release(ResourceRequest(resource, quantity))
+
+
+/**
+ * Request from a resource or resources
+ *
+ *  Not allowed for data components or main.
+ */
+fun release(vararg resources: Resource) =
+    release(*resources.map { it withQuantity Double.MAX_VALUE }.toTypedArray())
+
+
+/**
+ * Release a quantity from a resource or resources.
+ *
+ * It is not possible to release from an anonymous resource, this way.
+ * Use Resource.release() in that case.
+ *
+ * @param  releaseRequests  A list of resource requests. Each request is formed by a
+ *  * resource
+ *  * an optional priority
+ *  * an optional quantity to be requested from the resource
+ *     </ul>
+ */
+fun release(vararg releaseRequests: ResourceRequest) {
+    for ((resource, quantity) in releaseRequests) {
+        require(!resource.anonymous) { " It is not possible to release from an anonymous resource, this way. Use Resource.release() in that case." }
+
+        releaseInternal(resource, quantity)
     }
 
+    if (releaseRequests.isEmpty()) {
+        printTrace("Releasing all claimed resources ${claims}")
 
-    fun getThis() = this
-
-    fun callProcess() = simProcess!!.call()
-
-    /**
-     * Release a quantity from a resource or resources.
-     *
-     * It is not possible to release from an anonymous resource, this way.
-     * Use Resource.release() in that case.
-     *
-     * @param resource The resource to be released
-     * @param  quantity  quantity to be released. If not specified, the resource will be emptied completely.
-     * For non-anonymous resources, all components claiming from this resource will be released.
-     */
-    fun release(resource: Resource, quantity: Double = Double.MAX_VALUE) = release(ResourceRequest(resource, quantity))
-
-
-    /**
-     * Request from a resource or resources
-     *
-     *  Not allowed for data components or main.
-     */
-    fun release(vararg resources: Resource) =
-        release(*resources.map { it withQuantity Double.MAX_VALUE }.toTypedArray())
-
-
-    /**
-     * Release a quantity from a resource or resources.
-     *
-     * It is not possible to release from an anonymous resource, this way.
-     * Use Resource.release() in that case.
-     *
-     * @param  releaseRequests  A list of resource requests. Each request is formed by a
-     *  * resource
-     *  * an optional priority
-     *  * an optional quantity to be requested from the resource
-     *     </ul>
-     */
-    fun release(vararg releaseRequests: ResourceRequest) {
-        for ((resource, quantity) in releaseRequests) {
-            require(!resource.anonymous) { " It is not possible to release from an anonymous resource, this way. Use Resource.release() in that case." }
-
-            releaseInternal(resource, quantity)
-        }
-
-        if (releaseRequests.isEmpty()) {
-            printTrace("Releasing all claimed resources ${claims}")
-
-            for ((r, _) in claims) {
-                releaseInternal(r)
-            }
+        for ((r, _) in claims) {
+            releaseInternal(r)
         }
     }
+}
 
-    // todo move this function into Resource
-    private fun releaseInternal(resource: Resource, q: Double? = null, bumpedBy: Component? = null) {
-        require(resource in claims) { "$name not claiming from resource ${resource.name}" }
+// todo move this function into Resource
+private fun releaseInternal(resource: Resource, q: Double? = null, bumpedBy: Component? = null) {
+    require(resource in claims) { "$name not claiming from resource ${resource.name}" }
 
-        val quantity = if (q == null) {
-            claims[resource]!!
-        } else if (q > claims[resource]!!) {
-            claims[resource]!!
-        } else {
-            q
-        }
-
-        resource.claimedQuantity -= quantity
-
-        claims[resource] = claims[resource]!! - quantity
-
-        if (claims[resource]!! < EPS) {
-            leave(resource.claimers)
-            claims.remove(resource)
-        }
-
-        // check for rounding errors salabim.py:12290
-        require(!resource.claimers.isEmpty() || resource.claimedQuantity == 0.0) { "rounding error in claimed quantity" }
-        // fix if(claimers.isEmpty()) field= 0.0
-
-        if (bumpedBy == null) resource.tryRequest()
+    val quantity = if (q == null) {
+        claims[resource]!!
+    } else if (q > claims[resource]!!) {
+        claims[resource]!!
+    } else {
+        q
     }
 
+    resource.claimedQuantity -= quantity
 
-    /**
-     * Wait for any or all of the given state values are met
-     *
-     * For `wait` contract see [user manual](https://www.kalasim.org/component/#wait)
-     *
-     * @sample TODO
-     *
-     * @param state state variable
-     * @param waitFor State value to wait for
-     * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
-     * @param failDelay  If the request is not honored before now+fail_delay,
-    the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
-     * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
-     */
-    // todo states may have different types so this methods does not make real sense here. 
-    //  Either remove type from state or enforce the user to call wait multiple times
-    suspend fun <T> SequenceScope<Component>.wait(
-        state: State<T>,
-        waitFor: T,
-        failAt: RealDistribution? = null,
-        failDelay: RealDistribution? = null
-    ) = wait(
-        StateRequest(state) { state.value == waitFor },
+    claims[resource] = claims[resource]!! - quantity
+
+    if (claims[resource]!! < EPS) {
+        leave(resource.claimers)
+        claims.remove(resource)
+    }
+
+    // check for rounding errors salabim.py:12290
+    require(!resource.claimers.isEmpty() || resource.claimedQuantity == 0.0) { "rounding error in claimed quantity" }
+    // fix if(claimers.isEmpty()) field= 0.0
+
+    if (bumpedBy == null) resource.tryRequest()
+}
+
+
+/**
+ * Wait for any or all of the given state values are met
+ *
+ * For `wait` contract see [user manual](https://www.kalasim.org/component/#wait)
+ *
+ * @sample TODO
+ *
+ * @param state state variable
+ * @param waitFor State value to wait for
+ * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
+ * @param failDelay  If the request is not honored before now+fail_delay,
+the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
+ * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
+ */
+// todo states may have different types so this methods does not make real sense here.
+//  Either remove type from state or enforce the user to call wait multiple times
+suspend fun <T> SequenceScope<Component>.wait(
+    state: State<T>,
+    waitFor: T,
+    failAt: RealDistribution? = null,
+    failDelay: RealDistribution? = null
+) = wait(
+    StateRequest(state) { state.value == waitFor },
 //        *states.map { StateRequest(it) }.toTypedArray(),
-        failAt = failAt,
-        failDelay = failDelay,
-    )
+    failAt = failAt,
+    failDelay = failDelay,
+)
 
 
-    /**
-     * Wait for any or all of the given state values are met
-     *
-     * For `wait` contract see [user manual](https://www.kalasim.org/component/#wait)
-     *
-     * @sample TODO
-     *
-     * @param stateRequests Requests indicating a state and a target condition or predicate for fulfilment
-     * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
-     * @param failDelay  If the request is not honored before now+fail_delay,
-    the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
-     * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
-     */
-    suspend fun SequenceScope<Component>.wait(
-        vararg stateRequests: StateRequest<*>,
-        //todo change to support distribution parameters instead
-        priority: Int = 0,
-        urgent: Boolean = false,
-        failAt: RealDistribution? = null,
-        failDelay: RealDistribution? = null,
-        all: Boolean = false
-    ) = yieldCurrent {
-        if (status != CURRENT) {
-            requireNotData()
-            requireNotMain()
-            remove()
-            checkFail()
+/**
+ * Wait for any or all of the given state values are met
+ *
+ * For `wait` contract see [user manual](https://www.kalasim.org/component/#wait)
+ *
+ * @sample TODO
+ *
+ * @param stateRequests Requests indicating a state and a target condition or predicate for fulfilment
+ * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
+ * @param failDelay  If the request is not honored before now+fail_delay,
+the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
+ * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
+ */
+suspend fun SequenceScope<Component>.wait(
+    vararg stateRequests: StateRequest<*>,
+    //todo change to support distribution parameters instead
+    priority: Int = 0,
+    urgent: Boolean = false,
+    failAt: RealDistribution? = null,
+    failDelay: RealDistribution? = null,
+    all: Boolean = false
+) = yieldCurrent {
+    if (status != CURRENT) {
+        requireNotData()
+        requireNotMain()
+        remove()
+        checkFail()
+    }
+
+    waitAll = all
+    scheduledTime = env.now + (failAt?.sample() ?: Double.MAX_VALUE) + (failDelay?.sample() ?: 0.0)
+
+    stateRequests
+        // skip already tracked states
+        .filterNot { sr -> waits.any { it.state == sr.state } }
+        .forEach { sr ->
+            val (state, srPriority, _) = sr
+            state.waiters.add(this@Component, srPriority)
+            waits.add(sr)
         }
 
-        waitAll = all
-        scheduledTime = env.now + (failAt?.sample() ?: Double.MAX_VALUE) + (failDelay?.sample() ?: 0.0)
+    tryWait()
 
-        stateRequests
-            // skip already tracked states
-            .filterNot { sr -> waits.any { it.state == sr.state } }
-            .forEach { sr ->
-                val (state, srPriority, _) = sr
-                state.waiters.add(this@Component, srPriority)
-                waits.add(sr)
+    if (waits.isNotEmpty()) {
+        reschedule(scheduledTime!!, priority = priority, urgent = urgent, caller = "wait", newStatus = WAITING)
+    }
+}
+
+internal fun tryWait(): Boolean {
+    if (status == INTERRUPTED) {
+        return false
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    val honored = if (waitAll) {
+        waits.all { sr ->
+            (sr as StateRequest<Any>).let {
+                it.predicate(it.state.value)
             }
-
-        tryWait()
-
-        if (waits.isNotEmpty()) {
-            reschedule(scheduledTime!!, priority = priority, urgent = urgent, caller = "wait", newStatus = WAITING)
+        }
+    } else {
+        waits.any { sr ->
+            (sr as StateRequest<Any>).let {
+                it.predicate(it.state.value)
+            }
         }
     }
 
-    internal fun tryWait(): Boolean {
-        if (status == INTERRUPTED) {
-            return false
+
+    if (honored) {
+        waits.forEach { sr ->
+            sr.state.waiters.remove(this)
         }
 
-        @Suppress("UNCHECKED_CAST")
-        val honored = if (waitAll) {
-            waits.all { sr ->
-                (sr as StateRequest<Any>).let {
-                    it.predicate(it.state.value)
-                }
-            }
-        } else {
-            waits.any { sr ->
-                (sr as StateRequest<Any>).let {
-                    it.predicate(it.state.value)
-                }
-            }
-        }
+        waits.clear()
+        remove()
 
-
-        if (honored) {
-            waits.forEach { sr ->
-                sr.state.waiters.remove(this)
-            }
-
-            waits.clear()
-            remove()
-            
-            reschedule(env.now, 0, false, "wait", SCHEDULED)
-        }
-
-        return honored
+        reschedule(env.now, 0, false, "wait", SCHEDULED)
     }
 
-    /**
-     * Leave queue
-     *
-     * @param q Queue queue to leave
-     */
-    fun leave(q: ComponentQueue<Component>) {
-        printTrace("leave ${q.name}")
-        q.remove(this)
+    return honored
+}
+
+/**
+ * Leave queue
+ *
+ * @param q Queue queue to leave
+ */
+fun leave(q: ComponentQueue<Component>) {
+    printTrace("leave ${q.name}")
+    q.remove(this)
+}
+
+
+public override val info: Jsonable
+    get() = ComponentInfo(this)
+
+
+private suspend fun SequenceScope<Component>.yieldCurrent(builder: () -> Unit = {}) {
+    val initialStatus = status
+
+    builder()
+
+    if (initialStatus == CURRENT) {
+        yield(this@Component)
     }
-
-
-    public override val info: Jsonable
-        get() = ComponentInfo(this)
-
-
-    private suspend fun SequenceScope<Component>.yieldCurrent(builder: () -> Unit = {}) {
-        val initialStatus = status
-
-        builder()
-
-        if (initialStatus == CURRENT) {
-            yield(this@Component)
-        }
-    }
+}
 }
 
 
@@ -1110,8 +1115,8 @@ open class ComponentInfo(c: Component) : Jsonable() {
     val creationTime = c.creationTime
     val scheduledTime = c.scheduledTime
 
-    val claims = c.claims.map{ it.key.name to it.value}.toMap()
-    val requests = c.requests.map{ it.key.name to it.value}.toMap()
+    val claims = c.claims.map { it.key.name to it.value }.toMap()
+    val requests = c.requests.map { it.key.name to it.value }.toMap()
 }
 
 //

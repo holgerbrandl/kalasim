@@ -33,3 +33,7 @@ In case you also wonder why `salabim` was named `salabim`, see [here](https://ww
 ## Can we use it with from Java?
 
 [Kotlin-2-Java interop](https://kotlinlang.org/docs/reference/java-to-kotlin-interop.html) is a core design goal of Kotlin. Thus, kalasim should work without any issues from java. However, we have not tried yet, so in case you struggle please file a ticket.
+
+## Why can we use resource.request(1)?
+
+Admittedly, the provided [resource](resource.md) request syntax `request(resource)` feels a bit dated. It's designed in that way because we would need [multiple receiver](https://youtrack.jetbrains.com/issue/KT-10468) support for extensions functions to provide a more object-oriented API. However, extensions with multiple receivers are not (yet) supported by Kotlin.
