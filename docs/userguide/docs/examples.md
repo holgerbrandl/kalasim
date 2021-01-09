@@ -17,9 +17,9 @@ Moderate
 Elaborate
 
 * [ATM](examples/atm_queue.md) - The canonical queue model. Here, illustrated with a cash machine that needs to serve customers.
-* [Gas Station](examples/gas_station.md)
-* [Bank Office with Resources](examples/bank_office.md#bank-office-with-resources)
-* [Bank Office with States](examples/bank_office.md#bank-office-with-states)
+* [Gas Station](examples/gas_station.md) - A gas-station again, but this time the focus is on the station itself and how it struggls to get new petrol to serve hungry customers.
+* [Bank Office](examples/bank_office.md#bank-office-with-resources) - A classical queue problem where customers need to be served. Here solved 4 times in different ways using different `kalasim` models.
+* [Dining Philosophers](examples/dining_philosophers.md) -  Philosophers sit at a round table with bowls of spaghetti and try to eat. It ain't easy...
 
 
 

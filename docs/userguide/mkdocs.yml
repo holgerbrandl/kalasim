@@ -39,13 +39,15 @@ nav:
 
   - Examples:
     - Overview: examples.md
-    - ATM Queue: examples/atm_queue.md
     - Traffic: examples/traffic.md
-    - Gas Station: examples/gas_station.md
+    - Bank Office: examples/bank_office.md
+    - Movie Theater: examples/movie_theater.md
     - Car Wash: examples/car_wash.md
+    - ATM Queue: examples/atm_queue.md
+    - Gas Station: examples/gas_station.md
     - Machine Parts: examples/machine_parts.md
     - Machine Shop: examples/machine_shop.md
-    - Bank Office: examples/bank_office.md
+    - Dining Philosophers: examples/dining_philosophers.md
   - Advanced:
     - advanced.md
   - About:
@@ -62,12 +64,17 @@ extra:
     - icon: fontawesome/brands/linkedin
       link: https://linkedin.com/in/holgerbrandl/
 
+# adopted from https://github.com/squidfunk/mkdocs-material/issues/748
+extra_css:
+  - 'stylesheets/extra.css'
+  -
 markdown_extensions:
   - markdown_include.include:
 #      base_path: examples/kotlin
       base_path: ../../src/test/kotlin/org/kalasim/examples
   - footnotes
   - admonition
+  - attr_list
   - pymdownx.highlight:
 #      linenums: true
   - pymdownx.superfences:

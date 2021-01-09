@@ -150,3 +150,11 @@ fun <A, B> cartesianProduct(
         }
     }
 
+//https://kotlinlang.slack.com/archives/C0B8Q383C/p1610224701103600
+fun <T> repeat(n:Int, builder: (Int) -> T) = (1..n).map{ builder(it)}
+
+
+// https://stackoverflow.com/questions/48007311/how-do-i-infinitely-repeat-a-sequence-in-kotlin
+fun <T> Iterable<T>.repeat() = sequence<T> {
+    while (true) yieldAll(this@repeat)
+}

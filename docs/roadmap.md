@@ -20,11 +20,11 @@ request(failAt=uniform().sample())
 
 **{done}** implement support for real-time simulations
 
+**{todo}**  <https://r-simmer.org/articles/simmer-08-philosophers.html>
+
 **{todo}**  implement `Demo preemptive resource animated.py`
 
 **{todo}** finish elevator example with visualization
-
-**{todo}**  <https://r-simmer.org/articles/simmer-08-philosophers.html>
 
 
 **{todo}** Add equivalent of simmer::select (See Ucar2019,p12) with multiple select policies `List<Resource>.select()`; Also detail out how DI for multiple elements by type (see https://stackoverflow.com/questions/54374067/how-to-retrieve-all-instances-that-matches-a-given-type-using-koin-dependency-in)
@@ -58,11 +58,9 @@ finished, that indicates whether the arrival exhausted its activities (or was re
 > Ucar I, Smeets B (2019b). simmer.plot: Plotting Methods for simmer. R package version 0.1.15, URL https://CRAN.R-project.org/package=simmer.plot
 
 
----
+## v0.6
 
 **{todo}** review simjulia <https://simjuliajl.readthedocs.io/en/stable/topical_guides/5_shared_resources.html#containers>
-
-## v0.6
 
 **{todo}** hide ` anonymous` in resources
 
@@ -70,7 +68,6 @@ finished, that indicates whether the arrival exhausted its activities (or was re
 
 **{todo}**  better document/discuss intent of `standby`
 * isn't it just like hold? What are the benefits?
-
 
 
 **{todo}** pluggable backend for visualization functions
@@ -85,7 +82,6 @@ val c = Component(){
     hold(1)
 }
 ```
-
 
 **{todo}** it should track renege stats in resource directly
 
