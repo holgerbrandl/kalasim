@@ -47,5 +47,14 @@ fun main() {
             println("Movie ${movie.name} sold out $soldOutSince minutes after ticket counter opening.")
             println("$numLeftQueue walked away after film was sold out.")
         }
+
+//        // Visualize ticket sales
+//        val plotData = theater.tickets.values.flatMap {
+//            it.occupancyMonitor.stepFun().map { sf -> Triple(it.name, sf.first, sf.second) }
+//        }
+//
+//        plotData.asDataFrame().plot(x = "second", y = "third")
+//            .geomStep().facetWrap("first").title("Theater Occupancy")
+//            .xLabel("Time (min)").yLabel("Occupancy").show()
     }
 }
