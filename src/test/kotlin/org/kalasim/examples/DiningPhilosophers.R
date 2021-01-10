@@ -53,7 +53,13 @@ env
 # queue status == requests
 
 env %>% get_mon_arrivals() %>% tbl_df
-env %>% get_mon_arrivals(per_resource = TRUE) %>% tbl_df
+env %>%
+    get_mon_arrivals(per_resource = TRUE) %>%
+    transform(
+    philosopher = sub("_[0-9]*", "", name),
+    state = factor(states, states)
+    ) %>%
+    tbl_df
 # # A tibble: 116 x 6
 # name         start_time end_time activity_time resource replication
 # <chr>             <dbl>    <dbl>         <dbl> <chr>          <int>
@@ -73,8 +79,10 @@ states <- c("hungry", "eating")
 
 philosophers_gantt <- function(env, size=15) env %>%
     get_mon_arrivals(per_resource = TRUE) %>%
-    transform(philosopher = sub("_[0-9]*", "", name),
-    state = factor(states, states)) %>%
+    transform(
+    philosopher = sub("_[0-9]*", "", name),
+    state = factor(states, states)
+    ) %>%
     ggplot(aes(y = philosopher, yend = philosopher)) +
     xlab("time") +
     geom_segment(aes(x = start_time, xend = end_time, color = state), size = size)
@@ -94,7 +102,7 @@ fork_seq$Aristotle <- rev(fork_seq$Aristotle)
 
 fork_seq$Aristotle <- rev(fork_seq$Aristotle)
 
-simulate(fork_seq, time=50) %>%
+simulate(fork_seq, time = 50) %>%
     print() %>%
     philosophers_gantt() + theme_bw()
 

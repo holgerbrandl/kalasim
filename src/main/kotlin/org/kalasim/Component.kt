@@ -619,7 +619,7 @@ open class Component(
                     log(
                         ResourceEvent(
                             env.now,
-                            this,
+                            this, resource,
                             env.curComponent,
                             CLAIMED,
                             quantity,
@@ -970,6 +970,7 @@ open class Component(
             ResourceEvent(
                 env.now,
                 this,
+                resource,
                 env.curComponent,
                 RELEASED,
                 quantity,

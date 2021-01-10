@@ -4,6 +4,7 @@ import com.github.holgerbrandl.jsonbuilder.json
 import org.json.JSONObject
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
+import org.koin.dsl.module
 import java.util.logging.Level
 import kotlin.math.absoluteValue
 
@@ -18,7 +19,8 @@ enum class ResourceEventType { CLAIMED, RELEASED, PUT }
 
 class ResourceEvent(
     time: Double,
-    requester: SimulationEntity?,
+    val requester: SimulationEntity,
+    val resource: Resource,
     curComponent: Component?,
     val type: ResourceEventType,
     val amount: Double,
@@ -128,14 +130,26 @@ class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.I
         .joinToString("")
 }
 
-fun Environment.traceCollector() = TraceCollector().apply { addEventConsumer(this) }
+//fun Environment.traceCollector() = TraceCollector().apply { addEventConsumer(this) }
+fun Environment.traceCollector(): TraceCollector {
+    val traceCollector = TraceCollector()
+    getKoin().loadModules(listOf(
+        module(createdAtStart = true) {
+            add{ traceCollector.apply { addEventConsumer(this) }}
+        }
+    ), createEagerInstances = true)
 
-class TraceCollector() : EventConsumer {
-    val traces = mutableListOf<Event>()
+    return traceCollector
+}
+
+class TraceCollector(val traces: MutableList<Event> = mutableListOf<Event>()) : EventConsumer,
+    MutableList<Event> by traces {
+//    val traces = mutableListOf<Event>()
 
     override fun consume(event: Event) {
         traces.add(event)
     }
 
-    operator fun get(index: Int): Event = traces[index]
+    operator fun invoke() = traces
+//    operator fun get(index: Int): Event = traces[index]
 }
