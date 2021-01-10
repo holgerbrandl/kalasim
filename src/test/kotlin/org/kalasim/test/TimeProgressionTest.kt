@@ -4,6 +4,7 @@ import io.kotest.matchers.shouldNotBe
 import org.junit.Test
 import org.kalasim.Component
 import org.kalasim.Environment
+import org.kalasim.TraceCollector
 
 class TimeProgressionTest {
 

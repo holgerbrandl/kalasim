@@ -5,16 +5,6 @@ import org.junit.Test
 import org.kalasim.*
 import kotlin.test.assertEquals
 
-class TraceCollector : TraceListener {
-    val traces = mutableListOf<TraceElement>()
-
-    override fun processTrace(traceElement: TraceElement) {
-        traces.add(traceElement)
-    }
-
-    operator fun get(index: Int): TraceElement = traces[index]
-}
-
 class GeneratorTest {
 
     class Customer : Component() {}

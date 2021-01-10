@@ -1,27 +1,51 @@
 package org.kalasim
 
+import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
 import java.util.logging.Level
 
 
 internal val TRACE_COL_WIDTHS = mutableListOf(10, 25, 45, 35)
 
+abstract class TraceDetails : Jsonable()
+
+class RequestClaimed(
+
+
+) : TraceDetails() {
+
+}
+
+class TraceElement(
+    time: Double,
+    curComponent: Component?,
+    source: SimulationEntity?,
+    val action: String?,
+    val details: String?
+) : AbstractTraceElement(time, curComponent, source) {
+
+    override fun renderAction() = action
+    override fun renderDetails() = details
+}
+
 //todo we should provide an api to resolve these references into a more slim log representation
-data class TraceElement(
+abstract class AbstractTraceElement(
     val time: Double,
     val curComponent: Component?,
-    val source: SimulationEntity?,
-    val action: String?,
-    val info: String?
-) {
+    val source: SimulationEntity?
+) : Jsonable() {
+
+    abstract fun renderAction(): String?
+    abstract fun renderDetails(): String?
+
     override fun toString(): String {
 
         return listOf(
             TRACE_DF.format(time),
             curComponent?.name,
-            ((source?.name ?: "") + " " + (action ?: "")).trim(),
+            ((source?.name ?: "") + " " + (renderAction() ?: "")).trim(),
 //            if(source is Component) source.status.toString() else "",
-            info
+            renderDetails()
         ).apply {
             1 + 1
         }.renderTraceLine().trim()
@@ -77,7 +101,7 @@ class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.F
                     if (ccChanged) curComponent else null,
                     if (ccChanged) null else source,
                     action,
-                    info
+                    details
                 )
             }
         } else {
@@ -89,4 +113,16 @@ class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.F
 
         println(printElement)
     }
+}
+
+fun Environment.traceCollector() = TraceCollector().apply { addTraceListener(this) }
+
+class TraceCollector() : TraceListener {
+    val traces = mutableListOf<TraceElement>()
+
+    override fun processTrace(traceElement: TraceElement) {
+        traces.add(traceElement)
+    }
+
+    operator fun get(index: Int): TraceElement = traces[index]
 }

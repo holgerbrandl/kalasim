@@ -1,7 +1,7 @@
 
 The [Dining Philosophers problem](https://en.wikipedia.org/wiki/Dining_philosophers_problem) is a classical example in computer science to illustrate synchronisation issues in concurrent processes. It was originally formulated in 1965 by [E. W. Dijkstra](https://en.wikipedia.org/wiki/Edsger_W._Dijkstra) as a student exam exercise, and was later reworked in its current form by [Tony Hoare](https://en.wikipedia.org/wiki/Tony_Hoare):
 
-> $N$ silent philosophers sit at a round table with bowls of spaghetti with tomato sauce and tasty cheese. Forks are placed between each pair of adjacent philosophers.
+> Some philosophers sit at a round table with bowls of spaghetti with tomato sauce and tasty cheese. Forks are placed between each pair of adjacent philosophers.
 >
 > Each philosopher must alternately think and eat. However, a philosopher can only eat spaghetti when they have both left and right forks. Each fork can be held by only one philosopher and so a philosopher can use the fork only if it is not being used by another philosopher. After an individual philosopher finishes eating, they need to put down both forks so that the forks become available to others. A philosopher can take the fork on their right or the one on their left as they become available, but cannot start eating before getting both forks.
 
@@ -21,6 +21,9 @@ Let us define each philosopher as a process executing a thinking + eating loop, 
 
 The following function sets up a simulation of $N$ dining philosophers as established above:
 
+```kotlin
+//{!DiningPhilosophers.kt!}
+```
 
 The `fork_seq` argument consists of a named list of fork sequences. For instance, given the numbering conventions in the image above, if we decide that philosopher 1, Socrates, must take fork 1 first and then fork 2, his fork sequence would be `Socrates = c(1, 2)`. This function also expects the simulation `time`, and there are other arguments to play with, such as the `thinking` and `eating` random processes, the `lag` between forks, and the seed.
 

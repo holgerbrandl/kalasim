@@ -33,7 +33,7 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
 
     fun printTrace(info: String) = env.apply { printTrace(now, curComponent, this@SimulationEntity, info) }
 
-    fun <T : Component> printTrace(element: T, info: String?) =
+    fun <T : Component> printTrace(element: T, info: String?, details: TraceDetails?=null) =
         env.apply { printTrace(now, curComponent, element, info, null) }
 
     /**
@@ -49,10 +49,17 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
         source: SimulationEntity?,
         action: String? = null,
         actionDetails: String? = null
+        
     ) {
         if (!monitor) return
 
         val tr = TraceElement(time, curComponent, source, action, actionDetails)
+
+        publishTraceRecord(tr)
+    }
+
+    protected fun publishTraceRecord(tr: TraceElement) {
+        if (!monitor) return
 
         env.publishTraceRecord(tr)
     }

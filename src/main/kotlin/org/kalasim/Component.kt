@@ -615,6 +615,8 @@ open class Component(
                 if (rHonor.any { it.first == resource }) {
                     resource.claimedQuantity += quantity //this will also update the monitor
 
+                    //todo implement more structured logging here
+
                     if (!resource.anonymous) {
                         val thisPrio = resource.requesters.q.firstOrNull { it.component == this }?.priority
                         claims.merge(resource, quantity, Double::plus)

@@ -1,3 +1,4 @@
+//DiningPhilosophers.kt
 package org.kalasim.examples
 
 import org.kalasim.*
@@ -7,11 +8,12 @@ import org.kalasim.misc.repeat
 fun main() {
     class Fork : Resource()
 
-    class Philosopher(val leftFork: Fork, val rightFork: Fork): Component(){
+    class Philosopher(val leftFork: Fork, val rightFork: Fork) : Component() {
         val thinking = exponential(1)
         val eating = exponential(1)
 
-        override fun process() =sequence<Component> {
+
+        override fun process() = sequence<Component> {
             while(true) {
                 hold(thinking())
                 request(leftFork) {
@@ -26,15 +28,22 @@ fun main() {
     }
 
     val env = createSimulation(true) {
+        val tc = traceCollector()
+
         // create forks and resources
-        val forks = (1..4).map{ Fork()} //.repeat().take(100).toList()
-        val philosophers = repeat(forks.size){
-            Philosopher(forks[it-1], forks[it.rem(forks.size)])
-        }
+        val names = listOf("Socrates", "Pythagoras", "Plato", "Aristotle")
+        val forks = repeat(names.size) { Fork() }.repeat().take(names.size + 1).toList()
+        val philosophers = repeat(forks.size) { Philosopher(forks[it - 1], forks[it.rem(forks.size)]) }
 
         run(100)
+
+
+        // Analysis
+
+        // gather monitoring data (as in simmer:get_mon_arrivals)
+
+        //        env.tc.traces.filter{ it.source is Resource}.map{ \}
+
+
     }
-
-    // Analysis
-
 }

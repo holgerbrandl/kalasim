@@ -25,8 +25,6 @@ class DepletableResource(
 ) : Resource(name = name, capacity = capacity, preemptive = preemptive, anonymous = true, koin = koin) {
 
     init {
-        //todo temporarily disable monitors
-
         claimedQuantity = capacity.toDouble() - initialLevel.toDouble()
     }
 }

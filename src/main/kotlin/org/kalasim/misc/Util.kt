@@ -151,6 +151,7 @@ fun <A, B> cartesianProduct(
     }
 
 //https://kotlinlang.slack.com/archives/C0B8Q383C/p1610224701103600
+// Same can be achieved with List(10){ foo() }
 fun <T> repeat(n:Int, builder: (Int) -> T) = (1..n).map{ builder(it)}
 
 
