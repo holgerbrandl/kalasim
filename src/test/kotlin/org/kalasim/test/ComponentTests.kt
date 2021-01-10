@@ -87,7 +87,7 @@ class ComponentTests {
         val tool = object : Component("tool") {
             override fun process() = sequence<Component> {
                 hold(10)
-                printTrace("production finished")
+                log("production finished")
             }
         }
 
@@ -126,7 +126,7 @@ class ComponentTests {
             }
         }
 
-        val tc = TraceCollector().apply { addTraceListener(this) }
+        val tc = TraceCollector().apply { addEventConsumer(this) }
 
         run(20)
 

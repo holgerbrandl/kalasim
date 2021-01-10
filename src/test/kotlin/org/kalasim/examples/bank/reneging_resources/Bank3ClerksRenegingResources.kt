@@ -16,7 +16,7 @@ class Customer(val clerks: Resource) : Component() {
     override fun process() = sequence {
         if (clerks.requesters.size >= 5) {
             numBalked++
-            printTrace("balked")
+            log("balked")
             cancel()
         }
 
@@ -24,7 +24,7 @@ class Customer(val clerks: Resource) : Component() {
 
         if (failed) {
             numReneged++
-            printTrace("reneged")
+            log("reneged")
         } else {
             hold(30)
             release(clerks)

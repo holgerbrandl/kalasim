@@ -1,6 +1,5 @@
 package org.kalasim.test
 
-import io.kotest.assertions.fail
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
@@ -84,9 +83,10 @@ class EnvTests {
         }
 
         println("continuing env1...")
-        env1.addTraceListener { println(it) }
+        env1.addEventConsumer { println(it) }
         shouldThrow<IllegalStateException> {
             env1.run(10)
+            println()
         }
 
         println(env1._koin)

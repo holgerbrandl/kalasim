@@ -62,7 +62,7 @@ class ResourceTests {
             override fun process() = sequence {
                 request(resource)
                 hold(1)
-                printTrace("finished process, terminating...")
+                log("finished process, terminating...")
             }
         }
 
@@ -99,12 +99,12 @@ class ResourceTests {
                 hold(postRequestHold)
 
                 if (isBumped(resource)) {
-                    printTrace("got bumped from $resource")
+                    log("got bumped from $resource")
                     if (failOnBump) Assert.fail()
                     return@sequence
                 }
 
-                printTrace("finished process, terminating...")
+                log("finished process, terminating...")
             }
         }
 
@@ -154,7 +154,7 @@ class ResourceTests {
             override fun process() = sequence {
                 request(r)
                 hold(5)
-                printTrace("finished process, terminating...")
+                log("finished process, terminating...")
             }
         }
 
@@ -176,7 +176,7 @@ class ResourceTests {
             override fun process() = sequence {
                 request(r)
                 hold(5)
-                printTrace("finished process, terminating...")
+                log("finished process, terminating...")
             }
         }
 

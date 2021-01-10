@@ -100,16 +100,16 @@ class Environment(
         get() = eventQueue.map { it.component }
 
 
-    private val traceListeners = listOf<TraceListener>().toMutableList()
+    private val traceListeners = listOf<EventConsumer>().toMutableList()
 
 
-    val traceFilters = mutableListOf<TraceFilter>()
+    val traceFilters = mutableListOf<EventFilter>()
 
     init {
-        traceFilters.add(TraceFilter { it.action?.contains("entering requesters") ?: false })
-        traceFilters.add(TraceFilter { it.action?.contains("entering claimers") ?: false })
-        traceFilters.add(TraceFilter { it.action?.contains("removed from requesters") ?: false })
-        traceFilters.add(TraceFilter { it.action?.contains("removed from claimers") ?: false })
+        traceFilters.add(EventFilter { it.renderAction()?.contains("entering requesters") ?: false })
+        traceFilters.add(EventFilter { it.renderAction()?.contains("entering claimers") ?: false })
+        traceFilters.add(EventFilter { it.renderAction()?.contains("removed from requesters") ?: false })
+        traceFilters.add(EventFilter { it.renderAction()?.contains("removed from claimers") ?: false })
     }
 
     var now = 0.0
@@ -132,7 +132,7 @@ class Environment(
 
 //        addTraceListener { print(it) }
         if (enableTraceLogger) {
-            addTraceListener(ConsoleTraceLogger(true))
+            addEventConsumer(ConsoleTraceLogger(true))
         }
 
         _koin = koin ?: run {
@@ -240,7 +240,7 @@ class Environment(
             time to c
         } else {
             val t = if (endOnEmptyEventlist) {
-                publishTraceRecord(TraceElement(now, curComponent, null, null, "run end; no events left"))
+                publishEvent(DefaultEvent(now, curComponent, null, null, "run end; no events left"))
                 now
             } else {
                 Double.MAX_VALUE
@@ -270,7 +270,7 @@ class Environment(
 
         curComponent = c
 
-        c.printTrace(c, info)
+        c.log(c, info)
     }
 
 
@@ -278,17 +278,17 @@ class Environment(
         standBy.add(component)
     }
 
-    fun addTraceListener(tr: TraceListener) = traceListeners.add(tr)
+    fun addEventConsumer(consumer: EventConsumer) = traceListeners.add(consumer)
 
     @Suppress("unused")
-    fun removeTraceListener(tr: TraceListener) = traceListeners.remove(tr)
+    fun removeTraceListener(tr: EventConsumer) = traceListeners.remove(tr)
 
 
-    internal fun publishTraceRecord(te: TraceElement) {
-        if (traceFilters.any { it.matches(te) }) return
+    internal fun publishEvent(event: Event) {
+        if (traceFilters.any { it.matches(event) }) return
 
         traceListeners.forEach {
-            it.processTrace(te)
+            it.consume(event)
         }
     }
 

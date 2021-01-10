@@ -52,7 +52,7 @@ object DeterministicRefuel {
             override fun process() = sequence {
                 hold(TANK_TRUCK_TIME)
 
-                val amount = fuelPump.claimedQuantity
+                val amount = fuelPump.claimed
                 put(fuelPump withQuantity amount)
             }
         }
@@ -75,7 +75,7 @@ object DeterministicRefuel {
 
                 // order a new Tank if the fuelpump runs of out fuel
                 if ((fuelPump.availableQuantity - litersRequired) / fuelPump.capacity * 100 < THRESHOLD) {
-                    printTrace("running out of fuel at $gasStation. Ordering new fuel truck...")
+                    log("running out of fuel at $gasStation. Ordering new fuel truck...")
                     TankTruck()
 
                     // track number of trucks
@@ -112,8 +112,8 @@ object DeterministicRefuel {
 
             fuelPump.apply {
                 capacityMonitor.printHistogram()
-                claimedQuantityMonitor.printHistogram()
-                availableQuantityMonitor.printHistogram()
+                claimedMonitor.printHistogram()
+                availableMonitor.printHistogram()
             }
 
 
@@ -123,8 +123,8 @@ object DeterministicRefuel {
             // save the simulation state to file
 //            Json.encodeToString(this).println()
 
-            get<GasStation>().claimedQuantityMonitor.display()
-            fuelPump.claimedQuantityMonitor.display()
+            get<GasStation>().claimedMonitor.display()
+            fuelPump.claimedMonitor.display()
             get<NumericLevelMonitor>(named(CAR_LEAVING)).display()
             get<NumericLevelMonitor>(named(TRUCKS_EN_ROUTE)).display()
             get<NumericLevelMonitor>(named(TRUCKS_ORDERED)).display()

@@ -13,19 +13,19 @@ import org.kalasim.*
 // * You can think of a channel as a pipe between two coroutines. T
 
 
-class MyTraceListener : TraceListener {
+class MyEventConsumer : EventConsumer {
     // think of it as a  Non Blocking Queue
-    val ordersChannel = Channel<TraceElement>()
+    val ordersChannel = Channel<Event>()
 
-    override fun processTrace(traceElement: TraceElement) {
+    override fun consume(event: Event) {
         GlobalScope.launch {
-            ordersChannel.offer(traceElement)
+            ordersChannel.offer(event)
         }
     }
 }
 
 
-val tl = MyTraceListener()
+val tl = MyEventConsumer()
 
 // start a log consumer
 GlobalScope.launch {
@@ -42,7 +42,7 @@ val sim = createSimulation {
 }
 
 // add custom log consumer
-sim.addTraceListener(tl)
+sim.addEventConsumer(tl)
 
 // run the simulation
 sim.run(100)

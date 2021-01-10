@@ -20,7 +20,7 @@ fun main() {
                     hold(0.1) // wait before taking the second fork
                     request(rightFork) {
                         hold(eating())
-                        printTrace("$name is eating")
+                        log("$name is eating")
                     }
                 }
             }

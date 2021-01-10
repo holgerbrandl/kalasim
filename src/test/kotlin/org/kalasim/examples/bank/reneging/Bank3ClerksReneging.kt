@@ -29,7 +29,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
         if (waitingLine.size >= 5) {
             numBalked++
 
-            printTrace("balked")
+            log("balked")
             cancel()
         }
 
@@ -49,7 +49,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
             waitingLine.leave(this@Customer)
 
             numReneged++
-            printTrace("reneged")
+            log("reneged")
         } else {
             // if customer no longer in waiting line,
             // serving has started meanwhile

@@ -35,7 +35,7 @@ class StateTests {
 //                val (state: State<String>, bar: Int?, predicate: (String) -> Boolean) = stateRequest
 
                 wait(stateRequest)
-                printTrace("passing crossing")
+                log("passing crossing")
 
 //                terminate()
             }
@@ -81,7 +81,7 @@ class StateTests {
 
             override fun process() = sequence {
                 wait(trafficLight turns "green", engine turns true, all = true)
-                printTrace("passing crossing")
+                log("passing crossing")
 //                terminate()
             }
         }
@@ -143,7 +143,7 @@ class StateTests {
 
             override fun process() = sequence {
                 wait(trafficLight turns "green", engine turns true, all = true)
-                printTrace("passing crossing")
+                log("passing crossing")
 //                terminate()
             }
         }

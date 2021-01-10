@@ -19,7 +19,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>, val workToDo: State<Bo
     override fun process() = sequence {
         if (waitingLine.size >= 5) {
             numBalked++
-            printTrace("balked")
+            log("balked")
             cancel()
         }
 
@@ -30,7 +30,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>, val workToDo: State<Bo
         if (waitingLine.contains(this@Customer)) {
             waitingLine.leave(this@Customer)
             numReneged++
-            printTrace("reneged")
+            log("reneged")
 
         } else {
             passivate()

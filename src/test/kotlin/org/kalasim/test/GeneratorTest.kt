@@ -16,7 +16,7 @@ class GeneratorTest {
 
         Environment().apply {
 
-            addTraceListener(tc)
+            addEventConsumer(tc)
 
             ComponentGenerator(iat = ExponentialDistribution(2.0), total = 4) { Customer() }
         }.run(100.0)

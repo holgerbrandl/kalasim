@@ -108,6 +108,8 @@ val c = Component(){
 
 ## Later
 
+**{todo}** use inline class for time, quantity, priorities and so so on
+
 **{todo}** should we support a resource queue limit ` queue_size = Inf)` (as in simmer ucar209,p19)
 
 ---

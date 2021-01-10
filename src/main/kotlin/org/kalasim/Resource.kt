@@ -6,7 +6,6 @@ import com.github.holgerbrandl.jsonbuilder.json
 import org.kalasim.misc.Jsonable
 import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
-import kotlin.math.absoluteValue
 
 // TODO Analyze we we support the same preemptible contract as simmer (Ucar2019, p11) (in particular restart)
 
@@ -25,7 +24,7 @@ class DepletableResource(
 ) : Resource(name = name, capacity = capacity, preemptive = preemptive, anonymous = true, koin = koin) {
 
     init {
-        claimedQuantity = capacity.toDouble() - initialLevel.toDouble()
+        claimed = capacity.toDouble() - initialLevel.toDouble()
     }
 }
 
@@ -51,7 +50,7 @@ open class Resource(
 
     var capacity = capacity.toDouble()
         set(value) {
-            require(value >= claimedQuantity) { "can not reduce capacity below current claims" }
+            require(value >= claimed) { "can not reduce capacity below current claims" }
 
             field = value
 
@@ -61,7 +60,7 @@ open class Resource(
 
 
     // https://stackoverflow.com/questions/41214452/why-dont-property-initializers-call-a-custom-setter
-    var claimedQuantity: Double = 0.0
+    var claimed: Double = 0.0
         internal set(x) {
             val diffQuantity = field - x
 
@@ -73,12 +72,12 @@ open class Resource(
             if (field < EPS)
                 field = 0.0
 
-            claimedQuantityMonitor.addValue(x)
+            claimedMonitor.addValue(x)
             updateCapacityMonitors()
 
 //            if(this is DepletableResource && )
-            val action = if (diffQuantity > 0) "released" else "claimed"
-            printTrace("$action ${diffQuantity.absoluteValue} from '$name'")
+//            val action = if (diffQuantity > 0) "released" else "claimed"
+//            log("$action ${diffQuantity.absoluteValue} from '$name'")
 
             // it would seem natural to tryReqeust here, but since this is not done in case of bumping,
             // we do it manually at the call-site instead
@@ -86,27 +85,27 @@ open class Resource(
 
 
     private fun updateCapacityMonitors() {
-        availableQuantityMonitor.addValue(availableQuantity)
+        availableMonitor.addValue(availableQuantity)
         occupancyMonitor.addValue(occupancy)
         capacityMonitor.addValue(capacity)
     }
 
     val occupancy: Double
-        get() = if (capacity < 0) 0.0 else claimedQuantity / capacity
+        get() = if (capacity < 0) 0.0 else claimed / capacity
 
     val availableQuantity: Double
-        get() = capacity - claimedQuantity
+        get() = capacity - claimed
 
 
     val capacityMonitor = NumericLevelMonitor("Capacity of ${super.name}", initialValue = capacity, koin = koin)
-    val claimedQuantityMonitor = NumericLevelMonitor("Claimed quantity of ${this.name}", koin = koin)
-    val availableQuantityMonitor =
+    val claimedMonitor = NumericLevelMonitor("Claimed quantity of ${this.name}", koin = koin)
+    val availableMonitor =
         NumericLevelMonitor("Available quantity of ${this.name}", initialValue = availableQuantity, koin = koin)
     val occupancyMonitor = NumericLevelMonitor("Occupancy of ${this.name}", koin = koin)
 
 
     init {
-        printTrace(
+        log(
             env.now,
             env.curComponent,
             this,
@@ -127,7 +126,7 @@ open class Resource(
         } else {
             while (iterator.hasNext()) {
                 //try honor as many requests as possible
-                if (minq > (capacity - claimedQuantity + EPS)) {
+                if (minq > (capacity - claimed + EPS)) {
                     break
                 }
                 iterator.next().component.tryRequest()
@@ -145,9 +144,9 @@ open class Resource(
     fun release(quantity: Number? = null) {
         // TODO Split resource types into QuantityResource and Resource or similar
         if (anonymous) {
-            val q = quantity?.toDouble() ?: claimedQuantity
+            val q = quantity?.toDouble() ?: claimed
 
-            claimedQuantity = -q
+            claimed = -q
 
             // done within decrementing claimedQuantity
 //            occupancyMonitor.addValue(if (capacity <= 0) 0 else claimedQuantity / capacity)
@@ -184,7 +183,7 @@ class ResourceInfo(resource: Resource) : Jsonable() {
     val name: String = resource.name
     val creationTime: Double = resource.creationTime
 
-    val claimedQuantity: Double = resource.claimedQuantity
+    val claimedQuantity: Double = resource.claimed
     val capacity = resource.capacity
 
     // use a dedicated type here to see null prios in json
@@ -208,8 +207,8 @@ class ResourceStatistics(resource: Resource) : Jsonable() {
     val claimers = resource.claimers.stats
 
     val capacity = resource.capacityMonitor.statistics(false)
-    val availableQuantity = resource.availableQuantityMonitor.statistics(false)
-    val claimedQuantity = resource.claimedQuantityMonitor.statistics(false)
+    val availableQuantity = resource.availableMonitor.statistics(false)
+    val claimedQuantity = resource.claimedMonitor.statistics(false)
     val occupancy = resource.occupancyMonitor.statistics(false)
 
 

@@ -52,7 +52,7 @@ open class State<T>(
      * @param max Maximum number of components to be honored for the trigger value
      */
     fun trigger(value: T, valueAfter: T = this.value, max: Int = Int.MAX_VALUE) {
-        printTrace(
+        log(
             env.now,
             env.curComponent,
             this,

@@ -112,7 +112,8 @@ internal fun Collection<Double>.median() = Median().evaluate(toDoubleArray())
 //@Serializable
 abstract class Jsonable {
 
-    open fun toJson(): JSONObject = JSONObject(GSON.toJson(this))
+    open fun toJson(): JSONObject =
+        JSONObject(GSON.toJson(this))
 
     override fun toString(): String {
         return toJson().toString(JSON_INDENT)

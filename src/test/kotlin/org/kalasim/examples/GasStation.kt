@@ -42,7 +42,7 @@ object GasStation {
             override fun process() = sequence {
                 hold(TANK_TRUCK_TIME)
 
-                val amount = fuelPump.claimedQuantity
+                val amount = fuelPump.claimed
                 put(fuelPump withQuantity amount)
             }
         }
@@ -65,7 +65,7 @@ object GasStation {
 
                 // order a new Tank if the fuelpump runs of out fuel
                 if ((fuelPump.availableQuantity - litersRequired) / fuelPump.capacity * 100 < THRESHOLD) {
-                    printTrace("running out of fuel at $gasStation. Ordering new fuel truck...")
+                    log("running out of fuel at $gasStation. Ordering new fuel truck...")
                     TankTruck()
                 }
 
@@ -91,8 +91,8 @@ object GasStation {
 
             fuelPump.apply {
                 capacityMonitor.printHistogram()
-                claimedQuantityMonitor.printHistogram()
-                availableQuantityMonitor.printHistogram()
+                claimedMonitor.printHistogram()
+                availableMonitor.printHistogram()
 
 //                capacityMonitor.display()
 //                claimedQuantityMonitor.display()

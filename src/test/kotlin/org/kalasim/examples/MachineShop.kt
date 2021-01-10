@@ -24,9 +24,9 @@ fun main() {
         override fun process(): Sequence<Component> = sequence {
             while (true) {
                 // start working on a new part
-                printTrace("building a new part")
+                log("building a new part")
                 hold(timePerPart())
-                printTrace("finished building part")
+                log("finished building part")
                 madeParts++
             }
         }
@@ -83,7 +83,7 @@ fun main() {
                     hold(JOB_DURATION)
 
                     if (isBumped(repairMan)) {
-                        printTrace("other job was bumped")
+                        log("other job was bumped")
                         continue
                     }
 

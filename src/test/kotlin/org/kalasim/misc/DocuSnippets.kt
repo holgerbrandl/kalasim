@@ -68,7 +68,7 @@ object EventLog {
         val sim = createSimulation { }
 
         // add custom log consumer
-        sim.addTraceListener(TraceListener { traceElement -> TODO("do something with") })
+        sim.addEventConsumer(EventConsumer { traceElement -> TODO("do something with") })
     }
 }
 

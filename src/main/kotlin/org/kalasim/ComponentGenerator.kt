@@ -55,7 +55,7 @@ class ComponentGenerator<T : Component>(
     }
 
     fun doFinalize(): Sequence<Component> = sequence {
-        printTrace(env.now, env.curComponent, this@ComponentGenerator, "till reached")
+        log(env.now, env.curComponent, this@ComponentGenerator, "till reached")
     }
 
     override val info: Jsonable

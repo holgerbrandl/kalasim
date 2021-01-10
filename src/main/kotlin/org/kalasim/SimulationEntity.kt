@@ -13,10 +13,13 @@ import org.koin.core.context.GlobalContext
 abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext.get()) : KoinComponent {
     val env = getKoin().get<Environment>()
 
+    /** The (possibly auto-generated) name of this simulation entity.*/
     val name = name ?: javaClass.defaultName(env.nameCache)
 
+    /** The time when the component was instantiated. */
     val creationTime = env.now
 
+    /** Indicates if log events from this entity should be tracked. */
     var monitor = true;
 
     protected abstract val info: Jsonable
@@ -31,37 +34,53 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
     final override fun getKoin(): Koin = simKoin
 
 
-    fun printTrace(info: String) = env.apply { printTrace(now, curComponent, this@SimulationEntity, info) }
+    /**
+     * Records a state-change event.
+     *
+     * @param action Describing the nature if the event
+     */
+    fun log(action: String) = env.apply { log(now, curComponent, this@SimulationEntity, action) }
 
-    fun <T : Component> printTrace(element: T, info: String?, details: TraceDetails?=null) =
-        env.apply { printTrace(now, curComponent, element, info, null) }
 
     /**
-     * Prints a trace line
+     * Records a state-change event.
      *
-     *  @param curComponent  Modification consuming component
-     *  @param source Modification causing simulation entity
-     *  @param action Detailing out the nature of the modification
+     * @param source Modification causing simulation entity
+     * @param action Describing the nature if the event
+     * @param details More details characterizing the state change
      */
-    fun printTrace(
+    fun <T : Component> log(source: T, action: String?, details: String? = null) =
+        env.apply { log(now, curComponent, source, action, details) }
+
+
+    /**
+     * Records a state-change event.
+     *
+     * @param time The current simulation time
+     * @param curComponent  Modification consuming component
+     * @param source Modification causing simulation entity
+     * @param action Describing the nature if the event
+     * @param details More details characterizing the state change
+     */
+    fun log(
         time: Double,
         curComponent: Component?,
         source: SimulationEntity?,
         action: String? = null,
-        actionDetails: String? = null
-        
+        details: String? = null
     ) {
-        if (!monitor) return
-
-        val tr = TraceElement(time, curComponent, source, action, actionDetails)
-
-        publishTraceRecord(tr)
+        if(monitor) log(DefaultEvent(time, curComponent, source, action, details))
     }
 
-    protected fun publishTraceRecord(tr: TraceElement) {
-        if (!monitor) return
 
-        env.publishTraceRecord(tr)
+    /**
+     * Records a state-change event.
+     *
+     * @param event A structure event log record. Users may want to sub-class `Event` to provide their
+     *              own structured log record formats.
+     */
+    fun log(event: Event) {
+        if(monitor) env.publishEvent(event)
     }
 }
 

@@ -26,7 +26,7 @@ fun main() {
     env.get<Resource>().apply {
         printInfo()
 
-        claimedQuantityMonitor.display()
+        claimedMonitor.display()
         requesters.queueLengthMonitor.display()
 
         printStatistics()

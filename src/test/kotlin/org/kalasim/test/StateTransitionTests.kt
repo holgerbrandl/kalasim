@@ -13,13 +13,12 @@ class StateTransitionTests {
     @Ignore
     @Test
     fun testCars() {
-
-        val traces = mutableListOf<TraceElement>()
+        val traces = mutableListOf<Event>()
 
         Environment().apply {
             class TestCar : Component()
 
-            addTraceListener { traceElement -> traces.add(traceElement) }
+            addEventConsumer { traces.add(it) }
 
             object : Component() {
                 override fun process() = sequence {
@@ -83,10 +82,10 @@ class StateTransitionTests {
 
                 val other = object : Component("other") {
                     override fun process() = sequence<Component> {
-                        printTrace("starting process!")
+                        log("starting process!")
                         hold(100)
 
-                        printTrace("other process continued")
+                        log("other process continued")
                         hold(100)
                     }
                 }
