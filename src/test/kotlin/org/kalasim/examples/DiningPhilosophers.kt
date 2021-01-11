@@ -35,12 +35,13 @@ fun main() {
 
         // create forks and resources
         val names = listOf("Socrates", "Pythagoras", "Plato", "Aristotle")
-        val forks = repeat(names.size) { Fork() }.repeat().take(names.size + 1).toList()
+        val forks = repeat(names.size) { Fork() } //.repeat().take(names.size + 1).toList()
+
         names.forEachIndexed { idx, name ->
             Philosopher(name, forks[idx], forks[(idx + 1).rem(forks.size)])
         }
 
-        run(1000)
+        run(50)
     }
 
     // Analysis (gather monitoring data (as in simmer:get_mon_arrivals)
