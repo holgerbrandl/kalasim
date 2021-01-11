@@ -128,3 +128,8 @@ consider modeling `Store` Using Stores you can model the production and consumpt
 ---
 
 Register project at awesome-kotlin
+
+
+---
+
+fix https://github.com/holgerbrandl/kravis/issues/25

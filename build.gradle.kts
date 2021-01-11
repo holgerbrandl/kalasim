@@ -12,8 +12,8 @@ plugins {
 }
 
 group = "org.kalasim"
-version = "0.5-SNAPSHOT"
-//version = "0.4.3"
+//version = "0.5-SNAPSHOT"
+version = "0.4.4"
 
 application {
     mainClassName = "foo.Bar" // not needed technically but makes gradle happy
@@ -44,8 +44,8 @@ dependencies {
     testImplementation(kotlin("test-junit"))
     testImplementation("io.kotest:kotest-assertions-core:4.2.6")
 
-    compileOnly( "com.github.holgerbrandl:kravis:0.7")
-    testImplementation( "com.github.holgerbrandl:kravis:0.6.1")
+    compileOnly( "com.github.holgerbrandl:kravis:0.7.1")
+    testImplementation( "com.github.holgerbrandl:kravis:0.7.1")
 
     //experimental dependencies  use for experimentation
     testImplementation( "com.thoughtworks.xstream:xstream:1.4.14")

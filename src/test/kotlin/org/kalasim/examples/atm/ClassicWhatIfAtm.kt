@@ -55,8 +55,8 @@ suspend fun main() {
         .addColumn("mean_queue_length") {
             // parameterize simulation
             val env = buildAtmSimulation(
-                it["lambda"].asDoubles().first()!!,
-                it["mu"].asDoubles().first()!!
+                it["lambda"].toDoubles().first()!!,
+                it["mu"].toDoubles().first()!!
             )
 
             env.run(100)

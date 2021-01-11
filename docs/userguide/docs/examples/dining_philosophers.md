@@ -25,41 +25,38 @@ The following function sets up a simulation of $N$ dining philosophers as establ
 //{!DiningPhilosophers.kt!}
 ```
 
-The `fork_seq` argument consists of a named list of fork sequences. For instance, given the numbering conventions in the image above, if we decide that philosopher 1, Socrates, must take fork 1 first and then fork 2, his fork sequence would be `Socrates = c(1, 2)`. This function also expects the simulation `time`, and there are other arguments to play with, such as the `thinking` and `eating` random processes, the `lag` between forks, and the seed.
+To enable a strictly typed simulation, we declare the [resource](../resource.md) `Fork` and [component](../component.md) `Philosopher`. The latter is associated to a process where the philosopher first thinks for some exponentially distributed time, takes a fork, meditates for a brief second, and finally takes the second fork once it becomes available. Both interactions modelled as [request](../component.md#request)s where we use a self-releasing request context. Once the philosopher has eaten, the whole process starts over again.
 
-The following function would allow us to plot a kind of Gantt chart of the simulation:
+A variable number of philosophers (here N=4) is instantiated and are equipped with forks on their left and right.
 
-```{r, message=FALSE}
-states <- c("hungry", "eating")
-philosophers_gantt <- function(env, size=15) env %>%
-  get_mon_arrivals(per_resource=TRUE) %>%
-  transform(philosopher = sub("_[0-9]*", "", name),
-            state = factor(states, states)) %>%
-  ggplot(aes(y=philosopher, yend=philosopher)) + xlab("time") +
-  geom_segment(aes(x=start_time, xend=end_time, color=state), size=size)
-```
+<!--With the simplest algorithm, each philosopher would take, for example, the right fork first and then the left one. But it is easy to see that this policy may result in starvation:-->
 
-With the simplest algorithm, each philosopher would take, for example, the right fork first and then the left one. But it is easy to see that this policy may result in starvation:
+<!--```{r, message=FALSE}-->
+<!--fork_seq <- list(-->
+<!--  Socrates   = c(1, 2),-->
+<!--  Pythagoras = c(2, 3),-->
+<!--  Plato      = c(3, 4),-->
+<!--  Aristotle  = c(4, 1)-->
+<!--)-->
+<!--simulate(fork_seq, time=50) %>%-->
+<!--  print() %>%-->
+<!--  philosophers_gantt() + theme_bw()-->
+<!--```-->
 
-```{r, message=FALSE}
-fork_seq <- list(
-  Socrates   = c(1, 2),
-  Pythagoras = c(2, 3),
-  Plato      = c(3, 4),
-  Aristotle  = c(4, 1)
-)
-simulate(fork_seq, time=50) %>%
-  print() %>%
-  philosophers_gantt() + theme_bw()
-```
+Our implementation follows the solution originally proposed by Dijkstra, which establishes the convention that all resources must be requested in order. This means that, in our simulation, Aristotle should pick fork 1 first instead. Without that convention, the simulation would stop soon at a point in which every philosopher holds one fork and waits for the other to be available.
 
-As we can see, the simulation stopped very soon at a point in which every philosopher holds one fork and waits for the other to be available. The solution originally proposed by Dijkstra establishes the convention that all resources must be requested in order. This means that, in our simulation, Aristotle should pick fork 1 first instead:
+<!--```{r, message=FALSE}-->
+<!--fork_seq$Aristotle <- rev(fork_seq$Aristotle)-->
+<!--simulate(fork_seq, time=50) %>%-->
+<!--  print() %>%-->
+<!--  philosophers_gantt() + theme_bw()-->
+<!--```-->
 
-```{r, message=FALSE}
-fork_seq$Aristotle <- rev(fork_seq$Aristotle)
-simulate(fork_seq, time=50) %>%
-  print() %>%
-  philosophers_gantt() + theme_bw()
-```
+Finally, we can transform the resulting [monitoring](../monitors.md) data with [`krangl`](http://holgerbrandl.github.io/krangl/) and visualize it with [`kravis`](https://github.com/holgerbrandl/kravis).
+
+![](spaghetti_time.png){: .center}
+
+
+See [here](https://github.com/holgerbrandl/kalasim/blob/master/simulations/notebooks/dining.ipynb) for a jupyter notebook implementation of this example.
 
 This example was adopted from the [simmer manual](https://r-simmer.org/articles/simmer-08-philosophers.html).

@@ -2,6 +2,8 @@
 package org.kalasim.examples
 
 import krangl.*
+import kravis.geomSegment
+import kravis.plot
 import org.kalasim.*
 import org.kalasim.misc.repeat
 import org.koin.core.component.get
@@ -38,7 +40,7 @@ fun main() {
             Philosopher(name, forks[idx], forks[(idx + 1).rem(forks.size)])
         }
 
-        run(100)
+        run(1000)
     }
 
     // Analysis (gather monitoring data (as in simmer:get_mon_arrivals)
@@ -50,20 +52,16 @@ fun main() {
         RequestRecord(it.requester.name, it.time, it.resource.name, amountDirected)
     }
 
+    // transform data into shape suiteable for interval plotting
     val requestsDf = requests.asDataFrame()
         .groupBy("requester")
         .sortedBy("requester", "timestamp")
         .addColumn("end_time") { it["timestamp"].lag() }
+        .addColumn("state") { rowNumber.map { if(it.rem(2) == 0) "hungry" else "eating" } }
         .filter { it["quantity"] gt 0 }
+        .ungroup()
 
-    // reshape into form suitable for plotting
-    requestsDf.schema()
-//        requestsDf.plot().geomSegment()
-
-    requestsDf.print()
-//        requestsDf.groupBy("requester").sortedBy("time").addColumns(
-//            "end_time" to { it["time"].lag() }
-//        )
-
-//        requestsDf.plot(x = "requester", x=)
+    // visualize with kravis
+    requestsDf.plot(x = "timestamp", xend = "end_time", y = "requester", yend = "requester", color = "state")
+        .geomSegment(size = 15.0).show()
 }
