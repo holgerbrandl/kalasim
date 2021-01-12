@@ -60,3 +60,10 @@ Finally, we can transform the resulting [monitoring](../monitors.md) data with [
 See [here](https://github.com/holgerbrandl/kalasim/blob/master/simulations/notebooks/dining.ipynb) for a jupyter notebook implementation of this example.
 
 This example was adopted from the [simmer manual](https://r-simmer.org/articles/simmer-08-philosophers.html).
+
+<!--!!! note-->
+<!--    -->
+<!--    The implemented fork selection policy \*will\* result in starvation, -->
+<!--    For some seeds and for some finite periods of time, \*may not\* result in  -->
+<!--    starvation. But if you run any seed for a long time, it \*will\*  -->
+<!--    eventually result in starvation. -->

@@ -54,7 +54,7 @@ Events can also be acculated by using `traceCollector()`
 For example to fetch all events related to resource requests we could filter by the corresponding event type
 
 ```kotlin
-//{!api/EventCollector.kt!}
+//{!api/EventCollector.kts!}
 ```
 
 ## Monitors
