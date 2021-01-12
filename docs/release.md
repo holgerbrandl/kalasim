@@ -1,9 +1,11 @@
 ## How to do a release?
 
-1. Make sure to increase version number in [setup](userguide/docs/setup.md) and [build.gradle.kts](../build.gradle.kts)
+1. Make sure to increase version number in [build.gradle.kts](../build.gradle.kts)
+
+2. Document [changes](../CHANGES.md)
 
 
-2. Do the release
+3. Do the release
 ```bash
 # adjust to te path of your working copy
 export KALASIM_HOME=/c/brandl_data/projects/scheduling/kalasim

@@ -1,10 +1,30 @@
 # Kalasim Release History
 
-## v0.4
+## v0.5
 
-Released 2021-01-21
+Released 2021-01-12
 
 Major Enhancements
+
+* Added first [jupyter notebook](https://github.com/holgerbrandl/kalasim/blob/master/simulations/notebooks/dining.ipynb) example
+* New [depletable resource](https://www.kalasim.org/resource/#depletable-resources) type
+* New [statistical distributions](https://www.kalasim.org/basics/#randomness-distributions) API
+* New more structured event logging. See [user manual](https://www.kalasim.org/analysis/#event-log)
+* Implemented support for [real-time simulations](https://www.kalasim.org/advanced/#clock-synchronization)
+* New example [Dining Philosophers](https://www.kalasim.org/examples/dining_philosophers/)
+* New example [Movie Theater](https://www.kalasim.org/examples/movie_theater/)
+* New API to add dependencies in simulation context using `dependency {}`
+
+Notable Fixes
+* Fixed `failAt` in `request`
+
+
+## v0.4
+
+Released 2021-01-03
+
+Major Enhancements
+
 * Implemented [`interrupt`](https://www.kalasim.org/component/#interrupt) interaction
 * Reworked documentation and examples
 * Implemented [`standby`](https://www.kalasim.org/component/#standby)
