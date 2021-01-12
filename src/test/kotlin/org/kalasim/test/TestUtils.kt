@@ -23,8 +23,8 @@ internal fun captureOutput(expr: () -> Any): CapturedOutput {
     // run the expression
     expr()
 
-    val stdout = String(baosOut.toByteArray()).trim()
-    val stderr = String(baosErr.toByteArray()).trim()
+    val stdout = String(baosOut.toByteArray()).trim().replace(System.lineSeparator() , "\n")
+    val stderr = String(baosErr.toByteArray()).trim().replace(System.lineSeparator() , "\n")
 
     System.setOut(origOut)
     System.setErr(origErr)
@@ -35,5 +35,5 @@ internal fun captureOutput(expr: () -> Any): CapturedOutput {
 // since the test reference dat is typically provided as multi-line which is using \n by design, we adjust the
 // out-err stream results accordingly here to become platform independent.
 // https://stackoverflow.com/questions/48933641/kotlin-add-carriage-return-into-multiline-string
-internal fun String.trimAndReline() = trimIndent().replace("\n", System.getProperty("line.separator"))
+//internal fun String.trimAndReline() = trimIndent().replace("\n", System.getProperty("line.separator"))
 

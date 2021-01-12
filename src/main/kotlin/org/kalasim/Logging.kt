@@ -4,12 +4,11 @@ import com.github.holgerbrandl.jsonbuilder.json
 import org.json.JSONObject
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
-import org.koin.dsl.module
 import java.util.logging.Level
 import kotlin.math.absoluteValue
 
 
-internal val TRACE_COL_WIDTHS = mutableListOf(10, 25, 45, 35)
+internal val TRACE_COL_WIDTHS = mutableListOf(10, 22,22, 45, 35)
 
 abstract class TraceDetails : Jsonable()
 
@@ -29,7 +28,7 @@ class ResourceEvent(
 ) : Event(time, curComponent, requester) {
 
     override fun renderAction() =
-        "$type ${amount.absoluteValue.roundAny(2)} from '${source?.name}'"
+        "${type.toString().toLowerCase().capitalize()} ${amount.absoluteValue.roundAny(2)} from '${source?.name}'"
 
     override fun renderDetails(): String? = null
 }
@@ -62,14 +61,14 @@ abstract class Event(
     override fun toJson(): JSONObject = json {
         "time" to time
         "current" to curComponent?.name
-        "source" to source?.name
+        "receiver" to source?.name
         "action" to renderAction()
         "details" to renderDetails()
     }
 }
 
 
-fun interface EventConsumer {
+fun interface EventListener {
     fun consume(event: Event)
 }
 
@@ -77,7 +76,7 @@ fun interface EventFilter {
     fun matches(event: Event): Boolean
 }
 
-class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.INFO) : EventConsumer {
+class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.INFO) : EventListener {
 
     var hasPrintedHeader = false
     var lastElement: Event? = null
@@ -91,8 +90,8 @@ class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.I
 
             val header = listOf(
                 "time",
-                "current component",
-//                "state",
+                "current",
+                "receiver",
                 "action",
                 "info"
             )
@@ -100,22 +99,26 @@ class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.I
             println(TRACE_COL_WIDTHS.map { "-".repeat(it - 1) }.joinToString(separator = " "))
         }
 
-        // update last element
-        lastElement = event
 
         with(event) {
-            val ccChanged = curComponent != lastElement!!.curComponent
+            val ccChanged = curComponent != lastElement?.curComponent
+            val receiverChanged = source != lastElement?.source
 
             val traceLine = listOf(
                 TRACE_DF.format(time),
                 if(ccChanged) curComponent?.name else null,
-                if(ccChanged) ((source?.name ?: "") + " " + (renderAction() ?: "")).trim() else null,
-//            renderAction(),
+                if(receiverChanged) source?.name else null,
+//                ((source?.name ?: "") + " " + (renderAction() ?: "")).trim(),
+                renderAction(),
                 renderDetails()
             ).renderTraceLine().trim()
 
             println(traceLine)
         }
+
+
+        // update last element
+        lastElement = event
     }
 
 
@@ -130,19 +133,14 @@ class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.I
         .joinToString("")
 }
 
-//fun Environment.traceCollector() = TraceCollector().apply { addEventConsumer(this) }
 fun Environment.traceCollector(): TraceCollector {
-    val traceCollector = TraceCollector()
-    getKoin().loadModules(listOf(
-        module(createdAtStart = true) {
-            add{ traceCollector.apply { addEventConsumer(this) }}
-        }
-    ), createEagerInstances = true)
+    val tc = dependency { TraceCollector() }
+    addEventListener(tc)
 
-    return traceCollector
+    return tc
 }
 
-class TraceCollector(val traces: MutableList<Event> = mutableListOf<Event>()) : EventConsumer,
+class TraceCollector(val traces: MutableList<Event> = mutableListOf<Event>()) : EventListener,
     MutableList<Event> by traces {
 //    val traces = mutableListOf<Event>()
 

@@ -47,7 +47,7 @@ If no process method is found for `Ship`, the ship will be a data component.
 In that case, it may become active by means of an `activate()` statement:
 
 ```kotlin
-//{!CraneProcess.kts!}
+//{!api/CraneProcess.kts!}
 ```
 
 Effectively, creation and start of `crane1` and `crane2` is the same.

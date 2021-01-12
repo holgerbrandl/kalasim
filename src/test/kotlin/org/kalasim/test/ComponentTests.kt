@@ -2,9 +2,7 @@ package org.kalasim.test
 
 import io.kotest.matchers.shouldBe
 import org.junit.Test
-import org.kalasim.Component
-import org.kalasim.ComponentState
-import org.kalasim.TraceCollector
+import org.kalasim.*
 import org.kalasim.misc.printThis
 
 class ComponentTests {
@@ -26,9 +24,56 @@ class ComponentTests {
     }
 
     @Test
+    fun `it should log to the console`() = captureOutput {
+
+        createTestSimulation(true) {
+            object : Component("tester") {
+                override fun process() = sequence<Component> {
+                    wait(State(true), true)
+                    hold(1)
+                    request(Resource()) {
+                        hold(1)
+                    }
+                }
+            }
+
+            run(5)
+        }
+    }.stdout shouldBe """
+time      current               receiver              action                                       info                               
+--------- --------------------- --------------------- -------------------------------------------- ----------------------------------
+.00                             main                  create
+.00       main
+.00                             tester                create
+.00                                                   activate                                     scheduled for .00
+.00                             main                  run +5.00                                    scheduled for 5.00
+.00       tester                tester
+.00                                                   Entering waiters of State.1
+.00                                                   removed from waiters of State.1
+.00                                                   wait                                         scheduled for .00
+.00
+.00                                                   hold +1.00                                   scheduled for 1.00
+1.00
+1.00                            Resource.1            Created                                      capacity=1
+1.00                            tester                Entering requesters of Resource.1
+1.00                                                  Requesting 1.0 from Resource.1 with prio...
+1.00                                                  Claimed 1.0 from 'tester'
+1.00                                                  Entering claimers of Resource.1
+1.00                                                  request honor Resource.1                     scheduled for 1.00
+1.00
+1.00                                                  hold +1.00                                   scheduled for 2.00
+2.00
+2.00                                                  Released 1.0 from 'tester'
+2.00                                                  leaving claimers of Resource.1
+2.00                                                  ended
+5.00      main                  main        
+""".trimIndent()
+
+
+    @Test
     fun `it should yield and terminate automagically`() = createTestSimulation {
         val c = object : Component("foo") {
-            override fun process() = sequence<Component> {
+            override fun process() = sequence {
                 hold(2)
             }
         }
@@ -126,7 +171,7 @@ class ComponentTests {
             }
         }
 
-        val tc = TraceCollector().apply { addEventConsumer(this) }
+        val tc = TraceCollector().apply { addEventListener(this) }
 
         run(20)
 

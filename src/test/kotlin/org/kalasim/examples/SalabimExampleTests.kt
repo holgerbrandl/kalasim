@@ -10,6 +10,8 @@ import org.json.JSONObject
 import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
+import org.kalasim.examples.bank.oneclerk.Clerk
+import org.kalasim.examples.bank.oneclerk.Customer
 import org.kalasim.examples.bank.reneging.CustomerGenerator
 import org.kalasim.misc.median
 import org.kalasim.test.captureOutput
@@ -26,8 +28,8 @@ class SalabimExampleTests {
     @Test
     fun `Bank_1_clerk should result in correct waiting line statistics`() {
         val env = configureEnvironment {
-            add { org.kalasim.examples.bank.oneclerk.Clerk() }
-            add { ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer>("waiting line") }
+            add { Clerk() }
+            add { ComponentQueue<Customer>("waiting line") }
         }.apply {
             org.kalasim.examples.bank.oneclerk.CustomerGenerator()
         }.run(50.0)
@@ -86,8 +88,8 @@ class SalabimExampleTests {
     fun `average waiting should be constant in bank with 1 clerk`() {
         val avgQueueMeans = (1..100 step 10).map { 1000.0 * it }.map { runtime ->
             runtime to declareDependencies {
-                add { org.kalasim.examples.bank.oneclerk.Clerk() }
-                add { ComponentQueue<org.kalasim.examples.bank.oneclerk.Customer>("waiting line") }
+                add { Clerk() }
+                add { ComponentQueue<Customer>("waiting line") }
             }.createSimulation {
 
                 org.kalasim.examples.bank.oneclerk.CustomerGenerator()
@@ -233,6 +235,6 @@ class SalabimExampleTests {
         // todo finish kts
         //  see https://kotlinexpertise.com/run-kotlin-scripts-from-kotlin-programs/
         //  see https://github.com/s1monw1/KtsRunner)
-        // org.kalasim.examples.Cars..main()
+        // org.kalasim.examples.org.kalasim.examples.api.Cars..main()
     }
 }

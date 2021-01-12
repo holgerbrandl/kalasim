@@ -13,7 +13,7 @@ import org.kalasim.*
 // * You can think of a channel as a pipe between two coroutines. T
 
 
-class MyEventConsumer : EventConsumer {
+class MyEventConsumer : EventListener {
     // think of it as a  Non Blocking Queue
     val ordersChannel = Channel<Event>()
 
@@ -42,7 +42,7 @@ val sim = createSimulation {
 }
 
 // add custom log consumer
-sim.addEventConsumer(tl)
+sim.addEventListener(tl)
 
 // run the simulation
 sim.run(100)

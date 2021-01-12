@@ -36,7 +36,7 @@ class MonitorTests {
                 AUDI              |       2 |  .29 | ***********                             
                 VW                |       1 |  .14 | ******                                  
                 PORSCHE           |       4 |  .57 | ***********************
-                """.trimAndReline()
+                """.trimIndent()
 
         captureOutput { m.printHistogram(values = listOf(AUDI, TOYOTA)) }.stdout shouldBe """
                 Summary of: 'FrequencyMonitor.1'
@@ -48,7 +48,7 @@ class MonitorTests {
                 AUDI              |       2 |  .29 | ***********                             
                 TOYOTA            |       0 |  .00 |                                         
                 rest              |       5 |  .71 | *****************************
-                """.trimAndReline()
+                """.trimIndent()
 
         captureOutput { m.printHistogram(sortByWeight = true) }.stdout shouldBe """
                 Summary of: 'FrequencyMonitor.1'
@@ -60,7 +60,7 @@ class MonitorTests {
                 PORSCHE           |       4 |  .57 | ***********************                 
                 AUDI              |       2 |  .29 | ***********                             
                 VW                |       1 |  .14 | ******
-                """.trimAndReline()
+                """.trimIndent()
     }
 
 

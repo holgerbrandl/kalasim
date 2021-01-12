@@ -83,7 +83,7 @@ class EnvTests {
         }
 
         println("continuing env1...")
-        env1.addEventConsumer { println(it) }
+        env1.addEventListener { println(it) }
         shouldThrow<IllegalStateException> {
             env1.run(10)
             println()

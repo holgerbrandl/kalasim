@@ -10,7 +10,7 @@ To facilitate this process, `kalasim` offers various means to analyze data creat
 
 ## Event Log
 
-To analyze a simulation, you may want to trace entity creation and process progression. You may also want to trace which process caused an event or which processes waited for an event. `kalasim` is collecting these data across all basic [simulation entities](basics.md) and in particular in the support process [interaction model](component.md#process-interaction).
+To analyze a simulation, you may want to monitor entity creation and process progression. You may also want to trace which process caused an event or which processes waited for an event. `kalasim` is collecting these data across all basic [simulation entities](basics.md) and in particular in the support process [interaction model](component.md#process-interaction).
 
 
 With console logging being enabled, we get the following output (displayed as table for convenience):
@@ -40,7 +40,7 @@ For larger simulations, console logging might not scale. Also, users may want to
 val sim = createSimulation(enableConsoleLogger = false) {  }
 
 // add custom log consumer
-sim.addTraceListener(TraceListener { traceElement -> TODO("do something with")  })
+sim.addEventListener(EventListener { event -> TODO("do something with")  })
 ```
 
 By supporting a pub-sub pattern, users can easily attach different monitoring backends such as files, databases, or in-place-analytics.
@@ -48,6 +48,19 @@ By supporting a pub-sub pattern, users can easily attach different monitoring ba
 <!-- TODO detail out monitoring backends https://github.com/r-simmer/simmer.mon-->
 
 Trace logs a suitable for standard kotlin collection processing. E.g. we can setup a [coroutines channel](https://kotlinlang.org/docs/reference/coroutines/channels.html) for log events that is is consumed asynchronously ([example](examples/misc.md#coroutine-channels)).
+
+Events can also be acculated by using `traceCollector()`
+
+For example to fetch all events related to resource requests we could filter by the corresponding event type
+
+```kotlin
+createSimulation{
+    traceCollector
+}
+val claims = environment.tc // get the trace collection
+        .filterIsInstance<ResourceEvent>()
+        .filter{ it.type == ResourceEventType.CLAIMED}
+```
 
 ## Monitors
 

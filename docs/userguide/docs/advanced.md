@@ -10,7 +10,7 @@ To support use cases where a simulation may drive a demonstration or system chec
 * If you want to analyze the real-time behavior of an algorithm
 
 ```kotlin hl_lines="11"
-//{!RealtimeSimulation.kts!}
+{!api/RealtimeSimulation.kts!}
 ```
 This example will execute in 10 seconds. Since the simulation is empty (for educational reasons), it is entirely idle during that time.
 

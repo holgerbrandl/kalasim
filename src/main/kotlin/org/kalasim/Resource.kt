@@ -109,7 +109,7 @@ open class Resource(
             env.now,
             env.curComponent,
             this,
-            "create",
+            "Created",
             "capacity=$capacity " + if (anonymous) "anonymous" else ""
         )
     }

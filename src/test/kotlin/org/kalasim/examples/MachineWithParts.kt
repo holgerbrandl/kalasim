@@ -1,7 +1,6 @@
 package org.kalasim.examples
 
 import org.kalasim.*
-import org.koin.core.component.get
 
 
 class Part(val machine: Machine, partNo: Int) :

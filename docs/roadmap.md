@@ -20,7 +20,9 @@ request(failAt=uniform().sample())
 
 **{done}** implement support for real-time simulations
 
-**{todo}**  <https://r-simmer.org/articles/simmer-08-philosophers.html>
+**{done}**  <https://r-simmer.org/articles/simmer-08-philosophers.html>
+
+## v0.6
 
 **{todo}**  implement `Demo preemptive resource animated.py`
 
@@ -58,7 +60,7 @@ finished, that indicates whether the arrival exhausted its activities (or was re
 > Ucar I, Smeets B (2019b). simmer.plot: Plotting Methods for simmer. R package version 0.1.15, URL https://CRAN.R-project.org/package=simmer.plot
 
 
-## v0.6
+## v0.7
 
 **{todo}** review simjulia <https://simjuliajl.readthedocs.io/en/stable/topical_guides/5_shared_resources.html#containers>
 

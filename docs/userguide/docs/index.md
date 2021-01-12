@@ -2,7 +2,7 @@
 
 [ ![Download](https://api.bintray.com/packages/holgerbrandl/github/kalasim/images/download.svg) ](https://bintray.com/holgerbrandl/github/kalasim/_latestVersion)  [![Build Status](https://github.com/holgerbrandl/kalasim/workflows/build/badge.svg)](https://github.com/holgerbrandl/kalasim/actions?query=workflow%3Abuild) [![Gitter](https://badges.gitter.im/kalasim.svg)](https://gitter.im/kalasim/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-`kalasim` is a [discrete event simulator](theory.md.#what-is-discrete-event-simulation) that enables complex, dynamic process models. It provides a statically typed API, dependency injection, modern persistence, structured logging and automation capabilities.
+`kalasim` is a [discrete event simulator](theory.md#what-is-discrete-event-simulation) that enables complex, dynamic process models. It provides a statically typed API, dependency injection, modern persistence, structured logging and automation capabilities.
 
 `kalasim` is written in [Kotlin](https://kotlinlang.org/), is designed around suspendable [coroutines](https://kotlinlang.org/docs/reference/coroutines-overview.html) for process definitions, runs on the [JVM](https://github.com/openjdk/jdk) for performance and scale, is built with [koin](https://github.com/InsertKoinIO/koin) as dependency wiring framework, is using [common-math](https://commons.apache.org/proper/commons-math/) for stats and distributions. See [acknowledgements](about.md#acknowledgements) for further references.
 
@@ -24,26 +24,13 @@ Find out more about the [basics](basics.md) of a `kalasim` simulation.
 
 ## First Example
 
-Let’s start with a very simple model, to demonstrate the basic structure, process interaction, component definition and output.
-
-We want to build a simulation where a single car is driving around for a some time before arriving at its destination.
+Let’s start with a very simple model. The example demonstrates the main mode of operation, the core API and the component process model implemented in `kalasim`. We want to build a simulation where a single car is driving around for a some time before arriving at its destination.
 
 ```kotlin
-//{!Cars.kts!}
+//{!api/Cars.kts!}
 ```
 
 <!--This example corresponds to the `Cars` `salabim` example https://www.salabim.org/manual/Modeling.html-->
-
-The example demonstrates the main mode of operation, the core API and the component state model implemented in `kalasim`. In the examples section you can find the [traffic example model](examples/traffic.md) that is integrating more elaborate  `kalasim` concepts such as [states](state.md) and [resources](resource.md).
-
-
-The main body of every `kalasim` model usually starts with:
-```
-createSimulation(enableConsoleLogger = true){
-...
-}
-```
-Here, we enable trace logging of state changes to see the status of simulation on the console.
 
 For each (active) component we (can) define a type such as:
 
@@ -53,9 +40,11 @@ class Car : Component()
 
 The class inherits from `org.kalasim.Component`.
 
+Our car depends on a [state](state.md) `TrafficLight` and [resource](resource.md) `Driver` for operation. To implement that, we first declare these dependencies with `dependency{}` in the main body of the simulation, and secondly [inject](basics.md#dependency-injection) them into our car with `get<T>`. Note, we could also directly inject states and resources with `dependency {State("red")}` without sub-classing.
+
 Although it is possible to define other processes within a class,
 the standard way is to define a generator function called `process` in the class.
-A generator is a function with at least one `yield` statement. These are used in the `kalasim` context as a signal to give control to the sequence mechanism.
+A generator is a function that returns `Sequence<Component>`. Within these process definitions we use [`suspend`](https://kotlinlang.org/docs/reference/coroutines/basics.html#your-first-coroutine)able interaction function calls as a [signal](basics.md#dependency-injection) to give control to the centralized [event loop](basics.md#event-queue).
 
 In this example,
 
@@ -63,35 +52,50 @@ In this example,
 hold(1.0)
 ```
 
-gives control, to the sequence mechanism and *comes back* after 1 time unit. We will see later other uses of yield like `passivate`,
-`request`, `wait` and `standby`.
+suspends execution control and *comes back* after 1 time unit (referred to as _tick_). Apart from [`hold`](component.md#hold),  it supports a rich vocabulary of interaction methods including [`passivate`](component.md#passivate), [`request`](component.md#request), [`wait`](component.md#wait) and [`component`](component.md#standby).
 
-In the main body an instance of a car is created by `Car()`. It automatically gets the name *Car.0*.
-As there is a generator function called process in Car, this process description will be activated (by default at time now, which is 0 here). It is possible to start a process later, but this is by far the most common way to start a process.
 
-With :
+The main body of every `kalasim` model usually starts with:
+```
+createSimulation(enableConsoleLogger = true){
+...
+}
+```
+Here, we enable event logging of state changes to see the status of simulation on the console. After declaring our dependencies, we instantiate a single car with `Car()`. It automatically gets the name *Car.0*.
+
+As there is a generator function called process in Car, this process description will be activated (by default at time `now`, which is `0` here). It is possible to start a process later, but this is by far the most common way to start a process.
+
+With
 
 ```kotlin
 run(5.0)
 ```
 
-we start the simulation and get back control after 5 time units. A component called *main* is defined under the hood to get access to the main process.
+we start the simulation and get back control after 5 ticks. A component called *main* is defined under the hood to get access to the main process.
 
 When we run this program, we get the following output (displayed as table for convenience):
 
 ```
-time      current component        component                action      info                          
---------- ------------------------ ------------------------ ----------- -----------------------------
-.00                                main                     DATA        create
-.00       main
-.00                                Car.1                    DATA        create
-.00                                Car.1                    DATA        activate
-.00                                main                     CURRENT     run +5.0
-.00       Car.1
-.00                                Car.1                    CURRENT     hold +1.0
-1.00                               Car.1                    CURRENT
-1.00                               Car.1                    DATA        ended
-5.00      main
+time   current  receiver  action                             info               
+------ -------- --------- ---------------------------------- -------------------
+.00             main      Created
+.00    main
+.00             Driver.1  Created                             capacity=1
+.00             Car.1     Created
+.00                       activate                           scheduled for .00
+.00             main      run +5.00                          scheduled for 5.00
+.00    Car.1    Car.1
+.00                       Requesting 1.0 from Driver.1 
+.00                       Claimed 1.0 from 'Car.1'
+.00                       Request honor Driver.1             scheduled for .00
+.00
+.00                       hold +1.00                         scheduled for 1.00
+1.00
+1.00                      Released 1.0 from 'Car.1'
+1.00                      Leaving claimers of Driver.1
+1.00                      entering waiters of TrafficLight.1
+1.00                      wait                               scheduled for <inf>
+5.00   main     main
 Process finished with exit code 0
 ```
 

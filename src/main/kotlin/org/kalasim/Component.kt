@@ -6,7 +6,11 @@ import org.kalasim.ResourceEventType.*
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
 import org.koin.core.Koin
+import org.koin.core.component.KoinApiExtension
+import org.koin.core.component.KoinComponent
 import org.koin.core.context.GlobalContext
+import org.koin.core.parameter.ParametersDefinition
+import org.koin.core.qualifier.Qualifier
 import java.util.*
 import kotlin.reflect.KFunction1
 
@@ -510,7 +514,7 @@ open class Component(
                 requests.merge(r, q, Double::plus)
 
                 val reqText =
-                    (calledFrom ?: "") + "requesting ${q} from ${r.name} with priority ${priority} and oneof=${oneOf}"
+                    (calledFrom ?: "") + "Requesting ${q} from ${r.name} with priority ${priority} and oneof=${oneOf}"
 
                 //            enterSorted(r.requesters, priority)
                 r.requesters.add(this@Component, priority = priority)
@@ -1112,7 +1116,7 @@ open class Component(
      * @param q Queue queue to leave
      */
     fun leave(q: ComponentQueue<Component>) {
-        log("leave ${q.name}")
+        log("leaving ${q.name}")
         q.remove(this)
     }
 
@@ -1130,6 +1134,14 @@ open class Component(
             yield(this@Component)
         }
     }
+
+    //redeclare to simplify imports
+    @OptIn(KoinApiExtension::class)
+    inline fun <reified T : Any> KoinComponent.get(
+        qualifier: Qualifier? = null,
+        noinline parameters: ParametersDefinition? = null
+    ): T =
+        getKoin().get(qualifier, parameters)
 }
 
 

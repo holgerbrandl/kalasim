@@ -26,7 +26,7 @@ class TimeProgressionTest {
         }
 
         Environment().apply {
-            addEventConsumer(tr)
+            addEventListener(tr)
 
             Car()
 

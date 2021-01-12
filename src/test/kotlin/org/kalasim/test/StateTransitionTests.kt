@@ -18,7 +18,7 @@ class StateTransitionTests {
         Environment().apply {
             class TestCar : Component()
 
-            addEventConsumer { traces.add(it) }
+            addEventListener { traces.add(it) }
 
             object : Component() {
                 override fun process() = sequence {

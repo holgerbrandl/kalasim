@@ -31,7 +31,7 @@ class ComponentQueue<C : Component>(
     val lengthOfStayMonitor = NumericStatisticMonitor("Length of stay in ${this.name}", koin = koin)
 
     fun add(component: C, priority: Int? = null): Boolean {
-        log(component, "entering $name")
+        log(component, "Entering $name")
 
         val added = q.add(CQElement(component, env.now, priority))
 
@@ -78,7 +78,7 @@ class ComponentQueue<C : Component>(
 
     /** Makes the argument leaving this queue. */
     fun leave(c: C) {
-        log(c, "leaving $name")
+        log(c, "Leaving $name")
         q.find { it.component == c }?.let { q.remove(it) }
     }
 

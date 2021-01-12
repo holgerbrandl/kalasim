@@ -100,7 +100,7 @@ class Environment(
         get() = eventQueue.map { it.component }
 
 
-    private val traceListeners = listOf<EventConsumer>().toMutableList()
+    private val eventListeners = listOf<EventListener>().toMutableList()
 
 
     val traceFilters = mutableListOf<EventFilter>()
@@ -132,7 +132,7 @@ class Environment(
 
 //        addTraceListener { print(it) }
         if (enableConsoleLogger) {
-            addEventConsumer(ConsoleTraceLogger(true))
+            addEventListener(ConsoleTraceLogger(true))
         }
 
         _koin = koin ?: run {
@@ -278,16 +278,16 @@ class Environment(
         standBy.add(component)
     }
 
-    fun addEventConsumer(consumer: EventConsumer) = traceListeners.add(consumer)
+    fun addEventListener(listener: EventListener) = eventListeners.add(listener)
 
     @Suppress("unused")
-    fun removeTraceListener(tr: EventConsumer) = traceListeners.remove(tr)
+    fun removeEventListener(tr: EventListener) = eventListeners.remove(tr)
 
 
     internal fun publishEvent(event: Event) {
         if (traceFilters.any { it.matches(event) }) return
 
-        traceListeners.forEach {
+        eventListeners.forEach {
             it.consume(event)
         }
     }
@@ -390,4 +390,15 @@ inline fun <reified T> KoinModule.add(
 ) {
     single(qualifier = qualifier, createdAtStart = true, definition = definition)
 
+}
+
+public inline fun <reified T> Environment.dependency(builder : Environment.()-> T) : T {
+    val something = builder(this)
+    getKoin().loadModules(listOf(
+        module(createdAtStart = true) {
+            add { something }
+        }
+    ), createEagerInstances = true)
+
+    return something
 }
