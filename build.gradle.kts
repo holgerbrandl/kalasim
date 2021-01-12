@@ -13,7 +13,7 @@ plugins {
 
 group = "org.kalasim"
 //version = "0.5-SNAPSHOT"
-version = "0.4.4"
+version = "0.5"
 
 application {
     mainClassName = "foo.Bar" // not needed technically but makes gradle happy

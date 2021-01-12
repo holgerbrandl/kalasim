@@ -8,11 +8,9 @@
 # adjust to te path of your working copy
 export KALASIM_HOME=/c/brandl_data/projects/scheduling/kalasim
 
-
-## Increment version in readme, gradle, example-poms and
-
 cd $KALASIM_HOME
 
+# run tests
 ./gradlew check
 
 
@@ -21,11 +19,13 @@ kalasim_version='v'$(grep '^version' ${KALASIM_HOME}/build.gradle.kts | cut -f3 
 
 echo "new version is $kalasim_version !"
 
+
 if [[ $kalasim_version == *"-SNAPSHOT" ]]; then
   echo "ERROR: Won't publish snapshot build $kalasim_version}!" 1>&2
   exit 1
 fi
 
+kscript src/test/kotlin/org/kalasim/misc/PatchVersion.kts "${kalasim_version:1}"
 
 git status
 git commit -am "${kalasim_version} release"

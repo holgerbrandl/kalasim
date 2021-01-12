@@ -66,7 +66,7 @@ time      current               receiver              action                    
 2.00                                                  Released 1.0 from 'tester'
 2.00                                                  leaving claimers of Resource.1
 2.00                                                  ended
-5.00      main                  main        
+5.00      main                  main
 """.trimIndent()
 
 

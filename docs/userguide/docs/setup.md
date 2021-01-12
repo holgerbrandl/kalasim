@@ -5,7 +5,13 @@
 
 To get started simply add it as a dependency via Jcenter:
 ```
-implementation "com.github.holgerbrandl:kalasim:0.4.3"
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation "org.kalasim:kalasim:0.5"
+}
 ```
 
 
