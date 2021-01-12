@@ -39,7 +39,7 @@ The example demonstrates the main mode of operation, the core API and the compon
 
 The main body of every `kalasim` model usually starts with:
 ```
-createSimulation(enableTraceLogger = true){
+createSimulation(enableConsoleLogger = true){
 ...
 }
 ```

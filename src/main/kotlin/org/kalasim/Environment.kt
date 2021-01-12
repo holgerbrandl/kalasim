@@ -23,16 +23,16 @@ const val MAIN = "main"
 typealias KoinModule = org.koin.core.module.Module
 
 //internal class EnvBuildContext : KoinModule() {
-//    var enableTraceLogger: Boolean = true
+//    var enableConsoleLogger: Boolean = true
 //}
 // --> not possible because Module is not open
 
 // https://github.com/InsertKoinIO/koin/issues/801
 fun configureEnvironment(
-    enableTraceLogger: Boolean = false,
+    enableConsoleLogger: Boolean = false,
     builder: KoinModule.() -> Unit
 ): Environment =
-    declareDependencies(builder).createSimulation(enableTraceLogger) {}
+    declareDependencies(builder).createSimulation(enableConsoleLogger) {}
 
 fun declareDependencies(
     builder: KoinModule.() -> Unit
@@ -40,12 +40,12 @@ fun declareDependencies(
 
 
 fun KoinModule.createSimulation(
-    enableTraceLogger: Boolean = false,
+    enableConsoleLogger: Boolean = false,
     useCustomKoin: Boolean = false,
     randomSeed: Int = DEFAULT_SEED,
     builder: Environment.() -> Unit
 ): Environment = createSimulation(
-    enableTraceLogger = enableTraceLogger,
+    enableConsoleLogger = enableConsoleLogger,
     dependencies = this,
     useCustomKoin = useCustomKoin,
     randomSeed = randomSeed,
@@ -53,14 +53,14 @@ fun KoinModule.createSimulation(
 )
 
 fun createSimulation(
-    enableTraceLogger: Boolean = false,
+    enableConsoleLogger: Boolean = false,
     dependencies: KoinModule? = null,
     useCustomKoin: Boolean = false,
     randomSeed: Int = DEFAULT_SEED,
     builder: Environment.() -> Unit
 ): Environment =
     Environment(
-        enableTraceLogger = enableTraceLogger,
+        enableConsoleLogger = enableConsoleLogger,
         dependencies = dependencies,
         randomSeed = randomSeed,
         koin = if (useCustomKoin) koinApplication { }.koin else null
@@ -77,7 +77,7 @@ object Defaults {
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class Environment(
-    enableTraceLogger: Boolean = false,
+    enableConsoleLogger: Boolean = false,
     dependencies: KoinModule? = null,
     koin: Koin? = null,
     randomSeed: Int = DEFAULT_SEED
@@ -131,7 +131,7 @@ class Environment(
         // start console logger
 
 //        addTraceListener { print(it) }
-        if (enableTraceLogger) {
+        if (enableConsoleLogger) {
             addEventConsumer(ConsoleTraceLogger(true))
         }
 

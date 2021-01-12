@@ -12,6 +12,6 @@ class Car : Component() {
     }
 }
 
-createSimulation(enableTraceLogger = true) {
+createSimulation(enableConsoleLogger = true) {
     Car()
 }.run(5.0)

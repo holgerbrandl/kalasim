@@ -8,8 +8,6 @@
 
 ## Acknowledgements
 
-Order decreasingly by relevance for the development of `kalasim`.
-
 ### salabim
 
 `kalasim` started off as a blunt rewrite of [salabim](https://www.salabim.org/). We are deeply thankful for its permissive licence that enabled setting up `kalasim`. A great starting point was in particular the wonderful article [salabim: discrete event simulation and animation in Python](https://www.semanticscholar.org/paper/salabim%3A-discrete-event-simulation-and-animation-in-Ham/b513ce3d7cd56c478bb045d7080f7e34c0eb20de).

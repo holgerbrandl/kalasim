@@ -4,7 +4,7 @@ pacman::p_load(simmer)
 pacman::p_load(simmer.plot)
 require(tidyverse)
 
-simulate <- function(fork_seq, time, thinking=function() rexp(1, 1), eating=function() rexp(1, 1), lag=0.1, seed=333) {
+simulate <- function(fork_seq, time, thinking=function() rexp(1, 1), eating=function() rexp(1, 1), lag=0.1, seed=313) {
     set.seed(seed)
 
     env <- simmer("Dining philosophers")
@@ -30,6 +30,32 @@ simulate <- function(fork_seq, time, thinking=function() rexp(1, 1), eating=func
 
     run(env, time)
 }
+
+
+## visualize with gantt
+states <- c("hungry", "eating")
+
+philosophers_gantt <- function(env, size=15) env %>%
+    get_mon_arrivals(per_resource = TRUE) %>%
+    transform(
+    philosopher = sub("_[0-9]*", "", name),
+    state = factor(states, states)
+    ) %>%
+    ggplot(aes(y = philosopher, yend = philosopher)) +
+    xlab("time") +
+    geom_segment(aes(x = start_time, xend = end_time, color = state), size = size)
+
+fork_seq <- list(
+Socrates = c(1, 2),
+Pythagoras = c(2, 3),
+Plato = c(3, 4),
+Aristotle = c(4, 1)
+)
+
+simulate(fork_seq, time = 50) %>%
+    print() %>%
+    philosophers_gantt() + theme_bw()
+
 
 
 env = simulate(fork_seq, time = 50)
@@ -73,30 +99,6 @@ env %>%
 
 env %>% get_mon_attributes
 env %>% get_mon_resources %>% tbl_df
-
-## visualize with gantt
-states <- c("hungry", "eating")
-
-philosophers_gantt <- function(env, size=15) env %>%
-    get_mon_arrivals(per_resource = TRUE) %>%
-    transform(
-    philosopher = sub("_[0-9]*", "", name),
-    state = factor(states, states)
-    ) %>%
-    ggplot(aes(y = philosopher, yend = philosopher)) +
-    xlab("time") +
-    geom_segment(aes(x = start_time, xend = end_time, color = state), size = size)
-
-fork_seq <- list(
-Socrates = c(1, 2),
-Pythagoras = c(2, 3),
-Plato = c(3, 4),
-Aristotle = c(4, 1)
-)
-
-simulate(fork_seq, time = 50) %>%
-    print() %>%
-    philosophers_gantt() + theme_bw()
 
 fork_seq$Aristotle <- rev(fork_seq$Aristotle)
 

@@ -31,13 +31,13 @@ time      current component        component                action      info
 Process finished with exit code 0
 ```
 
-This output is not active by default, but must be enabled when creating the simulation with `createSimulation(enableTraceLogger = true)`
+This output is not active by default, but must be enabled when creating the simulation with `createSimulation(enableConsoleLogger = true)`
 
 For larger simulations, console logging might not scale. Also, users may want to consume state changes for analysis and visualization. To support these use-cases, default logging can be disabled and custom log handlers can be added.
 
 ```kotlin
 // create simulation without default console logging
-val sim = createSimulation(enableTraceLogger = false) {  }
+val sim = createSimulation(enableConsoleLogger = false) {  }
 
 // add custom log consumer
 sim.addTraceListener(TraceListener { traceElement -> TODO("do something with")  })

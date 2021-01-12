@@ -52,7 +52,7 @@ So the key points to recall are
 The execution context of a kalasim simulation is an `Environment`, which can be created with
 
 ```kotlin
-val env : Environment = createSimulation(enableTraceLogger = true){
+val env : Environment = createSimulation(enableConsoleLogger = true){
     // Create components in here 
     Car()
     
