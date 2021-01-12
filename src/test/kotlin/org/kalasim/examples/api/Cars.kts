@@ -1,4 +1,4 @@
-//org.kalasim.examples.api.Cars.kts
+//Cars.kts
 import org.kalasim.*
 
 class Driver : Resource()
