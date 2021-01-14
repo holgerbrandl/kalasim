@@ -208,7 +208,7 @@ class Environment(
 
         val scheduledTime = calcScheduleTime(until, duration)
 
-        main.reschedule(scheduledTime, priority, urgent, "run", SCHEDULED)
+        main.reschedule(scheduledTime, priority, urgent, null, "run", SCHEDULED)
 
         running = true
         while (running) {

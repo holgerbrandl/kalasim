@@ -82,7 +82,7 @@ class ComponentQueue<C : Component>(
     /** Makes the argument leaving this queue. */
     fun leave(c: C) {
         log(c, "Leaving $name")
-        find { it.component == c }?.let { q.remove(it) }
+        q.find { it.component == c }?.let { q.remove(it) }
     }
 
     fun printHistogram() {

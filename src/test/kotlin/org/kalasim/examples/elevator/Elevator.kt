@@ -102,7 +102,7 @@ class Car(val capacity: Int = CAR_CAPACITY) : Component() {
 
 
 
-    override fun process() = sequence<Component> {
+    override fun process() = sequence {
         while(true) {
             if(direction == STILL) passivate()
 
@@ -117,17 +117,15 @@ class Car(val capacity: Int = CAR_CAPACITY) : Component() {
 
                 // let them exit
                 log("Allow passengers to exit")
-                hold(EXIT_TIME)
-
-
+                hold(EXIT_TIME, description = "Passengers exiting")
 
                 closeDoor()
 
                 if(direction != STILL){
                     val nextFloor = floors[floors.indexOf(floor) + direction.asIncrement()]
                     hold(MOVE_TIME)
+                    floor = nextFloor
                 }
-
             }
         }
     }

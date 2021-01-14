@@ -93,7 +93,7 @@ open class Component(
                 at.toDouble() + delay.toDouble()
             }
 
-            reschedule(scheduledTime, priority, false, "activate", SCHEDULED)
+            reschedule(scheduledTime, priority, false, null, "activate", SCHEDULED)
         }
 
         @Suppress("LeakingThis")
@@ -292,7 +292,13 @@ open class Component(
                         else -> "unknown"
                     }
 
-                    reschedule(env.now + remainingDuration, priority, urgent = false, caller = reason, status)
+                    reschedule(
+                        env.now + remainingDuration,
+                        priority,
+                        urgent = false,
+                        caller = reason,
+                        newStatus = status
+                    )
 
                 }
                 else -> error("Unexpected interrupt status ${status} is $name")
@@ -651,7 +657,7 @@ open class Component(
 
         val honorInfo = rHonor.firstOrNull()!!.first.name + (if(rHonor.size > 1) "++" else "")
 
-        reschedule(now(), 0, false, "request honor $honorInfo", SCHEDULED)
+        reschedule(now(), 0, false, null, "request honor $honorInfo", SCHEDULED)
 
         // process negative put requests (todo can't we handle them separately)
         rHonor.filter { it.first.anonymous }.forEach { it.first.tryRequest() }
@@ -723,6 +729,7 @@ open class Component(
         scheduledTime: Double,
         priority: Int = DEFAULT_QUEUE_PRIORITY,
         urgent: Boolean = false,
+        description: String? = null,
         caller: String? = null,
         newStatus: ComponentState,
     ) {
@@ -752,7 +759,7 @@ open class Component(
         }
 
         // print trace
-        log(now(), env.curComponent, this, caller + " " + delta, extra)
+        log(now(), env.curComponent, this, ("$caller $delta ${description ?: ""}").trim(), extra)
     }
 
 
@@ -825,7 +832,7 @@ open class Component(
             at.toDouble() + delay.toDouble()
         }
 
-        reschedule(scheduledTime, priority, urgent, "activate $extra", SCHEDULED)
+        reschedule(scheduledTime, priority, urgent, null, "activate $extra", SCHEDULED)
 
         return (this)
     }
@@ -869,9 +876,10 @@ open class Component(
         duration: Number? = null,
         till: Number? = null,
         priority: Int = 0,
-        urgent: Boolean = false
+        urgent: Boolean = false,
+        description: String? = null
     ) = yieldCurrent {
-        this@Component.hold(duration, till, priority, urgent)
+        this@Component.hold(duration, till, priority, urgent, description)
     }
 
     /**
@@ -888,7 +896,8 @@ open class Component(
         duration: Number? = null,
         till: Number? = null,
         priority: Int = 0,
-        urgent: Boolean = false
+        urgent: Boolean = false,
+        description: String? = null
     ) {
         if(status != PASSIVE && status != CURRENT) {
             requireNotData()
@@ -898,7 +907,7 @@ open class Component(
 
         val scheduledTime = env.calcScheduleTime(till, duration)
 
-        reschedule(scheduledTime, priority, urgent, "hold", SCHEDULED)
+        reschedule(scheduledTime, priority, urgent, description, "hold", SCHEDULED)
     }
 
 
@@ -1071,7 +1080,13 @@ open class Component(
         tryWait()
 
         if(waits.isNotEmpty()) {
-            reschedule(scheduledTime!!, priority = priority, urgent = urgent, caller = "wait", newStatus = WAITING)
+            reschedule(
+                scheduledTime!!,
+                priority = priority,
+                urgent = urgent,
+                caller = "wait",
+                newStatus = WAITING
+            )
         }
     }
 
@@ -1104,7 +1119,7 @@ open class Component(
             waits.clear()
             remove()
 
-            reschedule(env.now, 0, false, "wait", SCHEDULED)
+            reschedule(env.now, 0, false, null, "wait", SCHEDULED)
         }
 
         return honored
