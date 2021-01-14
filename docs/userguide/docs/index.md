@@ -91,8 +91,6 @@ time   current  receiver  action                             info
 .00
 .00                       hold +1.00                         scheduled for 1.00
 1.00
-1.00                      Released 1.0 from 'Car.1'
-1.00                      Leaving claimers of Driver.1
 1.00                      entering waiters of TrafficLight.1
 1.00                      wait                               scheduled for <inf>
 5.00   main     main

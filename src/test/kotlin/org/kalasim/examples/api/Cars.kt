@@ -12,15 +12,17 @@ fun main() {
         override fun process() = sequence {
             request(driver) {
                 hold(1.0)
-            }
 
-            wait(trafficLight, "green")
+                wait(trafficLight, "green")
+            }
         }
     }
 
     createSimulation(enableConsoleLogger = true) {
         dependency { TrafficLight() }
         dependency { Driver() }
+
+        // finetune column width for website
 
         Car()
     }.run(5.0)

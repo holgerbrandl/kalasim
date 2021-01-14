@@ -3,24 +3,8 @@
 
 ## Next steps
 
-https://github.com/denisvstepanov/lets-plot-examples
+<https://github.com/denisvstepanov/lets-plot-examples>
 
-
-## v0.5
-
-
-
-**{done}** Removed distribution arguments in `request`. Sampling can be done at call site
-```
-request(failAt=uniform().sample())
-```
-
-**{done}** https://simpy.readthedocs.io/en/latest/examples/movie_renege.html && https://simjuliajl.readthedocs.io/en/stable/examples/2_movie_renege.html
-
-
-**{done}** implement support for real-time simulations
-
-**{done}**  <https://r-simmer.org/articles/simmer-08-philosophers.html>
 
 ## v0.6
 
@@ -29,7 +13,7 @@ request(failAt=uniform().sample())
 **{todo}** finish elevator example with visualization
 
 
-**{todo}** Add equivalent of simmer::select (See Ucar2019,p12) with multiple select policies `List<Resource>.select()`; Also detail out how DI for multiple elements by type (see https://stackoverflow.com/questions/54374067/how-to-retrieve-all-instances-that-matches-a-given-type-using-koin-dependency-in)
+**{todo}** Add equivalent of simmer::select (See Ucar2019,p12) with multiple select policies `List<Resource>.select()`; Also detail out how DI for multiple elements by type (see <https://stackoverflow.com/questions/54374067/how-to-retrieve-all-instances-that-matches-a-given-type-using-koin-dependency-in>)
 
 ---
 
@@ -57,7 +41,7 @@ finished, that indicates whether the arrival exhausted its activities (or was re
 
 ---
 **{todo}** review simmer.plot
-> Ucar I, Smeets B (2019b). simmer.plot: Plotting Methods for simmer. R package version 0.1.15, URL https://CRAN.R-project.org/package=simmer.plot
+> Ucar I, Smeets B (2019b). simmer.plot: Plotting Methods for simmer. R package version 0.1.15, URL <https://CRAN.R-project.org/package=simmer.plot>
 
 
 ## v0.7
@@ -95,16 +79,16 @@ val c = Component(){
 
 **{todo}** update logs example in docs intro
 
-**{todo}** review docs for https://holgerbrandl.github.io/kalasim/state/
+**{todo}** review docs for <https://holgerbrandl.github.io/kalasim/state/>
 
 **{todo}** port interesting examples from <https://simjuliajl.readthedocs.io/en/stable/examples/index.html>
 
 **{todo}** port interesting simmer examples
-* https://r-simmer.org/articles/simmer-08-philosophers.html
+<https://r-simmer.org/articles/simmer-08-philosophers.html>
 
 **{todo}** port machine repair example from  <https://github.com/matloff/des>
 
-**{todo}** port interesting SimPy examples from https://simpy.readthedocs.io/en/latest/examples/index.html
+**{todo}** port interesting SimPy examples from <https://simpy.readthedocs.io/en/latest/examples/index.html>
 
 **{todo}** port  machine maintenance example from ucar 2019
 
@@ -121,7 +105,7 @@ Benchmark desim, salabim, simmer vs kalasim
 
 ---
 
-Slicing of monitors https://www.salabim.org/manual/Monitor.html#slicing-of-monitors
+Slicing of monitors <https://www.salabim.org/manual/Monitor.html#slicing-of-monitors>
 
 ---
 
@@ -134,4 +118,4 @@ Register project at awesome-kotlin
 
 ---
 
-fix https://github.com/holgerbrandl/kravis/issues/25
+fix <https://github.com/holgerbrandl/kravis/issues/25>

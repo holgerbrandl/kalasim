@@ -12,9 +12,9 @@ class Car : Component() {
     override fun process() = sequence {
         request(driver) {
             hold(1.0)
-        }
 
-        wait(trafficLight, "green")
+            wait(trafficLight, "green")
+        }
     }
 }
 
