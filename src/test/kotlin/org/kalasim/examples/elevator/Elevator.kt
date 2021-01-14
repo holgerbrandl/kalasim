@@ -4,18 +4,18 @@ import org.kalasim.*
 import org.kalasim.examples.elevator.Car.DoorState.*
 import org.kalasim.examples.elevator.Direction.*
 import org.kalasim.misc.repeat
+import java.lang.IllegalArgumentException
+import java.util.*
 
 // Adopted from https://github.com/salabim/salabim/blob/master/sample%20models/Elevator.py
 
-
-const val up = 1
-const val still = 0
-const val down = -1
+// todo built second version where vistors get angry and walk away
+ // todo use inline class for better typing // inline class Floor(level: Int)
 
 const val MOVE_TIME = 10
 const val DOOR_OPEN_TIME = 3
 const val DOOR_CLOSE_TIME = 3
-const val enter_time = 3
+const val ENTER_TIME = 3
 const val EXIT_TIME = 3
 
 const val LOAD_0_n = 50
@@ -23,21 +23,23 @@ const val LOAD_n_n = 100
 const val LOAD_n_0 = 100
 const val CAR_CAPACITY = 4
 const val NUM_CARS = 3
-const val groundFloor = 0
 const val TOP_FLOOR = 15
 
-enum class Direction { DOWN, STILL, UP;
+enum class Direction {
+    DOWN, STILL, UP;
 
-    fun asIncrement(): Int = when(this){
+    fun asIncrement(): Int = when(this) {
         DOWN -> -1
         STILL -> 0
         UP -> 1
     }
+
+    fun invert(): Direction = when(this){
+        DOWN -> UP
+        STILL -> throw IllegalArgumentException()
+        UP -> DOWN
+    }
 }
-
-//@Suppress("EXPERIMENTAL_FEATURE_WARNING")
-//inline class Floor(val value:Int)
-
 
 class VisitorGenerator(
     val fromRange: Pair<Int, Int>,
@@ -65,107 +67,132 @@ class VisitorGenerator(
             uniform(0.5, 1.5)()
             hold(uniform(0.5, 1.5).sample() * iat)
         }
-
     }
 }
 
 
 class Visitor(from: Int, to: Int) : Component() {
-    val direction = if(from < to) UP else DOWN
 
     val building = get<Building>()
 
     val fromFloor = building.floors[from]
     val toFloor = building.floors[to]
+    val direction = if(from < to) UP else DOWN
 
-
-    override fun process() = sequence<Component> {
+    override fun process() = sequence {
         fromFloor.add(this@Visitor)
 
+        // call car if not yet done by another visitor waiting
+        // on the same floor for the same direction
+        get<Requests>().putIfAbsent(fromFloor to  direction, env.now)
+
         building.cabs.firstOrNull { isPassive }?.activate()
+
+        passivate() // wait for it
     }
 }
 
 
-class Car(val capacity: Int = CAR_CAPACITY) : Component() {
+class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) : Component() {
     var direction = STILL
-
-    val floors = get<Building>().floors
-    var floor = floors.first()
+    var floor = initialFloor
 
     // todo why is this is queue (it does no seem to be used as such; stats?)
     val visitors = ComponentQueue<Visitor>("visitors in $name")
 
     enum class DoorState { OPEN, CLOSED }
-
     var door = CLOSED
-
 
 
     override fun process() = sequence {
         while(true) {
-            if(direction == STILL) passivate()
+            if(direction == STILL && requests.isEmpty()) passivate()
 
-            val leaving = visitors.components.filter{ it.toFloor ==floor}
+            val leaving = visitors.components.filter { it.toFloor == floor }
 
-            if(leaving.isNotEmpty()){
+            if(leaving.isNotEmpty()) {
                 openDoor()
                 leaving.forEach {
                     it.leave(visitors)
                     activate()
                 }
 
-                // let them exit
-                log("Allow passengers to exit")
                 hold(EXIT_TIME, description = "Passengers exiting")
+            }
 
-                closeDoor()
+//            if(direction == STILL) direction  = listOf(UP, DOWN).random() // todo not deterministic
+            if(direction == STILL) direction  = enumerated(UP, DOWN).sample()
 
-                if(direction != STILL){
-                    val nextFloor = floors[floors.indexOf(floor) + direction.asIncrement()]
-                    hold(MOVE_TIME)
-                    floor = nextFloor
+            val requests = get<Requests>()
+
+            // try to continue in the same direction or change
+            for(dir in listOf(direction, direction.invert())){
+                if(requests.containsKey(floor to dir)){
+                    requests.remove(floor to dir)
+
+                    openDoor()
+
+                    val zusteiger = floor.components
+                        .filter { it.direction == dir }
+                        .take(capacity - visitors.size)
+
+                    zusteiger.forEach { it.leave(floor)}
+                    zusteiger.forEach { visitors.add(it)}
+                    hold(ENTER_TIME, description = "Letting new passengers in")
+
+                    val countInDirection = visitors.components.count{it.direction == dir}
+                    if(countInDirection > 0){
+                        requests.putIfAbsent(floor to  direction, env.now)
+                    }
                 }
+            }
+
+            closeDoor()
+
+            val floors = get<Building>().floors
+
+            if(direction != STILL) {
+                val nextFloor = floors[floors.indexOf(floor) + direction.asIncrement()]
+                hold(MOVE_TIME)
+                floor = nextFloor
             }
         }
     }
 
     suspend fun SequenceScope<Component>.openDoor() {
         if(door == OPEN) return
-        hold(DOOR_OPEN_TIME)
+        hold(DOOR_OPEN_TIME, description = "Opening door of ${this@Car.name}")
         door = OPEN
     }
 
     suspend fun SequenceScope<Component>.closeDoor() {
-        if(door == OPEN) return
-        hold(DOOR_OPEN_TIME)
-        door = OPEN
+        if(door == CLOSED) return
+        hold(DOOR_CLOSE_TIME, description = "Closing door of ${this@Car.name}")
+        door = CLOSED
     }
-
-
 }
-
 
 class Building : Component() {
-    val cabs = repeat(NUM_CARS) { Car() }
-    val floors = repeat(TOP_FLOOR) { ComponentQueue<Visitor>() }
+    val floors = repeat(1+ TOP_FLOOR) { Floor() }
+    val cabs = repeat(NUM_CARS) { Car(floors.first()) }
 }
 
-fun ComponentQueue<Visitor>.countDirection(direction: Direction) {
-    q.filter { it.component.direction == direction }.count()
-}
 
+typealias Floor = ComponentQueue<Visitor>
+typealias Requests = MutableMap<Pair<Floor, Direction>, Double>
 
 fun main() {
 
     createSimulation(true) {
         dependency { Building() }
 
+        val requests: Requests = mutableMapOf()
+        dependency { requests }
 
         VisitorGenerator(0 to 0, 1 to TOP_FLOOR, LOAD_0_n, "vg_0_n")
         VisitorGenerator(1 to TOP_FLOOR, 0 to 0, LOAD_n_0, "vg_n_0")
         VisitorGenerator(1 to TOP_FLOOR, 1 to TOP_FLOOR, LOAD_n_n, "vg_n_nn")
 
-        run(100)
+        run(1000)
     }
 }

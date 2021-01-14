@@ -13,7 +13,7 @@ fun freqLevelDemo() {
         "bar" to 0.9
     )
 
-    val dist = EnumeratedDistribution(data.asCM())
+    val dist = EnumeratedDistribution(data.asCMPairList())
 
     val dm = FrequencyLevelMonitor("bla")
 

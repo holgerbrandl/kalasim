@@ -1,6 +1,7 @@
 package org.kalasim
 
 import org.apache.commons.math3.distribution.*
+import org.kalasim.misc.asCMPairList
 
 /** Distribution support API */
 
@@ -28,3 +29,6 @@ fun Component.uniform(lower: Number = 0, upper: Number = 1) = env.uniform(lower,
 fun Environment.uniform(lower: Number = 1, upper: Number = 0) =
     UniformRealDistribution(rg, lower.toDouble(), upper.toDouble())
 
+
+fun <T> Component.enumerated(vararg elements :  T) = enumerated((elements.map{ it to 1.0/elements.size}).toMap())
+fun <T> Component.enumerated(elements: Map<T, Double>) = EnumeratedDistribution(env.rg, elements.toList().asCMPairList())

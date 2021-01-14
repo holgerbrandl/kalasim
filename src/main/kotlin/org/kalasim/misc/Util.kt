@@ -133,7 +133,7 @@ var JSON_INDENT = 2
 
 typealias   CMPair<K, V> = org.apache.commons.math3.util.Pair<K, V>
 
-fun <T, S> List<Pair<T, S>>.asCM(): List<CMPair<T, S>> = map { CMPair(it.first, it.second) }
+fun <T, S> List<Pair<T, S>>.asCMPairList(): List<CMPair<T, S>> = map { CMPair(it.first, it.second) }
 
 
 // from https://stackoverflow.com/questions/46895140/how-to-perform-action-for-all-combinations-of-elements-in-lists

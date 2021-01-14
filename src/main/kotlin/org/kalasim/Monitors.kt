@@ -414,7 +414,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
 
             val stats =
                 DescriptiveStatistics(
-                    EnumeratedDistribution(hist.asCM()).sample(1000, arrayOf<Double>()).toDoubleArray()
+                    EnumeratedDistribution(hist.asCMPairList()).sample(1000, arrayOf<Double>()).toDoubleArray()
                 )
 
             stats.buildHistogram(binCount).printHistogram(sortByWeight = sortByWeight)

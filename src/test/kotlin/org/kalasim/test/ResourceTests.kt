@@ -6,7 +6,7 @@ import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.junit.Assert
 import org.junit.Test
 import org.kalasim.*
-import org.kalasim.misc.asCM
+import org.kalasim.misc.asCMPairList
 
 class ResourceTests {
 
@@ -30,7 +30,7 @@ class ResourceTests {
         createSimulation {
             val resource = Resource(preemptive = true)
 
-            val prioPDF = EnumeratedDistribution(listOf(1, 2, 3).map { it to 1.0 / 3.0 }.asCM())
+            val prioPDF = EnumeratedDistribution(listOf(1, 2, 3).map { it to 1.0 / 3.0 }.asCMPairList())
 
             object : Component() {
 
