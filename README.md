@@ -8,7 +8,7 @@ Discrete Event Simulator
 `kalasim` is a discrete event simulator with type support, dependency injection, modern persistence and logging to enable large-scale, industrial-ready simulations.
 
 
-`kalasim` is written in [Kotlin](https://kotlinlang.org/), designed on top of [koin](https://github.com/InsertKoinIO/koin) as dependency injection framework, is using [common-math](https://commons.apache.org/proper/commons-math/) for stats and distributions, modern event tracking and persistence, and [plotly.kt](https://github.com/mipt-npm/plotly.kt), [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) as well as [`kravis`](https://github.com/holgerbrandl/kravis) for visualization.
+`kalasim` is written in [Kotlin](https://kotlinlang.org/), designed on top of [koin](https://github.com/InsertKoinIO/koin) as dependency injection framework, and is using [common-math](https://commons.apache.org/proper/commons-math/) for stats and distributions, modern event tracking and persistence, and [plotly.kt](https://github.com/mipt-npm/plotly.kt), [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) as well as [`kravis`](https://github.com/holgerbrandl/kravis) for visualization.
 
 In contrast to many other simulation tools, `kalasim` is neither low-code nor no-code. It is _code-first_ to enable change tracking, scaling, refactoring, CI/CD, unit-tests, and the rest of the gang that makes simulation development fun.
 

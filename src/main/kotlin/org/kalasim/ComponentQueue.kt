@@ -26,6 +26,9 @@ class ComponentQueue<C : Component>(
     val size: Int
         get() = q.size
 
+    val components
+        get() = q.map{it.component}
+
     //    val ass = AggregateSummaryStatistics()
     val queueLengthMonitor = NumericLevelMonitor("Length of ${this.name}", koin = koin)
     val lengthOfStayMonitor = NumericStatisticMonitor("Length of stay in ${this.name}", koin = koin)
@@ -79,7 +82,7 @@ class ComponentQueue<C : Component>(
     /** Makes the argument leaving this queue. */
     fun leave(c: C) {
         log(c, "Leaving $name")
-        q.find { it.component == c }?.let { q.remove(it) }
+        find { it.component == c }?.let { q.remove(it) }
     }
 
     fun printHistogram() {

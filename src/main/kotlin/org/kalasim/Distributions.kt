@@ -9,6 +9,7 @@ fun Number.asDist() = ConstantRealDistribution(this.toDouble())
 fun fixed(value: Double) = ConstantRealDistribution(value)
 
 operator fun RealDistribution.invoke(): Double = sample()
+operator fun IntegerDistribution.invoke(): Int = sample()
 
 
 fun Component.exponential(mean: Number) = env.exponential(mean)
