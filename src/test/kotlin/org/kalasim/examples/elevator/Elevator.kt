@@ -21,7 +21,7 @@ const val LOAD_0_n = 50
 const val LOAD_n_n = 100
 const val LOAD_n_0 = 100
 const val CAR_CAPACITY = 4
-const val NUM_CARS = 3
+const val NUM_CARS = 1
 const val TOP_FLOOR = 15
 
 enum class Direction {
@@ -40,6 +40,9 @@ enum class Direction {
     }
 }
 
+private fun getDirection(from: Int, to: Int) = if(from < to) UP else DOWN
+
+
 class VisitorGenerator(
     val fromRange: Pair<Int, Int>,
     val toRange: Pair<Int, Int>,
@@ -54,7 +57,7 @@ class VisitorGenerator(
         yieldAll(generateSequence { dintFrom() to dintTo() })
     }.filter { it.first != it.second }.iterator()
 
-    override fun process() = sequence<Component> {
+    override fun process() = sequence {
         while(true) {
             val (from, to) = fromTo.next()
 
@@ -63,14 +66,14 @@ class VisitorGenerator(
             if(load == 0) passivate()
 
             val iat = 3600 / load
-            hold(uniform(0.5, 1.5).sample() * iat) // TODO should we hold before the first visitor
+            hold(uniform(0.5, 1.5).sample() * iat) // TODO should we hold before the first visitor?
         }
     }
 }
 
-private fun getDirection(from: Int, to: Int) = if(from < to) UP else DOWN
 
-class Visitor(from: Int, to: Int) : Component() {
+// todo how to get instance number in superconstructor?
+class Visitor(val from: Int, val to: Int) : Component() {
 
     val building = get<Building>()
 
@@ -78,8 +81,10 @@ class Visitor(from: Int, to: Int) : Component() {
     val toFloor = building.floors[to]
     val direction = getDirection(from, to)
 
+    override fun toString() = "$name($from->$to)" // todo remove
+
     override fun process() = sequence {
-        fromFloor.visitors.add(this@Visitor)
+        fromFloor.queue.add(this@Visitor)
 
         // call car if not yet done by another visitor waiting
         // on the same floor for the same direction
@@ -97,7 +102,7 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) : Component() {
     var floor = initialFloor
 
     // todo why is this is queue (it does no seem to be used as such; stats?)
-    val visitors = ComponentQueue<Visitor>("visitors in $name")
+    val visitors = ComponentQueue<Visitor>("passengers of $name")
 
     enum class DoorState { OPEN, CLOSED }
 
@@ -106,6 +111,8 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) : Component() {
 
     override fun process() = sequence {
         while(true) {
+            val requests = get<Requests>()
+
             if(direction == STILL && requests.isEmpty()) passivate()
 
             val leaving = visitors.components.filter { it.toFloor == floor }
@@ -122,46 +129,45 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) : Component() {
                 hold(EXIT_TIME, description = "Passengers exiting")
             }
 
-//            if(direction == STILL) direction  = listOf(UP, DOWN).random() // todo not deterministic
+//            if(direction == STILL) direction  = listOf(UP, DOWN).random() // not deterministic because using kotlin random
             if(direction == STILL) direction = enumerated(UP, DOWN).sample()
 
-            val requests = get<Requests>()
-
-            // try to continue in the same direction or change
-            // todo rather use iterator approach for better control logic
-            val directions = listOf(direction, direction.invert()).iterator()
-            for(dir in directions) {
-                if(requests.containsKey(floor to dir)) {
-                    requests.remove(floor to dir) // consume it right away so that other cars' doors wont open as well
-
-                    openDoor()
-
-                    val zusteiger = floor.visitors.components
-                        .filter { it.direction == dir }
-                        .take(capacity - visitors.size)
-
-                    zusteiger.forEach {
-                        it.leave(floor.visitors)
-                        visitors.add(it)
-                    }
-                    hold(ENTER_TIME * zusteiger.size, description = "Letting ${zusteiger.size} new passengers in")
-
-                    // If there are still visitors going up/down in that floor
-                    // then restore the request to the list of requests
-                    val countInDirection = visitors.components.count { it.direction == dir }
-                    if(countInDirection > 0) {
-                        requests.putIfAbsent(floor to direction, env.now)
-                    }
-                }
-
-                // if car is empty, than continue the loop to change direction if there are requests
-                if(visitors.isNotEmpty()) {
-                    break
-                }
-            }
 
             // https://kotlinlang.slack.com/archives/C0922A726/p1610700674029200
-            if(!directions.hasNext()) { // loop terminated through exhaustion, i.e. there are passengers in the car
+            run {
+                // try to continue in the same direction or change
+                for(dir in listOf(direction, direction.invert())) {
+                    if(requests.containsKey(floor to dir)) {
+                        requests.remove(floor to dir) // consume it right away so that other cars doors won't open as well
+
+                        openDoor()
+
+                        val zusteiger = floor.queue.components
+                            .filter { it.direction == dir }
+                            .take(capacity - visitors.size)
+
+                        zusteiger.forEach {
+                            it.leave(floor.queue)
+                            visitors.add(it)
+                        }
+
+                        hold(ENTER_TIME * zusteiger.size, description = "${zusteiger.size} passengers entering")
+
+                        // If there are still visitors going up/down in that floor
+                        // then restore the request to the list of requests
+                        val countInDirection = floor.queue.components.count { it.direction == dir }
+                        if(countInDirection > 0) {
+                            requests.putIfAbsent(floor to direction, env.now)
+                        }
+                    }
+
+                    // if car is empty, than continue the loop to change direction if there are requests
+                    if(visitors.isNotEmpty()) {
+                        return@run
+                    }
+                }
+
+                // loop terminated through exhaustion, i.e. there are passengers in the car
                 direction = if(requests.isNotEmpty()) {
                     val earliestRequest = requests.minByOrNull { it.value }!!
                     // start in this direction
@@ -175,9 +181,10 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) : Component() {
 
             val floors = get<Building>().floors
 
+
             if(direction != STILL) {
-                val nextFloor = floors[floors.indexOf(floor) + direction.asIncrement()-1]
-                hold(MOVE_TIME)
+                val nextFloor = floors[floors.indexOf(floor) + direction.asIncrement()]
+                hold(MOVE_TIME, description = "Moving to ${nextFloor.level}")
                 floor = nextFloor
             }
         }
@@ -202,7 +209,11 @@ class Building {
 }
 
 
-class Floor(val level: Int, val visitors: ComponentQueue<Visitor> = ComponentQueue())
+class Floor(val level: Int, val queue: ComponentQueue<Visitor> = ComponentQueue()) {
+    override fun toString(): String {
+        return "Floor($level)"
+    }
+}
 
 typealias Requests = MutableMap<Pair<Floor, Direction>, Double>
 
@@ -214,11 +225,14 @@ fun main() {
         val requests: Requests = mutableMapOf()
         dependency { requests }
 
-        VisitorGenerator(0 to 0, 1 to TOP_FLOOR, LOAD_0_n, "vg_0_n")
-        VisitorGenerator(1 to TOP_FLOOR, 0 to 0, LOAD_n_0, "vg_n_0")
-        VisitorGenerator(1 to TOP_FLOOR, 1 to TOP_FLOOR, LOAD_n_n, "vg_n_nn")
+//        VisitorGenerator(0 to 0, 1 to TOP_FLOOR, LOAD_0_n, "vg_0_n")
+//        VisitorGenerator(1 to TOP_FLOOR, 0 to 0, LOAD_n_0, "vg_n_0")
+//        VisitorGenerator(1 to TOP_FLOOR, 1 to TOP_FLOOR, LOAD_n_n, "vg_n_nn")
+        // try with single visitor to get started
+        Visitor(3, 12)
 
-        run(1000)
+//        run(50000)
+        run(2000)
 
 
         //print summary
@@ -226,11 +240,11 @@ fun main() {
         building.floors.forEach {
             it.let {
                 println(
-                    "%5d, %5d, %15.3f : %15.3f".format(
+                    "%5d%5d%15.3f%15.3f".format(
                         it.level,
-                        it.visitors.lengthOfStayMonitor.statistics().n,
-                        it.visitors.queueLengthMonitor.statistics().mean,
-                        it.visitors.lengthOfStayMonitor.statistics().mean
+                        it.queue.lengthOfStayMonitor.statistics().n,
+                        it.queue.queueLengthMonitor.statistics().mean,
+                        it.queue.lengthOfStayMonitor.statistics().mean
                     )
                 )
             }

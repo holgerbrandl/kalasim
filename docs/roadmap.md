@@ -8,6 +8,8 @@
 
 **{todo}** fix empty log lines in elevator
 
+**{todo}** env.toString does not scale for large simulations
+
 ## v0.6
 
 **{todo}**  implement `Demo preemptive resource animated.py`
@@ -121,3 +123,7 @@ Register project at awesome-kotlin
 ---
 
 fix <https://github.com/holgerbrandl/kravis/issues/25>
+
+---
+
+also adjust random generator of kotlin to prevent non-determins enterin simulation when user is doing `listOf().random()`
