@@ -192,7 +192,7 @@ class ResourceInfo(resource: Resource) : Jsonable() {
     data class ReqComp(val component: String, val quantity: Double?)
 
     val requestingComponents = resource.requesters.q.toList().map {
-        ReqComp(it.component.name, it.component.requests[resource])
+        ReqComp(it.component.name, it.component.requestedQuantity(resource))
     }
 }
 

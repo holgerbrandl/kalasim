@@ -1157,19 +1157,22 @@ open class Component(
         noinline parameters: ParametersDefinition? = null
     ): T =
         getKoin().get(qualifier, parameters)
+
+
+    internal fun requestedQuantity(resource: Resource) = requests[resource]
+
+    /** Captures the current state of a `State`*/
+    open class ComponentInfo(c: Component) : Jsonable() {
+        val name = c.name
+        val status = c.status
+        val creationTime = c.creationTime
+        val scheduledTime = c.scheduledTime
+
+        val claims = c.claims.map { it.key.name to it.value }.toMap()
+        val requests = c.requests.map { it.key.name to it.value }.toMap()
+    }
 }
 
-
-/** Captures the current state of a `State`*/
-open class ComponentInfo(c: Component) : Jsonable() {
-    val name = c.name
-    val status = c.status
-    val creationTime = c.creationTime
-    val scheduledTime = c.scheduledTime
-
-    val claims = c.claims.map { it.key.name to it.value }.toMap()
-    val requests = c.requests.map { it.key.name to it.value }.toMap()
-}
 
 //
 // Abstract component process to be either generator or simple function

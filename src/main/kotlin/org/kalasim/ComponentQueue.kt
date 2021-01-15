@@ -63,6 +63,7 @@ class ComponentQueue<C : Component>(
         return cqe.component
     }
 
+
     private fun updateExitStats(cqe: CQElement<C>) {
         val (_, enterTime) = cqe
 
@@ -78,12 +79,6 @@ class ComponentQueue<C : Component>(
     fun isNotEmpty() = !isEmpty()
 
     fun printStats() = stats.print()
-
-    /** Makes the argument leaving this queue. */
-    fun leave(c: C) {
-        log(c, "Leaving $name")
-        q.find { it.component == c }?.let { q.remove(it) }
-    }
 
     fun printHistogram() {
         lengthOfStayMonitor.printHistogram()

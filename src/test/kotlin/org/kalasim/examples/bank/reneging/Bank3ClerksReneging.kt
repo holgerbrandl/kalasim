@@ -46,7 +46,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
 
         if (waitingLine.contains(this@Customer)) {
             //  this@Customer.leave(waitingLine)
-            waitingLine.leave(this@Customer)
+            waitingLine.remove(this@Customer)
 
             numReneged++
             log("reneged")

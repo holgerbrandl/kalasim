@@ -334,8 +334,10 @@ class Environment(
         require(queue.none(Component::isPassive)) { "passive component must not be in event queue" }
     }
 
-    fun toJson(): JSONObject = json {
-        "components" to components.map { it.info.toJson() }
+    fun toJson(includeComponents:Boolean = false): JSONObject = json {
+        if(includeComponents){
+            "components" to components.map { it.info.toJson() }
+        }
         "num_components" to components.size
         "now" to now
         "queue" to queue.toList().map { it.name }.toTypedArray()
@@ -343,7 +345,7 @@ class Environment(
 
     @Suppress("EXPERIMENTAL_OVERRIDE")
     override fun toString(): String {
-        return toJson().toString(JSON_INDENT)
+        return toJson(false).toString(JSON_INDENT)
     }
 }
 

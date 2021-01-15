@@ -28,7 +28,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>, val workToDo: State<Bo
         hold(50) // if not serviced within this time, renege
 
         if (waitingLine.contains(this@Customer)) {
-            waitingLine.leave(this@Customer)
+            waitingLine.remove(this@Customer)
             numReneged++
             log("reneged")
 
