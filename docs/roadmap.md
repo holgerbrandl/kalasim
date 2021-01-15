@@ -6,6 +6,8 @@
 <https://github.com/denisvstepanov/lets-plot-examples>
 
 
+**{todo}** fix empty log lines in elevator
+
 ## v0.6
 
 **{todo}**  implement `Demo preemptive resource animated.py`
