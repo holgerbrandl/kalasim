@@ -269,8 +269,7 @@ class Environment(
         c.scheduledTime = null
 
         curComponent = c
-
-        c.log(c, info)
+//        c.log(c, info)
     }
 
 

@@ -47,7 +47,7 @@ class ComponentQueue<C : Component>(
         val cqe = q.poll()
 
         updateExitStats(cqe)
-        log(cqe.component, "leaving $name")
+        log(cqe.component, "Left $name")
 
         return cqe.component
     }
@@ -58,7 +58,7 @@ class ComponentQueue<C : Component>(
 
         updateExitStats(cqe)
 
-        log(cqe.component, "removed from $name")
+        log(cqe.component, "Removed from $name")
 
         return cqe.component
     }

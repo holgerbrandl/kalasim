@@ -1131,7 +1131,7 @@ open class Component(
      * @param q Queue queue to leave
      */
     fun leave(q: ComponentQueue<*>) {
-        log("leaving ${q.name}")
+//        log("Leaving ${q.name}")
         (q as ComponentQueue<Component>).remove(this)
     }
 
