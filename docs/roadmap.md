@@ -6,10 +6,6 @@
 <https://github.com/denisvstepanov/lets-plot-examples>
 
 
-**{todo}** fix empty log lines in elevator
-
-**{todo}** env.toString does not scale for large simulations
-
 ## v0.6
 
 **{todo}**  implement `Demo preemptive resource animated.py`

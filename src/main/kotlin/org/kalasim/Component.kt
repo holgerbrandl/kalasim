@@ -716,7 +716,7 @@ open class Component(
         scheduledTime = null
         simProcess = null
 
-        log(now(), env.curComponent, this, "ended")
+        log(now(), env.curComponent, this, "Ended")
     }
 
     private fun requireNotData() =

@@ -43,30 +43,24 @@ class ComponentTests {
 time      current               receiver              action                                       info                               
 --------- --------------------- --------------------- -------------------------------------------- ----------------------------------
 .00                             main                  create
-.00       main
-.00                             tester                create
+.00       main                  tester                create
 .00                                                   activate                                     scheduled for .00
 .00                             main                  run +5.00                                    scheduled for 5.00
-.00       tester                tester
-.00                                                   Entering waiters of State.1
-.00                                                   removed from waiters of State.1
+.00       tester                tester                Entering waiters of State.1
+.00                                                   Removed from waiters of State.1
 .00                                                   wait                                         scheduled for .00
-.00
 .00                                                   hold +1.00                                   scheduled for 1.00
-1.00
 1.00                            Resource.1            Created                                      capacity=1
 1.00                            tester                Entering requesters of Resource.1
 1.00                                                  Requesting 1.0 from Resource.1 with prio...
 1.00                                                  Claimed 1.0 from 'tester'
 1.00                                                  Entering claimers of Resource.1
+1.00                                                  Removed from requesters of Resource.1
 1.00                                                  request honor Resource.1                     scheduled for 1.00
-1.00
 1.00                                                  hold +1.00                                   scheduled for 2.00
-2.00
 2.00                                                  Released 1.0 from 'tester'
-2.00                                                  leaving claimers of Resource.1
-2.00                                                  ended
-5.00      main                  main
+2.00                                                  Removed from claimers of Resource.1
+2.00                                                  Ended
 """.trimIndent()
 
 
