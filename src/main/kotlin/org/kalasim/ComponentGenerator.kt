@@ -6,7 +6,7 @@ import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
 
 /**
- * A component generator can be used to genetate components
+ * A component generator can be used to generate components
  *
  * See https://www.salabim.org/manual/ComponentGenerator.html
  *
@@ -17,7 +17,7 @@ import org.koin.core.context.GlobalContext
  *  @param from time where the generator starts time
  *  @param till time up to which components should be generated. If omitted, no end
  */
-class ComponentGenerator<T : Component>(
+class ComponentGenerator<T>(
     val iat: RealDistribution,
     val from: Double? = 0.0,
     var till: Double = Double.MAX_VALUE,
@@ -29,6 +29,11 @@ class ComponentGenerator<T : Component>(
     val builder: Environment.(counter: Int) -> T
 ) : Component(name, priority = priority, process = ComponentGenerator<T>::doIat, koin = koin) {
 
+    fun  interface Consumer<K> {
+        fun consume(generated: K)
+    }
+
+    val consumers  = mutableListOf<Consumer<T>>()
 
     init {
         // TODO build intervals
@@ -39,8 +44,10 @@ class ComponentGenerator<T : Component>(
         var numGenerated = 0
 
         while (true) {
-            builder(env, numGenerated)
+            val created = builder(env, numGenerated)
             numGenerated++
+
+            consumers.forEach{ it.consume(created)}
 
             if (numGenerated >= total) break
 
@@ -66,4 +73,4 @@ class ComponentGenerator<T : Component>(
 }
 
 
-class ComponentGeneratorInfo<T : Component>(cg: ComponentGenerator<T>) : Component.ComponentInfo(cg)
+class ComponentGeneratorInfo<T >(cg: ComponentGenerator<T>) : Component.ComponentInfo(cg)
