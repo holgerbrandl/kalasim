@@ -55,6 +55,8 @@ env <- simmer() %>%
 <https://r-simmer.org/reference/batch.html>
 
 ```r
+pacman::p_load(simmer)
+
 ## unnamed batch with a timeout
 traj <- trajectory() %>%
   log_("arrived") %>%
@@ -74,6 +76,8 @@ simmer() %>%
 #> 6: dummy1: leaving
 #> 7: batch1: in a batch
 #> 12: dummy2: leaving
+
+
 ## batching based on some dynamic rule
 traj <- trajectory() %>%
   log_("arrived") %>%

@@ -70,6 +70,11 @@ val c = Component(){
 
 **{todo}** restrict more methods in Component from being overridden
 
+##  v0.8
+
+**{todo}** consider if ComponentGenerator and ComponentQueue should support all types (and not just Component)
+
+
 ## Pre-release
 
 **{todo}** lambda builder fro interrupt/release

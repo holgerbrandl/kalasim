@@ -107,7 +107,7 @@ A component is always in one of the following states modelled by `org.kalasim.Co
 A component's status is automatically tracked in the status level monitor `component.statusMonitor`. Thus, it possible to check how long a component has been in passive state with
 
 ```kotlin
-val passive_duration = component.statusMonitor[ComponentState.PASSIVE]
+val passiveDuration = component.statusMonitor[ComponentState.PASSIVE]
 ```
 
 It is possible to print a histogram with all the statuses a component has been in with

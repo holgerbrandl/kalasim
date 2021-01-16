@@ -2,12 +2,18 @@
 
 ## v0.6 (In Progress)
 
-* New API to select from resources with policy
+* New API `selectResource` to select from resources with policy
 ```kotlin
 val doctors = List(3) { Resource() }
 val selected = selectResource( doctors, policy = SHORTEST_QUEUE )
 ```
 
+* Allow generating not just `Component`s with `ComponentGenerator`
+```kotlin
+ComponentGenerator(uniform(0,1)){ counter -> "smthg no$counter"}
+```
+
+* 
 
 ## v0.5
 
