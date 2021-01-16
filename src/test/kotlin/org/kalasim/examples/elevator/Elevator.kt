@@ -1,3 +1,4 @@
+//Elevator.kt
 package org.kalasim.examples.elevator
 
 import org.kalasim.*
@@ -102,7 +103,8 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) : Component() {
     var floor = initialFloor
 
     // todo why is this is queue (it does no seem to be used as such; stats?)
-    val visitors = ComponentQueue<Visitor>("passengers of $name")//.apply { lengthOfStayMonitor.disable(); queueLengthMonitor.disable() }
+    val visitors = ComponentQueue<Visitor>("passengers of $name")
+    //.apply { lengthOfStayMonitor.disable(); queueLengthMonitor.disable() }
 
     enum class DoorState { OPEN, CLOSED }
 

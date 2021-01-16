@@ -48,6 +48,7 @@ nav:
     - Machine Parts: examples/machine_parts.md
     - Machine Shop: examples/machine_shop.md
     - Dining Philosophers: examples/dining_philosophers.md
+    - Office Tower: examples/office_tower.md
   - Advanced:
     - advanced.md
   - About:

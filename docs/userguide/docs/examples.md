@@ -20,6 +20,7 @@ Elaborate
 * [Gas Station](examples/gas_station.md) - A gas-station again, but this time the focus is on the station itself and how it struggls to get new petrol to serve hungry customers.
 * [Bank Office](examples/bank_office.md#bank-office-with-resources) - A classical queue problem where customers need to be served. Here solved 4 times in different ways using different `kalasim` models.
 * [Dining Philosophers](examples/dining_philosophers.md) -  Philosophers sit at a round table with bowls of spaghetti and try to eat. It ain't easy...
+* [Office Tower](examples/office_tower.md) - A busy office building, where workers need to get from floor to floor using a limited number of elevators.
 
 
 
