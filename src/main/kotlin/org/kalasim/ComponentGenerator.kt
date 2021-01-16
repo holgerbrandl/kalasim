@@ -47,7 +47,7 @@ class ComponentGenerator<T : Component>(
             val t = env.now + iat.sample()
 
             if (t > till) {
-                yield((this@ComponentGenerator).activate(at = till, process = ComponentGenerator<T>::doFinalize))
+                yield(activate(at = till, process = ComponentGenerator<T>::doFinalize))
             }
 
             hold(till = t)
@@ -60,6 +60,9 @@ class ComponentGenerator<T : Component>(
 
     override val info: Jsonable
         get() = ComponentGeneratorInfo(this)
+
+    // https://www.baeldung.com/kotlin/observer-pattern
+
 }
 
 
