@@ -8,12 +8,9 @@
 
 ## v0.6
 
-**{todo}**  implement `Demo preemptive resource animated.py`
+**{todo}** implement `Demo preemptive resource animated.py`
 
 **{todo}** finish elevator example with visualization
-
-
-**{todo}** Add equivalent of simmer::select (See Ucar2019,p12) with multiple select policies `List<Resource>.select()`; Also detail out how DI for multiple elements by type (see <https://stackoverflow.com/questions/54374067/how-to-retrieve-all-instances-that-matches-a-given-type-using-koin-dependency-in>)
 
 ---
 

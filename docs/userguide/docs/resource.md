@@ -258,6 +258,44 @@ to obtain the mean occupancy.
 
 Note that the occupancy is set to 0 if the capacity of the resource is <= 0.
 
+## Resource Selection
+
+<!--https://r-simmer.org/reference/select.html-->
+<!--Equivalent of simmer::select (See Ucar2019,p12) with multiple select policies-->
+
+There is a special mechanism to select resources dynamically. With `selectResource()` a resource can be  selected from a list of resources using a policy. There are several policies provided:
+
+* `SHORTEST_QUEUE`: The resource with the shortest queue, i.e. the least busy resource is selected.
+* `ROUND_ROBIN`: Resources will be selected in a cyclical order.
+* `FIRST_AVAILABLE`: The first available resource is selected.
+* `RANDOM`: A resource is randomly selected.
+
+The `*_AVAILABLE` policies check for resource availability (i.e. whether the current capacity is sufficient to honor the requested quantity (defaulting to `1`). Resources that do not meet this requirement will not be considered for selection. When using these policies, an error will be raised if all resources are unavailable.
+
+!!! warning
+    With `selectResource`, a resource will be only selected. It won't actually [request](component.md#request) it.
+
+Example
+
+```kotlin
+//{!api/ResourceSelection.kts!}
+```
+
+An alternative more direct approach to achieve round-robin resource selection (e.g. for nested calls) could also be implemented ([example](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/examples/api/ResourceSelectionClassic.kts)) with an iterator.
+
+
+
+<!--A simple round-robin selector could also be achieved with a simple iterator-->
+<!--```kotlin-->
+<!--val resources = List(3) { Resource() }-->
+<!--val resIter = resources.repeat().iterator()-->
+<!--//...-->
+<!--while(true) {-->
+<!--    request(resIter.next())-->
+<!--}-->
+<!--```-->
+
+
 ##  Depletable Resources
 
 For depletable (which are also referred to as _anonymous_) resources, it may be not allowed to exceed the capacity and have a component wait for enough (claimed) capacity to be available. That may be accomplished by using a negative quantity in the `Component.request()` call.

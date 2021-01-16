@@ -6,6 +6,7 @@ import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.junit.Assert
 import org.junit.Test
 import org.kalasim.*
+import org.kalasim.ResourceSelectionPolicy.*
 import org.kalasim.misc.asCMPairList
 
 class ResourceTests {
@@ -35,10 +36,10 @@ class ResourceTests {
             object : Component() {
 
                 override fun process() = sequence {
-                    while (true) {
+                    while(true) {
                         request(resource withQuantity 1 andPriority prioPDF.sample())
                         hold(1)
-                        if (!isClaiming(resource)) {
+                        if(!isClaiming(resource)) {
                             break
                         } else {
                             release(resource)
@@ -90,7 +91,7 @@ class ResourceTests {
             override fun process() = sequence {
                 hold(preRequestHold)
 
-                if (requestPriority != null) {
+                if(requestPriority != null) {
                     request(resource withPriority requestPriority)
                 } else {
                     request(resource)
@@ -98,9 +99,9 @@ class ResourceTests {
 
                 hold(postRequestHold)
 
-                if (isBumped(resource)) {
+                if(isBumped(resource)) {
                     log("got bumped from $resource")
-                    if (failOnBump) Assert.fail()
+                    if(failOnBump) Assert.fail()
                     return@sequence
                 }
 
@@ -305,6 +306,77 @@ class ResourceTests {
             c.status shouldBe ComponentState.DATA
         }
     }
+
 }
+
+class ResourceSelectionTests {
+    @Test
+    fun `it should allow to select with FIRST_AVAILBLE`() = createTestSimulation(true) {
+        val resources = List(3) { Resource().apply { capacity = 0.0 } }
+
+        object : Component() {
+            override fun process() = sequence {
+                val r = selectResource(resources, policy = FIRST_AVAILABLE)
+                r shouldBe resources[1]
+            }
+        }
+
+        run(3)
+        resources[1].capacity = 3.0
+        run(3)
+    }
+
+    @Test
+    fun `it should allow to select with SHORTEST_QUEUE`() = createTestSimulation(true) {
+        val resources = List(3) { Resource() }
+
+        class ResourceConsumer(val resource: Resource) : Component() {
+            override fun process() = sequence {
+                request(resource) { hold(10) }
+            }
+        }
+
+        repeat(10) { ResourceConsumer(resources[0]) }
+        repeat(3) { ResourceConsumer(resources[1]) }
+        repeat(20) { ResourceConsumer(resources[2]) }
+
+        object : Component() {
+            override fun process() = sequence {
+                val r = selectResource(resources, policy = SHORTEST_QUEUE)
+                r shouldBe resources[1]
+            }
+        }
+
+        run(3)
+        resources[1].capacity = 3.0
+        run(3)
+    }
+
+    @Test
+    fun `it should allow to select with ROUND_ROBIN`() = createTestSimulation(true) {
+        val resources = List(3) { Resource() }
+
+        val c = object : Component() {
+
+            val obtainedResources = mutableListOf<Resource>()
+
+            override fun process() = sequence {
+                repeat(9) {
+                    val r = selectResource(resources, policy = ROUND_ROBIN)
+                    request(r) {
+                        hold(1)
+                    }
+
+                    obtainedResources.add(r)
+                }
+            }
+        }
+
+        run(20)
+
+        c.obtainedResources shouldBe (resources + resources + resources)
+    }
+}
+
 
 

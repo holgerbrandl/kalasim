@@ -1,5 +1,14 @@
 # Kalasim Release History
 
+## v0.6 (In Progress)
+
+* New API to select from resources with policy
+```kotlin
+val doctors = List(3) { Resource() }
+val selected = selectResource( doctors, policy = SHORTEST_QUEUE )
+```
+
+
 ## v0.5
 
 Released 2021-01-12

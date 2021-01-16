@@ -3,6 +3,7 @@ package org.kalasim
 import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.ComponentState.*
 import org.kalasim.ResourceEventType.*
+import org.kalasim.ResourceSelectionPolicy.*
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
 import org.koin.core.Koin
@@ -1171,6 +1172,57 @@ open class Component(
         val claims = c.claims.map { it.key.name to it.value }.toMap()
         val requests = c.requests.map { it.key.name to it.value }.toMap()
     }
+
+
+    suspend fun SequenceScope<Component>.selectResource(
+        resources: List<Resource>,
+        quantity: Number = 1,
+        policy: ResourceSelectionPolicy = RANDOM
+    ): Resource {
+        require(resources.isNotEmpty()) { "Resources listing must not be empty" }
+
+        val selected = when(policy) {
+            SHORTEST_QUEUE -> {
+                resources.minByOrNull { it.requesters.size }!!
+            }
+            ROUND_ROBIN -> {
+                // note could also be achieved with listOf<Resource>().repeat().iterator()
+                val mapKey = listOf(this.hashCode(), resources.map{it.name}.hashCode()).hashCode()
+                // initialize if not yet done
+                val curValue = SELECT_SCOPE_IDX.putIfAbsent(mapKey, 0) ?:0
+
+                // increment for future calls
+                SELECT_SCOPE_IDX.put(mapKey, (curValue+1).rem(resources.size))
+
+                return resources[curValue]
+            }
+            FIRST_AVAILABLE -> {
+                while(resources.all { it.availableQuantity < quantity.toDouble() }) {
+                    standby()
+                }
+
+                resources.first { it.availableQuantity > quantity.toDouble() }
+            }
+            RANDOM -> {
+                resources[discreteUniform(0, resources.size - 1).sample()]
+            }
+            RANDOM_AVAILABLE -> {
+                val available = resources.filter { it.availableQuantity >= quantity.toDouble() }
+                require(available.isNotEmpty()) { "Not all resources must be in use to use RANDOM_AVAILABE selection policy" }
+
+                available[discreteUniform(0, available.size - 1).sample()]
+            }
+        }
+
+        return selected
+    }
+}
+
+internal val SELECT_SCOPE_IDX = mutableMapOf<Int, Int>()
+
+
+enum class ResourceSelectionPolicy {
+    SHORTEST_QUEUE, FIRST_AVAILABLE, RANDOM, RANDOM_AVAILABLE, ROUND_ROBIN
 }
 
 
