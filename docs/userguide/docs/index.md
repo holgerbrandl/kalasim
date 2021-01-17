@@ -18,7 +18,7 @@ In contrast to many other simulation tools, `kalasim` is neither low-code nor no
 * [Simulation entities](component.md) have a generative process description that defines the interplay with other entities
 * There is a well-defined rich process interaction vocabulary, including [hold](component.md#hold), [request](component.md#request), [wait](component.md#wait) or [passivate](component.md#passivate)
 * An [event trigger queue](basics.md#event-queue) maintains future action triggers and acts as sole driver to progress simulation state
-* Built-in monitoring and statistics gathering across the entire API
+* Built-in [monitoring](monitors.md) and [statistics](analysis.md) gathering across the entire API
 
 Find out more about the [basics](basics.md) of a `kalasim` simulation.
 
@@ -52,7 +52,7 @@ In this example,
 hold(1.0)
 ```
 
-suspends execution control and *comes back* after 1 time unit (referred to as _tick_). Apart from [`hold`](component.md#hold),  it supports a rich vocabulary of interaction methods including [`passivate`](component.md#passivate), [`request`](component.md#request), [`wait`](component.md#wait) and [`component`](component.md#standby).
+suspends execution control and *comes back* after 1 time unit (referred to as _tick_). Apart from [`hold`](component.md#hold), `kalasim` supports a rich vocabulary of interaction methods including [`passivate`](component.md#passivate), [`request`](component.md#request), [`wait`](component.md#wait) and [`component`](component.md#standby).
 
 
 The main body of every `kalasim` model usually starts with:
@@ -61,9 +61,9 @@ createSimulation(enableConsoleLogger = true){
 ...
 }
 ```
-Here, we enable event logging of state changes to see the status of simulation on the console. After declaring our dependencies, we instantiate a single car with `Car()`. It automatically gets the name *Car.0*.
+Here, we enable event logging of state changes to see the status of simulation on the console. After declaring our dependencies, we instantiate a single car with `Car()`. It automatically is assigned the name *Car.0*.
 
-As there is a generator function called process in Car, this process description will be activated (by default at time `now`, which is `0` here). It is possible to start a process later, but this is by far the most common way to start a process.
+As there is a generator function called `process` in `Car`, this process description will be activated (by default at time `now`, which is `0` by default at the beginning of a simulation). It is possible to start a process later, but this is by far the most common way to start a process.
 
 With
 

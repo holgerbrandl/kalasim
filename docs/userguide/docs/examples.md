@@ -13,6 +13,7 @@ Moderate
 * [Car Wash](examples/car_wash.md) - A car wash with limited throughput, and a continuous stream of new customers
 * [Machine Parts](examples/machine_parts.md) - A small shop-floor with multi-part machines, where all parts must be functional to avoid tool downtime
 * [Machine Shop](examples/machine_shop.md) - A day in a life of a busy maintenance engineer. Tools break and need to be repaired before they can continue operation
+* [The Ferryman](examples/ferryman.md) - A wild river, one boat only, and a patient ferryman transporting batches of passengers across the body of water
 
 Elaborate
 

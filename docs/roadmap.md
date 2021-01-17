@@ -77,6 +77,8 @@ val c = Component(){
 
 ## Pre-release
 
+**{todo}** wait lambda should use state.value as receiver
+
 **{todo}** lambda builder fro interrupt/release
 
 **{todo}** update logs example in docs intro

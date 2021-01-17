@@ -153,8 +153,7 @@ The scheme below shows how interaction relate to component state transitions:
 
 ### activate
 
-Activate is the way to turn a data component into a live component. If you do not specify a process,
-the (usually generator) function process is assumed. So you can say:
+Activate will schedule execution at the specified time. If you do not specify a process, the current process will scheduled for *continuation*. If a `process` argument is provided, the process will be *started* (or *restarted* if it is equal to the currently active process).
 
 ```kotlin
 val car0 = Car(process=null)  // data component
@@ -164,19 +163,24 @@ val car1 = Car(process=null)  // data component
 car1.activate(process=null) //  activate @ wash
 ```
 
-* If the component to be activated is current, always use `yield(activate())`. The effect is that the
-  component becomes scheduled, thus this is essentially equivalent to the preferred hold method.
-* If the component to be activated is passive, the component will be activated at the specified time.
-* If the component to be activated is scheduled, the component will get a new scheduled time.
-* If the component to be activated is requesting, the request will be
-  terminated, the attribute failed set and the component will become scheduled. If keep_request=True
-  is specified, only the fail_at will be updated and the component will stay requesting.
-* If the component to be activated is waiting, the wait will be
-  terminated, the attribute failed set and the component will become scheduled. If keep_wait=True
-  is specified, only the fail_at will be updated and the component will stay waiting.
-* If the component to be activated is standby, the component will get a new scheduled time and become
+<!--* If the component to be activated is `CURRENT`, always use `yield(activate())`. The effect is that the-->
+<!--  component becomes scheduled, thus this is essentially equivalent to the preferred hold method.-->
+* If the component to be activated is `DATA`, unless provided with `process` the default `Component::process` will be scheduled at the specified time.
+* If the component to be activated is `PASSIVE`, the component will be activated at the specified time.
+* If the component to be activated is `SCHEDULED`, the component will get a new scheduled time.
+* If the component to be activated is `REQUESTING`, the request will be
+  terminated, the attribute failed set, and the component will become scheduled. If keep_request=True
+  is specified, only the fail_at will be updated, and the component will stay requesting.
+* If the component to be activated is `WAITING`, the wait will be
+  terminated, the attribute `failed` set, and the component will become scheduled. If `keepWait=true`
+  is specified, only the `failAt` will be updated, and the component will stay waiting.
+* If the component to be activated is `STANDBY`, the component will get a new scheduled time and become
   scheduled.
-* If the component is interrupted, the component will be activated at the specified time.
+* If the component is `INTERRUPTED`, the component will be activated at the specified time.
+
+!!! note
+    It is not possible to `activate` the `CURRENT` component, and `kalasim` will throw an error in this situation. The effect of a "self"-activate would be that the component becomes scheduled, thus this is essentially equivalent to the preferred hold method, so please use `hold` instead. In rare situations processes need to be restarted. If so, use yield for activation and provide the process pointer `yield(activate(process = Component::process))` which will bypass the internal requirement that the activated component mustt not be `CURRENT`.
+
 
 ### hold
 
@@ -369,3 +373,8 @@ Clerk-->>EventLoop: hold vor n time units for processing
 Examples
 
 * [ATM Queue](examples/atm_queue.md)
+
+
+## Batching
+
+Queues can be consumed in a *batched* manner using the `batch()`. See ["The Ferryman"](examples/ferryman.md) for a worked out example and its API documentation.
