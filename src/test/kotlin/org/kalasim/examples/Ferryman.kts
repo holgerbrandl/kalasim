@@ -10,18 +10,18 @@ createSimulation {
     class Passenger : Component(process = null)
 
     val fm = object : Component("ferryman") {
-        val left2Right = ComponentQueue<Passenger>("queue(left->right)")
-        val right2Left = ComponentQueue<Passenger>("queue(right->left)")
+        val left2Right = ComponentQueue<Passenger>()
+        val right2Left = ComponentQueue<Passenger>()
 
         val l2rMonitor = NumericStatisticMonitor()
         val r2lMonitor = NumericStatisticMonitor()
 
         override fun process() = sequence {
-            val batchLR: List<Component> = batch(left2Right, 4, timeout = 10)
+            val batchLR: List<Passenger> = batch(left2Right, 4, timeout = 10)
             l2rMonitor.addValue(batchLR.size)
             hold(5, description = "shipping ${batchLR.size} l2r")
 
-            val batchRL: List<Component> = batch(right2Left, 4, timeout = 10)
+            val batchRL: List<Passenger> = batch(right2Left, 4, timeout = 10)
             r2lMonitor.addValue(batchRL.size)
             hold(5, description = "shipping ${batchRL.size} r2l")
 
@@ -38,6 +38,6 @@ createSimulation {
 
     run(10000)
 
-    fm.l2rMonitor.display("Queue left->right")
-    fm.r2lMonitor.display("Queue right->left")
+    fm.l2rMonitor.display("Passengers left->right")
+    fm.r2lMonitor.display("Passengers right->left")
 }

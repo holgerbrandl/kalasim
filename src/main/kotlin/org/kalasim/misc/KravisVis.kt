@@ -68,6 +68,7 @@ fun <T> FrequencyLevelMonitor<T>.display(title:String=name) {
             )
         }
 
+        // why cant we use "x".asDiscreteVariable here?
         segments.plot(
             x = Segment<T>::start,
             y = Segment<T>::value,

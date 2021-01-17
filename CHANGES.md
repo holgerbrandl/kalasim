@@ -2,7 +2,7 @@
 
 ## v0.6 (In Progress)
 
-* New API `selectResource` to select from resources with policy
+* Added `selectResource()` to [select from resources with policy](https://www.kalasim.org/resource/#resource-selection)
 ```kotlin
 val doctors = List(3) { Resource() }
 val selected = selectResource( doctors, policy = SHORTEST_QUEUE )
@@ -13,7 +13,11 @@ val selected = selectResource( doctors, policy = SHORTEST_QUEUE )
 ComponentGenerator(uniform(0,1)){ counter -> "smthg no$counter"}
 ```
 
-* 
+* New suspending [`batch`](https://www.kalasim.org/component/#batching) interaction to group an entity stream into blocks
+```kotlin
+val queue = ComponentQueue<Customer>()
+val batchLR: List<Customer> = batch(queue, 4, timeout = 10)
+```
 
 ## v0.5
 

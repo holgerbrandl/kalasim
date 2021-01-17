@@ -1234,6 +1234,8 @@ open class Component(
         batchSize: Int,
         timeout: Int? = null
     ): List<T> {
+        // Note: Adopted from simmer::batch (Ucar2019, p14)
+
         require(batchSize>0){"Batch size must be positive"}
 
         val queueListener = object : QueueChangeListener<T>() {

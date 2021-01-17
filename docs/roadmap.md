@@ -12,19 +12,6 @@
 
 **{todo}** finish elevator example with visualization
 
----
-
-work out an example that is equivalent to simmer::batch (Ucar2019, p14); RollerCoasterManager with ComponentQueue?
-
-```
-roller <- trajectory() %>%
-+ batch(10, timeout = 5, permanent = FALSE) %>%
-+ seize("rollercoaster", 1) %>%
-+ timeout(5) %>%
-+ release("rollercoaster", 1) %>%
-+ separate()
-```
-
 
 ---
 **{todo}** generator should monitor generation, from Ucar

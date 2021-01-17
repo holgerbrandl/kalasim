@@ -36,9 +36,9 @@ Since passengers on the right bank arrive with a higher rate (that is shorter in
 
 ![](ferry_right_left.png)
 
+
 **Left→Right**
 
 Because of a slightly higher inter-arrival time (up to `15` minutes) on the left banks, it often happens that the ferry starts its journey across the river with some seats unoccupied. On average, just `3` seats are taken. However, at least during this simulation we did not encounter a passing with just the ferryman and his thoughts.
 
 ![](ferry_left_right.png)
-
