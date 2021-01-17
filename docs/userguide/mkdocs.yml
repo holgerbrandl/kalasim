@@ -28,6 +28,7 @@ nav:
     - Theory: theory.md
     - Setup: setup.md
     - FAQ: faq.md
+    - What's New: changes.md
   - Basics:
     - Simulation Basics: basics.md
     - Components: component.md
