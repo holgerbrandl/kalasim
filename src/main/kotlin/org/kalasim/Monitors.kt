@@ -14,7 +14,6 @@ import org.kalasim.misc.*
 import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
 import kotlin.math.roundToInt
-import kotlin.math.roundToLong
 import kotlin.math.sqrt
 
 
@@ -106,8 +105,8 @@ open class FrequencyMonitor<T>(
 
         // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
         println("Histogram of: '${name}'")
-        frequencies.mapValues { it.value.toLong() }.toList()
-            .printHistogram(values = values, sortByWeight = sortByWeight)
+        frequencies.mapValues { it.value.toDouble() }
+            .printConsole(values = values, sortByWeight = sortByWeight)
 //        frequencies.keys.asSequence().map {
 //            println("${it}\t${getPct(it)}\t${frequencies[it]}")
 //        }
@@ -193,15 +192,16 @@ class FrequencyLevelMonitor<T>(
         println("# Levels: ${this.values.distinct().size}")
         println()
 
-        val hist: List<Pair<T, Long>> =
-            xDuration().zip(this.values).groupBy { (_, value) -> value }
-                .map { it.key to it.value.sumOf { (it.first * 100).roundToLong() } }
-
-//        val ed = EnumeratedDistribution(hist.asCM())
+        //        val ed = EnumeratedDistribution(hist.asCM())
 //        repeat(1000){ ed.sample()}.c
 
-        hist.printHistogram(sortByWeight = sortByWeight, values = values)
+        summed().printConsole(sortByWeight = sortByWeight, values = values)
     }
+
+    /** Accumulated retention time of the ComponentState. Only visited states will be included. */
+    fun summed(): ColData<T> = xDuration().zip(this.values)
+        .groupBy { (_, value) -> value }
+        .map { it.key to it.value.sumOf { (it.first) } }.toMap()
 
 
     fun statsData(): LevelStatsData<T> {
@@ -251,7 +251,7 @@ class NumericStatisticMonitor(name: String? = null, koin: Koin = GlobalContext.g
 
 //    fun statistics(): DescriptiveStatistics = DescriptiveStatistics(sumStats.values)
 
-    fun printHistogram(sortByWeight: Boolean = false, binCount: Int = NUM_HIST_BINS, valueBins: Boolean = false) {
+    fun printHistogram(binCount: Int = NUM_HIST_BINS, valueBins: Boolean = false) {
         //    val histJson = JSONArray(GSON.toJson(histogramScaled))
 
         //    json {
@@ -272,7 +272,7 @@ class NumericStatisticMonitor(name: String? = null, koin: Koin = GlobalContext.g
         statistics().printThis()
 
         println("Histogram of: '${name}'")
-        sumStats.buildHistogram(binCount).printHistogram(sortByWeight = sortByWeight)
+        sumStats.buildHistogram(binCount).printHistogram()
     }
 
 
@@ -389,19 +389,17 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
 
             values.forEach { freq.addValue(it) }
 
-            val byValueHist: List<Pair<Double, Long>> = statistics().data.run {
+            val colData = statistics().data.run {
                 durations.zip(values).groupBy { (_, value) -> value }
-                    .map { it.key to it.value.sumOf { it.first }.roundToLong() }
-            }
-
+                    .map { it.key to it.value.sumOf { it.first } }
+            }.toMap()
 
             // inherently wrong because does not take into account durations
 //            val byValueHist = freq
 //                .valuesIterator().iterator().asSequence().toList()
 //                .map { it to freq.getCount(it) }
 
-            byValueHist.printHistogram(sortByWeight = sortByWeight)
-
+            colData.printConsole(sortByWeight = sortByWeight)
         } else {
 
             // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
@@ -417,7 +415,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
                     EnumeratedDistribution(hist.asCMPairList()).sample(1000, arrayOf<Double>()).toDoubleArray()
                 )
 
-            stats.buildHistogram(binCount).printHistogram(sortByWeight = sortByWeight)
+            stats.buildHistogram(binCount).printHistogram()
         }
     }
 

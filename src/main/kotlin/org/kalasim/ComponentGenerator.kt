@@ -24,6 +24,7 @@ class ComponentGenerator<T>(
     val total: Int = Int.MAX_VALUE,
     name: String? = null,
     priority: Int = 0,
+    val storeRefs : Boolean = false,
     @Suppress("UNUSED_PARAMETER") urgent: Boolean = false,
     koin: Koin = GlobalContext.get(),
     val builder: Environment.(counter: Int) -> T
@@ -40,6 +41,9 @@ class ComponentGenerator<T>(
     init {
         // TODO build intervals
 
+        if(storeRefs){
+            consumers.add(ArrivalTracker())
+        }
     }
 
     fun doIat(): Sequence<Component> = sequence {
@@ -71,6 +75,15 @@ class ComponentGenerator<T>(
         get() = ComponentGeneratorInfo(this)
 
     // https://www.baeldung.com/kotlin/observer-pattern
+
+    class  ArrivalTracker<T> : ArrayList<T>(), Consumer<T>{
+        override fun consume(generated: T) {
+            add(generated)
+        }
+    }
+
+    val arrivals: List<T>
+        get() = consumers.filterIsInstance<ArrivalTracker<T>>().first().toList()
 
 }
 

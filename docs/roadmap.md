@@ -13,11 +13,6 @@
 * https://stackoverflow.com/questions/30812204/i-need-to-check-if-a-method-is-overridden
 * it should be `DATA` until process is overridden or pointing to a different method
 
-**{todo}** generator should monitor generation, from Ucar
->  Returns timing information per arrival: name of the arrival,
-start_time, end_time, activity_time (time not spent in resource queues) and a flag,
-finished, that indicates whether the arrival exhausted its activities (or was rejected)
-
 **{todo}** add averaging resource usage (see AtmQueue.kt)
 
 **{todo}** hide `anonymous` in resources
@@ -47,13 +42,11 @@ nlm.printHistogram()
 
 **{todo}** build visualization for covid19 simulation
 
-
 **{todo}** review simjulia <https://simjuliajl.readthedocs.io/en/stable/topical_guides/5_shared_resources.html#containers>
-
 
 **{todo}** finish elevator example with visualization
 
-**{todo}** consider if ComponentGenerator and ComponentQueue should support all types (and not just Component)
+**{todo}** consider if ComponentQueue should support all types (and not just Component)
 
 **{todo}** wait lambda should use state.value as receiver
 
@@ -61,6 +54,7 @@ nlm.printHistogram()
 
 ## Later
 
+**{todo}** find better way to draw random value without clutter `uniform(0,5)()` --> `uniform(0,5)`?!
 **{todo}** use inline class for time, quantity, priorities and so so on
 
 **{todo}** should we support a resource queue limit ` queue_size = Inf)` (as in simmer ucar209,p19)
@@ -86,7 +80,7 @@ fix <https://github.com/holgerbrandl/kravis/issues/25>
 
 ---
 
-also adjust random generator of kotlin to prevent non-determins enterin simulation when user is doing `listOf().random()`
+also adjust random generator of kotlin to prevent non-determinism entering simulation when user is doing `listOf().random()`
 
 
 ## More Examples
@@ -100,3 +94,4 @@ also adjust random generator of kotlin to prevent non-determins enterin simulati
 **{todo}** port interesting SimPy examples from <https://simpy.readthedocs.io/en/latest/examples/index.html>
 
 **{todo}** port  machine maintenance example from ucar 2019
+![](.roadmap_images/2bad897b.png)

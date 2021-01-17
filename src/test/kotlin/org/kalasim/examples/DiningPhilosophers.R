@@ -35,6 +35,8 @@ simulate <- function(fork_seq, time, thinking=function() rexp(1, 1), eating=func
 ## visualize with gantt
 states <- c("hungry", "eating")
 
+env %>% get_mon_arrivals(per_resource=TRUE) %>% tbl_df
+
 philosophers_gantt <- function(env, size=15) env %>%
     get_mon_arrivals(per_resource = TRUE) %>%
     transform(

@@ -68,6 +68,52 @@ There are two type of visualization
 * Statistical plots. See the [Movie Theater](examples/movie_theater.md)
 
 
+## Tabular Interface
+
+Often a sound type is usually the preferred solution for modelling. Still, accessing data in a tabluar way can also be helpful to enable more statistical analysis. `kalasim` supports transformation. This also allows to provide a semantic compatibility layer with other DES engines (such as [simmer](about.md#simmer)), that are centered around tables for model analysis.
+
+Most metric types in `kalasim` provide a transformation to  a `*Record` type. For instance, for component states we can extract a lifecycle history summary `ComponentLifecycleRecord` with
+
+```kotlin
+val customers : List<Component> // = ...
+val records: List<ComponentLifecycleRecord> = customers.map { it.toLifeCycleRecord() }
+
+records.asDataFrame()
+```
+
+This transform the customers straight into a `krangl` dataframe. Its structure is
+
+```
+A DataFrame: 1034 x 11
+      component   createdAt   inCurrent    inData   inDataSince   inInterrupted   inPassive
+ 1    Vehicle.1       0.366           0   989.724        10.276               0           0
+ 2    Vehicle.2       1.294           0   984.423        15.577               0           0
+ 3    Vehicle.3       1.626           0   989.724        10.276               0           0
+ 4    Vehicle.4       2.794           0   989.724        10.276               0           0
+and 1024 more rows, and and 4 more variables: inScheduled, inStandby, inWaiting
+```
+
+Clearly if needed, the user may also work with the records directly to drive a visualization for instance.
+
+A similar approach can be applied to simulation `Event`s. For example, we can apply an instance filter to the recorded log to extract only log records relating to resource requests. These can be transformed and converted to a csv with just:
+
+```kotlin
+// ... add your simulation here ...
+data class RequestRecord(val requester: String, val timestamp: Double, 
+            val resource: String, val quantity: Double)
+
+val tc = sim.get<TraceCollector>()
+val requests = tc.filterIsInstance<ResourceEvent>().map {
+    val amountDirected = (if(it.type == ResourceEventType.RELEASED) -1 else 1) * it.amount
+    RequestRecord(it.requester.name, it.time, it.resource.name, amountDirected)
+}
+
+// transform data into data-frame (for visualization and stats)  
+requests.asDataFrame().writeCSV("requests.csv")
+```
+
+The transformation step is optional, `List<Event>` can be transformed `asDataFrame()` directly.
+
 ## Replication
 
 Running a simulation just once, often does not provide sufficient insights into the dynamics of the system under consideration. Often, the user may want to execute a model many times with altered initial conditions, and then perform a statistical analysis over the output. This is also considered as *what-if* analyis. See [here](examples/atm_queue.md#simple-what-if) for simple example.

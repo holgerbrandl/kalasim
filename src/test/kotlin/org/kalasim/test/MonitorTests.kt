@@ -31,11 +31,11 @@ class MonitorTests {
                 # Levels: 3
                 
                 Histogram of: 'FrequencyMonitor.1'
-                              bin | entries |  pct |                                         
-                AUDI              |       2 |  .29 | ***********                             
-                VW                |       1 |  .14 | ******                                  
-                PORSCHE           |       4 |  .57 | ***********************
-                """.trimIndent()
+                              bin |  values |  pct |                                         
+                AUDI              |    2.00 |  .29 | ***********                             
+                VW                |    1.00 |  .14 | ******                                  
+                PORSCHE           |    4.00 |  .57 | ***********************
+                                """.trimIndent()
 
         captureOutput { m.printHistogram(values = listOf(AUDI, TOYOTA)) }.stdout shouldBe """
                 Summary of: 'FrequencyMonitor.1'
@@ -43,10 +43,10 @@ class MonitorTests {
                 # Levels: 3
                 
                 Histogram of: 'FrequencyMonitor.1'
-                              bin | entries |  pct |                                         
-                AUDI              |       2 |  .29 | ***********                             
-                TOYOTA            |       0 |  .00 |                                         
-                rest              |       5 |  .71 | *****************************
+                              bin |  values |  pct |                                         
+                AUDI              |    2.00 |  .29 | ***********                             
+                TOYOTA            |     .00 |  .00 |                                         
+                rest              |    5.00 |  .71 | *****************************
                 """.trimIndent()
 
         captureOutput { m.printHistogram(sortByWeight = true) }.stdout shouldBe """
@@ -55,10 +55,10 @@ class MonitorTests {
                 # Levels: 3
                 
                 Histogram of: 'FrequencyMonitor.1'
-                              bin | entries |  pct |                                         
-                PORSCHE           |       4 |  .57 | ***********************                 
-                AUDI              |       2 |  .29 | ***********                             
-                VW                |       1 |  .14 | ******
+                              bin |  values |  pct |                                         
+                PORSCHE           |    4.00 |  .57 | ***********************                 
+                AUDI              |    2.00 |  .29 | ***********                             
+                VW                |    1.00 |  .14 | ******
                 """.trimIndent()
     }
 

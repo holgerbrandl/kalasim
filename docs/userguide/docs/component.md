@@ -104,7 +104,7 @@ A component is always in one of the following states modelled by `org.kalasim.Co
 * `DATA` - The component is non of the _active_ states above. Components without a `process` definition are always in this state.
 
 
-A component's status is automatically tracked in the status level monitor `component.statusMonitor`. Thus, it possible to check how long a component has been in passive state with
+A component's status is automatically tracked in the status level monitor `component.statusMonitor`. Thus, it possible to check how long a component has been in a particuar state with
 
 ```kotlin
 val passiveDuration = component.statusMonitor[ComponentState.PASSIVE]
@@ -115,6 +115,17 @@ It is possible to print a histogram with all the statuses a component has been i
 ```kotlin
 component.statusMonitor.printHistogram()
 ```
+
+Accumulated times in a particular state can be obtained with `summed()` and be printed to console or displayed with the selected graphics backend
+
+```kotlin
+val timeInEachState = component.statusMonitor.summed()
+
+timeInEachState.printConsole()
+timeInEachState.display()
+```
+
+![](component_state_summed.png)
 
 ## Process Interaction
 

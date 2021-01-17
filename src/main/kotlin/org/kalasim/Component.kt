@@ -1337,3 +1337,39 @@ infix fun <T> State<T>.turns(value: T) = StateRequest(this) { it == value }
 
 private fun formatWithInf(time: Double) =
     if(time == Double.MAX_VALUE || time.isInfinite()) "<inf>" else TRACE_DF.format(time)
+
+
+
+data class ComponentLifecycleRecord(
+    val component: String,
+    val createdAt: Double,
+    val inDataSince: Double?,
+    val inData: Double,
+    val inCurrent: Double,
+    val inStandby: Double,
+    val inPassive: Double,
+    val inInterrupted: Double,
+    val inScheduled: Double,
+    val inRequesting: Double,
+    val inWaiting: Double
+)
+
+fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {
+    val c = this
+
+    val histogram: Map<ComponentState, Double> = c.statusMonitor.summed()
+
+    return ComponentLifecycleRecord(
+        c.name,
+        c.creationTime,
+        inDataSince = if(c.isData) c.statusMonitor.statsData().timepoints.last() else null,
+        histogram.get(DATA) ?: 0.0,
+        histogram[CURRENT] ?: 0.0,
+        histogram[STANDBY] ?: 0.0,
+        histogram[PASSIVE] ?: 0.0,
+        histogram[INTERRUPTED] ?: 0.0,
+        histogram[SCHEDULED] ?: 0.0,
+        histogram[REQUESTING] ?: 0.0,
+        histogram[WAITING] ?: 0.0,
+    )
+}

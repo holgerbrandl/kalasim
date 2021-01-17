@@ -15,7 +15,7 @@ fun hasR(): Boolean {
     return proc.exitValue() == 0
 }
 
-internal fun warnNoDisplay(): Boolean = if (!canDisplay()) {
+internal fun warnNoDisplay(): Boolean = if(!canDisplay()) {
     printWarning(" No display or R not found")
     true
 } else {
@@ -26,8 +26,8 @@ internal fun printWarning(msg: String) {
     System.err.println("[kalasim] $msg")
 }
 
-fun NumericLevelMonitor.display(title:String=name) {
-    if (warnNoDisplay()) return
+fun NumericLevelMonitor.display(title: String = name) {
+    if(warnNoDisplay()) return
 
     apply {
         val data = stepFun()
@@ -40,8 +40,8 @@ fun NumericLevelMonitor.display(title:String=name) {
 }
 
 
-fun NumericStatisticMonitor.display(title:String=name) {
-    if (warnNoDisplay()) return
+fun NumericStatisticMonitor.display(title: String = name) {
+    if(warnNoDisplay()) return
 
     apply {
         val data = values.toList()
@@ -51,8 +51,19 @@ fun NumericStatisticMonitor.display(title:String=name) {
     }
 }
 
-fun <T> FrequencyLevelMonitor<T>.display(title:String=name) {
-    if (warnNoDisplay()) return
+fun <T> ColData<T>.display(title: String? = null) {
+    if(warnNoDisplay()) return
+
+    val data = toList()
+
+    data.plot(x = { it.first }, y= {it.second})
+        .geomCol()
+        .run { if(title != null) title(title) else this }
+        .show()
+}
+
+fun <T> FrequencyLevelMonitor<T>.display(title: String = name) {
+    if(warnNoDisplay()) return
 
     apply {
         val nlmStatsData = statsData()

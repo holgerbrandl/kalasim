@@ -19,6 +19,9 @@ val queue = ComponentQueue<Customer>()
 val batchLR: List<Customer> = batch(queue, 4, timeout = 10)
 ```
 
+* Added [lifecycle records](analysis.md#tabular-interface) to streamline component state analyses
+
+
 * New Example: ["The ferryman"](examples/ferryman.md)
 * New Example: [Office Tower](examples/office_tower.md)
 
@@ -38,6 +41,7 @@ Major Enhancements
 * New API to add dependencies in simulation context using `dependency {}`
 
 Notable Fixes
+
 * Fixed `failAt` in `request`
 
 
