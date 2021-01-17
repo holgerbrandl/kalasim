@@ -1,7 +1,5 @@
-package org.kalasim.examples
-
+//MachineWithParts.kt
 import org.kalasim.*
-
 
 class Part(val machine: Machine, partNo: Int) :
     Component(
@@ -12,7 +10,6 @@ class Part(val machine: Machine, partNo: Int) :
     val ttr = uniform(3, 6)  //  time to repair distribution
 
     override fun process() = sequence {
-
         while (true) {
             hold(ttf())
             machine.interrupt()
@@ -40,9 +37,8 @@ class Machine : Component() {
 }
 
 fun main() {
-    declareDependencies {
-        add { Resource() }
-    }.createSimulation(true) {
+    createSimulation(true) {
+        dependency { Resource() }
         repeat(2) { Machine() }
 
         run(400)
