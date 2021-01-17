@@ -38,6 +38,14 @@ open class State<T>(
     internal val waiters = ComponentQueue<Component>("waiters of ${this.name}", koin = koin)
 //    val waiters = PriorityQueue<Component>()
 
+    /** Tracks the queue length level along time. */
+    val queueLength: NumericLevelMonitor
+        get() = waiters.queueLengthMonitor
+
+    /** Tracks the length of stay in the queue over time*/
+    val lengthOfStay: NumericStatisticMonitor
+        get() = waiters.lengthOfStayMonitor
+
     override fun toString(): String = super.toString() + "[${value}]"
 
     private var isTrigger: Boolean = false
