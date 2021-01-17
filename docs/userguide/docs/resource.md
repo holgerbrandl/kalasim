@@ -39,11 +39,14 @@ request(clerks withQuantity 2) // request 2s from clerks
 
 `request` has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
 
-It is also possible to request for more resources at once. In the following examples, we request 1 quantity from `clerks` AND 2 quantities from `assistance`.
+It is also possible to request for more resources at once. In the following examples, we request 1 quantity from `clerks` **AND** 2 quantities from `assistance`.
 
 ```kotlin
 request(clerks withQuantity 1, assistance withQuantity 2) 
 ```
+
+To request alternative resources, the user can define the parameter `oneOf=true`, which will would result in requesting 1 quantity from `clerks` **OR** 2 quantities from `assistance`.
+
 
 Resources have a queue `requesters` containing all components trying to claim from the resource.
 In addition, there is a queue `claimers` containing all components claiming from the resource (not for anonymous resources).
