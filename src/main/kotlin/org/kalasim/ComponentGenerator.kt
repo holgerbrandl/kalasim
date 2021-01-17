@@ -33,7 +33,9 @@ class ComponentGenerator<T>(
         fun consume(generated: K)
     }
 
-    val consumers  = mutableListOf<Consumer<T>>()
+    private val consumers  = mutableListOf<Consumer<T>>()
+    fun addConsumer(consumer: Consumer<T>) = consumers.add(consumer)
+    fun removeConsumer(consumer: Consumer<T>) = consumers.remove(consumer)
 
     init {
         // TODO build intervals
@@ -44,13 +46,6 @@ class ComponentGenerator<T>(
         var numGenerated = 0
 
         while (true) {
-            val created = builder(env, numGenerated)
-            numGenerated++
-
-            consumers.forEach{ it.consume(created)}
-
-            if (numGenerated >= total) break
-
             val t = env.now + iat.sample()
 
             if (t > till) {
@@ -58,6 +53,13 @@ class ComponentGenerator<T>(
             }
 
             hold(till = t)
+
+            val created = builder(env, numGenerated)
+            numGenerated++
+
+            consumers.forEach{ it.consume(created)}
+
+            if (numGenerated >= total) break
         }
     }
 

@@ -1,8 +1,11 @@
 package org.kalasim.test
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.*
+import org.kalasim.ComponentState.*
+import kotlin.math.roundToInt
 import kotlin.test.assertEquals
 
 class QueueTests {
@@ -30,7 +33,7 @@ class QueueTests {
         // add a consumer
         object : Component() {
             override fun process() = sequence {
-                while (waitingLine.isNotEmpty()) {
+                while(waitingLine.isNotEmpty()) {
                     waitingLine.poll()
                     // wait for it...
                     hold(5.0)
@@ -98,5 +101,67 @@ class QueueTests {
 
             run(10)
         }
+    }
+
+
+    @Test
+    fun `it should correctly calculate inversed iat`() = createTestSimulation {
+        run(5)
+        val inverseIat = inversedIatDist(6, 7, 9)
+
+        run(inverseIat())
+        now shouldBe 6
+
+        run(inverseIat())
+        now shouldBe 7
+
+        run(inverseIat())
+        now shouldBe 9
+
+        // since the underying iterator is exhausted now, we expect an exception
+        shouldThrow<NoSuchElementException> {
+            inverseIat()
+        }
+    }
+
+   @Test
+    fun `it should correctly generate using inversed iat`() = createTestSimulation {
+        val arrivalsTimes = listOf(6, 7, 9)
+        val inverseIat = inversedIatDist(*arrivalsTimes.toTypedArray())
+
+       val generated  = mutableListOf<Component>()
+       ComponentGenerator(inverseIat){ Component() }.addConsumer{ generated.add(it)}
+
+       run(20)
+       generated.map{ it.creationTime.roundToInt()} shouldBe arrivalsTimes
+    }
+
+    @Test
+    fun `it should form batches`() = createTestSimulation {
+        // see ferryman.md
+        class Passenger : Component(process = null)
+
+        val fm = object : Component() {
+            val waitingLine = ComponentQueue<Passenger>()
+
+            override fun process() = sequence {
+                val batchComplete = batch(waitingLine, 4, timeout = 10)
+                batchComplete.size shouldBe 4
+                env.now shouldBe 8
+
+                hold(till = 20)
+
+                val batchPartial = batch(waitingLine, 4, timeout = 10)
+                batchPartial.size shouldBe 2
+                env.now shouldBe 30
+            }
+        }
+
+        ComponentGenerator(inversedIatDist(1, 4, 5, 8, 21, 25)) { Passenger() }
+            .addConsumer { fm.waitingLine.add(it) }
+
+        run(100)
+
+        fm.status shouldBe DATA
     }
 }

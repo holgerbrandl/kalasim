@@ -7,7 +7,6 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.test.MonitorTests.Car.*
 
-//class MonitorTests : KoinStopper() {
 class MonitorTests {
 
     private enum class Car {
@@ -75,6 +74,7 @@ class MonitorTests {
 
         m.getPct(AUDI) shouldBe 0.25
 
+        // todo add test assertions
     }
 
 
@@ -119,8 +119,6 @@ class MonitorTests {
             val nsm = FrequencyMonitor<Int>()
 
             nsm.addValue(2)
-
-
             nsm.disable()
 
             shouldThrow<IllegalArgumentException> {
@@ -130,8 +128,6 @@ class MonitorTests {
             // should be silently ignores
             nsm.addValue(2)
 
-
-
             shouldThrow<IllegalArgumentException> {
                 nsm.printHistogram()
             }
@@ -139,11 +135,4 @@ class MonitorTests {
     }
 
     // TODO test the others
-
-
-}
-
-
-internal fun createTestSimulation(enableConsoleLogger: Boolean = true, builder: Environment.() -> Unit) {
-    createSimulation(enableConsoleLogger, builder = builder)
 }

@@ -1,13 +1,12 @@
 package org.kalasim
 
 import org.apache.commons.math3.distribution.*
-import org.kalasim.misc.asCMPairList
 
 /** Distribution support API */
 
 fun Number.asDist() = ConstantRealDistribution(this.toDouble())
 
-fun fixed(value: Double) = ConstantRealDistribution(value)
+fun fixed(value: Number) = ConstantRealDistribution(value.toDouble())
 
 operator fun RealDistribution.invoke(): Double = sample()
 operator fun IntegerDistribution.invoke(): Int = sample()
@@ -30,5 +29,10 @@ fun Environment.uniform(lower: Number = 1, upper: Number = 0) =
     UniformRealDistribution(rg, lower.toDouble(), upper.toDouble())
 
 
-fun <T> Component.enumerated(vararg elements :  T) = enumerated((elements.map{ it to 1.0/elements.size}).toMap())
-fun <T> Component.enumerated(elements: Map<T, Double>) = EnumeratedDistribution(env.rg, elements.toList().asCMPairList())
+fun <T> Component.enumerated(vararg elements: T) = enumerated((elements.map { it to 1.0 / elements.size }).toMap())
+fun <T> Component.enumerated(elements: Map<T, Double>) =
+    EnumeratedDistribution(env.rg, elements.toList().asCMPairList())
+
+fun <T, S> List<Pair<T, S>>.asCMPairList(): List<CMPair<T, S>> = map { CMPair(it.first, it.second) }
+
+typealias   CMPair<K, V> = org.apache.commons.math3.util.Pair<K, V>

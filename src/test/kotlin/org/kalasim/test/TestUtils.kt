@@ -1,5 +1,10 @@
 package org.kalasim.test
 
+import org.apache.commons.math3.distribution.AbstractRealDistribution
+import org.apache.commons.math3.distribution.ConstantRealDistribution
+import org.kalasim.Environment
+import org.kalasim.createSimulation
+import org.kalasim.misc.cumSum
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
@@ -23,8 +28,8 @@ internal fun captureOutput(expr: () -> Any): CapturedOutput {
     // run the expression
     expr()
 
-    val stdout = String(baosOut.toByteArray()).trim().replace(System.lineSeparator() , "\n")
-    val stderr = String(baosErr.toByteArray()).trim().replace(System.lineSeparator() , "\n")
+    val stdout = String(baosOut.toByteArray()).trim().replace(System.lineSeparator(), "\n")
+    val stderr = String(baosErr.toByteArray()).trim().replace(System.lineSeparator(), "\n")
 
     System.setOut(origOut)
     System.setErr(origErr)
@@ -37,3 +42,24 @@ internal fun captureOutput(expr: () -> Any): CapturedOutput {
 // https://stackoverflow.com/questions/48933641/kotlin-add-carriage-return-into-multiline-string
 //internal fun String.trimAndReline() = trimIndent().replace("\n", System.getProperty("line.separator"))
 
+
+internal fun createTestSimulation(enableConsoleLogger: Boolean = true, builder: Environment.() -> Unit) {
+    createSimulation(enableConsoleLogger, builder = builder)
+}
+
+
+/** Converts a list of fixed arrivals into a inter-arrival distribution. Once the list is exhausted it will throw an
+ * error. This is mainly useful for testing.
+ *
+ * Note: the thrown NoSuchElementException will cause the event-loop to terminate a consuming ComponentGenerator
+ */
+fun Environment.inversedIatDist(vararg arrivalTimes: Number) = object : ConstantRealDistribution(-1.0) {
+
+    val values = (listOf(now) + arrivalTimes.map{it.toDouble()})
+        .zipWithNext()
+        .map{ (prev, curVal )-> (curVal -prev) }
+        .iterator()
+
+
+    override fun sample(): Double = values.next()
+}

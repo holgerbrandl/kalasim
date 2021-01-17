@@ -13,6 +13,7 @@ import org.koin.core.context.GlobalContext
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 import java.util.*
+import kotlin.math.min
 import kotlin.reflect.KFunction1
 
 
@@ -787,12 +788,13 @@ open class Component(
 
     ): Component {
 
-        require(status != CURRENT) {
+        require(status != CURRENT || process !=null) {
             // original contract
             "Can not activate the CURRENT component. If needed simply use hold method."
             // technically we could use suspend here , but since activate is used
             // outside of process definitions we don't want to overcomplete the API for this
             // rare edge case
+            // workaround yield(activate(process = Component::process))
         }
 
         var p: ProcessPointer? = null
@@ -800,7 +802,7 @@ open class Component(
         if(process == null) {
             if(status == DATA) {
                 //                require(this.simProcess != null) { "no process for data component" }
-                // note: not applicable, becuase the test would be if Component has a method called process, which it does by design
+                // note: not applicable, because the test would be if Component has a method called process, which it does by design
 
                 p = Component::process
             }
@@ -835,7 +837,7 @@ open class Component(
 
         reschedule(scheduledTime, priority, urgent, null, "activate $extra", SCHEDULED)
 
-        return (this)
+        return this
     }
 
     internal fun checkFail() {
@@ -1215,6 +1217,44 @@ open class Component(
         }
 
         return selected
+    }
+
+
+    /** Consume a queue into groups of elements (a.k.a batches).
+     *
+     * For details see [user manual](https://www.kalasim.org/component/#queue)
+     *
+     * @param queue The queue to be consumed
+     * @param batchSize The size of the batch to be created. A positive integer is expected here.
+     * @param timeout An optional timeout describing how long it shall wait before forming an incomplete/empty batch
+     * @return A list of type <T> of size `batchSize` or lesser (and potentially even empty) if timed out before filling the batch.
+     */
+    suspend fun <T : Component> SequenceScope<Component>.batch(
+        queue: ComponentQueue<T>,
+        batchSize: Int,
+        timeout: Int? = null
+    ): List<T> {
+        require(batchSize>0){"Batch size must be positive"}
+
+        val queueListener = object : QueueChangeListener<T>() {
+            override fun added(component: T) {
+                if(queue.size >= batchSize) {
+                    activate()
+                }
+            }
+        }
+
+        if(queue.size < batchSize) {
+            queue.addChangeListener(queueListener)
+            hold(timeout)
+        }
+
+        val actualBatchSize = min(batchSize, queue.size)
+        val batch = List(actualBatchSize) { queue.poll() }
+
+        queue.removeChangeListener(queueListener)
+
+        return batch
     }
 }
 

@@ -7,7 +7,7 @@ import org.junit.Assert
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ResourceSelectionPolicy.*
-import org.kalasim.misc.asCMPairList
+import org.kalasim.asCMPairList
 
 class ResourceTests {
 

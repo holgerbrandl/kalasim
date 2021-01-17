@@ -26,7 +26,7 @@ internal fun printWarning(msg: String) {
     System.err.println("[kalasim] $msg")
 }
 
-fun NumericLevelMonitor.display() {
+fun NumericLevelMonitor.display(title:String=name) {
     if (warnNoDisplay()) return
 
     apply {
@@ -35,23 +35,23 @@ fun NumericLevelMonitor.display() {
         data.plot(
             x = Pair<Double, Double>::first,
             y = Pair<Double, Double>::second
-        ).xLabel("time").yLabel("").geomStep().title(name).show()
+        ).xLabel("time").yLabel("").geomStep().title(title).show()
     }
 }
 
 
-fun NumericStatisticMonitor.display() {
+fun NumericStatisticMonitor.display(title:String=name) {
     if (warnNoDisplay()) return
 
     apply {
         val data = values.toList()
         data.plot(
             x = { it }
-        ).geomHistogram().title(name).show()
+        ).geomHistogram().title(title).show()
     }
 }
 
-fun <T> FrequencyLevelMonitor<T>.display() {
+fun <T> FrequencyLevelMonitor<T>.display(title:String=name) {
     if (warnNoDisplay()) return
 
     apply {
@@ -78,6 +78,6 @@ fun <T> FrequencyLevelMonitor<T>.display() {
             .yLabel("")
             .geomSegment()
             .geomPoint()
-            .title(name).show()
+            .title(title).show()
     }
 }

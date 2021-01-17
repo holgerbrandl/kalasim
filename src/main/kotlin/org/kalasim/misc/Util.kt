@@ -131,10 +131,6 @@ internal val GSON by lazy {
 }
 var JSON_INDENT = 2
 
-typealias   CMPair<K, V> = org.apache.commons.math3.util.Pair<K, V>
-
-fun <T, S> List<Pair<T, S>>.asCMPairList(): List<CMPair<T, S>> = map { CMPair(it.first, it.second) }
-
 
 // from https://stackoverflow.com/questions/46895140/how-to-perform-action-for-all-combinations-of-elements-in-lists
 // ternary and higher order: https://stackoverflow.com/questions/53749357/idiomatic-way-to-create-n-ary-cartesian-product-combinations-of-several-sets-of // todo simply add up to 8ary?
@@ -159,4 +155,9 @@ fun <T> repeat(n:Int, builder: (Int) -> T) = (1..n).map{ builder(it)}
 // https://stackoverflow.com/questions/48007311/how-do-i-infinitely-repeat-a-sequence-in-kotlin
 fun <T> Iterable<T>.repeat() = sequence {
     while (true) yieldAll(this@repeat)
+}
+
+// copied from krangl
+fun <T : Number> List<T>.cumSum(): Iterable<Double> {
+    return drop(1).fold(listOf(first().toDouble()), { list, curVal -> list + (list.last().toDouble() + curVal.toDouble()) })
 }

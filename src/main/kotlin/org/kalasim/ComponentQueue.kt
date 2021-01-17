@@ -38,6 +38,8 @@ class ComponentQueue<C : Component>(
 
         val added = q.add(CQElement(component, env.now, priority))
 
+        changeListeners.forEach{ it.added(component)}
+
         queueLengthMonitor.addValue(q.size.toDouble())
 
         return added
@@ -46,7 +48,9 @@ class ComponentQueue<C : Component>(
     fun poll(): C {
         val cqe = q.poll()
 
+        changeListeners.forEach{ it.polled(cqe.component)}
         updateExitStats(cqe)
+
         log(cqe.component, "Left $name")
 
         return cqe.component
@@ -56,6 +60,7 @@ class ComponentQueue<C : Component>(
         val cqe = q.first { it.component == component }
         q.remove(cqe)
 
+        changeListeners.forEach{ it.removed(cqe.component)}
         updateExitStats(cqe)
 
         log(cqe.component, "Removed from $name")
@@ -84,6 +89,15 @@ class ComponentQueue<C : Component>(
         lengthOfStayMonitor.printHistogram()
         queueLengthMonitor.printHistogram()
     }
+
+    private val changeListeners = mutableListOf<QueueChangeListener<C>>()
+
+    fun addChangeListener(changeListener: QueueChangeListener<C>): QueueChangeListener<C> {
+        changeListeners.add(changeListener); return changeListener
+    }
+
+    fun removeChangeListener(changeListener: QueueChangeListener<C>) = changeListeners.remove(changeListener)
+
 
     val stats: QueueStatistics
         get() = QueueStatistics(this)
@@ -164,3 +178,10 @@ internal fun Double?.nanAsNull(): Double? = if (this != null && isNaN()) null el
 //private fun DoubleArray.standardDeviation(): Double = StandardDeviation(false).evaluate(this)
 
 internal fun Double?.roundAny(n: Int = 3) = if (this == null) this else Precision.round(this, n)
+
+
+open class QueueChangeListener<C>{
+    open fun added(component:C){}
+    open fun removed(component:C){}
+    open fun polled(component:C){}
+}
