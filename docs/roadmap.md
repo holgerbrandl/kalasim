@@ -8,37 +8,24 @@
 
 ## v0.6
 
-**{todo}** implement `Demo preemptive resource animated.py`
+**{fixme}** fix  `val x = Component()` to create a DATA component (as stated in the docs)
+* this will also fix the `Passenger` in the ferryman
+* https://stackoverflow.com/questions/30812204/i-need-to-check-if-a-method-is-overridden
+* it should be `DATA` until process is overridden or pointing to a different method
 
-**{todo}** finish elevator example with visualization
-
-
----
 **{todo}** generator should monitor generation, from Ucar
 >  Returns timing information per arrival: name of the arrival,
 start_time, end_time, activity_time (time not spent in resource queues) and a flag,
 finished, that indicates whether the arrival exhausted its activities (or was rejected)
 
-
----
 **{todo}** add averaging resource usage (see AtmQueue.kt)
 
----
-**{todo}** review simmer.plot
-> Ucar I, Smeets B (2019b). simmer.plot: Plotting Methods for simmer. R package version 0.1.15, URL <https://CRAN.R-project.org/package=simmer.plot>
-
-
-## v0.7
-
-**{todo}** review simjulia <https://simjuliajl.readthedocs.io/en/stable/topical_guides/5_shared_resources.html#containers>
-
-**{todo}** hide ` anonymous` in resources
+**{todo}** hide `anonymous` in resources
 
 **{todo}** Cleanup ComponentGenerator API --> take out from until into own constructor
 
 **{todo}**  better document/discuss intent of `standby`
 * isn't it just like hold? What are the benefits?
-
 
 **{todo}** pluggable backend for visualization functions
 ```
@@ -46,42 +33,31 @@ env.visEngine = KRAVIS
 nlm.printHistogram()
 ```
 
-**{todo}** consider a more simplistic process definition pattern
-```kotlin
-val c = Component(){
-    hold(1)
-}
-```
+**{todo}** review simmer.plot and provide similar API
+> Ucar I, Smeets B (2019b). simmer.plot: Plotting Methods for simmer. R package version 0.1.15, URL <https://CRAN.R-project.org/package=simmer.plot>
 
 **{todo}** it should track renege stats in resource directly
 
 **{todo}** restrict more methods in Component from being overridden
 
-##  v0.8
+**{todo}** Register project at awesome-kotlin
+
+
+## v0.7
+
+**{todo}** build visualization for covid19 simulation
+
+
+**{todo}** review simjulia <https://simjuliajl.readthedocs.io/en/stable/topical_guides/5_shared_resources.html#containers>
+
+
+**{todo}** finish elevator example with visualization
 
 **{todo}** consider if ComponentGenerator and ComponentQueue should support all types (and not just Component)
 
-
-## Pre-release
-
 **{todo}** wait lambda should use state.value as receiver
 
-**{todo}** lambda builder fro interrupt/release
-
-**{todo}** update logs example in docs intro
-
-**{todo}** review docs for <https://holgerbrandl.github.io/kalasim/state/>
-
-**{todo}** port interesting examples from <https://simjuliajl.readthedocs.io/en/stable/examples/index.html>
-
-**{todo}** port interesting simmer examples
-<https://r-simmer.org/articles/simmer-08-philosophers.html>
-
-**{todo}** port machine repair example from  <https://github.com/matloff/des>
-
-**{todo}** port interesting SimPy examples from <https://simpy.readthedocs.io/en/latest/examples/index.html>
-
-**{todo}** port  machine maintenance example from ucar 2019
+**{todo}** lambda builder for interrupt/release
 
 ## Later
 
@@ -89,9 +65,7 @@ val c = Component(){
 
 **{todo}** should we support a resource queue limit ` queue_size = Inf)` (as in simmer ucar209,p19)
 
----
-
-Benchmark desim, salabim, simmer vs kalasim
+**{todo}** Benchmark desim, salabim, simmer vs kalasim
 * See Ucar2019  5.1 `Comparison with similar frameworks`
 
 ---
@@ -104,7 +78,6 @@ consider modeling `Store` Using Stores you can model the production and consumpt
 
 ---
 
-Register project at awesome-kotlin
 
 
 ---
@@ -114,3 +87,16 @@ fix <https://github.com/holgerbrandl/kravis/issues/25>
 ---
 
 also adjust random generator of kotlin to prevent non-determins enterin simulation when user is doing `listOf().random()`
+
+
+## More Examples
+
+**{todo}** port interesting examples from <https://simjuliajl.readthedocs.io/en/stable/examples/index.html>
+
+**{todo}** port other interesting simmer examples
+
+**{todo}** port machine repair example from  <https://github.com/matloff/des>
+
+**{todo}** port interesting SimPy examples from <https://simpy.readthedocs.io/en/latest/examples/index.html>
+
+**{todo}** port  machine maintenance example from ucar 2019

@@ -1,9 +1,8 @@
 # State
 
-States together with the `Component.wait()` method provide a powerful way of process interaction.
+States together provide a powerful way of process interaction.
 
-A state will have a certain value at a given time. In its simplest form a component can then wait for
-a specific value of a state. Once that value is reached, the component will be resumed.
+A state will have a value at any given time. In its simplest form a component can [`wait()`](component.md#wait) for a specific value of a state. Once that value is reached, the component will be resumed.
 
 ## Examples
 
@@ -13,9 +12,8 @@ a specific value of a state. Once that value is reached, the component will be r
 
 ## Usage
 
-Definition is simple, like `val doorOpen = State(false)`. The initial value is False, meaning
+New States are defined as `val doorOpen = State(false)`. The initial value is `false`, meaning
 the door is closed.
-
 
 Now we can say :
 
@@ -31,27 +29,34 @@ If we want a person to wait for an open door, we could say :
 wait(doorOpen, true)
 ```
 
-If we just want at most one person to enter, we say `doorOpen.trigger(max=1)`.
+The person's [process definition](component.md#creation-of-a-component) will be suspended until the door is open.
 
-We can obtain the current value by just calling the state, like in:
+We can obtain the current value (e.g. for logging) with:
 
 ```kotlin
 print("""door is ${if(doorOpen.value) "open" else "closed"}""")
 ```
 
-The value of a state is automatically monitored in the `State<T>.value` level monitor.
+The value of a state is automatically monitored in the `State<T>.valueMonitor` level monitor.
 
-All components waiting for a state are in a queue, called `waiters()`.
+All components waiting for a state are tracked in a (internal) queue, that can be obtained with `doorOpen.waiters`.
+
+If we just want at most one person to enter, we can use `trigger()` (which is a simple convenience wrapper around `wait)` with `doorOpen.trigger(true, max=1)`. The following will happen:
+
+1. Temporarily change the state to the provided value,
+2. Reschedule `max` components (or less if there are fewer/no `waiters`) for immediate process continuation,
+3. and finally restore the previous state value
+
 
 ## Type Support
 
-States support generics, so we could equally well use a string (or any type) to indicate state.
-
-States can be used also for non values other than bool type. E.g.
+States support generics, so we could equally well use any other type to model the value. For example, a traffic light could be modelled with a `String` state:
 
 ```
+// initially the traffic light is red
 val light = State("red")
 ...
+// toggle its value to green
 light.value = "green"
 ```
 
@@ -65,26 +70,29 @@ level.value += 10
 
 Since `State<T>` is a generic type, the compiler will reject invalid level associations such as
 ```
-level.value = "foo"
+level.value = "red"
 ```
 This won't compile because the type of level is `Double`.
 
 
-States have a number of monitors:
+## Metrics
 
-* `valueMonitor`, where all the values are collected over time
-* info.queueLengthStats,
-* info.lengthOfStayStats
+States have a number of metrics endpoints:
+
+* `valueMonitor` tracks state changes over time
+* `queueLength` tracks the queue length level across time
+* `lengthOfStay` tracks the length of stay in the queue over time
+
 
 ## Process interaction with `wait()`
 
-A component can [wait](component.md#wait) for a state to get a certain value. In its most simple form this is done with
+A component can [`wait()`](component.md#wait) for a state to get a certain value. In its most simple form this is done with
 
 ```kotlin
-wait(dooropen, true)
+wait(doorOpen, true)
 ```
 
-Once the `dooropen` state is `true`, the component will continue.
+Once the `doorOpen` state is `true`, the component will be scheduled for process continuation.
 
 As with [`request`](component.md#request) it is possible to set a timeout with `failAt` or `failDelay` :
 
@@ -93,7 +101,7 @@ wait(dooropen, true, failDelay=10.0)
 if(failed) print("impatient ...")
 ```
 
-In the above example we tested for a state to be `true`.
+In this example, the process will wait at max `10` ticks. If the state predicate was not met until then, the `failed` flag will be set and be consumed by the user.
 
 There are two ways to test for a value
 
@@ -108,7 +116,7 @@ It is possible to test for a certain value:
 wait(light, "green")
 ```
     
-Or more states at once :
+Or more states at once:
     
 ```kotlin
 wait(light turns "green", light turns "yellow")  
@@ -118,21 +126,21 @@ where the wait is honored as soon is light is `green` OR `yellow`.
 It is also possible to wait for all conditions to be satisfied, by adding `all=true`:
 
 ```kotlin
-wait((light turns "green"), enginerunning turns true, all=true) 
+wait(light turns "green", engineRunning turns true, all=true) 
 ```
-Here, the wait is honored as soon as light is `green` AND engine is `running`.
+Here, the wait is honored as soon as light is `green` AND  the engine is running.
 
 
 ### Predicate testing
 
-This is a more complicated but also more versatile way of specifying the honor-condition. In that case, a predicate function `(T) -> Boolean` is required to specify the condition.
+This is a more complicated but also more versatile way of specifying the honor-condition. In that case, a predicate function `(T) -> Boolean` must be provided required to specify the condition.
 
 #### Example 1
 
 ```kotlin
 wait(StateRequest(State("foo")) { listOf("bar", "test").contains(it) })
 ```
-The wait is honored if the `Strin` State becomes either `bar` or `test`.
+The wait is honored if the `String` State becomes either `bar` or `test`.
 
 #### Example 2
 

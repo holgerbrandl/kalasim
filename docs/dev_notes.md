@@ -56,7 +56,6 @@ git push origin :refs/tags/refs/heads/master
 
 
 ## misc
-multiple receivers <https://youtrack.jetbrains.com/issue/KT-10468>
 
 
 consume sequence `seq.toList()`

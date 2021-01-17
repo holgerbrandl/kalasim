@@ -8,7 +8,7 @@ val doctors = List(3) { Resource() }
 val selected = selectResource( doctors, policy = SHORTEST_QUEUE )
 ```
 
-* Allow generating not just `Component`s with `ComponentGenerator`
+* Changed `ComponentGenerator` to allow generating arbitrary types (and not just `Component`s)
 ```kotlin
 ComponentGenerator(uniform(0,1)){ counter -> "smthg no$counter"}
 ```
@@ -18,8 +18,9 @@ ComponentGenerator(uniform(0,1)){ counter -> "smthg no$counter"}
 val queue = ComponentQueue<Customer>()
 val batchLR: List<Customer> = batch(queue, 4, timeout = 10)
 ```
-* New Example: "The ferryman"
-* New Example: Office Tower
+
+* New Example: ["The ferryman"](examples/ferryman.md)
+* New Example: [Office Tower](examples/office_tower.md)
 
 ## v0.5
 

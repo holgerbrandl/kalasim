@@ -66,7 +66,7 @@ ship2.activate(delay=50)
 ## Creation of a component
 
 Although it is possible to create a component directly with `val x = Component()`, this
-makes it very hard to make that component into an active component, because there's no process method. So, nearly always we define our simulation entities by extending `org.kalasim.Component`:
+makes it very hard to make that component into an active component, because there's no process method. So, nearly always we define our simulation entities by extending `org.kalasim.Component` and by providing a _process definition_ which details out the component's life cycle:
 
 ```kotlin
 class Car: Component(){
@@ -82,10 +82,10 @@ The result is that car is put on the future [event list](basics.md#event-queue) 
 
 It is also possible to set a time at which the component (car) becomes active, like `val car = Car(at=10)`. This requires an additional constructor argument to be passed on to `Component` as in `class Car(at:Number): Component(delay=at)`.
 
-And instead of starting at process, the component may be initialized to start at another (generator) method,
+Instead of starting at process, the component may be initialized to start at another (generator) method,
 like `car=Car(process=Car::wash)`.
 
-And, finally, if there is a process method, you can disable the automatic activation (i.e. make it a data component), by specifying `process = null`.
+Finally, if there is a process method, you can disable the automatic activation (i.e. make it a data component), by specifying `process = null`.
 
 If there is no process method, and process= is not given, the component will be a data component.
 

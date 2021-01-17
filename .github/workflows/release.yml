@@ -36,6 +36,6 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
           body: |
-            See [CHANGES.md](https://github.com/holgerbrandl/kalasim/blob/master/CHANGES.md) for new features, bug-fixes and changes.
+            See [CHANGES.md](https://www.kalasim.org/changes) for new features, bug-fixes and changes.
           draft: false
           prerelease: false
