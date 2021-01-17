@@ -25,7 +25,7 @@ fun main() {
 
         val customer = object : Component() {
             override fun process() = sequence<Component> {
-                waitPredicate{ waiter.isBusy }
+                waitPredicate{ !waiter.isBusy }
             }
 
             suspend fun SequenceScope<Component>.waitPredicate(predicate: () -> Boolean) {
