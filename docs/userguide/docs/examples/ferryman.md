@@ -13,6 +13,8 @@ Covers:
 <i>Stanhope Forbes - A Ferryman at Flushing (oil on canvas, CC0 1.0)</i>
 </p>
 
+## Simulation
+
 To form groups of passengers before passing the waters, we use `batch()` in the ferryman's [process definition](../component.md#creation-of-a-component). It has multiple arguments:
 
 * A mandatory [queue](../component.md#queue) with elements of type `<T>` to be consumed
@@ -24,6 +26,8 @@ To form groups of passengers before passing the waters, we use `batch()` in the 
 ```kotlin
 //{!Ferryman.kts!}
 ```
+
+## Analysis
 
 The ferryman tries to max out his boat with 4 passengers, but after 10 minutes he will start anyway (even if the boat is entirely emtpy). `kalasim` will suspend execution when using `batch()` until `timeout` or indefinitely (if `timeout` is not set).
 

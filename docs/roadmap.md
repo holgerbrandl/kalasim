@@ -52,6 +52,8 @@ nlm.printHistogram()
 
 **{todo}** lambda builder for interrupt/release
 
+**{todo}** continue inline predicates
+
 ## Later
 
 **{todo}** find better way to draw random value without clutter `uniform(0,5)()` --> `uniform(0,5)`?!
