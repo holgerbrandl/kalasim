@@ -21,9 +21,10 @@ class DepletableResource(
     initialLevel: Number = capacity,
     preemptive: Boolean = false,
     koin: Koin = GlobalContext.get()
-) : Resource(name = name, capacity = capacity, preemptive = preemptive, anonymous = true, koin = koin) {
+) : Resource(name = name, capacity = capacity, preemptive = preemptive,koin = koin) {
 
     init {
+        anonymous = true
         claimed = capacity.toDouble() - initialLevel.toDouble()
     }
 }
@@ -37,10 +38,10 @@ open class Resource(
     name: String? = null,
     capacity: Number = 1,
     val preemptive: Boolean = false,
-    val anonymous: Boolean = false,
     koin: Koin = GlobalContext.get()
 ) : SimulationEntity(name = name, simKoin = koin) {
 
+    internal var anonymous: Boolean = false
 
     var minq: Double = Double.MAX_VALUE
 
@@ -67,9 +68,9 @@ open class Resource(
             field = x
 
             // this ugly hak is needed to avoid tracking of initialLevel setting in DR constructor
-            if (this is DepletableResource && diffQuantity == 0.0 && requesters.isEmpty()) return
+            if(this is DepletableResource && diffQuantity == 0.0 && requesters.isEmpty()) return
 
-            if (field < EPS)
+            if(field < EPS)
                 field = 0.0
 
             claimedMonitor.addValue(x)
@@ -91,7 +92,7 @@ open class Resource(
     }
 
     val occupancy: Double
-        get() = if (capacity < 0) 0.0 else claimed / capacity
+        get() = if(capacity < 0) 0.0 else claimed / capacity
 
     val availableQuantity: Double
         get() = capacity - claimed
@@ -110,23 +111,23 @@ open class Resource(
             env.curComponent,
             this,
             "Created",
-            "capacity=$capacity " + if (anonymous) "anonymous" else ""
+            "capacity=$capacity " + if(anonymous) "anonymous" else ""
         )
     }
 
     fun tryRequest(): Boolean {
         val iterator = requesters.q.iterator()
 
-        if (anonymous) {
+        if(anonymous) {
             // TODO trying not implemented
 
             iterator.forEach {
                 it.component.tryRequest()
             }
         } else {
-            while (iterator.hasNext()) {
+            while(iterator.hasNext()) {
                 //try honor as many requests as possible
-                if (minq > (capacity - claimed + EPS)) {
+                if(minq > (capacity - claimed + EPS)) {
                     break
                 }
                 iterator.next().component.tryRequest()
@@ -143,7 +144,7 @@ open class Resource(
      */
     fun release(quantity: Number? = null) {
         // TODO Split resource types into QuantityResource and Resource or similar
-        if (anonymous) {
+        if(anonymous) {
             val q = quantity?.toDouble() ?: claimed
 
             claimed = -q
@@ -157,7 +158,7 @@ open class Resource(
         } else {
             require(quantity != null) { "quantity missing for non-anonymous resource" }
 
-            while (claimers.isNotEmpty()) {
+            while(claimers.isNotEmpty()) {
                 claimers.q.first().component.release(this)
             }
         }
@@ -165,7 +166,7 @@ open class Resource(
 
     fun removeRequester(component: Component) {
         requesters.remove(component)
-        if (requesters.isEmpty()) minq = Double.MAX_VALUE
+        if(requesters.isEmpty()) minq = Double.MAX_VALUE
     }
 
     /** Prints a summary of statistics of a resource. */

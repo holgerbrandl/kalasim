@@ -5,6 +5,7 @@
 
 <https://github.com/denisvstepanov/lets-plot-examples>
 
+https://www.anylogic.com/resources/articles/framework-for-standardization-of-simulation-integrated-production-planning/
 
 ## v0.6
 
@@ -15,12 +16,8 @@
 
 **{todo}** add averaging resource usage (see AtmQueue.kt)
 
-**{todo}** hide `anonymous` in resources
 
 **{todo}** Cleanup ComponentGenerator API --> take out from until into own constructor
-
-**{todo}**  better document/discuss intent of `standby`
-* isn't it just like hold? What are the benefits?
 
 **{todo}** pluggable backend for visualization functions
 ```

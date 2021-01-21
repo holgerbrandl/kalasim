@@ -98,7 +98,7 @@ object DeterministicRefuel {
 
             single { GasStation() }
 
-            single(qualifier = named(FUEL_PUMP)) { Resource(FUEL_PUMP, GAS_STATION_SIZE, anonymous = true) }
+            single(qualifier = named(FUEL_PUMP)) { DepletableResource(FUEL_PUMP, GAS_STATION_SIZE) }
             single(qualifier = named(CAR_LEAVING)) { NumericLevelMonitor(CAR_LEAVING) }
             single(qualifier = named(TRUCKS_EN_ROUTE)) { NumericLevelMonitor(TRUCKS_EN_ROUTE) }
             single(qualifier = named(TRUCKS_ORDERED)) { NumericLevelMonitor(TRUCKS_ORDERED) }
