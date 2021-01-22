@@ -90,6 +90,7 @@ class Environment(
     private var running: Boolean = false
 
     val rg: RandomGenerator = JDKRandomGenerator(randomSeed)
+    val random: kotlin.random.Random = kotlin.random.Random(randomSeed.toLong())
 
     internal val nameCache = mapOf<String, Int>().toMutableMap()
 
