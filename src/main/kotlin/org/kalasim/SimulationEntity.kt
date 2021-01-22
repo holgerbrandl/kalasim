@@ -49,7 +49,7 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
      * @param action Describing the nature if the event
      * @param details More details characterizing the state change
      */
-    fun <T : Component> log(source: T, action: String?, details: String? = null) =
+    fun <T : SimulationEntity> log(source: T, action: String?, details: String? = null) =
         env.apply { log(now, curComponent, source, action, details) }
 
 

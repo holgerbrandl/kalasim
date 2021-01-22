@@ -12,11 +12,11 @@ import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
 import java.util.*
 
-data class CQElement<C : Component>(val component: C, val enterTime: Double, val priority: Int? = null)
+data class CQElement<C : SimulationEntity>(val component: C, val enterTime: Double, val priority: Int? = null)
 
 //TODO add opt-out for queue monitoring
 
-class ComponentQueue<C : Component>(
+class ComponentQueue<C: SimulationEntity>(
     name: String? = null,
 //    val q: Queue<CQElement<T>> = LinkedList()
     val q: Queue<CQElement<C>> = PriorityQueue { o1, o2 -> compareValuesBy(o1, o2, { it.priority }) },
