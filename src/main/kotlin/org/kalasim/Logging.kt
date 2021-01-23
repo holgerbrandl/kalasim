@@ -8,7 +8,7 @@ import java.util.logging.Level
 import kotlin.math.absoluteValue
 
 
-internal val TRACE_COL_WIDTHS = mutableListOf(10, 22,22, 45, 35)
+internal val TRACE_COL_WIDTHS = mutableListOf(10, 22, 22, 45, 35)
 
 abstract class TraceDetails : Jsonable()
 
@@ -35,10 +35,10 @@ class ResourceEvent(
 
 internal class DefaultEvent(
     time: Double,
-    curComponent: Component?,
-    source: SimulationEntity?,
-    val action: String?,
-    val details: String?
+    curComponent: Component?= null,
+    source: SimulationEntity?= null,
+    val action: String?= null,
+    val details: String?= null
 ) : Event(time, curComponent, source) {
 
     override fun renderAction() = action
@@ -48,8 +48,8 @@ internal class DefaultEvent(
 
 abstract class Event(
     val time: Double,
-    val curComponent: Component?,
-    val source: SimulationEntity?,
+    val curComponent: Component? = null,
+    val source: SimulationEntity? = null,
 ) : Jsonable() {
 
     abstract fun renderAction(): String?

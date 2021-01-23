@@ -82,7 +82,7 @@ open class Component(
     init {
         val dataSuffix = if(process == null && this.name != MAIN) " data" else ""
         env.addComponent(this)
-        log(now(), env.curComponent, this, "create", dataSuffix)
+        log(now, env.curComponent, this, "create", dataSuffix)
 
 
         // if its a generator treat it as such
@@ -132,8 +132,9 @@ open class Component(
     open fun setup() {
     }
 
-    /**         the current simulation time : float */
-    private fun now() = env.now
+    /** The current simulation time*/
+    val now
+        get() = env.now
 
 
     open fun process() = this.let {
@@ -214,7 +215,7 @@ open class Component(
         scheduledTime = null
         status = PASSIVE
 
-        log(now(), env.curComponent, this, "passivate")
+        log(now, env.curComponent, this, "passivate")
     }
 
 
@@ -335,7 +336,7 @@ open class Component(
 
         status = DATA
 
-        log(now(), env.curComponent, this, "cancel")
+        log(now, env.curComponent, this, "cancel")
     }
 
     /**
@@ -358,7 +359,7 @@ open class Component(
 
         status = STANDBY
 
-        log(now(), env.curComponent, this@Component)
+        log(now, env.curComponent, this@Component)
     }
 
 
@@ -528,7 +529,7 @@ open class Component(
                 r.requesters.add(this@Component, priority = priority)
 
                 log(
-                    now(),
+                    now,
                     env.curComponent,
                     this@Component,
                     reqText
@@ -659,7 +660,7 @@ open class Component(
 
         val honorInfo = rHonor.firstOrNull()!!.first.name + (if(rHonor.size > 1) "++" else "")
 
-        reschedule(now(), 0, false, null, "request honor $honorInfo", SCHEDULED)
+        reschedule(now, 0, false, null, "request honor $honorInfo", SCHEDULED)
 
         // process negative put requests (todo can't we handle them separately)
         rHonor.filter { it.first.anonymous }.forEach { it.first.tryRequest() }
@@ -718,7 +719,7 @@ open class Component(
         scheduledTime = null
         simProcess = null
 
-        log(now(), env.curComponent, this, "Ended")
+        log(now, env.curComponent, this, "Ended")
     }
 
     private fun requireNotData() =
@@ -761,7 +762,7 @@ open class Component(
         }
 
         // print trace
-        log(now(), env.curComponent, this, ("$caller $delta ${description ?: ""}").trim(), extra)
+        log(now, env.curComponent, this, ("$caller $delta ${description ?: ""}").trim(), extra)
     }
 
 
@@ -788,7 +789,7 @@ open class Component(
 
     ): Component {
 
-        require(status != CURRENT || process !=null) {
+        require(status != CURRENT || process != null) {
             // original contract
             "Can not activate the CURRENT component. If needed simply use hold method."
             // technically we could use suspend here , but since activate is used
@@ -1189,12 +1190,12 @@ open class Component(
             }
             ROUND_ROBIN -> {
                 // note could also be achieved with listOf<Resource>().repeat().iterator()
-                val mapKey = listOf(this.hashCode(), resources.map{it.name}.hashCode()).hashCode()
+                val mapKey = listOf(this.hashCode(), resources.map { it.name }.hashCode()).hashCode()
                 // initialize if not yet done
-                val curValue = SELECT_SCOPE_IDX.putIfAbsent(mapKey, 0) ?:0
+                val curValue = SELECT_SCOPE_IDX.putIfAbsent(mapKey, 0) ?: 0
 
                 // increment for future calls
-                SELECT_SCOPE_IDX.put(mapKey, (curValue+1).rem(resources.size))
+                SELECT_SCOPE_IDX.put(mapKey, (curValue + 1).rem(resources.size))
 
                 return resources[curValue]
             }
@@ -1236,7 +1237,7 @@ open class Component(
     ): List<T> {
         // Note: Adopted from simmer::batch (Ucar2019, p14)
 
-        require(batchSize>0){"Batch size must be positive"}
+        require(batchSize > 0) { "Batch size must be positive" }
 
         val queueListener = object : QueueChangeListener<T>() {
             override fun added(component: T) {
@@ -1337,7 +1338,6 @@ infix fun <T> State<T>.turns(value: T) = StateRequest(this) { it == value }
 
 private fun formatWithInf(time: Double) =
     if(time == Double.MAX_VALUE || time.isInfinite()) "<inf>" else TRACE_DF.format(time)
-
 
 
 data class ComponentLifecycleRecord(
