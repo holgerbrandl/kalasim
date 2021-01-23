@@ -288,7 +288,7 @@ class Environment(
         if (traceFilters.any { it.matches(event) }) return
 
         eventListeners.forEach {
-            it.consume(event)
+            if(it.filter?.matches(event) == true) it.consume(event)
         }
     }
 

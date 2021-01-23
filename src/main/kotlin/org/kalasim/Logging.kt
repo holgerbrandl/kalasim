@@ -70,6 +70,9 @@ abstract class Event(
 
 fun interface EventListener {
     fun consume(event: Event)
+
+    val filter : EventFilter?
+        get() = null
 }
 
 fun interface EventFilter {
