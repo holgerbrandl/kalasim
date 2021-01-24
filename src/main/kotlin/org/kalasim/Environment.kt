@@ -15,6 +15,7 @@ import org.koin.core.definition.Definition
 import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
+import java.time.Instant
 import java.util.*
 
 
@@ -127,8 +128,6 @@ class Environment(
 
     /** Allows to transform ticks to real world time moements (represented by `java.time.Instant`) */
     var tickTransform: TickTransform? = null
-
-    fun transformTickTime(tickTime: Double) = tickTransform!!.transform(tickTime)
 
     var curComponent: Component? = null
         private set

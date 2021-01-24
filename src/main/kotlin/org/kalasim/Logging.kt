@@ -63,9 +63,12 @@ abstract class Event(
 
     open val logLevel: Level get() = Level.INFO
 
+    override fun toString() = toJson().toString()
+
+
     override fun toJson(): JSONObject = json {
         "time" to time
-        "details" to toString()
+        "details" to this@Event.toString()
     }
 }
 

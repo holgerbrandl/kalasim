@@ -75,17 +75,15 @@ class ClockOverloadException(val simTime: Double, msg: String) : RuntimeExceptio
 
 
 // https://stackoverflow.com/questions/32437550/whats-the-difference-between-instant-and-localdatetime
-fun interface TickTransform {
-    fun transform(tickTime: Double): Instant
+interface TickTransform {
+    fun tick2wallTime(tickTime: Double): Instant
+    fun wall2TickTime(instant: Instant): Number
+    fun durationAsTicks(duration: Duration): Double
 }
 
-
-fun Environment.configureTickTransformation(transform: (Double) -> Instant) {
-    tickTransform = TickTransform { transform(it) }
-}
 
 class OffsetTransform(val offset: Instant = Instant.now(), val tickUnit: TimeUnit = TimeUnit.MINUTES) : TickTransform {
-    override fun transform(tickTime: Double): Instant {
+    override fun tick2wallTime(tickTime: Double): Instant {
         val durationSinceOffset = when(tickUnit){
             TimeUnit.NANOSECONDS -> Duration.ofNanos(tickTime.toLong())
             TimeUnit.MICROSECONDS -> Duration.ofNanos((tickTime*1000).toLong())
@@ -98,4 +96,29 @@ class OffsetTransform(val offset: Instant = Instant.now(), val tickUnit: TimeUni
 
         return offset + durationSinceOffset
     }
+
+    override fun wall2TickTime(instant: Instant): Number {
+        val offsetDuration = Duration.between(offset, instant)
+
+        return durationAsTicks(offsetDuration)
+    }
+
+    // todo improve precision of transformation
+    override fun durationAsTicks(duration: Duration): Double = when(tickUnit){
+        TimeUnit.NANOSECONDS -> duration.toNanos()
+        TimeUnit.MICROSECONDS -> duration.toMillis()*1000
+        TimeUnit.MILLISECONDS -> duration.toMillis()
+        TimeUnit.SECONDS -> duration.toSeconds()
+        TimeUnit.MINUTES -> duration.toMinutes()
+        TimeUnit.HOURS -> duration.toHours()
+        TimeUnit.DAYS -> duration.toDays()
+    }.toDouble()
 }
+
+
+/** Transforms a simulation time (typically `now`) to the corresponding wall time. */
+fun Environment.asWallTime(tickTime: Double) = tickTransform!!.tick2wallTime(tickTime)
+/** Transforms a wall `duration` into the corresponding amount of ticks.*/
+fun Environment.asTickDuration(duration: Duration) = tickTransform!!.durationAsTicks(duration)
+/** Transforms an wall `Instant` to simulation time.*/
+fun Environment.asTickTime(instant: Instant) = tickTransform!!.wall2TickTime(instant)

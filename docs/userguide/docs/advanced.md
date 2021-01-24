@@ -27,6 +27,25 @@ It may happen that a simulation is too complex to run at a defined clock. In suc
 
 <!-- Inspired by <https://simpy.readthedocs.io/en/latest/topical_guides/real-time-simulations.html>-->
 
+## Tick Transformation
+
+Simulation time is measured in ticks. Usually, a simulation starts at `0` and then progresses through actions such as hold or wait or component generation.
+
+To enable a more eye-friendly logging and to stay closer to the system under study, `kalasim` supports a built in transformation `tickTransform` to convert from simulation to wall clock. Let's consider the following example
+
+```kotlin hl_lines="11"
+{!api/TickTrafoExample.kts!}
+```
+This example will run for 2h in total which is transformed to 2x60 ticks, and will report a transform wall time of `now` plus 120 minutes. It also illustrates the 3 supported provided transformations:
+
+* `asWallTime(tickTime)` - Transforms a simulation time (typically `now`) to the corresponding wall time.
+* `asTickDuration(duration)` - Transforms a wall `duration` into the corresponding amount of ticks.
+* `asTickTime(instant)` - Transforms an wall `Instant` to simulation time.
+ 
+
+Please note that setting this transformation does not impact the actual simulation, which is always carried out in ticks. It can be configured independently from the [clock synchronization](#clock-synchronization) described above.
+
+There is one provided implementation `OffsetTransform` that can be instantiated with  a start time offset the unit of a tick. The user can also implement own transformation by implementing the [functional interface](https://kotlinlang.org/docs/reference/fun-interfaces.html) `TickTransform`.
 
 ## Operational Control
 

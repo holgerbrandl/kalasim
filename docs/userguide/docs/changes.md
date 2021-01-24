@@ -19,6 +19,14 @@ val queue = ComponentQueue<Customer>()
 val batchLR: List<Customer> = batch(queue, 4, timeout = 10)
 ```
 
+* Added possible to [configure](advanced.md#tick-transformation) a tick to wall time transformer 
+```kotlin
+createSimulation {
+    tickTransform = OffsetTransform(Instant.now(), TimeUnit.MINUTES)
+    println(transformTickTime(now))
+}
+```
+
 * Added [lifecycle records](analysis.md#tabular-interface) to streamline component state analyses
 
 

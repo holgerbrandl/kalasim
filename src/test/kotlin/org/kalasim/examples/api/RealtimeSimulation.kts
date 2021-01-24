@@ -5,8 +5,6 @@ import java.time.Duration
 val timeBefore = System.currentTimeMillis()
 
 createSimulation(true) {
-    // TODO Define components, resources, states and interactions
-
     // enable real-time clock synchronization w
     ClockSync(tickDuration = Duration.ofSeconds(1))
 
