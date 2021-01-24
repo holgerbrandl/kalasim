@@ -660,7 +660,7 @@ open class Component(
 
         val honorInfo = rHonor.firstOrNull()!!.first.name + (if(rHonor.size > 1) "++" else "")
 
-        reschedule(now, 0, false, null, "request honor $honorInfo", SCHEDULED)
+        reschedule(now, 0, false, null, "Request honored by $honorInfo", SCHEDULED)
 
         // process negative put requests (todo can't we handle them separately)
         rHonor.filter { it.first.anonymous }.forEach { it.first.tryRequest() }

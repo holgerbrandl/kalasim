@@ -34,7 +34,7 @@ class ComponentQueue<C: SimulationEntity>(
     val lengthOfStayMonitor = NumericStatisticMonitor("Length of stay in ${this.name}", koin = koin)
 
     fun add(component: C, priority: Int? = null): Boolean {
-        log(component, "Entering $name")
+//        log(component, "Entering $name")
 
         val added = q.add(CQElement(component, env.now, priority))
 
@@ -63,7 +63,7 @@ class ComponentQueue<C: SimulationEntity>(
         changeListeners.forEach{ it.removed(cqe.component)}
         updateExitStats(cqe)
 
-        log(cqe.component, "Removed from $name")
+//        log(cqe.component, "Removed from $name")
 
         return cqe.component
     }

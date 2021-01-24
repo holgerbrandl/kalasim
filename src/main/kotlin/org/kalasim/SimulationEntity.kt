@@ -69,7 +69,7 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
         action: String? = null,
         details: String? = null
     ) {
-        if(monitor) log(DefaultEvent(time, curComponent, source, action, details))
+        if(monitor) log(InteractionEvent(time, curComponent, source, action, details))
     }
 
 

@@ -25,38 +25,26 @@ class ResourceEvent(
     val amount: Double,
     val capacity: Double,
     val claimed: Double
-) : Event(time, curComponent, requester) {
+) : InteractionEvent(time, curComponent, requester) {
 
     override fun renderAction() =
-        "${type.toString().toLowerCase().capitalize()} ${amount.absoluteValue.roundAny(2)} from '${source?.name}'"
+        "${type.toString().toLowerCase().capitalize()} ${amount.absoluteValue.roundAny(2)} from '${requester.name}'"
 
-    override fun renderDetails(): String? = null
+
 }
 
-internal class DefaultEvent(
+open class InteractionEvent(
     time: Double,
-    curComponent: Component?= null,
-    source: SimulationEntity?= null,
-    val action: String?= null,
-    val details: String?= null
-) : Event(time, curComponent, source) {
-
-    override fun renderAction() = action
-
-    override fun renderDetails() = details
-}
-
-abstract class Event(
-    val time: Double,
     val curComponent: Component? = null,
     val source: SimulationEntity? = null,
-) : Jsonable() {
+    val action: String? = null,
+    val details: String? = null
+) : Event(time) {
 
-    abstract fun renderAction(): String?
+    open fun renderAction() = action ?: ""
 
-    open fun renderDetails(): String? = null
+    fun renderDetails() = details
 
-    open val logLevel: Level get() = Level.INFO
 
     override fun toJson(): JSONObject = json {
         "time" to time
@@ -65,13 +53,27 @@ abstract class Event(
         "action" to renderAction()
         "details" to renderDetails()
     }
+
+}
+
+/** The base event of kalasim. Usually this extended to convey more specific information.*/
+abstract class Event(
+    val time: Double
+) : Jsonable() {
+
+    open val logLevel: Level get() = Level.INFO
+
+    override fun toJson(): JSONObject = json {
+        "time" to time
+        "details" to toString()
+    }
 }
 
 
 fun interface EventListener {
     fun consume(event: Event)
 
-    val filter : EventFilter?
+    val filter: EventFilter?
         get() = null
 }
 
@@ -82,7 +84,7 @@ fun interface EventFilter {
 class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.INFO) : EventListener {
 
     var hasPrintedHeader = false
-    var lastElement: Event? = null
+    var lastElement: InteractionEvent? = null
 
 
     override fun consume(event: Event) {
@@ -104,24 +106,30 @@ class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.I
 
 
         with(event) {
-            val ccChanged = curComponent != lastElement?.curComponent
-            val receiverChanged = source != lastElement?.source
 
-            val traceLine = listOf(
-                TRACE_DF.format(time),
-                if(ccChanged) curComponent?.name else null,
-                if(receiverChanged) source?.name else null,
+            val traceLine: List<String?> = if(this is InteractionEvent) {
+                val ccChanged = curComponent != lastElement?.curComponent
+                val receiverChanged = source != lastElement?.source
+
+                listOf(
+                    TRACE_DF.format(time),
+                    if(ccChanged) curComponent?.name else null,
+                    if(receiverChanged) source?.name else null,
 //                ((source?.name ?: "") + " " + (renderAction() ?: "")).trim(),
-                renderAction(),
-                renderDetails()
-            ).renderTraceLine().trim()
+                    renderAction(),
+                    renderDetails()
+                ).apply {
+                    // update last element
+                    lastElement = this@with
+                }
+            } else {
+                listOf(TRACE_DF.format(time), "", "", toString())
+            }
 
-            println(traceLine)
+            val renderedLine = traceLine.renderTraceLine().trim()
+
+            println(renderedLine)
         }
-
-
-        // update last element
-        lastElement = event
     }
 
 

@@ -9,6 +9,8 @@ https://www.anylogic.com/resources/articles/framework-for-standardization-of-sim
 
 ## v0.6
 
+**{todo}** use inline class for time, quantity, priorities and so so on
+
 **{fixme}** fix  `val x = Component()` to create a DATA component (as stated in the docs)
 * this will also fix the `Passenger` in the ferryman
 * https://stackoverflow.com/questions/30812204/i-need-to-check-if-a-method-is-overridden
@@ -54,7 +56,6 @@ nlm.printHistogram()
 ## Later
 
 **{todo}** find better way to draw random value without clutter `uniform(0,5)()` --> `uniform(0,5)`?!
-**{todo}** use inline class for time, quantity, priorities and so so on
 
 **{todo}** should we support a resource queue limit ` queue_size = Inf)` (as in simmer ucar209,p19)
 

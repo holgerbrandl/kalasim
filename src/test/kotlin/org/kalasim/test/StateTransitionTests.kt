@@ -32,14 +32,16 @@ class StateTransitionTests {
 
 //        traces.forEach { println(it) }
 
+        val interactions = traces.filterIsInstance<InteractionEvent>()
         // make sure multiple cars are created
-        println("car traces are ${traces.map { it.toString() }}")
-        val cars = traces.mapNotNull { it.source }.distinct().filter { it.name.startsWith("TestCar") }
+        println("car traces are ${interactions.map { it.toString() }}")
+
+        val cars = interactions.mapNotNull { it.source }.distinct().filter { it.name.startsWith("TestCar") }
         assertEquals(6, cars.size, "expected cars count does not match")
 
-        assert(traces[0].curComponent!!.name == MAIN)
-        assert(traces[1].curComponent!!.name == MAIN)
-        assert(traces[2].curComponent!!.name == MAIN)
+        assert(interactions[0].curComponent!!.name == MAIN)
+        assert(interactions[1].curComponent!!.name == MAIN)
+        assert(interactions[2].curComponent!!.name == MAIN)
     }
 
 

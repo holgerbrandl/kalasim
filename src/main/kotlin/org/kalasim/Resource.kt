@@ -6,6 +6,7 @@ import com.github.holgerbrandl.jsonbuilder.json
 import org.kalasim.misc.Jsonable
 import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
+import kotlin.math.absoluteValue
 
 // TODO Analyze we we support the same preemptible contract as simmer (Ucar2019, p11) (in particular restart)
 
@@ -77,7 +78,7 @@ open class Resource(
             updateCapacityMonitors()
 
 //            if(this is DepletableResource && )
-//            val action = if (diffQuantity > 0) "released" else "claimed"
+//            val action = if (diffQuantity > 0) "Released" else "Claimed"
 //            log("$action ${diffQuantity.absoluteValue} from '$name'")
 
             // it would seem natural to tryReqeust here, but since this is not done in case of bumping,

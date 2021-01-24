@@ -22,6 +22,7 @@ class GeneratorTest {
         }.run(100.0)
 
         val customers = tc.traces
+            .filterIsInstance<InteractionEvent>()
             .map { it.source }
             .filterNotNull().distinct()
             .filter { it.name.startsWith("Customer") }

@@ -18,6 +18,9 @@ import org.koin.dsl.module
 import java.util.*
 
 
+@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+internal inline class TickTime(val instant: Double)
+
 const val MAIN = "main"
 
 typealias KoinModule = org.koin.core.module.Module
@@ -63,7 +66,7 @@ fun createSimulation(
         enableConsoleLogger = enableConsoleLogger,
         dependencies = dependencies,
         randomSeed = randomSeed,
-        koin = if (useCustomKoin) koinApplication { }.koin else null
+        koin = if(useCustomKoin) koinApplication { }.koin else null
     ).apply(builder)
 
 
@@ -107,14 +110,25 @@ class Environment(
     val traceFilters = mutableListOf<EventFilter>()
 
     init {
-        traceFilters.add(EventFilter { it.renderAction()?.contains("entering requesters") ?: false })
-        traceFilters.add(EventFilter { it.renderAction()?.contains("entering claimers") ?: false })
-        traceFilters.add(EventFilter { it.renderAction()?.contains("removed from requesters") ?: false })
-        traceFilters.add(EventFilter { it.renderAction()?.contains("removed from claimers") ?: false })
+//        traceFilters.add(EventFilter {
+//            if(it !is InteractionEvent) return@EventFilter true
+//
+//            val action = it.renderAction()
+//
+//            !(action.contains("entering requesters")
+//                    || action.contains("entering claimers")
+//                    || action.contains("removed from requesters")
+//                    || action.contains("removed from claimers"))
+//        })
     }
 
     var now = 0.0
         internal set
+
+    /** Allows to transform ticks to real world time moements (represented by `java.time.Instant`) */
+    var tickTransform: TickTransform? = null
+
+    fun transformTickTime(tickTime: Double) = tickTransform!!.transform(tickTime)
 
     var curComponent: Component? = null
         private set
@@ -132,7 +146,7 @@ class Environment(
         // start console logger
 
 //        addTraceListener { print(it) }
-        if (enableConsoleLogger) {
+        if(enableConsoleLogger) {
             addEventListener(ConsoleTraceLogger(true))
         }
 
@@ -163,7 +177,7 @@ class Environment(
         setCurrent(main)
 
         // declare dependencies
-        if (dependencies != null) {
+        if(dependencies != null) {
 //            val deps = dependencies ?: (module(createdAtStart = true) { })
             getKoin().loadModules(listOf(dependencies), createEagerInstances = true)
 //        KoinContextHandler.get()._scopeRegistry.rootScope.createEagerInstances()
@@ -205,14 +219,14 @@ class Environment(
 
         // TODO add test coverage for `until`
 
-        if (duration == null) endOnEmptyEventlist = true
+        if(duration == null) endOnEmptyEventlist = true
 
         val scheduledTime = calcScheduleTime(until, duration)
 
         main.reschedule(scheduledTime, priority, urgent, null, "run", SCHEDULED)
 
         running = true
-        while (running) {
+        while(running) {
             step()
         }
 
@@ -235,13 +249,13 @@ class Environment(
         standBy.clear()
 
 
-        val (time, component) = if (eventQueue.isNotEmpty()) {
+        val (time, component) = if(eventQueue.isNotEmpty()) {
             val (c, time, _, _) = eventQueue.poll()
 
             time to c
         } else {
-            val t = if (endOnEmptyEventlist) {
-                publishEvent(DefaultEvent(now, curComponent, null, null, "run end; no events left"))
+            val t = if(endOnEmptyEventlist) {
+                publishEvent(InteractionEvent(now, curComponent, null, null, "run end; no events left"))
                 now
             } else {
                 Double.MAX_VALUE
@@ -256,7 +270,7 @@ class Environment(
 
         setCurrent(component)
 
-        if (component == main) {
+        if(component == main) {
             running = false
             return
         }
@@ -285,10 +299,10 @@ class Environment(
 
 
     internal fun publishEvent(event: Event) {
-        if (traceFilters.any { it.matches(event) }) return
+        if(traceFilters.any { it.matches(event) }) return
 
         eventListeners.forEach {
-            if(it.filter?.matches(event) == true) it.consume(event)
+            if(it.filter == null || it.filter!!.matches(event)) it.consume(event)
         }
     }
 
@@ -304,7 +318,7 @@ class Environment(
         unschedule(c)
 
         // TODO what is happening here, can we simplify that?
-        if (c.status == STANDBY) {
+        if(c.status == STANDBY) {
             standBy.remove(c)
             pendingStandBy.remove(c)
         }
@@ -315,7 +329,7 @@ class Environment(
             it.component == c
         }
 
-        if (queueElem != null) {
+        if(queueElem != null) {
             eventQueue.remove(queueElem)
         }
     }
@@ -334,8 +348,8 @@ class Environment(
         require(queue.none(Component::isPassive)) { "passive component must not be in event queue" }
     }
 
-    fun toJson(includeComponents:Boolean = false): JSONObject = json {
-        if(includeComponents){
+    fun toJson(includeComponents: Boolean = false): JSONObject = json {
+        if(includeComponents) {
             "components" to components.map { it.info.toJson() }
         }
         "num_components" to components.size
@@ -374,8 +388,8 @@ data class QueueElement(
 
 fun Environment.calcScheduleTime(till: Number?, duration: Number?): Double {
     return (till?.toDouble() to duration?.toDouble()).let { (till, duration) ->
-        if (till == null) {
-            if (duration == null) now else {
+        if(till == null) {
+            if(duration == null) now else {
                 now + duration
             }
         } else {
@@ -394,7 +408,7 @@ inline fun <reified T> KoinModule.add(
 
 }
 
-public inline fun <reified T> Environment.dependency(builder : Environment.()-> T) : T {
+public inline fun <reified T> Environment.dependency(builder: Environment.() -> T): T {
     val something = builder(this)
     getKoin().loadModules(listOf(
         module(createdAtStart = true) {

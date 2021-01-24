@@ -4,7 +4,7 @@ import org.kalasim.*
 createSimulation(enableConsoleLogger = true) {
     val tc = traceCollector()
 
-    tc.filter { it.source?.name == "foo" }
+    tc.filter { it is InteractionEvent && it.source?.name == "foo" }
 
     val claims = tc //
         .filterIsInstance<ResourceEvent>()

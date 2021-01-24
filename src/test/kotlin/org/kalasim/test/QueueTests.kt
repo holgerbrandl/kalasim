@@ -4,7 +4,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.*
-import org.kalasim.ComponentState.*
+import org.kalasim.ComponentState.DATA
 import kotlin.math.roundToInt
 import kotlin.test.assertEquals
 
@@ -82,10 +82,12 @@ class QueueTests {
 
             run(10)
 
-            tc.traces.filter { it.renderAction() == "Ended" }.apply {
-                size shouldBe 2
-                get(0).source?.name shouldBe c1.name
-            }
+            tc.traces.filterIsInstance<InteractionEvent>()
+                .filter { it.renderAction() == "Ended" }
+                .apply {
+                    size shouldBe 2
+                    get(0).source?.name shouldBe c1.name
+                }
         }
 
         // redo but with priority
@@ -124,16 +126,16 @@ class QueueTests {
         }
     }
 
-   @Test
+    @Test
     fun `it should correctly generate using inversed iat`() = createTestSimulation {
         val arrivalsTimes = listOf(6, 7, 9)
         val inverseIat = inversedIatDist(*arrivalsTimes.toTypedArray())
 
-       val generated  = mutableListOf<Component>()
-       ComponentGenerator(inverseIat){ Component() }.addConsumer{ generated.add(it)}
+        val generated = mutableListOf<Component>()
+        ComponentGenerator(inverseIat) { Component() }.addConsumer { generated.add(it) }
 
-       run(20)
-       generated.map{ it.creationTime.roundToInt()} shouldBe arrivalsTimes
+        run(20)
+        generated.map { it.creationTime.roundToInt() } shouldBe arrivalsTimes
     }
 
     @Test
