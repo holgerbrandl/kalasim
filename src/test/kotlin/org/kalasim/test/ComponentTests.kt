@@ -139,6 +139,35 @@ class ComponentTests {
         mechanic.isData shouldBe true
     }
 
+
+    @Test
+    fun `it should interrupt and resume a passive component`() = createTestSimulation {
+
+
+        val tool = object : Component("tool") {
+            override fun process() = sequence {
+                passivate()
+            }
+        }
+        run(1)
+
+
+        object : Component("interrupter") {
+            override fun process() = sequence {
+                tool.interrupt()
+
+                // do maintenance
+                hold(2)
+
+                tool.resume()
+            }
+        }
+
+        run(10)
+
+        tool.isPassive shouldBe true
+    }
+
     @Test
     fun `it should  hold on someones elses behalf`() = createTestSimulation(true) {
         val c = object : Component("other") {

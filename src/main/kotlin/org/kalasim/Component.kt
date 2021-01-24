@@ -68,7 +68,7 @@ open class Component(
     //  What are performance implications?
     var scheduledTime: Double? = null
 
-    private var remainingDuration = 0.0
+    private var remainingDuration : Double? = null
 
     var status: ComponentState = DATA
         set(value) {
@@ -236,7 +236,7 @@ open class Component(
         } else {
             requireNotData()
             remove()
-            remainingDuration = scheduledTime!! - env.now
+            remainingDuration = scheduledTime?.minus(env.now)
             interruptLevel = 1
             interruptedStatus = status
             status = INTERRUPTED
@@ -296,7 +296,7 @@ open class Component(
                     }
 
                     reschedule(
-                        env.now + remainingDuration,
+                        env.now + remainingDuration!!,
                         priority,
                         urgent = false,
                         caller = reason,
