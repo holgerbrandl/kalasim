@@ -68,7 +68,7 @@ abstract class Event(
 
     override fun toJson(): JSONObject = json {
         "time" to time
-        "details" to this@Event.toString()
+        "type" to this@Event.javaClass.simpleName
     }
 }
 
