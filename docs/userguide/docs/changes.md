@@ -8,26 +8,28 @@ val doctors = List(3) { Resource() }
 val selected = selectResource( doctors, policy = SHORTEST_QUEUE )
 ```
 
-* Changed `ComponentGenerator` to allow generating arbitrary types (and not just `Component`s)
-```kotlin
-ComponentGenerator(uniform(0,1)){ counter -> "smthg no$counter"}
-```
-
 * New suspending [`batch`](https://www.kalasim.org/component/#batching) interaction to group an entity stream into blocks
 ```kotlin
 val queue = ComponentQueue<Customer>()
 val batchLR: List<Customer> = batch(queue, 4, timeout = 10)
 ```
 
-* Added possible to [configure](advanced.md#tick-transformation) a tick to wall time transformer 
+* Added option to [configure](advanced.md#tick-transformation) a tick to wall time transformer 
 ```kotlin
 createSimulation {
     tickTransform = OffsetTransform(Instant.now(), TimeUnit.MINUTES)
-    println(transformTickTime(now))
+
+    run(asTickDuration(Duration.ofMinutes(90)))
+    println(asWallTime(now))
 }
 ```
 
 * Added [lifecycle records](analysis.md#tabular-interface) to streamline component state analyses
+
+* Changed `ComponentGenerator` to allow generating arbitrary types (and not just `Component`s)
+```kotlin
+ComponentGenerator(uniform(0,1)){ counter -> "smthg no$counter"}
+```
 
 
 * New Example: ["The ferryman"](examples/ferryman.md)

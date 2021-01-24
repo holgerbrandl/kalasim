@@ -39,6 +39,8 @@ nlm.printHistogram()
 
 ## v0.7
 
+**{todo}** add `keepPositive` to `normal` 
+
 **{todo}** build visualization for covid19 simulation
 
 **{todo}** review simjulia <https://simjuliajl.readthedocs.io/en/stable/topical_guides/5_shared_resources.html#containers>

@@ -15,6 +15,7 @@ import org.koin.core.definition.Definition
 import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
+import java.time.Duration
 import java.time.Instant
 import java.util.*
 
@@ -359,6 +360,12 @@ class Environment(
     @Suppress("EXPERIMENTAL_OVERRIDE")
     override fun toString(): String {
         return toJson(false).toString(JSON_INDENT)
+    }
+
+    /** Transforms a wall `duration` into the corresponding amount of ticks.*/
+    fun Duration.asTicks(): Double {
+        require(tickTransform != null){ MISSING_TICK_TRAFO_ERROR }
+        return tickTransform!!.durationAsTicks(this)
     }
 }
 

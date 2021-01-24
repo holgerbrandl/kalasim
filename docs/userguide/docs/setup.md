@@ -1,5 +1,6 @@
 # Installation
 
+`kalasim` requires Java11 or higher.
 
 ## Gradle
 
