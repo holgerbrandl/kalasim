@@ -29,7 +29,7 @@ class TimeTrafoTests {
                     asWallTime(now) shouldBe Instant.parse("2021-01-24T13:30:00.00Z")
                 }
 
-                hold(asTickDuration(Duration.ofMinutes(90)))
+                hold(asTicks(Duration.ofMinutes(90)))
                 log(TimeTrafoTestEvent(now))
             }
         }

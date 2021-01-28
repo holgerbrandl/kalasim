@@ -12,14 +12,14 @@ import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
 import java.util.*
 
-data class CQElement<C : SimulationEntity>(val component: C, val enterTime: Double, val priority: Int? = null)
+data class CQElement<C : SimulationEntity>(val component: C, val enterTime: Double, val priority: Priority? = null)
 
 //TODO add opt-out for queue monitoring
 
 class ComponentQueue<C: SimulationEntity>(
     name: String? = null,
 //    val q: Queue<CQElement<T>> = LinkedList()
-    val q: Queue<CQElement<C>> = PriorityQueue { o1, o2 -> compareValuesBy(o1, o2, { it.priority }) },
+    val q: Queue<CQElement<C>> = PriorityQueue { o1, o2 -> compareValuesBy(o1, o2, { it.priority?.value }) },
     koin: Koin = GlobalContext.get()
 ) : SimulationEntity(name, koin) {
 
@@ -33,7 +33,7 @@ class ComponentQueue<C: SimulationEntity>(
     val queueLengthMonitor = NumericLevelMonitor("Length of ${this.name}", koin = koin)
     val lengthOfStayMonitor = NumericStatisticMonitor("Length of stay in ${this.name}", koin = koin)
 
-    fun add(component: C, priority: Int? = null): Boolean {
+    fun add(component: C, priority: Priority? = null): Boolean {
 //        log(component, "Entering $name")
 
         val added = q.add(CQElement(component, env.now, priority))
@@ -109,7 +109,7 @@ class ComponentQueue<C: SimulationEntity>(
 
 class QueueInfo(cq: ComponentQueue<*>) : Jsonable() {
 
-    data class Entry(val component: String, val enterTime: Double, val priority: Int?)
+    data class Entry(val component: String, val enterTime: Double, val priority: Priority?)
 
     val name = cq.name
     val timestamp = cq.env.now

@@ -39,6 +39,8 @@ nlm.printHistogram()
 
 ## v0.7
 
+**{todo}** provide heatmap of component-list status
+
 **{todo}** add `keepPositive` to `normal` 
 
 **{todo}** build visualization for covid19 simulation

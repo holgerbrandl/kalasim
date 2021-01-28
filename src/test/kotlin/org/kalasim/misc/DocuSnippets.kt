@@ -23,7 +23,7 @@ class ResourceDocu {
                 request(clerks withQuantity 2)
                 request(clerks withQuantity 1, assistance withQuantity 2)
                 request(clerks withPriority 1)
-                request(clerks withQuantity 3.4 andPriority 1)
+                request(clerks withQuantity 3.4 andPriority Priority(1))
 
                 hold(2) // consume it
 
@@ -55,7 +55,7 @@ object ProcessGraph {
             request(clerk)
 
             // billing process
-            hold(duration = 2.0, priority = 3)
+            hold(duration = 2.0, priority = HIGH)
         }
     }
 }

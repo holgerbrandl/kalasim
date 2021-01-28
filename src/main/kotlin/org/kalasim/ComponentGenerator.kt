@@ -23,7 +23,7 @@ class ComponentGenerator<T>(
     var till: Double = Double.MAX_VALUE,
     val total: Int = Int.MAX_VALUE,
     name: String? = null,
-    priority: Int = 0,
+    priority: Priority = NORMAL,
     val storeRefs : Boolean = false,
     @Suppress("UNUSED_PARAMETER") urgent: Boolean = false,
     koin: Koin = GlobalContext.get(),

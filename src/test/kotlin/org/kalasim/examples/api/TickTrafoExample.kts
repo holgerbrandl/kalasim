@@ -12,7 +12,7 @@ createSimulation(true) {
     run(until = asTickTime(Instant.now().plus(Duration.ofHours(1))))
 
     // run for a given duration
-    run(asTickDuration(Duration.ofHours(1)))
+    run(asTicks(Duration.ofHours(1)))
 
     println(asWallTime(now))
 }

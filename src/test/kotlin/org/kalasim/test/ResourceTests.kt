@@ -37,7 +37,7 @@ class ResourceTests {
 
                 override fun process() = sequence {
                     while(true) {
-                        request(resource withQuantity 1 andPriority prioPDF.sample())
+                        request(resource withQuantity 1 andPriority Priority(prioPDF.sample()))
                         hold(1)
                         if(!isClaiming(resource)) {
                             break
@@ -199,7 +199,7 @@ class ResourceTests {
                 hold(duration = 5.0)
 
                 request(clerk)
-                hold(duration = 2.0, priority = 3)
+                hold(duration = 2.0, priority = HIGH)
                 release(clerk)
 
                 passivate()

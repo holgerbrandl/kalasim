@@ -26,6 +26,14 @@ enum class ComponentState {
     DATA, CURRENT, STANDBY, PASSIVE, INTERRUPTED, SCHEDULED, REQUESTING, WAITING
 }
 
+internal const val DEFAULT_QUEUE_PRIORITY = 0
+
+inline class Priority(val value: Int)
+
+val LOWER = Priority(-10)
+val NORMAL = Priority(DEFAULT_QUEUE_PRIORITY)
+val HIGH = Priority(10)
+
 
 /**
  * A kalasim component is used as component (primarily for queueing) or as a component with a process.
@@ -43,7 +51,7 @@ open class Component(
     name: String? = null,
     at: Number? = null,
     delay: Number = 0,
-    priority: Int = 0,
+    priority: Priority = NORMAL,
     process: ProcessPointer? = Component::process,
     koin: Koin = GlobalContext.get()
 ) :
@@ -255,7 +263,7 @@ open class Component(
      * @param priority If a component has the same time on the event list, this component is sorted according to
     the priority.
      */
-    fun resume(all: Boolean = false, priority: Int = 0) {
+    fun resume(all: Boolean = false, priority: Priority = NORMAL) {
         // not part of original impl
         require(status == INTERRUPTED) { "Can only resume interrupted components" }
         require(interruptLevel > 0) { "interrupt level is expected to be greater than 0" }
@@ -408,7 +416,7 @@ open class Component(
         failAt: Number? = null,
         failDelay: Number? = null,
         oneOf: Boolean = false,
-        priority: Int = DEFAULT_QUEUE_PRIORITY,
+        priority: Priority = NORMAL,
         honorBlock: (suspend SequenceScope<Component>.() -> Any)? = null
     ) = request(
         *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
@@ -441,7 +449,7 @@ open class Component(
         failAt: Number? = null,
         failDelay: Number? = null,
         oneOf: Boolean = false,
-        priority: Int = DEFAULT_QUEUE_PRIORITY,
+        priority: Priority = NORMAL,
         honorBlock: (suspend SequenceScope<Component>.() -> Any)? = null
     ) = request(
         *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
@@ -475,7 +483,7 @@ open class Component(
         failDelay: Number? = null,
         oneOf: Boolean = false,
         //todo use type here and not string
-        priority: Int = DEFAULT_QUEUE_PRIORITY,
+        priority: Priority = NORMAL,
         urgent: Boolean = false,
         // try to avoid argument by inferring from stacktrace
         calledFrom: String? = null,
@@ -547,7 +555,7 @@ open class Component(
                         }
 
                         // check if prior of component
-                        if((priority ?: 0) <= (cqe.priority ?: 0)) {
+                        if((priority?.value ?: 0) <= (cqe.priority?.value ?: 0)) {
                             break
                         }
 
@@ -660,7 +668,7 @@ open class Component(
 
         val honorInfo = rHonor.firstOrNull()!!.first.name + (if(rHonor.size > 1) "++" else "")
 
-        reschedule(now, 0, false, null, "Request honored by $honorInfo", SCHEDULED)
+        reschedule(now, NORMAL, false, null, "Request honored by $honorInfo", SCHEDULED)
 
         // process negative put requests (todo can't we handle them separately)
         rHonor.filter { it.first.anonymous }.forEach { it.first.tryRequest() }
@@ -730,7 +738,7 @@ open class Component(
 
     internal fun reschedule(
         scheduledTime: Double,
-        priority: Int = DEFAULT_QUEUE_PRIORITY,
+        priority: Priority = NORMAL,
         urgent: Boolean = false,
         description: String? = null,
         caller: String? = null,
@@ -780,7 +788,7 @@ open class Component(
     fun activate(
         at: Number? = null,
         delay: Number = 0,
-        priority: Int = 0,
+        priority: Priority = NORMAL,
         urgent: Boolean = false,
         keepRequest: Boolean = false,
         keepWait: Boolean = false,
@@ -879,7 +887,7 @@ open class Component(
     suspend fun SequenceScope<Component>.hold(
         duration: Number? = null,
         till: Number? = null,
-        priority: Int = 0,
+        priority: Priority = NORMAL,
         urgent: Boolean = false,
         description: String? = null
     ) = yieldCurrent {
@@ -899,7 +907,7 @@ open class Component(
     fun hold(
         duration: Number? = null,
         till: Number? = null,
-        priority: Int = 0,
+        priority: Priority = NORMAL,
         urgent: Boolean = false,
         description: String? = null
     ) {
@@ -1056,7 +1064,7 @@ open class Component(
     suspend fun SequenceScope<Component>.wait(
         vararg stateRequests: StateRequest<*>,
         //todo change to support distribution parameters instead
-        priority: Int = 0,
+        priority: Priority = NORMAL,
         urgent: Boolean = false,
         failAt: RealDistribution? = null,
         failDelay: RealDistribution? = null,
@@ -1123,7 +1131,7 @@ open class Component(
             waits.clear()
             remove()
 
-            reschedule(env.now, 0, false, null, "wait", SCHEDULED)
+            reschedule(env.now, NORMAL, false, null, "wait", SCHEDULED)
         }
 
         return honored
@@ -1304,17 +1312,16 @@ class SimpleProcessInternal(val component: Component, val funPointer: ProcessPoi
 }
 
 internal const val DEFAULT_REQUEST_QUANTITY = 1.0
-internal const val DEFAULT_QUEUE_PRIORITY = 1
 
-data class ResourceRequest(val r: Resource, val quantity: Double = DEFAULT_REQUEST_QUANTITY, val priority: Int? = null)
+data class ResourceRequest(val r: Resource, val quantity: Double = DEFAULT_REQUEST_QUANTITY, val priority: Priority? = null)
 
 infix fun Resource.withQuantity(quantity: Number) = ResourceRequest(this, quantity.toDouble())
-infix fun Resource.withPriority(priority: Int) = ResourceRequest(this, priority = priority)
+infix fun Resource.withPriority(priority: Int) = ResourceRequest(this, priority = Priority(priority))
 
-infix fun ResourceRequest.andPriority(priority: Int) = ResourceRequest(this.r, this.quantity, priority)
+infix fun ResourceRequest.andPriority(priority: Priority) = ResourceRequest(this.r, this.quantity, priority)
 
 //    data class StateRequest<T>(val s: State<T>, val value: T? = null, val priority: Int? = null)
-data class StateRequest<T>(val state: State<T>, val priority: Int? = null, val predicate: (T) -> Boolean) {
+data class StateRequest<T>(val state: State<T>, val priority: Priority? = null, val predicate: (T) -> Boolean) {
     override fun equals(other: Any?): Boolean {
         if(this === other) return true
         if(javaClass != other?.javaClass) return false

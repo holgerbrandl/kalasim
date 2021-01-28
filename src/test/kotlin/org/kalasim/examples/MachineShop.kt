@@ -79,7 +79,7 @@ fun main() {
         object : Component("side jobs") {
             override fun process() = sequence {
                 while (true) {
-                    request(ResourceRequest(repairMan, priority = -1))
+                    request(ResourceRequest(repairMan, priority = Priority(-1)))
                     hold(JOB_DURATION)
 
                     if (isBumped(repairMan)) {

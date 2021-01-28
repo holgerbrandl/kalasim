@@ -93,7 +93,7 @@ class QueueTests {
         // redo but with priority
         createSimulation(true) {
             val c1 = Component("comp1", at = 3)
-            val c2 = Component("comp2", at = 3, priority = 3)
+            val c2 = Component("comp2", at = 3, priority = HIGH)
 
             val tc = TraceCollector().also { addEventListener(it) }
 

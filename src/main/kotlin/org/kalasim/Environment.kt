@@ -212,7 +212,7 @@ class Environment(
     /**
      * Start execution of the simulation
      */
-    fun run(duration: Number? = null, until: Number? = null, priority: Int = 0, urgent: Boolean = false): Environment {
+    fun run(duration: Number? = null, until: Number? = null, priority: Priority = NORMAL, urgent: Boolean = false): Environment {
         // TODO https://simpy.readthedocs.io/en/latest/topical_guides/environments.html
         //  If you call it without any argument (env.run()), it steps through the simulation until there are
         //  no more events left.
@@ -336,13 +336,13 @@ class Environment(
 
     private var queueCounter: Int = 0
 
-    fun push(component: Component, scheduledTime: Double, priority: Int, urgent: Boolean) {
+    fun push(component: Component, scheduledTime: Double, priority: Priority, urgent: Boolean) {
         queueCounter++
 
 //        https://bezkoder.com/kotlin-priority-queue/
         // Remove an element from the Priority Queue => Dequeue the least element. The front of the Priority Queue
         // contains the least element according to the ordering, and the rear contains the greatest element.
-        eventQueue.add(QueueElement(component, scheduledTime, -priority, queueCounter, urgent))
+        eventQueue.add(QueueElement(component, scheduledTime, Priority(-priority.value), queueCounter, urgent))
 
         // consistency checks
         require(queue.none(Component::isPassive)) { "passive component must not be in event queue" }
@@ -373,7 +373,7 @@ class Environment(
 data class QueueElement(
     val component: Component,
     val time: Double,
-    val priority: Int,
+    val priority: Priority,
     val queueCounter: Int,
     val urgent: Boolean
 ) :
@@ -381,7 +381,7 @@ data class QueueElement(
     //TODO clarify if we need/want to also support urgent
 
     override fun compareTo(other: QueueElement): Int =
-        compareValuesBy(this, other, { it.time }, { it.priority }, { it.queueCounter })
+        compareValuesBy(this, other, { it.time }, { it.priority.value }, { it.queueCounter })
 
 //    val heapSeq = if (urgent) -queueCounter else queueCounter
 
