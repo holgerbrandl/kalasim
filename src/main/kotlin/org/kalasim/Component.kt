@@ -6,6 +6,7 @@ import org.kalasim.ResourceEventType.*
 import org.kalasim.ResourceSelectionPolicy.*
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
+import org.kalasim.monitors.FrequencyLevelMonitor
 import org.koin.core.Koin
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent

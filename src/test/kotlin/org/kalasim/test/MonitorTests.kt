@@ -4,7 +4,10 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import org.junit.Test
-import org.kalasim.*
+import org.kalasim.monitors.FrequencyLevelMonitor
+import org.kalasim.monitors.FrequencyStatisticMonitor
+import org.kalasim.monitors.NumericLevelMonitor
+import org.kalasim.monitors.NumericStatisticMonitor
 import org.kalasim.test.MonitorTests.Car.*
 
 class MonitorTests {
@@ -16,7 +19,7 @@ class MonitorTests {
 
     @Test
     fun `Frequency stats should be correct`() = createTestSimulation {
-        val m = FrequencyMonitor<Car>()
+        val m = FrequencyStatisticMonitor<Car>()
         m.addValue(AUDI)
         m.addValue(AUDI)
         m.addValue(VW)
@@ -116,7 +119,7 @@ class MonitorTests {
     fun `disabled monitor should error nicely when being queried`() = createTestSimulation {
         //FrequencyMonitor
         run {
-            val nsm = FrequencyMonitor<Int>()
+            val nsm = FrequencyStatisticMonitor<Int>()
 
             nsm.addValue(2)
             nsm.disable()

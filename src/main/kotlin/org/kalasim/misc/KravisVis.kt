@@ -1,9 +1,9 @@
 package org.kalasim.misc
 
 import kravis.*
-import org.kalasim.FrequencyLevelMonitor
-import org.kalasim.NumericLevelMonitor
-import org.kalasim.NumericStatisticMonitor
+import org.kalasim.monitors.FrequencyLevelMonitor
+import org.kalasim.monitors.NumericLevelMonitor
+import org.kalasim.monitors.NumericStatisticMonitor
 import java.awt.GraphicsEnvironment
 
 internal fun canDisplay() = !GraphicsEnvironment.isHeadless() && hasR()

@@ -16,7 +16,6 @@ https://www.anylogic.com/resources/articles/framework-for-standardization-of-sim
 
 **{todo}** add averaging resource usage (see AtmQueue.kt)
 
-
 **{todo}** pluggable backend for visualization functions
 ```
 env.visEngine = KRAVIS
@@ -25,12 +24,6 @@ nlm.printHistogram()
 
 **{todo}** review simmer.plot and provide similar API
 > Ucar I, Smeets B (2019b). simmer.plot: Plotting Methods for simmer. R package version 0.1.15, URL <https://CRAN.R-project.org/package=simmer.plot>
-
-**{todo}** it should track renege stats in resource directly
-
-**{todo}** restrict more methods in Component from being overridden
-
-**{todo}** Register project at awesome-kotlin
 
 
 ## v0.7
@@ -72,6 +65,7 @@ consider modeling `Store` Using Stores you can model the production and consumpt
 
 ---
 
+**{todo}** restrict more methods in Component from being overridden
 
 
 ---

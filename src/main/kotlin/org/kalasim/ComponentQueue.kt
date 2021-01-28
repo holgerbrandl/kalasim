@@ -8,6 +8,9 @@ import org.json.JSONObject
 import org.kalasim.misc.JSON_INDENT
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.printThis
+import org.kalasim.monitors.NumericLevelMonitor
+import org.kalasim.monitors.NumericLevelMonitorStats
+import org.kalasim.monitors.NumericStatisticMonitor
 import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
 import java.util.*

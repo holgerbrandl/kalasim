@@ -1,6 +1,9 @@
 package org.kalasim
 
 import org.kalasim.misc.Jsonable
+import org.kalasim.monitors.FrequencyLevelMonitor
+import org.kalasim.monitors.NumericLevelMonitor
+import org.kalasim.monitors.NumericStatisticMonitor
 import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
 

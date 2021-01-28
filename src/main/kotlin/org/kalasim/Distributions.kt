@@ -33,6 +33,9 @@ fun <T> Component.enumerated(vararg elements: T) = enumerated((elements.map { it
 fun <T> Component.enumerated(elements: Map<T, Double>) =
     EnumeratedDistribution(env.rg, elements.toList().asCMPairList())
 
-fun <T, S> List<Pair<T, S>>.asCMPairList(): List<CMPair<T, S>> = map { CMPair(it.first, it.second) }
 
 typealias   CMPair<K, V> = org.apache.commons.math3.util.Pair<K, V>
+
+fun <T, S> List<Pair<T, S>>.asCMPairList(): List<CMPair<T, S>> = map { CMPair(it.first, it.second) }
+fun <T, S> Map<T, S>.asCMPairList(): List<CMPair<T, S>> = map { CMPair(it.key, it.value) }
+
