@@ -9,8 +9,6 @@ https://www.anylogic.com/resources/articles/framework-for-standardization-of-sim
 
 ## v0.6
 
-**{todo}** use inline class for time, quantity, priorities and so so on
-
 **{fixme}** fix  `val x = Component()` to create a DATA component (as stated in the docs)
 * this will also fix the `Passenger` in the ferryman
 * https://stackoverflow.com/questions/30812204/i-need-to-check-if-a-method-is-overridden
@@ -18,8 +16,6 @@ https://www.anylogic.com/resources/articles/framework-for-standardization-of-sim
 
 **{todo}** add averaging resource usage (see AtmQueue.kt)
 
-
-**{todo}** Cleanup ComponentGenerator API --> take out from until into own constructor
 
 **{todo}** pluggable backend for visualization functions
 ```

@@ -31,7 +31,11 @@ createSimulation {
 ComponentGenerator(uniform(0,1)){ counter -> "smthg no$counter"}
 ```
 
+* Added `forceStart` to `ComponentGenerator` to define an arrival should be happen when it is activated for the first time.
+
 * Changed scheduling priority from `Int` to inline class `Priority` (with defaults `NORMAL`, `HIGH`, `LOW`) in all interaction methods for more typesafe API.
+
+* Improved 
 
 * New Example: ["The ferryman"](examples/ferryman.md)
 * New Example: [Office Tower](examples/office_tower.md)

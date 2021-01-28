@@ -433,7 +433,7 @@ open class Component(
      *
      * For `request` contract see [user manual](https://www.kalasim.org/component/#request)
      *
-     * @param resources Resources to be requested with default quanity and default priority.
+     * @param resources Resources to be requested with default quantity and default priority.
      * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failDelay  if the request is not honored before now+fail_delay,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
