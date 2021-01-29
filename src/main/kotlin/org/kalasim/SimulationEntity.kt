@@ -22,7 +22,7 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
     /** Indicates if log events from this entity should be tracked. */
     var monitor = true;
 
-    protected abstract val info: Jsonable
+    abstract val info: Jsonable
 
     /** Print info about this resource */
     fun printInfo() = info.printThis()

@@ -1,6 +1,7 @@
 package org.kalasim.misc
 
 import kravis.*
+import org.kalasim.monitors.FrequencyTable
 import org.kalasim.monitors.FrequencyLevelMonitor
 import org.kalasim.monitors.NumericLevelMonitor
 import org.kalasim.monitors.NumericStatisticMonitor
@@ -51,7 +52,7 @@ fun NumericStatisticMonitor.display(title: String = name) {
     }
 }
 
-fun <T> ColData<T>.display(title: String? = null) {
+fun <T> FrequencyTable<T>.display(title: String? = null) {
     if(warnNoDisplay()) return
 
     val data = toList()

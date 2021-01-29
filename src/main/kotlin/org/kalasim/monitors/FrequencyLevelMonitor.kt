@@ -1,9 +1,7 @@
 package org.kalasim.monitors
 
-import org.kalasim.misc.ColData
 import org.kalasim.misc.ImplementMe
 import org.kalasim.misc.Jsonable
-import org.kalasim.misc.printConsole
 import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
 
@@ -88,12 +86,12 @@ class FrequencyLevelMonitor<T>(
     }
 
     /** Accumulated retention time of the ComponentState. Only visited states will be included. */
-    fun summed(): ColData<T> = xDuration().zip(this.values)
+    fun summed(): FrequencyTable<T> = xDuration().zip(this.values)
         .groupBy { (_, value) -> value }
         .map { it.key to it.value.sumOf { (it.first) } }.toMap()
 
 
-    fun  statisticsSummary() = statsData().statisticalSummary()
+    override fun  statisticsSummary() = statsData().statisticalSummary()
 
     fun statsData(): LevelStatsData<T> {
         require(values.isNotEmpty()) { "data must not be empty when preparing statistics of $name" }

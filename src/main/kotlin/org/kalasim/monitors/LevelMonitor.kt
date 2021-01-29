@@ -31,6 +31,8 @@ interface LevelMonitor<T> {
     fun reset(initial: T)
 
     fun addValue(value: T)
+
+    fun  statisticsSummary(): EnumeratedDistribution<T>
 }
 
 

@@ -61,6 +61,9 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
         values.zip(durations).filter { it.first == value }.map { it.second }.sum()
     }
 
+    @Suppress("UNCHECKED_CAST")
+    override fun  statisticsSummary() = (statsData() as LevelStatsData<Number>).statisticalSummary()
+
     fun statsData(excludeZeros: Boolean = false): LevelStatsData<Double> {
         require(values.isNotEmpty()) { "data must not be empty when preparing statistics of $name" }
 
@@ -95,7 +98,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
 
             values.forEach { freq.addValue(it) }
 
-            val colData = statistics().data.run {
+            val colData: Map<Double, Double> = statistics().data.run {
                 durations.zip(values).groupBy { (_, value) -> value }
                     .map { it.key to it.value.sumOf { it.first } }
             }.toMap()
@@ -148,7 +151,7 @@ class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean =
     val min: Double?
     val max: Double?
 
-    internal val data: LevelStatsData<Double> = nlm.statsData(excludeZeros)
+    internal val data = nlm.statsData(excludeZeros)
 
 //    val median :Double = TODO()
 //    val ninetyfivePercentile :Double = TODO()

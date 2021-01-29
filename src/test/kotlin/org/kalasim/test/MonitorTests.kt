@@ -4,10 +4,9 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import org.junit.Test
-import org.kalasim.monitors.FrequencyLevelMonitor
-import org.kalasim.monitors.FrequencyStatisticMonitor
-import org.kalasim.monitors.NumericLevelMonitor
-import org.kalasim.monitors.NumericStatisticMonitor
+import org.kalasim.misc.merge
+import org.kalasim.misc.mergeStats
+import org.kalasim.monitors.*
 import org.kalasim.test.MonitorTests.Car.*
 
 class MonitorTests {
@@ -19,21 +18,20 @@ class MonitorTests {
 
     @Test
     fun `Frequency stats should be correct`() = createTestSimulation {
-        val m = FrequencyStatisticMonitor<Car>()
+        val m = FrequencyStatsMonitor<Car>()
         m.addValue(AUDI)
         m.addValue(AUDI)
         m.addValue(VW)
         repeat(4) { m.addValue(PORSCHE) }
 
         m.printHistogram()
-        m.printHistogram()
 
         captureOutput { m.printHistogram() }.stdout shouldBe """
-                Summary of: 'FrequencyMonitor.1'
+                Summary of: 'FrequencyStatsMonitor.1'
                 # Records: 7
                 # Levels: 3
                 
-                Histogram of: 'FrequencyMonitor.1'
+                Histogram of: 'FrequencyStatsMonitor.1'
                               bin |  values |  pct |                                         
                 AUDI              |    2.00 |  .29 | ***********                             
                 VW                |    1.00 |  .14 | ******                                  
@@ -41,11 +39,11 @@ class MonitorTests {
                                 """.trimIndent()
 
         captureOutput { m.printHistogram(values = listOf(AUDI, TOYOTA)) }.stdout shouldBe """
-                Summary of: 'FrequencyMonitor.1'
+                Summary of: 'FrequencyStatsMonitor.1'
                 # Records: 7
                 # Levels: 3
                 
-                Histogram of: 'FrequencyMonitor.1'
+                Histogram of: 'FrequencyStatsMonitor.1'
                               bin |  values |  pct |                                         
                 AUDI              |    2.00 |  .29 | ***********                             
                 TOYOTA            |     .00 |  .00 |                                         
@@ -53,11 +51,11 @@ class MonitorTests {
                 """.trimIndent()
 
         captureOutput { m.printHistogram(sortByWeight = true) }.stdout shouldBe """
-                Summary of: 'FrequencyMonitor.1'
+                Summary of: 'FrequencyStatsMonitor.1'
                 # Records: 7
                 # Levels: 3
                 
-                Histogram of: 'FrequencyMonitor.1'
+                Histogram of: 'FrequencyStatsMonitor.1'
                               bin |  values |  pct |                                         
                 PORSCHE           |    4.00 |  .57 | ***********************                 
                 AUDI              |    2.00 |  .29 | ***********                             
@@ -119,13 +117,13 @@ class MonitorTests {
     fun `disabled monitor should error nicely when being queried`() = createTestSimulation {
         //FrequencyMonitor
         run {
-            val nsm = FrequencyStatisticMonitor<Int>()
+            val nsm = FrequencyStatsMonitor<Int>()
 
             nsm.addValue(2)
             nsm.disable()
 
             shouldThrow<IllegalArgumentException> {
-                nsm.frequencies.size
+                nsm.statistics.size
             }
 
             // should be silently ignores
@@ -138,4 +136,98 @@ class MonitorTests {
     }
 
     // TODO test the others
+}
+
+/* Test the monitors and their stats can be merge jor a joint analysis. */
+class MergeMonitorTests {
+
+    @Test
+    fun `it should merge NLM`() = createTestSimulation {
+        val nlmA = NumericLevelMonitor()
+        val nlmB = NumericLevelMonitor()
+
+        now = 5.0
+        nlmA.addValue(23)
+
+        now = 10.0
+        nlmB.addValue(3)
+
+        now = 12.0
+        nlmB.addValue(5)
+
+        now = 14.0
+        nlmA.addValue(10)
+
+        //merge statistics
+        val mergedStats = listOf(nlmA, nlmB).mergeStats()
+        println(mergedStats)
+    }
+
+
+    @Test
+    fun `it should merge FLM`() = createTestSimulation {
+        val flmA = FrequencyLevelMonitor(1)
+        val flmB = FrequencyLevelMonitor(2)
+
+        flmA.addValue(1)
+        flmB.addValue(2)
+
+        now=1.0
+        flmB.addValue(4)
+
+        now=3.0
+        flmA.addValue(1)
+
+        //merge statistics
+        now=5.0
+        val mergedStats = listOf(flmA, flmB).mergeStats()
+        println(mergedStats)
+    }
+
+
+    @Test
+    fun `it should merge NSM`() = createTestSimulation {
+        // note NSM.statistics() // delegates to StatisticalSummary (so should be mergeable as well)
+        val nsmA = NumericStatisticMonitor()
+        val nsmB = NumericStatisticMonitor() // delegates to StatisticalSummary (so should be mergeable as well)
+
+        nsmA.apply{
+            addValue(1)
+            addValue(1)
+        }
+
+        nsmB.apply{
+            addValue(3)
+            addValue(3)
+        }
+
+        val mergedStats = listOf(nsmA.statistics(), nsmB.statistics()).merge()
+       println(mergedStats)
+        mergedStats.mean shouldBe 2
+    }
+
+
+    @Test
+    fun `it should merge FSM`() = createTestSimulation {
+        val fsmA = FrequencyStatsMonitor<Int>()
+        val fsmB = FrequencyStatsMonitor<Int>()
+
+        fsmA.apply{
+            addValue(1)
+            addValue(1)
+        }
+
+        fsmB.apply{
+            addValue(3)
+            addValue(3)
+        }
+
+        print(fsmA.info)
+
+        val mergedDist = listOf(fsmA, fsmB).mergeStats()
+
+        //todo test this
+        print(mergedDist)
+    }
+
 }

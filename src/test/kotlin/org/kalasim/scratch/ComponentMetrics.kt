@@ -3,7 +3,7 @@ package org.kalasim.scratch
 import krangl.asDataFrame
 import org.kalasim.*
 import org.kalasim.misc.display
-import org.kalasim.misc.printConsole
+import org.kalasim.monitors.printConsole
 import org.kalasim.misc.printThis
 
 fun main() {
