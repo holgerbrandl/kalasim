@@ -14,8 +14,6 @@ https://www.anylogic.com/resources/articles/framework-for-standardization-of-sim
 * https://stackoverflow.com/questions/30812204/i-need-to-check-if-a-method-is-overridden
 * it should be `DATA` until process is overridden or pointing to a different method
 
-**{todo}** add averaging resource usage (see AtmQueue.kt)
-
 **{todo}** pluggable backend for visualization functions
 ```
 env.visEngine = KRAVIS
