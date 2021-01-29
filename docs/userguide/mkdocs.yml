@@ -40,6 +40,7 @@ nav:
 
   - Examples:
     - Overview: examples.md
+    - Car: examples/car.md
     - Traffic: examples/traffic.md
     - Bank Office: examples/bank_office.md
     - Movie Theater: examples/movie_theater.md
