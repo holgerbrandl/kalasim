@@ -254,156 +254,30 @@ Histogram of: 'NumericLevelMonitor.1'
 
 ##  Merging of Monitors
 
-<!-- **{TODO}** Write tests for merging of monitors-->
-In contrast to `salabim` Monitors cannot be directly merged (yet) in `kalasim`. However, it is possible to merge the resulting `DescriptiveStatistics`
+Tt is possible to merge the resulting statistics of multiple monitors
+```kotlin
+val flmA = FrequencyLevelMonitor(1)
+val flmB = FrequencyLevelMonitor(2)
 
-<!--The method Monitor.merge() is used for that, like:-->
+// ... run simulation 
 
-<!--```-->
-<!--mc = m0.merge(m1, m2)-->
-<!--```-->
+val mergedStats: EnumeratedDistribution<Int> = listOf(flmA, flmB).mergeStats()
+```
 
-<!--Then we can just get the mean of the monitors m0, m1 and m2 combined by:-->
-
-<!--```-->
-<!--mc.mean()-->
-<!--```-->
-
-<!--,but also directly with :-->
-
-<!--```-->
-<!--m0.merge(m1, m2).mean()-->
-<!--```-->
-
-<!--Alternatively, monitors can be merged with the + operator, like:-->
-
-<!--```-->
-<!--mc = m0 + m1 + m2  -->
-<!--```-->
-
-<!--And then get the mean of the aggregated monitors with:-->
-
-<!--```-->
-<!--mc.mean()-->
-<!--```-->
-
-<!--, but also with-->
-
-<!--```-->
-<!--(m0 + m1 + m2).mean()-->
-<!--```-->
-
-<!--It is also possible to use the sum function to merge a number of monitors. So:-->
-
-<!--```-->
-<!--print(sum((m0, m1, m2)).mean())-->
-<!--```-->
-
-<!--Finally, if ms = (m0, m1, m2), it is also possible to use:-->
-
-<!--```-->
-<!--print(sum(ms).mean())-->
-<!--```-->
-
-<!--A practical example of this is the case where the list waitinglines contains a number of queues.-->
-
-<!--Then to get the aggregated statistics of the length of all these queues, use:-->
-
-<!--```-->
-<!--sum(waitingline.length for waitingline in waitinglines).print_statistics()-->
-<!--```-->
-
-
-<!--For non level monitors, all of the tallied x-values are copied from the to be merged monitors.-->
-<!--For level monitors, the x-values are summed, for all the periods where all the monitors were on.-->
-<!--Periods where one or more monitors were disabled, are excluded.-->
-<!--Note that the merge only takes place at creation of the (timestamped) monitor and not dynamically later.-->
-
-<!--Sample usage:-->
-
-<!--Suppose we have three types of products (a, b, c) and that each have a queue for processing, so-->
-<!--a.processing, b.processing, c.processing.-->
-<!--If we want to print the histogram of the combined (=summed) length of these queues:-->
-
-<!--```-->
-<!--a.processing.length.merge(b.processing.length, c.processing.length, name='combined processing length')).print_histogram()-->
-<!--```-->
-
-<!--and to get the minimum of the length_of_stay for all queues:-->
-
-<!--```-->
-<!--(a.processing.length_of_stay + b.processing.length_of_stay + c.processing.length_of_stay).minimum()-->
-<!--```-->
-
-<!--Note that it is possible to rename a merged monitor (particularly those created with + or sum) with the rename() method::-->
-
-<!--```-->
-<!--sum(waitingline.length for waitingline in waitinglines).rename('aggregated length of waitinglines').print_statistics()-->
-<!--```-->
-
-<!--Merged monitors are disabled and cannot be enabled again.-->
+See [`MergeMonitorTests`](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/test/MonitorTests.kt) for more examples regarding the other monitor types.
 
 ## Slicing of monitors
 
-**Note**: Slicing of monitors is planned but not yet supported.
+**Note**: Slicing of monitors as in [salabim](https://www.salabim.org/manual/Monitor.html#slicing-of-monitors) is  not yet supported. If needed please file a [ticket](https://github.com/holgerbrandl/kalasim/issues).
 
-<!--It is possible to slice a monitor with Monitor.slice(), which has two applications:-->
+Use-cases for slicing are
 
-<!--* to get statistics on a monitor with respect to a given time period, most likely a subrun-->
-<!--* to get statistics on a monitor with respect to a recurring time period, like hour 0-1, hour 0-2, etc.-->
+* to get statistics on a monitor with respect to a given time period, most likely a subrun
+* to get statistics on a monitor with respect to a recurring time period, like hour 0-1, hour 0-2, etc.
 
-<!--Examples:-->
-<!--```-->
-<!--for i in range(10):-->
-<!--   start = i * 1000-->
-<!--   stop = (i+1) * 1000-->
-<!--   print(f'mean length of q in [{start},{stop})={q.length.slice(start,stop).mean()}'-->
-<!--   print(f'mean length of stay in [{start},{stop})={q.length_of_stay.slice(start,stop).mean()}'-->
+##  Summarizing a monitor
 
-<!--for i in range(24):-->
-<!--   print(f'mean length of q in hour {i}={q.length.slice(i, i+1, 24).mean()}'-->
-<!--   print(f'mean length of stay of q in hour {i}={q.length_of_stay.slice(i, i+1, 24).mean()}'-->
-<!--```-->
-
-<!--Instead of slice(), a monitor can be sliced as well with the standard slice operator [], like:-->
-
-<!--```-->
-<!--q.length[1000:2000].print_histogram()-->
-<!--q.length[2:3:24].print_histogram()-->
-<!--print(q.length[1000].mean())-->
-<!--```-->
-
-<!--Note that it is possible to rename a sliced monitor (particularly those created []) with the rename() method::-->
-
-<!--    waitingline.length[1000:2000].rename('length of waitingline between t=1000 and t-2000').print_statistics()   -->
-
-<!--Sliced monitors are disabled and cannot be enabled again.-->
-
-<!--The sampled values from a non level monitor can be retrieved with Monitor.x(). If the moment of the sample is required as well, either Monitor.xt() or Monitor.tx() can be used.-->
-
-<!--For level monitors, there is choice of :-->
-
-<!--* Monitor.xt()-->
-<!--* Monitor.tx()-->
-<!--* Monitor.xduration()-->
-
-<!--To get a proper display of a level monitor, we advise something like:-->
-
-<!--```-->
-<!--plt.plot(*waitingline.length.tx(), drawstyle="steps-post") -->
-<!--```-->
-
-##  Pickling a monitor
-
-`Monitor.statistics()`  returns a 'frozen' monitor that can be used to store the results not
-depending on the current environment.
-
-This is particularly useful for persisting monitor statistics for later analysis.
-
-For further background information see <https://www.salabim.org/manual/Monitor.html>
-
-
-##
+`Monitor.statistics()`  returns a 'frozen' monitor that can be used to store the results not depending on the current environment. This is particularly useful for persisting monitor statistics for later analysis.
 
 ## Visualization
 

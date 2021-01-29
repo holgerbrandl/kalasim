@@ -3,6 +3,8 @@ package org.kalasim.test
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
+import org.apache.commons.math3.distribution.EnumeratedDistribution
+import org.apache.commons.math3.stat.descriptive.StatisticalSummaryValues
 import org.junit.Test
 import org.kalasim.misc.merge
 import org.kalasim.misc.mergeStats
@@ -159,7 +161,7 @@ class MergeMonitorTests {
         nlmA.addValue(10)
 
         //merge statistics
-        val mergedStats = listOf(nlmA, nlmB).mergeStats()
+        val mergedStats: EnumeratedDistribution<Number> = listOf(nlmA, nlmB).mergeStats()
         println(mergedStats)
     }
 
@@ -172,15 +174,15 @@ class MergeMonitorTests {
         flmA.addValue(1)
         flmB.addValue(2)
 
-        now=1.0
+        now = 1.0
         flmB.addValue(4)
 
-        now=3.0
+        now = 3.0
         flmA.addValue(1)
 
         //merge statistics
-        now=5.0
-        val mergedStats = listOf(flmA, flmB).mergeStats()
+        now = 5.0
+        val mergedStats: EnumeratedDistribution<Int> = listOf(flmA, flmB).mergeStats()
         println(mergedStats)
     }
 
@@ -191,18 +193,18 @@ class MergeMonitorTests {
         val nsmA = NumericStatisticMonitor()
         val nsmB = NumericStatisticMonitor() // delegates to StatisticalSummary (so should be mergeable as well)
 
-        nsmA.apply{
+        nsmA.apply {
             addValue(1)
             addValue(1)
         }
 
-        nsmB.apply{
+        nsmB.apply {
             addValue(3)
             addValue(3)
         }
 
-        val mergedStats = listOf(nsmA.statistics(), nsmB.statistics()).merge()
-       println(mergedStats)
+        val mergedStats: StatisticalSummaryValues = listOf(nsmA.statistics(), nsmB.statistics()).merge()
+        println(mergedStats)
         mergedStats.mean shouldBe 2
     }
 
@@ -212,19 +214,19 @@ class MergeMonitorTests {
         val fsmA = FrequencyStatsMonitor<Int>()
         val fsmB = FrequencyStatsMonitor<Int>()
 
-        fsmA.apply{
+        fsmA.apply {
             addValue(1)
             addValue(1)
         }
 
-        fsmB.apply{
+        fsmB.apply {
             addValue(3)
             addValue(3)
         }
 
         print(fsmA.info)
 
-        val mergedDist = listOf(fsmA, fsmB).mergeStats()
+        val mergedDist: FrequencyTable<Int> = listOf(fsmA, fsmB).mergeStats()
 
         //todo test this
         print(mergedDist)
