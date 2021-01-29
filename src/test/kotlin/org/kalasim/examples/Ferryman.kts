@@ -7,8 +7,7 @@ import org.kalasim.monitors.NumericStatisticMonitor
 
 createSimulation {
 
-    // process set to null here to prevent them from polluting the event queue
-    class Passenger : Component(process = null)
+    class Passenger : Component()
 
     val fm = object : Component("ferryman") {
         val left2Right = ComponentQueue<Passenger>()

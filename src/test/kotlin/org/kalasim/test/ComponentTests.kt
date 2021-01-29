@@ -1,15 +1,36 @@
 package org.kalasim.test
 
 import io.kotest.matchers.shouldBe
+import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
+import org.kalasim.ComponentState.*
 import org.kalasim.misc.printThis
 
 class ComponentTests {
 
+    @Ignore
     @Test
     fun `it should create components outside of an environment`() {
+        // todo should it? E.g. creation time would prevent that
         Component("foo").info.printThis()
+
+        println("done")
+    }
+
+    @Test
+    fun `components should be in DATA by default unless a process is defines`()  = createTestSimulation {
+
+        object: Component(){
+            override fun process(): Sequence<Component> {
+                return super.process()
+            }
+        }.status shouldBe SCHEDULED
+
+
+        Component("foo").status shouldBe DATA
+
+        Component("foo", process = Component::process).status shouldBe DATA
     }
 
 
@@ -20,7 +41,7 @@ class ComponentTests {
 
         run(20)
 
-        c.status shouldBe ComponentState.DATA
+        c.status shouldBe DATA
     }
 
     @Test
@@ -65,7 +86,7 @@ class ComponentTests {
         }
 
         run(5)
-        c.status shouldBe ComponentState.DATA
+        c.status shouldBe DATA
     }
 
 

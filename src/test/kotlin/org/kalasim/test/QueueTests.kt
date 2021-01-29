@@ -71,6 +71,10 @@ class QueueTests {
         // also see https://simpy.readthedocs.io/en/latest/topical_guides/time_and_scheduling.html
 
         createSimulation(true) {
+//            class TestComponent(name:String, at: Number): Component(name){
+//                override fun process(): Sequence<Component> = super.process()
+//            }
+
             val c1 = Component("comp1", at = 3)
             val c2 = Component("comp2", at = 3)
 
@@ -92,6 +96,11 @@ class QueueTests {
 
         // redo but with priority
         createSimulation(true) {
+            // to make sure that the component methods are auto-scheduled we need to overrride them
+//            class TestComponent(name:String, at: Number, priority: Priority = NORMAL): Component(name, priority = priority){
+//                override fun process(): Sequence<Component> = super.process()
+//            }
+
             val c1 = Component("comp1", at = 3)
             val c2 = Component("comp2", at = 3, priority = HIGH)
 
@@ -141,7 +150,7 @@ class QueueTests {
     @Test
     fun `it should form batches`() = createTestSimulation {
         // see ferryman.md
-        class Passenger : Component(process = null)
+        class Passenger : Component()
 
         val fm = object : Component() {
             val waitingLine = ComponentQueue<Passenger>()

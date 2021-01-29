@@ -77,8 +77,14 @@ open class Component(
     //  What are performance implications?
     var scheduledTime: Double? = null
 
-    private var remainingDuration : Double? = null
+    private var remainingDuration: Double? = null
 
+//    init {
+//        println(Component::process == this::process)
+//        this.javaClass.getMethod("process").getDeclaringClass();
+//    }
+
+    //    var status: ComponentState = if(this.javaClass.getMethod("process").getDeclaringClass().simpleName == "Component") DATA else SCHEDULED
     var status: ComponentState = DATA
         set(value) {
             field = value
@@ -97,7 +103,15 @@ open class Component(
         // if its a generator treat it as such
         this.simProcess = ingestFunPointer(process)
 
-        if(process != null) {
+        // the contract for initial auto-scheduling is
+        // either the user has set `at` which clearly indicates the intent for schedulingg the component
+        // or
+        // the has overridden `Component` and has overridden `process`
+        // or
+        // has provided another process pointer (other than `process`)
+        val overriddenProcess = this.javaClass.getMethod("process").declaringClass.simpleName != "Component"
+
+        if(at != null || (process != null && (process.name != "process" || overriddenProcess))) {
             val scheduledTime = if(at == null) {
                 env.now + delay.toDouble()
             } else {
@@ -1314,7 +1328,11 @@ class SimpleProcessInternal(val component: Component, val funPointer: ProcessPoi
 
 internal const val DEFAULT_REQUEST_QUANTITY = 1.0
 
-data class ResourceRequest(val r: Resource, val quantity: Double = DEFAULT_REQUEST_QUANTITY, val priority: Priority? = null)
+data class ResourceRequest(
+    val r: Resource,
+    val quantity: Double = DEFAULT_REQUEST_QUANTITY,
+    val priority: Priority? = null
+)
 
 infix fun Resource.withQuantity(quantity: Number) = ResourceRequest(this, quantity.toDouble())
 infix fun Resource.withPriority(priority: Int) = ResourceRequest(this, priority = Priority(priority))

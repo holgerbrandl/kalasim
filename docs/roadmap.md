@@ -9,11 +9,6 @@ https://www.anylogic.com/resources/articles/framework-for-standardization-of-sim
 
 ## v0.6
 
-**{fixme}** fix  `val x = Component()` to create a DATA component (as stated in the docs)
-* this will also fix the `Passenger` in the ferryman
-* https://stackoverflow.com/questions/30812204/i-need-to-check-if-a-method-is-overridden
-* it should be `DATA` until process is overridden or pointing to a different method
-
 **{todo}** pluggable backend for visualization functions
 ```
 env.visEngine = KRAVIS
@@ -43,6 +38,8 @@ nlm.printHistogram()
 **{todo}** lambda builder for interrupt/release
 
 **{todo}** continue inline predicates
+
+**{todo}** read: Flow itself is a very good model for even-based simulations.
 
 ## Later
 
