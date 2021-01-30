@@ -126,6 +126,8 @@ class Environment(
     var now = 0.0
         internal set
 
+    fun now() = now
+
     /** Allows to transform ticks to real world time moements (represented by `java.time.Instant`) */
     var tickTransform: TickTransform? = null
 

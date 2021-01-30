@@ -126,8 +126,35 @@ simmer() %>%
 
 ## Optimization
 
-**{todo}** https://github.com/r-simmer/simmer.optim
+**{todo}** <https://github.com/r-simmer/simmer.optim>
 
+
+## simmer.plot
+
+
+https://github.com/r-simmer/simmer.plot
+
+methods overview <https://r-simmer.org/extensions/plot/reference/>
+
+review simmer.plot and provide similar API
+> Ucar I, Smeets B (2019b). simmer.plot: Plotting Methods for simmer. R package version 0.1.15, URL <https://CRAN.R-project.org/package=simmer.plot>
+
+
+plot(<simmer>) --> deprecated
+
+Plot Method for simmer Objects
+
+plot(<trajectory>) --> simple flow chart (we can do that I think)
+
+plot(<arrivals>) 
+plot(<attributes>)
+plot(<resources>)
+
+Plot Methods for simmer Monitoring Statistic 
+
+From <https://r-simmer.org/extensions/plot/reference/plot.mon.html>
+
+see `simmer_plot.R`
 
 # R Alternatives
 
@@ -139,5 +166,7 @@ simmer() %>%
 * 4 github stars
 * similar event-loop paradigm `mainloop(simlist)`
 * `mrpreact` -> <https://github.com/matloff/des#user-suppplied-reaction-function-and-package-function-mainloop>
+
+
 
 

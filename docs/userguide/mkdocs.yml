@@ -36,7 +36,9 @@ nav:
     - States: state.md
   - Analysis:
     - analysis.md
+    - Event Log: event_log.md
     - Monitors: monitors.md
+    - Visualization: visualization.md
 
   - Examples:
     - Overview: examples.md

@@ -9,10 +9,10 @@ To support use cases where a simulation may drive a demonstration or system chec
 * If there is human interaction with your simulation, or
 * If you want to analyze the real-time behavior of an algorithm
 
-```kotlin hl_lines="11"
+```kotlin hl_lines="9"
 {!api/RealtimeSimulation.kts!}
 ```
-This example will execute in 10 seconds. Since the simulation is empty (for educational reasons), it is entirely idle during that time.
+This example will execute in 10 seconds. Since the simulation is empty (for educational reasons to keep the focus on the clock here), it is entirely idle during that time.
 
 To enable clock synchronization, we need to add a `ClockSync` to our simulation. We need to define what one _tick_ in simulation time corresponds to in wall time. In the example, one tick equals to one second wall time. This is configured with the parameter `tickDuration`. It defines the duration of a simulation tick in wall clock coordinates. It can be created with `Duration.ofSeconds(1)`, `Duration.ofMinutes(10)` and [so on](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/Duration.html).
 
@@ -33,7 +33,7 @@ Simulation time is measured in ticks. Usually, a simulation starts at `0` and th
 
 To enable a more eye-friendly logging and to stay closer to the system under study, `kalasim` supports a built in transformation `tickTransform` to convert from simulation to wall clock. Let's consider the following example
 
-```kotlin hl_lines="11"
+```kotlin hl_lines="9"
 {!api/TickTrafoExample.kts!}
 ```
 This example will run for 2h in total which is transformed to 2x60 ticks, and will report a transform wall time of `now` plus 120 minutes. It also illustrates the 3 supported provided transformations:

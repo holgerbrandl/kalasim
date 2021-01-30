@@ -31,7 +31,7 @@ nlm.printHistogram()
 
 **{todo}** wait lambda should use state.value as receiver
 
-**{todo}** lambda builder for interrupt/release
+**{todo}** lambda builder for interrupt/resume
 
 **{todo}** continue inline predicates
 

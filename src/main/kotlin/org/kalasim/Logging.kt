@@ -6,6 +6,7 @@ import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
 import java.util.logging.Level
 import kotlin.math.absoluteValue
+import kotlin.reflect.KClass
 
 
 internal val TRACE_COL_WIDTHS = mutableListOf(10, 22, 22, 45, 35)
@@ -79,6 +80,15 @@ fun interface EventListener {
     val filter: EventFilter?
         get() = null
 }
+
+class MyEventLister : EventListener{
+    override fun consume(event: Event) {
+        println(event)
+    }
+
+    override val filter = EventFilter { it is ResourceEvent }
+}
+
 
 fun interface EventFilter {
     fun matches(event: Event): Boolean

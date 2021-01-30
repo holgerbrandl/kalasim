@@ -1,3 +1,4 @@
+//LogChannelConsumer.kts
 package org.kalasim.examples.analysis
 
 import kotlinx.coroutines.GlobalScope
@@ -7,10 +8,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.kalasim.*
-
-
-// https://proandroiddev.com/kotlin-coroutines-channels-csp-android-db441400965f
-// * You can think of a channel as a pipe between two coroutines. T
 
 
 class MyEventConsumer : EventListener {
@@ -24,10 +21,9 @@ class MyEventConsumer : EventListener {
     }
 }
 
-
 val tl = MyEventConsumer()
 
-// start a log consumer
+// Start a log consumer
 GlobalScope.launch {
     tl.ordersChannel.receiveAsFlow().filter {
        it is InteractionEvent &&  it.curComponent?.name == "ComponentGenerator.1"
@@ -39,10 +35,10 @@ GlobalScope.launch {
 // create simulation with no default logging
 val sim = createSimulation {
     ComponentGenerator(iat = 1.asDist()) { Component("Car.${it}") }
+
+    // add custom log consumer
+    addEventListener(tl)
+
+    // run the simulation
+    run(100)
 }
-
-// add custom log consumer
-sim.addEventListener(tl)
-
-// run the simulation
-sim.run(100)

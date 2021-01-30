@@ -65,7 +65,17 @@ object EventLog {
     @JvmStatic
     fun main(args: Array<String>) {
         // create simulation with no default logging
-        val sim = createSimulation { }
+        val sim = createSimulation {
+            addEventListener{ it: Event -> println(it)}
+
+            class MyEvent(msg:String) : Event(now())
+
+            object: Component(){
+                override fun process() = sequence<Component> {
+                    log(MyEvent("something magical happened"))
+                }
+            }
+        }
 
         // add custom log consumer
         sim.addEventListener(EventListener { traceElement -> TODO("do something with") })

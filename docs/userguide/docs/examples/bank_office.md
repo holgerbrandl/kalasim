@@ -18,7 +18,7 @@ We need a queue for the customers to wait for service.
 
 The model code is:
 
-```kotlin hl_lines="17 19 33 35 36 49 67"
+```kotlin hl_lines="15 17 31 33 34 47 65"
 //{!bank/oneclerk/Bank1clerk.kt!}
 ```
 
