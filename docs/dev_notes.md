@@ -31,9 +31,6 @@ main differences
 * interpreter vs jvm performance
 
 
-### simmer::select()?
-
-Can we have select policies as in simmer? (Ucar 2019, p12)
 
 ## gihub actions
 

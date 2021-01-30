@@ -11,7 +11,7 @@ A single car, a driver, and red traffic light in the middle of the night.
 Let’s start with a very simple model. The example demonstrates the main mode of operation, the core API and the component process model implemented in `kalasim`. We want to build a simulation where a single car is driving around for a some time before arriving at its destination.
 
 ```kotlin
-//{!api/Cars.kts!}
+//{!api/Car.kts!}
 ```
 
 <!--This example corresponds to the `Cars` `salabim` example https://www.salabim.org/manual/Modeling.html-->

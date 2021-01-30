@@ -15,10 +15,6 @@ env.visEngine = KRAVIS
 nlm.printHistogram()
 ```
 
-**{todo}** review simmer.plot and provide similar API
-> Ucar I, Smeets B (2019b). simmer.plot: Plotting Methods for simmer. R package version 0.1.15, URL <https://CRAN.R-project.org/package=simmer.plot>
-
-
 ## v0.7
 
 **{todo}** provide heatmap of component-list status

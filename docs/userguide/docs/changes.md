@@ -19,7 +19,7 @@ val batchLR: List<Customer> = batch(queue, 4, timeout = 10)
 createSimulation {
     tickTransform = OffsetTransform(Instant.now(), TimeUnit.MINUTES)
 
-    run(asTickDuration(Duration.ofMinutes(90)))
+    run(Duration.ofMinutes(90).asTicks())
     println(asWallTime(now))
 }
 ```
@@ -34,8 +34,6 @@ ComponentGenerator(uniform(0,1)){ counter -> "smthg no$counter"}
 * Added `forceStart` to `ComponentGenerator` to define if an arrival should be happen when it is activated for the first time
 
 * Changed scheduling priority from `Int` to inline class `Priority` (with defaults `NORMAL`, `HIGH`, `LOW`) in all interaction methods for more typesafe API
-
-* Improved 
 
 * New Example: ["The ferryman"](examples/ferryman.md)
 * New Example: [Office Tower](examples/office_tower.md)

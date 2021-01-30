@@ -27,7 +27,7 @@ Find out more about the [basics](basics.md) of a `kalasim` simulation.
 Let’s start with a very simple model. The example demonstrates the main mode of operation, the core API and the component process model implemented in `kalasim`. We want to build a simulation where a single car is driving around for a some time before arriving at its destination.
 
 ```kotlin
-//{!api/Cars.kts!}
+//{!api/Car.kts!}
 ```
 
 Curious about an in-depth analysis of this example? It's your lucky day, see [here](examples/car.md).
