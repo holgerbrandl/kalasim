@@ -53,6 +53,8 @@ There is one provided implementation `OffsetTransform` that can be instantiated 
 
 Even if `kalasim` tries to provide a simplistic declarative approach to define a simulation, it may come along with computational demands simulation. To allow introspection into time-complexity of the underlying computations, the user may want to use the built-in `env.tickMetrics` [monitor](monitors.md) to analyze how much time is spent per time unit (aka *tick*). This monitor is not enabled by default and need to enabled when the environment is created by passing `tickMetricsEnabled=true`
 
+<!-- Also see https://cran.r-project.org/web/packages/simmer/vignettes/simmer-01-introduction.html#replication --> 
+
 ## Save and Load Simulations
 
 <!-- TODO learn from https://github.com/r-simmer/simmer.json -->

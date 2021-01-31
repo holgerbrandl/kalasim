@@ -1,4 +1,4 @@
-# Monitor
+# Monitors
 
 Monitors are a way to collect data from the simulation. They are automatically collected for [resources](resource.md), [components](component.md), [states](state.md) and [queues](component.md#queue). On top of that the user can define her own monitors.
 
@@ -281,14 +281,6 @@ Use-cases for slicing are
 
 ## Visualization
 
-
-`kalasim` integrates nicely with [`kravis`](https://github.com/holgerbrandl/kravis) to visualize monitor data. For examples see `src/test/kotlin/org/kalasim/analytics/KravisVis.kt`.
-
- **Prerequisite**
- > To visualize data with kravis, [R](https://www.r-project.org/) must be installed on the system. See [here](https://github.com/holgerbrandl/kravis)) for details.
-
-
-
 It is possible to render monitors with the following extension functions
 ```kotlin
 NumericStatisticMonitor.display() 
@@ -297,7 +289,7 @@ NumericLevelMonitor.display()
 
 ![](monitors_images/monitor.png)
 
-In particular multiple outputs are supported here by the underlying `kravis` visualization windows, which allows forward backward navigation (via the arrow buttons). See `org.kalasim.examples.bank.resources.Bank3ClerksResources` for an example where multiple visualziaiton are combined to inspect the internal state of the simulation.
+In particular multiple outputs are supported here by the underlying `kravis` visualization windows, which allows forward backward navigation (via the arrow buttons). See `org.kalasim.examples.bank.resources.Bank3ClerksResources` for an example where multiple visualizing are combined to inspect the internal state of the simulation.
 
 
 Note that, currently monitor visualization just works in retrospect, and it is not (yet) possible to view the progression while a simulation is still running.

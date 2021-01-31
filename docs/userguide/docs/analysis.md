@@ -4,11 +4,23 @@ A core aspect when building simulations is to understand, define and modulate th
 
 To facilitate this process, `kalasim` offers various means to analyze data created by a simulation
 
-* [Lifecycle Records](#event-log) summarize a component's states history
 * The [Event Log](event_log.md) tracks events in a simulation
-* [Monitors](monitors.md) track state and statistics of the [basic](basics.md) elements within a simulation, and may be used for domain-specific entities as well.
+* [Monitors](monitors.md) track state and statistics of the [basic](basics.md) elements within a simulation, and may be used for domain-specific entities as well
+* [Lifecycle Records](#event-log) summarize a component's states history
+* [visualization](visualization.md) to inspect complex spatio-temporal patterns   
 
 
+## Monitors
+
+See chapter about [monitors](monitors.md).
+
+## Event Log
+
+See chapter about [event logging](event_log.md).
+
+## Visualization
+
+See chapter about [visualization](visualization.md).
 
 ## Component Status
 
@@ -35,16 +47,6 @@ and 1024 more rows, and and 4 more variables: inScheduled, inStandby, inWaiting
 ```
 
 Clearly if needed, the user may also work with the records directly. For instance to configure a visualization.
-
-## Monitors
-
-See chapter about [monitors](monitors.md).
-
-## Visualization
-
-There are two type of visualization
-
-* Statistical plots. See the [Movie Theater](examples/movie_theater.md)
 
 
 

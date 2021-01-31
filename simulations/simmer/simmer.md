@@ -20,32 +20,6 @@ traj0 <- trajectory() %>%
 * parameters can also be function poiners (instead of 10)
 * request/release are seize/release in simmer
 
-extended example (from paper p11)
-```r
- patient <- trajectory() %>%
-   log_("arriving...") %>%
-   seize(
-   "doctor", 1, continue = c(TRUE, FALSE),
-   post.seize = trajectory("accepted patient") %>%
-   log_("doctor seized"),
-   reject = trajectory("rejected patient") %>%
-   log_("rejected!") %>%
-   seize("nurse", 1) %>%
-   log_("nurse seized") %>%
-   timeout(2) %>%
-   release("nurse", 1) %>%
-   log_("nurse released")) %>%
-   timeout(5) %>%
-   release("doctor", 1) %>%
-   log_("doctor released")
-   
-env <- simmer() %>%
-  add_resource("doctor", capacity = 1, queue_size = 0) %>%
-  add_resource("nurse", capacity = 10, queue_size = 0) %>%
-  add_generator("patient", patient, at(0, 1)) %>%
-  run()
-```
-
 <https://r-simmer.org/index.html>
 
 <https://github.com/r-simmer/simmer>
@@ -134,6 +108,7 @@ simmer() %>%
 
 https://github.com/r-simmer/simmer.plot
 
+
 methods overview <https://r-simmer.org/extensions/plot/reference/>
 
 review simmer.plot and provide similar API
@@ -144,9 +119,18 @@ plot(<simmer>) --> deprecated
 
 Plot Method for simmer Objects
 
+resources <- get_mon_resources(env) columns:
+* server - claimers
+* queue - requesters
+* capacity - dito
+* system - server+queue - total arrivals in systems - non-data-components 
+arrivals <- get_mon_arrivals(env) #%>% tbl_df
+
+
 plot(<trajectory>) --> simple flow chart (we can do that I think)
 
-plot(<arrivals>) 
+plot(<arrivals>)
+ 
 plot(<attributes>)
 plot(<resources>)
 
