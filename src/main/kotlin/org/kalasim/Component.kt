@@ -420,7 +420,7 @@ open class Component(
      * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failDelay  if the request is not honored before now+fail_delay,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
-     * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given.
+     * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given. It is possible to check which resource has been claimed with `Component.claimers()`.
      * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
      * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      *
@@ -452,7 +452,7 @@ open class Component(
      * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failDelay  if the request is not honored before now+fail_delay,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
-     * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given.
+     * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given. It is possible to check which resource has been claimed with `Component.claimers()`.
      * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
      * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      *
@@ -485,7 +485,7 @@ open class Component(
      * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failDelay  if the request is not honored before now+fail_delay,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
-     * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given.
+     * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given. It is possible to check which resource has been claimed with `Component.claimers()`.
      * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
      *
@@ -607,7 +607,8 @@ open class Component(
             // suspend{ ... }
             honorBlock()
 
-            release(*resourceRequests)
+            // salabim says: It is possible to check which resource has been claimed with `Component.claimers()`.
+            resourceRequests.filter{ it.r.claimers.contains(this@Component)}.forEach { release(it) }
         }
     }
 
@@ -655,12 +656,11 @@ open class Component(
                     log(
                         ResourceEvent(
                             env.now,
-                            this, resource,
                             env.curComponent,
+                            this,
+                            resource,
                             CLAIMED,
-                            quantity,
-                            resource.capacity,
-                            resource.claimed
+                            quantity
                         )
                     )
 
@@ -1009,13 +1009,11 @@ open class Component(
         log(
             ResourceEvent(
                 env.now,
+                env.curComponent,
                 this,
                 resource,
-                env.curComponent,
                 RELEASED,
-                quantity,
-                resource.capacity,
-                resource.claimed
+                quantity
             )
         )
 

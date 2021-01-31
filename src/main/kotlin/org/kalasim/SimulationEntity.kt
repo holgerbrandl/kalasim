@@ -27,7 +27,8 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
     /** Print info about this resource */
     fun printInfo() = info.printThis()
 
-    override fun toString(): String = "${javaClass.simpleName}($name)"
+//    override fun toString(): String = "${javaClass.simpleName}($name)"
+    override fun toString(): String = name
 
 
     //https://medium.com/koin-developers/ready-for-koin-2-0-2722ab59cac3

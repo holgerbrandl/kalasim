@@ -1,5 +1,6 @@
 package org.kalasim.test
 
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import org.apache.commons.math3.distribution.EnumeratedDistribution
@@ -305,6 +306,31 @@ class ResourceTests {
             c.requests.shouldBeEmpty()
             c.status shouldBe ComponentState.DATA
         }
+    }
+
+    @Test
+    fun `it should correctly handle oneOf requests`() = createTestSimulation {
+        class DoctorMeier: Resource()
+        class DoctorSchreier: Resource()
+
+        val doctors: List<Resource> = listOf(DoctorMeier(), DoctorSchreier() )
+
+        val patient = object: Component(){
+            override fun process() =sequence<Component> {
+                request( doctors, oneOf = true){
+                    hold(1)
+                }
+            }
+        }
+
+        run(10)
+
+        doctors.forEach { dr ->
+            dr.requesters.q.shouldBeEmpty()
+            dr.claimers.q.shouldBeEmpty()
+        }
+
+        patient.status shouldBe ComponentState.DATA
     }
 
 }

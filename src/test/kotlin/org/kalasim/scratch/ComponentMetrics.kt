@@ -41,7 +41,7 @@ fun main() {
         //gather arrival data
         val pStats: List<ComponentLifecycleRecord> = cg.arrivals.map { it.toLifeCycleRecord() }
 
-        // konvert to krangl data-frame
+        // convert to krangl data-frame
         pStats.asDataFrame().printThis()
 
 

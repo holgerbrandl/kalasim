@@ -68,11 +68,11 @@ object EventLog {
         val sim = createSimulation {
             addEventListener{ it: Event -> println(it)}
 
-            class MyEvent(msg:String) : Event(now())
+            class MyEvent(msg:String, time:Double ) : Event(time)
 
             object: Component(){
                 override fun process() = sequence<Component> {
-                    log(MyEvent("something magical happened"))
+                    log(MyEvent("something magical happened", now))
                 }
             }
         }

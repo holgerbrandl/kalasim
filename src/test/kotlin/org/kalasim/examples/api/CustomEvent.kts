@@ -3,13 +3,13 @@ import org.kalasim.Event
 import org.kalasim.createSimulation
 
 createSimulation {
-    addEventListener{ it: Event -> println(it)}
+    addEventListener{ println(it)}
 
     class MyEvent(msg:String) : Event(now())
 
     object: Component(){
-        override fun process() = sequence<Component> {
-            log(MyEvent("something magical happened"))
-        }
+//        override fun process() = sequence<Component> {
+//            log(MyEvent("something magical happened"))
+//        }
     }
 }
