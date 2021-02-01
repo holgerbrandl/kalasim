@@ -4,7 +4,6 @@
 
 2. Document [changes](../CHANGES.md)
 
-
 3. Do the release
 ```bash
 # adjust to te path of your working copy
@@ -23,7 +22,7 @@ echo "new version is $kalasim_version !"
 
 
 if [[ $kalasim_version == *"-SNAPSHOT" ]]; then
-  echo "ERROR: Won't publish snapshot build $kalasim_version}!" 1>&2
+  echo "ERROR: Won't publish snapshot build $kalasim_version!" 1>&2
   exit 1
 fi
 
@@ -40,10 +39,10 @@ git push origin --tags
 
 
 ### Build and publish the binary release to jcenter
-gradle install
+./gradlew install
 
 # careful with this one!
-gradle bintrayUpload
+./gradlew bintrayUpload
 
 #For released versions check:
 #- https://bintray.com/holgerbrandl/github/kalasim

@@ -42,6 +42,8 @@ resources %>% head
 plot(resources, metric = "usage", "doctor", items = "server", steps = TRUE)
 
 plot(resources, metric = "utilization", c("nurse", "doctor", "administration"))
+plot(resources, metric = "usage", c("nurse", "doctor", "administration"))
+plot(resources, metric = "usage", c("nurse", "doctor", "administration"), steps = TRUE)
 
 ## experiments
 plot(resources, metric = "usage", "doctor", items = "server", steps = TRUE)
@@ -58,6 +60,53 @@ get_mon_arrivals(env) %>% head
 
 # The S3 method for 'arrivals' provides three metrics: "activity_time", "waiting_time", and "flow_time". The "activity_time" is the amount of time spent in active state (i.e., in timeout activities), and it is already provided in the output of get_mon_arrivals. The "flow_time" is the amount of time spent in the system, and it is computed as follows: flow = end_time - start_time. Finally, the "waiting_time" is the amount of time spent waiting (e.g., in resources' queues, or due to a wait activity...), and it is computed as follows: waiting_time = flow_time - activity_time. This method does not apply any summary, but just shows a line plot of the values throughout the simulation.
 plot(arrivals, metric = "waiting_time")
+
+
+###
+### simmplot debug
+###
+
+resources
+x =resources
+items=c("queue", "server", "system")
+steps=FALSE
+if(T){
+
+    limits <- x %>%
+        dplyr::mutate(server = .data$capacity, queue = .data$queue_size, system = .data$limit) %>%
+        tidyr::gather("item", "value", c("queue", "server", "system")) %>%
+        dplyr::filter(.data$item %in% items) %>%
+        dplyr::mutate(item = factor(.data$item, levels = items))
+
+    require(datautils)
+    # x <-
+    x %>%
+        tidyr::gather("item", "value", c("queue", "server", "system")) %>%
+        dplyr::filter(.data$item %in% items) %>%
+        dplyr::mutate(item = factor(.data$item, levels = items)) %>%
+        dplyr::group_by(.data$resource, .data$replication, .data$item) %>% #first_group()
+        dplyr::mutate(
+        # mean = utils::head(.data$value) * diff(.data$time),
+        mean = c(0, cumsum(utils::head(.data$value, -1) * diff(.data$time))) / .data$time
+        )
+# %>%
+#         dplyr::ungroup()
+
+    plot_obj <-
+    ggplot(x, aes_(x = ~time, color = ~item)) +
+        facet_grid(~resource) +
+        geom_step(aes_(y = ~value, group = ~interaction(replication, item)), limits, lty = 2) +
+        ggtitle(paste("Resource usage")) +
+        ylab("in use") +
+        xlab("time") +
+        expand_limits(y = 0)
+
+    if (steps == TRUE)
+    plot_obj + geom_step(aes_(y = ~value, group = ~interaction(replication, item)), alpha = 0.8)
+    else
+     plot_obj + geom_line(aes_(y = ~mean, group = ~interaction(replication, item)), alpha = 0.8)
+}
+
 
 ##
 ## same with replicas
@@ -89,3 +138,5 @@ envs %>% get_mon_resources() %>% plot( metric = "usage")
 envs %>%
 get_mon_arrivals() %>%
 head()
+
+

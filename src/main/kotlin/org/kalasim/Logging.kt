@@ -6,7 +6,6 @@ import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
 import java.util.logging.Level
 import kotlin.math.absoluteValue
-import kotlin.reflect.KClass
 
 
 internal val TRACE_COL_WIDTHS = mutableListOf(10, 22, 22, 45, 35)
@@ -17,20 +16,40 @@ abstract class TraceDetails : Jsonable()
 
 enum class ResourceEventType { CLAIMED, RELEASED, PUT }
 
+
 class ResourceEvent(
-    time: Double,
+    time: Double, // bug in krangl, parent
+    curComponent: Component?,
     val requester: SimulationEntity,
     val resource: Resource,
-    curComponent: Component?,
     val type: ResourceEventType,
-    val amount: Double,
-    val capacity: Double,
-    val claimed: Double
+    val amount: Double
 ) : InteractionEvent(time, curComponent, requester) {
+
+    val claimed: Double = resource.claimed
+    val capacity: Double = resource.capacity
+    val occupancy: Double = resource.occupancy
+    val requesters: Int = resource.requesters.size
+//    val requested: Int = resource.requesters.q.map{ it.component.requests.filter{ it.key == resource}}
+    val claimers: Int = resource.claimers.size
+
 
     override fun renderAction() =
         "${type.toString().toLowerCase().capitalize()} ${amount.absoluteValue.roundAny(2)} from '${requester.name}'"
 
+        override fun toJson() = json {
+            "time" to time
+            "current" to curComponent?.name
+            "requester" to requester.name
+            "resource" to resource.name
+            "type" to type
+            "amount" to amount
+            "capacity" to capacity
+            "claimed" to claimed
+            "occupancy" to occupancy
+            "requesters" to requesters
+            "claimers" to claimers
+        }
 
 }
 

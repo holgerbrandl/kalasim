@@ -39,6 +39,8 @@ nlm.printHistogram()
 
 ## Later
 
+**{todo}** review if simulattion entities must have distinct names (optional policies) (see Hospital example)
+
 **{todo}** find better way to draw random value without clutter `uniform(0,5)()` --> `uniform(0,5)`?!
 
 **{todo}** should we support a resource queue limit ` queue_size = Inf)` (as in simmer ucar209,p19)
