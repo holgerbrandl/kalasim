@@ -16,11 +16,11 @@ class OffsetTransform(val offset: Instant = Instant.now(), val tickUnit: TimeUni
         val durationSinceOffset = when(tickUnit){
             TimeUnit.NANOSECONDS -> Duration.ofNanos(tickTime.toLong())
             TimeUnit.MICROSECONDS -> Duration.ofNanos((tickTime * 1000).toLong())
-            TimeUnit.MILLISECONDS -> Duration.ofMillis(tickTime.toLong())
-            TimeUnit.SECONDS -> Duration.ofSeconds(tickTime.toLong())
-            TimeUnit.MINUTES -> Duration.ofMinutes(tickTime.toLong())
-            TimeUnit.HOURS -> Duration.ofHours(tickTime.toLong())
-            TimeUnit.DAYS -> Duration.ofDays(tickTime.toLong())
+            TimeUnit.MILLISECONDS -> Duration.ofNanos((tickTime * 1000000).toLong())
+            TimeUnit.SECONDS -> Duration.ofMillis((tickTime * 1000).toLong())
+            TimeUnit.MINUTES -> Duration.ofMillis((tickTime * 60000).toLong())
+            TimeUnit.HOURS -> Duration.ofSeconds((tickTime * 3600).toLong())
+            TimeUnit.DAYS -> Duration.ofMinutes((tickTime * 1440).toLong())
         }
 
         return offset + durationSinceOffset
@@ -35,13 +35,13 @@ class OffsetTransform(val offset: Instant = Instant.now(), val tickUnit: TimeUni
     // todo improve precision of transformation
     override fun durationAsTicks(duration: Duration): Double = when(tickUnit){
         TimeUnit.NANOSECONDS -> duration.toNanos()
-        TimeUnit.MICROSECONDS -> duration.toMillis()*1000
-        TimeUnit.MILLISECONDS -> duration.toMillis()
+        TimeUnit.MICROSECONDS -> duration.toNanos()/1000.0
+        TimeUnit.MILLISECONDS -> duration.toNanos()/1000000.0
         // https://stackoverflow.com/questions/42317152/why-does-the-duration-class-not-have-toseconds-method
-        TimeUnit.SECONDS -> duration.toSeconds()
-        TimeUnit.MINUTES -> duration.toMinutes()
-        TimeUnit.HOURS -> duration.toHours()
-        TimeUnit.DAYS -> duration.toDays()
+        TimeUnit.SECONDS -> duration.toMillis()/1000.0
+        TimeUnit.MINUTES -> duration.toMillis()/60000.0
+        TimeUnit.HOURS -> duration.toSeconds()/3600.0
+        TimeUnit.DAYS -> duration.toMinutes()/1440.0
     }.toDouble()
 }
 

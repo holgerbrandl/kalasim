@@ -35,7 +35,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.21")
 
-    implementation("com.github.holgerbrandl:jsonbuilder:0.8")
+    api("com.github.holgerbrandl:jsonbuilder:0.8")
     implementation("com.google.code.gson:gson:2.8.6")
 
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")

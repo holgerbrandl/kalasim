@@ -23,6 +23,8 @@ https://medium.com/mobile-app-development-publication/kotlin-koin-scope-illustra
 >  startKoin declaration function which declare your Koin instance into the GlobalContext, use the koinApplication function to declare a local Koin instance.
 
 
+How to bind interface? https://stackoverflow.com/questions/57816557/provide-an-instance-as-its-interface-in-koin
+
 ## salabim
 
 doc sources --> https://www.salabim.org/manual/ view page sources
@@ -32,7 +34,7 @@ main differences
 
 
 
-## gihub actions
+## github actions
 
 revert remote tags that prevent pushing because of
 > error: dst refspec refs/heads/master matches more than one

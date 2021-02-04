@@ -3,6 +3,8 @@
 
 ## Next steps
 
+<https://medium.com/mobile-app-development-publication/kotlin-flow-buffer-is-like-a-fashion-adoption-31630a9cdb00>
+
 <https://github.com/denisvstepanov/lets-plot-examples>
 
 https://www.anylogic.com/resources/articles/framework-for-standardization-of-simulation-integrated-production-planning/

@@ -1,6 +1,7 @@
 package org.kalasim.test
 
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.junit.Test
 import org.kalasim.*
 import java.time.Duration
@@ -10,6 +11,22 @@ import java.util.concurrent.TimeUnit
 class TimeTrafoTests {
 
     class TimeTrafoTestEvent(time: Double) : Event(time)
+
+
+    @Test
+    fun `it should preserve precision when transforming ticks to walltime`() = createTestSimulation {
+        val baseTime = Instant.parse("2021-01-24T12:00:00.00Z")
+
+        tickTransform = OffsetTransform(baseTime, TimeUnit.MINUTES)
+
+        asWallTime(15.0) shouldNotBe asWallTime(15.32)
+
+        asWallTime(15.0) shouldBe  Instant.parse("2021-01-24T12:15:00Z")
+
+        Duration.ofSeconds(300).asTicks() shouldNotBe Duration.ofSeconds(350).asTicks()
+        Duration.ofSeconds(30).asTicks() shouldBe 0.5
+
+    }
 
     @Test
     fun `it should correctly project simulation times with offset-trafo`() = createTestSimulation(true) {
