@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 //val kotlinVersion = KotlinVersion.CURRENT
 
 plugins {
-    kotlin("jvm") version "1.4.21"
+    kotlin("jvm") version "1.4.30"
     application
     `maven-publish`
     id("com.jfrog.bintray") version "1.8.5"
@@ -33,7 +33,7 @@ dependencies {
 //    implementation("org.koin:koin-core:2.1.6")
     api ("org.koin:koin-core:2.2.1")
 
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.21")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.30")
 
     api("com.github.holgerbrandl:jsonbuilder:0.8")
     implementation("com.google.code.gson:gson:2.8.6")
