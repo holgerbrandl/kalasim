@@ -1072,6 +1072,7 @@ open class Component(
      * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failDelay  If the request is not honored before now+fail_delay,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
+     * @param all If `false` (default), continue, if any of the given state/values is met. if `true`, continue if all of the given state/values are met.
      * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      */
     suspend fun SequenceScope<Component>.wait(
