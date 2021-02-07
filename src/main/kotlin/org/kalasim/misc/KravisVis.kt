@@ -1,8 +1,9 @@
 package org.kalasim.misc
 
 import kravis.*
-import org.kalasim.monitors.FrequencyTable
+import kravis.device.JupyterDevice
 import org.kalasim.monitors.FrequencyLevelMonitor
+import org.kalasim.monitors.FrequencyTable
 import org.kalasim.monitors.NumericLevelMonitor
 import org.kalasim.monitors.NumericStatisticMonitor
 import java.awt.GraphicsEnvironment
@@ -16,81 +17,88 @@ fun hasR(): Boolean {
     return proc.exitValue() == 0
 }
 
-internal fun warnNoDisplay(): Boolean = if(!canDisplay()) {
-    printWarning(" No display or R not found")
-    true
-} else {
-    false
+internal fun checkDisplay() {
+    if(!canDisplay()) {
+        throw IllegalArgumentException(" No display or R not found")
+    }
 }
 
 internal fun printWarning(msg: String) {
     System.err.println("[kalasim] $msg")
 }
 
-fun NumericLevelMonitor.display(title: String = name) {
-    if(warnNoDisplay()) return
 
-    apply {
-        val data = stepFun()
-
-        data.plot(
-            x = Pair<Double, Double>::first,
-            y = Pair<Double, Double>::second
-        ).xLabel("time").yLabel("").geomStep().title(title).show()
-    }
+private fun GGPlot.showNotJupyter(): GGPlot = also {
+    if(SessionPrefs.OUTPUT_DEVICE !is JupyterDevice) show()
 }
 
 
-fun NumericStatisticMonitor.display(title: String = name) {
-    if(warnNoDisplay()) return
+fun NumericLevelMonitor.display(title: String = name): GGPlot {
+    checkDisplay()
 
-    apply {
-        val data = values.toList()
-        data.plot(
-            x = { it }
-        ).geomHistogram().title(title).show()
-    }
+    val data = stepFun()
+
+    return data.plot(
+        x = Pair<Double, Double>::first,
+        y = Pair<Double, Double>::second
+    ).xLabel("time")
+        .yLabel("")
+        .geomStep()
+        .title(title)
+        .showNotJupyter()
 }
 
-fun <T> FrequencyTable<T>.display(title: String? = null) {
-    if(warnNoDisplay()) return
+
+fun NumericStatisticMonitor.display(title: String = name): GGPlot {
+    checkDisplay()
+
+    val data = values.toList()
+
+    return data.plot(x = { it })
+        .geomHistogram()
+        .title(title)
+        .showNotJupyter()
+}
+
+fun <T> FrequencyTable<T>.display(title: String? = null): GGPlot {
+    checkDisplay()
 
     val data = toList()
 
-    data.plot(x = { it.first }, y= {it.second})
+    return data.plot(x = { it.first }, y = { it.second })
         .geomCol()
         .run { if(title != null) title(title) else this }
-        .show()
+        .showNotJupyter()
 }
 
-fun <T> FrequencyLevelMonitor<T>.display(title: String = name) {
-    if(warnNoDisplay()) return
 
-    apply {
-        val nlmStatsData = statsData()
-        val data = nlmStatsData.stepFun()
+fun <T> FrequencyLevelMonitor<T>.display(title: String = name): GGPlot {
+    checkDisplay()
 
-        data class Segment<T>(val value: T, val start: Double, val end: Double)
+    val nlmStatsData = statsData()
+    val data = nlmStatsData.stepFun()
 
-        val segments = data.zipWithNext().map {
-            Segment(
-                it.first.second,
-                it.first.first,
-                it.second.first
-            )
-        }
+    data class Segment<T>(val value: T, val start: Double, val end: Double)
 
-        // why cant we use "x".asDiscreteVariable here?
-        segments.plot(
-            x = Segment<T>::start,
-            y = Segment<T>::value,
-            xend = Segment<T>::end,
-            yend = Segment<T>::value
+    val segments = data.zipWithNext().map {
+        Segment(
+            it.first.second,
+            it.first.first,
+            it.second.first
         )
-            .xLabel("time")
-            .yLabel("")
-            .geomSegment()
-            .geomPoint()
-            .title(title).show()
     }
+
+    // why cant we use "x".asDiscreteVariable here?
+    return segments.plot(
+        x = Segment<T>::start,
+        y = Segment<T>::value,
+        xend = Segment<T>::end,
+        yend = Segment<T>::value
+    )
+        .xLabel("time")
+        .yLabel("")
+        .geomSegment()
+        .geomPoint()
+        .title(title)
+        .showNotJupyter()
 }
