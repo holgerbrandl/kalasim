@@ -40,7 +40,8 @@ class OffsetTransform(val offset: Instant = Instant.now(), val tickUnit: TimeUni
         // https://stackoverflow.com/questions/42317152/why-does-the-duration-class-not-have-toseconds-method
         TimeUnit.SECONDS -> duration.toMillis()/1000.0
         TimeUnit.MINUTES -> duration.toMillis()/60000.0
-        TimeUnit.HOURS -> duration.toSeconds()/3600.0
+        //https://stackoverflow.com/questions/42317152/why-does-the-duration-class-not-have-toseconds-method
+        TimeUnit.HOURS -> duration.seconds /3600.0
         TimeUnit.DAYS -> duration.toMinutes()/1440.0
     }.toDouble()
 }
