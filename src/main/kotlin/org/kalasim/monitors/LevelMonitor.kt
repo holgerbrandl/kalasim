@@ -56,7 +56,11 @@ data class LevelStatsData<T>(
     /** Returns the step function of time, value pairs*/
     fun stepFun(): List<Pair<Double, T>> =
         (this.timepoints + (timepoints.last() + durations.last())).zip(values.toList() + values.last())
+
+    fun asList() = stepFun().zip(durations).map{ LevelStateRecord(it.first.first, it.first.second, it.second)}
 }
+
+data class LevelStateRecord<T>(val timestamp: Double, val value:T, val  duration:Double?)
 
 
 
