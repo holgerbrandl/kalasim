@@ -1,10 +1,12 @@
 package org.kalasim.test
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
-import org.kalasim.ComponentState.*
+import org.kalasim.ComponentState.DATA
+import org.kalasim.ComponentState.SCHEDULED
 import org.kalasim.misc.printThis
 
 class ComponentTests {
@@ -19,9 +21,9 @@ class ComponentTests {
     }
 
     @Test
-    fun `components should be in DATA by default unless a process is defines`()  = createTestSimulation {
+    fun `components should be in DATA by default unless a process is defines`() = createTestSimulation {
 
-        object: Component(){
+        object : Component() {
             override fun process(): Sequence<Component> {
                 return super.process()
             }
@@ -151,6 +153,43 @@ class ComponentTests {
                 // do maintenance
                 hold(2)
                 tool.resume()
+            }
+        }
+
+        run(20)
+
+        tool.isData shouldBe true
+        mechanic.isData shouldBe true
+    }
+
+    @Test
+    // https://github.com/salabim/salabim/issues/24
+    fun `all interactions should fail for an interrupted component`() = createTestSimulation {
+
+
+        val tool = object : Component("tool") {
+            override fun process() = sequence<Component> {
+                hold(10)
+                log("production finished")
+            }
+        }
+
+        val mechanic = object : Component("tool") {
+            override fun process() = sequence<Component> {
+                hold(1)
+                tool.interrupt()
+
+                hold(1)
+                shouldThrow<IllegalArgumentException> {
+                    tool.hold(1)
+                }
+
+                // do maintenance
+                hold(2)
+                tool.resume()
+
+                tool.hold(1)
+
             }
         }
 

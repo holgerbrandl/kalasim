@@ -230,6 +230,7 @@ open class Component(
             0.0
         } else {
             requireNotData()
+            requireNotInterrupted()
             remove()
             checkFail()
             scheduledTime!! - env.now
@@ -350,6 +351,7 @@ open class Component(
     fun cancel() {
         if(status != CURRENT) {
             requireNotData()
+            requireNotInterrupted()
             remove()
             checkFail()
         }
@@ -371,8 +373,9 @@ open class Component(
      */
     suspend fun SequenceScope<Component>.standby(): Unit = yieldCurrent {
         if(status != CURRENT) {
-            requireNotData()
             requireNotMain()
+            requireNotData()
+            requireNotInterrupted()
             remove()
             checkFail()
         }
@@ -507,8 +510,9 @@ open class Component(
     ) {
         yieldCurrent {
             if(status != CURRENT) {
-                requireNotData()
                 requireNotMain()
+                requireNotData()
+                requireNotInterrupted()
                 remove()
                 checkFail()
             }
@@ -748,6 +752,9 @@ open class Component(
     private fun requireNotData() =
         require(status != DATA) { "data component '$name' not allowed" }
 
+    private fun requireNotInterrupted() =
+        require(!isInterrupted) { "interrupted component '$name' needs to be resumed prior to interaction" }
+
     private fun requireNotMain() =
         require(this != env.main) { "main component not allowed" }
 
@@ -928,6 +935,7 @@ open class Component(
     ) {
         if(status != PASSIVE && status != CURRENT) {
             requireNotData()
+            requireNotInterrupted()
             remove()
             checkFail()
         }
@@ -1085,8 +1093,9 @@ open class Component(
         all: Boolean = false
     ) = yieldCurrent {
         if(status != CURRENT) {
-            requireNotData()
             requireNotMain()
+            requireNotData()
+            requireNotInterrupted()
             remove()
             checkFail()
         }
