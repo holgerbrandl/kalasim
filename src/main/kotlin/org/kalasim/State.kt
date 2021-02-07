@@ -36,7 +36,7 @@ open class State<T>(
         }
 
 
-    private val valueMonitor = FrequencyLevelMonitor<T>(initialValue = value, koin = koin)
+    val valueMonitor = FrequencyLevelMonitor(initialValue = value, koin = koin, name="State of '$name'")
 
     internal val waiters = ComponentQueue<Component>("waiters of ${this.name}", koin = koin)
 //    val waiters = PriorityQueue<Component>()
