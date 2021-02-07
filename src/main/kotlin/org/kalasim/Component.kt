@@ -29,7 +29,7 @@ enum class ComponentState {
 
 internal const val DEFAULT_QUEUE_PRIORITY = 0
 
-inline class Priority(val value: Int)
+class Priority(val value: Int)
 
 val LOWER = Priority(-10)
 val NORMAL = Priority(DEFAULT_QUEUE_PRIORITY)
@@ -91,7 +91,7 @@ open class Component(
             statusMonitor.addValue(value)
         }
 
-    val statusMonitor = FrequencyLevelMonitor(status, "status of ${name}", koin)
+    val statusMonitor = FrequencyLevelMonitor(status, "status of ${this.name}", koin)
 
 
     init {
