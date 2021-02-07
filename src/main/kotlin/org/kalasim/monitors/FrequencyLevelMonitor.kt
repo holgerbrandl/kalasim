@@ -61,11 +61,13 @@ class FrequencyLevelMonitor<T>(
     }
 
 
-    override fun get(time: Double): T? {
-        // https://youtrack.jetbrains.com/issue/KT-43776
-        val timeIndex = timestamps.withIndex().firstOrNull { it.value >= time }?.index
+    override fun get(time: Number): T? {
+        require(time.toDouble() >= timestamps.first()) {
+            "query time must be greater than monitor start (${timestamps.first()})"
+        }
 
-        return timeIndex?.let { values[it] }
+        // https://youtrack.jetbrains.com/issue/KT-43776
+        return timestamps.zip(values.toList()).reversed().first { it.first <= time.toDouble() }.second
     }
 
     override fun total(value: T): Double = statsData().run {

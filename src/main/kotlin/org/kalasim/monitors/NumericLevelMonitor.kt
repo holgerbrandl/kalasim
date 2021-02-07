@@ -7,7 +7,10 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.moment.Variance
 import org.kalasim.asCMPairList
-import org.kalasim.misc.*
+import org.kalasim.misc.Jsonable
+import org.kalasim.misc.buildHistogram
+import org.kalasim.misc.printHistogram
+import org.kalasim.misc.printThis
 import org.kalasim.roundAny
 import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
@@ -30,7 +33,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
     }
 
     override fun addValue(value: Number) {
-        if (!enabled) return
+        if(!enabled) return
 
         timestamps.add(env.now)
         values.add(value.toDouble())
@@ -38,7 +41,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
 
 
     /** Increment the current value by 1 and add it as value. Autostart with 0 if there is no prior value. */
-    fun inc(): NumericLevelMonitor {
+    operator fun inc(): NumericLevelMonitor {
 //        val roundToInt = (values.lastOrNull() ?: 0.0).roundToInt()
         val roundToInt = values.last()
         addValue((roundToInt + 1))
@@ -46,7 +49,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
         return this
     }
 
-    fun dec(): NumericLevelMonitor {
+    operator fun dec(): NumericLevelMonitor {
 //        val roundToInt = (values.lastOrNull() ?: 0.0).roundToInt()
         val roundToInt = values.last()
         addValue((roundToInt - 1))
@@ -54,7 +57,13 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
         return this
     }
 
-    override fun get(time: Double): Number = timestamps.zip(values.toList()).first { it.first > time }.second
+    override fun get(time: Number): Number {
+        require(time.toDouble() >= timestamps.first()) {
+            "query time must be greater than monitor start (${timestamps.first()})"
+        }
+
+        return timestamps.zip(values.toList()).reversed().first { it.first <= time.toDouble() }.second
+    }
 
     override fun total(value: Number): Double = statsData().run {
         // https://youtrack.jetbrains.com/issue/KT-43776
@@ -62,7 +71,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun  statisticsSummary() = (statsData() as LevelStatsData<Number>).statisticalSummary()
+    override fun statisticsSummary() = (statsData() as LevelStatsData<Number>).statisticalSummary()
 
     fun statsData(excludeZeros: Boolean = false): LevelStatsData<Double> {
         require(values.isNotEmpty()) { "data must not be empty when preparing statistics of $name" }
@@ -72,7 +81,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
         val timepointsExt = timestamps + env.now
         val durations = timepointsExt.toMutableList().zipWithNext { first, second -> second - first }
 
-        return if (excludeZeros) {
+        return if(excludeZeros) {
             val (durFilt, valFilt) = durations.zip(valuesLst).filter { it.second > 0 }.unzip()
             val (_, timestampsFilt) = timestamps.zip(valuesLst).filter { it.second > 0 }.unzip()
 
@@ -93,7 +102,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
 
         println("Histogram of: '${name}'")
 
-        if (valueBins) {
+        if(valueBins) {
             val freq = Frequency()
 
             values.forEach { freq.addValue(it) }
@@ -161,7 +170,7 @@ class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean =
         min = data.values.minOrNull()
         max = data.values.maxOrNull()
 
-        if (data.durations.any { it != 0.0 }) {
+        if(data.durations.any { it != 0.0 }) {
             val durationsArray = data.durations.toDoubleArray()
             mean = Mean().evaluate(data.values.toDoubleArray(), durationsArray)
             standardDeviation = sqrt(Variance().evaluate(data.values.toDoubleArray(), durationsArray))

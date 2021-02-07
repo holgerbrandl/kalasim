@@ -16,8 +16,10 @@ interface LevelMonitor<T> {
 
     /**
      * When Monitor.get() is called with a time parameter or a direct call with a time parameter, the value at that time will be returned.
+     *
+     * @throws IllegalArgumentException When querying a time before the start of the recording
      * */
-    operator fun get(time: Double): T?
+    operator fun get(time: Number): T?
 
 
     /** Get the total time for which a monitor was is state `value`*/

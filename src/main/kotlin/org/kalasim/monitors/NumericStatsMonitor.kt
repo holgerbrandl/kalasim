@@ -24,10 +24,21 @@ class NumericStatisticMonitor(name: String? = null, koin: Koin = GlobalContext.g
     }
 
     /** Increment the current value by 1 and add it as value. Autostart with 0 if there is no prior value. */
-    fun inc() {
+    operator fun inc(): NumericStatisticMonitor {
         val roundToInt = (values.lastOrNull() ?: 0.0).roundToInt()
         addValue((roundToInt + 1).toDouble())
+
+        return this
     }
+
+    operator fun dec(): NumericStatisticMonitor {
+        val roundToInt = values.last()
+        addValue((roundToInt - 1))
+
+        return this
+    }
+
+
 
     override fun reset() = sumStats.clear()
 
