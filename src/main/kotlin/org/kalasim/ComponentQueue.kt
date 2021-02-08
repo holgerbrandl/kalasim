@@ -22,7 +22,7 @@ data class CQElement<C : SimulationEntity>(val component: C, val enterTime: Doub
 class ComponentQueue<C: SimulationEntity>(
     name: String? = null,
 //    val q: Queue<CQElement<T>> = LinkedList()
-    val q: Queue<CQElement<C>> = PriorityQueue { o1, o2 -> compareValuesBy(o1, o2, { it.priority?.value }) },
+    val q: Queue<CQElement<C>> = PriorityQueue { o1, o2 -> compareValuesBy(o1, o2, { it.priority?.value }, { it.enterTime }) },
     koin: Koin = GlobalContext.get()
 ) : SimulationEntity(name, koin) {
 
