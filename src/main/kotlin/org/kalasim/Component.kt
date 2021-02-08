@@ -29,7 +29,7 @@ enum class ComponentState {
 
 internal const val DEFAULT_QUEUE_PRIORITY = 0
 
-class Priority(val value: Int)
+data class Priority(val value: Int)
 
 val LOWER = Priority(-10)
 val NORMAL = Priority(DEFAULT_QUEUE_PRIORITY)
@@ -1059,8 +1059,8 @@ open class Component(
     suspend fun <T> SequenceScope<Component>.wait(
         state: State<T>,
         waitFor: T,
-        failAt: RealDistribution? = null,
-        failDelay: RealDistribution? = null
+        failAt: Number? = null,
+        failDelay: Number? = null
     ) = wait(
         StateRequest(state) { state.value == waitFor },
 //        *states.map { StateRequest(it) }.toTypedArray(),
@@ -1088,8 +1088,8 @@ open class Component(
         //todo change to support distribution parameters instead
         priority: Priority = NORMAL,
         urgent: Boolean = false,
-        failAt: RealDistribution? = null,
-        failDelay: RealDistribution? = null,
+        failAt: Number? = null,
+        failDelay: Number? = null,
         all: Boolean = false
     ) = yieldCurrent {
         if(status != CURRENT) {
@@ -1101,7 +1101,14 @@ open class Component(
         }
 
         waitAll = all
-        scheduledTime = env.now + (failAt?.sample() ?: Double.MAX_VALUE) + (failDelay?.sample() ?: 0.0)
+
+        require(failAt == null || failDelay == null) { "Either failAt or failDelay can be specified, not both together" }
+
+        scheduledTime = when {
+            failAt != null -> failAt.toDouble()
+            failDelay != null -> env.now + failDelay.toDouble()
+            else -> Double.MAX_VALUE
+        }
 
         stateRequests
             // skip already tracked states
