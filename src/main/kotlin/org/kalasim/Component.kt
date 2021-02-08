@@ -1329,6 +1329,7 @@ class GenProcessInternal(val component: Component, seq: Sequence<Component>, ove
         try {
             iterator.next()
         } catch(e: NoSuchElementException) {
+            if(e.message!=null) e.printStackTrace()
             component.terminate()
         }
     }
