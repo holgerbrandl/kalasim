@@ -13,6 +13,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.context.GlobalContext
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
+import java.time.Duration
+import java.time.Instant
 import java.util.*
 import kotlin.math.min
 import kotlin.reflect.KFunction1
@@ -1297,6 +1299,11 @@ open class Component(
 
         return batch
     }
+
+
+    /** Transforms a wall `duration` into the corresponding amount of ticks.*/
+    fun Duration.asTicks(): Double  = env.asTicks(this)
+    fun Instant.asTickTime(): Double = env.asTickTime(this)
 }
 
 internal val SELECT_SCOPE_IDX = mutableMapOf<Int, Int>()

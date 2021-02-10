@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
 // https://stackoverflow.com/questions/32437550/whats-the-difference-between-instant-and-localdatetime
 interface TickTransform {
     fun tick2wallTime(tickTime: Double): Instant
-    fun wall2TickTime(instant: Instant): Number
+    fun wall2TickTime(instant: Instant): Double
     fun durationAsTicks(duration: Duration): Double
 }
 
@@ -26,7 +26,7 @@ class OffsetTransform(val offset: Instant = Instant.now(), val tickUnit: TimeUni
         return offset + durationSinceOffset
     }
 
-    override fun wall2TickTime(instant: Instant): Number {
+    override fun wall2TickTime(instant: Instant): Double {
         val offsetDuration = Duration.between(offset, instant)
 
         return durationAsTicks(offsetDuration)
@@ -60,10 +60,13 @@ fun Environment.asTicks(duration: Duration): Double {
     return tickTransform!!.durationAsTicks(duration)
 }
 
+/** Transforms a wall `duration` into the corresponding amount of ticks.*/
+fun Component.asTicks(duration: Duration) = env.asTicks(duration)
+
 // note: There is also an extension on Duration in Environment (because of missing multiple receiver support)
 
 /** Transforms an wall `Instant` to simulation time.*/
-fun Environment.asTickTime(instant: Instant): Number {
+fun Environment.asTickTime(instant: Instant): Double {
     require(tickTransform != null){ MISSING_TICK_TRAFO_ERROR }
     return tickTransform!!.wall2TickTime(instant)
 }

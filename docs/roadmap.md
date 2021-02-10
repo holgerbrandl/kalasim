@@ -17,6 +17,8 @@ env.visEngine = KRAVIS
 nlm.printHistogram()
 ```
 
+it should not print stacktraces of user exceptions but actually rethrow them
+
 ## v0.7
 
 **{todo}** provide heatmap of component-list status
@@ -41,7 +43,7 @@ nlm.printHistogram()
 
 ## Later
 
-**{todo}** review if simulattion entities must have distinct names (optional policies) (see Hospital example)
+**{todo}** review if simulation entities must have distinct names (optional policies) (see Hospital example)
 
 **{todo}** find better way to draw random value without clutter `uniform(0,5)()` --> `uniform(0,5)`?!
 
