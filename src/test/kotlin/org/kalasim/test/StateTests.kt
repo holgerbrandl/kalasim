@@ -22,6 +22,20 @@ class StateTests {
     }
 
     @Test
+    fun `it should gracefully print an empty state`() {
+        createSimulation {
+            State("foo").apply {
+                println(info)
+                println(toString())
+                printHistograms()
+            }
+        }
+
+//        StateRequest(State("foo")) { listOf("bar", "test").contains(it) }
+//        StateRequest(State(3.0)) { it*3 < 42 }
+    }
+
+    @Test
     fun `it should wait until a predicate is met`() {
 
         class Car : Component(process = Car::waitForGreen) {

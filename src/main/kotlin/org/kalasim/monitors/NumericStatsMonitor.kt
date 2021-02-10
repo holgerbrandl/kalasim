@@ -68,8 +68,12 @@ class NumericStatisticMonitor(name: String? = null, koin: Koin = GlobalContext.g
         println("Summary of: '${name}'")
         statistics().printThis()
 
-        println("Histogram of: '${name}'")
-        sumStats.buildHistogram(binCount).printHistogram()
+        if(values.size>2) {
+            println("Histogram of: '${name}'")
+            sumStats.buildHistogram(binCount).printHistogram()
+        }else{
+            println("Skipping histogram of '$name' because of to few data")
+        }
     }
 
 

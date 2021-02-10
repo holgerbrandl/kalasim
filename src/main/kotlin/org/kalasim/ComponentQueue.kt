@@ -89,8 +89,12 @@ class ComponentQueue<C: SimulationEntity>(
     fun printStats() = stats.print()
 
     fun printHistogram() {
-        lengthOfStayMonitor.printHistogram()
-        queueLengthMonitor.printHistogram()
+        if(lengthOfStayMonitor.values.size < 2) {
+            println("Skipping histogram of '$name' because of to few data")
+        }else {
+            lengthOfStayMonitor.printHistogram()
+            queueLengthMonitor.printHistogram()
+        }
     }
 
     private val changeListeners = mutableListOf<QueueChangeListener<C>>()

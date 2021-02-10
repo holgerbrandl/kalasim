@@ -81,6 +81,11 @@ class FrequencyLevelMonitor<T>(
         println("# Levels: ${this.values.distinct().size}")
         println()
 
+        if(this.values.size <= 1){
+            println("Skipping histogram of '$name' because of to few data")
+            return
+        }
+
         //        val ed = EnumeratedDistribution(hist.asCM())
 //        repeat(1000){ ed.sample()}.c
 
