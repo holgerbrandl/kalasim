@@ -35,6 +35,22 @@ ComponentGenerator(uniform(0,1)){ counter -> "smthg no$counter"}
 
 * Changed scheduling priority from `Int` to inline class `Priority` (with defaults `NORMAL`, `HIGH`, `LOW`) in all interaction methods for more typesafe API
 
+* Started bundled simulations for adhoc experimentation and demonstration by adding [M/M/1 queue](https://en.wikipedia.org/wiki/M/M/1_queue) `MM1Queue`
+
+* Added support for pluggable visualization backend. Currently [kravis](https://github.com/holgerbrandl/kravis) and [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) are supported.
+```kotlin
+// simply toggle backend by package import
+import org.kalasim.plot.letsplot.display
+// or
+//import org.kalasim.plot.kravis.display
+
+MM1Queue().apply {
+    run(100)
+    server.claimedMonitor.display()
+}
+```
+
+
 * New Example: ["The ferryman"](examples/ferryman.md)
 * New Example: [Office Tower](examples/office_tower.md)
 

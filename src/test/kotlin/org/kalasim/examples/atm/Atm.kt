@@ -2,7 +2,7 @@
 
 import org.apache.commons.math3.distribution.ExponentialDistribution
 import org.kalasim.*
-import org.kalasim.misc.display
+import org.kalasim.plot.kravis.display
 
 //https://youtrack.jetbrains.com/issue/KT-44062
 

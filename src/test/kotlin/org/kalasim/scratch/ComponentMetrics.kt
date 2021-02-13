@@ -2,7 +2,7 @@ package org.kalasim.scratch
 
 import krangl.asDataFrame
 import org.kalasim.*
-import org.kalasim.misc.display
+import org.kalasim.plot.kravis.display
 import org.kalasim.monitors.printConsole
 import org.kalasim.misc.printThis
 

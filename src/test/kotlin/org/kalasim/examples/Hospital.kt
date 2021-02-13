@@ -6,7 +6,7 @@ import kravis.facetWrap
 import kravis.geomStep
 import kravis.plot
 import org.kalasim.*
-import org.kalasim.misc.display
+import org.kalasim.plot.kravis.display
 import org.koin.core.component.get
 import kotlin.collections.listOf
 

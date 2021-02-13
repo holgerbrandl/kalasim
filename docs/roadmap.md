@@ -11,12 +11,6 @@ https://www.anylogic.com/resources/articles/framework-for-standardization-of-sim
 
 ## v0.6
 
-**{todo}** pluggable backend for visualization functions
-```
-env.visEngine = KRAVIS
-nlm.printHistogram()
-```
-
 
 ## v0.7
 

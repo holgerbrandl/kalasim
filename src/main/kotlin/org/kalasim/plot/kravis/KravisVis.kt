@@ -1,4 +1,4 @@
-package org.kalasim.misc
+package org.kalasim.plot.kravis
 
 import kravis.*
 import kravis.device.JupyterDevice

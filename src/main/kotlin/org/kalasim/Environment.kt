@@ -80,7 +80,7 @@ object Defaults {
 }
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-class Environment(
+open class Environment(
     enableConsoleLogger: Boolean = false,
     dependencies: KoinModule? = null,
     koin: Koin? = null,

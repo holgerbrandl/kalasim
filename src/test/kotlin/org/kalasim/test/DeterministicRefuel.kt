@@ -2,7 +2,7 @@ package org.kalasim.test
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
-import org.kalasim.misc.display
+import org.kalasim.plot.kravis.display
 import org.kalasim.misc.printThis
 import org.kalasim.monitors.NumericLevelMonitor
 import org.koin.core.component.get
