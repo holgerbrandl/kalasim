@@ -97,3 +97,12 @@ requests.asDataFrame().writeCSV("requests.csv")
 ```
 
 The transformation step is optional, `List<Event>` can be transformed `asDataFrame()` directly.
+
+
+# Events in Jupyter
+
+When working with jupyter, we can harvest the kernel's built-in rendering capabilities to render events. Note that we need to filter for specific event type to capture all attributes.
+
+![](jupyter_event_log.png)
+
+For a fully worked out example see 

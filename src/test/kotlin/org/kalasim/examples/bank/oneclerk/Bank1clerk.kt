@@ -2,6 +2,7 @@
 package org.kalasim.examples.bank.oneclerk
 
 import org.kalasim.*
+import org.kalasim.plot.kravis.canDisplay
 import org.kalasim.plot.kravis.display
 import org.koin.core.component.get
 import org.koin.core.component.inject
@@ -14,7 +15,7 @@ class Customer(
     override fun process() = sequence {
         waitingLine.add(this@Customer)
 
-        if (clerk.isPassive) clerk.activate()
+        if(clerk.isPassive) clerk.activate()
 
         passivate()
     }
@@ -25,8 +26,8 @@ class Clerk : Component() {
     val waitingLine: ComponentQueue<Customer> by inject()
 
     override fun process() = sequence {
-        while (true) {
-            while (waitingLine.isEmpty()) passivate()
+        while(true) {
+            while(waitingLine.isEmpty()) passivate()
 
             val customer = waitingLine.poll()
 
@@ -41,7 +42,7 @@ class CustomerGenerator : Component() {
     //    var numCreated  = 0
     override fun process() = sequence {
 //        if(numCreated++ >5 ) return@sequence
-        while (true) {
+        while(true) {
             Customer(get(), get())
 
             hold(uniform(5.0, 15.0).sample())
@@ -63,6 +64,9 @@ fun main() {
     val waitingLine: ComponentQueue<Customer> = env.get()
 
     waitingLine.stats.print()
-    waitingLine.queueLengthMonitor.display()
-    waitingLine.lengthOfStayMonitor.display()
+
+    if(canDisplay()) {
+        waitingLine.queueLengthMonitor.display()
+        waitingLine.lengthOfStayMonitor.display()
+    }
 }

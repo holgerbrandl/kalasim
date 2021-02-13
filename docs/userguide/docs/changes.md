@@ -1,6 +1,10 @@
 # Kalasim Release History
 
-## v0.6 (In Progress)
+## v0.6
+
+Released 2021-02-12
+
+Major Enhancements
 
 * Added `selectResource()` to [select from resources with policy](https://www.kalasim.org/resource/#resource-selection)
 ```kotlin
@@ -28,7 +32,7 @@ createSimulation {
 
 * Changed `ComponentGenerator` to allow generating arbitrary types (and not just `Component`s)
 ```kotlin
-ComponentGenerator(uniform(0,1)){ counter -> "smthg no$counter"}
+ComponentGenerator(uniform(0,1)){ counter -> "smthg no${counter}"}
 ```
 
 * Added `forceStart` to `ComponentGenerator` to define if an arrival should be happen when it is activated for the first time
@@ -37,7 +41,7 @@ ComponentGenerator(uniform(0,1)){ counter -> "smthg no$counter"}
 
 * Started bundled simulations for adhoc experimentation and demonstration by adding [M/M/1 queue](https://en.wikipedia.org/wiki/M/M/1_queue) `MM1Queue`
 
-* Added support for pluggable visualization backend. Currently [kravis](https://github.com/holgerbrandl/kravis) and [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) are supported.
+* Added support for pluggable visualization backend. Currently [kravis](https://github.com/holgerbrandl/kravis) and [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) are supported. For jupyter-notebook examples [mm1-queue analysis](https://github.com/holgerbrandl/kalasim/blob/master/simulations/notebooks//simu-letsplot.ipynb)
 ```kotlin
 // simply toggle backend by package import
 import org.kalasim.plot.letsplot.display
@@ -49,7 +53,6 @@ MM1Queue().apply {
     server.claimedMonitor.display()
 }
 ```
-
 
 * New Example: ["The ferryman"](examples/ferryman.md)
 * New Example: [Office Tower](examples/office_tower.md)

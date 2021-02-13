@@ -148,7 +148,7 @@ open class Environment(
 
 //        addTraceListener { print(it) }
         if(enableConsoleLogger) {
-            addEventListener(ConsoleTraceLogger(true))
+            addEventListener(ConsoleTraceLogger())
         }
 
         _koin = koin ?: run {

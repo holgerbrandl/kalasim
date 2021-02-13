@@ -10,8 +10,6 @@ import kotlin.math.absoluteValue
 
 internal val TRACE_COL_WIDTHS = mutableListOf(10, 22, 22, 45, 35)
 
-abstract class TraceDetails : Jsonable()
-
 //inline class SimTime(val time: Double)
 
 enum class ResourceEventType { CLAIMED, RELEASED, PUT }
@@ -100,20 +98,14 @@ fun interface EventListener {
         get() = null
 }
 
-class MyEventLister : EventListener{
-    override fun consume(event: Event) {
-        println(event)
-    }
-
-    override val filter = EventFilter { it is ResourceEvent }
-}
-
 
 fun interface EventFilter {
     fun matches(event: Event): Boolean
 }
 
-class ConsoleTraceLogger(val diffRecords: Boolean, var logLevel: Level = Level.INFO) : EventListener {
+
+
+class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
 
     var hasPrintedHeader = false
     var lastElement: InteractionEvent? = null
@@ -183,7 +175,7 @@ fun Environment.traceCollector(): TraceCollector {
     return tc
 }
 
-class TraceCollector(val traces: MutableList<Event> = mutableListOf<Event>()) : EventListener,
+class TraceCollector(val traces: MutableList<Event> = mutableListOf()) : EventListener,
     MutableList<Event> by traces {
 //    val traces = mutableListOf<Event>()
 

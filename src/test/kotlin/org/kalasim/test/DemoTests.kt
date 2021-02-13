@@ -6,22 +6,27 @@ import jetbrains.letsPlot.geom.geom_point
 import jetbrains.letsPlot.ggsize
 import jetbrains.letsPlot.intern.Plot
 import jetbrains.letsPlot.lets_plot
+import krangl.asDataFrame
 import krangl.irisData
+import krangl.print
 import krangl.toMap
+import org.kalasim.InteractionEvent
 import org.kalasim.demo.MM1Queue
 import org.kalasim.misc.showPlot
 import org.kalasim.plot.letsplot.display
 
 class DemoTests {
-
+//TODO
 }
 
 fun main() {
-    MM1Queue().apply {
+    val mm1Queue = MM1Queue().apply {
         run(100)
         server.claimedMonitor.display().showPlot()
         server.requesters.lengthOfStayMonitor.display().showPlot()
     }
+
+    mm1Queue.traces.filterIsInstance<InteractionEvent>().asDataFrame().print()
 }
 
 object LetsPlotASimulation {
