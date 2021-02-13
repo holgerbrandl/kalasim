@@ -54,6 +54,11 @@ git push origin :refs/tags/refs/heads/master
 <https://stackoverflow.com/questions/40161956/kotlin-sequence-concatenation>
 
 
+---
+
+<https://medium.com/mobile-app-development-publication/kotlin-flow-buffer-is-like-a-fashion-adoption-31630a9cdb00>
+![](.dev_notes_images/flowmodes.png)
+
 ## misc
 
 
