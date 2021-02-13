@@ -43,44 +43,44 @@ class SalabimExampleTests {
 
         val expectedStats = JSONObject(
             """{
-                  "queue_length": {
-                    "all": {
-                      "duration": 50,
-                      "min": 0,
-                      "max": 1,
-                      "mean": 0.121,
-                      "standard_deviation": 0.33
-                    },
-                    "excl_zeros": {
-                      "duration": 6.054825992605437,
-                      "min": 1,
-                      "max": 1,
-                      "mean": 1,
-                      "standard_deviation": 0
-                    }
-                  },
-                  "name": "waiting line",
-                  "length_of_stay": {
-                    "all": {
-                      "entries": 5,
-                      "ninty_pct_quantile": 4.142,
-                      "median": 1.836,
-                      "mean": 1.211,
-                      "nintyfive_pct_quantile": 4.142,
-                      "standard_deviation": 1.836
-                    },
-                    "excl_zeros": {
-                      "entries": 2,
-                      "ninty_pct_quantile": 4.142,
-                      "median": 1.576,
-                      "mean": 3.027,
-                      "nintyfive_pct_quantile": 4.142,
-                      "standard_deviation": 1.576
-                    }
-                  },
-                  "type": "QueueStatistics",
-                  "timestamp": 50
-                  }"""
+              "queue_length": {
+                "all": {
+                  "duration": 50,
+                  "min": 0,
+                  "max": 1,
+                  "mean": 0.119,
+                  "standard_deviation": 0.327
+                },
+                "excl_zeros": {
+                  "duration": 5.965374252531483,
+                  "min": 1,
+                  "max": 1,
+                  "mean": 1,
+                  "standard_deviation": 0
+                }
+              },
+              "name": "waiting line",
+              "length_of_stay": {
+                "all": {
+                  "entries": 5,
+                  "ninty_pct_quantile": 4.083,
+                  "median": 1.81,
+                  "mean": 1.193,
+                  "nintyfive_pct_quantile": 4.083,
+                  "standard_deviation": 1.81
+                },
+                "excl_zeros": {
+                  "entries": 2,
+                  "ninty_pct_quantile": 4.083,
+                  "median": 1.557,
+                  "mean": 2.983,
+                  "nintyfive_pct_quantile": 4.083,
+                  "standard_deviation": 1.557
+                }
+              },
+              "type": "QueueStatistics",
+              "timestamp": 50
+            }"""
         )
 
         //https://github.com/stleary/JSON-java/issues/573
