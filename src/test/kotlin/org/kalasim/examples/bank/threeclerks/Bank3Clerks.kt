@@ -2,6 +2,7 @@
 package org.kalasim.examples.bank.threeclerks
 
 import org.kalasim.*
+import org.kalasim.plot.kravis.canDisplay
 import org.kalasim.plot.kravis.display
 import org.koin.core.component.get
 import org.koin.core.component.inject
@@ -66,12 +67,13 @@ fun main() {
 
         val waitingLine: ComponentQueue<Customer> = get()
 
-        if (!isHeadless())
+        if (canDisplay()) {
 //        waitingLine.lengthOfStayMonitor.printHistogram()
 //        waitingLine.queueLengthMonitor.printHistogram()
 
             waitingLine.queueLengthMonitor.display()
-        waitingLine.lengthOfStayMonitor.display()
+            waitingLine.lengthOfStayMonitor.display()
+        }
 
 //        waitingLine.stats.toJson().toString(2).printThis()
         waitingLine.printInfo()

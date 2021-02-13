@@ -41,7 +41,7 @@ ComponentGenerator(uniform(0,1)){ counter -> "smthg no${counter}"}
 
 * Started bundled simulations for adhoc experimentation and demonstration by adding [M/M/1 queue](https://en.wikipedia.org/wiki/M/M/1_queue) `MM1Queue`
 
-* Added support for pluggable visualization backend. Currently [kravis](https://github.com/holgerbrandl/kravis) and [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) are supported. For jupyter-notebook examples [mm1-queue analysis](https://github.com/holgerbrandl/kalasim/blob/master/simulations/notebooks//simu-letsplot.ipynb)
+* Added support for pluggable visualization backend. Currently [kravis](https://github.com/holgerbrandl/kravis) and [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) are supported. For jupyter-notebook examples [mm1-queue analysis](https://nbviewer.jupyter.org/github/holgerbrandl/kalasim/blob/master/simulations/notebooks/simu-letsplot.ipynb)
 ```kotlin
 // simply toggle backend by package import
 import org.kalasim.plot.letsplot.display

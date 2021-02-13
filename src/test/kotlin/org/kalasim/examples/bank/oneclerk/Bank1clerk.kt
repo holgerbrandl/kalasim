@@ -45,7 +45,7 @@ class CustomerGenerator : Component() {
         while(true) {
             Customer(get(), get())
 
-            hold(uniform(5.0, 15.0).sample())
+            hold(uniform(5.0, 15.1).sample())
         }
     }
 }

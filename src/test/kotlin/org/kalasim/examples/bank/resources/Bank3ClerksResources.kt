@@ -2,6 +2,7 @@
 package org.kalasim.examples.bank.resources
 
 import org.kalasim.*
+import org.kalasim.plot.kravis.canDisplay
 import org.kalasim.plot.kravis.display
 import org.koin.core.component.get
 
@@ -26,8 +27,10 @@ fun main() {
     env.get<Resource>().apply {
         printInfo()
 
-        claimedMonitor.display()
-        requesters.queueLengthMonitor.display()
+        if(canDisplay()) {
+            claimedMonitor.display()
+            requesters.queueLengthMonitor.display()
+        }
 
         printStatistics()
     }
