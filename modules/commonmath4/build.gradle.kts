@@ -17,7 +17,6 @@ repositories {
 dependencies {
     testImplementation(kotlin("test-junit"))
     api( "com.github.apache:commons-math:d71b8c93d2")
-
 }
 
 tasks.test {
