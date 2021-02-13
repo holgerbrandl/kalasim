@@ -30,8 +30,8 @@ fun Environment.uniform(lower: Number = 1, upper: Number = 0) =
 
 
 fun <T> Component.enumerated(vararg elements: T) = enumerated((elements.map { it to 1.0 / elements.size }).toMap())
-fun <T> Component.enumerated(elements: Map<T, Double>) =
-    EnumeratedDistribution(env.rg, elements.toList().asCMPairList())
+fun <T> Component.enumerated(elements: Map<T, Double>) = env.enumerated(elements)
+fun <T> Environment.enumerated(elements: Map<T, Double>) = EnumeratedDistribution(rg, elements.toList().asCMPairList())
 
 
 typealias   CMPair<K, V> = org.apache.commons.math3.util.Pair<K, V>
