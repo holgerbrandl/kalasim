@@ -55,6 +55,6 @@ fun main() {
 //
 //        plotData.asDataFrame().plot(x = "second", y = "third")
 //            .geomStep().facetWrap("first").title("Theater Occupancy")
-//            .xLabel("Time (min)").yLabel("Occupancy").show()
+//            .xLabel("Time (min)").yLabel("Occupancy")
     }
 }

@@ -112,7 +112,6 @@ class SalabimExampleTests {
 //            .plot(x = { it.first }, y = { (it.second as DescriptiveStatistics).median })
 //            .geomPoint()
 //            .geomLine()
-//            .show()
 //        Thread.sleep(100000)
     }
 

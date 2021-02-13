@@ -64,5 +64,5 @@ fun main() {
 
     // visualize with kravis
     requestsDf.plot(x = "timestamp", xend = "end_time", y = "requester", yend = "requester", color = "state")
-        .geomSegment(size = 15.0).show()
+        .geomSegment(size = 15.0)
 }

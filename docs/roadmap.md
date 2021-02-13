@@ -17,7 +17,6 @@ env.visEngine = KRAVIS
 nlm.printHistogram()
 ```
 
-it should not print stacktraces of user exceptions but actually rethrow them
 
 ## v0.7
 

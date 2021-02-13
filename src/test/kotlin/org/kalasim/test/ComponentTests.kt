@@ -252,5 +252,22 @@ class ComponentTests {
 
         (tc[4] as InteractionEvent).source!!.name shouldBe "other"
     }
+
+
+    @Test
+    fun `it should throw user exceptions`() = createTestSimulation(true) {
+        class MyException(msg:String): IllegalArgumentException(msg)
+
+        object : Component("other") {
+            override fun process() = sequence<Component> {
+
+                hold(1)
+
+                throw MyException("something went wrong")
+            }
+        }
+
+        shouldThrow<MyException> { run(10)  }
+    }
 }
 

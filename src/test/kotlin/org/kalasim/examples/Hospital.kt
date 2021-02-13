@@ -67,8 +67,7 @@ fun main() {
     records.forEach{ println("$it")}
 
 
-     records.displayTimeline().show()
-
+     records.displayTimeline()
 
 //    sim.components
     // component state heatmap
