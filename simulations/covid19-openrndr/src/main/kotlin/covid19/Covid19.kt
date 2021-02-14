@@ -40,6 +40,7 @@ class Infection(val person: Person) : Component() {
 
         hold(cureProb().run { if (this < 0) 0 else this })
         person.sick = false
+        person.immune = true
         get<NumericLevelMonitor>().dec()
 
         // undo quarantaine
@@ -47,7 +48,7 @@ class Infection(val person: Person) : Component() {
     }
 }
 
-class Person(var position: Position, var sick: Boolean = false) : Component() {
+class Person(var position: Position, var sick: Boolean = false, var immune : Boolean = false): Component(){
 
     val personTracker = get<PersonTracker>()
 
@@ -57,8 +58,8 @@ class Person(var position: Position, var sick: Boolean = false) : Component() {
             position = personTracker.increment(position)
 
             // if in contact check for risk for infection
-            if (personTracker.hasSickContact(this@Person)) {
-                if (CONTACT_INFECTION_PROBABILITY > Random().nextDouble()) {
+            if(!immune && personTracker.hasSickContact(this@Person)){
+                if(CONTACT_INFECTION_PROBABILITY > Random().nextDouble()) {
                     Infection(this@Person)
 
 
@@ -79,6 +80,7 @@ class PersonStatusEvent(now:Double, person: Person):Event(now) {
     val person = person.name
     val position = person.position.copy()
     val sick = person.sick
+    val immune = person.immune
 }
 
 class PersonTracker(environment: Environment) {

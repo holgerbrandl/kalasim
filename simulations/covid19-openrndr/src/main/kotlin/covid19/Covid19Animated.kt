@@ -31,6 +31,7 @@ fun main() = application {
 
         val timeStretch = 100
         val mapScale =Math.min(width, height)/100
+
         extend {
             curTime = curTime.inc().rem(numSimulationDays * timeStretch)
 //                drawer.clear(ColorRGBa.BLACK)
@@ -43,7 +44,7 @@ fun main() = application {
                 .filterNotNull()
 
             for (person in current) {
-                drawer.fill = if (person.sick) ColorRGBa.RED else ColorRGBa.GRAY
+                drawer.fill = if (person.sick) ColorRGBa.RED else { if(person.immune) ColorRGBa.GREEN else ColorRGBa.GRAY}
                 drawer.circle(Vector2(person.position.x * mapScale, person.position.y * mapScale), 7.0)
             }
 
