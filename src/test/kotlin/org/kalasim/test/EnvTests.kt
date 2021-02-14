@@ -127,4 +127,32 @@ class EnvTests {
             }
         }
     }
+
+    @Test
+    fun `it should run until event queue is empty`(){
+        createSimulation {
+            object: Component(){
+                override fun process()=sequence<Component> {
+                    hold(10)
+                }
+            }
+
+            run(null)
+            now shouldBe 10.0
+        }
+    }
+
+    @Test
+    fun `it should run until or duration until has reached`(){
+        createSimulation {
+            run(until=10)
+            now shouldBe 10.0
+        }
+
+        createSimulation {
+            run(duration = 5)
+            run(duration = 5)
+            now shouldBe 10.0
+        }
+    }
 }
