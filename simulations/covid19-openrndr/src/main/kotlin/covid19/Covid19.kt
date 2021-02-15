@@ -6,8 +6,8 @@ import org.koin.core.component.get
 import java.util.*
 
 
-var CONTACT_INFECTION_PROBABILITY = 0.8
-val MIN_CONTACT_DISTANCE = 3
+var CONTACT_INFECTION_PROBABILITY = 0.9
+val MIN_CONTACT_DISTANCE = 5
 
 data class Position(val x: Double, val y: Double) {
 
@@ -69,7 +69,6 @@ class Person(var position: Position, var sick: Boolean = false, var immune : Boo
             }
 
             log(PersonStatusEvent(now, this@Person))
-
 
             hold(uniform(0, 0.3).sample())
         }

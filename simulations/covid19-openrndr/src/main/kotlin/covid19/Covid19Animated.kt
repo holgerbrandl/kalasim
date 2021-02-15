@@ -15,7 +15,7 @@ fun main() = application {
         position = IntVector2(50, 50)
     }
     program {
-        val numSimulationDays = 10
+        val numSimulationDays = 30
         val covid19 = Covid19().apply {
             run(numSimulationDays)
         }
