@@ -32,7 +32,7 @@ fun main() = application {
 
         val currentPopulation = mutableMapOf<String, PersonStatusEvent>()
         GlobalScope.launch {
-            ordersChannel.receiveAsFlow().buffer(1000).filterIsInstance<PersonStatusEvent>().collect {
+            ordersChannel.receiveAsFlow().buffer(Channel.UNLIMITED).filterIsInstance<PersonStatusEvent>().collect {
                 now = it.time
                 currentPopulation.put(it.person, it)
             }
@@ -41,7 +41,7 @@ fun main() = application {
         // Start a log consumer
         GlobalScope.launch {
             Covid19().apply {
-                ClockSync(tickDuration = Duration.ofDays(1), speedUp =100000)
+                ClockSync(tickDuration = Duration.ofDays(1), speedUp =200000, syncsPerTick=5)
 
                 addEventListener { if(it is PersonStatusEvent) ordersChannel.offer(it) }
                 run(null)

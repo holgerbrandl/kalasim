@@ -21,7 +21,7 @@ data class Position(val x: Double, val y: Double) {
 
 
 class Infection(val person: Person) : Component() {
-    val cureProb = normal(12, 4)
+    val cureProb = normal(12, 2)
 
     init {
         person.sick = true
@@ -70,7 +70,8 @@ class Person(var position: Position, var sick: Boolean = false, var immune : Boo
 
             log(PersonStatusEvent(now, this@Person))
 
-            hold(uniform(0, 0.3).sample())
+            // 100 actions per day
+            hold(uniform(0, 0.08).sample())
         }
     }
 }
