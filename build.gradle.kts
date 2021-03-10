@@ -10,9 +10,10 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
 }
 
-group = "org.kalasim"
+//group = "org.kalasim"
+group = "com.github.holgerbrandl"
 //version = "0.7-SNAPSHOT"
-version = "0.6.1"
+version = "0.6.4"
 
 application {
     mainClassName = "foo.Bar" // not needed technically but makes gradle happy
@@ -30,7 +31,7 @@ dependencies {
 
     //cant upgrade because of https://github.com/InsertKoinIO/koin/issues/939
 //    implementation("org.koin:koin-core:2.1.6")
-    api ("org.koin:koin-core:2.2.1")
+    api("org.koin:koin-core:2.2.1")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.30")
 
@@ -43,10 +44,10 @@ dependencies {
     testImplementation(kotlin("test-junit"))
     testImplementation("io.kotest:kotest-assertions-core:4.2.6")
 
-    implementation( "com.github.holgerbrandl.krangl:krangl:0.15.7")
+    implementation("com.github.holgerbrandl.krangl:krangl:0.15.7")
 
-    compileOnly( "com.github.holgerbrandl:kravis:0.7.4")
-    testImplementation( "com.github.holgerbrandl:kravis:0.7.4")
+    compileOnly("com.github.holgerbrandl:kravis:0.7.4")
+    testImplementation("com.github.holgerbrandl:kravis:0.7.4")
 
 
 
@@ -56,7 +57,7 @@ dependencies {
     //    testImplementation("org.jetbrains.lets-plot:lets-plot-jfx:1.5.4")
 
     //experimental dependencies  use for experimentation
-    testImplementation( "com.thoughtworks.xstream:xstream:1.4.15")
+    testImplementation("com.thoughtworks.xstream:xstream:1.4.15")
 
     //https://youtrack.jetbrains.com/issue/KT-44197
 
@@ -104,6 +105,8 @@ publishing {
 
             pom {
                 url.set("https://www.kalasim.org")
+                name.set("kalasim")
+                description.set("kalasim is a process-oriented discrete event simulation engine")
 
                 scm {
                     connection.set("scm:git:github.com/holgerbrandl/kalasim.git")
@@ -131,11 +134,11 @@ publishing {
 
 
 nexusPublishing {
-    packageGroup.set("com.github.holgerbrandl.kalasim")
+//    packageGroup.set("com.github.holgerbrandl.kalasim")
 
     repositories {
-        create("sonatype") {
-            print("staging id is ${project.properties["sonatypeStagingProfileId"]}")
+        sonatype {
+//            print("staging id is ${project.properties["sonatypeStagingProfileId"]}")
             stagingProfileId.set(project.properties["sonatypeStagingProfileId"]!! as String)
 
 //            nexusUrl.set(uri("https://oss.sonatype.org/"))
@@ -148,9 +151,9 @@ nexusPublishing {
 }
 
 
-//signing {
-//    sign(publishing.publications["maven"])
-//}
+signing {
+    sign(publishing.publications["maven"])
+}
 
 fun findProperty(s: String) = project.findProperty(s) as String?
 
