@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 //val kotlinVersion = KotlinVersion.CURRENT
 
 plugins {
-    kotlin("jvm") version "1.4.30"
+    kotlin("jvm") version "1.4.31"
     application
     `maven-publish`
     id("com.jfrog.bintray") version "1.8.5"
@@ -23,10 +23,10 @@ application {
 repositories {
     mavenCentral()
     jcenter()
+    mavenLocal()
 }
 
 dependencies {
-    // cant upgrade to 1.8 because of https://issues.apache.org/jira/browse/CSV-257
     api("org.apache.commons:commons-math3:3.6.1")
 
     //cant upgrade because of https://github.com/InsertKoinIO/koin/issues/939
@@ -35,7 +35,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.30")
 
-    api("com.github.holgerbrandl:jsonbuilder:0.8")
+    api("com.github.holgerbrandl:jsonbuilder:0.9")
     implementation("com.google.code.gson:gson:2.8.6")
 
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
@@ -44,10 +44,10 @@ dependencies {
     testImplementation(kotlin("test-junit"))
     testImplementation("io.kotest:kotest-assertions-core:4.2.6")
 
-    implementation( "de.mpicbg.scicomp:krangl:0.15.2")
+    implementation( "com.github.holgerbrandl.krangl:krangl:0.15.7")
 
-    compileOnly( "com.github.holgerbrandl:kravis:0.7.1")
-    testImplementation( "com.github.holgerbrandl:kravis:0.7.1")
+    compileOnly( "com.github.holgerbrandl:kravis:0.7.4")
+    testImplementation( "com.github.holgerbrandl:kravis:0.7.4")
 
 
 
@@ -57,7 +57,7 @@ dependencies {
     //    testImplementation("org.jetbrains.lets-plot:lets-plot-jfx:1.5.4")
 
     //experimental dependencies  use for experimentation
-    testImplementation( "com.thoughtworks.xstream:xstream:1.4.14")
+    testImplementation( "com.thoughtworks.xstream:xstream:1.4.15")
 
     //https://youtrack.jetbrains.com/issue/KT-44197
 
