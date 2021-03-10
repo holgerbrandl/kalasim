@@ -42,16 +42,8 @@ git push origin --tags
 ./gradlew install
 ./gradlew publishMavenPublicationToMavenLocal
 
-# careful with this one!
-#./gradlew bintrayUpload
-
 #./gradlew publishToSonatype closeSonatypeStagingRepository
 ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
-
-
-#For released versions check:
-#- https://bintray.com/holgerbrandl/github/kalasim
-#- https://jcenter.bintray.com/de/github/kalasim
 ```
 
 

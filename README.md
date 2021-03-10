@@ -2,7 +2,7 @@
 
 Discrete Event Simulator
 
-[ ![Download](https://api.bintray.com/packages/holgerbrandl/github/kalasim/images/download.svg) ](https://bintray.com/holgerbrandl/github/kalasim/_latestVersion) [![Build Status](https://github.com/holgerbrandl/kalasim/workflows/build/badge.svg)](https://github.com/holgerbrandl/kalasim/actions?query=workflow%3Abuild)  [![Gitter](https://badges.gitter.im/kalasim.svg)](https://gitter.im/holgerbrandl/kalasim) [![slack](https://img.shields.io/badge/kotlinlang%20slack-kalasim-yellowgreen)](https://kotlinlang.slack.com/messages/kalasim/)
+[ ![Download](https://img.shields.io/github/v/release/holgerbrandl/kalasim) ](https://github.com/holgerbrandl/kalasim/releases) [![Build Status](https://github.com/holgerbrandl/kalasim/workflows/build/badge.svg)](https://github.com/holgerbrandl/kalasim/actions?query=workflow%3Abuild)  [![Gitter](https://badges.gitter.im/kalasim.svg)](https://gitter.im/holgerbrandl/kalasim) [![slack](https://img.shields.io/badge/kotlinlang%20slack-kalasim-yellowgreen)](https://kotlinlang.slack.com/messages/kalasim/)
 
 
 `kalasim` is a discrete event simulator with type support, dependency injection, modern persistence and logging to enable large-scale, industrial-ready simulations.
