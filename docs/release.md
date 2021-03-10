@@ -48,3 +48,8 @@ git push origin --tags
 #- https://bintray.com/holgerbrandl/github/kalasim
 #- https://jcenter.bintray.com/de/github/kalasim
 ```
+
+
+## release migration to maven-central
+
+https://getstream.io/blog/publishing-libraries-to-mavencentral-2021/

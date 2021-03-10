@@ -3,14 +3,13 @@
 
 ## Next steps
 
+https://en.wikipedia.org/wiki/Erlang_(unit)
 
 ## v0.7
 
 **{todo}** provide heatmap of component-list status
 
 **{todo}** add `keepPositive` to `normal` 
-
-**{todo}** build visualization for covid19 simulation
 
 **{todo}** review simjulia <https://simjuliajl.readthedocs.io/en/stable/topical_guides/5_shared_resources.html#containers>
 
@@ -24,11 +23,18 @@
 
 **{todo}** continue inline predicates
 
-**{todo}** read: Flow itself is a very good model for even-based simulations.
+**{todo}** review if simulation entities must have distinct names (optional policies) (see Hospital example)
+
+nothing better than a good picure--> rock the (shop)floor
+
+**{todo}** consider to expose createTestSimulation via public API
+
+**{todo}** storeRefs --> trackArrivals
+
+detach from jcenter
 
 ## Later
 
-**{todo}** review if simulation entities must have distinct names (optional policies) (see Hospital example)
 
 **{todo}** find better way to draw random value without clutter `uniform(0,5)()` --> `uniform(0,5)`?!
 
