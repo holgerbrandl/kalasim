@@ -6,14 +6,13 @@ plugins {
     kotlin("jvm") version "1.4.31"
     application
     `maven-publish`
-    id("com.jfrog.bintray") version "1.8.5"
-
-//    kotlin("plugin.serialization") version "1.4.20"
+    signing
+    id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
 }
 
 group = "org.kalasim"
-version = "0.7-SNAPSHOT"
-//version = "0.6"
+//version = "0.7-SNAPSHOT"
+version = "0.6.1"
 
 application {
     mainClassName = "foo.Bar" // not needed technically but makes gradle happy
@@ -22,8 +21,8 @@ application {
 
 repositories {
     mavenCentral()
-    jcenter()
-    mavenLocal()
+    jcenter() // still needed because of lets-plot
+//    mavenLocal()
 }
 
 dependencies {
@@ -95,57 +94,66 @@ java {
 //    }
 //}
 
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
-//                    artifact sourcesJar { classifier "sources" }
-//            artifact javadocJar
+//          artifact sourcesJar { classifier "sources" }
+//          artifact javadocJar
+
+            pom {
+                url.set("https://www.kalasim.org")
+
+                scm {
+                    connection.set("scm:git:github.com/holgerbrandl/kalasim.git")
+                    url.set("https://github.com/holgerbrandl/kalasim.git")
+                }
+
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://raw.githubusercontent.com/holgerbrandl/kalasim/master/LICENSE")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("holgerbrandl")
+                        name.set("Holger Brandl")
+                        email.set("holgerbrandl@gmail.com")
+                    }
+                }
+            }
         }
     }
 }
 
 
+nexusPublishing {
+    packageGroup.set("com.github.holgerbrandl.kalasim")
+
+    repositories {
+        create("sonatype") {
+            print("staging id is ${project.properties["sonatypeStagingProfileId"]}")
+            stagingProfileId.set(project.properties["sonatypeStagingProfileId"]!! as String)
+
+//            nexusUrl.set(uri("https://oss.sonatype.org/"))
+//            snapshotRepositoryUrl.set(uri("https://oss.sonatype.org/content/repositories/snapshots/"))
+
+            username.set(project.properties["ossrhUsername"]!! as String) // defaults to project.properties["myNexusUsername"]
+            password.set(project.properties["ossrhPassword"]!! as String) // defaults to project.properties["myNexusPassword"]
+        }
+    }
+}
+
+
+//signing {
+//    sign(publishing.publications["maven"])
+//}
+
 fun findProperty(s: String) = project.findProperty(s) as String?
 
-bintray {
-    user = findProperty("bintray_user")
-    key = findProperty("bintray_key")
-
-    publish = true
-//    dryRun = false
-    setPublications("maven")
-
-
-    pkg(closureOf<com.jfrog.bintray.gradle.BintrayExtension.PackageConfig> {
-        repo = "github"
-        name = "kalasim"
-        websiteUrl = "https://github.com/holgerbrandl/kalasim"
-//        description = "Simple Lib for TLS/SSL socket handling written in Kotlin"
-//        setLabels("kotlin")
-        setLicenses("MIT")
-        publicDownloadNumbers = true
-
-        desc = description
-
-        version = VersionConfig().apply{
-            name  = project.version.toString()
-            description = "v" + project.version + " of kalasim"
-            vcsTag = "v" + project.version
-//            released = java.util.Date().toString()
-        }
-
-//        version{
-//            name = project.version //Bintray logical version name
-//                desc = '.'
-//                released = new Date()
-//                vcsTag = 'v' + project.version
-//        }
-//        versions{
-//
-//        }
-    })
-}
 
 //val compileKotlin: KotlinCompile by tasks
 //compileKotlin.kotlinOptions {

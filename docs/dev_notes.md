@@ -62,6 +62,13 @@ git push origin :refs/tags/refs/heads/master
 ## misc
 
 
+publish the central
+
+* old plugin https://raw.githubusercontent.com/bozaro/git-lfs-java/4038db01066f9326dc3d7a40c6218824d0bf62f3/build.gradle.kts
+* https://github.com/cortinico/kotlin-android-template
+* https://github.com/gradle-nexus/publish-plugin
+* https://github.com/Ninja-Squad/DbSetup/blob/master/build.gradle.kts
+
 consume sequence `seq.toList()`
 
 # Visualization

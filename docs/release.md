@@ -44,6 +44,11 @@ git push origin --tags
 # careful with this one!
 ./gradlew bintrayUpload
 
+./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+./gradlew publishToSonatype 
+./gradlew closeSonatypeStagingRepository 
+
+
 #For released versions check:
 #- https://bintray.com/holgerbrandl/github/kalasim
 #- https://jcenter.bintray.com/de/github/kalasim
