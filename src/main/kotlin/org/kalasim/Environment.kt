@@ -401,9 +401,8 @@ data class QueueElement(
 fun Environment.calcScheduleTime(till: Number?, duration: Number?): Double {
     return (till?.toDouble() to duration?.toDouble()).let { (till, duration) ->
         if(till == null) {
-            if(duration == null) now else {
-                now + duration
-            }
+            require(duration != null) { "neither duration nor till specified" }
+            now + duration
         } else {
             require(duration == null) { "both duration and till specified" }
             till

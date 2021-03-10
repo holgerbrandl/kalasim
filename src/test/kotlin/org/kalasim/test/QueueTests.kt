@@ -175,4 +175,26 @@ class QueueTests {
 
         fm.status shouldBe DATA
     }
+
+    @Test
+    fun `batch creation should not timeout by default`() = createTestSimulation {
+        class Passenger : Component()
+
+        val fm = object : Component() {
+            val waitingLine = ComponentQueue<Passenger>()
+
+            override fun process() = sequence {
+                val batchComplete = batch(waitingLine, 4)
+                batchComplete.size shouldBe 4
+                env.now shouldBe 50
+            }
+        }
+
+        ComponentGenerator(inversedIatDist(1, 4, 5, 50, 60, 70)) { Passenger() }
+            .addConsumer { fm.waitingLine.add(it) }
+
+        run(55)
+
+        fm.status shouldBe DATA
+    }
 }

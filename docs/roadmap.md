@@ -31,7 +31,9 @@ nothing better than a good picure--> rock the (shop)floor
 
 **{todo}** storeRefs --> trackArrivals
 
-detach from jcenter
+**{todo}** detach from jcenter
+
+**{todo}** add `description` to `request` 
 
 ## Later
 

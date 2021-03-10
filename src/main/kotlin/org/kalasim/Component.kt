@@ -1292,7 +1292,7 @@ open class Component(
 
         if(queue.size < batchSize) {
             queue.addChangeListener(queueListener)
-            hold(timeout)
+            if(timeout!=null) hold(timeout) else passivate()
         }
 
         val actualBatchSize = min(batchSize, queue.size)

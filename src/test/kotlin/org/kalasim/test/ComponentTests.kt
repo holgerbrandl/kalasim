@@ -8,6 +8,7 @@ import org.kalasim.*
 import org.kalasim.ComponentState.DATA
 import org.kalasim.ComponentState.SCHEDULED
 import org.kalasim.misc.printThis
+import kotlin.test.fail
 
 class ComponentTests {
 
@@ -89,6 +90,21 @@ class ComponentTests {
 
         run(5)
         c.status shouldBe DATA
+    }
+
+
+    @Test
+    fun `it should enforce that either hold or until is not null in hold`() = createTestSimulation {
+        val c = object : Component("foo") {
+            override fun process() = sequence {
+                hold(null)
+                fail("it should not allow calling hold with duration and until being both null ")
+            }
+        }
+
+        shouldThrow<IllegalArgumentException>(){
+            run(5)
+        }
     }
 
 
