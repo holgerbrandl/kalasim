@@ -4,6 +4,7 @@ import org.apache.commons.math3.distribution.ExponentialDistribution
 import org.junit.Test
 import org.kalasim.*
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 class GeneratorTest {
 
@@ -28,5 +29,43 @@ class GeneratorTest {
             .filter { it.name.startsWith("Customer") }
 
         assertEquals(4, customers.size, "incorrect expected customer cont")
+    }
+
+
+    @Test
+    fun `it should allow to stop a generator from outside`() = createTestSimulation {
+        val cg = ComponentGenerator(iat = fixed(1), storeRefs = true) { it.toString() }
+
+        run(10)
+
+        cg.cancel()
+
+
+        cg.addConsumer{ it ->
+            fail()
+        }
+
+        run(10)
+    }
+
+    @Test
+    fun `it should allow to stop a generator from inside`() = createTestSimulation {
+        val cg = ComponentGenerator(iat = fixed(1), storeRefs = true) { it.toString() }
+
+        run(10)
+
+
+        cg.addConsumer{ it ->
+            cg.cancel()
+        }
+
+        run(3)
+
+
+        cg.addConsumer{ it ->
+            fail()
+        }
+
+        run(10)
     }
 }

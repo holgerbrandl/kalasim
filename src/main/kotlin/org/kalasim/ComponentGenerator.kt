@@ -61,8 +61,9 @@ class ComponentGenerator<T>(
         while(true) {
             val interArrivalTime = iatSeq.next()
 
-            if((env.now + interArrivalTime) > until) {
-                yield(activate(at = until, process = ComponentGenerator<T>::doFinalize))
+            if((env.now + interArrivalTime) > until || isData) {
+//                yield(activate(at = until, process = ComponentGenerator<T>::doFinalize))
+                break
             }
 
             hold(interArrivalTime)
@@ -76,9 +77,9 @@ class ComponentGenerator<T>(
         }
     }
 
-    fun doFinalize(): Sequence<Component> = sequence {
-        log(env.now, env.curComponent, this@ComponentGenerator, "till reached")
-    }
+//    private fun doFinalize(): Sequence<Component> = sequence {
+//        log(env.now, env.curComponent, this@ComponentGenerator, "till reached")
+//    }
 
     override val info: Jsonable
         get() = ComponentGeneratorInfo(this)

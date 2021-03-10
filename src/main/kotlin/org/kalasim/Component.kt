@@ -950,7 +950,10 @@ open class Component(
 
     fun getThis() = this
 
-    fun callProcess() = simProcess!!.call()
+    fun callProcess() {
+        require(simProcess != null){"component '${name}' must have active process to be called"}
+        simProcess!!.call()
+    }
 
     /**
      * Release a quantity from a resource or resources.
@@ -1270,7 +1273,7 @@ open class Component(
      * @param timeout An optional timeout describing how long it shall wait before forming an incomplete/empty batch
      * @return A list of type <T> of size `batchSize` or lesser (and potentially even empty) if timed out before filling the batch.
      */
-    suspend fun <T : Component> SequenceScope<Component>.batch(
+    suspend fun <T : SimulationEntity> SequenceScope<Component>.batch(
         queue: ComponentQueue<T>,
         batchSize: Int,
         timeout: Int? = null
