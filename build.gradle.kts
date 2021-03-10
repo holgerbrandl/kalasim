@@ -139,13 +139,13 @@ nexusPublishing {
     repositories {
         sonatype {
 //            print("staging id is ${project.properties["sonatypeStagingProfileId"]}")
-            stagingProfileId.set(project.properties["sonatypeStagingProfileId"]!! as String)
+            stagingProfileId.set(project.properties["sonatypeStagingProfileId"] as String)
 
 //            nexusUrl.set(uri("https://oss.sonatype.org/"))
 //            snapshotRepositoryUrl.set(uri("https://oss.sonatype.org/content/repositories/snapshots/"))
 
-            username.set(project.properties["ossrhUsername"]!! as String) // defaults to project.properties["myNexusUsername"]
-            password.set(project.properties["ossrhPassword"]!! as String) // defaults to project.properties["myNexusPassword"]
+            username.set(project.properties["ossrhUsername"] as String) // defaults to project.properties["myNexusUsername"]
+            password.set(project.properties["ossrhPassword"] as String) // defaults to project.properties["myNexusPassword"]
         }
     }
 }
