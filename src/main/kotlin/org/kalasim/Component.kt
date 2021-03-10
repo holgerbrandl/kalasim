@@ -1276,7 +1276,7 @@ open class Component(
     suspend fun <T : SimulationEntity> SequenceScope<Component>.batch(
         queue: ComponentQueue<T>,
         batchSize: Int,
-        timeout: Int? = null
+        timeout: Number? = null
     ): List<T> {
         // Note: Adopted from simmer::batch (Ucar2019, p14)
 
