@@ -38,15 +38,15 @@ git push origin
 git push origin --tags
 
 
-### Build and publish the binary release to jcenter
+### Build and publish the binary release to maven central
 ./gradlew install
+./gradlew publishMavenPublicationToMavenLocal
 
 # careful with this one!
-./gradlew bintrayUpload
+#./gradlew bintrayUpload
 
+#./gradlew publishToSonatype closeSonatypeStagingRepository
 ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
-./gradlew publishToSonatype 
-./gradlew closeSonatypeStagingRepository 
 
 
 #For released versions check:

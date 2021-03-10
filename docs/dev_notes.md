@@ -68,6 +68,7 @@ publish the central
 * https://github.com/cortinico/kotlin-android-template
 * https://github.com/gradle-nexus/publish-plugin
 * https://github.com/Ninja-Squad/DbSetup/blob/master/build.gradle.kts
+* sigining credentials https://github.com/vanniktech/gradle-maven-publish-plugin/issues/71
 
 consume sequence `seq.toList()`
 

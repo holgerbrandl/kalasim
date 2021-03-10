@@ -5,9 +5,9 @@ val newVersion = args[0]
 
 val setupMD = File("docs/userguide/docs/setup.md")
 val transformedSetup: String = setupMD.readLines().map{
-    val prefix: String = """    implementation "org.kalasim:kalasim:"""
+    val prefix: String = """    implementation "com.github.holgerbrandl:kalasim:"""
     if(it.startsWith(prefix)){
-        """    implementation "org.kalasim:kalasim:${newVersion}""""
+        """    implementation "com.github.holgerbrandl:kalasim:${newVersion}""""
     }else{
         it
     }

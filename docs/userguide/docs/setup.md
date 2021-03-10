@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.kalasim:kalasim:0.6"
+    implementation "com.github.holgerbrandl:kalasim:0.6.4"
 }
 ```
 
