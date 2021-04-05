@@ -68,3 +68,16 @@ fun <T> repeat(n:Int, builder: (Int) -> T) = (1..n).map{ builder(it)}
 fun <T> Iterable<T>.repeat() = sequence {
     while (true) yieldAll(this@repeat)
 }
+
+
+/** The environment mode also allows you to detect common bugs in your implementation. */
+enum class AssertMode{
+    /** Productive mode, where asserts that may impact performance are disabled. */
+    NONE,
+    /** Disables compute-intensive asserts. This will have a minimal to moderate performance impact on simulations. */
+    LIGHT,
+    /** Full introspection, this will have a measurable performance impact on simulations. */
+    FULL
+}
+
+var ASSERT_MODE = AssertMode.LIGHT

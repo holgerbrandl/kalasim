@@ -4,6 +4,8 @@ import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.ComponentState.*
 import org.kalasim.ResourceEventType.*
 import org.kalasim.ResourceSelectionPolicy.*
+import org.kalasim.misc.ASSERT_MODE
+import org.kalasim.misc.AssertMode
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
 import org.kalasim.monitors.FrequencyLevelMonitor
@@ -769,7 +771,12 @@ open class Component(
         newStatus: ComponentState,
     ) {
         require(scheduledTime >= env.now) { "scheduled time (${scheduledTime}) before now (${env.now})" }
-        require(this !in env.queue) { "component must not be in queue when reschudling but must be removed already at this point" }
+
+        if(ASSERT_MODE > AssertMode.NONE) {
+            require(this !in env.queue) {
+                "component must not be in queue when rescheduling but must be removed already at this point"
+            }
+        }
 
         status = newStatus
 
@@ -784,7 +791,7 @@ open class Component(
         //todo implement extra
         val extra = "scheduled for ${formatWithInf(scheduledTime)}"
         // line_no: reference to source position
-        // 9+ --> continnue generator
+        // 9+ --> continue generator
         // 13 --> no plus means: generator start
 
 

@@ -6,6 +6,8 @@ import org.apache.commons.math3.random.RandomGenerator
 import org.json.JSONObject
 import org.kalasim.ComponentState.*
 import org.kalasim.Defaults.DEFAULT_SEED
+import org.kalasim.misc.ASSERT_MODE
+import org.kalasim.misc.AssertMode
 import org.kalasim.misc.JSON_INDENT
 import org.koin.core.Koin
 import org.koin.core.component.KoinComponent
@@ -351,7 +353,9 @@ open class Environment(
         eventQueue.add(QueueElement(component, scheduledTime, Priority(-priority.value), queueCounter, urgent))
 
         // consistency checks
-        require(queue.none(Component::isPassive)) { "passive component must not be in event queue" }
+        if(ASSERT_MODE == AssertMode.FULL) {
+            require(queue.none(Component::isPassive)) { "passive component must not be in event queue" }
+        }
     }
 
     fun toJson(includeComponents: Boolean = false): JSONObject = json {
