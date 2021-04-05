@@ -55,6 +55,16 @@ Even if `kalasim` tries to provide a simplistic declarative approach to define a
 
 <!-- Also see https://cran.r-project.org/web/packages/simmer/vignettes/simmer-01-introduction.html#replication --> 
 
+## Performance tuning
+
+There are multiple ways to improve the performance of a simulation. 
+
+* Set the correct `AssertMode`: The assertion mode determines which internal consistency checks are being performed.  The mode can be set to `Full` (Slowest), `Light` (default) or `None` (Fastest). Depending on simulation logic and complexity, this will improve performance by ~20%. 
+* Disable internal logging: The [interaction model](component.md) is configured by default to provide insights into the simulation via the [event log](event_log.md). However, for productive use of a simulation where sometimes just custom event-types are being used, internal interaction logging can be disabled. To todo  
+* Disable component statistics: Components and queues log various component statistics with built-in [monitors](monitors.md) which can be [disabled](monitors.md) to reduce compute and memory footprint of a simulation.   
+
+To further fine-tune and optimize simulation performance and to reveal bottlenecks, a JVM profiler (such as [yourkit](https://www.yourkit.com/)) can be used. Both call-counts and spent-time analysis have been proven useful here. 
+
 ## Save and Load Simulations
 
 <!-- TODO learn from https://github.com/r-simmer/simmer.json -->

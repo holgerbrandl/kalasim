@@ -1,5 +1,13 @@
 # Kalasim Release History
 
+## v0.7 
+
+Not released yet 
+
+Major enhancement
+* Dramatically improved simulation performance
+* Introduced `AssertMode`s (`Full`, `Light` (default), `None`) to enable/disable internal consistency checks. This will optimize performance by another ~20% (depending on simulation logic)
+
 ## v0.6
 
 Released 2021-02-12
