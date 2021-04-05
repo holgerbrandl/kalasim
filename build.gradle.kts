@@ -12,8 +12,8 @@ plugins {
 
 //group = "org.kalasim"
 group = "com.github.holgerbrandl"
-//version = "0.7-SNAPSHOT"
-version = "0.6.4"
+version = "0.7-SNAPSHOT"
+//version = "0.6.4"
 
 application {
     mainClassName = "foo.Bar" // not needed technically but makes gradle happy
@@ -23,7 +23,7 @@ application {
 repositories {
     mavenCentral()
     jcenter() // still needed because of lets-plot
-//    mavenLocal()
+    mavenLocal()
 }
 
 dependencies {
@@ -44,10 +44,10 @@ dependencies {
     testImplementation(kotlin("test-junit"))
     testImplementation("io.kotest:kotest-assertions-core:4.2.6")
 
-    implementation("com.github.holgerbrandl.krangl:krangl:0.15.7")
+    implementation("com.github.holgerbrandl:krangl:0.16-SNAPSHOT")
 
-    compileOnly("com.github.holgerbrandl:kravis:0.7.4")
-    testImplementation("com.github.holgerbrandl:kravis:0.7.4")
+    compileOnly("com.github.holgerbrandl:kravis:0.8-SNAPSHOT")
+    testImplementation("com.github.holgerbrandl:kravis:0.8-SNAPSHOT")
 
 
 

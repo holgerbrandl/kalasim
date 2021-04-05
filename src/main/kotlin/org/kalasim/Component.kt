@@ -1064,10 +1064,12 @@ open class Component(
     suspend fun <T> SequenceScope<Component>.wait(
         state: State<T>,
         waitFor: T,
+        priority: Priority = NORMAL,
         failAt: Number? = null,
         failDelay: Number? = null
     ) = wait(
         StateRequest(state) { state.value == waitFor },
+        priority=priority,
 //        *states.map { StateRequest(it) }.toTypedArray(),
         failAt = failAt,
         failDelay = failDelay,
