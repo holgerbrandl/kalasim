@@ -21,6 +21,8 @@ open class State<T>(
     koin: Koin = GlobalContext.get()
 ) : SimulationEntity(name, koin) {
 
+    private var isTriggerCxt:Boolean = false
+
     var value: T = initialValue
         set(value) {
             if (field == value) return
@@ -30,7 +32,8 @@ open class State<T>(
             // todo ensure that this is called also for the initial value
             valueMonitor.addValue(value)
 
-            if (Thread.currentThread().getStackTrace()[2].methodName != "trigger") {
+//            if (Thread.currentThread().getStackTrace()[2].methodName != "trigger") {
+            if(!isTriggerCxt){
                 tryWait()
             }
         }
@@ -71,11 +74,21 @@ open class State<T>(
             "trigger"
         )
 
-        this.value = value
+
+
+        withoutAutoTry{
+            this.value = value
+        }
         tryWait(max)
 
         this.value = valueAfter
         tryWait()
+    }
+
+    fun withoutAutoTry(smthg: ()->Unit){
+        isTriggerCxt=true
+        smthg()
+        isTriggerCxt=false
     }
 
     private fun tryWait(maxHonor: Int = Int.MAX_VALUE) {

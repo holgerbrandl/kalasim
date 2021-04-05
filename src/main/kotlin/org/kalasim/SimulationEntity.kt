@@ -77,7 +77,7 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
     /**
      * Records a state-change event.
      *
-     * @param event A structure event log record. Users may want to sub-class `Event` to provide their
+     * @param event A structured event log record. Users may want to sub-class `Event` to provide their
      *              own structured log record formats.
      */
     fun log(event: Event) {
