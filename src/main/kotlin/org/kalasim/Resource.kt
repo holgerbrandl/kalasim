@@ -107,7 +107,7 @@ open class Resource(
 
 
     init {
-        log(
+        logInternal(
             env.now,
             env.curComponent,
             this,

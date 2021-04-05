@@ -19,15 +19,18 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
     /** The time when the component was instantiated. */
     val creationTime = env.now
 
-    /** Indicates if log events from this entity should be tracked. */
-    var monitor = true;
+    /**
+     *  Indicates if interaction events from this entity should be logged. This applies to core interactions only and
+     *  not to user-triggered log events
+     */
+    var logCoreInteractions = true;
 
     abstract val info: Jsonable
 
     /** Print info about this resource */
     fun printInfo() = info.printThis()
 
-//    override fun toString(): String = "${javaClass.simpleName}($name)"
+    //    override fun toString(): String = "${javaClass.simpleName}($name)"
     override fun toString(): String = name
 
 
@@ -35,12 +38,9 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
     final override fun getKoin(): Koin = simKoin
 
 
-    /**
-     * Records a state-change event.
-     *
-     * @param action Describing the nature if the event
-     */
-    fun log(action: String) = env.apply { log(now, curComponent, this@SimulationEntity, action) }
+    internal fun logInternal(action: String) = log{
+         with(env) { InteractionEvent(now, curComponent, this@SimulationEntity, action) }
+    }
 
 
     /**
@@ -50,8 +50,8 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
      * @param action Describing the nature if the event
      * @param details More details characterizing the state change
      */
-    fun <T : SimulationEntity> log(source: T, action: String?, details: String? = null) =
-        env.apply { log(now, curComponent, source, action, details) }
+//    fun <T : SimulationEntity> log(source: T, action: String?, details: String? = null) =
+//        env.apply { log(now, curComponent, source, action, details) }
 
 
     /**
@@ -63,15 +63,23 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
      * @param action Describing the nature if the event
      * @param details More details characterizing the state change
      */
-    fun log(
+    protected fun logInternal(
         time: Double,
         curComponent: Component?,
         source: SimulationEntity?,
         action: String? = null,
         details: String? = null
-    ) {
-        if(monitor) log(InteractionEvent(time, curComponent, source, action, details))
+    ) = log{
+        InteractionEvent(time, curComponent, source, action, details)
     }
+
+
+    /**
+     * Records a state-change event.
+     *
+     * @param action Describing the nature if the event
+     */
+    fun log(action: String) = env.apply { log(InteractionEvent(now, curComponent, this@SimulationEntity, action)) }
 
 
     /**
@@ -81,7 +89,16 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
      *              own structured log record formats.
      */
     fun log(event: Event) {
-        if(monitor) env.publishEvent(event)
+        env.publishEvent(event)
+    }
+
+
+
+    fun log(function: () -> Event) {
+        if(logCoreInteractions) {
+            val event = function()
+            log(event)
+        }
     }
 }
 

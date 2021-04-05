@@ -2,6 +2,7 @@ package org.kalasim.test
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
@@ -94,6 +95,42 @@ class ComponentTests {
 
 
     @Test
+    fun `it should allow to disable interaction logging`() = createTestSimulation {
+
+        val r = Resource().apply {  logCoreInteractions=false}
+        val s: State<String> = State("foo").apply {  logCoreInteractions=false}
+
+        val c = object : Component("foo") {
+            init {
+                logCoreInteractions = false
+            }
+
+            override fun process() = sequence {
+                hold(2)
+
+                s.value = "bar"
+
+                request(r){
+//                                    s.value = "bar"
+                }
+
+                log("work done")
+            }
+        }
+
+        val tc = traceCollector()
+
+        run(10)
+
+        tc.traces.apply{
+            size shouldBe 2
+            last().shouldBeInstanceOf<InteractionEvent>()
+            (last() as InteractionEvent).action shouldBe "work done"
+        }
+    }
+
+
+    @Test
     fun `it should enforce that either hold or until is not null in hold`() = createTestSimulation {
         val c = object : Component("foo") {
             override fun process() = sequence {
@@ -102,7 +139,7 @@ class ComponentTests {
             }
         }
 
-        shouldThrow<IllegalArgumentException>(){
+        shouldThrow<IllegalArgumentException>() {
             run(5)
         }
     }
@@ -272,7 +309,7 @@ class ComponentTests {
 
     @Test
     fun `it should throw user exceptions`() = createTestSimulation(true) {
-        class MyException(msg:String): IllegalArgumentException(msg)
+        class MyException(msg: String) : IllegalArgumentException(msg)
 
         object : Component("other") {
             override fun process() = sequence<Component> {
@@ -283,7 +320,7 @@ class ComponentTests {
             }
         }
 
-        shouldThrow<MyException> { run(10)  }
+        shouldThrow<MyException> { run(10) }
     }
 }
 

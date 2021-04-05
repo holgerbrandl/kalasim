@@ -30,7 +30,7 @@ class ComponentQueue<C: SimulationEntity>(
         get() = q.size
 
     val components
-        get() = q.map{it.component}
+        get() = q.map { it.component }
 
     //    val ass = AggregateSummaryStatistics()
     val queueLengthMonitor = NumericLevelMonitor("Length of ${this.name}", koin = koin)
@@ -41,7 +41,7 @@ class ComponentQueue<C: SimulationEntity>(
 
         val added = q.add(CQElement(component, env.now, priority))
 
-        changeListeners.forEach{ it.added(component)}
+        changeListeners.forEach { it.added(component) }
 
         queueLengthMonitor.addValue(q.size.toDouble())
 
@@ -51,10 +51,10 @@ class ComponentQueue<C: SimulationEntity>(
     fun poll(): C {
         val cqe = q.poll()
 
-        changeListeners.forEach{ it.polled(cqe.component)}
+        changeListeners.forEach { it.polled(cqe.component) }
         updateExitStats(cqe)
 
-        log(cqe.component, "Left $name")
+        logInternal(env.now, env.curComponent, cqe.component, "Left $name", null)
 
         return cqe.component
     }
@@ -63,7 +63,7 @@ class ComponentQueue<C: SimulationEntity>(
         val cqe = q.first { it.component == component }
         q.remove(cqe)
 
-        changeListeners.forEach{ it.removed(cqe.component)}
+        changeListeners.forEach { it.removed(cqe.component) }
         updateExitStats(cqe)
 
 //        log(cqe.component, "Removed from $name")
@@ -91,7 +91,7 @@ class ComponentQueue<C: SimulationEntity>(
     fun printHistogram() {
         if(lengthOfStayMonitor.values.size < 2) {
             println("Skipping histogram of '$name' because of to few data")
-        }else {
+        } else {
             lengthOfStayMonitor.printHistogram()
             queueLengthMonitor.printHistogram()
         }

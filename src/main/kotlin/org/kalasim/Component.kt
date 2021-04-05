@@ -1,6 +1,5 @@
 package org.kalasim
 
-import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.ComponentState.*
 import org.kalasim.ResourceEventType.*
 import org.kalasim.ResourceSelectionPolicy.*
@@ -101,7 +100,7 @@ open class Component(
     init {
         val dataSuffix = if(process == null && this.name != MAIN) " data" else ""
         env.addComponent(this)
-        log(now, env.curComponent, this, "create", dataSuffix)
+        logInternal(now, env.curComponent, this, "create", dataSuffix)
 
 
         // if its a generator treat it as such
@@ -243,7 +242,7 @@ open class Component(
         scheduledTime = null
         status = PASSIVE
 
-        log(now, env.curComponent, this, "passivate")
+        logInternal(now, env.curComponent, this, "passivate")
     }
 
 
@@ -270,7 +269,7 @@ open class Component(
             status = INTERRUPTED
         }
 
-        log("interrupt (level=$interruptLevel)")
+        logInternal("interrupt (level=$interruptLevel)")
     }
 
     /** Resumes an interrupted component. Can only be applied to interrupted components.
@@ -292,20 +291,20 @@ open class Component(
         interruptLevel--
 
         if(interruptLevel != 0 && !all) {
-            log("resume stalled (interrupt level=$interruptLevel)")
+            logInternal("resume stalled (interrupt level=$interruptLevel)")
         } else {
             status = interruptedStatus!!
 
-            log("resume ($status)")
+            logInternal("resume ($status)")
 
             when(status) {
                 PASSIVE -> {
-                    log("passivate")
+                    logInternal("passivate")
                 }
                 STANDBY -> {
                     scheduledTime = env.now
                     env.addStandBy(this)
-                    log("standby")
+                    logInternal("standby")
                 }
                 in listOf(SCHEDULED, WAITING, REQUESTING) -> {
                     val reason = when(status) {
@@ -365,7 +364,7 @@ open class Component(
 
         status = DATA
 
-        log(now, env.curComponent, this, "cancel")
+        logInternal(now, env.curComponent, this, "cancel")
     }
 
     /**
@@ -389,7 +388,7 @@ open class Component(
 
         status = STANDBY
 
-        log(now, env.curComponent, this@Component)
+        logInternal(now, env.curComponent, this@Component)
     }
 
 
@@ -559,12 +558,7 @@ open class Component(
                 //            enterSorted(r.requesters, priority)
                 r.requesters.add(this@Component, priority = priority)
 
-                log(
-                    now,
-                    env.curComponent,
-                    this@Component,
-                    reqText
-                )
+                logInternal(now, env.curComponent, this@Component, reqText)
 
                 if(r.preemptive) {
                     var av = r.availableQuantity
@@ -589,7 +583,7 @@ open class Component(
                     if(av >= 0) {
                         bumpCandidates.forEach {
                             it.releaseInternal(r, bumpedBy = this@Component)
-                            log("$it bumped from $r by ${this@Component}")
+                            logInternal("$it bumped from $r by ${this@Component}")
                             it.activate()
                         }
                     }
@@ -661,16 +655,10 @@ open class Component(
                 if(rHonor.any { it.first == resource }) {
                     resource.claimed += quantity //this will also update the monitor
 
-                    log(
-                        ResourceEvent(
-                            env.now,
-                            env.curComponent,
-                            this,
-                            resource,
-                            CLAIMED,
-                            quantity
-                        )
-                    )
+
+                    log{
+                        ResourceEvent(env.now, env.curComponent, this, resource, CLAIMED, quantity)
+                    }
 
                     if(!resource.anonymous) {
                         val thisPrio = resource.requesters.q.firstOrNull { it.component == this }?.priority
@@ -698,6 +686,7 @@ open class Component(
 
         return true
     }
+
 
 
     /**
@@ -750,7 +739,7 @@ open class Component(
         scheduledTime = null
         simProcess = null
 
-        log(now, env.curComponent, this, "Ended")
+        logInternal(now, env.curComponent, this, "Ended")
     }
 
     private fun requireNotData() =
@@ -772,7 +761,7 @@ open class Component(
     ) {
         require(scheduledTime >= env.now) { "scheduled time (${scheduledTime}) before now (${env.now})" }
 
-        if(ASSERT_MODE > AssertMode.NONE) {
+        if(ASSERT_MODE == AssertMode.FULL) {
             require(this !in env.queue) {
                 "component must not be in queue when rescheduling but must be removed already at this point"
             }
@@ -788,20 +777,22 @@ open class Component(
             env.push(this, scheduledTime, priority, urgent)
         }
 
-        //todo implement extra
-        val extra = "scheduled for ${formatWithInf(scheduledTime)}"
-        // line_no: reference to source position
-        // 9+ --> continue generator
-        // 13 --> no plus means: generator start
+        if(logCoreInteractions) {
+            //todo implement extra
+            val extra = "scheduled for ${formatWithInf(scheduledTime)}"
+            // line_no: reference to source position
+            // 9+ --> continue generator
+            // 13 --> no plus means: generator start
 
 
-        // calculate scheduling delta
-        val delta = if(this.scheduledTime == env.now || (this.scheduledTime == Double.MAX_VALUE)) "" else {
-            "+" + TRACE_DF.format(scheduledTime - env.now) + " "
+            // calculate scheduling delta
+            val delta = if(this.scheduledTime == env.now || (this.scheduledTime == Double.MAX_VALUE)) "" else {
+                "+" + TRACE_DF.format(scheduledTime - env.now) + " "
+            }
+
+            // print trace
+            logInternal(now, env.curComponent, this, ("$caller $delta ${description ?: ""}").trim(), extra)
         }
-
-        // print trace
-        log(now, env.curComponent, this, ("$caller $delta ${description ?: ""}").trim(), extra)
     }
 
 
@@ -882,14 +873,14 @@ open class Component(
 
     internal fun checkFail() {
         if(requests.isNotEmpty()) {
-            log("request failed")
+            logInternal("request failed")
             requests.forEach { it.key.removeRequester(this) }
             requests.clear()
             failed = true
         }
 
         if(waits.isNotEmpty()) {
-            log("wait failed")
+            logInternal("wait failed")
             waits.forEach { it.state.waiters.remove(this) }
 
             waits.clear()
@@ -1004,7 +995,7 @@ open class Component(
         }
 
         if(releaseRequests.isEmpty()) {
-            log("Releasing all claimed resources ${claims}")
+            logInternal("Releasing all claimed resources ${claims}")
 
             for((r, _) in claims) {
                 releaseInternal(r)
@@ -1026,16 +1017,9 @@ open class Component(
 
         resource.claimed -= quantity
 
-        log(
-            ResourceEvent(
-                env.now,
-                env.curComponent,
-                this,
-                resource,
-                RELEASED,
-                quantity
-            )
-        )
+        log{
+            ResourceEvent(env.now, env.curComponent, this, resource, RELEASED, quantity)
+        }
 
         claims[resource] = claims[resource]!! - quantity
 
