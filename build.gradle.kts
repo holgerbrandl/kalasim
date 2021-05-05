@@ -6,14 +6,14 @@ plugins {
     kotlin("jvm") version "1.4.31"
     application
     `maven-publish`
-    signing
+        signing
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
 }
 
 //group = "org.kalasim"
 group = "com.github.holgerbrandl"
-version = "0.7-SNAPSHOT"
-//version = "0.6.4"
+//version = "0.7-SNAPSHOT"
+version = "0.6.5"
 
 application {
     mainClassName = "foo.Bar" // not needed technically but makes gradle happy

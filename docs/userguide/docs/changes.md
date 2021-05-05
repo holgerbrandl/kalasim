@@ -7,6 +7,7 @@ Not released yet
 Major enhancement
 * Dramatically improved simulation performance
 * Introduced `AssertMode`s (`Full`, `Light` (default), `None`) to enable/disable internal consistency checks. This will optimize performance by another ~20% (depending on simulation logic)
+* Improved event logging API
 
 ## v0.6
 

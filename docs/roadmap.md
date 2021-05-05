@@ -5,6 +5,24 @@
 
 https://en.wikipedia.org/wiki/Erlang_(unit)
 
+
+real-time metrics
+```
+     object : Component() {
+                override fun process() = sequence {
+                    while (true) {
+                        hold(asTicks(Duration.ofDays(1)))
+                        println("tick time is ${env.asWallTime(now)}")
+                    }
+                }
+            }
+
+```
+
+distinguish between tick-duration and tick-time.
+
+consider `logCoreInteractions=false` as default 
+
 ## v0.7
 
 **{todo}** provide heatmap of component-list status

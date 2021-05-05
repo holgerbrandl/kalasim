@@ -4,6 +4,29 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
+
+
+
+@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+ inline class TickTime(val instant: Number)
+
+//infix fun Number.tt(): TickTime = TickTime(this)
+//
+//fun main() {
+//    val foo = 1.tickTime
+//}
+//
+////    @Suppress("EXPERIMENTAL_FEATURE_WARNING")
+//data class TickTime(val env: Environment, val time: Number){
+//    operator fun plus(duration: Number): TickTime = TickTime(env,this.time.toDouble() + duration.toDouble())
+//    operator fun plus(duration: Duration, env:Environment) =  TickTime(env,this.time.toDouble() + env.asTicks(duration))
+//}
+//
+//
+//private val Number.tickTime
+//    get() = TickTime(this)
+
+
 // https://stackoverflow.com/questions/32437550/whats-the-difference-between-instant-and-localdatetime
 interface TickTransform {
     fun tick2wallTime(tickTime: Double): Instant
@@ -50,6 +73,12 @@ internal val MISSING_TICK_TRAFO_ERROR = "Tick transformation not configured. "
 
 /** Transforms a simulation time (typically `now`) to the corresponding wall time. */
 fun Environment.asWallTime(tickTime: Double): Instant {
+    require(tickTransform != null){ MISSING_TICK_TRAFO_ERROR }
+    return tickTransform!!.tick2wallTime(tickTime)
+}
+
+/** Transforms a simulation time (typically `now`) to the corresponding wall time. */
+fun Environment.asWallDuration(tickTime: Double): Instant {
     require(tickTransform != null){ MISSING_TICK_TRAFO_ERROR }
     return tickTransform!!.tick2wallTime(tickTime)
 }

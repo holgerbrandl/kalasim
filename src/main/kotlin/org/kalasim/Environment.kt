@@ -21,9 +21,6 @@ import java.time.Duration
 import java.util.*
 
 
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
-internal inline class TickTime(val instant: Double)
-
 const val MAIN = "main"
 
 typealias KoinModule = org.koin.core.module.Module
@@ -378,6 +375,7 @@ open class Environment(
         return tickTransform!!.durationAsTicks(this)
     }
 }
+
 
 
 data class QueueElement(
