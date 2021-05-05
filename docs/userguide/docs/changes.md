@@ -11,7 +11,7 @@ Major enhancement
 
 ## v0.6
 
-Released 2021-02-12
+Released 2021-02-12 -> Updated to v0.6.5 on 2021-05-05
 
 Major Enhancements
 
