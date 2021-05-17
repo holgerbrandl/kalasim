@@ -13,7 +13,7 @@ plugins {
 //group = "org.kalasim"
 group = "com.github.holgerbrandl"
 //version = "0.7-SNAPSHOT"
-version = "0.6.6"
+version = "0.6.7"
 
 application {
     mainClassName = "foo.Bar" // not needed technically but makes gradle happy
@@ -46,8 +46,8 @@ dependencies {
 
     implementation("com.github.holgerbrandl:krangl:0.16.2")
 
-    compileOnly("com.github.holgerbrandl:kravis:0.7.4")
-    testImplementation("com.github.holgerbrandl:kravis:0.7.4")
+    compileOnly("com.github.holgerbrandl:kravis:0.7.5")
+    testImplementation("com.github.holgerbrandl:kravis:0.7.5")
 
 
 
