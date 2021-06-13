@@ -10,6 +10,7 @@ import org.kalasim.misc.merge
 import org.kalasim.misc.mergeStats
 import org.kalasim.monitors.*
 import org.kalasim.test.MonitorTests.Car.*
+import org.kalasim.tt
 
 class MonitorTests {
 
@@ -70,10 +71,10 @@ class MonitorTests {
     fun `Frequency level stats should be correct`() = createTestSimulation {
         val m = FrequencyLevelMonitor<Car>(AUDI)
 //        m.addValue(AUDI)
-        now = 2.0
+        now = 2.tt
 
         m.addValue(VW)
-        now = 8.0
+        now = 8.tt
 
         m.getPct(AUDI) shouldBe 0.25
 
@@ -191,16 +192,16 @@ class MergeMonitorTests {
         val nlmA = NumericLevelMonitor()
         val nlmB = NumericLevelMonitor()
 
-        now = 5.0
+        now = 5.tt
         nlmA.addValue(23)
 
-        now = 10.0
+        now = 10.tt
         nlmB.addValue(3)
 
-        now = 12.0
+        now = 12.tt
         nlmB.addValue(5)
 
-        now = 14.0
+        now = 14.tt
         nlmA.addValue(10)
 
         //merge statistics
@@ -217,14 +218,14 @@ class MergeMonitorTests {
         flmA.addValue(1)
         flmB.addValue(2)
 
-        now = 1.0
+        now = 1.tt
         flmB.addValue(4)
 
-        now = 3.0
+        now = 3.tt
         flmA.addValue(1)
 
         //merge statistics
-        now = 5.0
+        now = 5.tt
         val mergedStats: EnumeratedDistribution<Int> = listOf(flmA, flmB).mergeStats()
         println(mergedStats)
     }

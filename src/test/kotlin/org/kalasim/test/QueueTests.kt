@@ -75,8 +75,8 @@ class QueueTests {
 //                override fun process(): Sequence<Component> = super.process()
 //            }
 
-            val c1 = Component("comp1", at = 3)
-            val c2 = Component("comp2", at = 3)
+            val c1 = Component("comp1", at = 3.tt)
+            val c2 = Component("comp2", at = 3.tt)
 
             val tc = TraceCollector().also { addEventListener(it) }
 
@@ -101,8 +101,8 @@ class QueueTests {
 //                override fun process(): Sequence<Component> = super.process()
 //            }
 
-            val c1 = Component("comp1", at = 3)
-            val c2 = Component("comp2", at = 3, priority = HIGH)
+            val c1 = Component("comp1", at = 3.tt)
+            val c2 = Component("comp2", at = 3.tt, priority = HIGH)
 
             val tc = TraceCollector().also { addEventListener(it) }
 
@@ -121,13 +121,13 @@ class QueueTests {
         val inverseIat = inversedIatDist(6, 7, 9)
 
         run(inverseIat())
-        now shouldBe 6
+        now shouldBe 6.tt
 
         run(inverseIat())
-        now shouldBe 7
+        now shouldBe 7.tt
 
         run(inverseIat())
-        now shouldBe 9
+        now shouldBe 9.tt
 
         // since the underying iterator is exhausted now, we expect an exception
         shouldThrow<NoSuchElementException> {
@@ -144,7 +144,7 @@ class QueueTests {
         ComponentGenerator(inverseIat) { Component() }.addConsumer { generated.add(it) }
 
         run(20)
-        generated.map { it.creationTime.roundToInt() } shouldBe arrivalsTimes
+        generated.map { it.creationTime.value.roundToInt() } shouldBe arrivalsTimes
     }
 
     @Test
@@ -158,13 +158,13 @@ class QueueTests {
             override fun process() = sequence {
                 val batchComplete = batch(waitingLine, 4, timeout = 10)
                 batchComplete.size shouldBe 4
-                env.now shouldBe 8
+                env.now shouldBe 8.tt
 
-                hold(till = 20)
+                hold(until = TickTime(20))
 
                 val batchPartial = batch(waitingLine, 4, timeout = 10)
                 batchPartial.size shouldBe 2
-                env.now shouldBe 30
+                env.now shouldBe 30.tt
             }
         }
 
@@ -186,7 +186,7 @@ class QueueTests {
             override fun process() = sequence {
                 val batchComplete = batch(waitingLine, 4)
                 batchComplete.size shouldBe 4
-                env.now shouldBe 50
+                env.now shouldBe 50.tt
             }
         }
 

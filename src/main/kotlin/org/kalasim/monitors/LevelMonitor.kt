@@ -4,6 +4,7 @@ import com.github.holgerbrandl.jsonbuilder.json
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.moment.Variance
+import org.kalasim.TickTime
 import org.kalasim.asCMPairList
 import org.kalasim.misc.Jsonable
 import org.kalasim.roundAny

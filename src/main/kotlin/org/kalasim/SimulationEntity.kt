@@ -64,7 +64,7 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
      * @param details More details characterizing the state change
      */
     protected fun logInternal(
-        time: Double,
+        time: TickTime,
         curComponent: Component?,
         source: SimulationEntity?,
         action: String? = null,

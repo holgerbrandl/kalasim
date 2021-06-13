@@ -112,7 +112,7 @@ open class State<T>(
 
 /** Captures the current state of a `State`*/
 //@Serializable
-data class StateInfo(val time: Double, val name: String, val value: String, val waiters: List<String>) : Jsonable() {
+data class StateInfo(val time: TickTime, val name: String, val value: String, val waiters: List<String>) : Jsonable() {
 //    override fun toString(): String {
 //        return Json.encodeToString(this)
 //    }

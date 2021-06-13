@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 //val kotlinVersion = KotlinVersion.CURRENT
 
 plugins {
-    kotlin("jvm") version "1.4.31"
+    kotlin("jvm") version "1.5.10"
     application
     `maven-publish`
         signing
@@ -12,8 +12,8 @@ plugins {
 
 //group = "org.kalasim"
 group = "com.github.holgerbrandl"
-//version = "0.7-SNAPSHOT"
-version = "0.6.7"
+version = "0.7-SNAPSHOT"
+//version = "0.6.7"
 
 application {
     mainClassName = "foo.Bar" // not needed technically but makes gradle happy

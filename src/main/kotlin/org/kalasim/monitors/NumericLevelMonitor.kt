@@ -6,6 +6,7 @@ import org.apache.commons.math3.stat.Frequency
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.moment.Variance
+import org.kalasim.TickTime
 import org.kalasim.asCMPairList
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.buildHistogram
@@ -35,7 +36,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
     override fun addValue(value: Number) {
         if(!enabled) return
 
-        timestamps.add(env.now)
+        timestamps.add(env.now.value)
         values.add(value.toDouble())
     }
 
@@ -65,6 +66,8 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
         return timestamps.zip(values.toList()).reversed().first { it.first <= time.toDouble() }.second
     }
 
+    operator fun get(time: TickTime) = get(time.value)
+
     override fun total(value: Number): Double = statsData().run {
         // https://youtrack.jetbrains.com/issue/KT-43776
         values.zip(durations).filter { it.first == value }.map { it.second }.sum()
@@ -78,7 +81,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
 
         val valuesLst = values.toList()
 
-        val timepointsExt = timestamps + env.now
+        val timepointsExt = timestamps + env.now.value
         val durations = timepointsExt.toMutableList().zipWithNext { first, second -> second - first }
 
         return if(excludeZeros) {

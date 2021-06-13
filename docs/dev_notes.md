@@ -83,3 +83,6 @@ C:\brandl_data\projects\scheduling\external\barchart-jfx --> works
 in-progress docs https://www.notion.so/Charts-kt-Documentation-b8e8e8d7096e4d059a121d6f03b71026
 
 
+## three.kt
+
+https://github.com/markaren/three.kt

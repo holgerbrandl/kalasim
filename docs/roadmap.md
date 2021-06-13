@@ -25,6 +25,12 @@ consider `logCoreInteractions=false` as default
 
 ## v0.7
 
+
+**{todo}** get rid of `setup`
+**{todo}** respect ticktrafo in visualizations
+
+**{todo}** TickTime comparator and more consistent use in API
+
 **{todo}** provide heatmap of component-list status
 
 **{todo}** add `keepPositive` to `normal` 

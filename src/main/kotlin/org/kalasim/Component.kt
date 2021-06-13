@@ -53,7 +53,7 @@ val HIGH = Priority(10)
  */
 open class Component(
     name: String? = null,
-    at: Number? = null,
+    at: TickTime? = null,
     delay: Number = 0,
     priority: Priority = NORMAL,
     process: ProcessPointer? = Component::process,
@@ -78,7 +78,7 @@ open class Component(
 
     // TODO 0.6 get rid of this field (not needed because can be always retrieved from eventList if needed
     //  What are performance implications?
-    var scheduledTime: Double? = null
+    var scheduledTime: TickTime? = null
 
     private var remainingDuration: Double? = null
 
@@ -118,7 +118,7 @@ open class Component(
             val scheduledTime = if(at == null) {
                 env.now + delay.toDouble()
             } else {
-                at.toDouble() + delay.toDouble()
+                at + delay.toDouble()
             }
 
             reschedule(scheduledTime, priority, false, null, "activate", SCHEDULED)
@@ -410,7 +410,7 @@ open class Component(
      */
     suspend fun SequenceScope<Component>.put(
         vararg resourceRequests: ResourceRequest,
-        failAt: Number? = null,
+        failAt: TickTime? = null,
         failDelay: Number? = null,
     ) = request(
         *resourceRequests.map { it.copy(quantity = -it.quantity) }.toTypedArray(),
@@ -434,7 +434,7 @@ open class Component(
      */
     suspend fun SequenceScope<Component>.request(
         resources: Collection<Resource>,
-        failAt: Number? = null,
+        failAt: TickTime? = null,
         failDelay: Number? = null,
         oneOf: Boolean = false,
         priority: Priority = NORMAL,
@@ -467,7 +467,7 @@ open class Component(
     suspend fun SequenceScope<Component>.request(
         vararg resources: Resource,
         // todo review if this should rather be a number (and dist at call site)
-        failAt: Number? = null,
+        failAt: TickTime? = null,
         failDelay: Number? = null,
         oneOf: Boolean = false,
         priority: Priority = NORMAL,
@@ -500,7 +500,7 @@ open class Component(
     suspend fun SequenceScope<Component>.request(
         vararg resourceRequests: ResourceRequest,
         //todo change to support distribution parameters instead
-        failAt: Number? = null,
+        failAt: TickTime? = null,
         failDelay: Number? = null,
         oneOf: Boolean = false,
         //todo use type here and not string
@@ -526,9 +526,9 @@ open class Component(
             require(failAt == null || failDelay == null) { "Either failAt or failDelay can be specified, not both together" }
 
             scheduledTime = when {
-                failAt != null -> failAt.toDouble()
+                failAt != null -> failAt
                 failDelay != null -> env.now + failDelay.toDouble()
-                else -> Double.MAX_VALUE
+                else -> TickTime(Double.MAX_VALUE)
             }
 
             failed = false
@@ -752,7 +752,7 @@ open class Component(
         require(this != env.main) { "main component not allowed" }
 
     internal fun reschedule(
-        scheduledTime: Double,
+        scheduledTime: TickTime,
         priority: Priority = NORMAL,
         urgent: Boolean = false,
         description: String? = null,
@@ -786,7 +786,7 @@ open class Component(
 
 
             // calculate scheduling delta
-            val delta = if(this.scheduledTime == env.now || (this.scheduledTime == Double.MAX_VALUE)) "" else {
+            val delta = if(this.scheduledTime == env.now || (this.scheduledTime?.value == Double.MAX_VALUE)) "" else {
                 "+" + TRACE_DF.format(scheduledTime - env.now) + " "
             }
 
@@ -808,7 +808,7 @@ open class Component(
      * * if the component is a data component, the generator function `process` will be used as the default process.
      */
     fun activate(
-        at: Number? = null,
+        at: TickTime? = null,
         delay: Number = 0,
         priority: Priority = NORMAL,
         urgent: Boolean = false,
@@ -863,7 +863,7 @@ open class Component(
         val scheduledTime = if(at == null) {
             env.now + delay.toDouble()
         } else {
-            at.toDouble() + delay.toDouble()
+            at + delay.toDouble()
         }
 
         reschedule(scheduledTime, priority, urgent, null, "activate $extra", SCHEDULED)
@@ -901,19 +901,37 @@ open class Component(
      *
      * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
      *
-     * @param duration Time to hold. Either `duration` or `till` must be specified.
-     * @param till Absolute time until the component should be held
+     * @param ticks Time to hold. Either `duration` or `till` must be specified.
      * @param priority If a component has the same time on the event list, this component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
     suspend fun SequenceScope<Component>.hold(
-        duration: Number? = null,
-        till: Number? = null,
+        ticks: Ticks? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false,
         description: String? = null
     ) = yieldCurrent {
-        this@Component.hold(duration, till, priority, urgent, description)
+        this@Component.hold(ticks?.value, null, priority, urgent, description)
+    }
+
+    /**
+     * Hold the component.
+     *
+     * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
+     *
+     * @param ticks Time to hold. Either `duration` or `till` must be specified.
+     * @param until Absolute time until the component should be held
+     * @param priority If a component has the same time on the event list, this component is sorted according to
+     * the priority. An event with a higher priority will be scheduled first.
+     */
+    suspend fun SequenceScope<Component>.hold(
+        ticks: Number? = null,
+        until: TickTime? = null,
+        priority: Priority = NORMAL,
+        urgent: Boolean = false,
+        description: String? = null
+    ) = yieldCurrent {
+        this@Component.hold(ticks, until, priority, urgent, description)
     }
 
     /**
@@ -922,13 +940,13 @@ open class Component(
      * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
      *
      * @param duration Time to hold. Either `duration` or `till` must be specified.
-     * @param till Absolute time until the component should be held
+     * @param until Absolute time until the component should be held
      * @param priority If a component has the same time on the event list, this component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
     fun hold(
         duration: Number? = null,
-        till: Number? = null,
+        until: TickTime? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false,
         description: String? = null
@@ -940,7 +958,7 @@ open class Component(
             checkFail()
         }
 
-        val scheduledTime = env.calcScheduleTime(till, duration)
+        val scheduledTime = env.calcScheduleTime(until, duration)
 
         reschedule(scheduledTime, priority, urgent, description, "hold", SCHEDULED)
     }
@@ -1056,7 +1074,7 @@ open class Component(
         state: State<T>,
         waitFor: T,
         priority: Priority = NORMAL,
-        failAt: Number? = null,
+        failAt: TickTime? = null,
         failDelay: Number? = null
     ) = wait(
         StateRequest(state) { state.value == waitFor },
@@ -1086,7 +1104,7 @@ open class Component(
         //todo change to support distribution parameters instead
         priority: Priority = NORMAL,
         urgent: Boolean = false,
-        failAt: Number? = null,
+        failAt: TickTime? = null,
         failDelay: Number? = null,
         all: Boolean = false
     ) = yieldCurrent {
@@ -1103,9 +1121,9 @@ open class Component(
         require(failAt == null || failDelay == null) { "Either failAt or failDelay can be specified, not both together" }
 
         scheduledTime = when {
-            failAt != null -> failAt.toDouble()
+            failAt != null -> failAt
             failDelay != null -> env.now + failDelay.toDouble()
-            else -> Double.MAX_VALUE
+            else -> TickTime(Double.MAX_VALUE)
         }
 
         stateRequests
@@ -1298,8 +1316,8 @@ open class Component(
 
 
     /** Transforms a wall `duration` into the corresponding amount of ticks.*/
-    fun Duration.asTicks(): Double  = env.asTicks(this)
-    fun Instant.asTickTime(): Double = env.asTickTime(this)
+    fun Duration.asTicks(): Double = env.asTicks(this)
+    fun Instant.asTickTime(): TickTime = env.asTickTime(this)
 }
 
 internal val SELECT_SCOPE_IDX = mutableMapOf<Int, Int>()
@@ -1381,22 +1399,22 @@ data class StateRequest<T>(val state: State<T>, val priority: Priority? = null, 
 
 infix fun <T> State<T>.turns(value: T) = StateRequest(this) { it == value }
 
-private fun formatWithInf(time: Double) =
-    if(time == Double.MAX_VALUE || time.isInfinite()) "<inf>" else TRACE_DF.format(time)
+private fun formatWithInf(time: TickTime) =
+    if(time.value == Double.MAX_VALUE || time.value.isInfinite()) "<inf>" else TRACE_DF.format(time.value)
 
 
 data class ComponentLifecycleRecord(
     val component: String,
-    val createdAt: Double,
-    val inDataSince: Double?,
-    val inData: Double,
-    val inCurrent: Double,
-    val inStandby: Double,
-    val inPassive: Double,
-    val inInterrupted: Double,
-    val inScheduled: Double,
-    val inRequesting: Double,
-    val inWaiting: Double
+    val createdAt: TickTime,
+    val inDataSince: TickTime?,
+    val inData: TickTime,
+    val inCurrent: TickTime,
+    val inStandby: TickTime,
+    val inPassive: TickTime,
+    val inInterrupted: TickTime,
+    val inScheduled: TickTime,
+    val inRequesting: TickTime,
+    val inWaiting: TickTime
 )
 
 fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {
@@ -1407,14 +1425,14 @@ fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {
     return ComponentLifecycleRecord(
         c.name,
         c.creationTime,
-        inDataSince = if(c.isData) c.statusMonitor.statsData().timepoints.last() else null,
-        histogram.get(DATA) ?: 0.0,
-        histogram[CURRENT] ?: 0.0,
-        histogram[STANDBY] ?: 0.0,
-        histogram[PASSIVE] ?: 0.0,
-        histogram[INTERRUPTED] ?: 0.0,
-        histogram[SCHEDULED] ?: 0.0,
-        histogram[REQUESTING] ?: 0.0,
-        histogram[WAITING] ?: 0.0,
+        inDataSince = if(c.isData) c.statusMonitor.statsData().timepoints.last().asTickTime() else null,
+        (histogram.get(DATA) ?: 0.0).asTickTime(),
+        (histogram[CURRENT] ?: 0.0).asTickTime(),
+        (histogram[STANDBY] ?: 0.0).asTickTime(),
+        (histogram[PASSIVE] ?: 0.0).asTickTime(),
+        (histogram[INTERRUPTED] ?: 0.0).asTickTime(),
+        (histogram[SCHEDULED] ?: 0.0).asTickTime(),
+        (histogram[REQUESTING] ?: 0.0).asTickTime(),
+        (histogram[WAITING] ?: 0.0).asTickTime(),
     )
 }

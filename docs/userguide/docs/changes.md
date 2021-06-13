@@ -4,10 +4,14 @@
 
 Not released yet 
 
-Major enhancement
+Major enhancements
 * Dramatically improved simulation performance
 * Introduced `AssertMode`s (`Full`, `Light` (default), `None`) to enable/disable internal consistency checks. This will optimize performance by another ~20% (depending on simulation logic)
 * Improved event logging API
+
+
+Breaking changes
+* changes `Component.now `and `Environment.now` to new value class `TickTime` for better type safety
 
 ## v0.6
 

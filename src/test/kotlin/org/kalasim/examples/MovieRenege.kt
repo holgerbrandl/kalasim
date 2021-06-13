@@ -24,7 +24,7 @@ fun main() {
         class Cineast(val movie: Movie, val numTickets: Int) : Component() {
             override fun process() = sequence {
                 request(theater.counter) {
-                    request(theater.tickets[movie]!! withQuantity numTickets, failAt = 0)
+                    request(theater.tickets[movie]!! withQuantity numTickets, failAt = 0.tickTime)
                     if (failed) {
                         theater.numReneged.merge(movie, 1, Int::plus)
                     }

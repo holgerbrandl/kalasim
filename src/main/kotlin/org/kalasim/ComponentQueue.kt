@@ -15,7 +15,7 @@ import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
 import java.util.*
 
-data class CQElement<C : SimulationEntity>(val component: C, val enterTime: Double, val priority: Priority? = null)
+data class CQElement<C : SimulationEntity>(val component: C, val enterTime: TickTime, val priority: Priority? = null)
 
 //TODO add opt-out for queue monitoring
 
@@ -75,7 +75,7 @@ class ComponentQueue<C: SimulationEntity>(
     private fun updateExitStats(cqe: CQElement<C>) {
         val (_, enterTime) = cqe
 
-        lengthOfStayMonitor.addValue(env.now - enterTime)
+        lengthOfStayMonitor.addValue((env.now - enterTime))
         queueLengthMonitor.addValue(q.size.toDouble())
     }
 
@@ -116,7 +116,7 @@ class ComponentQueue<C: SimulationEntity>(
 
 class QueueInfo(cq: ComponentQueue<*>) : Jsonable() {
 
-    data class Entry(val component: String, val enterTime: Double, val priority: Priority?)
+    data class Entry(val component: String, val enterTime: TickTime, val priority: Priority?)
 
     val name = cq.name
     val timestamp = cq.env.now
@@ -149,7 +149,7 @@ class QueueStatistics(cq: ComponentQueue<*>) {
 
     fun toJson() = json {
         "name" to name
-        "timestamp" to timestamp
+        "timestamp" to timestamp.value
         "type" to this@QueueStatistics.javaClass.simpleName //"queue statistics"
 
         "length_of_stay" to {

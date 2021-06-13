@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 
 class TimeTrafoTests {
 
-    class TimeTrafoTestEvent(time: Double) : Event(time)
+    class TimeTrafoTestEvent(time: TickTime) : Event(time)
 
 
     @Test
@@ -19,9 +19,9 @@ class TimeTrafoTests {
 
         tickTransform = OffsetTransform(baseTime, TimeUnit.MINUTES)
 
-        asWallTime(15.0) shouldNotBe asWallTime(15.32)
+        asWallTime(15.tt) shouldNotBe asWallTime(15.32.tt)
 
-        asWallTime(15.0) shouldBe  Instant.parse("2021-01-24T12:15:00Z")
+        asWallTime(15.tt) shouldBe  Instant.parse("2021-01-24T12:15:00Z")
 
         Duration.ofSeconds(300).asTicks() shouldNotBe Duration.ofSeconds(350).asTicks()
         Duration.ofSeconds(30).asTicks() shouldBe 0.5

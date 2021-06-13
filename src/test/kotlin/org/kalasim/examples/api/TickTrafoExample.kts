@@ -9,10 +9,10 @@ createSimulation(true) {
     tickTransform = OffsetTransform(Instant.now(), TimeUnit.MINUTES)
 
     // run until a specific time
-    run(until = asTickTime(Instant.now().plus(Duration.ofHours(1))))
+    run(until = Instant.now().plus(Duration.ofHours(1)).asTickTime())
 
     // run for a given duration
-    run(asTicks(Duration.ofHours(1)))
+    run(Duration.ofHours(1).asTicks())
 
     println(asWallTime(now))
 }

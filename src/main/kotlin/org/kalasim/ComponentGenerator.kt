@@ -26,9 +26,9 @@ import org.koin.core.context.GlobalContext
  */
 class ComponentGenerator<T>(
     val iat: RealDistribution,
-    val startAt: Double? = null,
+    val startAt: TickTime? = null,
     val forceStart: Boolean = false,
-    var until: Double = Double.MAX_VALUE,
+    var until: TickTime = TickTime(Double.MAX_VALUE),
     val total: Int = Int.MAX_VALUE,
     name: String? = null,
     priority: Priority = NORMAL,

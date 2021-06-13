@@ -43,5 +43,5 @@ fun main() {
     println("Check out http://youtu.be/fXXmeP9TvBg while simulating ... ;-)")
 
     // Start the simulation
-    env.run(until = SIM_TIME)
+    env.run(until = SIM_TIME.asTickTime())
 }

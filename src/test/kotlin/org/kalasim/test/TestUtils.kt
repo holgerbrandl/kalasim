@@ -5,6 +5,7 @@ import org.apache.commons.math3.distribution.ConstantRealDistribution
 import org.kalasim.Environment
 import org.kalasim.createSimulation
 import org.kalasim.misc.cumSum
+import org.kalasim.tickTime
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
@@ -55,7 +56,7 @@ internal fun createTestSimulation(enableConsoleLogger: Boolean = true, builder: 
  */
 fun Environment.inversedIatDist(vararg arrivalTimes: Number) = object : ConstantRealDistribution(-1.0) {
 
-    val values = (listOf(now) + arrivalTimes.map{it.toDouble()})
+    val values = (listOf(now) + arrivalTimes.map{it.toDouble().tickTime})
         .zipWithNext()
         .map{ (prev, curVal )-> (curVal -prev) }
         .iterator()

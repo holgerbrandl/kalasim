@@ -16,7 +16,7 @@ enum class ResourceEventType { CLAIMED, RELEASED, PUT }
 
 
 class ResourceEvent(
-    time: Double, // bug in krangl, parent
+    time: TickTime, // bug in krangl, parent
     curComponent: Component?,
     val requester: SimulationEntity,
     val resource: Resource,
@@ -52,7 +52,7 @@ class ResourceEvent(
 }
 
 open class InteractionEvent(
-    time: Double,
+    time: TickTime,
     val curComponent: Component? = null,
     val source: SimulationEntity? = null,
     val action: String? = null,
@@ -76,8 +76,11 @@ open class InteractionEvent(
 
 /** The base event of kalasim. Usually this extended to convey more specific information.*/
 abstract class Event(
-    val time: Double
+    val time: TickTime
 ) : Jsonable() {
+
+//    constructor(time: TickTime) : this(time.value)
+//    constructor(time: Number) : this(time.toDouble())
 
     open val logLevel: Level get() = Level.INFO
 
@@ -94,8 +97,8 @@ abstract class Event(
 fun interface EventListener {
     fun consume(event: Event)
 
-    val filter: EventFilter?
-        get() = null
+//    val filter: EventFilter?
+//        get() = null
 }
 
 
@@ -136,7 +139,7 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
                 val receiverChanged = source != lastElement?.source
 
                 listOf(
-                    TRACE_DF.format(time),
+                    TRACE_DF.format(time.value),
                     if(ccChanged) curComponent?.name else null,
                     if(receiverChanged) source?.name else null,
 //                ((source?.name ?: "") + " " + (renderAction() ?: "")).trim(),
@@ -147,7 +150,7 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
                     lastElement = this@with
                 }
             } else {
-                listOf(TRACE_DF.format(time), "", "", toString())
+                listOf(TRACE_DF.format(time.value), "", "", toString())
             }
 
             val renderedLine = traceLine.renderTraceLine().trim()

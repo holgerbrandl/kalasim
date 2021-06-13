@@ -45,7 +45,7 @@ fun main() {
     }
 
     // Analysis (gather monitoring data (as in simmer:get_mon_arrivals)
-    data class RequestRecord(val requester: String, val timestamp: Double, val resource: String, val quantity: Double)
+    data class RequestRecord(val requester: String, val timestamp: TickTime, val resource: String, val quantity: Double)
 
     val tc = sim.get<TraceCollector>()
     val requests = tc.filterIsInstance<ResourceEvent>().map {

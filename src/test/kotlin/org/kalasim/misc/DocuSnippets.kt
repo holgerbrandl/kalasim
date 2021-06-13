@@ -49,13 +49,13 @@ object ProcessGraph {
 
         override fun process() = sequence {
             // do shopping
-            hold(duration = 23.0)
+            hold(ticks = 23.0)
 
             // wait for an empty counter
             request(clerk)
 
             // billing process
-            hold(duration = 2.0, priority = HIGH)
+            hold(ticks = 2.0, priority = HIGH)
         }
     }
 }
@@ -68,7 +68,7 @@ object EventLog {
         val sim = createSimulation {
             addEventListener{ it: Event -> println(it)}
 
-            class MyEvent(msg:String, time:Double ) : Event(time)
+            class MyEvent(msg:String, time:TickTime ) : Event(time)
 
             object: Component(){
                 override fun process() = sequence<Component> {

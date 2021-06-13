@@ -18,6 +18,7 @@ import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 import java.time.Duration
+import java.time.Instant
 import java.util.*
 
 
@@ -83,7 +84,8 @@ open class Environment(
     enableConsoleLogger: Boolean = false,
     dependencies: KoinModule? = null,
     koin: Koin? = null,
-    randomSeed: Int = DEFAULT_SEED
+    randomSeed: Int = DEFAULT_SEED,
+    startTime:TickTime = TickTime(0.0)
 ) : KoinComponent {
 
     @Deprecated("serves no purposes and creates a memory leaks as objects are nowhere releases")
@@ -122,10 +124,13 @@ open class Environment(
 //        })
     }
 
-    var now = 0.0
+    var now = startTime
         internal set
 
     fun now() = now
+
+//    val foo  = 3.ticks
+//    val foo  = 3.simtime
 
     /** Allows to transform ticks to real world time moements (represented by `java.time.Instant`) */
     var tickTransform: TickTransform? = null
@@ -209,23 +214,47 @@ open class Environment(
     }
 
 
+
     /**
      * Start execution of the simulation
      *
      *  If neither `until` nor `duration` are specified, the main component will be reactivated at
      * the time there are no more events on the event-list, i.e. possibly not at Double.MAX_VAULE. If you want to keep a simulation    *  running simply call `run(Double.MAX_VALUE)`.
      *
-     * @param duration Time to run
+     * @param ticks Time to run
      * @param until Absolute tick-time until the which the simulation should run
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
-    fun run(duration: Number? = null, until: Number? = null, priority: Priority = NORMAL, urgent: Boolean = false): Environment {
+    fun run(
+        ticks: Ticks? = null,
+//        until: TickTime? = null,
+        priority: Priority = NORMAL,
+        urgent: Boolean = false
+    ) = run(ticks?.value,  null, priority, urgent)
+
+    /**
+     * Start execution of the simulation
+     *
+     *  If neither `until` nor `ticks` are specified, the main component will be reactivated at
+     * the time there are no more events on the event-list, i.e. possibly not at Double.MAX_VAULE. If you want to keep a simulation    *  running simply call `run(Double.MAX_VALUE)`.
+     *
+     * @param ticks Time to run
+     * @param until Absolute tick-time until the which the simulation should run
+     * @param priority If a component has the same time on the event list, the main component is sorted according to
+     * the priority. An event with a higher priority will be scheduled first.
+     */
+    fun run(
+        ticks: Number? = null,
+        until: TickTime? = null,
+        priority: Priority = NORMAL,
+        urgent: Boolean = false
+    ): Environment {
         // also see https://simpy.readthedocs.io/en/latest/topical_guides/environments.html
-        if(duration == null && until==null){
+        if(ticks == null && until == null) {
             endOnEmptyEventlist = true
-        }else {
-            val scheduledTime = calcScheduleTime(until, duration)
+        } else {
+            val scheduledTime = calcScheduleTime(until, ticks)
 
             main.reschedule(scheduledTime, priority, urgent, null, "run", SCHEDULED)
         }
@@ -263,7 +292,7 @@ open class Environment(
                 publishEvent(InteractionEvent(now, curComponent, null, null, "run end; no events left"))
                 now
             } else {
-                Double.MAX_VALUE
+                TickTime(Double.MAX_VALUE)
             }
 
             t to main
@@ -307,7 +336,8 @@ open class Environment(
         if(traceFilters.any { it.matches(event) }) return
 
         eventListeners.forEach {
-            if(it.filter == null || it.filter!!.matches(event)) it.consume(event)
+            it.consume(event)
+//            if(it.filter == null || it.filter!!.matches(event)) it.consume(event)
         }
     }
 
@@ -341,7 +371,7 @@ open class Environment(
 
     private var queueCounter: Int = 0
 
-    fun push(component: Component, scheduledTime: Double, priority: Priority, urgent: Boolean) {
+    fun push(component: Component, scheduledTime: TickTime, priority: Priority, urgent: Boolean) {
         queueCounter++
 
 //        https://bezkoder.com/kotlin-priority-queue/
@@ -371,16 +401,21 @@ open class Environment(
 
     /** Transforms a wall `duration` into the corresponding amount of ticks.*/
     fun Duration.asTicks(): Double {
-        require(tickTransform != null){ MISSING_TICK_TRAFO_ERROR }
+        require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
         return tickTransform!!.durationAsTicks(this)
     }
+    fun Instant.asTickTime(): TickTime {
+        require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
+        return tickTransform!!.wall2TickTime(this)
+    }
+
+    val Duration.ticks: Double
+        get() = asTicks(this)
 }
-
-
 
 data class QueueElement(
     val component: Component,
-    val time: Double,
+    val time: TickTime,
     val priority: Priority,
     val queueCounter: Int,
     val urgent: Boolean
@@ -389,7 +424,7 @@ data class QueueElement(
     //TODO clarify if we need/want to also support urgent
 
     override fun compareTo(other: QueueElement): Int =
-        compareValuesBy(this, other, { it.time }, { it.priority.value }, { it.queueCounter })
+        compareValuesBy(this, other, { it.time.value }, { it.priority.value }, { it.queueCounter })
 
 //    val heapSeq = if (urgent) -queueCounter else queueCounter
 
@@ -400,16 +435,16 @@ data class QueueElement(
 }
 
 
-fun Environment.calcScheduleTime(till: Number?, duration: Number?): Double {
-    return (till?.toDouble() to duration?.toDouble()).let { (till, duration) ->
+fun Environment.calcScheduleTime(until: TickTime?, duration: Number?): TickTime {
+    return (until?.value to duration?.toDouble()).let { (till, duration) ->
         if(till == null) {
             require(duration != null) { "neither duration nor till specified" }
-            now + duration
+            now.value + duration
         } else {
             require(duration == null) { "both duration and till specified" }
             till
         }
-    }
+    }.let { TickTime(it) }
 }
 
 

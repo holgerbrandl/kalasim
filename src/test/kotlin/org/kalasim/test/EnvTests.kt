@@ -137,22 +137,22 @@ class EnvTests {
                 }
             }
 
-            run(null)
-            now shouldBe 10.0
+            run(until = null)
+            now shouldBe 10.tt
         }
     }
 
     @Test
     fun `it should run until or duration until has reached`(){
         createSimulation {
-            run(until=10)
-            now shouldBe 10.0
+            run(until=TickTime(10))
+            now shouldBe 10.tt
         }
 
         createSimulation {
-            run(duration = 5)
-            run(duration = 5)
-            now shouldBe 10.0
+            run(ticks = 5)
+            run(ticks = 5)
+            now shouldBe 10.tt
         }
     }
 }

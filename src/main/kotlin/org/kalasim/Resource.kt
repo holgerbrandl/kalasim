@@ -183,7 +183,7 @@ open class Resource(
 
 class ResourceInfo(resource: Resource) : Jsonable() {
     val name: String = resource.name
-    val creationTime: Double = resource.creationTime
+    val creationTime: TickTime = resource.creationTime
 
     val claimedQuantity: Double = resource.claimed
     val capacity = resource.capacity

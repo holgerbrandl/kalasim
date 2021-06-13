@@ -1,5 +1,6 @@
 package org.kalasim.monitors
 
+import org.kalasim.TickTime
 import org.kalasim.misc.ImplementMe
 import org.kalasim.misc.Jsonable
 import org.koin.core.Koin
@@ -35,7 +36,7 @@ class FrequencyLevelMonitor<T>(
     override fun addValue(value: T) {
         if (!enabled) return
 
-        timestamps.add(env.now)
+        timestamps.add(env.now.value)
         values.add(value)
     }
 
@@ -56,7 +57,7 @@ class FrequencyLevelMonitor<T>(
 
     private fun xDuration(): DoubleArray {
         return timestamps.toMutableList()
-            .apply { add(env.now) }.zipWithNext { first, second -> second - first }
+            .apply { add(env.now.value) }.zipWithNext { first, second -> second - first }
             .toDoubleArray()
     }
 
@@ -69,6 +70,8 @@ class FrequencyLevelMonitor<T>(
         // https://youtrack.jetbrains.com/issue/KT-43776
         return timestamps.zip(values.toList()).reversed().first { it.first <= time.toDouble() }.second
     }
+
+    operator fun get(time: TickTime) = get(time.value)
 
     override fun total(value: T): Double = statsData().run {
         // https://youtrack.jetbrains.com/issue/KT-43776
@@ -105,7 +108,7 @@ class FrequencyLevelMonitor<T>(
 
         val valuesLst = values.toList()
 
-        val timepointsExt = timestamps + env.now
+        val timepointsExt = timestamps + env.now.value
         val durations = timepointsExt.toMutableList().zipWithNext { first, second -> second - first }
 
         return LevelStatsData(valuesLst, timestamps, durations)

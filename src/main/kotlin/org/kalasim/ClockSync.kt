@@ -40,7 +40,7 @@ class ClockSync(
 
         while(true) {
             //wait until we have caught up with wall clock
-            val simTimeSinceStart = Duration.between(simStart, simStart.plusMillis((tickMs * env.now).roundToLong()));
+            val simTimeSinceStart = Duration.between(simStart, simStart.plusMillis((tickMs * env.now.value).roundToLong()));
             val wallTimeSinceStart = Duration.between(simStart, Instant.now())
 
             val sleepDuration = simTimeSinceStart - wallTimeSinceStart
@@ -70,6 +70,6 @@ class ClockSync(
 /**
  * Will be thrown if the maximum delay time is exceeded when using [clock synchronization](https://www.kalasim.org/advanced/#clock-synchronization).
  */
-class ClockOverloadException(val simTime: Double, msg: String) : RuntimeException(msg)
+class ClockOverloadException(val simTime: TickTime, msg: String) : RuntimeException(msg)
 
 
