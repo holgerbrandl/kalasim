@@ -1,6 +1,7 @@
 package org.kalasim
 
 import org.kalasim.misc.TRACE_DF
+import org.koin.core.component.KoinComponent
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -68,7 +69,7 @@ interface TickTransform {
 class OffsetTransform(val offset: Instant = Instant.now(), val tickUnit: TimeUnit = TimeUnit.MINUTES) : TickTransform {
     override fun tick2wallTime(tickTime: TickTime): Instant {
         val ttValue = tickTime.value
-        val durationSinceOffset = when (tickUnit) {
+        val durationSinceOffset = when(tickUnit) {
             TimeUnit.NANOSECONDS -> Duration.ofNanos(ttValue.toLong())
             TimeUnit.MICROSECONDS -> Duration.ofNanos((ttValue * 1000).toLong())
             TimeUnit.MILLISECONDS -> Duration.ofNanos((ttValue * 1000000).toLong())
@@ -88,7 +89,7 @@ class OffsetTransform(val offset: Instant = Instant.now(), val tickUnit: TimeUni
     }
 
     // todo improve precision of transformation
-    override fun durationAsTicks(duration: Duration): Double = when (tickUnit) {
+    override fun durationAsTicks(duration: Duration): Double = when(tickUnit) {
         TimeUnit.NANOSECONDS -> duration.toNanos()
         TimeUnit.MICROSECONDS -> duration.toNanos() / 1000.0
         TimeUnit.MILLISECONDS -> duration.toNanos() / 1000000.0
@@ -103,39 +104,39 @@ class OffsetTransform(val offset: Instant = Instant.now(), val tickUnit: TimeUni
 
 internal val MISSING_TICK_TRAFO_ERROR = "Tick transformation not configured. "
 
-/** Transforms a simulation time (typically `now`) to the corresponding wall time. */
-@Deprecated("Passe TickTime instead of raw double time")
-fun Environment.asWallTime(tickTime: Double): Instant {
-    require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
-    return tickTransform!!.tick2wallTime(tickTime.tickTime)
+
+@Suppress("EXPERIMENTAL_API_USAGE")
+interface SimContext : KoinComponent {
+
+    var tickTransform: TickTransform?
+
+    /** Transforms a wall `duration` into the corresponding amount of ticks.*/
+    fun Duration.asTicks(): Double {
+        require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
+        return tickTransform!!.durationAsTicks(this)
+    }
+
+    val Duration.ticks: Double
+        get() = asTicks()
+
+    // Scoped extensions
+    fun Instant.asTickTime(): TickTime {
+        require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
+        return tickTransform!!.wall2TickTime(this)
+    }
+
+    operator fun TickTime.plus(duration: Duration): TickTime = TickTime(value + duration.asTicks())
+    operator fun TickTime.minus(duration: Duration): TickTime = TickTime(value - duration.asTicks())
+
+    /** Transforms a simulation time (typically `now`) to the corresponding wall time. */
+    fun TickTime.asWallTime(): Instant {
+        require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
+        return tickTransform!!.tick2wallTime(this)
+    }
 }
 
 /** Transforms a simulation time (typically `now`) to the corresponding wall time. */
-fun Environment.asWallTime(tickTime: TickTime): Instant {
-    require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
-    return tickTransform!!.tick2wallTime(tickTime)
-}
-
-/** Transforms a simulation time (typically `now`) to the corresponding wall time. */
-//fun Environment.asWallDuration(tickTime: Double): Instant {
-//    require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
-//    return tickTransform!!.tick2wallTime(tickTime)
-//}
-
-/** Transforms a wall `duration` into the corresponding amount of ticks.*/
-fun Environment.asTicks(duration: Duration): Double {
-    require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
-    return tickTransform!!.durationAsTicks(duration)
-}
-
-/** Transforms a wall `duration` into the corresponding amount of ticks.*/
-fun Component.asTicks(duration: Duration) = env.asTicks(duration)
-
-// note: There is also an extension on Duration in Environment (because of missing multiple receiver support)
+fun Environment.asTicks(duration: Duration): Double = duration.asTicks()
 
 /** Transforms an wall `Instant` to simulation time.*/
-fun Environment.asTickTime(instant: Instant): TickTime {
-    require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
-    return tickTransform!!.wall2TickTime(instant)
-}
-
+fun Environment.asTickTime(instant: Instant)= instant.asTickTime()
