@@ -123,9 +123,6 @@ open class Component(
 
             reschedule(scheduledTime, priority, false, null, "activate", SCHEDULED)
         }
-
-        @Suppress("LeakingThis")
-        setup()
     }
 
 
@@ -151,12 +148,6 @@ open class Component(
         }
     }
 
-    /**  called immediately after initialization of a component.
-     * by default this is a dummy method, but it can be overridden.
-     * */
-    @Deprecated("use inheritance instead and do additional setup bits in child class constructor")
-    open fun setup() {
-    }
 
     /** The current simulation time*/
     val now
@@ -1313,11 +1304,6 @@ open class Component(
 
         return batch
     }
-
-
-    /** Transforms a wall `duration` into the corresponding amount of ticks.*/
-    fun Duration.asTicks(): Double = env.asTicks(this)
-    fun Instant.asTickTime(): TickTime = env.asTickTime(this)
 }
 
 internal val SELECT_SCOPE_IDX = mutableMapOf<Int, Int>()

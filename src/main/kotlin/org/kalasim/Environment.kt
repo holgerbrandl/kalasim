@@ -86,7 +86,7 @@ open class Environment(
     koin: Koin? = null,
     randomSeed: Int = DEFAULT_SEED,
     startTime:TickTime = TickTime(0.0)
-) : KoinComponent {
+) :  SimContext {
 
     @Deprecated("serves no purposes and creates a memory leaks as objects are nowhere releases")
     private val components: MutableList<Component> = listOf<Component>().toMutableList()
@@ -133,7 +133,7 @@ open class Environment(
 //    val foo  = 3.simtime
 
     /** Allows to transform ticks to real world time moements (represented by `java.time.Instant`) */
-    var tickTransform: TickTransform? = null
+    override var tickTransform: TickTransform? = null
 
     var curComponent: Component? = null
         private set
@@ -398,19 +398,30 @@ open class Environment(
     override fun toString(): String {
         return toJson(false).toString(JSON_INDENT)
     }
+}
+
+@Suppress("EXPERIMENTAL_API_USAGE")
+interface SimContext : KoinComponent{
+
+    var tickTransform : TickTransform?
 
     /** Transforms a wall `duration` into the corresponding amount of ticks.*/
     fun Duration.asTicks(): Double {
         require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
         return tickTransform!!.durationAsTicks(this)
     }
+
+    val Duration.ticks: Double
+        get() = asTicks()
+
+    // Scoped extensions
     fun Instant.asTickTime(): TickTime {
         require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
         return tickTransform!!.wall2TickTime(this)
     }
 
-    val Duration.ticks: Double
-        get() = asTicks(this)
+    operator fun TickTime.plus(duration: Duration): TickTime = TickTime(value + duration.asTicks())
+    operator fun TickTime.minus(duration: Duration): TickTime = TickTime(value - duration.asTicks())
 }
 
 data class QueueElement(

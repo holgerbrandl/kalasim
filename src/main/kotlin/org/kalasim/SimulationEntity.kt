@@ -5,12 +5,11 @@ package org.kalasim
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.printThis
 import org.koin.core.Koin
-import org.koin.core.component.KoinComponent
 import org.koin.core.context.GlobalContext
 
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext.get()) : KoinComponent {
+abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext.get()) : SimContext {
     val env = getKoin().get<Environment>()
 
     /** The (possibly auto-generated) name of this simulation entity.*/
@@ -38,9 +37,16 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
     final override fun getKoin(): Koin = simKoin
 
 
-    internal fun logInternal(action: String) = log{
-         with(env) { InteractionEvent(now, curComponent, this@SimulationEntity, action) }
+    internal fun logInternal(action: String) = log {
+        with(env) { InteractionEvent(now, curComponent, this@SimulationEntity, action) }
     }
+
+     override var tickTransform: TickTransform?
+        get() = env.tickTransform
+        set(_) {
+            throw RuntimeException("Tick transformation must be set via the environment")
+        }
+//        private set
 
 
     /**
@@ -69,7 +75,7 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
         source: SimulationEntity?,
         action: String? = null,
         details: String? = null
-    ) = log{
+    ) = log {
         InteractionEvent(time, curComponent, source, action, details)
     }
 
@@ -91,7 +97,6 @@ abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext
     fun log(event: Event) {
         env.publishEvent(event)
     }
-
 
 
     fun log(function: () -> Event) {

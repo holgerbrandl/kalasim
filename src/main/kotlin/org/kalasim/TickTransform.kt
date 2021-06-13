@@ -11,6 +11,7 @@ value class TickTime(val value: Double) : Comparable<TickTime> {
     override operator fun compareTo(other: TickTime): Int = value.compareTo(other.value)
     operator fun minus(duration: Double): TickTime = TickTime(value - duration)
     operator fun plus(duration: Number): TickTime = TickTime(value + duration.toDouble())
+
     operator fun minus(other: TickTime): Double = value - other.value
 
 

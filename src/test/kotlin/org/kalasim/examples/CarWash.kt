@@ -1,5 +1,6 @@
 //CarWash.kt
 import org.kalasim.*
+import org.koin.core.component.get
 
 /**
  *  A carwash has a limited number of washing machines and defines
@@ -33,7 +34,6 @@ fun main() {
 
         //Create 4 initial cars
         repeat(3) { Car() }
-
         // Create more cars while the simulation is running
         ComponentGenerator(iat = uniform(T_INTER - 2, T_INTER + 2)) { Car() }
     }
