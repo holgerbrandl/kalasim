@@ -33,7 +33,7 @@ dependencies {
 //    implementation("org.koin:koin-core:2.1.6")
     api("org.koin:koin-core:2.2.1")
 
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.30")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.10")
 
     api("com.github.holgerbrandl:jsonbuilder:0.9")
     implementation("com.google.code.gson:gson:2.8.6")
