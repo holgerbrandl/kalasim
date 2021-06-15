@@ -135,8 +135,15 @@ interface SimContext : KoinComponent {
     }
 }
 
+// also provide tranforms via direct environment extensions for use outside of simulation context. *?
+
 /** Transforms a simulation time (typically `now`) to the corresponding wall time. */
 fun Environment.asTicks(duration: Duration): Double = duration.asTicks()
 
 /** Transforms an wall `Instant` to simulation time.*/
 fun Environment.asTickTime(instant: Instant)= instant.asTickTime()
+
+
+
+/** Transforms a simulation time (typically `now`) to the corresponding wall time. */
+fun Environment.asWallTime(time: TickTime)= time.asWallTime()
