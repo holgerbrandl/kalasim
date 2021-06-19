@@ -1,0 +1,85 @@
+<!doctype html>
+<html  xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/examples/sticky-footer/sticky-footer.css"/>
+
+    <!-- overrride width  -->
+    <style>
+        .container {
+            width: auto;
+            max-width: 900px;
+            padding: 0 15px;
+        }
+        .my-btn {
+            width: 10em
+        }
+    </style>
+
+    <title>TIB/RV Health Analytics</title>
+</head>
+<body>
+<main role="main" class="container">
+
+    <div>
+        <p></p>
+        <h1 class="text-center">TIB/RV Health Analytics</h1>
+        <p></p>
+    </div>
+
+
+    <div class="row">
+        <div class="col-sm">
+            <a th:href="@{${config}}" class="btn btn-primary btn-lg my-btn" role="button">System</a>
+        </div>
+
+        <div class="col-sm">
+            <a th:href="@{${grafana}}" class="btn btn-primary btn-lg my-btn" role="button">Reporting</a>
+        </div>
+
+        <div class="col-sm">
+            <a th:href="@{${mail}}" class="btn btn-primary btn-lg my-btn" role="button">Mail</a>
+        </div>
+
+    </div>
+    <p></p>
+    <div class="row">
+
+        <div class="col-sm">
+            <a th:href="@{${clientCount}}" class="btn btn-primary btn-lg my-btn" role="button">Client Count</a>
+        </div>
+        <div class="col-sm">
+            <a th:href="@{${controlCenter}}" class="btn btn-primary btn-lg my-btn" role="button">Kafka</a>
+        </div>
+        <div class="col-sm">
+            <a th:href="@{${docs}}" class="btn btn-info btn-lg my-btn"  role="button">Documentation</a>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+            <span class="text-muted"><a href="info">Application Info</a> © All right Reversed .<a class="ml-2" href="https://www.kalasim.org" target="_blank">Holger Brandl</a></span>
+    </div>
+</footer>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+</body>
+</html>
