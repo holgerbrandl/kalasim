@@ -11,7 +11,7 @@
 
     <link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/examples/sticky-footer/sticky-footer.css"/>
 
-    <!-- overrride width  -->
+    <!-- overwrite width  -->
     <style>
         .container {
             width: auto;
@@ -23,45 +23,32 @@
         }
     </style>
 
-    <title>TIB/RV Health Analytics</title>
+    <title>Kalasim Simulation Status</title>
 </head>
 <body>
 <main role="main" class="container">
 
     <div>
         <p></p>
-        <h1 class="text-center">TIB/RV Health Analytics</h1>
+        <h1 class="text-center">Kalasim Simulation Status</h1>
         <p></p>
     </div>
 
 
     <div class="row">
         <div class="col-sm">
-            <a th:href="@{${config}}" class="btn btn-primary btn-lg my-btn" role="button">System</a>
+            <a th:href="@{${status}}" class="btn btn-primary btn-lg my-btn" role="button">Simulation Status 1</a>
         </div>
 
         <div class="col-sm">
-            <a th:href="@{${grafana}}" class="btn btn-primary btn-lg my-btn" role="button">Reporting</a>
+            <a th:href="@{${status}}" class="btn btn-primary btn-lg my-btn" role="button">Simulation Status 2</a>
         </div>
 
         <div class="col-sm">
-            <a th:href="@{${mail}}" class="btn btn-primary btn-lg my-btn" role="button">Mail</a>
-        </div>
-
-    </div>
-    <p></p>
-    <div class="row">
-
-        <div class="col-sm">
-            <a th:href="@{${clientCount}}" class="btn btn-primary btn-lg my-btn" role="button">Client Count</a>
-        </div>
-        <div class="col-sm">
-            <a th:href="@{${controlCenter}}" class="btn btn-primary btn-lg my-btn" role="button">Kafka</a>
-        </div>
-        <div class="col-sm">
-            <a th:href="@{${docs}}" class="btn btn-info btn-lg my-btn"  role="button">Documentation</a>
+            <a th:href="@{${info}}" class="btn btn-primary btn-lg my-btn" role="button">Application Info</a>
         </div>
     </div>
+
 </main>
 
 <footer class="footer">

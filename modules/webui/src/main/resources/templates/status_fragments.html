@@ -5,20 +5,13 @@
 </head>
 
 <body>
-<div th:fragment="content1">
-    This is Content 1
-</div>
 
-<div th:fragment="content2">
-    This is Content 2
-</div>
-
-<div th:fragment="content3">
-    Current Server time [[${counter}]]
+<div th:fragment="sim_time">
+    Current simulation time [[${counter}]]
 </div>
 
 
-<div th:fragment="content4">
+<div th:fragment="comp_state">
     Current Simulation time [[${now}]]
 
     <!--@thymesVar id="simState" type="org.kalasim.webui.SimState"-->
@@ -27,16 +20,18 @@
             <thead>
             <tr>
                 <th>Name</th>
-<!--                <th>Daemon</th>-->
-<!--                <th>Network</th>-->
+                <th>State</th>
+                <!--                <th>Daemon</th>-->
+                <!--                <th>Network</th>-->
                 <th>Action</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="compState : ${simState.getStates()}">
-                <td th:text="${compState.name}"></td>
-<!--                <td th:text="${compState.}"></td>-->
-<!--                <td th:text="${compState.network }"></td>-->
+                <td th:text="${compState.getName()}"></td>
+                <td th:text="${compState.getState()}"></td>
+                <!--                <td th:text="${compState.}"></td>-->
+                <!--                <td th:text="${compState.network }"></td>-->
                 <td>
                     <a th:href="@{'env/' + ${compState.name}}" class="btn btn-primary btn-sm" role="button">Edit</a>
                     <a th:href="@{'delenv/' + ${compState.name}}" class="btn btn-danger btn-sm" role="button">Delete</a>

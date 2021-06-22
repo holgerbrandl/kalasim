@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/examples/sticky-footer/sticky-footer.css"/>
+
+    <title>Simulation State</title>
+</head>
+
+<body>
+<main role="main" class="container">
+
+    <div>
+        <p></p>
+        <h1 class="text-center">Simulation Status</h1>
+        <p></p>
+    </div>
+
+    <!--    <select id="selection">-->
+    <!--        <option>Content 1</option>-->
+    <!--        <option>Content 2</option>-->
+    <!--    </select>-->
+
+    <div class="row">
+<!--        <h2 class="mt-5">Current State</h2>-->
+
+        <div class="col-sm">
+            <div id="replace_div">
+                Content goes here
+            </div>
+        </div>
+
+        <div class="col-sm">
+            <div id="sim_state">
+                SimState
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <h2 class="mt-5">Application Components</h2>
+
+            <form method="post" th:object="${simControl}">
+                <div class="ml-2">
+                    <div class="form-group mt-3">
+                        <label for="simSpeedRange" class="form-label">Simulation Speed</label>
+                        <input type="range" th:field="*{speed}" class="form-range" min="0" max="100" id="simSpeedRange"
+                               oninput="this.nextElementSibling.value = this.value">
+                        <output>24</output>
+                    </div>
+
+                    <!--                    <div class="form-group mt-3">-->
+                    <!--                        <input id="css" type="text" th:field="*{css}" data-slider-min="1" data-slider-max="10"-->
+                    <!--                               data-slider-step="1"-->
+                    <!--                               data-slider-value="1" class="skill"/>-->
+                    <!--                        <span class="ml-2">CSS: <strong id="cssVal">1</strong></span>-->
+                    <!--                    </div>-->
+                </div>
+
+                <button class="btn btn-primary" type="submit">Submit form</button>
+
+            </form>
+        </div>
+    </div>
+</main>
+
+
+<footer class="footer">
+    <div class="container">
+        <span class="text-muted"><a href="info">Application Info</a> © All right Reversed .<a class="ml-2" href="https://www.kalasim.org" target="_blank">Holger Brandl</a></span>
+    </div>
+</footer>
+
+<!-- JQury from Google CDN -->
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>-->
+
+
+<script>
+    $(document).ready(function () {
+        console.log("page ready")
+        //call function when page is loaded
+        // getContent();
+
+        //set on change listener
+        // $('#selection').change(getContent);
+
+        // function getContent() {
+        //
+        //     //create url to request fragment
+        //     var url = /content/;
+        //     if ($('#selection').val() === "Content 1") {
+        //         url = url + "content1";
+        //     } else {
+        //         url = url + "content2";
+        //     }
+        //
+        //     //load fragment and replace content
+        //     // $('#replace_div').load(url);
+        // }
+
+
+        setInterval(function () {
+            console.log('fun called')
+            $('#replace_div').load('/status/sim_time')
+        }, 1000);
+
+        setInterval(function () {
+            console.log('content4 called')
+            $('#sim_state').load('/status/comp_state')
+        }, 1000);
+
+        //https://stackoverflow.com/questions/29103818/how-can-i-retrieve-and-display-slider-range-value
+        document.getElementById('simSpeedRange').onchange = function () {
+            var xmlHttp = new XMLHttpRequest();
+            var newSpeed = $('#simSpeedRange').value;
+
+            console.log("calling speed...")
+            xmlHttp.open("GET", 'content/speedChange?speed=' + newSpeed, true); // false for synchronous request
+            xmlHttp.send(null);
+            return xmlHttp.responseText;
+        }
+
+    })
+
+</script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -11,39 +11,30 @@
 
     <link rel="stylesheet" href="https://getbootstrap.com/docs/4.0/examples/sticky-footer/sticky-footer.css"/>
 
-    <!-- overrride width  -->
-    <style>
-        .container {
-            width: auto;
-            max-width: 900px;
-            padding: 0 15px;
-        }
-    </style>
-
-    <title>Daemon Heartbeats Config UI</title>
+    <title>Info</title>
 </head>
 <body>
-<main role="main" class="container">
+<main role="main" class="container" style="max-width:800px">
 
     <div>
-        <h1>Heartbeat Monitoring Service Configuration</h1>
-        <p>Choose a service to be reconfigured</p>
+<!--        lasy margin fix-->
+        <p></p>
+        <h2 class="text-center">Simulation UI Information</h2>
+        <p></p>
     </div>
 
 
-    <div class="row">
-        <div class="col-sm">
-            <a href="mailhub.html" class="btn btn-primary btn-lg" role="button">Alert Notifications</a>
-            <!--            <button type="button" class="btn btn-primary btn-lg">Mail Notifications</button>-->
-        </div>
+    <table class="table">
+        <tr th:each="e : ${info}">
+            <td th:text="${e.first}"></td>
+            <td th:text="${e.second}"></td>
+        <tr>
+    </table>
 
-        <div class="col-sm">
-            <a href="kafka.html" class="btn btn-primary btn-lg" role="button">Kafka Cluster</a>
-        </div>
+    <br>
 
-        <div class="col-sm">
-            <a href="hbsampler.html?reload_model=true" class="btn btn-primary btn-lg" role="button">Heartbeat Sampler</a>
-        </div>
+    <div>
+        <a class="btn btn-info" href="/">Home</a>
     </div>
 </main>
 

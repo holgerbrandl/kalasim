@@ -16,8 +16,8 @@ class IndexController {
     @RequestMapping("/")
     fun index(model: Model): String {
 //        model.addAttribute("grafana", "http://$host:3000/d/eFkjY7FGk")
-        model.addAttribute("config", "config.html")
-        model.addAttribute("docs", "docs.html")
+        model.addAttribute("status", "status.html")
+        model.addAttribute("info", "info.html")
         return "index"
     }
 
