@@ -1,7 +1,9 @@
 package org.kalasim.webui
 
+import org.kalasim.ClockSync
 import org.kalasim.Component
 import org.kalasim.ComponentState
+import org.koin.core.component.get
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
@@ -56,6 +58,8 @@ class StatusController(val simProvider: SimProvider) {
 
     @GetMapping("speedChange")
     fun speedChange(@RequestParam speed: Double?) {
+        val clockSync = simProvider.sim.get<ClockSync>()
+        clockSync.speedUp
         println("new sim-speed is $speed")
     }
 }

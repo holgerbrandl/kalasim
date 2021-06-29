@@ -26,7 +26,6 @@ class ClockSync(
         // disable trace monitoring for clock control
         env.traceFilters.add { it is InteractionEvent && it.curComponent is ClockSync }
     }
-
     val tickMs = tickDuration.toMillis().toDouble() / speedUp.toDouble()
     val holdTime = 1.0 / syncsPerTick.toDouble()
 

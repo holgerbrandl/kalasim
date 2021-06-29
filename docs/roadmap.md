@@ -26,7 +26,11 @@ consider `logCoreInteractions=false` as default
 ## v0.7
 
 
+**{todo}** use standard sl4j for simulation logging or at least provide adapter
+
 **{todo}** get rid of `setup`
+
+
 **{todo}** respect ticktrafo in visualizations
 
 **{todo}** TickTime comparator and more consistent use in API

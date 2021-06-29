@@ -70,6 +70,16 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
+
+//https://gist.github.com/domnikl/c19c7385927a7bef7217aa036a71d807
+val jar by tasks.getting(Jar::class) {
+    manifest {
+        attributes["Main-Class"] = "com.example.MainKt"
+        attributes["Implementation-Title"] = "kalasim"
+        attributes["Implementation-Version"] = project.version
+    }
+}
+
 //
 //subprojects {
 //    java.sourceCompatibility = JavaVersion.VERSION_1_8
