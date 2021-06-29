@@ -17,7 +17,7 @@ dependencies {
     testImplementation(kotlin("test"))
 
     // webui
-    implementation ("org.springframework:spring-websocket:5.2.5.RELEASE")
+//    implementation ("org.springframework:spring-websocket:5.2.5.RELEASE")
 
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf:2.5.1")
 
