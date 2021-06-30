@@ -46,8 +46,8 @@ dependencies {
 
     implementation("com.github.holgerbrandl:krangl:0.16.2")
 
-    compileOnly("com.github.holgerbrandl:kravis:0.7.5")
-    testImplementation("com.github.holgerbrandl:kravis:0.7.5")
+    compileOnly("com.github.holgerbrandl:kravis:0.7.7")
+    testImplementation("com.github.holgerbrandl:kravis:0.7.7")
 
 
 
