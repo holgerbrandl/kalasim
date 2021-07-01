@@ -1,6 +1,7 @@
 package org.kalasim.misc
 
 import com.google.gson.GsonBuilder
+import org.apache.commons.math3.util.Precision
 import org.json.JSONObject
 import java.text.DecimalFormat
 
@@ -81,3 +82,5 @@ enum class AssertMode{
 }
 
 var ASSERT_MODE = AssertMode.LIGHT
+
+fun Double?.roundAny(n: Int = 3) = if (this == null) this else Precision.round(this, n)

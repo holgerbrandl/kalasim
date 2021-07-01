@@ -3,11 +3,11 @@ package org.kalasim
 import com.github.holgerbrandl.jsonbuilder.json
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
-import org.apache.commons.math3.util.Precision
 import org.json.JSONObject
 import org.kalasim.misc.JSON_INDENT
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.printThis
+import org.kalasim.misc.roundAny
 import org.kalasim.monitors.NumericLevelMonitor
 import org.kalasim.monitors.NumericLevelMonitorStats
 import org.kalasim.monitors.NumericStatisticMonitor
@@ -183,8 +183,6 @@ fun StatisticalSummary.toJson(): JSONObject {
 internal fun Double?.nanAsNull(): Double? = if (this != null && isNaN()) null else this
 
 //private fun DoubleArray.standardDeviation(): Double = StandardDeviation(false).evaluate(this)
-
-internal fun Double?.roundAny(n: Int = 3) = if (this == null) this else Precision.round(this, n)
 
 
 open class QueueChangeListener<C>{

@@ -26,6 +26,8 @@ consider `logCoreInteractions=false` as default
 ## v0.7
 
 
+**{todo}** mandatory jsonable on sim-entities feels cumbersome
+
 **{todo}** use standard sl4j for simulation logging or at least provide adapter
 
 **{todo}** get rid of `setup`
