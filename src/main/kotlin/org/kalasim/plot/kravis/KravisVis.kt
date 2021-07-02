@@ -2,6 +2,7 @@ package org.kalasim.plot.kravis
 
 import kravis.*
 import kravis.device.JupyterDevice
+import org.kalasim.TickTime
 import org.kalasim.monitors.FrequencyLevelMonitor
 import org.kalasim.monitors.FrequencyTable
 import org.kalasim.monitors.NumericLevelMonitor
@@ -18,7 +19,7 @@ fun hasR(): Boolean {
 }
 
 internal fun checkDisplay() {
-    if(!canDisplay()) {
+    if (!canDisplay()) {
         throw IllegalArgumentException(" No display or R not found")
     }
 }
@@ -27,16 +28,21 @@ internal fun printWarning(msg: String) {
     System.err.println("[kalasim] $msg")
 }
 
+/** Show plots automatically without the need to call `show()`*/
+var AUTO_SHOW = false
 
 private fun GGPlot.showNotJupyter(): GGPlot = also {
-    if(SessionPrefs.OUTPUT_DEVICE !is JupyterDevice) show()
+    if (SessionPrefs.OUTPUT_DEVICE !is JupyterDevice && AUTO_SHOW) {
+        checkDisplay()
+        show()
+    }
 }
 
 
-fun NumericLevelMonitor.display(title: String = name): GGPlot {
-    checkDisplay()
-
+fun NumericLevelMonitor.display(title: String = name, from: TickTime? = null, to:TickTime? = null): GGPlot {
     val data = stepFun()
+        .filter{ from == null || it.first >= from.value}
+        .filter{ to == null || it.first <= to.value}
 
     return data.plot(
         x = Pair<Double, Double>::first,
@@ -50,8 +56,6 @@ fun NumericLevelMonitor.display(title: String = name): GGPlot {
 
 
 fun NumericStatisticMonitor.display(title: String = name): GGPlot {
-    checkDisplay()
-
     val data = values.toList()
 
     return data.plot(x = { it })
@@ -61,20 +65,16 @@ fun NumericStatisticMonitor.display(title: String = name): GGPlot {
 }
 
 fun <T> FrequencyTable<T>.display(title: String? = null): GGPlot {
-    checkDisplay()
-
     val data = toList()
 
     return data.plot(x = { it.first }, y = { it.second })
         .geomCol()
-        .run { if(title != null) title(title) else this }
+        .run { if (title != null) title(title) else this }
         .showNotJupyter()
 }
 
 
 fun <T> FrequencyLevelMonitor<T>.display(title: String = name): GGPlot {
-    checkDisplay()
-
     val nlmStatsData = statsData()
     val data = nlmStatsData.stepFun()
 

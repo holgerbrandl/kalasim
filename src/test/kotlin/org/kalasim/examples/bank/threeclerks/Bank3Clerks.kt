@@ -6,7 +6,6 @@ import org.kalasim.plot.kravis.canDisplay
 import org.kalasim.plot.kravis.display
 import org.koin.core.component.get
 import org.koin.core.component.inject
-import java.awt.GraphicsEnvironment.isHeadless
 
 
 class CustomerGenerator : Component() {
