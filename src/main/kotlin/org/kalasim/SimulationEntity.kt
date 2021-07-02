@@ -9,7 +9,7 @@ import org.koin.core.context.GlobalContext
 
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-abstract class SimulationEntity(name: String?, val simKoin: Koin = GlobalContext.get()) : SimContext {
+abstract class SimulationEntity(name: String? = null, val simKoin: Koin = GlobalContext.get()) : SimContext {
     val env = getKoin().get<Environment>()
 
     /** The (possibly auto-generated) name of this simulation entity.*/
