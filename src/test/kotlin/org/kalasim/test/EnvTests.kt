@@ -98,7 +98,7 @@ class EnvTests {
         val timeBefore = System.currentTimeMillis()
 
         createSimulation(true) {
-            ClockSync(Duration.ofSeconds(1), speedUp = 2)
+            ClockSync(Duration.ofMillis(500))
 
             run(10)
         }
