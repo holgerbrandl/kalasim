@@ -443,11 +443,11 @@ inline fun <reified T> KoinModule.add(
 
 }
 
-public inline fun <reified T> Environment.dependency(builder: Environment.() -> T): T {
+inline fun <reified T> Environment.dependency(qualifier: Qualifier? = null, builder: Environment.() -> T): T {
     val something = builder(this)
     getKoin().loadModules(listOf(
         module(createdAtStart = true) {
-            add { something }
+            add(qualifier) { something }
         }
     ), createEagerInstances = true)
 
