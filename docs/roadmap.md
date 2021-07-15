@@ -33,7 +33,7 @@ consider `logCoreInteractions=false` as default
 **{todo}** get rid of `setup`
 
 
-**{todo}** respect ticktrafo in visualizations
+**{todo}** respect ticktrafo in built-invisualizations
 
 **{todo}** TickTime comparator and more consistent use in API
 
