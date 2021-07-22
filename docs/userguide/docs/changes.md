@@ -5,15 +5,19 @@
 Not released yet 
 
 Major enhancements
+
 * Dramatically improved simulation performance
 * Introduced `AssertMode`s (`Full`, `Light` (default), `None`) to enable/disable internal consistency checks. This will optimize performance by another ~20% (depending on simulation logic)
 * Improved event logging API
 
 Minor enhancements
+
 * Allow for runtime reconfiguration of `ClockSync` to enable adjustable simulation speed
 
 Breaking changes
-* changes `Component.now `and `Environment.now` to new value class `TickTime` for better type safety
+
+* Established use of `TickTime` across the entire API to disambiguate simulation time instants from durations, which are still modelled as `Double`
+* Changed `Component.now `and `Environment.now` to new value class `TickTime` for better type safety
 * Simplified `ClockSync` API by removing redundant `speedUp` parameter
 
 

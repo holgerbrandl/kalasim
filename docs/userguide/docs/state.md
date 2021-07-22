@@ -1,6 +1,6 @@
 # State
 
-States together provide a powerful way of process interaction.
+States provide a powerful tool for process interaction.
 
 A state will have a value at any given time. In its simplest form a component can [`wait()`](component.md#wait) for a specific value of a state. Once that value is reached, the component will be resumed.
 

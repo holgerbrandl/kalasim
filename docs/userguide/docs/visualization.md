@@ -51,4 +51,3 @@ MM1Queue().apply {
 
 [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) is another very modern visualization library that renders within the JVM and thus does not have any external dependencies. Similar to `kravis` it mimics the API of [ggplot2](https://ggplot2.tidyverse.org/).
 
-Currently, lets-plot works best in jupyter notebooks. We provide a basic [JVM wrapper](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/misc/LetsPlotUtil.kt#L55-L55). For a more elaborate JVM solution please vote for [lets-plot-kotlin/51](https://github.com/JetBrains/lets-plot-kotlin/issues/51).

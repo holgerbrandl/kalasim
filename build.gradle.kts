@@ -44,12 +44,10 @@ dependencies {
     testImplementation(kotlin("test-junit"))
     testImplementation("io.kotest:kotest-assertions-core:4.2.6")
 
-    implementation("com.github.holgerbrandl:krangl:0.16.2")
+    implementation("com.github.holgerbrandl:krangl:0.17")
 
-    compileOnly("com.github.holgerbrandl:kravis:0.7.7")
-    testImplementation("com.github.holgerbrandl:kravis:0.7.7")
-
-
+    compileOnly("com.github.holgerbrandl:kravis:0.8.1")
+    testImplementation("com.github.holgerbrandl:kravis:0.8.1")
 
     compileOnly("org.jetbrains.lets-plot-kotlin:lets-plot-kotlin-api:1.2.0")
     testImplementation("org.jetbrains.lets-plot-kotlin:lets-plot-kotlin-api:1.2.0")
