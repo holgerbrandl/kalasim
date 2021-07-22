@@ -4,21 +4,18 @@
 
 ## Gradle
 
-To get started simply add it as a dependency via Jcenter:
+To get started simply add it as a dependency:
 ```
-repositories {
-    jcenter()
-}
-
 dependencies {
-    implementation "com.github.holgerbrandl:kalasim:0.6.7"
+    implementation "com.github.holgerbrandl:kalasim:0.6.8"
 }
 ```
 
+Builds are hosted on [maven-central](https://search.maven.org/search?q=a:kalasim) supported by the great folks at [sonatype](https://www.sonatype.com/).
 
 ## Jitpack Integration
 
-You can also use [JitPack with Maven or Gradle](https://jitpack.io/#holgerbrandl/kalasim) to build the latest snapshot as a dependency in your project.
+You can also use [JitPack with Maven or Gradle](https://jitpack.io/#holgerbrandl/kalasim) to include the latest snapshot as a dependency in your project.
 
 ```groovy
 repositories {
