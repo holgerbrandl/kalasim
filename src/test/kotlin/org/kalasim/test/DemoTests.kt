@@ -5,7 +5,7 @@ import jetbrains.letsPlot.geom.geom_density
 import jetbrains.letsPlot.geom.geom_point
 import jetbrains.letsPlot.ggsize
 import jetbrains.letsPlot.intern.Plot
-import jetbrains.letsPlot.lets_plot
+import jetbrains.letsPlot.letsPlot
 import krangl.asDataFrame
 import krangl.irisData
 import krangl.print
@@ -38,15 +38,15 @@ object LetsPlotASimulation {
             "cond" to List(200) { "A" } + List(200) { "B" }
         )
 
-        var p: Plot = lets_plot(data)
+        var p: Plot = letsPlot(data)
         p += geom_density(color = "dark_green", alpha = .3) { x = "rating"; fill = "cond" }
         p + ggsize(500, 250)
 //        p.show()
-        p.showPlot()
+        p.show()
 
 
-        (lets_plot(irisData.toMap()) + geom_boxplot(){ x="Species" ; y="Petal.Length" }).showPlot()
-        (lets_plot(irisData.toMap()) + geom_point(){ x="Petal.Width" ; y="Petal.Length" }).showPlot()
+        (letsPlot(irisData.toMap()) + geom_boxplot(){ x="Species" ; y="Petal.Length" }).showPlot()
+        (letsPlot(irisData.toMap()) + geom_point(){ x="Petal.Width" ; y="Petal.Length" }).showPlot()
 
     }
 }

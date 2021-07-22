@@ -49,9 +49,8 @@ dependencies {
     compileOnly("com.github.holgerbrandl:kravis:0.8.1")
     testImplementation("com.github.holgerbrandl:kravis:0.8.1")
 
-    compileOnly("org.jetbrains.lets-plot-kotlin:lets-plot-kotlin-api:1.2.0")
-    testImplementation("org.jetbrains.lets-plot-kotlin:lets-plot-kotlin-api:1.2.0")
-    testImplementation("org.jetbrains.lets-plot:lets-plot-batik:1.5.4")
+    compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:3.0.1")
+    testImplementation("org.jetbrains.lets-plot:lets-plot-batik:2.0.4")
     //    testImplementation("org.jetbrains.lets-plot:lets-plot-jfx:1.5.4")
 
     //experimental dependencies  use for experimentation
