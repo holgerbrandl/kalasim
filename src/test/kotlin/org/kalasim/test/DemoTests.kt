@@ -12,7 +12,6 @@ import krangl.print
 import krangl.toMap
 import org.kalasim.InteractionEvent
 import org.kalasim.demo.MM1Queue
-import org.kalasim.misc.showPlot
 import org.kalasim.plot.letsplot.display
 
 class DemoTests {
@@ -22,8 +21,8 @@ class DemoTests {
 fun main() {
     val mm1Queue = MM1Queue().apply {
         run(100)
-        server.claimedMonitor.display().showPlot()
-        server.requesters.lengthOfStayMonitor.display().showPlot()
+        server.claimedMonitor.display().show()
+        server.requesters.lengthOfStayMonitor.display().show()
     }
 
     mm1Queue.traces.filterIsInstance<InteractionEvent>().asDataFrame().print()
@@ -45,8 +44,8 @@ object LetsPlotASimulation {
         p.show()
 
 
-        (letsPlot(irisData.toMap()) + geom_boxplot(){ x="Species" ; y="Petal.Length" }).showPlot()
-        (letsPlot(irisData.toMap()) + geom_point(){ x="Petal.Width" ; y="Petal.Length" }).showPlot()
+        (letsPlot(irisData.toMap()) + geom_boxplot(){ x="Species" ; y="Petal.Length" }).show()
+        (letsPlot(irisData.toMap()) + geom_point(){ x="Petal.Width" ; y="Petal.Length" }).show()
 
     }
 }
