@@ -48,6 +48,13 @@ parallel maschines --> solve with or tools
 
 
 ---
+**TODO** pathfinding example
+
+https://github.com/citiususc/hipster
+
+https://www.baeldung.com/java-a-star-pathfinding
+
+---
 
 **{todo}** get rid of `setup`
 
