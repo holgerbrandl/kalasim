@@ -26,9 +26,28 @@ consider `logCoreInteractions=false` as default
 ## v0.7
 
 
+
+
 **{todo}** mandatory jsonable on sim-entities feels cumbersome
 
+---
 **{todo}** use standard sl4j for simulation logging or at least provide adapter
+
+> Structured logging is the practice of implementing a consistent, predetermined message format for application logs that allows them to be treated as data sets rather than text.
+
+https://tersesystems.github.io/terse-logback/1.0.0/structured-logging/
+
+https://www.innoq.com/en/blog/structured-logging/
+---
+
+**TODO** add planning example from classical scheduling theory
+parallel maschines --> solve with or tools
+
+
+**TODO** recent survy on scheduling with setups can be found in Allahverdi (2015)
+
+
+---
 
 **{todo}** get rid of `setup`
 
