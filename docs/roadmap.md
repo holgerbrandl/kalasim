@@ -27,6 +27,8 @@ consider `logCoreInteractions=false` as default
 
 
 
+**{tbd}** can data class be a `Component`
+
 
 **{todo}** mandatory jsonable on sim-entities feels cumbersome
 
@@ -42,6 +44,11 @@ https://www.innoq.com/en/blog/structured-logging/
 
 **TODO** add planning example from classical scheduling theory
 parallel maschines --> solve with or tools
+
+> Other relevant applications arise in the context of health-care, where, for example, patients have to be assigned to surgery rooms that must be
+equipped by considering the type (i.e., the family) of surgery to
+be performed. In such cases, the weight usually models a level of
+urgency for the patient.
 
 
 **TODO** recent survy on scheduling with setups can be found in Allahverdi (2015)
