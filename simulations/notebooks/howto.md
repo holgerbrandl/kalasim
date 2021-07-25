@@ -1,14 +1,25 @@
 ```bash
+export KALASIM_HOME=/d/projects/scheduling/kalasim
+cd ${KALASIM_HOME}/simulations/notebooks/
 
 # clean up SNAPSHOT builds in local ivy cache
- rm -rf ~/.ivy2/cache/com.github.holgerbrandl/kravis
- rm -rf ~/.ivy2/cache/org.kalasim/
+# rm -rf ~/.ivy2/cache/com.github.holgerbrandl/kravis
+# rm -rf ~/.ivy2/cache/org.kalasim/
  
 #https://stackoverflow.com/questions/35254852/how-to-change-the-jupyter-start-up-folder
 #cd projects\scheduling\kalasim\simulations\notebooks 
 
+# cmd.exe "/K" C:\Users\brandl\Anaconda3\Scripts\activate.bat C:\Users\brandl\Anaconda3
+
+
+#conda install -c jetbrains kotlin-jupyter-kernel
+jupyter notebook --kernel=kotlin oee_test_db/oee_db.ipynb
+
 ## start jupyter
-jupyter notebook  
-jupyter notebook --kernel  
+jupyter notebook --kernel=kotlin 
+
+ 
+## start with notebook
+jupyter notebook --kernel=kotlin hospital.ipynb
 
 ```

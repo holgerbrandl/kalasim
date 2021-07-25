@@ -31,6 +31,7 @@ Process dynamics
 * **PD-B** The more busy the waiting room is, the less efficient surgeries tend to be. This is because of stress (over-allocation of supporting personal and material). It is phenomenon that is often observed complex queuing processes such as manufacturing or customer services.  
 * **PD-C** Depending on the severity, patients will die during surgery
 * **PD-D** The surgery time correlates with the severity of the injury
+* **PD-E** During nights fewer new patients arrive compared to the day
 
 Clearly, more resources are required in the ER and many supported processes are required to run it. However, we leave these out here, as they are not considered to have a major impact on the overall process efficiency. Choosing a correct level of abstraction with a focus on key actors and resources, is the first _key to success_ when optimizing a complex process.
 
