@@ -4,20 +4,15 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.5.21"
-    application
     `maven-publish`
-        signing
+    signing
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
 }
 
 //group = "org.kalasim"
 group = "com.github.holgerbrandl"
-//version = "0.7-SNAPSHOT"
-version = "0.6.8"
-
-application {
-    mainClassName = "foo.Bar" // not needed technically but makes gradle happy
-}
+version = "0.7-SNAPSHOT"
+//version = "0.6.8"
 
 
 repositories {
