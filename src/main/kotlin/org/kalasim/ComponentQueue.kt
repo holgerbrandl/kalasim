@@ -19,12 +19,33 @@ data class CQElement<C : SimulationEntity>(val component: C, val enterTime: Tick
 
 //TODO add opt-out for queue monitoring
 
-class ComponentQueue<C: SimulationEntity>(
+class ComponentQueue<C : SimulationEntity>(
     name: String? = null,
 //    val q: Queue<CQElement<T>> = LinkedList()
-    val q: Queue<CQElement<C>> = PriorityQueue { o1, o2 -> compareValuesBy(o1, o2, { it.priority?.value }, { it.enterTime }) },
+    val q: Queue<CQElement<C>> = PriorityQueue { o1, o2 ->
+        compareValuesBy(
+            o1,
+            o2,
+            { it.priority?.value },
+            { it.enterTime })
+    },
     koin: Koin = GlobalContext.get()
 ) : SimulationEntity(name, koin) {
+
+    constructor(
+        name: String? = null,
+        comparator: Comparator<C>,
+        koin: Koin = GlobalContext.get()
+    ) : this(
+        name,
+        PriorityQueue { o1, o2 ->
+            compareValuesBy(
+                o1,
+                o2,
+                { comparator.compare(o1.component, o2.component) },
+                { it.enterTime })
+        },
+        koin)
 
     val size: Int
         get() = q.size
@@ -89,7 +110,7 @@ class ComponentQueue<C: SimulationEntity>(
     fun printStats() = stats.print()
 
     fun printHistogram() {
-        if(lengthOfStayMonitor.values.size < 2) {
+        if (lengthOfStayMonitor.values.size < 2) {
             println("Skipping histogram of '$name' because of to few data")
         } else {
             lengthOfStayMonitor.printHistogram()
@@ -104,6 +125,14 @@ class ComponentQueue<C: SimulationEntity>(
     }
 
     fun removeChangeListener(changeListener: QueueChangeListener<C>) = changeListeners.remove(changeListener)
+
+    /** Update queue position of component after property changes. */
+    fun updateOrderOf(c: C) {
+        val element = q.find { it.component == c }
+
+        q.remove(element)
+        q.add(element)
+    }
 
 
     val stats: QueueStatistics
@@ -185,8 +214,8 @@ internal fun Double?.nanAsNull(): Double? = if (this != null && isNaN()) null el
 //private fun DoubleArray.standardDeviation(): Double = StandardDeviation(false).evaluate(this)
 
 
-open class QueueChangeListener<C>{
-    open fun added(component:C){}
-    open fun removed(component:C){}
-    open fun polled(component:C){}
+open class QueueChangeListener<C> {
+    open fun added(component: C) {}
+    open fun removed(component: C) {}
+    open fun polled(component: C) {}
 }
