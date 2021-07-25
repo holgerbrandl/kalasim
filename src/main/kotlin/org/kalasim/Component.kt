@@ -88,7 +88,7 @@ open class Component(
 //    }
 
     //    var status: ComponentState = if(this.javaClass.getMethod("process").getDeclaringClass().simpleName == "Component") DATA else SCHEDULED
-    var status: ComponentState = DATA
+    internal  var status: ComponentState = DATA
         set(value) {
             field = value
             statusMonitor.addValue(value)
