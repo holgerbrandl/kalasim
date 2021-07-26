@@ -358,34 +358,3 @@ Examples
 * [Car Wash](examples/car_wash.md)
 * [Gas Station](examples/gas_station.md)
 * [ATM Queue](examples/atm_queue.md)
-
-
-## Queue
-
-Kalasim builds on top of the JVM's [PriorityQueue](https://docs.oracle.com/javase/7/docs/api/java/util/PriorityQueue.html)  to model waiting lines etc. Conceptual our implementation is very similar to `salabim`'s [queue](
-https://www.salabim.org/manual/Queue.html).
-
-
-A typical use case would be a generator process (material, customers, etc.) that is consumed by other components. By definition, a *generator* is a `Component` that contains at least one yield in its process definition.
- In the following example a generator is creating new `Customer`s which are entering a waiting line `Queue`. This queue is consumed by a clerk which take one customer at a time and goes on [`hold`](#hold) for processing. See [here](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/examples/bank/oneclerk/Bank1clerk.kt) for the complete implementation.
-
-```mermaid
-sequenceDiagram
-EventLoop->>CustomerGenerator: Continue generator process
-CustomerGenerator->>Customer: Create new Customer
-CustomerGenerator-->>EventLoop: Reschedule for later
-
-Customer->>Queue: Enter waiting line
-Clerk->>Queue: Pull next customer
-Clerk-->>EventLoop: hold vor n time units for processing
-```
-
-
-Examples
-
-* [ATM Queue](examples/atm_queue.md)
-
-
-## Batching
-
-Queues can be consumed in a *batched* manner using the `batch()`. See ["The Ferryman"](examples/ferryman.md) for a worked out example and its API documentation.

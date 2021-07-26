@@ -29,11 +29,14 @@ nav:
     - Setup: setup.md
     - FAQ: faq.md
     - What's New: changes.md
+
   - Basics:
     - Simulation Basics: basics.md
     - Components: component.md
     - Resources: resource.md
     - States: state.md
+    - Collections: collections.md
+
   - Analysis:
     - analysis.md
     - Event Log: event_log.md
@@ -54,8 +57,10 @@ nav:
     - Dining Philosophers: examples/dining_philosophers.md
     - Office Tower: examples/office_tower.md
     - The Ferryman: examples/ferryman.md
+
   - Advanced:
     - advanced.md
+
   - About:
     - about.md
 

@@ -4,7 +4,7 @@ A wild river, one boat only, and a patient ferryman transporting batches of pass
 
 Covers:
 
-* [Batching](../component.md#queue) to consume queue elements in defined blocks
+* [Batching](../collections.md#batching) to consume queue elements in defined blocks
 * [Monitors](../monitors.md) for stats and visualization
 
 ![Stanhope Forbes A Ferryman at Flushing](https://upload.wikimedia.org/wikipedia/commons/5/50/Stanhope_Forbes_A_Ferryman_at_Flushing.jpg){: .center}
@@ -17,7 +17,7 @@ Covers:
 
 To form groups of passengers before passing the waters, we use `batch()` in the ferryman's [process definition](../component.md#creation-of-a-component). It has multiple arguments:
 
-* A mandatory [queue](../component.md#queue) with elements of type `<T>` to be consumed
+* A mandatory [queue](../collections.md#queue) with elements of type `<T>` to be consumed
 * The size of the batch to be created. A positive integer is expected here.
 * An optional timeout describing how long it shall wait before forming an incomplete/empty batch
 

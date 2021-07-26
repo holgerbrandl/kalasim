@@ -15,11 +15,11 @@ import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
 import java.util.*
 
-data class CQElement<C : SimulationEntity>(val component: C, val enterTime: TickTime, val priority: Priority? = null)
+data class CQElement<C>(val component: C, val enterTime: TickTime, val priority: Priority? = null)
 
 //TODO add opt-out for queue monitoring
 
-class ComponentQueue<C : SimulationEntity>(
+class ComponentQueue<C>(
     name: String? = null,
 //    val q: Queue<CQElement<T>> = LinkedList()
     val q: Queue<CQElement<C>> = PriorityQueue { o1, o2 ->
@@ -75,7 +75,12 @@ class ComponentQueue<C : SimulationEntity>(
         changeListeners.forEach { it.polled(cqe.component) }
         updateExitStats(cqe)
 
-        logInternal(env.now, env.curComponent, cqe.component, "Left $name", null)
+        if(cqe.component is Component) {
+            logInternal(env.now, env.curComponent, cqe.component as Component, "Left $name", null)
+        }else{
+            logInternal(env.now, env.curComponent, null, "${cqe.component} left $name", null)
+
+        }
 
         return cqe.component
     }

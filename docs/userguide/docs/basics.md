@@ -3,7 +3,7 @@ The beauty of discrete event simulation is its very limited vocabulary which sti
 * [Components](component.md)
 * [Resources](resource.md)
 * [States](state.md)
-* [Queues](component.md#queue)
+* [Collections](collections.md)
 * [Generators](component.md#component-generator)
 
 

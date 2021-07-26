@@ -1,14 +1,14 @@
 # Monitors
 
-Monitors are a way to collect data from the simulation. They are automatically collected for [resources](resource.md), [components](component.md), [states](state.md) and [queues](component.md#queue). On top of that the user can define her own monitors.
+Monitors are a way to collect data from the simulation. They are automatically collected for [resources](resource.md), [components](component.md), [states](state.md) and [collections](collections.md). On top of that the user can define her own monitors.
 
 Monitors can be used to get statistics and as a feed for graphical tools.
 
 There are two types of monitors:
 
 * **Level monitors** are useful to collect data about a variable that keeps its value over a certain length
-  of time, such as the length of a queue orcthe colour of a traffic light.
-* **Non level monitors** are useful to collect data about  that occur just once. Examples, are the length of stay in a queue, or
+  of time, such as the length of a queue or the color of a traffic light.
+* **Non-level monitors** are useful to collect data about  that occur just once. Examples, are the length of stay in a queue, or
   the number of processing steps of a part.
 
 For both types, the time is always collected, along with the value.
@@ -29,17 +29,17 @@ e.g. `m.statistics(statistics=true)` returns the mean, excluding zero entries.
 Monitors can be disabled with `disable()` by setting the boolean flag ``.
 
 ```kotlin
-m.diable()  // disable monitoring
+m.disable()  // disable monitoring
 
 m.reset()              // reenable statistics monitoring
-m.reset(initalValue)   // reenable level monitoring
+m.reset(initialValue)   // reenable level monitoring
 ```
 
 Continuation of a temporarily disabled monitor is currently not supported.
 
 ## Non level monitors
 
-Non level monitors collects values which do not reflect a level, e.g. the processing time of a part.
+Non-level monitors collects values which do not reflect a level, e.g. the processing time of a part.
 
 There are  2 implementations to support categorical and numerical attributes
 
@@ -78,8 +78,8 @@ For all statistics, it is possible to exclude zero entries, e.g. `m.statistics(e
 
 **{todo}** implement off tallying
 <!--When monitoring is disabled, an off value (see table above) will be tallied. All statistics will ignore the periods from this-->
-<!--off to a non-off value. This also holds for the xduration() method, but NOT for xt() and tx(). Thus,-->
-<!--the x-arrays of xduration() are not necessarily the same as the x-arrays in xt() and tx(). This is-->
+<!--off to a non-off value. This also holds for the `xduration()` method, but NOT for xt() and tx(). Thus,-->
+<!--the x-arrays of `xduration()` are not necessarily the same as the x-arrays in xt() and tx(). This is-->
 <!--the reason why there's no x() or t() method. |n|-->
 <!--It is easy to get just the x-array with `xduration()[0]` or `xt()[0]`.-->
 

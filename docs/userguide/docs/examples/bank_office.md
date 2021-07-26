@@ -56,7 +56,7 @@ After that hold the customer is activated and will terminate:
 customer.activate()
 ```
 
-In the main section of the program, we create the `CustomerGenerator`, the `Clerk` and a [`ComponentQueue`](../component.md#queue) called waitingline. Here the customer generator is implemented as a custom instance of `Component` for educational puroposes. Using the provided [`ComponentGenerator`](../component.md#component-generator) API would be more concise.
+In the main section of the program, we create the `CustomerGenerator`, the `Clerk` and a [`ComponentQueue`](../collections.md#queue) called waitingline. Here the customer generator is implemented as a custom instance of `Component` for educational puroposes. Using the provided [`ComponentGenerator`](../component.md#component-generator) API would be more concise.
 
 ```kotlin
 hold(uniform(5.0, 15.0).sample())
