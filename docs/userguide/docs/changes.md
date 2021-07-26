@@ -12,6 +12,7 @@ Major enhancements
 * Introduced [`ComponentList`](collections.md#list)
   
 Documentation
+
 * New chapter about [collections](collections.md)
 * New example: [Hospital](examples/hospital.md)
 
@@ -19,6 +20,14 @@ Minor enhancements
 
 * Allow for runtime reconfiguration of `ClockSync` to enable adjustable simulation speed
 * Lifted `Component` sub-type requirement from `ComponentQueue`
+* Fixed `oneOf` in `request()`
+* Redesigned `honorBlock` in `request()` to return `Unit` and to provide claimed resource via `it` 
+```kotlin
+request(doctorFoo, doctorBar, oneOf=true){ doctor ->
+    println("patient treated by ${doctor}")
+}
+
+```
 
 Breaking changes
 

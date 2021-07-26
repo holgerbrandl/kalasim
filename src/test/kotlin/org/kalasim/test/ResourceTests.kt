@@ -8,7 +8,6 @@ import org.junit.Assert
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ResourceSelectionPolicy.*
-import org.kalasim.asCMPairList
 
 class ResourceTests {
 
@@ -37,10 +36,10 @@ class ResourceTests {
             object : Component() {
 
                 override fun process() = sequence {
-                    while(true) {
+                    while (true) {
                         request(resource withQuantity 1 andPriority Priority(prioPDF.sample()))
                         hold(1)
-                        if(!isClaiming(resource)) {
+                        if (!isClaiming(resource)) {
                             break
                         } else {
                             release(resource)
@@ -92,7 +91,7 @@ class ResourceTests {
             override fun process() = sequence {
                 hold(preRequestHold)
 
-                if(requestPriority != null) {
+                if (requestPriority != null) {
                     request(resource withPriority requestPriority)
                 } else {
                     request(resource)
@@ -100,9 +99,9 @@ class ResourceTests {
 
                 hold(postRequestHold)
 
-                if(isBumped(resource)) {
+                if (isBumped(resource)) {
                     log("got bumped from $resource")
-                    if(failOnBump) Assert.fail()
+                    if (failOnBump) Assert.fail()
                     return@sequence
                 }
 
@@ -263,6 +262,34 @@ class ResourceTests {
     }
 
     @Test
+    fun `it should report correct resource in honor block when using oneOf mode`() = createTestSimulation {
+        val r1 = Resource(capacity = 3)
+        val r2 = Resource(capacity = 3)
+        val r3 = Resource(capacity = 3)
+
+        var honorBlockReached = false
+        object : Component() {
+            override fun process() = sequence {
+                request(r2 withQuantity 2)
+
+                request(r1) {
+                    request(r2) {
+                        request(r2, r3, oneOf = true) { honored ->
+                            honored shouldBe r3
+                            println("honor block")
+                            honorBlockReached = true
+                        }
+                    }
+                }
+            }
+        }
+
+        run(1)
+
+        honorBlockReached shouldBe true
+    }
+
+    @Test
     fun `it should correctly set failed after timeout`() {
 
         createSimulation(true) {
@@ -310,14 +337,14 @@ class ResourceTests {
 
     @Test
     fun `it should correctly handle oneOf requests`() = createTestSimulation {
-        class DoctorMeier: Resource()
-        class DoctorSchreier: Resource()
+        class DoctorMeier : Resource()
+        class DoctorSchreier : Resource()
 
-        val doctors: List<Resource> = listOf(DoctorMeier(), DoctorSchreier() )
+        val doctors: List<Resource> = listOf(DoctorMeier(), DoctorSchreier())
 
-        val patient = object: Component(){
-            override fun process() =sequence<Component> {
-                request( doctors, oneOf = true){
+        val patient = object : Component() {
+            override fun process() = sequence<Component> {
+                request(doctors, oneOf = true) {
                     hold(1)
                 }
             }
