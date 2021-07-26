@@ -1,5 +1,9 @@
 package org.kalasim.examples.hospital
 
+import krangl.DataFrameRow
+import krangl.count
+import krangl.dataFrameOf
+import krangl.print
 import org.kalasim.*
 import org.kalasim.examples.hospital.PatientStatus.DeceasedWhileWaiting
 import org.kalasim.examples.hospital.PatientStatus.Waiting
@@ -86,7 +90,8 @@ data class Patient(
         this.severity.value = newSeverity
 
         // to adjust the queue position, we need to remove and readd it to the queue
-        get<EmergencyRoom>().waitingLine.updateOrderOf(this@Patient)
+        // disabled because just needed for component-queue
+//        get<EmergencyRoom>().waitingLine.updateOrderOf(this@Patient)
     }
 }
 
@@ -96,14 +101,16 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
 
     override fun process() = sequence {
         while (true) {
-            val patient = get<HeadNurse>().nextOne(this@Room)
+            val er = get<EmergencyRoom>()
+            val patient = er.nurse.nextOne(er, this@Room)
 
             if (patient == null) {
                 cancel(); return@sequence
             }
 
+            // pick him/her up from the waiting area
+            er.waitingLine.remove(patient)
             patient.patientStatus.value = PatientStatus.InSurgery
-
 
             // check setup state of room
             val injuryType = patient.type
@@ -120,11 +127,12 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
             // perform surgery one a qualified doctor becomes available
             request(doctors, oneOf = true) { doctor ->
                 // will be in range [1, inf]
-                val stressFactor = sqrt(get<EmergencyRoom>().waitingLine.size.toDouble())
-                val severityFactor = patient.severity.value.ordinal.toDouble().pow(0.6)
+                val stressFactor = sqrt(1 + get<EmergencyRoom>().waitingLine.size.toDouble())
 
                 // surgery time is a weighted by business in the ER and severity of the patient
-                val surgeryTime = stressFactor * severityFactor * nonUrgentSurgeryTimes[injuryType]!!
+                val severityWeightedSurgeryTime = patient.severityWeightedSurgeryTime
+
+                val surgeryTime = stressFactor * severityWeightedSurgeryTime
                 hold(
                     surgeryTime,
                     description = "Surgery of patient ${patient} in room ${this@Room} by doctor ${doctor}"
@@ -147,36 +155,96 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
 }
 
 
-val setupTimes = InjuryType.values().map { it to Random.nextInt(15, 30).toDouble() / 60.0 }.toMap()
+val Patient.severityWeightedSurgeryTime: Double
+    get() {
+        val severityFactor = severity.value.ordinal.toDouble().pow(0.6)
+
+        return severityFactor * nonUrgentSurgeryTimes[type]!!
+    }
+
+val setupTimes = InjuryType.values().map { it to Random.nextInt(5, 10).toDouble() / 60.0 }.toMap()
 
 val nonUrgentSurgeryTimes =
-    InjuryType.values().zip(Random(1).run { List(InjuryType.values().size) { this.nextDouble(0.2, 0.5) } }).toMap()
+    InjuryType.values().zip(Random(1).run { List(InjuryType.values().size) { nextDouble(0.1, 0.4) } }).toMap()
 
-val surgerySuccessProbability = Severity.values().zip(listOf(1.0, 1.0, 1.0, 0.8, 0.7)).toMap()
+val surgerySuccessProbability = Severity.values().zip(listOf(1.0, 1.0, 1.0, 0.9, 0.8)).toMap()
 
 
-class HeadNurse(val er: EmergencyRoom) {
+/** Observations */
+class ErMetrics {
 
-    fun nextOne(room: Room): Patient? {
+}
+
+fun interface HeadNurse {
+    fun nextOne(er: EmergencyRoom, room: Room): Patient?
+}
+
+
+val bySeverity = compareBy<Patient> { it.severity.value }
+val bySurgeryTime = compareBy<Patient> { it.severityWeightedSurgeryTime }
+
+
+class FifoNurse : HeadNurse {
+
+    override fun nextOne(er: EmergencyRoom, room: Room): Patient? {
+
         // simple fifo
         return if (er.waitingLine.size > 0) er.waitingLine.poll() else null
     }
 }
 
+val SetupAvoidanceNurse = HeadNurse { er, room -> // simple fifo
+    val sameTypePatients = er.waitingLine.filter { it.type == room.setup.value }
+
+    val firstBySeverity = sameTypePatients.sortedWith(bySeverity).firstOrNull()
+
+    // if we need to setup we setup to whats most needed in total count
+//    if(er.waitingLine.isEmpty()) return@HeadNurse null
+//    val maxSeverity = er.waitingLine.groupingBy { it.severity.value }.eachCount().maxByOrNull { it.value }!!
+//    return er.waitingLine.filter{it.severity.value ==maxSeverity.key}.sortedWith (bySeverity).firstOrNull()
+
+    // or if no same type injuries are present, we could use the most severe patient
+    firstBySeverity ?: er.waitingLine.sortedWith(bySeverity).firstOrNull()
+}
+
+val SetupAvoidanceNoMatterWhatNurse = HeadNurse { er, room -> // simple fifo
+    val sameTypePatients = er.waitingLine.filter { it.type == room.setup.value }
+
+    val firstBySeverity = sameTypePatients.sortedWith(bySeverity).firstOrNull()
+
+    // if we need to setup we setup to whats most needed in total count
+    if (er.waitingLine.isEmpty()) return@HeadNurse null
+
+    val maxSeverity = er.waitingLine.groupingBy { it.severity.value }.eachCount().maxByOrNull { it.value }!!
+    er.waitingLine.filter { it.severity.value == maxSeverity.key }.sortedWith(bySeverity).firstOrNull()
+}
+
+
+val urgencyNurse = HeadNurse { er, room -> // simple fifo
+    er.waitingLine.sortedWith(bySeverity).firstOrNull()
+}
+
+val ShortestTreatmentTimeNurse = HeadNurse { er, room ->
+    er.waitingLine.sortedWith(bySurgeryTime).firstOrNull()
+}
+
 class Doctor(name: String, val qualification: List<InjuryType>) : Resource(name)
 
 
-
-
-class EmergencyRoom : Environment(true) {
+class EmergencyRoom(
+//    nurse: HeadNurse = FifoNurse()
+    nurse: HeadNurse = FifoNurse()
+) : Environment(true) {
 
     // todo also here having sorted queue is causing almost more problems than solving
-    val waitingLine = ComponentQueue<Patient>(comparator = compareBy { it.severity.value }, name = "ER Waiting Area")
+//    val waitingLine = ComponentQueue(comparator = compareBy <Patient>{ it.severity.value }, name = "ER Waiting Area")
+//    val waitingLine = ComponentQueue(comparator = compareBy <Patient>{ it.severity.value }.thenBy { it.type }, name = "ER Waiting Area")
+    val waitingLine = ComponentList<Patient>(name = "ER Waiting Area Queue")
 
     private fun sampleQualification() =
         InjuryType.values().toList().shuffled(random).take(random.nextInt(3, 6))
 
-    val doctors = List(4) {
+    val doctors = List(6) {
         Doctor("Dr $it", sampleQualification())
     }
 
@@ -190,14 +258,14 @@ class EmergencyRoom : Environment(true) {
         ) { "lack of staff qualification" }
     }
 
-    val rooms = List(2) { Room("room $it", State(InjuryType.values().random(random), name = "Setup of room $it")) }
+    val rooms = List(4) { Room("room $it", State(InjuryType.values().random(random), name = "Setup of room $it")) }
 
     // Add additional metrics
     val deceasedMonitor = NumericLevelMonitor("deceased patients")
     val treatedMonitor = NumericLevelMonitor("treated patients")
-    val incomingMonitor =  NumericLevelMonitor("incoming patients")
+    val incomingMonitor = NumericLevelMonitor("incoming patients")
 
-    val nurse = dependency { HeadNurse(this@EmergencyRoom) }
+    val nurse = nurse
 
 
     // incoming patients
@@ -205,20 +273,26 @@ class EmergencyRoom : Environment(true) {
         val typeDist = enumerated(InjuryType.values())
         val sevDist = enumerated(values().zip(listOf(0.05, 0.1, 0.2, 0.3, 0.45)).toMap())
 
-        ComponentGenerator(iat = exponential(0.1), total=800) {
+        val cg = ComponentGenerator(
+            iat = exponential(0.2),
+//            total = 800,
+            storeRefs = true
+        ) {
             val patient = Patient(typeDist.sample(), State(sevDist.sample()), State(Waiting))
 
             // todo this is not pretty; How to model time-dependent iat?
             // reduce new patients during the night
             val isDay = (now.value % 24) in 8.0..18.0
-            if (isDay || random.nextDouble() > 0.95) {
+            if (isDay || random.nextDouble() > 0.9) {
                 register(patient)
-            }else{
+            } else {
                 println("skipping patient (out-of-office")
             }
 
             patient
         }
+
+        dependency { cg }
     }
 
     fun register(patient: Patient) {
@@ -231,10 +305,10 @@ class EmergencyRoom : Environment(true) {
 }
 
 fun main() {
-    val sim = EmergencyRoom().apply {
+    val sim = EmergencyRoom(SetupAvoidanceNurse).apply {
 
         // run for a week
-        run(24 * 6)
+        run(24 * 14)
 
         // analysis
         incomingMonitor.display("Incoming Patients")
@@ -250,6 +324,20 @@ fun main() {
 
         waitingLine.queueLengthMonitor.display().show()
         waitingLine.lengthOfStayMonitor.display().show()
+
+        val arrivals = get<ComponentGenerator<Patient>>().arrivals
+//        arrivals.asDataFrame().print()
+
+
+        val df = arrivals.map {
+            mapOf(
+                "type" to it.type.toString(),
+                "status" to it.patientStatus.value.toString(),
+                "severity" to it.severity.value.toString()
+            ) as DataFrameRow
+        }.let { dataFrameOf(it) }
+
+        df.count("status").print()
 
         // visualize room setup as gant chart
     }

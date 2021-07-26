@@ -9,10 +9,16 @@ Major enhancements
 * Dramatically improved simulation performance
 * Introduced `AssertMode`s (`Full`, `Light` (default), `None`) to enable/disable internal consistency checks. This will optimize performance by another ~20% (depending on simulation logic)
 * Improved event logging API
+* Introduced [`ComponentList`](collections.md#list)
+  
+Documentation
+* New chapter about [collections](collections.md)
+* New example: [Hospital](examples/hospital.md)
 
 Minor enhancements
 
 * Allow for runtime reconfiguration of `ClockSync` to enable adjustable simulation speed
+* Lifted `Component` sub-type requirement from `ComponentQueue`
 
 Breaking changes
 
