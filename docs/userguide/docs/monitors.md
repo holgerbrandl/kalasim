@@ -102,18 +102,18 @@ E.g: `waitingLine.lengthOfStayMonitor.printStatistics()`:
 {
     "all": {
       "entries": 5,
-      "ninty_pct_quantile": 4.142020545932034,
+      "ninety_pct_quantile": 4.142020545932034,
       "median": 1.836,
       "mean": 1.211,
-      "nintyfive_pct_quantile": 4.142020545932034,
+      "ninetyfive_pct_quantile": 4.142020545932034,
       "standard_deviation": 1.836
     },
     "excl_zeros": {
       "entries": 2,
-      "ninty_pct_quantile": 4.142020545932034,
+      "ninety_pct_quantile": 4.142020545932034,
       "median": 1.576,
       "mean": 3.027,
-      "nintyfive_pct_quantile": 4.142020545932034,
+      "ninetyfive_pct_quantile": 4.142020545932034,
       "standard_deviation": 1.576
     }
 }

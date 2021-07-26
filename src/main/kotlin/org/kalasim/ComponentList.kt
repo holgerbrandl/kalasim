@@ -117,7 +117,7 @@ class ComponentListStatistics(cq: ComponentList<*>) {
 
     // Partial support for weighted percentiles was added in https://github.com/apache/commons-math/tree/fe29577cdbcf8d321a0595b3ef7809c8a3ce0166
     // Update once released, use jitpack or publish manually
-//    val nintyfivePercentile = Percentile(0.95).setData()evaluate()
+//    val ninetyfivePercentile = Percentile(0.95).setData()evaluate()
 
 
     fun toJson() = json {

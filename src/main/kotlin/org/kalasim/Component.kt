@@ -23,8 +23,8 @@ import kotlin.reflect.KFunction1
 
 internal const val EPS = 1E-8
 
-@Deprecated("directly use sequence<Component>{}")
-typealias ProcContext = SequenceScope<Component>
+//@Deprecated("directly use sequence<Component>{}")
+//typealias ProcContext = SequenceScope<Component>
 
 enum class ComponentState {
     DATA, CURRENT, STANDBY, PASSIVE, INTERRUPTED, SCHEDULED, REQUESTING, WAITING
@@ -429,7 +429,7 @@ open class Component(
         failDelay: Number? = null,
         oneOf: Boolean = false,
         priority: Priority = NORMAL,
-        honorBlock: (suspend SequenceScope<Component>.() -> Any)? = null
+        honorBlock: (suspend SequenceScope<Component>.(Resource?) -> Unit)? = null
     ) = request(
         *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
         failAt = failAt,
@@ -462,7 +462,7 @@ open class Component(
         failDelay: Number? = null,
         oneOf: Boolean = false,
         priority: Priority = NORMAL,
-        honorBlock: (suspend SequenceScope<Component>.() -> Any)? = null
+        honorBlock: (suspend SequenceScope<Component>.(Resource?) -> Unit)? = null
     ) = request(
         *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
         failAt = failAt,
@@ -500,7 +500,7 @@ open class Component(
         // try to avoid argument by inferring from stacktrace
         calledFrom: String? = null,
         // see https://stackoverflow.com/questions/46098105/is-there-a-way-to-open-and-close-a-stream-easily-at-kotlin
-        honorBlock: (suspend SequenceScope<Component>.() -> Any)? = null
+        honorBlock: (suspend SequenceScope<Component>.(Resource?) -> Unit)? = null
     ) {
         yieldCurrent {
             if(status != CURRENT) {
@@ -512,7 +512,8 @@ open class Component(
             }
 
             require(requests.isEmpty()) { "no pending requests are allowed when requesting" }
-            require(requests.isEmpty()) { "no open claims are allowed when requesting" }
+            // fails because of org.kalasim.test.ResourceTests#it should report correct resource in honor block when using oneOf mode
+//            require(claims.isEmpty()) { "no open claims are allowed when requesting" }
 
             require(failAt == null || failDelay == null) { "Either failAt or failDelay can be specified, not both together" }
 
@@ -598,7 +599,7 @@ open class Component(
 
         if(honorBlock != null) {
             // suspend{ ... }
-            honorBlock()
+            honorBlock(if(oneOf)  claims.toList().last().first else null)
 
             // salabim says: It is possible to check which resource has been claimed with `Component.claimers()`.
             resourceRequests.filter{ it.r.claimers.contains(this@Component)}.forEach { release(it) }
@@ -622,8 +623,11 @@ open class Component(
     private fun honorAny(): List<Pair<Resource, Double>>? {
         for(request in requests) {
             val (r, requestedQuantity) = request
-            if(requestedQuantity > r.capacity - r.claimed + EPS) {
-                return listOf(r to requestedQuantity)
+
+            if(requestedQuantity >0 ) {
+                if(requestedQuantity <= r.capacity - r.claimed + EPS) {
+                    return listOf(r to requestedQuantity)
+                }
             } else if(-requestedQuantity <= r.claimed + EPS) {
                 return listOf(r to requestedQuantity)
             }

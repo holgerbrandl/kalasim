@@ -63,18 +63,18 @@ class SalabimExampleTests {
               "length_of_stay": {
                 "all": {
                   "entries": 5,
-                  "ninty_pct_quantile": 4.083,
+                  "ninety_pct_quantile": 4.083,
                   "median": 1.81,
                   "mean": 1.193,
-                  "nintyfive_pct_quantile": 4.083,
+                  "ninetyfive_pct_quantile": 4.083,
                   "standard_deviation": 1.81
                 },
                 "excl_zeros": {
                   "entries": 2,
-                  "ninty_pct_quantile": 4.083,
+                  "ninety_pct_quantile": 4.083,
                   "median": 1.557,
                   "mean": 2.983,
-                  "nintyfive_pct_quantile": 4.083,
+                  "ninetyfive_pct_quantile": 4.083,
                   "standard_deviation": 1.557
                 }
               },
@@ -177,18 +177,18 @@ class SalabimExampleTests {
               "length_of_stay": {
                 "all": {
                   "entries": 194,
-                  "ninty_pct_quantile": 16.256,
+                  "ninety_pct_quantile": 16.256,
                   "median": 6.427,
                   "mean": 5.642,
-                  "nintyfive_pct_quantile": 18.217,
+                  "ninetyfive_pct_quantile": 18.217,
                   "standard_deviation": 6.427
                 },
                 "excl_zeros": {
                   "entries": 133,
-                  "ninty_pct_quantile": 17.659,
+                  "ninety_pct_quantile": 17.659,
                   "median": 6.24,
                   "mean": 8.229,
-                  "nintyfive_pct_quantile": 19.847,
+                  "ninetyfive_pct_quantile": 19.847,
                   "standard_deviation": 6.24
                 }
               },

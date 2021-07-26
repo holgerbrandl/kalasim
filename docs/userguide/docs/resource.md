@@ -143,18 +143,18 @@ With `r.printStatistics()` the key statistics of these all monitors are printed.
     "length_of_stay": {
       "all": {
         "entries": 290,
-        "ninty_pct_quantile": 15.336764014133065,
+        "ninety_pct_quantile": 15.336764014133065,
         "median": 6.97,
         "mean": 5.771,
-        "nintyfive_pct_quantile": 17.9504616361896,
+        "ninetyfive_pct_quantile": 17.9504616361896,
         "standard_deviation": 6.97
       },
       "excl_zeros": {
         "entries": 205,
-        "ninty_pct_quantile": 17.074664209460025,
+        "ninety_pct_quantile": 17.074664209460025,
         "median": 7.014,
         "mean": 8.163,
-        "nintyfive_pct_quantile": 19.28443602612993,
+        "ninetyfive_pct_quantile": 19.28443602612993,
         "standard_deviation": 7.014
       }
     },
@@ -183,18 +183,18 @@ With `r.printStatistics()` the key statistics of these all monitors are printed.
     "length_of_stay": {
       "all": {
         "entries": 287,
-        "ninty_pct_quantile": 30,
+        "ninety_pct_quantile": 30,
         "median": 0,
         "mean": 30,
-        "nintyfive_pct_quantile": 30,
+        "ninetyfive_pct_quantile": 30,
         "standard_deviation": 0
       },
       "excl_zeros": {
         "entries": 287,
-        "ninty_pct_quantile": 30,
+        "ninety_pct_quantile": 30,
         "median": 0,
         "mean": 30,
-        "nintyfive_pct_quantile": 30,
+        "ninetyfive_pct_quantile": 30,
         "standard_deviation": 0
       }
     },

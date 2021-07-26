@@ -184,18 +184,18 @@ The statistics output looks like
   "length_of_stay": {
     "all": {
       "entries": 5,
-      "ninty_pct_quantile": 3.736,
+      "ninety_pct_quantile": 3.736,
       "median": 1.684,
       "mean": 1.334,
-      "nintyfive_pct_quantile": 3.736,
+      "ninetyfive_pct_quantile": 3.736,
       "standard_deviation": 1.684
     },
     "excl_zeros": {
       "entries": 3,
-      "ninty_pct_quantile": 3.736,
+      "ninety_pct_quantile": 3.736,
       "median": 1.645,
       "mean": 2.223,
-      "nintyfive_pct_quantile": 3.736,
+      "ninetyfive_pct_quantile": 3.736,
       "standard_deviation": 1.645
     }
   },

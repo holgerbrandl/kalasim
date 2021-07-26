@@ -178,7 +178,7 @@ class QueueStatistics(cq: ComponentQueue<*>) {
 
     // Partial support for weighted percentiles was added in https://github.com/apache/commons-math/tree/fe29577cdbcf8d321a0595b3ef7809c8a3ce0166
     // Update once released, use jitpack or publish manually
-//    val nintyfivePercentile = Percentile(0.95).setData()evaluate()
+//    val ninetyfivePercentile = Percentile(0.95).setData()evaluate()
 
 
     fun toJson() = json {
@@ -208,8 +208,8 @@ fun StatisticalSummary.toJson(): JSONObject {
 
         if (this@toJson is DescriptiveStatistics) {
             "median" to standardDeviation.roundAny().nanAsNull()
-            "ninty_pct_quantile" to getPercentile(90.0).roundAny().nanAsNull()
-            "nintyfive_pct_quantile" to getPercentile(95.0).roundAny().nanAsNull()
+            "ninety_pct_quantile" to getPercentile(90.0).roundAny().nanAsNull()
+            "ninetyfive_pct_quantile" to getPercentile(95.0).roundAny().nanAsNull()
         }
     }
 }
