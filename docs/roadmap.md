@@ -25,7 +25,9 @@ consider `logCoreInteractions=false` as default
 
 ## v0.7
 
-
+**TODO** save sims with moshi? 
+* https://www.ericthecoder.com/2020/10/13/benchmarking-gson-vs-jackson-vs-moshi-2020/
+* https://stackoverflow.com/questions/239280/which-is-the-best-alternative-for-java-serialization
 
 **{tbd}** can data class be a `Component`
 
