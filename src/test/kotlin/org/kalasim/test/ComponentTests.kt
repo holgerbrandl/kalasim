@@ -29,12 +29,12 @@ class ComponentTests {
             override fun process(): Sequence<Component> {
                 return super.process()
             }
-        }.status shouldBe SCHEDULED
+        }.componentState shouldBe SCHEDULED
 
 
-        Component("foo").status shouldBe DATA
+        Component("foo").componentState shouldBe DATA
 
-        Component("foo", process = Component::process).status shouldBe DATA
+        Component("foo", process = Component::process).componentState shouldBe DATA
     }
 
 
@@ -45,7 +45,7 @@ class ComponentTests {
 
         run(20)
 
-        c.status shouldBe DATA
+        c.componentState shouldBe DATA
     }
 
     @Test
@@ -90,7 +90,7 @@ class ComponentTests {
         }
 
         run(5)
-        c.status shouldBe DATA
+        c.componentState shouldBe DATA
     }
 
 

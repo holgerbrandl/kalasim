@@ -331,7 +331,7 @@ class ResourceTests {
             dr.requesters.isEmpty() shouldBe true
 
             c.requests.shouldBeEmpty()
-            c.status shouldBe ComponentState.DATA
+            c.componentState shouldBe ComponentState.DATA
         }
     }
 
@@ -357,7 +357,7 @@ class ResourceTests {
             dr.claimers.q.shouldBeEmpty()
         }
 
-        patient.status shouldBe ComponentState.DATA
+        patient.componentState shouldBe ComponentState.DATA
     }
 
 }

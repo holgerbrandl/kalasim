@@ -65,7 +65,7 @@ class StateTransitionTests {
         var c: Component? = null
         createSimulation { c = Component() }.apply {
             run(10.0)
-            c!!.status = WAITING
+            c!!.componentState = WAITING
             run(10.0)
         }
 

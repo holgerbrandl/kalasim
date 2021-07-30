@@ -14,8 +14,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.context.GlobalContext
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
-import java.time.Duration
-import java.time.Instant
 import java.util.*
 import kotlin.math.min
 import kotlin.reflect.KFunction1
@@ -88,13 +86,13 @@ open class Component(
 //    }
 
     //    var status: ComponentState = if(this.javaClass.getMethod("process").getDeclaringClass().simpleName == "Component") DATA else SCHEDULED
-    internal  var status: ComponentState = DATA
-        set(value) {
+    var componentState: ComponentState = DATA
+        internal set(value) {
             field = value
             statusMonitor.addValue(value)
         }
 
-    val statusMonitor = FrequencyLevelMonitor(status, "status of ${this.name}", koin)
+    val statusMonitor = FrequencyLevelMonitor(componentState, "status of ${this.name}", koin)
 
 
     init {
@@ -172,28 +170,28 @@ open class Component(
 
     /** @return `true` if status is `PASSIVE`, `false` otherwise. */
     val isPassive: Boolean
-        get() = status == PASSIVE
+        get() = componentState == PASSIVE
 
     /** @return `true` if status is `CURRENT`, `false` otherwise. */
     val isCurrent: Boolean
-        get() = status == CURRENT
+        get() = componentState == CURRENT
 
     /** @return `true` if status is `STANDBY`, `false` otherwise. */
     val isStandby: Boolean
-        get() = status == STANDBY
+        get() = componentState == STANDBY
 
 
     /** @return `true` if status is `SCHEDULED`, `false` otherwise. */
     val isScheduled: Boolean
-        get() = status == SCHEDULED
+        get() = componentState == SCHEDULED
 
     /** @return `true` if status is `INTERRUPTED`, `false` otherwise. */
     val isInterrupted: Boolean
-        get() = status == INTERRUPTED
+        get() = componentState == INTERRUPTED
 
     /** @return `true` if status is `DATA`, `false` otherwise. */
     val isData: Boolean
-        get() = status == DATA
+        get() = componentState == DATA
 
     /** @return `true` if status is `REQUESTING`, `false` otherwise. */
     val isRequesting: Boolean
@@ -220,7 +218,7 @@ open class Component(
      * For `passivate` contract see [user manual](https://www.kalasim.org/component/#passivate)
      */
     fun passivate() {
-        remainingDuration = if(status == CURRENT) {
+        remainingDuration = if(componentState == CURRENT) {
             0.0
         } else {
             requireNotData()
@@ -231,7 +229,7 @@ open class Component(
         }
 
         scheduledTime = null
-        status = PASSIVE
+        componentState = PASSIVE
 
         logInternal(now, env.curComponent, this, "passivate")
     }
@@ -247,17 +245,17 @@ open class Component(
      *
      * Can not be applied on the curent component. Use `resume()` to resume. */
     fun interrupt() {
-        require(status != CURRENT) { "Current component can no be interrupted" }
+        require(componentState != CURRENT) { "Current component can no be interrupted" }
 
-        if(status == INTERRUPTED) {
+        if(componentState == INTERRUPTED) {
             interruptLevel++
         } else {
             requireNotData()
             remove()
             remainingDuration = scheduledTime?.minus(env.now)
             interruptLevel = 1
-            interruptedStatus = status
-            status = INTERRUPTED
+            interruptedStatus = componentState
+            componentState = INTERRUPTED
         }
 
         logInternal("interrupt (level=$interruptLevel)")
@@ -275,7 +273,7 @@ open class Component(
      */
     fun resume(all: Boolean = false, priority: Priority = NORMAL) {
         // not part of original impl
-        require(status == INTERRUPTED) { "Can only resume interrupted components" }
+        require(componentState == INTERRUPTED) { "Can only resume interrupted components" }
         require(interruptLevel > 0) { "interrupt level is expected to be greater than 0" }
         require(interruptedStatus != null) { "interrupt must be called before resume" }
 
@@ -284,11 +282,11 @@ open class Component(
         if(interruptLevel != 0 && !all) {
             logInternal("resume stalled (interrupt level=$interruptLevel)")
         } else {
-            status = interruptedStatus!!
+            componentState = interruptedStatus!!
 
-            logInternal("resume ($status)")
+            logInternal("resume ($componentState)")
 
-            when(status) {
+            when(componentState) {
                 PASSIVE -> {
                     logInternal("passivate")
                 }
@@ -298,7 +296,7 @@ open class Component(
                     logInternal("standby")
                 }
                 in listOf(SCHEDULED, WAITING, REQUESTING) -> {
-                    val reason = when(status) {
+                    val reason = when(componentState) {
                         WAITING -> {
                             if(waits.isNotEmpty()) tryWait()
                             "wait"
@@ -318,11 +316,11 @@ open class Component(
                         priority,
                         urgent = false,
                         caller = reason,
-                        newStatus = status
+                        newStatus = componentState
                     )
 
                 }
-                else -> error("Unexpected interrupt status ${status} is $name")
+                else -> error("Unexpected interrupt status ${componentState} is $name")
             }
         }
 
@@ -343,7 +341,7 @@ open class Component(
      * For `cancel` contract see [user manual](https://www.kalasim.org/component/#cancel)
      */
     fun cancel() {
-        if(status != CURRENT) {
+        if(componentState != CURRENT) {
             requireNotData()
             requireNotInterrupted()
             remove()
@@ -353,7 +351,7 @@ open class Component(
         simProcess = null
         scheduledTime = null
 
-        status = DATA
+        componentState = DATA
 
         logInternal(now, env.curComponent, this, "cancel")
     }
@@ -366,7 +364,7 @@ open class Component(
      * For `standby` contract see [user manual](https://www.kalasim.org/component/#standby)
      */
     suspend fun SequenceScope<Component>.standby(): Unit = yieldCurrent {
-        if(status != CURRENT) {
+        if(componentState != CURRENT) {
             requireNotMain()
             requireNotData()
             requireNotInterrupted()
@@ -377,7 +375,7 @@ open class Component(
         scheduledTime = env.now
         env.addStandBy(this@Component)
 
-        status = STANDBY
+        componentState = STANDBY
 
         logInternal(now, env.curComponent, this@Component)
     }
@@ -503,7 +501,7 @@ open class Component(
         honorBlock: (suspend SequenceScope<Component>.(Resource?) -> Unit)? = null
     ) {
         yieldCurrent {
-            if(status != CURRENT) {
+            if(componentState != CURRENT) {
                 requireNotMain()
                 requireNotData()
                 requireNotInterrupted()
@@ -637,7 +635,7 @@ open class Component(
     }
 
     internal open fun tryRequest(): Boolean {
-        if(status == INTERRUPTED) return false
+        if(componentState == INTERRUPTED) return false
 
         val rHonor = if(oneOfRequest) honorAny() else honorAll()
 
@@ -730,7 +728,7 @@ open class Component(
             release(resource)
         }
 
-        status = DATA
+        componentState = DATA
         scheduledTime = null
         simProcess = null
 
@@ -738,7 +736,7 @@ open class Component(
     }
 
     private fun requireNotData() =
-        require(status != DATA) { "data component '$name' not allowed" }
+        require(componentState != DATA) { "data component '$name' not allowed" }
 
     private fun requireNotInterrupted() =
         require(!isInterrupted) { "interrupted component '$name' needs to be resumed prior to interaction" }
@@ -762,7 +760,7 @@ open class Component(
             }
         }
 
-        status = newStatus
+        componentState = newStatus
 
         this.scheduledTime = scheduledTime
 
@@ -814,7 +812,7 @@ open class Component(
 
     ): Component {
 
-        require(status != CURRENT || process != null) {
+        require(componentState != CURRENT || process != null) {
             // original contract
             "Can not activate the CURRENT component. If needed simply use hold method."
             // technically we could use suspend here , but since activate is used
@@ -826,7 +824,7 @@ open class Component(
         var p: ProcessPointer? = null
 
         if(process == null) {
-            if(status == DATA) {
+            if(componentState == DATA) {
                 //                require(this.simProcess != null) { "no process for data component" }
                 // note: not applicable, because the test would be if Component has a method called process, which it does by design
 
@@ -844,7 +842,7 @@ open class Component(
             extra = "process=${p.name}"
         }
 
-        if(status != CURRENT) {
+        if(componentState != CURRENT) {
             remove()
             if(p != null) {
                 if(!(keepRequest || keepWait)) {
@@ -946,7 +944,7 @@ open class Component(
         urgent: Boolean = false,
         description: String? = null
     ) {
-        if(status != PASSIVE && status != CURRENT) {
+        if(componentState != PASSIVE && componentState != CURRENT) {
             requireNotData()
             requireNotInterrupted()
             remove()
@@ -1103,7 +1101,7 @@ open class Component(
         failDelay: Number? = null,
         all: Boolean = false
     ) = yieldCurrent {
-        if(status != CURRENT) {
+        if(componentState != CURRENT) {
             requireNotMain()
             requireNotData()
             requireNotInterrupted()
@@ -1144,7 +1142,7 @@ open class Component(
     }
 
     internal fun tryWait(): Boolean {
-        if(status == INTERRUPTED) {
+        if(componentState == INTERRUPTED) {
             return false
         }
 
@@ -1194,7 +1192,7 @@ open class Component(
 
 
     private suspend fun SequenceScope<Component>.yieldCurrent(builder: () -> Unit = {}) {
-        val initialStatus = status
+        val initialStatus = componentState
 
         builder()
 
@@ -1217,7 +1215,7 @@ open class Component(
     /** Captures the current state of a `State`*/
     open class ComponentInfo(c: Component) : Jsonable() {
         val name = c.name
-        val status = c.status
+        val status = c.componentState
         val creationTime = c.creationTime
         val scheduledTime = c.scheduledTime
 

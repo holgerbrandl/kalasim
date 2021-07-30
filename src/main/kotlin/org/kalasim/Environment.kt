@@ -10,15 +10,12 @@ import org.kalasim.misc.ASSERT_MODE
 import org.kalasim.misc.AssertMode
 import org.kalasim.misc.JSON_INDENT
 import org.koin.core.Koin
-import org.koin.core.component.KoinComponent
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 import org.koin.core.definition.Definition
 import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
-import java.time.Duration
-import java.time.Instant
 import java.util.*
 
 
@@ -270,7 +267,7 @@ open class Environment(
     /** Executes the next step of the future event list */
     private fun step() {
 
-        pendingStandBy.removeIf { it.status != STANDBY }
+        pendingStandBy.removeIf { it.componentState != STANDBY }
 
         pendingStandBy.removeFirstOrNull()?.let {
             setCurrent(it, "standby")
@@ -314,7 +311,7 @@ open class Environment(
     }
 
     private fun setCurrent(c: Component, info: String? = null) {
-        c.status = CURRENT
+        c.componentState = CURRENT
         c.scheduledTime = null
 
         curComponent = c
@@ -353,7 +350,7 @@ open class Environment(
         unschedule(c)
 
         // TODO what is happening here, can we simplify that?
-        if(c.status == STANDBY) {
+        if(c.componentState == STANDBY) {
             standBy.remove(c)
             pendingStandBy.remove(c)
         }
@@ -417,7 +414,7 @@ data class QueueElement(
 
     override fun toString(): String {
 //        return "${component.javaClass.simpleName}(${component.name}, $time, $priority, $seq)"
-        return "${component.javaClass.simpleName}(${component.name}, $time, $priority, $queueCounter) : ${component.status}"
+        return "${component.javaClass.simpleName}(${component.name}, $time, $priority, $queueCounter) : ${component.componentState}"
     }
 }
 

@@ -34,7 +34,7 @@ Breaking changes
 * Established use of `TickTime` across the entire API to disambiguate simulation time instants from durations, which are still modelled as `Double`
 * Changed `Component.now `and `Environment.now` to new value class `TickTime` for better type safety
 * Simplified `ClockSync` API by removing redundant `speedUp` parameter
-* Internalized `Component.status` to enable extending classes to use the property name
+* `Component.status` has been renamed to `Component.componentState` to enable extending classes to use the property name `status` for domain modelling
 
 
 ## v0.6

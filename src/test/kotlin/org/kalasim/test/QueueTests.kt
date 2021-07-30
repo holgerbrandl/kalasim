@@ -173,7 +173,7 @@ class QueueTests {
 
         run(100)
 
-        fm.status shouldBe DATA
+        fm.componentState shouldBe DATA
     }
 
     @Test
@@ -195,6 +195,6 @@ class QueueTests {
 
         run(55)
 
-        fm.status shouldBe DATA
+        fm.componentState shouldBe DATA
     }
 }

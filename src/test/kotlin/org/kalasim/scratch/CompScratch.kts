@@ -10,11 +10,11 @@ val c = Component("foo")
 
 //c.hold(1)
 
-c.status
+c.componentState
 
 env.run(2)
 
-c.status
+c.componentState
 
 c.activate(process = Component::process)
 
@@ -30,11 +30,11 @@ env.run(1)
 r.capacity = 2.0
 
 env.run(1)
-c.status
+c.componentState
 
 env.run(1)
 
-c.status
+c.componentState
 
 c.statusMonitor.printHistogram()
 
