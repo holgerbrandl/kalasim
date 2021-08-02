@@ -17,8 +17,6 @@ import org.kalasim.examples.bank.oneclerk.Clerk
 import org.kalasim.examples.bank.oneclerk.Customer
 import org.kalasim.examples.bank.reneging.CustomerGenerator
 import org.kalasim.misc.median
-import org.kalasim.plot.kravis.canDisplay
-import org.kalasim.plot.kravis.display
 import org.kalasim.test.captureOutput
 import org.koin.core.component.get
 import org.koin.core.context.stopKoin
@@ -63,19 +61,19 @@ class SalabimExampleTests {
               "length_of_stay": {
                 "all": {
                   "entries": 5,
-                  "ninety_pct_quantile": 4.083,
                   "median": 1.81,
                   "mean": 1.193,
-                  "ninetyfive_pct_quantile": 4.083,
-                  "standard_deviation": 1.81
+                  "ninety_pct_quantile": 4.083,
+                  "standard_deviation": 1.81,
+                  "ninetyfive_pct_quantile": 4.083
                 },
                 "excl_zeros": {
                   "entries": 2,
-                  "ninety_pct_quantile": 4.083,
                   "median": 1.557,
                   "mean": 2.983,
-                  "ninetyfive_pct_quantile": 4.083,
-                  "standard_deviation": 1.557
+                  "ninety_pct_quantile": 4.083,
+                  "standard_deviation": 1.557,
+                  "ninetyfive_pct_quantile": 4.083
                 }
               },
               "type": "QueueStatistics",
@@ -177,19 +175,19 @@ class SalabimExampleTests {
               "length_of_stay": {
                 "all": {
                   "entries": 194,
-                  "ninety_pct_quantile": 16.256,
                   "median": 6.427,
                   "mean": 5.642,
-                  "ninetyfive_pct_quantile": 18.217,
-                  "standard_deviation": 6.427
+                  "ninety_pct_quantile": 16.256,
+                  "standard_deviation": 6.427,
+                  "ninetyfive_pct_quantile": 18.217
                 },
                 "excl_zeros": {
                   "entries": 133,
-                  "ninety_pct_quantile": 17.659,
                   "median": 6.24,
                   "mean": 8.229,
-                  "ninetyfive_pct_quantile": 19.847,
-                  "standard_deviation": 6.24
+                  "ninety_pct_quantile": 17.659,
+                  "standard_deviation": 6.24,
+                  "ninetyfive_pct_quantile": 19.847
                 }
               },
               "type": "QueueStatistics",

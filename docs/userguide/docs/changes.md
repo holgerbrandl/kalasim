@@ -35,6 +35,8 @@ Breaking changes
 * Changed `Component.now `and `Environment.now` to new value class `TickTime` for better type safety
 * Simplified `ClockSync` API by removing redundant `speedUp` parameter
 * `Component.status` has been renamed to `Component.componentState` to enable extending classes to use the property name `status` for domain modelling
+* Removed requirement to implement `info` in `SimulationEntity`
+* Moved stochastic distributions support API to from `Component` to `SimulationEntity`
 
 
 ## v0.6

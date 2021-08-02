@@ -2,6 +2,8 @@
 
 package org.kalasim
 
+import com.github.holgerbrandl.jsonbuilder.json
+import org.json.JSONObject
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.printThis
 import org.koin.core.Koin
@@ -24,7 +26,12 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Global
      */
     var logCoreInteractions = true;
 
-    abstract val info: Jsonable
+    open val info: Jsonable = object : Jsonable() {
+        override fun toJson(): JSONObject {
+            return json { "name" to name }
+        }
+    }
+
 
     /** Print info about this resource */
     fun printInfo() = info.printThis()
@@ -41,7 +48,7 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Global
         with(env) { InteractionEvent(now, curComponent, this@SimulationEntity, action) }
     }
 
-     override var tickTransform: TickTransform?
+    override var tickTransform: TickTransform?
         get() = env.tickTransform
         set(_) {
             throw RuntimeException("Tick transformation must be set via the environment")

@@ -1187,7 +1187,7 @@ open class Component(
     }
 
 
-    public override val info: Jsonable
+     override val info: Jsonable
         get() = ComponentInfo(this)
 
 

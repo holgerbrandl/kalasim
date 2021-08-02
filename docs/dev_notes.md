@@ -86,3 +86,8 @@ in-progress docs https://www.notion.so/Charts-kt-Documentation-b8e8e8d7096e4d059
 ## three.kt
 
 https://github.com/markaren/three.kt
+
+
+## visual modelling 
+
+https://www.bizagi.com/en/platform/modeler
