@@ -19,6 +19,7 @@ dependencies {
     implementation("com.github.holgerbrandl:kalasim:0.7-SNAPSHOT")
 
 
+    implementation("com.github.holgerbrandl:kravis:0.8.1")
 }
 
 tasks.test {

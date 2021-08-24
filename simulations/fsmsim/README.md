@@ -18,6 +18,7 @@ Pedestrian Crossing https://www.hackster.io/robin-herrmann/traffic-lights-using-
 ![](.README_images/efc66b82.png)
 
 
+---
 https://flaviocopes.com/finite-state-machines/
 
 house, with one door, 2 buttons and 3 lights.
