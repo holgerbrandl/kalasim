@@ -6,9 +6,8 @@ import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
-
-@JvmInline
-value class TickTime(val value: Double) : Comparable<TickTime> {
+// note: remove @JvmInline because it did not seem ready on the java-interop-side
+data class TickTime(val value: Double) : Comparable<TickTime> {
     override operator fun compareTo(other: TickTime): Int = value.compareTo(other.value)
     operator fun minus(duration: Double): TickTime = TickTime(value - duration)
     operator fun plus(duration: Number): TickTime = TickTime(value + duration.toDouble())
