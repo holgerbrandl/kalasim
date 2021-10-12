@@ -40,7 +40,7 @@ git push origin --tags
 
 
 ### Build and publish the binary release to maven central
-./gradlew install
+#./gradlew publishToMavenLocal
 ./gradlew publishMavenPublicationToMavenLocal
 
 #./gradlew publishToSonatype closeSonatypeStagingRepository
