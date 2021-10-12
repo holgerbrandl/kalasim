@@ -11,8 +11,8 @@ plugins {
 
 //group = "org.kalasim"
 group = "com.github.holgerbrandl"
-version = "0.7-SNAPSHOT"
-//version = "0.6.8"
+//version = "0.7-SNAPSHOT"
+version = "0.6.90"
 
 
 repositories {
