@@ -71,6 +71,19 @@ Kalasim is building on top of [koin](https://insert-koin.io/) to inject dependen
 
 As pragmatic approach, it is using a global application context by default, but does allow for parallel simulations with [Koin Isolation](https://medium.com/koin-developers/ready-for-koin-2-0-2722ab59cac3). For a simulation example with multiple `Environment` see `https://github.com/holgerbrandl/kalasim/tree/master/src/test/kotlin/org/kalasim/test/EnvTests.kt`
 
+To create simulation entities such as resources, components or states, a simulation context needs o be instantiated first. This  context is a of type `KalasimContext`. It is automatically created when calling `createSimulation` or by instantiating a new simulation `Environment`. This context is kept as a static reference, so the user may omit it when creating simulation entities. Example:
+
+```kotlin
+Environment().apply{
+    val devices = Resource(name = "devices", capacity = 3)
+    
+    // explicit context provisioning
+    val inUse = State(true, koin=getKoin())
+    
+    // implicit context provisioning
+    val inUse2 = State(true)
+}
+```
 
 Koin does not allow injecting simple types. To inject simple variables, consider using a wrapper class. Example
 
