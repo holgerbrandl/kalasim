@@ -30,19 +30,14 @@ class Car(val trafficLight: TrafficLight) : Component() {
 }
 
 
-val env: Environment = configureEnvironment(true) {
+createSimulation(true) {
     // Add a traffic light so that we can refer to it via koin get<T>()
-    add { TrafficLight() }
+    dependency { TrafficLight() }
 
     // Also add a resource with a limited capacity
-    add { GasStation(2) }
+    dependency { GasStation(2) }
 
-    // we could add a car here...
-    add { Car(get()) }
-
-}.apply {
-    // ... but since a car is not used as dependency elsewhere we
-    //     can also create them in here
+    val car1 = Car(get())
     val car2 = Car(get())
     val car3 = Car(get())
 
