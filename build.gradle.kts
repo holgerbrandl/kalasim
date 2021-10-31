@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 //val kotlinVersion = KotlinVersion.CURRENT
 
 plugins {
-    kotlin("jvm") version "1.5.21"
+    kotlin("jvm") version "1.5.31"
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
@@ -17,7 +17,7 @@ version = "0.7-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    jcenter() // still needed because of lets-plot
+//    jcenter() // still needed because of lets-plot
 //    mavenLocal()
 }
 
@@ -26,7 +26,7 @@ dependencies {
 
     //cant upgrade because of https://github.com/InsertKoinIO/koin/issues/939
 //    implementation("org.koin:koin-core:2.1.6")
-    api("org.koin:koin-core:2.2.1")
+    api("io.insert-koin:koin-core:3.1.3")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.10")
 
@@ -44,8 +44,8 @@ dependencies {
     compileOnly("com.github.holgerbrandl:kravis:0.8.1")
     testImplementation("com.github.holgerbrandl:kravis:0.8.1")
 
-    compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:3.0.1")
-    testImplementation("org.jetbrains.lets-plot:lets-plot-batik:2.0.4")
+    compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:3.0.2")
+    testImplementation("org.jetbrains.lets-plot:lets-plot-batik:2.2.0")
     //    testImplementation("org.jetbrains.lets-plot:lets-plot-jfx:1.5.4")
 
     //experimental dependencies  use for experimentation

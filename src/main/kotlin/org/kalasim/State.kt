@@ -5,7 +5,7 @@ import org.kalasim.monitors.FrequencyLevelMonitor
 import org.kalasim.monitors.NumericLevelMonitor
 import org.kalasim.monitors.NumericStatisticMonitor
 import org.koin.core.Koin
-import org.koin.core.context.GlobalContext
+import org.kalasim.misc.KalasimContext
 
 /**
  * States together with the Component.wait() method provide a powerful way of process interaction.
@@ -18,7 +18,7 @@ Definition is simple, like dooropen=sim.State('dooropen'). The default initial v
 open class State<T>(
     initialValue: T,
     name: String? = null,
-    koin: Koin = GlobalContext.get()
+    koin: Koin = KalasimContext.get()
 ) : SimulationEntity(name, koin) {
 
     private var isTriggerCxt:Boolean = false

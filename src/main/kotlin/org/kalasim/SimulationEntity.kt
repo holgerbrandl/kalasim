@@ -7,11 +7,11 @@ import org.json.JSONObject
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.printThis
 import org.koin.core.Koin
-import org.koin.core.context.GlobalContext
+import org.kalasim.misc.KalasimContext
 
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-abstract class SimulationEntity(name: String? = null, val simKoin: Koin = GlobalContext.get()) : SimContext {
+abstract class SimulationEntity(name: String? = null, val simKoin: Koin = KalasimContext.get()) : SimContext {
     val env = getKoin().get<Environment>()
 
     /** The (possibly auto-generated) name of this simulation entity.*/

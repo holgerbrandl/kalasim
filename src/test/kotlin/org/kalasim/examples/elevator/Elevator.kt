@@ -111,7 +111,7 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) : Component() {
     var door = CLOSED
 
 
-    override fun process() = sequence {
+    override fun process() = sequence<Component> {
         while(true) {
             val requests = get<Requests>()
 
@@ -144,7 +144,7 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) : Component() {
                     if(requests.containsKey(floor to direction)) {
                         requests.remove(floor to direction) // consume it right away so that other cars doors won't open as well
 
-                        openDoor()
+                        this@sequence.openDoor()
 
                         val zusteiger = floor.queue.components
                             .filter { it.direction == direction }
@@ -155,7 +155,7 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) : Component() {
                             visitors.add(it)
                         }
 
-                        hold(ENTER_TIME * zusteiger.size, description = "${zusteiger.size} passengers entering")
+                        this@sequence.hold(ENTER_TIME * zusteiger.size, description = "${zusteiger.size} passengers entering")
 
                         // If there are still visitors going up/down in that floor
                         // then restore the request to the list of requests

@@ -9,9 +9,8 @@ import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
 import org.kalasim.monitors.FrequencyLevelMonitor
 import org.koin.core.Koin
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
-import org.koin.core.context.GlobalContext
+import org.kalasim.misc.KalasimContext
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 import java.util.*
@@ -55,7 +54,7 @@ open class Component(
     delay: Number = 0,
     priority: Priority = NORMAL,
     process: ProcessPointer? = Component::process,
-    koin: Koin = GlobalContext.get()
+    koin: Koin = KalasimContext.get()
 ) :
 //    KoinComponent,
     SimulationEntity(name, koin) {
@@ -1202,7 +1201,7 @@ open class Component(
     }
 
     //redeclare to simplify imports
-    @OptIn(KoinApiExtension::class)
+//    @OptIn(KoinApiExtension::class)
     inline fun <reified T : Any> KoinComponent.get(
         qualifier: Qualifier? = null,
         noinline parameters: ParametersDefinition? = null

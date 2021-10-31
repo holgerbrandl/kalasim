@@ -12,7 +12,7 @@ import org.kalasim.monitors.NumericLevelMonitor
 import org.kalasim.monitors.NumericLevelMonitorStats
 import org.kalasim.monitors.NumericStatisticMonitor
 import org.koin.core.Koin
-import org.koin.core.context.GlobalContext
+import org.kalasim.misc.KalasimContext
 import java.util.*
 
 data class CQElement<C>(val component: C, val enterTime: TickTime, val priority: Priority? = null)
@@ -29,13 +29,13 @@ class ComponentQueue<C>(
             { it.priority?.value },
             { it.enterTime })
     },
-    koin: Koin = GlobalContext.get()
+    koin: Koin = KalasimContext.get()
 ) : SimulationEntity(name, koin) {
 
     constructor(
         name: String? = null,
         comparator: Comparator<C>,
-        koin: Koin = GlobalContext.get()
+        koin: Koin = KalasimContext.get()
     ) : this(
         name,
         PriorityQueue { o1, o2 ->

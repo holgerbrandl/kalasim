@@ -9,10 +9,10 @@ import org.kalasim.misc.printHistogram
 import org.kalasim.misc.printThis
 import org.kalasim.toJson
 import org.koin.core.Koin
-import org.koin.core.context.GlobalContext
+import org.kalasim.misc.KalasimContext
 import kotlin.math.roundToInt
 
-class NumericStatisticMonitor(name: String? = null, koin: Koin = GlobalContext.get()) :
+class NumericStatisticMonitor(name: String? = null, koin: Koin = KalasimContext.get()) :
     Monitor<Number>(name, koin), StatisticMonitor<Number> {
     private val sumStats = ifEnabled { DescriptiveStatistics() }
 

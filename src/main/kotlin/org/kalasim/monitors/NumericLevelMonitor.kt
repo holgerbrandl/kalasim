@@ -14,7 +14,7 @@ import org.kalasim.misc.printHistogram
 import org.kalasim.misc.printThis
 import org.kalasim.misc.roundAny
 import org.koin.core.Koin
-import org.koin.core.context.GlobalContext
+import org.kalasim.misc.KalasimContext
 import kotlin.math.sqrt
 
 /**
@@ -22,7 +22,7 @@ import kotlin.math.sqrt
  *
  * @param initialValue initial value for a level monitor. It is important to set the value correctly. Default: 0
  */
-class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: Koin = GlobalContext.get()) :
+class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: Koin = KalasimContext.get()) :
     Monitor<Number>(name, koin),
     LevelMonitor<Number> {
 

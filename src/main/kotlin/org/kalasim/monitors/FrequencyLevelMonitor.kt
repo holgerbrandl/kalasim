@@ -4,7 +4,7 @@ import org.kalasim.TickTime
 import org.kalasim.misc.ImplementMe
 import org.kalasim.misc.Jsonable
 import org.koin.core.Koin
-import org.koin.core.context.GlobalContext
+import org.kalasim.misc.KalasimContext
 
 /**
  * Level monitors tally levels along with the current (simulation) time. e.g. the number of parts a machine is working on.
@@ -14,7 +14,7 @@ import org.koin.core.context.GlobalContext
 class FrequencyLevelMonitor<T>(
     initialValue: T,
     name: String? = null,
-    koin: Koin = GlobalContext.get()
+    koin: Koin = KalasimContext.get()
 ) : Monitor<T>(name, koin), LevelMonitor<T> {
 
     private val timestamps = listOf<Double>().toMutableList()

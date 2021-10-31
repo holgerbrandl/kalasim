@@ -9,9 +9,8 @@ import org.kalasim.Defaults.DEFAULT_SEED
 import org.kalasim.misc.ASSERT_MODE
 import org.kalasim.misc.AssertMode
 import org.kalasim.misc.JSON_INDENT
+import org.kalasim.misc.KalasimContext
 import org.koin.core.Koin
-import org.koin.core.context.GlobalContext
-import org.koin.core.context.startKoin
 import org.koin.core.definition.Definition
 import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.koinApplication
@@ -82,8 +81,8 @@ open class Environment(
     dependencies: KoinModule? = null,
     koin: Koin? = null,
     randomSeed: Int = DEFAULT_SEED,
-    startTime:TickTime = TickTime(0.0)
-) :  SimContext {
+    startTime: TickTime = TickTime(0.0)
+) : SimContext {
 
     @Deprecated("serves no purposes and creates a memory leaks as objects are nowhere releases")
     private val components: MutableList<Component> = listOf<Component>().toMutableList()
@@ -153,13 +152,13 @@ open class Environment(
         }
 
         _koin = koin ?: run {
-            GlobalContext.stop()
+//            KalasimContext.stopKoin()
 
             //https://medium.com/koin-developers/ready-for-koin-2-0-2722ab59cac3
 
             // https://github.com/InsertKoinIO/koin/issues/972
 //        CustomContext.startKoin(koinContext = CustomContext()) { modules(module { single { this@Environment } }) }
-            startKoin() {
+            KalasimContext.startKoin() {
             }.koin
         }
 
@@ -172,7 +171,7 @@ open class Environment(
             single {
                 this@Environment
             }
-        }), createEagerInstances = true)
+        }))
 
 
         main = Component(name = "main", process = null, koin = getKoin())
@@ -181,7 +180,7 @@ open class Environment(
         // declare dependencies
         if(dependencies != null) {
 //            val deps = dependencies ?: (module(createdAtStart = true) { })
-            getKoin().loadModules(listOf(dependencies), createEagerInstances = true)
+            getKoin().loadModules(listOf(dependencies))
 //        KoinContextHandler.get()._scopeRegistry.rootScope.createEagerInstances()
 //        startKoin { modules(koins) }
         }
@@ -211,7 +210,6 @@ open class Environment(
     }
 
 
-
     /**
      * Start execution of the simulation
      *
@@ -228,7 +226,7 @@ open class Environment(
 //        until: TickTime? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
-    ) = run(ticks?.value,  null, priority, urgent)
+    ) = run(ticks?.value, null, priority, urgent)
 
     /**
      * Start execution of the simulation
@@ -446,7 +444,7 @@ inline fun <reified T> Environment.dependency(qualifier: Qualifier? = null, buil
         module(createdAtStart = true) {
             add(qualifier) { something }
         }
-    ), createEagerInstances = true)
+    ))
 
     return something
 }

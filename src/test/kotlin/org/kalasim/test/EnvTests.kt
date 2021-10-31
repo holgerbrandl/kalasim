@@ -6,8 +6,10 @@ import io.kotest.matchers.shouldBe
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.junit.Test
 import org.kalasim.*
+import org.kalasim.misc.KalasimContext
 import org.koin.core.Koin
-import org.koin.core.context.GlobalContext
+import org.koin.core.component.get
+import org.koin.core.error.NoBeanDefFoundException
 import org.koin.dsl.koinApplication
 import java.time.Duration
 
@@ -15,7 +17,7 @@ class EnvTests {
 
     @Test
     fun `it should support more than one env`() {
-        GlobalContext.stop()
+        KalasimContext.stopKoin()
 
         class TestComponent(koin: Koin) : Component(koin = koin) {
             override fun process() = sequence {
@@ -44,12 +46,12 @@ class EnvTests {
 
         // make sure that the global context has not yet been started
         shouldThrow<IllegalStateException> {
-            GlobalContext.get()
+            KalasimContext.get()
         }
     }
 
     @Test
-    fun `it should run be possible to run an old`() {
+    fun `it should run be possible to run an old koin-context`() {
 
         // Note: make sure that we need DI during execution
         class TestResource(resource: Resource) : Component()
@@ -68,6 +70,7 @@ class EnvTests {
             run(1)
         }
 
+        println("setting up second simulation environment")
         val env2 = Environment().apply {
             Component()
 
@@ -83,10 +86,17 @@ class EnvTests {
         }
 
         println("continuing env1...")
+        class LateArriver(koin: Koin) : Component("late arriver", koin = koin)
+
         env1.addEventListener { println(it) }
-        shouldThrow<IllegalStateException> {
-            env1.run(10)
-            println()
+//        shouldThrow<IllegalStateException> {
+        env1.run(10)
+        env1.apply {
+            LateArriver(getKoin())
+        }
+
+        shouldThrow<NoBeanDefFoundException> {
+            env2.get<LateArriver>()
         }
 
         println(env1._koin)
@@ -94,7 +104,7 @@ class EnvTests {
     }
 
     @Test
-    fun `it should allow to synchronize clock time`(){
+    fun `it should allow to synchronize clock time`() {
         val timeBefore = System.currentTimeMillis()
 
         createSimulation(true) {
@@ -103,11 +113,11 @@ class EnvTests {
             run(10)
         }
 
-        (System.currentTimeMillis() - timeBefore)/1000.0 shouldBe 5.0.plusOrMinus(1.0)
+        (System.currentTimeMillis() - timeBefore) / 1000.0 shouldBe 5.0.plusOrMinus(1.0)
     }
 
     @Test
-    fun `it should fail with exception if simulation is too slow `(){
+    fun `it should fail with exception if simulation is too slow `() {
         createSimulation(true) {
             object : Component() {
                 var waitCounter = 1
@@ -129,10 +139,10 @@ class EnvTests {
     }
 
     @Test
-    fun `it should run until event queue is empty`(){
+    fun `it should run until event queue is empty`() {
         createSimulation {
-            object: Component(){
-                override fun process()=sequence<Component> {
+            object : Component() {
+                override fun process() = sequence<Component> {
                     hold(10)
                 }
             }
@@ -143,9 +153,9 @@ class EnvTests {
     }
 
     @Test
-    fun `it should run until or duration until has reached`(){
+    fun `it should run until or duration until has reached`() {
         createSimulation {
-            run(until=TickTime(10))
+            run(until = TickTime(10))
             now shouldBe 10.tt
         }
 

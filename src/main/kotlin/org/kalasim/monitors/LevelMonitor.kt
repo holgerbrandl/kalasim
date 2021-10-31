@@ -3,7 +3,7 @@ package org.kalasim.monitors
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.kalasim.asCMPairList
 import org.koin.core.Koin
-import org.koin.core.context.GlobalContext
+import org.kalasim.misc.KalasimContext
 
 
 interface LevelMonitor<T> {
@@ -58,7 +58,7 @@ data class LevelStateRecord<T>(val timestamp: Double, val value:T, val  duration
 
 
 
-class IntVarMonitor(initialValue: Int = 0, name: String? = null, koin: Koin = GlobalContext.get()) {
+class IntVarMonitor(initialValue: Int = 0, name: String? = null, koin: Koin = KalasimContext.get()) {
     var value: Int = initialValue
         set(value) {
             field = value
@@ -70,7 +70,7 @@ class IntVarMonitor(initialValue: Int = 0, name: String? = null, koin: Koin = Gl
     override fun toString(): String = value.toString()
 }
 
-class GenericVarMonitor<T>(initialValue: T, name: String? = null, koin: Koin = GlobalContext.get()) {
+class GenericVarMonitor<T>(initialValue: T, name: String? = null, koin: Koin = KalasimContext.get()) {
     var value: T = initialValue
         set(value) {
             field = value
