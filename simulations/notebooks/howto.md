@@ -12,11 +12,12 @@ cd ${KALASIM_HOME}/simulations/notebooks/
 # cmd.exe "/K" C:\Users\brandl\Anaconda3\Scripts\activate.bat C:\Users\brandl\Anaconda3
 
 
-#conda install -c jetbrains kotlin-jupyter-kernel
-jupyter notebook --kernel=kotlin oee_test_db/oee_db.ipynb
 
-## start jupyter
+## start jupyter without a specific notebook
 jupyter notebook --kernel=kotlin 
+
+#conda install -c jetbrains kotlin-jupyter-kernel
+jupyter notebook --kernel=kotlin dining.ipynb
 
  
 ## start with notebook
