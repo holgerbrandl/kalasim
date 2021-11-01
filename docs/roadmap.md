@@ -3,32 +3,9 @@
 
 ## Next steps
 
-https://en.wikipedia.org/wiki/Erlang_(unit)
-
-
-real-time metrics
-```
-     object : Component() {
-                override fun process() = sequence {
-                    while (true) {
-                        hold(asTicks(Duration.ofDays(1)))
-                        println("tick time is ${env.asWallTime(now)}")
-                    }
-                }
-            }
-
-```
-
-distinguish between tick-duration and tick-time.
-
 consider `logCoreInteractions=false` as default 
 
 ## v0.7
-
-**TODO** save sims with moshi? 
-* https://www.ericthecoder.com/2020/10/13/benchmarking-gson-vs-jackson-vs-moshi-2020/
-* https://stackoverflow.com/questions/239280/which-is-the-best-alternative-for-java-serialization
-
 
 **{todo}** mandatory jsonable on sim-entities feels cumbersome
 
@@ -40,18 +17,16 @@ consider `logCoreInteractions=false` as default
 https://tersesystems.github.io/terse-logback/1.0.0/structured-logging/
 
 https://www.innoq.com/en/blog/structured-logging/
+
 ---
 
 **TODO** add planning example from classical scheduling theory
-parallel maschines --> solve with or tools
+parallel maschines --> solve with or tools or optaplanner
 
 > Other relevant applications arise in the context of health-care, where, for example, patients have to be assigned to surgery rooms that must be
 equipped by considering the type (i.e., the family) of surgery to
 be performed. In such cases, the weight usually models a level of
 urgency for the patient.
-
-
-**TODO** recent survy on scheduling with setups can be found in Allahverdi (2015)
 
 
 ---
@@ -63,12 +38,7 @@ https://www.baeldung.com/java-a-star-pathfinding
 
 ---
 
-**{todo}** get rid of `setup`
-
-
-**{todo}** respect ticktrafo in built-invisualizations
-
-**{todo}** TickTime comparator and more consistent use in API
+**{todo}** respect ticktrafo in built-in visualizations
 
 **{todo}** provide heatmap of component-list status
 
