@@ -10,6 +10,7 @@ import org.kalasim.misc.ASSERT_MODE
 import org.kalasim.misc.AssertMode
 import org.kalasim.misc.JSON_INDENT
 import org.kalasim.misc.KalasimContext
+import org.kalasim.monitors.NumericLevelMonitor
 import org.koin.core.Koin
 import org.koin.core.definition.Definition
 import org.koin.core.qualifier.Qualifier
@@ -41,11 +42,13 @@ fun declareDependencies(
 
 fun KoinModule.createSimulation(
     enableConsoleLogger: Boolean = false,
+    enableTickMetrics: Boolean = false,
     useCustomKoin: Boolean = false,
     randomSeed: Int = DEFAULT_SEED,
     builder: Environment.() -> Unit
 ): Environment = createSimulation(
     enableConsoleLogger = enableConsoleLogger,
+    enableTickMetrics = enableTickMetrics,
     dependencies = this,
     useCustomKoin = useCustomKoin,
     randomSeed = randomSeed,
@@ -54,6 +57,7 @@ fun KoinModule.createSimulation(
 
 fun createSimulation(
     enableConsoleLogger: Boolean = false,
+    enableTickMetrics: Boolean = false,
     dependencies: KoinModule? = null,
     useCustomKoin: Boolean = false,
     randomSeed: Int = DEFAULT_SEED,
@@ -61,6 +65,7 @@ fun createSimulation(
 ): Environment =
     Environment(
         enableConsoleLogger = enableConsoleLogger,
+        enableTickMetrics = enableTickMetrics,
         dependencies = dependencies,
         randomSeed = randomSeed,
         koin = if(useCustomKoin) koinApplication { }.koin else null
@@ -78,6 +83,7 @@ object Defaults {
 @Suppress("EXPERIMENTAL_API_USAGE")
 open class Environment(
     enableConsoleLogger: Boolean = false,
+    enableTickMetrics: Boolean = false,
     dependencies: KoinModule? = null,
     koin: Koin? = null,
     randomSeed: Int = DEFAULT_SEED,
@@ -174,6 +180,7 @@ open class Environment(
         }))
 
 
+
         main = Component(name = "main", process = null, koin = getKoin())
         setCurrent(main)
 
@@ -187,7 +194,15 @@ open class Environment(
 
 //        curComponent = main
 
+
     }
+
+    private val _tm: TickMetrics? = if(enableTickMetrics) TickMetrics(koin = koin) else null
+    val tickMetrics: NumericLevelMonitor
+        get() {
+            require(_tm != null) { "Use enableTickMetrics=true to enable tick metrics" }
+            return _tm.monitor
+        }
 
 
     private var endOnEmptyEventlist = false

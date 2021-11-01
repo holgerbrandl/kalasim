@@ -49,11 +49,13 @@ There is one provided implementation `OffsetTransform` that can be instantiated 
 
 ## Operational Control
 
-**{Note}** This feature is still in preparation and planned for version v0.8, see <https://github.com/holgerbrandl/kalasim/issues/9> and [roadmap](https://github.com/holgerbrandl/kalasim/blob/master/docs/roadmap.md).
+Even if `kalasim` tries to provide a simplistic, efficient, declarative approach to define a simulation, it may come along with computational demands simulation. To allow introspection into time-complexity of the underlying computations, the user may want to use the built-in `env.tickMetrics` [monitor](monitors.md) to analyze how much time is spent per time unit (aka *tick*). This monitor is not enabled by default and needs to be enabled when the environment is created by passing `enableTickMetrics=true`
 
-Even if `kalasim` tries to provide a simplistic declarative approach to define a simulation, it may come along with computational demands simulation. To allow introspection into time-complexity of the underlying computations, the user may want to use the built-in `env.tickMetrics` [monitor](monitors.md) to analyze how much time is spent per time unit (aka *tick*). This monitor is not enabled by default and need to enabled when the environment is created by passing `tickMetricsEnabled=true`
+```kotlin hl_lines="5"
+{!api/TickMetricsExample.kts!}
+```
 
-<!-- Also see https://cran.r-project.org/web/packages/simmer/vignettes/simmer-01-introduction.html#replication --> 
+[comment]: <> (<!-- Also see https://cran.r-project.org/web/packages/simmer/vignettes/simmer-01-introduction.html#replication --> )
 
 ## Performance tuning
 

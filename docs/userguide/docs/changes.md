@@ -10,6 +10,7 @@ Major enhancements
 * Introduced `AssertMode`s (`Full`, `Light` (default), `None`) to enable/disable internal consistency checks. This will optimize performance by another ~20% (depending on simulation logic)
 * Improved event logging API
 * Introduced [`ComponentList`](collections.md#list)
+* Implemented [ticks metrics](advanced.md#operational-control) monitor (fixes [#9](https://github.com/holgerbrandl/kalasim/issues/9))
   
 Documentation
 
@@ -37,6 +38,7 @@ Breaking changes
 * `Component.status` has been renamed to `Component.componentState` to enable extending classes to use the property name `status` for domain modelling
 * Removed requirement to implement `info` in `SimulationEntity`
 * Moved stochastic distributions support API to from `Component` to `SimulationEntity`
+* Removed `Component::setup` because the user can just use an `init{}` block instead
 
 
 ## v0.6
