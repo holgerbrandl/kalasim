@@ -101,6 +101,8 @@ open class Environment(
 
     internal val nameCache = mapOf<String, Int>().toMutableMap()
 
+    // As discussed in https://github.com/holgerbrandl/kalasim/issues/8, we could alternatively use a fibonacci
+    // heap for better performance
     private val eventQueue = PriorityQueue<QueueElement>()
 
     /** Unmodifiable view on `eventQueue`. */
