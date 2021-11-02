@@ -14,7 +14,7 @@ import org.koin.dsl.KoinAppDeclaration
  *
  * @author Arnaud Giuliani
  */
-object KalasimContext : KoinContext {
+object DependencyContext : KoinContext {
 
     private var _koin: Koin? = null
     private var _koinApplication: KoinApplication? = null

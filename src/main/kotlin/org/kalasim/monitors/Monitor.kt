@@ -4,7 +4,7 @@ package org.kalasim.monitors
 
 import org.kalasim.SimulationEntity
 import org.koin.core.Koin
-import org.kalasim.misc.KalasimContext
+import org.kalasim.misc.DependencyContext
 
 
 // See https://commons.apache.org/proper/commons-math/userguide/stat.html
@@ -12,7 +12,7 @@ import org.kalasim.misc.KalasimContext
 
 abstract class Monitor<T>(
     name: String? = null,
-    koin: Koin = KalasimContext.get()
+    koin: Koin = DependencyContext.get()
 ) : SimulationEntity(name, koin) {
 
     /** Disable or enable data collection in a monitor. */

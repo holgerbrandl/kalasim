@@ -1,8 +1,7 @@
 package org.kalasim
 
-import org.kalasim.misc.KalasimContext
+import org.kalasim.misc.DependencyContext
 import org.kalasim.monitors.NumericLevelMonitor
-import org.kalasim.plot.letsplot.display
 import org.koin.core.Koin
 import kotlin.math.round
 
@@ -16,7 +15,7 @@ class TickMetrics(
     val enableMonitor: Boolean = true,
     val enableMetricEvents: Boolean = false,
     koin: Koin? = null
-) : Component(koin = koin ?: KalasimContext.get()) {
+) : Component(koin = koin ?: DependencyContext.get()) {
 
     val monitor =  NumericLevelMonitor(name)
 

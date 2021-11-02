@@ -8,7 +8,7 @@ import org.kalasim.monitors.NumericLevelMonitor
 import org.kalasim.monitors.NumericLevelMonitorStats
 import org.kalasim.monitors.NumericStatisticMonitor
 import org.koin.core.Koin
-import org.kalasim.misc.KalasimContext
+import org.kalasim.misc.DependencyContext
 import java.util.*
 
 
@@ -22,7 +22,7 @@ class ComponentList<C>(
     name: String? = null,
     val list: MutableList<C> = LinkedList<C>(),
     private val trackStayStatistics: Boolean = true,
-    koin: Koin = KalasimContext.get()
+    koin: Koin = DependencyContext.get()
 ) : SimulationEntity(name, koin), MutableList<C> by list {
 
     //    val ass = AggregateSummaryStatistics()

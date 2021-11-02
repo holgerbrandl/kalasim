@@ -9,7 +9,7 @@ import org.kalasim.Defaults.DEFAULT_SEED
 import org.kalasim.misc.ASSERT_MODE
 import org.kalasim.misc.AssertMode
 import org.kalasim.misc.JSON_INDENT
-import org.kalasim.misc.KalasimContext
+import org.kalasim.misc.DependencyContext
 import org.kalasim.monitors.NumericLevelMonitor
 import org.koin.core.Koin
 import org.koin.core.definition.Definition
@@ -164,7 +164,7 @@ open class Environment(
 
             // https://github.com/InsertKoinIO/koin/issues/972
 //        CustomContext.startKoin(koinContext = CustomContext()) { modules(module { single { this@Environment } }) }
-            KalasimContext.startKoin() {
+            DependencyContext.startKoin() {
             }.koin
         }
 

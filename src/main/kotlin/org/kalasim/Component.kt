@@ -10,7 +10,7 @@ import org.kalasim.misc.TRACE_DF
 import org.kalasim.monitors.FrequencyLevelMonitor
 import org.koin.core.Koin
 import org.koin.core.component.KoinComponent
-import org.kalasim.misc.KalasimContext
+import org.kalasim.misc.DependencyContext
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 import java.util.*
@@ -54,7 +54,7 @@ open class Component(
     delay: Number = 0,
     priority: Priority = NORMAL,
     process: ProcessPointer? = Component::process,
-    koin: Koin = KalasimContext.get()
+    koin: Koin = DependencyContext.get()
 ) :
 //    KoinComponent,
     SimulationEntity(name, koin) {

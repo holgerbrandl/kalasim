@@ -6,7 +6,7 @@ import io.kotest.matchers.shouldBe
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.junit.Test
 import org.kalasim.*
-import org.kalasim.misc.KalasimContext
+import org.kalasim.misc.DependencyContext
 import org.koin.core.Koin
 import org.koin.core.component.get
 import org.koin.core.error.NoBeanDefFoundException
@@ -17,7 +17,7 @@ class EnvTests {
 
     @Test
     fun `it should support more than one env`() {
-        KalasimContext.stopKoin()
+        DependencyContext.stopKoin()
 
         class TestComponent(koin: Koin) : Component(koin = koin) {
             override fun process() = sequence {
@@ -46,7 +46,7 @@ class EnvTests {
 
         // make sure that the global context has not yet been started
         shouldThrow<IllegalStateException> {
-            KalasimContext.get()
+            DependencyContext.get()
         }
     }
 

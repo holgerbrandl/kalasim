@@ -6,7 +6,7 @@ import org.kalasim.misc.JSON_DF
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.printThis
 import org.koin.core.Koin
-import org.kalasim.misc.KalasimContext
+import org.kalasim.misc.DependencyContext
 import kotlin.math.roundToInt
 
 /**
@@ -16,7 +16,7 @@ import kotlin.math.roundToInt
  */
 open class FrequencyStatsMonitor<T>(
     name: String? = null,
-    koin: Koin = KalasimContext.get()
+    koin: Koin = DependencyContext.get()
 ) : Monitor<T>(name, koin), StatisticMonitor<T> {
 
 

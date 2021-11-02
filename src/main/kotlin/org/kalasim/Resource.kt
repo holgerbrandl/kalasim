@@ -6,7 +6,7 @@ import com.github.holgerbrandl.jsonbuilder.json
 import org.kalasim.misc.Jsonable
 import org.kalasim.monitors.NumericLevelMonitor
 import org.koin.core.Koin
-import org.kalasim.misc.KalasimContext
+import org.kalasim.misc.DependencyContext
 
 // TODO Analyze we we support the same preemptible contract as simmer (Ucar2019, p11) (in particular restart)
 
@@ -21,7 +21,7 @@ class DepletableResource(
     capacity: Number,
     initialLevel: Number = capacity,
     preemptive: Boolean = false,
-    koin: Koin = KalasimContext.get()
+    koin: Koin = DependencyContext.get()
 ) : Resource(name = name, capacity = capacity, preemptive = preemptive,koin = koin) {
 
     init {
@@ -39,7 +39,7 @@ open class Resource(
     name: String? = null,
     capacity: Number = 1,
     val preemptive: Boolean = false,
-    koin: Koin = KalasimContext.get()
+    koin: Koin = DependencyContext.get()
 ) : SimulationEntity(name = name, simKoin = koin) {
 
     internal var anonymous: Boolean = false

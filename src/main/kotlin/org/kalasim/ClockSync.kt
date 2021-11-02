@@ -1,7 +1,7 @@
 package org.kalasim
 
 import org.koin.core.Koin
-import org.kalasim.misc.KalasimContext
+import org.kalasim.misc.DependencyContext
 import java.time.Duration
 import java.time.Instant
 import kotlin.math.roundToLong
@@ -17,7 +17,7 @@ class ClockSync(
     tickDuration: Duration,
     val syncsPerTick: Number = 1,
     val maxDelay: Duration? = null,
-    koin: Koin = KalasimContext.get()
+    koin: Koin = DependencyContext.get()
 ) : Component(koin = koin) {
 
     init {

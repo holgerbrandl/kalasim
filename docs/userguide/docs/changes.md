@@ -32,6 +32,7 @@ request(doctorFoo, doctorBar, oneOf=true){ doctor ->
 
 Breaking changes
 
+* Updated to `koin` v3.1 (fixes [#15](https://github.com/holgerbrandl/kalasim/issues/15)): `GlobalContext` has been replaced with `DependencyContext`
 * Established use of `TickTime` across the entire API to disambiguate simulation time instants from durations, which are still modelled as `Double`
 * Changed `Component.now `and `Environment.now` to new value class `TickTime` for better type safety
 * Simplified `ClockSync` API by removing redundant `speedUp` parameter

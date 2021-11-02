@@ -3,7 +3,7 @@ package org.kalasim
 import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.misc.Jsonable
 import org.koin.core.Koin
-import org.kalasim.misc.KalasimContext
+import org.kalasim.misc.DependencyContext
 
 /**
  * A component generator can be used to generate components.
@@ -33,7 +33,7 @@ class ComponentGenerator<T>(
     name: String? = null,
     priority: Priority = NORMAL,
     val storeRefs: Boolean = false,
-    koin: Koin = KalasimContext.get(),
+    koin: Koin = DependencyContext.get(),
     val builder: Environment.(counter: Int) -> T
 ) : Component(name, priority = priority, at = startAt, process = ComponentGenerator<T>::doIat, koin = koin) {
 
