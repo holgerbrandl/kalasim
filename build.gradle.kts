@@ -31,13 +31,13 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.10")
 
     api("com.github.holgerbrandl:jsonbuilder:0.9")
-    implementation("com.google.code.gson:gson:2.8.6")
+    implementation("com.google.code.gson:gson:2.8.8")
 
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
 
     testImplementation(kotlin("test-junit"))
-    testImplementation("io.kotest:kotest-assertions-core:4.2.6")
+    testImplementation("io.kotest:kotest-assertions-core:4.6.3")
 
     implementation("com.github.holgerbrandl:krangl:0.17")
 
@@ -49,12 +49,12 @@ dependencies {
     //    testImplementation("org.jetbrains.lets-plot:lets-plot-jfx:1.5.4")
 
     //experimental dependencies  use for experimentation
-    testImplementation("com.thoughtworks.xstream:xstream:1.4.15")
+    testImplementation("com.thoughtworks.xstream:xstream:1.4.18")
 
     //https://youtrack.jetbrains.com/issue/KT-44197
 
     testImplementation(kotlin("script-runtime"))
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
 
 }
 
