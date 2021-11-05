@@ -1,32 +1,10 @@
-package org.kalasim.examples.hospital
-
-import com.esotericsoftware.kryo.Kryo
-import com.esotericsoftware.kryo.io.Output
-import com.thoughtworks.xstream.XStream
-import com.thoughtworks.xstream.io.xml.DomDriver
-import krangl.DataFrameRow
-import krangl.count
-import krangl.dataFrameOf
-import krangl.print
+import PatientStatus.*
+import Severity.*
 import org.kalasim.*
-import org.kalasim.examples.hospital.PatientStatus.DeceasedWhileWaiting
-import org.kalasim.examples.hospital.PatientStatus.Waiting
-import org.kalasim.examples.hospital.Severity.*
 import org.kalasim.monitors.NumericLevelMonitor
-import org.kalasim.plot.kravis.display
-import org.koin.core.Koin
-import org.koin.core.component.get
-import org.koin.core.logger.EmptyLogger
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.nio.charset.StandardCharsets.UTF_8
-import java.util.zip.GZIPInputStream
-import java.util.zip.GZIPOutputStream
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
-
 
 enum class InjuryType {
     AnimalBites, Bruises, Burns, Dislocations, Fractures, SprainsAndStrains, Cuts, Scratches
@@ -122,7 +100,7 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
 
             // pick him/her up from the waiting area
             er.waitingLine.remove(patient)
-            patient.patientStatus.value = PatientStatus.InSurgery
+            patient.patientStatus.value = InSurgery
 
             // check setup state of room
             val injuryType = patient.type
@@ -154,10 +132,10 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
                 val isDeceased = surgerySuccessProbability[patient.severity.value]!! > env.random.nextDouble()
                 if (isDeceased) {
                     get<EmergencyRoom>().treatedMonitor.inc()
-                    patient.patientStatus.value = PatientStatus.Released
+                    patient.patientStatus.value = Released
                 } else {
                     get<EmergencyRoom>().deceasedMonitor.inc()
-                    patient.patientStatus.value = PatientStatus.DeceasedInSurgery
+                    patient.patientStatus.value = DeceasedInSurgery
                 }
 
                 log("surgery of ${patient} completed ${if (isDeceased) "with" else "without"} success")
@@ -283,7 +261,7 @@ class EmergencyRoom(
     // incoming patients
     init {
         val typeDist = enumerated(InjuryType.values())
-        val sevDist = enumerated(values().zip(listOf(0.05, 0.1, 0.2, 0.3, 0.45)).toMap())
+        val sevDist = enumerated(Severity.values().zip(listOf(0.05, 0.1, 0.2, 0.3, 0.45)).toMap())
 
         val cg = ComponentGenerator(
             iat = exponential(0.2),
@@ -316,94 +294,3 @@ class EmergencyRoom(
     }
 }
 
-
-@OptIn(ExperimentalStdlibApi::class)
-fun main() {
-    val sim = EmergencyRoom(SetupAvoidanceNurse).apply {
-
-        // run for a week
-        run(24 * 14)
-
-
-//        val kryo = Kryo()
-//        kryo.register(EmergencyRoom::class.java)
-//        kryo.register(Koin::class.java)
-//        kryo.register(EmptyLogger::class.java)
-//        kryo.register(org.koin.core.logger.Level::class.java)
-//        kryo.register(java.util.HashSet::class.java)
-//        kryo.register(org.koin.core.module.Module::class.java)
-
-        val smthg = EmergencyRoom()
-
-        val output = Output(FileOutputStream("file.bin"))
-        kryo.writeObject(output, smthg)
-//
-//
-//        val moshi = Moshi.Builder()
-//            .addLast(KotlinJsonAdapterFactory())
-//            .add(SimProcess::class.java, JsonAdapter<SimProcess>{})
-//            .build()
-//
-//        moshi.
-//        val adapter = moshi.adapter<Environment>()
-//        val toJson = adapter.toJson(this)
-
-
-        //save simulation
-//        val xstream = XStream(DomDriver())
-//    val xstream = XStream(JsonHierarchicalStreamDriver())--> does not work because embeed json driver can just WRITE!
-//        xstream.setMode(XStream.XPATH_RELATIVE_REFERENCES);
-
-//        val envXML = xstream.toXML(this)
-//        File("test.xml").writeBytes(gzip(envXML))
-
-        // analysis
-        incomingMonitor.display("Incoming Patients")
-        treatedMonitor.display("Treated Patients")
-        deceasedMonitor.display("Deceased Patients")
-
-        get<EmergencyRoom>().apply {
-            rooms[0].setup.valueMonitor.display().show()
-            rooms[1].setup.valueMonitor.display().show()
-
-            rooms[1].statusMonitor.display().show()
-        }
-
-        waitingLine.queueLengthMonitor.display().show()
-        waitingLine.lengthOfStayMonitor.display().show()
-
-        val arrivals = get<ComponentGenerator<Patient>>().arrivals
-//        arrivals.asDataFrame().print()
-
-
-        val df = arrivals.map {
-            mapOf(
-                "type" to it.type.toString(),
-                "status" to it.patientStatus.value.toString(),
-                "severity" to it.severity.value.toString()
-            ) as DataFrameRow
-        }.let { dataFrameOf(it) }
-
-        df.count("status").print()
-
-        // visualize room setup as gant chart
-
-    }
-}
-
-object Foo{
-    @JvmStatic
-    fun main(args: Array<String>) {
-
-    }
-}
-
-//https://gist.github.com/sgdan/eaada2f243a48196c5d4e49a277e3880
-fun gzip(content: String): ByteArray {
-    val bos = ByteArrayOutputStream()
-    GZIPOutputStream(bos).bufferedWriter(UTF_8).use { it.write(content) }
-    return bos.toByteArray()
-}
-
-fun ungzip(content: ByteArray): String =
-    GZIPInputStream(content.inputStream()).bufferedReader(UTF_8).use { it.readText() }

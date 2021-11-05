@@ -1,3 +1,3 @@
 
-rootProject.name = "hospital"
+rootProject.name = "kalasim-persistence"
 

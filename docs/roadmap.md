@@ -5,6 +5,8 @@
 
 consider `logCoreInteractions=false` as default 
 
+complete and publish hospital example
+
 ## v0.7
 
 **{todo}** mandatory jsonable on sim-entities feels cumbersome
