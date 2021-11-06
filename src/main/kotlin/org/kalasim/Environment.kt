@@ -79,7 +79,7 @@ fun createSimulation(
 object Defaults {
     const val DEFAULT_SEED = 42
 }
-
+//@JsonClass(generateAdapter = true)
 @Suppress("EXPERIMENTAL_API_USAGE")
 open class Environment(
     enableConsoleLogger: Boolean = false,
@@ -91,10 +91,10 @@ open class Environment(
 ) : SimContext {
 
     @Deprecated("serves no purposes and creates a memory leaks as objects are nowhere releases")
-    private val components: MutableList<Component> = listOf<Component>().toMutableList()
+     val components: MutableList<Component> = listOf<Component>().toMutableList()
 
 
-    private var running: Boolean = false
+    internal var running: Boolean = false
 
     val rg: RandomGenerator = JDKRandomGenerator(randomSeed)
     val random: kotlin.random.Random = kotlin.random.Random(randomSeed.toLong())
@@ -103,14 +103,14 @@ open class Environment(
 
     // As discussed in https://github.com/holgerbrandl/kalasim/issues/8, we could alternatively use a fibonacci
     // heap for better performance
-    private val eventQueue = PriorityQueue<QueueElement>()
+    internal val eventQueue = PriorityQueue<QueueElement>()
 
     /** Unmodifiable view on `eventQueue`. */
     val queue: List<Component>
         get() = eventQueue.map { it.component }
 
 
-    private val eventListeners = listOf<EventListener>().toMutableList()
+    internal val eventListeners = listOf<EventListener>().toMutableList()
 
 
     val traceFilters = mutableListOf<EventFilter>()
@@ -137,7 +137,7 @@ open class Environment(
 //    val foo  = 3.simtime
 
     /** Allows to transform ticks to real world time moements (represented by `java.time.Instant`) */
-    override var tickTransform: TickTransform? = null
+    override var tickTransform: OffsetTransform? = null
 
     var curComponent: Component? = null
         private set
@@ -199,7 +199,7 @@ open class Environment(
 
     }
 
-    private val _tm: TickMetrics? = if(enableTickMetrics) TickMetrics(koin = koin) else null
+    internal val _tm: TickMetrics? = if(enableTickMetrics) TickMetrics(koin = koin) else null
     val tickMetrics: NumericLevelMonitor
         get() {
             require(_tm != null) { "Use enableTickMetrics=true to enable tick metrics" }
@@ -207,10 +207,10 @@ open class Environment(
         }
 
 
-    private var endOnEmptyEventlist = false
+    internal var endOnEmptyEventlist = false
 
-    private val standBy = listOf<Component>().toMutableList()
-    private val pendingStandBy = listOf<Component>().toMutableList()
+    internal val standBy = listOf<Component>().toMutableList()
+    internal val pendingStandBy = listOf<Component>().toMutableList()
 
 
 //    fun build(vararg compoennts: Component) = components.forEach { this + it }
@@ -381,7 +381,7 @@ open class Environment(
         }
     }
 
-    private var queueCounter: Int = 0
+    internal var queueCounter: Int = 0
 
     fun push(component: Component, scheduledTime: TickTime, priority: Priority, urgent: Boolean) {
         queueCounter++

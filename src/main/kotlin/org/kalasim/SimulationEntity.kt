@@ -48,7 +48,7 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
         with(env) { InteractionEvent(now, curComponent, this@SimulationEntity, action) }
     }
 
-    override var tickTransform: TickTransform?
+    override var tickTransform: OffsetTransform?
         get() = env.tickTransform
         set(_) {
             throw RuntimeException("Tick transformation must be set via the environment")

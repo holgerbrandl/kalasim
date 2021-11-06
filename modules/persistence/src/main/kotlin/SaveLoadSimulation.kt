@@ -1,5 +1,3 @@
-package org.kalasim.misc
-
 import com.google.gson.Gson
 import com.thoughtworks.xstream.XStream
 import com.thoughtworks.xstream.security.AnyTypePermission

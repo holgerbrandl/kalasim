@@ -2,6 +2,7 @@ package org.kalasim
 
 import org.kalasim.misc.TRACE_DF
 import org.koin.core.component.KoinComponent
+import java.io.Serializable
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -105,9 +106,9 @@ internal val MISSING_TICK_TRAFO_ERROR = "Tick transformation not configured. "
 
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-interface SimContext : KoinComponent {
+interface SimContext : KoinComponent,Serializable {
 
-    var tickTransform: TickTransform?
+    var tickTransform: OffsetTransform?
 
     /** Transforms a wall `duration` into the corresponding amount of ticks.*/
     fun Duration.asTicks(): Double {

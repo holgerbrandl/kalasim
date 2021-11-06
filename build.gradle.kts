@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 
 //val kotlinVersion = KotlinVersion.CURRENT
 
@@ -7,7 +8,9 @@ plugins {
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
+    kotlin("kapt") version "1.5.31"
 }
+
 
 //group = "org.kalasim"
 group = "com.github.holgerbrandl"
@@ -22,6 +25,8 @@ repositories {
 }
 
 dependencies {
+    kapt("com.squareup.moshi:moshi-kotlin-codegen:1.12.0")
+
     api("org.apache.commons:commons-math3:3.6.1")
 
     //cant upgrade because of https://github.com/InsertKoinIO/koin/issues/939
@@ -32,6 +37,8 @@ dependencies {
 
     api("com.github.holgerbrandl:jsonbuilder:0.9")
     implementation("com.google.code.gson:gson:2.8.8")
+    api("com.squareup.moshi:moshi-kotlin:1.12.0")
+
 
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")

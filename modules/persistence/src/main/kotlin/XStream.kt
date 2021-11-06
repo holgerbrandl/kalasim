@@ -29,7 +29,8 @@ import java.util.zip.GZIPOutputStream
 
 fun main() {
 //    val sim = EmergencyRoom(SetupAvoidanceNurse)
-    val sim = MM1Queue().apply { run(10) }
+    val sim = MM1Queue()
+        .apply { run(10) }
 
 
     //save simulation
@@ -42,7 +43,7 @@ fun main() {
     xstream.setMode(XStream.XPATH_RELATIVE_REFERENCES);
 
     val envXML = xstream.toXML(sim)
-    File("test.xml").writeBytes(gzip(envXML))
+//    File("test.xml").writeBytes(gzip(envXML))
 
 //    val xstream = XStream(JsonHierarchicalStreamDriver())--> does not work because embeed json driver can just WRITE!
 //    xstream.setMode(XStream.NO_REFERENCES)

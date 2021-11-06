@@ -3,14 +3,10 @@ package org.kalasim
 import org.kalasim.ComponentState.*
 import org.kalasim.ResourceEventType.*
 import org.kalasim.ResourceSelectionPolicy.*
-import org.kalasim.misc.ASSERT_MODE
-import org.kalasim.misc.AssertMode
-import org.kalasim.misc.Jsonable
-import org.kalasim.misc.TRACE_DF
+import org.kalasim.misc.*
 import org.kalasim.monitors.FrequencyLevelMonitor
 import org.koin.core.Koin
 import org.koin.core.component.KoinComponent
-import org.kalasim.misc.DependencyContext
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 import java.util.*
@@ -48,6 +44,8 @@ val HIGH = Priority(10)
  * @param process  of process to be started.  if None (default), it will try to start self.process()
  * @param koin The dependency resolution context to be used to resolve the `org.kalasim.Environment`
  */
+
+//@JsonClass(generateAdapter = true)
 open class Component(
     name: String? = null,
     at: TickTime? = null,
@@ -59,25 +57,25 @@ open class Component(
 //    KoinComponent,
     SimulationEntity(name, koin) {
 
-    private var oneOfRequest: Boolean = false
+    internal var oneOfRequest: Boolean = false
 
     internal val requests = mapOf<Resource, Double>().toMutableMap()
-    private val waits = listOf<StateRequest<*>>().toMutableList()
+    internal val waits = listOf<StateRequest<*>>().toMutableList()
     val claims = mapOf<Resource, Double>().toMutableMap()
 
     var failed: Boolean = false
-        private set
+        internal set
 
-    private var waitAll: Boolean = false
+    internal var waitAll: Boolean = false
 
-    private var simProcess: SimProcess? = null
+    internal var simProcess: GenProcessInternal? = null
 
 
     // TODO 0.6 get rid of this field (not needed because can be always retrieved from eventList if needed
     //  What are performance implications?
     var scheduledTime: TickTime? = null
 
-    private var remainingDuration: Double? = null
+    internal var remainingDuration: Double? = null
 
 //    init {
 //        println(Component::process == this::process)
@@ -123,23 +121,23 @@ open class Component(
     }
 
 
-    private fun ingestFunPointer(process: ProcessPointer?): SimProcess? {
+    private fun ingestFunPointer(process: ProcessPointer?): GenProcessInternal? {
 //        if(process != null ){
 //            print("param type is " + process!!.returnType)
 //            if(process!!.returnType.toString().startsWith("kotlin.sequences.Sequence"))
 //        }
 
         return if(process != null) {
-            val isGenerator = process.returnType.toString().startsWith("kotlin.sequences.Sequence")
+//            val isGenerator = process.returnType.toString().startsWith("kotlin.sequences.Sequence")
 
-            if(isGenerator) {
+//            if(isGenerator) {
                 @Suppress("UNCHECKED_CAST")
                 val sequence = process.call(this)
                 GenProcessInternal(this, sequence, process.name)
-            } else {
-                TODO("add test coverage here")
-                SimpleProcessInternal(this, process, process.name)
-            }
+//            } else {
+//                TODO("add test coverage here")
+//                SimpleProcessInternal(this, process, process.name)
+//            }
         } else {
             null
         }
@@ -234,11 +232,11 @@ open class Component(
     }
 
 
-    private var interruptedStatus: ComponentState? = null
+    internal var interruptedStatus: ComponentState? = null
 
     /** interrupt level of an interrupted component  non interrupted components return 0. */
     var interruptLevel = 0
-        private set
+        internal set
 
     /** Interrupt the component.
      *

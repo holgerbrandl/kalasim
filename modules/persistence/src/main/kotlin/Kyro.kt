@@ -14,10 +14,15 @@ import org.kalasim.demo.MM1Queue
 import org.kalasim.plot.letsplot.display
 import org.koin.core.Koin
 import org.koin.core.component.get
+import org.koin.core.definition.BeanDefinition
+import org.koin.core.definition.Callbacks
+import org.koin.core.instance.SingleInstanceFactory
 import org.koin.core.logger.EmptyLogger
+import org.koin.core.registry.InstanceRegistry
 import java.io.ByteArrayOutputStream
 import java.io.FileOutputStream
 import java.nio.charset.StandardCharsets.UTF_8
+import java.util.concurrent.ConcurrentHashMap
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
@@ -29,12 +34,20 @@ fun main() {
 //        run(24 * 14)
 
     val kryo = Kryo()
+
+    kryo.setReferences(true)
     kryo.register(EmergencyRoom::class.java)
     kryo.register(Koin::class.java)
     kryo.register(EmptyLogger::class.java)
     kryo.register(org.koin.core.logger.Level::class.java)
     kryo.register(java.util.HashSet::class.java)
     kryo.register(org.koin.core.module.Module::class.java)
+    kryo.register(MM1Queue::class.java)
+    kryo.register(InstanceRegistry::class.java)
+    kryo.register(BeanDefinition::class.java)
+    kryo.register(SingleInstanceFactory::class.java)
+    kryo.register(Callbacks::class.java)
+    kryo.register(ConcurrentHashMap::class.java)
 
 
     val output = Output(FileOutputStream("file.bin"))
