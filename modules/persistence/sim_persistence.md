@@ -54,6 +54,11 @@ great ref about PolymorphicJsonAdapterFactory. https://proandroiddev.com/moshi-p
 
 also see https://github.com/square/moshi/issues/309
 
+## Kryo
+
+Kotlin forum recommendation for kryo https://discuss.kotlinlang.org/t/new-serialization-library-for-kotlin/9509/8
+
+How to ignore private fields https://github.com/EsotericSoftware/kryo/issues/289
 
 ## Builtin
 

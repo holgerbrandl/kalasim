@@ -8,7 +8,7 @@ plugins {
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
-    kotlin("kapt") version "1.5.31"
+//    kotlin("kapt") version "1.5.31"
 }
 
 
@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    kapt("com.squareup.moshi:moshi-kotlin-codegen:1.12.0")
+//    kapt("com.squareup.moshi:moshi-kotlin-codegen:1.12.0")
 
     api("org.apache.commons:commons-math3:3.6.1")
 
