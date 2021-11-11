@@ -23,7 +23,8 @@ dependencies {
 
 
     api("com.thoughtworks.xstream:xstream:1.4.18")
-    api("com.esotericsoftware:kryo:5.2.0")
+//    api("com.esotericsoftware:kryo:5.2.0")
+    api("com.esotericsoftware:kryo:5.2.1-SNAPSHOT")
     api("com.squareup.moshi:moshi-kotlin:1.12.0")
     api("com.google.code.gson:gson:2.8.8")
 

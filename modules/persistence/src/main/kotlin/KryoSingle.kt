@@ -34,7 +34,7 @@ import kotlin.collections.ArrayDeque
 fun main() {
     val saveFile = File("file.bin")
 //    saveFile.delete()
-    val kryo = buildKryo()
+    val kryo = buildKryoSingle()
 
     val smthg: Definition<Dimension> = { it -> Dimension() }
 
@@ -54,7 +54,7 @@ fun main() {
 }
 
 
-private fun buildKryo(): Kryo {
+private fun buildKryoSingle(): Kryo {
 
     val kryo = Kryo()
 
