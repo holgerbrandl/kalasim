@@ -39,9 +39,9 @@ class StateTransitionTests {
         val cars = interactions.mapNotNull { it.source }.distinct().filter { it.name.startsWith("TestCar") }
         assertEquals(6, cars.size, "expected cars count does not match")
 
-        assert(interactions[0].curComponent!!.name == MAIN)
-        assert(interactions[1].curComponent!!.name == MAIN)
-        assert(interactions[2].curComponent!!.name == MAIN)
+        require(interactions[0].curComponent!!.name == MAIN)
+        require(interactions[1].curComponent!!.name == MAIN)
+        require(interactions[2].curComponent!!.name == MAIN)
     }
 
 

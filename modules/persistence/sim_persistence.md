@@ -60,6 +60,15 @@ Kotlin forum recommendation for kryo https://discuss.kotlinlang.org/t/new-serial
 
 How to ignore private fields https://github.com/EsotericSoftware/kryo/issues/289
 
+
+coroutine continuation serialization
+* https://github.com/Kotlin/kotlinx.serialization/issues/44
+* https://github.com/Kotlin/kotlinx.coroutines/issues/76
+  * usecase in games sim https://github.com/Kotlin/kotlinx.coroutines/issues/76#issuecomment-619201684
+  * usecase in process definitions https://github.com/Kotlin/kotlinx.coroutines/issues/76#issuecomment-631470593
+  * usecase in simulation (!) https://github.com/Kotlin/kotlinx.coroutines/issues/76#issuecomment-849942317
+
+
 ## Builtin
 
 Java Serialization Caveats https://www.baeldung.com/java-serialization-approaches

@@ -1,6 +1,7 @@
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.io.Input
 import com.esotericsoftware.kryo.io.Output
+import com.esotericsoftware.kryo.serializers.ClosureSerializer
 import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy
 import org.kalasim.*
 import org.kalasim.demo.MM1Queue
@@ -11,6 +12,7 @@ import org.objenesis.strategy.StdInstantiatorStrategy
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.lang.invoke.SerializedLambda
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.Comparator
@@ -40,6 +42,48 @@ object KryoComponent {
 
 
 object KryoSim {
+    @JvmStatic
+    fun main(args: Array<String>) {
+//    val sim = EmergencyRoom(SetupAvoidanceNurse)
+//        val sim = MM1Queue().apply { run(10) }
+        val sim = Environment().apply {
+//            run(10)
+        }
+
+//        sim.apply {
+            class MySim :Component(){
+                override fun process() = sequence {
+                    println(this@MySim)
+                    println(this@sequence)
+                    hold(10)
+                }
+            }
+
+        MySim()
+//        }
+
+        // run for a week
+//        run(24 * 14)
+
+        val kryo = buildKryo()
+
+        val saveFile = File("file.bin")
+
+        val output = Output(FileOutputStream(saveFile))
+        kryo.writeClassAndObject(output, sim)
+        output.close()
+
+        val input = Input(FileInputStream(saveFile));
+        val restored = kryo.readClassAndObject(input) as Environment
+
+        // analysis
+        restored.run(10)
+        println(restored)
+//    sim.testSim()
+    }
+}
+
+object KryoMM1 {
     @JvmStatic
     fun main(args: Array<String>) {
 //    val sim = EmergencyRoom(SetupAvoidanceNurse)
@@ -115,10 +159,13 @@ fun buildKryo(): Kryo {
 
     kryo.instantiatorStrategy = DefaultInstantiatorStrategy(StdInstantiatorStrategy())
 
-    kryo.register(ConcurrentHashMap::class.java)
+//    kryo.register(ConcurrentHashMap::class.java)
 //    kryo.addDefaultSerializer(PriorityQueue::class.java,  CustomPriorityQueueSerializer())
     kryo.isRegistrationRequired = false
 
+
+    kryo.register(SerializedLambda::class.java)
+    kryo.register(ClosureSerializer.Closure::class.java, ClosureSerializer())
 
     return kryo
 }
