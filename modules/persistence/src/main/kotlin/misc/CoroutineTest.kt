@@ -1,8 +1,9 @@
-package simpleproc
+package misc
 
 import com.esotericsoftware.kryo.io.Input
 import com.esotericsoftware.kryo.io.Output
 import kotlinx.coroutines.runBlocking
+import simpleproc.buildProcKryo
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import kotlin.coroutines.Continuation
