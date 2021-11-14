@@ -52,6 +52,7 @@ nav:
     - Car Wash: examples/car_wash.md
     - ATM Queue: examples/atm_queue.md
     - Gas Station: examples/gas_station.md
+    - Bridge Game: examples/bridge_game.md
     - Machine Parts: examples/machine_parts.md
     - Machine Shop: examples/machine_shop.md
     - Dining Philosophers: examples/dining_philosophers.md

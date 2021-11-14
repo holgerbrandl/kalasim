@@ -7,6 +7,7 @@ Simple
 * [Car](examples/car.md) - A single car, a driver, and red traffic light in the middle of the night. The thrilling landing page example but this time fully documented with an extensive code-walkthrough.  
 * [Traffic](examples/traffic.md) - Car navigate through a simple traffic model with crossings and traffic-lights. Clearly, they need to refill, but there is just a limited number of slots as the gas station.
 * [Bank Office with 1 clerk](examples/bank_office.md#simple-bank-office-1-clerk) - A classic queue, where customers arrive at a bank and need to be serviced
+* [Bridge Game](examples/bridge_game.md) - A survival analysis of murderous game in Netflix' famous Squid Games series. 
 
 Moderate
 
