@@ -10,6 +10,7 @@ fun fixed(value: Number) = ConstantRealDistribution(value.toDouble())
 
 operator fun RealDistribution.invoke(): Double = sample()
 operator fun IntegerDistribution.invoke(): Int = sample()
+operator fun <E> EnumeratedDistribution<E>.invoke(): E = sample()
 
 
 fun SimulationEntity.exponential(mean: Number) = env.exponential(mean)
