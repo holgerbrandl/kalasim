@@ -67,10 +67,10 @@ class SquidGame(
 
 Here, we also cap the time it takes a player to cross the bridge (or just part of it) at 100 seconds. Move times are modelled using a log-normal distribution with the parameters from [here](https://www.jhelvy.com/posts/2021-10-19-monte-carlo-bridge-game/).
 
-We asses different questions. Namely
 
-1. What the average number of survivors 
 
+
+See [here]()
 Complete source:
 
 ```kotlin
