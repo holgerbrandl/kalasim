@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit
 // note: remove @JvmInline because it did not seem ready on the java-interop-side
 data class TickTime(val value: Double) : Comparable<TickTime> {
     override operator fun compareTo(other: TickTime): Int = value.compareTo(other.value)
+    operator fun compareTo(other: Int): Int = value.compareTo(other)
+
     operator fun minus(duration: Double): TickTime = TickTime(value - duration)
     operator fun plus(duration: Number): TickTime = TickTime(value + duration.toDouble())
 
@@ -20,6 +22,7 @@ data class TickTime(val value: Double) : Comparable<TickTime> {
     override fun toString(): String {
         return TRACE_DF.format(value)
     }
+
 }
 
 /* A simple type wrapper around a duration in sim time coordinates. Not used in core API of kalasim. */
