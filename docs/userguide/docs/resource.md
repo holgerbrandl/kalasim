@@ -26,6 +26,7 @@ Any [component](component.md) can `request` from a resource in its [process meth
 ## Request Scope
 
 The most common usage pattern for resources is the _request scope_ which 
+
 1. requests a resource, 
 2. executes some action,
 3. and finally releases the claimed resources 
@@ -41,7 +42,9 @@ In the example, `kalasim` will release the clerks automatically at the end of th
 
 ## Unscoped Usage
 
-The user can omit the request scope (not recommended for your own good).
+The user can omit the request scope (not recommended for your own good), and release claimed resources with `release`.
+
+By design, a component can not request multiple times from the same resource in nested way.
 
 ```kotlin
 request(clerks)
@@ -50,6 +53,7 @@ hold(1, description ="doing something")
 
 release(clerks) 
 ```
+
 ## Examples
 
 * [Bank Office with Resources](examples/bank_office.md#bank-office-with-resources)
@@ -75,6 +79,8 @@ As multiple components may request the same resource, it is important to priorit
 request(clerks withPriority IMPORTANT) 
 ```
 
+`kalasim` will order requests on a resource by priority.
+
 There are different predefined priorities which correspond the following sort-levels 
 
 * `LOWEST` (-20)
@@ -86,7 +92,7 @@ There are different predefined priorities which correspond the following sort-le
 The user can also create more fine-grained priorities with
 
 
-### Multiple resources
+## Multiple resources
 
 It is also possible to request for more resources at once. In the following examples, we request 1 quantity from `clerks` **AND** 2 quantities from `assistance`.
 
