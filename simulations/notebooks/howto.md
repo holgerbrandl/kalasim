@@ -23,4 +23,11 @@ jupyter notebook --kernel=kotlin dining.ipynb
 ## start with notebook
 jupyter notebook --kernel=kotlin hospital.ipynb
 
+
+## build markdown from notebook
+
+jupyter nbconvert  --to html bridge_game.ipynb  # 
+
+jupyter nbconvert --kernel=kotlin --execute --to markdown  bridge_game.ipynb  --out  bridge_game.md
+
 ```
