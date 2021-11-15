@@ -28,6 +28,8 @@ jupyter notebook --kernel=kotlin hospital.ipynb
 
 jupyter nbconvert  --to html bridge_game.ipynb  # 
 
-jupyter nbconvert --kernel=kotlin --execute --to markdown  bridge_game.ipynb  --out  bridge_game.md
+cd D:\projects\scheduling\kalasim\docs\userguide\docs\examples
+#jupyter nbconvert --kernel=kotlin --execute --to markdown  bridge_game.ipynb  --out  bridge_game.md
+jupyter nbconvert --kernel=kotlin --to markdown  bridge_game.ipynb  --out  bridge_game.md
 
 ```
