@@ -250,6 +250,6 @@ With more than 16 steps, the odds of having more than 2 players decay quickly.
 
 ## Conclusion
 
-In this example we have explored a simple generative model. By means of simulation we have worked out an optimal strategy to survive the bridge game. But be reminded, if you ever find an invite to a squid-like game on your doorstep in times of despair , trash it, smoke it or eat it. There are better - and more fun - ways to make money, such as optimizing real-world process with simulation and business intelligence.
+In this example we have explored a simple generative model. By means of simulation we have worked out an optimal strategy to survive the bridge game. But be reminded, if you ever find an invite to a squid-like game on your doorstep in times of despair , trash it, smoke it or eat it. There are better - and more fun - ways to make money, such as optimizing real-world processes with simulation and business intelligence.
 
 For complete sources, also see the jupyter [notebook](https://nbviewer.org/github/holgerbrandl/kalasim/blob/master/docs/userguide/docs/examples/bridge_game.ipynb). Feel welcome to [get in touch](../index.md#support) for support, suggestions, and questions.
