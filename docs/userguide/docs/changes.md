@@ -19,6 +19,7 @@ Documentation
 
 Minor enhancements
 
+* Improved request priority API
 * Allow for runtime reconfiguration of `ClockSync` to enable adjustable simulation speed
 * Lifted `Component` sub-type requirement from `ComponentQueue`
 * Fixed `oneOf` in `request()`

@@ -31,9 +31,12 @@ internal const val DEFAULT_QUEUE_PRIORITY = 0
 
 data class Priority(val value: Int)
 
-val LOWER = Priority(-10)
+// adopted from
+val LOWEST= Priority(-20)
+val LOW= Priority(-10)
 val NORMAL = Priority(DEFAULT_QUEUE_PRIORITY)
-val HIGH = Priority(10)
+val IMPORTANT = Priority(20)
+val CRITICAL = Priority(20)
 
 
 /**
@@ -1360,6 +1363,7 @@ data class ResourceRequest(
 
 infix fun Resource.withQuantity(quantity: Number) = ResourceRequest(this, quantity.toDouble())
 infix fun Resource.withPriority(priority: Int) = ResourceRequest(this, priority = Priority(priority))
+infix fun Resource.withPriority(priority: Priority) = ResourceRequest(this, priority = priority)
 
 infix fun ResourceRequest.andPriority(priority: Priority) = ResourceRequest(this.r, this.quantity, priority)
 

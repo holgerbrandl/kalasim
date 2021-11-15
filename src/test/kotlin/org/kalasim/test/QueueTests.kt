@@ -102,7 +102,7 @@ class QueueTests {
 //            }
 
             val c1 = Component("comp1", at = 3.tt)
-            val c2 = Component("comp2", at = 3.tt, priority = HIGH)
+            val c2 = Component("comp2", at = 3.tt, priority = IMPORTANT)
 
             val tc = TraceCollector().also { addEventListener(it) }
 

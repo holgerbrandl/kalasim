@@ -55,7 +55,7 @@ object ProcessGraph {
             request(clerk)
 
             // billing process
-            hold(ticks = 2.0, priority = HIGH)
+            hold(ticks = 2.0, priority = IMPORTANT)
         }
     }
 }

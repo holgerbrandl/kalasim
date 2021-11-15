@@ -199,7 +199,7 @@ class ResourceTests {
                 hold(ticks = 5.0)
 
                 request(clerk)
-                hold(ticks = 2.0, priority = HIGH)
+                hold(ticks = 2.0, priority = IMPORTANT)
                 release(clerk)
 
                 passivate()
@@ -343,7 +343,7 @@ class ResourceTests {
         val doctors: List<Resource> = listOf(DoctorMeier(), DoctorSchreier())
 
         val patient = object : Component() {
-            override fun process() = sequence<Component> {
+            override fun process() = sequence {
                 request(doctors, oneOf = true) {
                     hold(1)
                 }

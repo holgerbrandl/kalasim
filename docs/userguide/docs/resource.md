@@ -13,6 +13,43 @@ There are two of types resources:
 
 <!-- todo consider to add a dedicated container type instead of anonymous resources https://simpy.readthedocs.io/en/latest/topical_guides/resources.html#containers-->
 
+Resources are declared with:
+
+```kotlin
+val clerks = Resource("clerks", capacity=3)
+```
+
+Any [component](component.md) can `request` from a resource in its [process method](component.md#creation-of-a-component). The user must not use `request` outside of a component's  process definition.
+
+`request` has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
+
+## Request Scope
+
+The most common usage pattern for resources is the _request scope_ which 
+1. requests a resource, 
+2. executes some action,
+3. and finally releases the claimed resources 
+
+```kotlin
+request(clerks) { //1
+    hold(1, description ="doing something") //2
+} //3
+```
+
+In the example, `kalasim` will release the clerks automatically at the end of the request scope.
+
+
+## Unscoped Usage
+
+The user can omit the request scope (not recommended for your own good).
+
+```kotlin
+request(clerks)
+
+hold(1, description ="doing something")
+
+release(clerks) 
+```
 ## Examples
 
 * [Bank Office with Resources](examples/bank_office.md#bank-office-with-resources)
@@ -21,23 +58,35 @@ There are two of types resources:
 * [Gas Station](examples/gas_station.md)
 
 
-## Usage
+## Quantity
 
-Resources are defined like:
-
-```kotlin
-val clerks = Resource("clerks", capacity=3)
-val customer = Component("clerks")
-```
-
-The `customer` can `request` a clerk in its [process method](component.md#creation-of-a-component):
+Some requests may have a capacity greater than 1. To request more than one unit from a resource, the user can use `withQuantity`:
 
 ```kotlin
 request(clerks)  // request 1 from clerks 
-request(clerks withQuantity 2) // request 2s from clerks
+request(clerks withQuantity 2) // request 2 elements from clerks
 ```
 
-`request` has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
+## Request Priority
+
+As multiple components may request the same resource, it is important to prioritize requests. This is possible by providing a request priority
+
+```kotlin
+request(clerks withPriority IMPORTANT) 
+```
+
+There are different predefined priorities which correspond the following sort-levels 
+
+* `LOWEST` (-20)
+* `LOW` (-10)
+* `NORMAL` (0)
+* `IMPORTANT` (20)
+* `CRITICAL` (20)
+
+The user can also create more fine-grained priorities with
+
+
+### Multiple resources
 
 It is also possible to request for more resources at once. In the following examples, we request 1 quantity from `clerks` **AND** 2 quantities from `assistance`.
 
