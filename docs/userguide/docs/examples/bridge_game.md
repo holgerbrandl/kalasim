@@ -30,40 +30,6 @@ As players in the show can pick their start number, the episode - as well as the
 
 To answer this question, we will model and analyze the process with `kalasim`. At its heart - which is its [process definition](../component.md#creation-of-a-component) -  it is a very simplistic model that centers around simulating the participant's stepping on the tiles one after another while considering the _learning experience_ of earlier participants with lower start numbers.
 
-
-
-```kotlin
-//@file:Repository("*mavenLocal")
-//@file:DependsOn("com.github.holgerbrandl:kalasim:0.7-SNAPSHOT")
-
-@file:DependsOn("com.github.holgerbrandl:kalasim:0.6.92")
-@file:DependsOn("com.github.holgerbrandl:kravis:0.8.1")
-```
-
-
-```kotlin
-import org.kalasim.*
-
-import kravis.geomBar
-import kravis.geomCol
-import kravis.plot
-import org.apache.commons.math3.distribution.LogNormalDistribution
-
-import java.lang.Double.min
-import kotlin.random.Random
-```
-
-
-```kotlin
-//LogNormalDistribution(3.5, 0.88).let{ dist ->
-//    repeat(100){ println(dist.sample())}
-//}
-
-//TODO set random seed, blocked by https://github.com/Kotlin/kotlin-jupyter/issues/345
-
-```
-
-
 ```kotlin
 class SquidGame(
     val numSteps: Int = 18,
