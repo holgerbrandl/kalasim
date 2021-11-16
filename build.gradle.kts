@@ -12,7 +12,7 @@ plugins {
 //group = "org.kalasim"
 group = "com.github.holgerbrandl"
 //version = "0.7-SNAPSHOT"
-version = "0.6.93"
+version = "0.6.94"
 
 
 repositories {
