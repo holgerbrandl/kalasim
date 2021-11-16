@@ -7,6 +7,7 @@ import org.kalasim.misc.Jsonable
 import org.kalasim.monitors.NumericLevelMonitor
 import org.koin.core.Koin
 import org.kalasim.misc.DependencyContext
+import kotlin.system.exitProcess
 
 // TODO Analyze we we support the same preemptible contract as simmer (Ucar2019, p11) (in particular restart)
 
@@ -129,7 +130,11 @@ open class Resource(
                 if (minq > (capacity - claimed + EPS)) {
                     break
                 }
-                requesters.q.peek().component.tryRequest()
+
+                if(!requesters.q.peek().component.tryRequest()) {
+                    // if we can honor this request, we must stop here (to respect request prioritites
+                    break
+                }
             }
         }
 
