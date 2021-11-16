@@ -5,7 +5,6 @@ import org.kalasim.*
 import org.kalasim.examples.elevator.Car.DoorState.*
 import org.kalasim.examples.elevator.Direction.*
 import org.kalasim.misc.repeat
-import java.util.*
 
 // Adopted from https://github.com/salabim/salabim/blob/master/sample%20models/Elevator.py
 
@@ -155,7 +154,10 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) : Component() {
                             visitors.add(it)
                         }
 
-                        this@sequence.hold(ENTER_TIME * zusteiger.size, description = "${zusteiger.size} passengers entering")
+                        this@sequence.hold(
+                            ENTER_TIME * zusteiger.size,
+                            description = "${zusteiger.size} passengers entering"
+                        )
 
                         // If there are still visitors going up/down in that floor
                         // then restore the request to the list of requests

@@ -290,6 +290,30 @@ class ResourceTests {
     }
 
     @Test
+    fun `it should be possible to use nested requests on the same resource`() = createTestSimulation {
+        val r1 = Resource(capacity = 4)
+
+        object : Component() {
+            override fun process() = sequence {
+                request(r1){
+                    request(r1){
+                        request(r1){
+                            hold(1)
+                        }
+
+                        r1.claimed shouldBe 2
+                        r1.claimers.size shouldBe 1
+                    }
+
+                    r1.claimed shouldBe 0
+                }
+            }
+        }
+
+        run(1)
+    }
+
+    @Test
     fun `it should correctly set failed after timeout`() {
 
         createSimulation(true) {

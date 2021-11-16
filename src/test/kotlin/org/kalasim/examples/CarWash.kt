@@ -1,6 +1,5 @@
 //CarWash.kt
 import org.kalasim.*
-import org.koin.core.component.get
 
 /**
  *  A carwash has a limited number of washing machines and defines

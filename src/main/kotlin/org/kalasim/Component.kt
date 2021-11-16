@@ -902,11 +902,11 @@ open class Component(
      */
     suspend fun SequenceScope<Component>.hold(
         ticks: Ticks? = null,
+        description: String? = null,
         priority: Priority = NORMAL,
-        urgent: Boolean = false,
-        description: String? = null
+        urgent: Boolean = false
     ) = yieldCurrent {
-        this@Component.hold(ticks?.value, null, priority, urgent, description)
+        this@Component.hold(ticks?.value, description, null, priority, urgent)
     }
 
     /**
@@ -921,12 +921,12 @@ open class Component(
      */
     suspend fun SequenceScope<Component>.hold(
         ticks: Number? = null,
+        description: String? = null,
         until: TickTime? = null,
         priority: Priority = NORMAL,
-        urgent: Boolean = false,
-        description: String? = null
+        urgent: Boolean = false
     ) = yieldCurrent {
-        this@Component.hold(ticks, until, priority, urgent, description)
+        this@Component.hold(ticks, description, until, priority, urgent)
     }
 
     /**
@@ -941,10 +941,10 @@ open class Component(
      */
     fun hold(
         duration: Number? = null,
+        description: String? = null,
         until: TickTime? = null,
         priority: Priority = NORMAL,
-        urgent: Boolean = false,
-        description: String? = null
+        urgent: Boolean = false
     ) {
         if(componentState != PASSIVE && componentState != CURRENT) {
             requireNotData()
