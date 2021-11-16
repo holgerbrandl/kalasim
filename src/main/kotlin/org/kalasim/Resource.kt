@@ -22,7 +22,7 @@ class DepletableResource(
     initialLevel: Number = capacity,
     preemptive: Boolean = false,
     koin: Koin = DependencyContext.get()
-) : Resource(name = name, capacity = capacity, preemptive = preemptive,koin = koin) {
+) : Resource(name = name, capacity = capacity, preemptive = preemptive, koin = koin) {
 
     init {
         anonymous = true
@@ -69,9 +69,9 @@ open class Resource(
             field = x
 
             // this ugly hak is needed to avoid tracking of initialLevel setting in DR constructor
-            if(this is DepletableResource && diffQuantity == 0.0 && requesters.isEmpty()) return
+            if (this is DepletableResource && diffQuantity == 0.0 && requesters.isEmpty()) return
 
-            if(field < EPS)
+            if (field < EPS)
                 field = 0.0
 
             claimedMonitor.addValue(x)
@@ -93,7 +93,7 @@ open class Resource(
     }
 
     val occupancy: Double
-        get() = if(capacity < 0) 0.0 else claimed / capacity
+        get() = if (capacity < 0) 0.0 else claimed / capacity
 
     val availableQuantity: Double
         get() = capacity - claimed
@@ -112,21 +112,21 @@ open class Resource(
             env.curComponent,
             this,
             "Created",
-            "capacity=$capacity " + if(anonymous) "anonymous" else ""
+            "capacity=$capacity " + if (anonymous) "anonymous" else ""
         )
     }
 
     fun tryRequest(): Boolean {
 
-        if(anonymous) {
+        if (anonymous) {
             // TODO trying not implemented
-            while(requesters.q.isNotEmpty()) {
+            while (requesters.q.isNotEmpty()) {
                 requesters.q.peek().component.tryRequest()
             }
         } else {
-            while(requesters.q.isNotEmpty()) {
+            while (requesters.q.isNotEmpty()) {
                 //try honor as many requests as possible
-                if(minq > (capacity - claimed + EPS)) {
+                if (minq > (capacity - claimed + EPS)) {
                     break
                 }
                 requesters.q.peek().component.tryRequest()
@@ -143,7 +143,7 @@ open class Resource(
      */
     fun release(quantity: Number? = null) {
         // TODO Split resource types into QuantityResource and Resource or similar
-        if(anonymous) {
+        if (anonymous) {
             val q = quantity?.toDouble() ?: claimed
 
             claimed = -q
@@ -157,7 +157,7 @@ open class Resource(
         } else {
             require(quantity != null) { "quantity missing for non-anonymous resource" }
 
-            while(claimers.isNotEmpty()) {
+            while (claimers.isNotEmpty()) {
                 claimers.q.first().component.release(this)
             }
         }
@@ -165,7 +165,7 @@ open class Resource(
 
     fun removeRequester(component: Component) {
         requesters.remove(component)
-        if(requesters.isEmpty()) minq = Double.MAX_VALUE
+        if (requesters.isEmpty()) minq = Double.MAX_VALUE
     }
 
     /** Prints a summary of statistics of a resource. */
@@ -176,6 +176,10 @@ open class Resource(
 
     val statistics: ResourceStatistics
         get() = ResourceStatistics(this)
+
+
+    val timeline: List<RequestScopeEvent> = mutableListOf()
+//    val timeline = env.eventCollector<RequestScopeEvent>()
 }
 
 

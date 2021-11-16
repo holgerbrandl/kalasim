@@ -5,19 +5,18 @@ import org.json.JSONObject
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
 import org.kalasim.misc.roundAny
+import org.koin.core.qualifier.TypeQualifier
+import java.util.*
 import java.util.logging.Level
 import kotlin.math.absoluteValue
 
 
 internal val TRACE_COL_WIDTHS = mutableListOf(10, 22, 22, 45, 35)
 
-//inline class SimTime(val time: Double)
-
 enum class ResourceEventType { CLAIMED, RELEASED, PUT }
 
-
 class ResourceEvent(
-    time: TickTime, // bug in krangl, parent
+    time: TickTime,
     curComponent: Component?,
     val requester: SimulationEntity,
     val resource: Resource,
@@ -34,7 +33,7 @@ class ResourceEvent(
 
 
     override fun renderAction() =
-        "${type.toString().toLowerCase().capitalize()} ${amount.absoluteValue.roundAny(2)} from '${requester.name}'"
+        "${type.toString().lowercase(Locale.ENGLISH).capitalize()} ${amount.absoluteValue.roundAny(2)} from '${requester.name}'"
 
         override fun toJson() = json {
             "time" to time
@@ -52,11 +51,22 @@ class ResourceEvent(
 
 }
 
+class RequestScopeEvent(
+    val from: TickTime,
+    val to: TickTime,
+    val requester: Component,
+    val resource: Resource,
+    val activity: String?,
+    val claimedQuantity: Double
+) : Event(to)
+
+
 open class InteractionEvent(
     time: TickTime,
     val curComponent: Component? = null,
     val source: SimulationEntity? = null,
     val action: String? = null,
+    @Deprecated("Will be removed because unclear semantics in comparison to action parameter")
     val details: String? = null
 ) : Event(time) {
 
@@ -172,6 +182,7 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
         .joinToString("")
 }
 
+/** Collects all events on the kalasim event bus. */
 fun Environment.traceCollector(): TraceCollector {
     val tc = dependency { TraceCollector() }
     addEventListener(tc)
@@ -190,3 +201,17 @@ class TraceCollector(val traces: MutableList<Event> = mutableListOf()) : EventLi
     operator fun invoke() = traces
 //    operator fun get(index: Int): Event = traces[index]
 }
+
+
+
+
+inline fun <reified E: Event> Environment.eventCollector(): List<E> {
+    val traces: MutableList<E> = mutableListOf()
+
+    addEventListener{
+        if(it is E) traces.add(it)
+    }
+
+    return traces.toList()
+}
+

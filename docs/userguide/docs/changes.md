@@ -114,6 +114,7 @@ Major Enhancements
 * New example [Dining Philosophers](https://www.kalasim.org/examples/dining_philosophers/)
 * New example [Movie Theater](https://www.kalasim.org/examples/movie_theater/)
 * New API to add dependencies in simulation context using `dependency {}`
+* New [timeline](https://www.kalasim.org/resource/#timeline) attribute for resources to streamline usage and capacity analysis  
 
 Notable Fixes
 

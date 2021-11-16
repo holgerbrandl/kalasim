@@ -425,6 +425,7 @@ open class Component(
      */
     suspend fun SequenceScope<Component>.request(
         resources: Collection<Resource>,
+        description: String? = null,
         failAt: TickTime? = null,
         failDelay: Number? = null,
         oneOf: Boolean = false,
@@ -457,7 +458,7 @@ open class Component(
      */
     suspend fun SequenceScope<Component>.request(
         vararg resources: Resource,
-        // todo review if this should rather be a number (and dist at call site)
+        description: String? = null,
         failAt: TickTime? = null,
         failDelay: Number? = null,
         oneOf: Boolean = false,
@@ -465,6 +466,7 @@ open class Component(
         honorBlock: (suspend SequenceScope<Component>.(Resource?) -> Unit)? = null
     ) = request(
         *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
+        description = description,
         failAt = failAt,
         failDelay = failDelay,
         oneOf = oneOf,
@@ -490,11 +492,10 @@ open class Component(
      */
     suspend fun SequenceScope<Component>.request(
         vararg resourceRequests: ResourceRequest,
-        //todo change to support distribution parameters instead
+        description: String? = null,
         failAt: TickTime? = null,
         failDelay: Number? = null,
         oneOf: Boolean = false,
-        //todo use type here and not string
         priority: Priority = NORMAL,
         urgent: Boolean = false,
         // try to avoid argument by inferring from stacktrace
@@ -599,10 +600,19 @@ open class Component(
 
         if(honorBlock != null) {
             // suspend{ ... }
+            val before = now
             honorBlock(if(oneOf)  claims.toList().last().first else null)
 
+            val after = now
+
             // salabim says: It is possible to check which resource has been claimed with `Component.claimers()`.
-            resourceRequests.filter{ it.r.claimers.contains(this@Component)}.forEach { release(it) }
+            resourceRequests.filter{ it.r.claimers.contains(this@Component)}.forEach {
+                release(it)
+                val rse = RequestScopeEvent(before, after, this@Component, it.r, description, it.quantity)
+                (it.r.timeline as MutableList<RequestScopeEvent>).add(rse)
+                log(rse)
+
+            }
         }
     }
 

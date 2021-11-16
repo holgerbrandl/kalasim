@@ -24,6 +24,9 @@ Any [component](component.md) can `request` from a resource in its [process meth
 `request` has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
 
 
+Resources have a [queue](collections.md#queue) `requesters` containing all components trying to claim from the resource. In addition, there is a queue `claimers` containing all components claiming from the resource (not for anonymous resources). Both queues must not be modified but str useful for analysis.
+
+
 Notes
 
 * `request` is not allowed for data components or main.
@@ -130,9 +133,22 @@ Another method to query from a pool of resources are group requests. These are s
 
 Typical use cases are staff models, where certain colleagues have similar but not identical qualification. In case of the same qualification, a single resource with a `capacity` equal to the staff size, would be usually the better/correct solution.
 
-## Monitors
+## Timeline
 
-Resources have a queue `requesters` containing all components trying to claim from the resource.  In addition, there is a queue `claimers` containing all components claiming from the resource (not for anonymous resources). Both queues must not be modified but str useful for analysis.
+Resources have a `timeline` attribute that provides a history of [scoped requests](#request-scope).
+
+```kotlin
+r1.timeline
+    .plot(y={resource.name},  yend={resource.name},x={from},xend={to}, color={activity})
+    .geomSegment(size=10.0)
+    .yLabel("Resource")
+```
+![](resource_timeline.png)
+
+There's also a [notebook](https://github.com/holgerbrandl/kalasim/blob/master/simulations/notebooks/ResourceTimeline.ipynb) with a complete example.
+
+
+## Monitors
 
 Resources have a number of monitors:
 

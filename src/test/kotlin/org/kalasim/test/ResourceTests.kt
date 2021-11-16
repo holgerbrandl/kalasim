@@ -295,9 +295,9 @@ class ResourceTests {
 
         object : Component() {
             override fun process() = sequence {
-                request(r1){
-                    request(r1){
-                        request(r1){
+                request(r1) {
+                    request(r1) {
+                        request(r1) {
                             hold(1)
                         }
 
@@ -312,6 +312,47 @@ class ResourceTests {
 
         run(1)
     }
+
+    @Test
+    fun `it should track request scoped activities`() = createTestSimulation {
+        val r1 = Resource(capacity = 4)
+        val r2 = Resource(capacity = 4)
+
+        object : Component() {
+            override fun process() = sequence {
+                request(r1)
+                hold(100)
+                release(r1)
+            }
+        }
+
+        object : Component() {
+            override fun process() = sequence {
+                hold(3)
+
+                request(r2) {
+                    hold(1)
+
+                    request(r1, description = "foo") {
+                        hold(2)
+                        r1.claimed shouldBe 2
+                    }
+
+                    hold(1)
+                }
+            }
+        }
+
+        run(10)
+
+        r1.timeline.apply {
+            size shouldBe 1
+            first().from.value shouldBe 4.0
+            first().to.value shouldBe 6.0
+            first().activity shouldBe "foo"
+        }
+    }
+
 
     @Test
     fun `it should correctly set failed after timeout`() {
