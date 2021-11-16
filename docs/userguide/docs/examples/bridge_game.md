@@ -198,19 +198,14 @@ Now, we calculate the probability of having less than two survivors. That's in p
 
 ```kotlin
 val probLT2Players = manyGames.count { it.numSurvivors < 2 }.toDouble() / manyGames.size
-println("the probability for less than 2 players is ${probLT2Players}")
-
-println("On average ${avgSurvivors} players will survive the game of squid")
-
+println("The probability for less than 2 players is ${probLT2Players}")
 ```
 
-    the probability for less than 2 players is 0.0771
-
-    On average 5.436 players will survive the game of squid
+    The probability for less than 2 players is 0.0771
 
 
 
-One may wonder why the makes of the series have placed 18 steps and not more or less. What do the numbers say? What are the odds for game continuation (# survivors >2) when the number of steps is different?
+One may wonder why the makers of the series have placed 18 steps and not more or less? What do the numbers say? What are the odds for game continuation (# survivors >2) when the number of steps is different?
 
 To answer these questions, let's re-run the model while varying the steps. To keep things simple, we run 10,000 iterations of the game over an increasing number of steps from 10 to 30:
 
