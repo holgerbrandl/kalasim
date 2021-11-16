@@ -23,6 +23,16 @@ Any [component](component.md) can `request` from a resource in its [process meth
 
 `request` has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
 
+
+Notes
+
+* `request` is not allowed for data components or main.
+* If to be used for the current component (which will be nearly always the case), use `yield (request(...))`.
+* If the same resource is specified more that once, the quantities are summed.
+* The requested quantity may exceed the current capacity of a resource.
+* The parameter `failed` will be reset by a calling `request` or `wait`.
+
+
 ## Request Scope
 
 The most common usage pattern for resources is the _request scope_ which 
@@ -39,12 +49,11 @@ request(clerks) { //1
 
 In the example, `kalasim` will release the clerks automatically at the end of the request scope.
 
+When requesting from a single resource in a nested way, claims are merged.
 
 ## Unscoped Usage
 
-The user can omit the request scope (not recommended for your own good), and release claimed resources with `release`.
-
-By design, a component can not request multiple times from the same resource in nested way.
+The user can omit the request scope (recommended), and release claimed resources with `release`.
 
 ```kotlin
 request(clerks)
@@ -53,6 +62,17 @@ hold(1, description ="doing something")
 
 release(clerks) 
 ```
+
+
+Typically, this is only needed when releasing a defined quantity from a resource with `c.release()`, e.g.
+
+```kotlin
+customer.release()  // releases all claimed quantity from r
+customer.release(2)  // release quantity 2 from r
+```
+
+After a release, all other requesting components will be checked whether their claim can be honored.
+
 
 ## Examples
 
@@ -102,41 +122,19 @@ request(clerks withQuantity 1, assistance withQuantity 2)
 
 To request alternative resources, the user can define the parameter `oneOf=true`, which will would result in requesting 1 quantity from `clerks` **OR** 2 quantities from `assistance`.
 
-
-Resources have a queue `requesters` containing all components trying to claim from the resource.
-In addition, there is a queue `claimers` containing all components claiming from the resource (not for anonymous resources).
-
-It is possible to release a quantity from a resource with `c.release()`, e.g.
+Another method to query from a pool of resources are group requests. These are simply achieved by grouping resources in a `List` before requesting from it using `oneOf=true`.
 
 ```kotlin
-customer.release()  // releases all claimed quantity from r
-customer.release(2)  // release quantity 2 from r
+//{!api/ResourceGroups.kts!}
 ```
-    
-Alternatively, it is possible to release from a resource directly, e.g.
 
-```kotlin
-// releases the total quantity from all claiming components:
-r.release()  
-
-// releases 10 from the resource; only valid for anonymous resources
-r.release(10)
-```
-    
-After a release, all requesting components will be checked whether their claim can be honored.
-
-Notes
-
-* `request` is not allowed for data components or main.
-* If to be used for the current component (which will be nearly always the case), use `yield (request(...))`.
-* If the same resource is specified more that once, the quantities are summed.
-* The requested quantity may exceed the current capacity of a resource.
-* The parameter `failed` will be reset by a calling `request` or `wait`.
-
+Typical use cases are staff models, where certain colleagues have similar but not identical qualification. In case of the same qualification, a single resource with a `capacity` equal to the staff size, would be usually the better/correct solution.
 
 ## Monitors
 
-Resources have a number monitors:
+Resources have a queue `requesters` containing all components trying to claim from the resource.  In addition, there is a queue `claimers` containing all components claiming from the resource (not for anonymous resources). Both queues must not be modified but str useful for analysis.
+
+Resources have a number of monitors:
 
 * claimers
   * `queueLength`
