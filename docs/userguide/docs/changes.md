@@ -11,11 +11,13 @@ Major enhancements
 * Improved event logging API
 * Introduced [`ComponentList`](collections.md#list)
 * Implemented [ticks metrics](advanced.md#operational-control) monitor (fixes [#9](https://github.com/holgerbrandl/kalasim/issues/9))
-  
+* New [timeline](https://www.kalasim.org/resource/#timeline) attribute for resources to streamline usage and capacity analysis  
+* 
 Documentation
 
 * New chapter about [collections](collections.md)
 * New example: [Hospital](examples/hospital.md)
+* New example [Bridge Games](examples/bridge_game.md)
 
 Minor enhancements
 
@@ -114,7 +116,6 @@ Major Enhancements
 * New example [Dining Philosophers](https://www.kalasim.org/examples/dining_philosophers/)
 * New example [Movie Theater](https://www.kalasim.org/examples/movie_theater/)
 * New API to add dependencies in simulation context using `dependency {}`
-* New [timeline](https://www.kalasim.org/resource/#timeline) attribute for resources to streamline usage and capacity analysis  
 
 Notable Fixes
 
