@@ -117,21 +117,19 @@ open class Resource(
     }
 
     fun tryRequest(): Boolean {
-        val iterator = requesters.q.iterator()
 
         if(anonymous) {
             // TODO trying not implemented
-
-            iterator.forEach {
-                it.component.tryRequest()
+            while(requesters.q.isNotEmpty()) {
+                requesters.q.peek().component.tryRequest()
             }
         } else {
-            while(iterator.hasNext()) {
+            while(requesters.q.isNotEmpty()) {
                 //try honor as many requests as possible
                 if(minq > (capacity - claimed + EPS)) {
                     break
                 }
-                iterator.next().component.tryRequest()
+                requesters.q.peek().component.tryRequest()
             }
         }
 
