@@ -78,6 +78,7 @@ class ComponentTests {
 1.00                                                  Request honored by Resource.1                scheduled for 1.00
 1.00                                                  hold +1.00                                   scheduled for 2.00
 2.00                                                  Released 1.0 from 'tester'
+2.00                                                  {"time":"2.00","type":"RequestScopeEvent"}
 2.00                                                  Ended""".trimIndent()
 
 
@@ -123,7 +124,7 @@ class ComponentTests {
         run(10)
 
         tc.traces.apply{
-            size shouldBe 2
+            size shouldBe 3
             last().shouldBeInstanceOf<InteractionEvent>()
             (last() as InteractionEvent).action shouldBe "work done"
         }
