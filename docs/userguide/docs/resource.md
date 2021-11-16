@@ -56,7 +56,7 @@ When requesting from a single resource in a nested way, claims are merged.
 
 ## Unscoped Usage
 
-The user can omit the request scope (recommended), and release claimed resources with `release`.
+The user can omit the request scope (not recommended and mostly not needed), and release claimed resources with `release`.
 
 ```kotlin
 request(clerks)
