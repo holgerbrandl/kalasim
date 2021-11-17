@@ -95,3 +95,11 @@ https://www.bizagi.com/en/platform/modeler
 
 ## Structured logging
 
+
+> Structured logging is the practice of implementing a consistent, predetermined message format for application logs that allows them to be treated as data sets rather than text.
+
+https://tersesystems.github.io/terse-logback/1.0.0/structured-logging/
+
+https://www.innoq.com/en/blog/structured-logging/
+
+

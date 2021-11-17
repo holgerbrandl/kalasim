@@ -11,11 +11,12 @@ Major enhancements
 * Improved event logging API
 * Introduced [`ComponentList`](collections.md#list)
 * Implemented [ticks metrics](advanced.md#operational-control) monitor (fixes [#9](https://github.com/holgerbrandl/kalasim/issues/9))
-* New [timeline](https://www.kalasim.org/resource/#timeline) attribute for resources to streamline usage and capacity analysis  
-* 
+* New [timeline](https://www.kalasim.org/resource/#timeline) and [activity log](https://www.kalasim.org/resource/#activity-log)  attribute for resources to streamline usage and capacity analysis  
+
 Documentation
 
 * New chapter about [collections](collections.md)
+* Revised [resource](resource.md) documentation
 * New example: [Hospital](examples/hospital.md)
 * New example [Bridge Games](examples/bridge_game.md)
 
@@ -43,6 +44,7 @@ Breaking changes
 * Removed requirement to implement `info` in `SimulationEntity`
 * Moved stochastic distributions support API to from `Component` to `SimulationEntity`
 * Removed `Component::setup` because the user can just use an `init{}` block instead
+* Migrated release channel from jcenter to [maven-central](https://search.maven.org/artifact/com.github.holgerbrandl/kalasim)
 
 
 ## v0.6

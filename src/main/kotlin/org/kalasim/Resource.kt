@@ -3,11 +3,11 @@
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
+import krangl.*
 import org.kalasim.misc.Jsonable
 import org.kalasim.monitors.NumericLevelMonitor
 import org.koin.core.Koin
 import org.kalasim.misc.DependencyContext
-import kotlin.system.exitProcess
 
 // TODO Analyze we we support the same preemptible contract as simmer (Ucar2019, p11) (in particular restart)
 
@@ -57,7 +57,9 @@ open class Resource(
 
             field = value
 
-            updateCapacityMonitors()
+            capacityMonitor.addValue(capacity)
+            updatedDerivedMetrics()
+
             tryRequest()
         }
 
@@ -76,7 +78,7 @@ open class Resource(
                 field = 0.0
 
             claimedMonitor.addValue(x)
-            updateCapacityMonitors()
+            updatedDerivedMetrics()
 
 //            if(this is DepletableResource && )
 //            val action = if (diffQuantity > 0) "Released" else "Claimed"
@@ -87,10 +89,9 @@ open class Resource(
         }
 
 
-    private fun updateCapacityMonitors() {
+    private fun updatedDerivedMetrics() {
         availableMonitor.addValue(availableQuantity)
         occupancyMonitor.addValue(occupancy)
-        capacityMonitor.addValue(capacity)
     }
 
     val occupancy: Double
@@ -102,6 +103,8 @@ open class Resource(
 
     val capacityMonitor = NumericLevelMonitor("Capacity of ${super.name}", initialValue = capacity, koin = koin)
     val claimedMonitor = NumericLevelMonitor("Claimed quantity of ${this.name}", koin = koin)
+
+    // **TODO**  technically availability and occupancy can be derived and may be omitted to reduce memory footprint
     val availableMonitor =
         NumericLevelMonitor("Available quantity of ${this.name}", initialValue = availableQuantity, koin = koin)
     val occupancyMonitor = NumericLevelMonitor("Occupancy of ${this.name}", koin = koin)
@@ -131,7 +134,7 @@ open class Resource(
                     break
                 }
 
-                if(!requesters.q.peek().component.tryRequest()) {
+                if (!requesters.q.peek().component.tryRequest()) {
                     // if we can honor this request, we must stop here (to respect request prioritites
                     break
                 }
@@ -183,10 +186,92 @@ open class Resource(
         get() = ResourceStatistics(this)
 
 
-    val timeline: List<RequestScopeEvent> = mutableListOf()
+    val activities: List<ResourceActivityEvent> = mutableListOf()
 //    val timeline = env.eventCollector<RequestScopeEvent>()
+
 }
 
+
+//
+// Resource timeline for streamlined analytics
+//
+
+enum class ResourceMetric { Capacity, Claimed, Requesters, Claimers, Occupancy, Availability }
+
+data class ResourceTimelineSegment(
+    val resource : Resource,
+    val start: TickTime,
+    val end: TickTime?,
+    val duration: Double?,
+    val metric: ResourceMetric,
+    val value: Double,
+//    val start_wt: Instant? = null,
+//    val end_wt: Instant? = null
+) {
+//    @Suppress("unused")
+//    // needed by krangl if no tick-transform is defined
+//    constructor(
+//        resource : Resource,
+//        duration: Double,
+//        start: TickTime,
+//        end: TickTime,
+//        value: Double,
+//        metric: ResourceMetric
+//    ) : this(resource, start, end,duration,  metric,value, null, null) {
+//
+//    }
+
+    val startWT = resource.env.tickTransform?.tick2wallTime(start)
+    val endWT = end?.let{resource.env.tickTransform?.tick2wallTime(it)}
+}
+
+
+val Resource.timeline: List<ResourceTimelineSegment>
+    get() {
+        val capStats =
+            capacityMonitor.statsData().asList().asDataFrame()
+                .addColumn("Metric") { ResourceMetric.Capacity }
+        val claimStats =
+            claimedMonitor.statsData().asList().asDataFrame()
+                .addColumn("Metric") { ResourceMetric.Claimed }
+        val occStats =
+            occupancyMonitor.statsData().asList().asDataFrame()
+                .addColumn("Metric") { ResourceMetric.Occupancy }
+        val availStats =
+            occupancyMonitor.statsData().asList().asDataFrame()
+                .addColumn("Metric") { ResourceMetric.Availability }
+
+        val requesters = requesters.queueLengthMonitor.statsData().asList().asDataFrame()
+            .addColumn("Metric") { ResourceMetric.Requesters }
+        val claimers = claimers.queueLengthMonitor.statsData().asList().asDataFrame()
+            .addColumn("Metric") { ResourceMetric.Claimers }
+
+        var statsDF = bindRows(capStats, claimStats, availStats, occStats, requesters, claimers)
+        statsDF = statsDF.rename("timestamp" to "start")
+        statsDF = statsDF.addColumn("end") { it["start"] + it["duration"] }
+        statsDF = statsDF.addColumn("resource") { this@timeline }
+
+        // convert to tick-time
+        statsDF = statsDF.addColumn("start") { it["start"].map<Double> { TickTime(it) } }
+        statsDF = statsDF.addColumn("end") { it["end"].map<Double> { TickTime(it) } }
+
+        // optionally add walltimes
+//        if (env.tickTransform != null) {
+//            statsDF = statsDF.addColumn("start_wt") { it["start"].map<TickTime> { env.asWallTime(it) } }
+//            statsDF = statsDF.addColumn("end_wt") { it["end"].map<TickTime> { env.asWallTime(it) } }
+//        }
+
+        val records = statsDF.rowsAs<ResourceTimelineSegment>().toList()
+
+//        statsDF.print()
+//        statsDF.schema()
+
+        // we also resample with a common time axis using
+        // val time = (capStats.keys + claimStats.keys + requesters.keys + claimers.keys).toList().sorted()
+//        listOf(1,2,3).map{         capacityMonitor[it] }
+
+        return records
+    }
 
 class ResourceInfo(resource: Resource) : Jsonable() {
     val name: String = resource.name

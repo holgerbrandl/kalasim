@@ -78,7 +78,7 @@ class ComponentTests {
 1.00                                                  Request honored by Resource.1                scheduled for 1.00
 1.00                                                  hold +1.00                                   scheduled for 2.00
 2.00                                                  Released 1.0 from 'tester'
-2.00                                                  {"time":"2.00","type":"RequestScopeEvent"}
+2.00                                                  ResourceActivityEvent(start=1.00, end=2....
 2.00                                                  Ended""".trimIndent()
 
 

@@ -5,7 +5,6 @@ import org.json.JSONObject
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
 import org.kalasim.misc.roundAny
-import org.koin.core.qualifier.TypeQualifier
 import java.util.*
 import java.util.logging.Level
 import kotlin.math.absoluteValue
@@ -51,14 +50,17 @@ class ResourceEvent(
 
 }
 
-class RequestScopeEvent(
-    val from: TickTime,
-    val to: TickTime,
+data class ResourceActivityEvent(
+    val start: TickTime,
+    val end: TickTime,
     val requester: Component,
     val resource: Resource,
     val activity: String?,
     val claimedQuantity: Double
-) : Event(to)
+) : Event(end){
+    val startWT = resource.env.tickTransform?.tick2wallTime(start)
+    val endWT = resource.env.tickTransform?.tick2wallTime(end)
+}
 
 
 open class InteractionEvent(

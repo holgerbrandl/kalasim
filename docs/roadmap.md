@@ -9,16 +9,53 @@ complete and publish hospital example
 
 ## v0.7
 
+**{todo}** [#18](https://github.com/holgerbrandl/kalasim/issues/18) respect ticktrafo in built-in visualizations 
+
 **{todo}** mandatory jsonable on sim-entities feels cumbersome
 
----
 **{todo}** use standard sl4j for simulation logging or at least provide adapter
 
-> Structured logging is the practice of implementing a consistent, predetermined message format for application logs that allows them to be treated as data sets rather than text.
+**{todo}** provide heatmap of component-list status
 
-https://tersesystems.github.io/terse-logback/1.0.0/structured-logging/
+**{todo}** add `keepPositive` to `normal` 
 
-https://www.innoq.com/en/blog/structured-logging/
+**{todo}** review simjulia <https://simjuliajl.readthedocs.io/en/stable/topical_guides/5_shared_resources.html#containers>
+
+**{todo}** consider if ComponentQueue should support all types (and not just Component)
+
+**{todo}** wait lambda should use state.value as receiver
+
+**{todo}** lambda builder for interrupt/resume
+
+**{todo}** continue inline predicates
+
+**{todo}** [#17](https://github.com/holgerbrandl/kalasim/issues/17) review if simulation entities must have distinct names (optional policies) (see Hospital example)
+
+**{todo}** consider to expose createTestSimulation via public API
+* provide main-like scope for cli-experimentation
+
+---
+
+**{todo}** storeRefs --> trackArrivals
+* revisit storing/streaming of metrics (with time limit)
+
+
+
+## v0.8
+
+simple optimizing example
+
+https://groups.google.com/g/salabim/c/iK6o7umeXKc/m/l3t59WbKBgAJ?utm_medium=email&utm_source=footer
+---
+
+**{todo}** finish elevator example with visualization
+
+---
+**TODO** pathfinding example
+
+https://github.com/citiususc/hipster
+
+https://www.baeldung.com/java-a-star-pathfinding
 
 ---
 
@@ -30,50 +67,8 @@ equipped by considering the type (i.e., the family) of surgery to
 be performed. In such cases, the weight usually models a level of
 urgency for the patient.
 
-
 ---
-**TODO** pathfinding example
-
-https://github.com/citiususc/hipster
-
-https://www.baeldung.com/java-a-star-pathfinding
-
----
-
-**{todo}** respect ticktrafo in built-in visualizations
-
-**{todo}** provide heatmap of component-list status
-
-**{todo}** add `keepPositive` to `normal` 
-
-**{todo}** review simjulia <https://simjuliajl.readthedocs.io/en/stable/topical_guides/5_shared_resources.html#containers>
-
-**{todo}** finish elevator example with visualization
-
-**{todo}** consider if ComponentQueue should support all types (and not just Component)
-
-**{todo}** wait lambda should use state.value as receiver
-
-**{todo}** lambda builder for interrupt/resume
-
-**{todo}** continue inline predicates
-
-**{todo}** review if simulation entities must have distinct names (optional policies) (see Hospital example)
-
-nothing better than a good picure--> rock the (shop)floor
-
-**{todo}** consider to expose createTestSimulation via public API
-
-**{todo}** storeRefs --> trackArrivals
-
-**{todo}** detach from jcenter
-
-**{todo}** add `description` to `request` 
-
 ## Later
-
-
-**{todo}** find better way to draw random value without clutter `uniform(0,5)()` --> `uniform(0,5)`?!
 
 **{todo}** should we support a resource queue limit ` queue_size = Inf)` (as in simmer ucar209,p19)
 

@@ -133,13 +133,13 @@ Another method to query from a pool of resources are group requests. These are s
 
 Typical use cases are staff models, where certain colleagues have similar but not identical qualification. In case of the same qualification, a single resource with a `capacity` equal to the staff size, would be usually the better/correct solution.
 
-## Timeline
+## Activity Log
 
-Resources have a `timeline` attribute that provides a history of [scoped requests](#request-scope).
+Resources have a `activities` attribute that provides a history of [scoped requests](#request-scope) as a `List<ResourceActivityEvent>`
 
 ```kotlin
-r1.timeline
-    .plot(y={resource.name},  yend={resource.name},x={from},xend={to}, color={activity})
+r1.activities
+    .plot(y={resource.name},  yend={resource.name},x={start},xend={end}, color={activity})
     .geomSegment(size=10.0)
     .yLabel("Resource")
 ```
@@ -147,6 +147,32 @@ r1.timeline
 
 There's also a [notebook](https://github.com/holgerbrandl/kalasim/blob/master/simulations/notebooks/ResourceTimeline.ipynb) with a complete example.
 
+## Timeline
+
+The `timeline` attribute of a resource reports the progression of all its major metrics. The `timeline` provides a changelog of a resource in terms of:
+
+* `capacity` of the resource
+* `claimed` capacity
+* `# requesters` in the queue of the resource at a given time
+* `# claimers` claiming from the resource at a given time
+
+For convenience also 2 inferrable attributes are also included:
+
+* `availability` 
+* `occupancy`
+
+Technically, the `timeline` is a `List<ResourceTimelineSegment>` that covers the entire lifespan of the resource as step functions per metric.
+
+Example (from [example notebook](https://github.com/holgerbrandl/kalasim/blob/master/simulations/notebooks/ResourceTimeline.ipynb)) that illustrates how the `timeline` can be used to visualize some aspects of the resource utilization over time.
+
+```kotlin
+r.timelime
+    .filter{listOf(ResourceMetric.Capacity, ResourceMetric.Claimed).contains(it.metric)}
+    .plot(x={start}, y={value} , color={metric})
+    .geomStep()
+    .facetWrap("color", ncol=1, scales=FacetScales.free_y)
+```
+![](timeline_example.png)
 
 ## Monitors
 

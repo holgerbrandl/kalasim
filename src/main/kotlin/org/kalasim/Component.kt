@@ -608,8 +608,8 @@ open class Component(
             // salabim says: It is possible to check which resource has been claimed with `Component.claimers()`.
             resourceRequests.filter{ it.r.claimers.contains(this@Component)}.forEach {
                 release(it)
-                val rse = RequestScopeEvent(before, after, this@Component, it.r, description, it.quantity)
-                (it.r.timeline as MutableList<RequestScopeEvent>).add(rse)
+                val rse = ResourceActivityEvent(before, after, this@Component, it.r, description, it.quantity)
+                (it.r.activities as MutableList<ResourceActivityEvent>).add(rse)
                 log(rse)
 
             }

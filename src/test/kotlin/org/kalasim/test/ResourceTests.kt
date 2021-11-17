@@ -3,11 +3,14 @@ package org.kalasim.test
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.junit.Assert
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ResourceSelectionPolicy.*
+import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 class ResourceTests {
 
@@ -318,6 +321,7 @@ class ResourceTests {
         val r1 = Resource(capacity = 4)
         val r2 = Resource(capacity = 4)
 
+
         object : Component() {
             override fun process() = sequence {
                 request(r1)
@@ -345,12 +349,25 @@ class ResourceTests {
 
         run(10)
 
-        r1.timeline.apply {
+        r1.activities.apply {
             size shouldBe 1
-            first().from.value shouldBe 4.0
-            first().to.value shouldBe 6.0
+            first().start.value shouldBe 4.0
+            first().end.value shouldBe 6.0
             first().activity shouldBe "foo"
         }
+
+
+        // also test timeline api here
+        val timeline = r1.timeline
+
+        // We should make sure that only actual changes are tracked (e.g. not same capacity value twice
+        timeline.filter { it.metric == ResourceMetric.Capacity }.size shouldBe 2
+        timeline.size shouldBe 28
+
+        // now set the tick-transform and check if the timeline includes walltime
+        tickTransform = OffsetTransform(offset = Instant.parse("2021-01-01T00:00:00.00Z"), tickUnit = TimeUnit.MINUTES)
+        val timelineWT = r1.timeline
+        timelineWT.first().startWT shouldNotBe null
     }
 
 

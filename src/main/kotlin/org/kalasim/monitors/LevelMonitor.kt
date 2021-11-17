@@ -28,7 +28,7 @@ interface LevelMonitor<T> {
 
     fun addValue(value: T)
 
-    fun  statisticsSummary(): EnumeratedDistribution<T>
+    fun statisticsSummary(): EnumeratedDistribution<T>
 }
 
 
@@ -51,11 +51,17 @@ data class LevelStatsData<T>(
     fun stepFun(): List<Pair<Double, T>> =
         (this.timepoints + (timepoints.last() + durations.last())).zip(values.toList() + values.last())
 
-    fun asList() = stepFun().zip(durations).map{ LevelStateRecord(it.first.first, it.first.second, it.second)}
+    /**
+     * @param includeNow If true a last segement with the last state (without known end or duration) will be added
+     *                  at the end of the list. This is in particular helpful when visualizing these data
+     */
+    fun asList(includeNow: Boolean = true): List<LevelStateRecord<T>> {
+        val durationsExt = if(includeNow) durations + null else durations
+        return stepFun().zip(durationsExt).map { LevelStateRecord(it.first.first, it.first.second, it.second) }
+    }
 }
 
-data class LevelStateRecord<T>(val timestamp: Double, val value:T, val  duration:Double?)
-
+data class LevelStateRecord<T>(val timestamp: Double, val value: T, val duration: Double?)
 
 
 class IntVarMonitor(initialValue: Int = 0, name: String? = null, koin: Koin = DependencyContext.get()) {
@@ -81,8 +87,6 @@ class GenericVarMonitor<T>(initialValue: T, name: String? = null, koin: Koin = D
 
     override fun toString(): String = value.toString()
 }
-
-
 
 
 // without wrapping type
