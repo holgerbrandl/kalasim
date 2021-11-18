@@ -132,3 +132,5 @@ ComponentGenerator(iat=dist){ Customer() }
 ```
 
 Here, `3` is converted into a `org.apache.commons.math3.distribution.ConstantRealDistribution`.
+
+Also, `RealDistribution.clip(0)` will cap the sampled values at 0 (or any other value,  allowing zero-inflated distribution models with controlled randomization

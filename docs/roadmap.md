@@ -9,6 +9,10 @@ complete and publish hospital example
 
 ## v0.7
 
+
+**TODO** fix in https://www.kalasim.org/basics/
+>  If two events are scheduled at the same time, the one scheduled first will also be the processed first
+
 **{todo}** [#18](https://github.com/holgerbrandl/kalasim/issues/18) respect ticktrafo in built-in visualizations 
 
 **{todo}** mandatory jsonable on sim-entities feels cumbersome
@@ -16,8 +20,6 @@ complete and publish hospital example
 **{todo}** use standard sl4j for simulation logging or at least provide adapter
 
 **{todo}** provide heatmap of component-list status
-
-**{todo}** add `keepPositive` to `normal` 
 
 **{todo}** review simjulia <https://simjuliajl.readthedocs.io/en/stable/topical_guides/5_shared_resources.html#containers>
 
@@ -42,6 +44,8 @@ complete and publish hospital example
 
 
 ## v0.8
+
+better work out https://www.kalasim.org/setup/ for novice users (e.g. use koans/or datalore share)
 
 simple optimizing example
 

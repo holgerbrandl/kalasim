@@ -1,6 +1,8 @@
 package org.kalasim
 
 import org.apache.commons.math3.distribution.*
+import java.lang.Double.min
+import kotlin.math.max
 
 /** Distribution support API */
 
@@ -20,6 +22,14 @@ fun Environment.exponential(mean: Number) = ExponentialDistribution(rg, mean.toD
 fun SimulationEntity.normal(mean: Number = 0, sd: Number = 1) = env.normal(mean, sd)
 fun Environment.normal(mean: Number = 0, sd: Number = 1) = NormalDistribution(rg, mean.toDouble(), sd.toDouble())
 
+class Clipper(val dist: RealDistribution, val lower: Double, val upper: Double) {
+    fun invoke(): Double = min(max(dist(), lower), upper)
+}
+
+/** Clip the values of the distribution to the provided interval. */
+fun RealDistribution.clip(lower: Number = 0, upper: Number = Double.MAX_VALUE) =
+    Clipper(this, lower.toDouble(), upper.toDouble())
+
 
 fun SimulationEntity.discreteUniform(lower: Int, upper: Int) = env.discreteUniform(lower, upper)
 fun Environment.discreteUniform(lower: Int, upper: Int) = UniformIntegerDistribution(rg, lower, upper)
@@ -30,12 +40,13 @@ fun Environment.uniform(lower: Number = 1, upper: Number = 0) =
     UniformRealDistribution(rg, lower.toDouble(), upper.toDouble())
 
 
+fun <T> SimulationEntity.enumerated(vararg elements: T) =
+    enumerated((elements.map { it to 1.0 / elements.size }).toMap())
 
-fun <T> SimulationEntity.enumerated(vararg elements: T) = enumerated((elements.map { it to 1.0 / elements.size }).toMap())
 fun <T> SimulationEntity.enumerated(elements: Map<T, Double>) = env.enumerated(elements)
 
 @JvmName("enumeratedArray")
-fun <T> Environment.enumerated(elements: Array<T>) : EnumeratedDistribution<T> = enumerated(*elements)
+fun <T> Environment.enumerated(elements: Array<T>): EnumeratedDistribution<T> = enumerated(*elements)
 fun <T> Environment.enumerated(vararg elements: T) = enumerated((elements.map { it to 1.0 / elements.size }).toMap())
 fun <T> Environment.enumerated(elements: Map<T, Double>) = EnumeratedDistribution(rg, elements.toList().asCMPairList())
 

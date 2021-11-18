@@ -11,7 +11,7 @@ Major enhancements
 * Improved event logging API
 * Introduced [`ComponentList`](collections.md#list)
 * Implemented [ticks metrics](advanced.md#operational-control) monitor (fixes [#9](https://github.com/holgerbrandl/kalasim/issues/9))
-* New [timeline](https://www.kalasim.org/resource/#timeline) and [activity log](https://www.kalasim.org/resource/#activity-log)  attribute for resources to streamline usage and capacity analysis  
+* New [timeline](https://www.kalasim.org/resource/#timeline) and [activity log](https://www.kalasim.org/resource/#activity-log)  attributes to resources for streamlined usage and capacity analysis  
 
 Documentation
 
@@ -31,8 +31,8 @@ Minor enhancements
 request(doctorFoo, doctorBar, oneOf=true){ doctor ->
     println("patient treated by ${doctor}")
 }
-
 ```
+* Added `RealDistribution.clip` to allow zero-inflated distribution models with controlled randomization
 
 Breaking changes
 
