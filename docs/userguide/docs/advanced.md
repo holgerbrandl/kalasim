@@ -74,3 +74,14 @@ To further fine-tune and optimize simulation performance and to reveal bottlenec
 `kalasim` does not include a default mechanism to serialize and deserialize simulations yet. However, it [seems](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/misc/SaveLoadSimulation.kt) that with [xstream](https://x-stream.github.io/) that `Environment` can be saved including its current simulation state across all included entities. It can be restored from the xml snapshot and continued with `run()`.
 
  We have not [succeeded](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/misc/SaveLoadSimulation.kt#L39) to do the same with [gson](https://github.com/google/gson) yet. Also, some experiments with [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) were not that successful.
+ 
+
+## Internal State Validation
+
+The simulation engine provides different levels of internal consistency checks. As these are partially computationally expensive these can be be/disabled. There are 3 modes
+
+* `OFF` - Productive mode, where asserts that may impact performance are disabled.
+* `LIGHT` - Disables compute-intensive asserts. This will have a minimal to moderate performance impact on simulations.
+* `FULL` - Full introspection, this will have a measurable performance impact on simulations. E.g. it will validate that passive components are not scheduled, and queued components have unique names.
+
+Switching off asserts, will typically optimize performance by another ~20% (depending on simulation logic).

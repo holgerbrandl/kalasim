@@ -68,7 +68,7 @@ fun createSimulation(
         enableTickMetrics = enableTickMetrics,
         dependencies = dependencies,
         randomSeed = randomSeed,
-        koin = if(useCustomKoin) koinApplication { }.koin else null
+        koin = if (useCustomKoin) koinApplication { }.koin else null
     ).apply(builder)
 
 
@@ -155,7 +155,7 @@ open class Environment(
         // start console logger
 
 //        addTraceListener { print(it) }
-        if(enableConsoleLogger) {
+        if (enableConsoleLogger) {
             addEventListener(ConsoleTraceLogger())
         }
 
@@ -187,7 +187,7 @@ open class Environment(
         setCurrent(main)
 
         // declare dependencies
-        if(dependencies != null) {
+        if (dependencies != null) {
 //            val deps = dependencies ?: (module(createdAtStart = true) { })
             getKoin().loadModules(listOf(dependencies))
 //        KoinContextHandler.get()._scopeRegistry.rootScope.createEagerInstances()
@@ -199,7 +199,7 @@ open class Environment(
 
     }
 
-    private val _tm: TickMetrics? = if(enableTickMetrics) TickMetrics(koin = koin) else null
+    private val _tm: TickMetrics? = if (enableTickMetrics) TickMetrics(koin = koin) else null
     val tickMetrics: NumericLevelMonitor
         get() {
             require(_tm != null) { "Use enableTickMetrics=true to enable tick metrics" }
@@ -263,7 +263,7 @@ open class Environment(
         urgent: Boolean = false
     ): Environment {
         // also see https://simpy.readthedocs.io/en/latest/topical_guides/environments.html
-        if(ticks == null && until == null) {
+        if (ticks == null && until == null) {
             endOnEmptyEventlist = true
         } else {
             val scheduledTime = calcScheduleTime(until, ticks)
@@ -272,7 +272,7 @@ open class Environment(
         }
 
         running = true
-        while(running) {
+        while (running) {
             step()
         }
 
@@ -295,12 +295,12 @@ open class Environment(
         standBy.clear()
 
 
-        val (time, component) = if(eventQueue.isNotEmpty()) {
+        val (time, component) = if (eventQueue.isNotEmpty()) {
             val (c, time, _, _) = eventQueue.poll()
 
             time to c
         } else {
-            val t = if(endOnEmptyEventlist) {
+            val t = if (endOnEmptyEventlist) {
                 publishEvent(InteractionEvent(now, curComponent, null, null, "run end; no events left"))
                 now
             } else {
@@ -316,7 +316,7 @@ open class Environment(
 
         setCurrent(component)
 
-        if(component == main) {
+        if (component == main) {
             running = false
             return
         }
@@ -345,7 +345,7 @@ open class Environment(
 
 
     internal fun publishEvent(event: Event) {
-        if(traceFilters.any { it.matches(event) }) return
+        if (traceFilters.any { it.matches(event) }) return
 
         eventListeners.forEach {
             it.consume(event)
@@ -365,7 +365,7 @@ open class Environment(
         unschedule(c)
 
         // TODO what is happening here, can we simplify that?
-        if(c.componentState == STANDBY) {
+        if (c.componentState == STANDBY) {
             standBy.remove(c)
             pendingStandBy.remove(c)
         }
@@ -376,7 +376,7 @@ open class Environment(
             it.component == c
         }
 
-        if(queueElem != null) {
+        if (queueElem != null) {
             eventQueue.remove(queueElem)
         }
     }
@@ -392,13 +392,16 @@ open class Environment(
         eventQueue.add(QueueElement(component, scheduledTime, Priority(-priority.value), queueCounter, urgent))
 
         // consistency checks
-        if(ASSERT_MODE == AssertMode.FULL) {
+        if (ASSERT_MODE == AssertMode.FULL) {
             require(queue.none(Component::isPassive)) { "passive component must not be in event queue" }
+
+            // ensure that no scheduled components have the same name
+            require(queue.map { it.name }.distinct().size == queue.size) { "components must not have the same name" }
         }
     }
 
     fun toJson(includeComponents: Boolean = false): JSONObject = json {
-        if(includeComponents) {
+        if (includeComponents) {
             "components" to components.map { it.info.toJson() }
         }
         "num_components" to components.size
@@ -436,7 +439,7 @@ data class QueueElement(
 
 fun Environment.calcScheduleTime(until: TickTime?, duration: Number?): TickTime {
     return (until?.value to duration?.toDouble()).let { (till, duration) ->
-        if(till == null) {
+        if (till == null) {
             require(duration != null) { "neither duration nor till specified" }
             now.value + duration
         } else {

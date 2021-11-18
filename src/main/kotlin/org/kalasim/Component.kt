@@ -1106,7 +1106,6 @@ open class Component(
      */
     suspend fun SequenceScope<Component>.wait(
         vararg stateRequests: StateRequest<*>,
-        //todo change to support distribution parameters instead
         priority: Priority = NORMAL,
         urgent: Boolean = false,
         failAt: TickTime? = null,

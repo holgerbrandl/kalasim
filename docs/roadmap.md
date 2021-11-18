@@ -23,13 +23,6 @@ complete and publish hospital example
 
 **{todo}** review simjulia <https://simjuliajl.readthedocs.io/en/stable/topical_guides/5_shared_resources.html#containers>
 
-**{todo}** consider if ComponentQueue should support all types (and not just Component)
-
-**{todo}** wait lambda should use state.value as receiver
-
-**{todo}** lambda builder for interrupt/resume
-
-**{todo}** continue inline predicates
 
 **{todo}** [#17](https://github.com/holgerbrandl/kalasim/issues/17) review if simulation entities must have distinct names (optional policies) (see Hospital example)
 
@@ -78,6 +71,9 @@ urgency for the patient.
 
 **{todo}** Benchmark desim, salabim, simmer vs kalasim
 * See Ucar2019  5.1 `Comparison with similar frameworks`
+
+---
+**{todo}** lambda builder for interrupt/resume
 
 ---
 
