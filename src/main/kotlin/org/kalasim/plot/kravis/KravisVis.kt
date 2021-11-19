@@ -1,13 +1,11 @@
 package org.kalasim.plot.kravis
 
 import jetbrains.letsPlot.label.ggtitle
+import krangl.*
 import kravis.*
 import kravis.device.JupyterDevice
 import org.kalasim.*
-import org.kalasim.monitors.CategoryTimeline
-import org.kalasim.monitors.FrequencyTable
-import org.kalasim.monitors.MetricTimeline
-import org.kalasim.monitors.NumericStatisticMonitor
+import org.kalasim.monitors.*
 import java.awt.GraphicsEnvironment
 
 internal fun canDisplay() = !GraphicsEnvironment.isHeadless() && hasR()
@@ -108,10 +106,18 @@ fun <T> CategoryTimeline<T>.display(
 // resources
 //
 
-fun List<ResourceActivityEvent>.display(title: String?): GGPlot {
-    return plot(y = { resource.name }, yend = { resource.name }, x = { start }, xend = { end }, color = { activity })
+fun List<ResourceActivityEvent>.display(title: String?,
+                                        forceTickAxis: Boolean = false,
+): GGPlot {
+    val useWT = any { it.startWT != null } && !forceTickAxis
+
+    return plot(y = { resource.name },
+        yend = { resource.name },
+        x = { if (useWT) startWT else start },
+        xend = { if (useWT) endWT else end },
+        color = { activity ?: "Other" })
         .geomSegment(size = 10.0)
-        .yLabel("Resource")
+        .yLabel("")
         .also { if (title != null) ggtitle(title) }
 }
 
@@ -143,6 +149,70 @@ fun List<ResourceTimelineSegment>.display(
 fun Component.display(
     title: String = statusTimeline.name,
     forceTickAxis: Boolean = false,
-): GGPlot = statusTimeline.display(title= title, forceTickAxis= forceTickAxis)
+): GGPlot = statusTimeline.display(title = title, forceTickAxis = forceTickAxis)
 
+
+fun List<Component>.displayStateTimeline(
+    title: String? = null,
+    componentName: String = "component",
+    forceTickAxis: Boolean = false,
+): GGPlot {
+//    val df = csTimelineDF(componentName)
+    val df = clistTimeline()
+
+    val useWT = first().tickTransform !=null && !forceTickAxis
+    fun wtTransform(tt: TickTime) = if(useWT) first().env.asWallTime(tt) else  tt
+
+    return df.plot(y = { first.name }, yend = { first.name }, x = { wtTransform(TickTime(second.timestamp))})
+        .geomStep()
+        .also { if (title != null) ggtitle(title) }
+        .xLabel(componentName)
+}
+
+//private fun List<Component>.csTimelineDF(componentName: String) = map { eqn ->
+//    eqn.statusTimeline
+//        .statsData().asList()
+//        .asDataFrame().addColumn(componentName) { eqn }
+//}.bindRows().rename("value" to "state")
+
+
+
+fun List<Component>.displayStateProportions(
+    title: String? = null,
+): GGPlot {
+    val df = clistTimeline()
+
+    return df.plot(y = { first.name }, fill = {second.value}, weight = { second.duration})
+        .geomBar(position = PositionFill())
+        .also { if (title != null) ggtitle(title) }
+}
+
+
+// not needed because displayStateProportions works so much better here
+//fun List<Component>.displayStateHeatmap(
+//    title: String? = null,
+//    componentName: String = "component",
+//    forceTickAxis: Boolean = false,
+//): GGPlot {
+//    val df = clistTimeline()
+//
+//    val dfUnfold = df.asDataFrame().unfold<LevelStateRecord<ComponentState>>("second").rename("first" to "component")
+//
+//    val durationSummary = dfUnfold
+//        .groupBy("state", "component")
+//        .summarize("total_duration" `=` { it["duration"] })
+//
+//    val propMatrix = durationSummary
+//        .groupBy("component")
+//        .addColumn("total_dur_prop"){ it["total_duration"]/ it["total_duration"].sum()!! }
+//
+//    return propMatrix.plot("component", y="state", fill="total_dur_prop")
+//        .geomTile()
+//        .also { if (title != null) ggtitle(title) }
+//}
+
+private fun List<Component>.clistTimeline() = flatMap { eqn ->
+    eqn.statusTimeline
+        .statsData().asList().map { eqn to it }
+}
 
