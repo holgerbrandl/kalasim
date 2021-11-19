@@ -15,6 +15,8 @@ import org.kalasim.ComponentGenerator
 import org.kalasim.demo.MM1Queue
 import org.kalasim.plot.kravis.canDisplay
 import org.kalasim.plot.kravis.display
+import org.kalasim.plot.kravis.displayStateProportions
+import org.kalasim.plot.kravis.displayStateTimeline
 import org.koin.core.component.get
 import java.io.File
 import java.io.StringReader
@@ -38,9 +40,16 @@ class DisplayTests : AbstractSvgPlotRegression() {
         mm1.run(100)
 //        mm1.customers
 
-        mm1.server.activities.display("MM1 Server Utilization").apply { assertExpected(this) }
+        mm1.server.activities.display("MM1 Server Utilization")
+            .apply { assertExpected(this, "activities") }
 
-        mm1.("MM1 Server Utilization").apply { assertExpected(this) }
+        with(mm1.componentGenerator.arrivals) {
+            displayStateProportions("MM1 Server Utilization")
+                .apply { assertExpected(this, "proportions") }
+
+            displayStateTimeline("MM1 Server Utilization")
+                .apply { assertExpected(this, "timeline") }
+        }
     }
 }
 

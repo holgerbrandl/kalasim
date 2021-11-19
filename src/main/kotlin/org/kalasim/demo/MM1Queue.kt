@@ -10,10 +10,22 @@ class MM1Queue(
 
     val server: Resource
 
+    val componentGenerator: ComponentGenerator<Customer>
+
     val traces: TraceCollector = traceCollector()
 
-    init {
+    class Customer(mu: Double) : Component() {
+        val ed = ExponentialDistribution(env.rg, mu )
 
+        override fun process() = sequence {
+            request(get<Resource>()) {
+                hold(ed.sample())
+            }
+        }
+    }
+
+
+    init {
         val rho = lambda / mu
 
         println(
@@ -21,20 +33,10 @@ class MM1Queue(
                     "because there are more arrivals then the server can serve."
         )
 
-        server = Resource("server", 1)
+        server = dependency {  Resource("server", 1) }
 
-        class Customer : Component() {
-            val ed = ExponentialDistribution(rg, mu)
-
-            override fun process() = sequence {
-                request(server) {
-                    hold(ed.sample())
-                }
-            }
-        }
-
-        ComponentGenerator(iat = exponential(lambda)) {
-            Customer()
+        componentGenerator = ComponentGenerator(iat = exponential(lambda), storeRefs = true) {
+            Customer(mu)
         }
     }
 }

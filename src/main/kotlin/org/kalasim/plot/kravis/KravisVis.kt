@@ -163,8 +163,14 @@ fun List<Component>.displayStateTimeline(
     val useWT = first().tickTransform !=null && !forceTickAxis
     fun wtTransform(tt: TickTime) = if(useWT) first().env.asWallTime(tt) else  tt
 
-    return df.plot(y = { first.name }, yend = { first.name }, x = { wtTransform(TickTime(second.timestamp))})
-        .geomStep()
+    return df.plot(
+        y = { first.name },
+        yend = { first.name },
+        x = { wtTransform(TickTime(second.timestamp)) },
+        xend = { wtTransform(TickTime(second.timestamp + (second.duration?:0.0))) },
+        color = { second.value }
+    )
+        .geomLine()
         .also { if (title != null) ggtitle(title) }
         .xLabel(componentName)
 }
