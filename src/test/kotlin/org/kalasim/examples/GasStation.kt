@@ -90,11 +90,11 @@ object GasStation {
             val fuelPump = get<DepletableResource>(qualifier = named(FUEL_PUMP))
 
             fuelPump.apply {
-                capacityMonitor.printHistogram()
-                claimedMonitor.printHistogram()
-                availableMonitor.printHistogram()
+                capacityTimeline.printHistogram()
+                claimedTimeline.printHistogram()
+                availabilityTimeline.printHistogram()
 
-//                capacityMonitor.display()
+//                capacityTimeline.display()
 //                claimedQuantityMonitor.display()
 //                availableQuantityMonitor.display()
             }

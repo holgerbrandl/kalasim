@@ -1,7 +1,7 @@
 import PatientStatus.*
 import Severity.*
 import org.kalasim.*
-import org.kalasim.monitors.NumericLevelMonitor
+import org.kalasim.monitors.MetricTimeline
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
@@ -251,9 +251,9 @@ class EmergencyRoom(
     val rooms = List(4) { Room("room $it", State(InjuryType.values().random(random), name = "Setup of room $it")) }
 
     // Add additional metrics
-    val deceasedMonitor = NumericLevelMonitor("deceased patients")
-    val treatedMonitor = NumericLevelMonitor("treated patients")
-    val incomingMonitor = NumericLevelMonitor("incoming patients")
+    val deceasedMonitor = MetricTimeline("deceased patients")
+    val treatedMonitor = MetricTimeline("treated patients")
+    val incomingMonitor = MetricTimeline("incoming patients")
 
     val nurse = nurse
 

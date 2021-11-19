@@ -14,10 +14,10 @@ import kotlin.math.roundToInt
  *
  * @sample org.kalasim.misc.DokkaExamplesKt.freqLevelDemo
  */
-open class FrequencyStatsMonitor<T>(
+open class CategoryMonitor<T>(
     name: String? = null,
     koin: Koin = DependencyContext.get()
-) : Monitor<T>(name, koin), StatisticMonitor<T> {
+) : Monitor<T>(name, koin), ValueMonitor<T> {
 
 
     fun enable() {
@@ -119,7 +119,7 @@ internal fun <T> FrequencyTable<T>.printConsole(
 }
 
 //https://stackoverflow.com/questions/64325428/kotlin-reduce-list-of-map-to-a-single-map
-fun <T> List<FrequencyStatsMonitor<T>>.mergeStats() : FrequencyTable<T> = map{ it.statistics}.run{
+fun <T> List<CategoryMonitor<T>>.mergeStats() : FrequencyTable<T> = map{ it.statistics}.run{
 //    val maps = listOf(mapOf("fo" to 1, "fop" to 2), mapOf("bar" to 1, "fo" to 2))
 
     return flatMap { it.entries }

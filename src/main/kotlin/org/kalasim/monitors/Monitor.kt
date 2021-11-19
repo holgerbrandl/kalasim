@@ -15,7 +15,7 @@ abstract class Monitor<T>(
     koin: Koin = DependencyContext.get()
 ) : SimulationEntity(name, koin) {
 
-    /** Disable or enable data collection in a monitor. */
+    /** Disable or enable data collection in a timeline. */
     var enabled: Boolean = true
         protected set
 
@@ -26,7 +26,7 @@ abstract class Monitor<T>(
 
     fun <T> ifEnabled(query: () -> T): T {
         if (!enabled) {
-            throw  IllegalArgumentException("can not query disabled monitor")
+            throw  IllegalArgumentException("can not query disabled timeline")
         }
 
         return query()
@@ -34,9 +34,9 @@ abstract class Monitor<T>(
 }
 
 
-interface StatisticMonitor<T> {
+interface ValueMonitor<T> {
 
-    /** Resets the monitor. This will also reenable it as a side-effect. */
+    /** Resets the timeline. This will also reenable it as a side-effect. */
     fun reset()
 
     fun addValue(value: T)

@@ -13,7 +13,7 @@ import org.kalasim.misc.DependencyContext
 import kotlin.math.roundToInt
 
 class NumericStatisticMonitor(name: String? = null, koin: Koin = DependencyContext.get()) :
-    Monitor<Number>(name, koin), StatisticMonitor<Number> {
+    Monitor<Number>(name, koin), ValueMonitor<Number> {
     private val sumStats = ifEnabled { DescriptiveStatistics() }
 
     val values: DoubleArray

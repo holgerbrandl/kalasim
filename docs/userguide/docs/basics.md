@@ -31,7 +31,19 @@ Even if real-world processes may run "in parallel", a simulation is processed se
 
 Although, `kalasim` supports double-precision to schedule events, events will inevitably arise that are scheduled for the *same time*. Because of its  single-threaded, deterministic execution model (like most DES frameworks),  `kalasim`  processes events sequentially – one after another. If two events are scheduled at the same time, the one scheduled first will also be the processed first (FIFO).
 
-As pointed out in [Ucar, 2019](https://www.jstatsoft.org/article/view/v090i02), there are many situations where simultaneous events may occur in simulation. To provide a well-defined behavior in such situations, process interaction methods (namely  `wait`, `request`,  `activate` and `reschedule`) support a `priority`  parameter. With `priority` which is 0 by default, it is possible to sort a component before or after other components, scheduled for the same time. Events with higher priority are executed first in situations where multiple events are scheduled for the same simulation time.
+As pointed out in [Ucar, 2019](https://www.jstatsoft.org/article/view/v090i02), there are many situations where simultaneous events may occur in simulation. To provide a well-defined behavior in such situations, process interaction methods (namely  `wait`, `request`,  `activate` and `reschedule`) support user-define [schedule priorities]. With the parameter `priority`, it is possible to sort a component before or after other components, scheduled for the same time. Events with higher priority are executed first in situations where multiple events are scheduled for the same simulation time.
+
+There are different predefined priorities which correspond the following sort-levels
+
+* `LOWEST` (-20)
+* `LOW` (-10)
+* `NORMAL` (0)
+* `IMPORTANT` (20)
+* `CRITICAL` (20)
+
+The user can also create more fine-grained priorities with `Priority(23)`
+
+
 
 <!--The `urgent` parameters only applies to components scheduled with the same time and same `priority`. TBD do we need it?-->
 

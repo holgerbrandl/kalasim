@@ -5,7 +5,7 @@ package org.kalasim
 import com.github.holgerbrandl.jsonbuilder.json
 import krangl.*
 import org.kalasim.misc.Jsonable
-import org.kalasim.monitors.NumericLevelMonitor
+import org.kalasim.monitors.MetricTimeline
 import org.koin.core.Koin
 import org.kalasim.misc.DependencyContext
 
@@ -57,7 +57,7 @@ open class Resource(
 
             field = value
 
-            capacityMonitor.addValue(capacity)
+            capacityTimeline.addValue(capacity)
             updatedDerivedMetrics()
 
             tryRequest()
@@ -77,7 +77,7 @@ open class Resource(
             if (field < EPS)
                 field = 0.0
 
-            claimedMonitor.addValue(x)
+            claimedTimeline.addValue(x)
             updatedDerivedMetrics()
 
 //            if(this is DepletableResource && )
@@ -90,8 +90,8 @@ open class Resource(
 
 
     private fun updatedDerivedMetrics() {
-        availableMonitor.addValue(availableQuantity)
-        occupancyMonitor.addValue(occupancy)
+        availabilityTimeline.addValue(availableQuantity)
+        occupancyTimeline.addValue(occupancy)
     }
 
     val occupancy: Double
@@ -101,13 +101,13 @@ open class Resource(
         get() = capacity - claimed
 
 
-    val capacityMonitor = NumericLevelMonitor("Capacity of ${super.name}", initialValue = capacity, koin = koin)
-    val claimedMonitor = NumericLevelMonitor("Claimed quantity of ${this.name}", koin = koin)
+    val capacityTimeline = MetricTimeline("Capacity of ${super.name}", initialValue = capacity, koin = koin)
+    val claimedTimeline = MetricTimeline("Claimed quantity of ${this.name}", koin = koin)
 
     // **TODO**  technically availability and occupancy can be derived and may be omitted to reduce memory footprint
-    val availableMonitor =
-        NumericLevelMonitor("Available quantity of ${this.name}", initialValue = availableQuantity, koin = koin)
-    val occupancyMonitor = NumericLevelMonitor("Occupancy of ${this.name}", koin = koin)
+    val availabilityTimeline =
+        MetricTimeline("Available quantity of ${this.name}", initialValue = availableQuantity, koin = koin)
+    val occupancyTimeline = MetricTimeline("Occupancy of ${this.name}", koin = koin)
 
 
     init {
@@ -157,7 +157,7 @@ open class Resource(
             claimed = -q
 
             // done within decrementing claimedQuantity
-//            occupancyMonitor.addValue(if (capacity <= 0) 0 else claimedQuantity / capacity)
+//            occupancyTimeline.addValue(if (capacity <= 0) 0 else claimedQuantity / capacity)
 //            availableQuantityMonitor.addValue(capacity - claimedQuantity)
 
             tryRequest()
@@ -229,16 +229,16 @@ data class ResourceTimelineSegment(
 val Resource.timeline: List<ResourceTimelineSegment>
     get() {
         val capStats =
-            capacityMonitor.statsData().asList().asDataFrame()
+            capacityTimeline.statsData().asList().asDataFrame()
                 .addColumn("Metric") { ResourceMetric.Capacity }
         val claimStats =
-            claimedMonitor.statsData().asList().asDataFrame()
+            claimedTimeline.statsData().asList().asDataFrame()
                 .addColumn("Metric") { ResourceMetric.Claimed }
         val occStats =
-            occupancyMonitor.statsData().asList().asDataFrame()
+            occupancyTimeline.statsData().asList().asDataFrame()
                 .addColumn("Metric") { ResourceMetric.Occupancy }
         val availStats =
-            occupancyMonitor.statsData().asList().asDataFrame()
+            occupancyTimeline.statsData().asList().asDataFrame()
                 .addColumn("Metric") { ResourceMetric.Availability }
 
         val requesters = requesters.queueLengthMonitor.statsData().asList().asDataFrame()
@@ -268,7 +268,7 @@ val Resource.timeline: List<ResourceTimelineSegment>
 
         // we also resample with a common time axis using
         // val time = (capStats.keys + claimStats.keys + requesters.keys + claimers.keys).toList().sorted()
-//        listOf(1,2,3).map{         capacityMonitor[it] }
+//        listOf(1,2,3).map{         capacityTimeline[it] }
 
         return records
     }
@@ -300,10 +300,10 @@ class ResourceStatistics(resource: Resource) : Jsonable() {
     val requesters = resource.requesters.stats
     val claimers = resource.claimers.stats
 
-    val capacity = resource.capacityMonitor.statistics(false)
-    val availableQuantity = resource.availableMonitor.statistics(false)
-    val claimedQuantity = resource.claimedMonitor.statistics(false)
-    val occupancy = resource.occupancyMonitor.statistics(false)
+    val capacity = resource.capacityTimeline.statistics(false)
+    val availableQuantity = resource.availabilityTimeline.statistics(false)
+    val claimedQuantity = resource.claimedTimeline.statistics(false)
+    val occupancy = resource.occupancyTimeline.statistics(false)
 
 
     override fun toJson() = json {

@@ -28,7 +28,7 @@ fun main() {
         printInfo()
 
         if(canDisplay()) {
-            claimedMonitor.display()
+            claimedTimeline.display()
             requesters.queueLengthMonitor.display()
         }
 

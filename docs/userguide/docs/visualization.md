@@ -9,15 +9,33 @@ Examples
 * [Movie Theater](examples/movie_theater.md)
 
 
-## Statistical plots
+## Built-in Visualizations
 
-Currently the following extensions for distribution analysis are supported
+Currently, the following extensions for distribution analysis are supported
+
+[Components](component.md)
 
 
-* `FrequencyLevelMonitor<T>.display()` provides a segment chart of the level
+
+[Monitors](monitors.md)
+
+* `CategoryTimeline<T>.display()` provides a segment chart of the level
 * `FrequencyTable<T>.display()` provides a barchart of the frequencies of the different values 
 * `NumericStatisticMonitor.display()` provides histogram of the underlying distribution
-* `NumericLevelMonitor.display()` provides a line chart with time on the x and the value on y
+* `MetricTimeline.display()` provides a line chart with time on the x and the value on y
+
+
+[Resources](resource.md)
+
+* `r.activiities` to show the activities as segments timeline
+* `r.timeline` to show the resource utilization and queuing status 
+* All monitor related plots from above
+
+
+[Component Queue](collections.md#queue)
+
+* All monitor related plots from above
+
 
 
 For [monitors](monitors.md), see corresponding [section](monitors.md#visualization)

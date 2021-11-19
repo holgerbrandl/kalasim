@@ -6,7 +6,7 @@ import org.koin.core.Koin
 import org.kalasim.misc.DependencyContext
 
 
-interface LevelMonitor<T> {
+interface ValueTimeline<T> {
 
     /**
      * When Monitor.get() is called with a time parameter or a direct call with a time parameter, the value at that time will be returned.
@@ -16,14 +16,14 @@ interface LevelMonitor<T> {
     operator fun get(time: Number): T?
 
 
-    /** Get the total time for which a monitor was is state `value`*/
+    /** Get the total time for which a timeline was is state `value`*/
     fun total(value: T): Double?
 
 
     /** Returns the step function of this monitored value along the time axis. */
     fun stepFun(): List<Pair<Double, T>>
 
-    /** Resets the monitor to a new initial at the current simulation clock. This will also reenable it as a side-effect. */
+    /** Resets the timeline to a new initial at the current simulation clock. This will also reenable it as a side-effect. */
     fun reset(initial: T)
 
     fun addValue(value: T)
@@ -64,26 +64,26 @@ data class LevelStatsData<T>(
 data class LevelStateRecord<T>(val timestamp: Double, val value: T, val duration: Double?)
 
 
-class IntVarMonitor(initialValue: Int = 0, name: String? = null, koin: Koin = DependencyContext.get()) {
+class IntVarTimeline(initialValue: Int = 0, name: String? = null, koin: Koin = DependencyContext.get()) {
     var value: Int = initialValue
         set(value) {
             field = value
-            monitor.addValue(value)
+            timeline.addValue(value)
         }
 
-    val monitor by lazy { NumericLevelMonitor(name, koin = koin) }
+    val timeline by lazy { MetricTimeline(name, koin = koin) }
 
     override fun toString(): String = value.toString()
 }
 
-class GenericVarMonitor<T>(initialValue: T, name: String? = null, koin: Koin = DependencyContext.get()) {
+class GenericVarTimeline<T>(initialValue: T, name: String? = null, koin: Koin = DependencyContext.get()) {
     var value: T = initialValue
         set(value) {
             field = value
-            monitor.addValue(value)
+            timeline.addValue(value)
         }
 
-    val monitor by lazy { FrequencyLevelMonitor<T>(initialValue, name, koin = koin) }
+    val timeline by lazy { CategoryTimeline<T>(initialValue, name, koin = koin) }
 
     override fun toString(): String = value.toString()
 }
@@ -91,7 +91,7 @@ class GenericVarMonitor<T>(initialValue: T, name: String? = null, koin: Koin = D
 
 // without wrapping type
 //to inject use data class Counter(var value: Int)
-//val numBalkedMonitor by lazy { NumericLevelMonitor() }
+//val numBalkedMonitor by lazy { MetricTimeline() }
 //var numBalked: Int = 0
 //    set(value) {
 //        field = value

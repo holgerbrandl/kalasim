@@ -11,7 +11,7 @@ import kotlin.properties.Delegates
 //
 //        val env = Environment()
 //
-//        val barMonitor = NumericLevelMonitor()
+//        val barMonitor = MetricTimeline()
 //
 //        var bar: Int by Delegates.observable(0) { property, oldValue, newValue ->
 //            println("New Value $newValue")
@@ -38,17 +38,17 @@ import kotlin.properties.Delegates
 //            var myValue: Int = 0
 //        }
 //
-//        val monitor = Monitor()
+//        val timeline = Monitor()
 //
 //        var bar: Int by Delegates.observable(0) { property, oldValue, newValue ->
 //            println("New Value $newValue")
 //            println("Old Value $oldValue")
-//            monitor.myValue = newValue
+//            timeline.myValue = newValue
 //        }
 //
 //        bar++
 //
-//        println(monitor.myValue)
+//        println(timeline.myValue)
 //
 //    }
 //}
@@ -64,12 +64,12 @@ object SimplfiedIntMonitorWithWrapperClass {
         class Foo {
             //        https://stackoverflow.com/questions/54313839/how-to-set-up-a-listener-for-a-variable-in-kotlin
 
-            val monitor = Monitor()
+            val timeline = Monitor()
 
             var bar: Int by Delegates.observable(0) { property, oldValue, newValue ->
                 println("New Value $newValue")
                 println("Old Value $oldValue")
-                monitor.myValue = newValue
+                timeline.myValue = newValue
             }
 
 

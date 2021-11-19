@@ -9,13 +9,13 @@ import jetbrains.letsPlot.label.ylab
 import jetbrains.letsPlot.letsPlot
 import krangl.asDataFrame
 import krangl.letsPlot
-import org.kalasim.monitors.FrequencyLevelMonitor
+import org.kalasim.monitors.CategoryTimeline
 import org.kalasim.monitors.FrequencyTable
-import org.kalasim.monitors.NumericLevelMonitor
+import org.kalasim.monitors.MetricTimeline
 import org.kalasim.monitors.NumericStatisticMonitor
 
 
-fun NumericLevelMonitor.display(title: String = name): Plot {
+fun MetricTimeline.display(title: String = name): Plot {
     return stepFun().asDataFrame().letsPlot() +
             geomStep { x = "first"; y = "second" } + ggtitle(title)
 }
@@ -37,7 +37,7 @@ fun <T> FrequencyTable<T>.display(title: String? = null): Plot {
 }
 
 
-fun <T> FrequencyLevelMonitor<T>.display(title: String = name): Plot {
+fun <T> CategoryTimeline<T>.display(title: String = name): Plot {
     val nlmStatsData = statsData()
     val data = nlmStatsData.stepFun()
 
@@ -64,3 +64,5 @@ fun <T> FrequencyLevelMonitor<T>.display(title: String = name): Plot {
             ylab("") +
             ggtitle(title)
 }
+
+

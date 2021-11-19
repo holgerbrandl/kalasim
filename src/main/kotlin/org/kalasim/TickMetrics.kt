@@ -1,13 +1,13 @@
 package org.kalasim
 
 import org.kalasim.misc.DependencyContext
-import org.kalasim.monitors.NumericLevelMonitor
+import org.kalasim.monitors.MetricTimeline
 import org.koin.core.Koin
 import kotlin.math.round
 
 typealias process = SequenceScope<Component>
 
-/** Allows introspection of time-complexity of the underlying computations. The user may want to use the built-in env.tickMetrics monitor to analyze how much time is spent per time unit (aka tick).
+/** Allows introspection of time-complexity of the underlying computations. The user may want to use the built-in env.tickMetrics timeline to analyze how much time is spent per time unit (aka tick).
  *
  * https://www.kalasim.org/advanced/#operational-control */
 class TickMetrics(
@@ -17,7 +17,7 @@ class TickMetrics(
     koin: Koin? = null
 ) : Component(koin = koin ?: DependencyContext.get()) {
 
-    val monitor =  NumericLevelMonitor(name)
+    val timeline =  MetricTimeline(name)
 
     override fun process() = sequence {
 //        hold(ceil(now.value))
@@ -34,7 +34,7 @@ class TickMetrics(
             }
 
             if(enableMonitor){
-                monitor.addValue(tickDuration)
+                timeline.addValue(tickDuration)
             }
         }
     }

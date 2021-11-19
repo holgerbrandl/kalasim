@@ -21,7 +21,7 @@ class MonitorTests {
 
     @Test
     fun `Frequency stats should be correct`() = createTestSimulation {
-        val m = FrequencyStatsMonitor<Car>()
+        val m = CategoryMonitor<Car>()
         m.addValue(AUDI)
         m.addValue(AUDI)
         m.addValue(VW)
@@ -30,11 +30,11 @@ class MonitorTests {
         m.printHistogram()
 
         captureOutput { m.printHistogram() }.stdout shouldBe """
-                Summary of: 'FrequencyStatsMonitor.1'
+                Summary of: 'CategoryMonitor.1'
                 # Records: 7
                 # Levels: 3
                 
-                Histogram of: 'FrequencyStatsMonitor.1'
+                Histogram of: 'CategoryMonitor.1'
                               bin |  values |  pct |                                         
                 AUDI              |    2.00 |  .29 | ***********                             
                 VW                |    1.00 |  .14 | ******                                  
@@ -42,11 +42,11 @@ class MonitorTests {
                                 """.trimIndent()
 
         captureOutput { m.printHistogram(values = listOf(AUDI, TOYOTA)) }.stdout shouldBe """
-                Summary of: 'FrequencyStatsMonitor.1'
+                Summary of: 'CategoryMonitor.1'
                 # Records: 7
                 # Levels: 3
                 
-                Histogram of: 'FrequencyStatsMonitor.1'
+                Histogram of: 'CategoryMonitor.1'
                               bin |  values |  pct |                                         
                 AUDI              |    2.00 |  .29 | ***********                             
                 TOYOTA            |     .00 |  .00 |                                         
@@ -54,11 +54,11 @@ class MonitorTests {
                 """.trimIndent()
 
         captureOutput { m.printHistogram(sortByWeight = true) }.stdout shouldBe """
-                Summary of: 'FrequencyStatsMonitor.1'
+                Summary of: 'CategoryMonitor.1'
                 # Records: 7
                 # Levels: 3
                 
-                Histogram of: 'FrequencyStatsMonitor.1'
+                Histogram of: 'CategoryMonitor.1'
                               bin |  values |  pct |                                         
                 PORSCHE           |    4.00 |  .57 | ***********************                 
                 AUDI              |    2.00 |  .29 | ***********                             
@@ -69,7 +69,7 @@ class MonitorTests {
 
     @Test
     fun `Frequency level stats should be correct`() = createTestSimulation {
-        val m = FrequencyLevelMonitor<Car>(AUDI)
+        val m = CategoryTimeline<Car>(AUDI)
 //        m.addValue(AUDI)
         now = 2.tt
 
@@ -84,7 +84,7 @@ class MonitorTests {
 
     @Test
     fun `it should correctly calculate numeric level stats`() = createTestSimulation {
-        val nlm = NumericLevelMonitor()
+        val nlm = MetricTimeline()
 
         now += 2
         nlm.addValue(2)
@@ -103,8 +103,8 @@ class MonitorTests {
     }
 
     @Test
-    fun `NumericLevelMonitor should allow to retrieve a value for now but not before recording start`() = createTestSimulation {
-        val nlm = NumericLevelMonitor()
+    fun `MetricTimeline should allow to retrieve a value for now but not before recording start`() = createTestSimulation {
+        val nlm = MetricTimeline()
 
         now += 2
         nlm.addValue(2)
@@ -125,8 +125,8 @@ class MonitorTests {
 
 
     @Test
-    fun `FrequencyLevelMonitor should allow to retrieve a value for now but not before recording start`() = createTestSimulation {
-        val nlm = FrequencyLevelMonitor<String>("foo")
+    fun `CategoryTimeline should allow to retrieve a value for now but not before recording start`() = createTestSimulation {
+        val nlm = CategoryTimeline<String>("foo")
 
         now += 2
         nlm.addValue("bar")
@@ -163,7 +163,7 @@ class MonitorTests {
     fun `disabled monitor should error nicely when being queried`() = createTestSimulation {
         //FrequencyMonitor
         run {
-            val nsm = FrequencyStatsMonitor<Int>()
+            val nsm = CategoryMonitor<Int>()
 
             nsm.addValue(2)
             nsm.disable()
@@ -189,8 +189,8 @@ class MergeMonitorTests {
 
     @Test
     fun `it should merge NLM`() = createTestSimulation {
-        val nlmA = NumericLevelMonitor()
-        val nlmB = NumericLevelMonitor()
+        val nlmA = MetricTimeline()
+        val nlmB = MetricTimeline()
 
         now = 5.tt
         nlmA.addValue(23)
@@ -212,8 +212,8 @@ class MergeMonitorTests {
 
     @Test
     fun `it should merge FLM`() = createTestSimulation {
-        val flmA = FrequencyLevelMonitor(1)
-        val flmB = FrequencyLevelMonitor(2)
+        val flmA = CategoryTimeline(1)
+        val flmB = CategoryTimeline(2)
 
         flmA.addValue(1)
         flmB.addValue(2)
@@ -255,8 +255,8 @@ class MergeMonitorTests {
 
     @Test
     fun `it should merge FSM`() = createTestSimulation {
-        val fsmA = FrequencyStatsMonitor<Int>()
-        val fsmB = FrequencyStatsMonitor<Int>()
+        val fsmA = CategoryMonitor<Int>()
+        val fsmB = CategoryMonitor<Int>()
 
         fsmA.apply {
             addValue(1)

@@ -7,7 +7,7 @@ Not released yet
 Major enhancements
 
 * Dramatically improved simulation performance
-* Introduced `AssertMode`s (`Full`, `Light` (default), `None`) to enable/disable internal consistency checks. This will optimize performance by another ~20% (depending on simulation logic)
+* Introduced `AssertMode`s (`Full`, `Light` (default), `None`) to enable/disable internal [consistency checks](https://www.kalasim.org/advanced/#internal-state-validation). This will optimize performance by another ~20% (depending on simulation logic)
 * Improved event logging API
 * Introduced [`ComponentList`](collections.md#list)
 * Implemented [ticks metrics](advanced.md#operational-control) monitor (fixes [#9](https://github.com/holgerbrandl/kalasim/issues/9))
@@ -36,6 +36,7 @@ request(doctorFoo, doctorBar, oneOf=true){ doctor ->
 
 Breaking changes
 
+* Renamed `MetricTimeline` to `MetricTimeline` 
 * Updated to `koin` v3.1 (fixes [#15](https://github.com/holgerbrandl/kalasim/issues/15)): `GlobalContext` has been replaced with `DependencyContext`
 * Established use of `TickTime` across the entire API to disambiguate simulation time instants from durations, which are still modelled as `Double`
 * Changed `Component.now `and `Environment.now` to new value class `TickTime` for better type safety

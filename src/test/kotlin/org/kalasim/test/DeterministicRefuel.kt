@@ -4,7 +4,7 @@ import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
 import org.kalasim.plot.kravis.display
 import org.kalasim.misc.printThis
-import org.kalasim.monitors.NumericLevelMonitor
+import org.kalasim.monitors.MetricTimeline
 import org.koin.core.component.get
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -80,16 +80,16 @@ object DeterministicRefuel {
                     TankTruck()
 
                     // track number of trucks
-                    get<NumericLevelMonitor>(named(TRUCKS_ORDERED)).inc()
-                    get<NumericLevelMonitor>(named(TRUCKS_EN_ROUTE)).addValue(
+                    get<MetricTimeline>(named(TRUCKS_ORDERED)).inc()
+                    get<MetricTimeline>(named(TRUCKS_EN_ROUTE)).addValue(
                         env.queue.count { it is TankTruck }
                     )
                 }
 
                 request(fuelPump withQuantity litersRequired)
                 hold(litersRequired / REFUELING_SPEED)
-                get<NumericLevelMonitor>(named(CAR_LEAVING)).inc()
-//                get<NumericLevelMonitor>(named(TRUCKS_EN_ROUTE)).inc()
+                get<MetricTimeline>(named(CAR_LEAVING)).inc()
+//                get<MetricTimeline>(named(TRUCKS_EN_ROUTE)).inc()
             }
         }
 
@@ -100,9 +100,9 @@ object DeterministicRefuel {
             single { GasStation() }
 
             single(qualifier = named(FUEL_PUMP)) { DepletableResource(FUEL_PUMP, GAS_STATION_SIZE) }
-            single(qualifier = named(CAR_LEAVING)) { NumericLevelMonitor(CAR_LEAVING) }
-            single(qualifier = named(TRUCKS_EN_ROUTE)) { NumericLevelMonitor(TRUCKS_EN_ROUTE) }
-            single(qualifier = named(TRUCKS_ORDERED)) { NumericLevelMonitor(TRUCKS_ORDERED) }
+            single(qualifier = named(CAR_LEAVING)) { MetricTimeline(CAR_LEAVING) }
+            single(qualifier = named(TRUCKS_EN_ROUTE)) { MetricTimeline(TRUCKS_EN_ROUTE) }
+            single(qualifier = named(TRUCKS_ORDERED)) { MetricTimeline(TRUCKS_ORDERED) }
         }.apply {
 
             ComponentGenerator(iat = T_INTER) { Car(get()) }
@@ -112,9 +112,9 @@ object DeterministicRefuel {
             val fuelPump = get<Resource>(qualifier = named(FUEL_PUMP))
 
             fuelPump.apply {
-                capacityMonitor.printHistogram()
-                claimedMonitor.printHistogram()
-                availableMonitor.printHistogram()
+                capacityTimeline.printHistogram()
+                claimedTimeline.printHistogram()
+                availabilityTimeline.printHistogram()
             }
 
 
@@ -124,11 +124,11 @@ object DeterministicRefuel {
             // save the simulation state to file
 //            Json.encodeToString(this).println()
 
-            get<GasStation>().claimedMonitor.display()
-            fuelPump.claimedMonitor.display()
-            get<NumericLevelMonitor>(named(CAR_LEAVING)).display()
-            get<NumericLevelMonitor>(named(TRUCKS_EN_ROUTE)).display()
-            get<NumericLevelMonitor>(named(TRUCKS_ORDERED)).display()
+            get<GasStation>().claimedTimeline.display()
+            fuelPump.claimedTimeline.display()
+            get<MetricTimeline>(named(CAR_LEAVING)).display()
+            get<MetricTimeline>(named(TRUCKS_EN_ROUTE)).display()
+            get<MetricTimeline>(named(TRUCKS_ORDERED)).display()
         }
     }
 }

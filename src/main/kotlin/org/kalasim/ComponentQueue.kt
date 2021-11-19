@@ -8,8 +8,8 @@ import org.kalasim.misc.JSON_INDENT
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.printThis
 import org.kalasim.misc.roundAny
-import org.kalasim.monitors.NumericLevelMonitor
-import org.kalasim.monitors.NumericLevelMonitorStats
+import org.kalasim.monitors.MetricTimeline
+import org.kalasim.monitors.MetricTimelineStats
 import org.kalasim.monitors.NumericStatisticMonitor
 import org.koin.core.Koin
 import org.kalasim.misc.DependencyContext
@@ -54,7 +54,7 @@ class ComponentQueue<C>(
         get() = q.map { it.component }
 
     //    val ass = AggregateSummaryStatistics()
-    val queueLengthMonitor = NumericLevelMonitor("Length of ${this.name}", koin = koin)
+    val queueLengthMonitor = MetricTimeline("Length of ${this.name}", koin = koin)
     val lengthOfStayMonitor = NumericStatisticMonitor("Length of stay in ${this.name}", koin = koin)
 
     fun add(component: C, priority: Priority? = null): Boolean {
@@ -171,7 +171,7 @@ class QueueStatistics(cq: ComponentQueue<*>) {
     val timestamp = cq.env.now
 
     val lengthStats = cq.queueLengthMonitor.statistics(false)
-    val lengthStatsExclZeros = NumericLevelMonitorStats(cq.queueLengthMonitor, excludeZeros = true)
+    val lengthStatsExclZeros = MetricTimelineStats(cq.queueLengthMonitor, excludeZeros = true)
 
     val lengthOfStayStats = cq.lengthOfStayMonitor.statistics()
     val lengthOfStayStatsExclZeros = cq.lengthOfStayMonitor.statistics(excludeZeros = true)

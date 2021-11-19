@@ -8,7 +8,7 @@ import org.kalasim.*
 import org.kalasim.examples.hospital.PatientStatus.DeceasedWhileWaiting
 import org.kalasim.examples.hospital.PatientStatus.Waiting
 import org.kalasim.examples.hospital.Severity.*
-import org.kalasim.monitors.NumericLevelMonitor
+import org.kalasim.monitors.MetricTimeline
 import org.kalasim.plot.kravis.display
 import org.koin.core.component.get
 import kotlin.math.pow
@@ -261,9 +261,9 @@ class EmergencyRoom(
     val rooms = List(4) { Room("room $it", State(InjuryType.values().random(random), name = "Setup of room $it")) }
 
     // Add additional metrics
-    val deceasedMonitor = NumericLevelMonitor("deceased patients")
-    val treatedMonitor = NumericLevelMonitor("treated patients")
-    val incomingMonitor = NumericLevelMonitor("incoming patients")
+    val deceasedMonitor = MetricTimeline("deceased patients")
+    val treatedMonitor = MetricTimeline("treated patients")
+    val incomingMonitor = MetricTimeline("incoming patients")
 
     val nurse = nurse
 

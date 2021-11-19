@@ -112,7 +112,7 @@ There are different predefined priorities which correspond the following sort-le
 * `IMPORTANT` (20)
 * `CRITICAL` (20)
 
-The user can also create more fine-grained priorities with
+The user can also create more fine-grained priorities with `Priority(23)`
 
 
 ## Multiple resources
@@ -143,9 +143,14 @@ r1.activities
     .geomSegment(size=10.0)
     .yLabel("Resource")
 ```
+
 ![](resource_timeline.png)
 
+This visualization is also provided by a built-in `display()` extension for the activity log.
+
 There's also a [notebook](https://github.com/holgerbrandl/kalasim/blob/master/simulations/notebooks/ResourceTimeline.ipynb) with a complete example.
+
+
 
 ## Timeline
 
@@ -173,6 +178,8 @@ r.timelime
     .facetWrap("color", ncol=1, scales=FacetScales.free_y)
 ```
 ![](timeline_example.png)
+
+This visualization is also provided by a built-in `display()` extension for the timeline attribute.
 
 ## Monitors
 

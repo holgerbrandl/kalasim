@@ -38,7 +38,7 @@ fun main() {
 
         run(2000)
 
-        atm.occupancyMonitor.display()
+        atm.occupancyTimeline.display()
         atm.requesters.queueLengthMonitor.display()
         atm.requesters.lengthOfStayMonitor.display()
 

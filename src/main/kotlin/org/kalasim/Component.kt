@@ -7,7 +7,7 @@ import org.kalasim.misc.ASSERT_MODE
 import org.kalasim.misc.AssertMode
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.TRACE_DF
-import org.kalasim.monitors.FrequencyLevelMonitor
+import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
 import org.koin.core.component.KoinComponent
 import org.kalasim.misc.DependencyContext
@@ -91,10 +91,10 @@ open class Component(
     var componentState: ComponentState = DATA
         internal set(value) {
             field = value
-            statusMonitor.addValue(value)
+            statusTimeline.addValue(value)
         }
 
-    val statusMonitor = FrequencyLevelMonitor(componentState, "status of ${this.name}", koin)
+    val statusTimeline = CategoryTimeline(componentState, "status of ${this.name}", koin)
 
 
     init {
@@ -658,7 +658,7 @@ open class Component(
             .forEach { (resource, quantity) ->
                 // proceed just if request was honored claim it
                 if(rHonor.any { it.first == resource }) {
-                    resource.claimed += quantity //this will also update the monitor
+                    resource.claimed += quantity //this will also update the timeline
 
 
                     log{
@@ -1420,12 +1420,12 @@ data class ComponentLifecycleRecord(
 fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {
     val c = this
 
-    val histogram: Map<ComponentState, Double> = c.statusMonitor.summed()
+    val histogram: Map<ComponentState, Double> = c.statusTimeline.summed()
 
     return ComponentLifecycleRecord(
         c.name,
         c.creationTime,
-        inDataSince = if(c.isData) c.statusMonitor.statsData().timepoints.last().asTickTime() else null,
+        inDataSince = if(c.isData) c.statusTimeline.statsData().timepoints.last().asTickTime() else null,
         (histogram.get(DATA) ?: 0.0).asTickTime(),
         (histogram[CURRENT] ?: 0.0).asTickTime(),
         (histogram[STANDBY] ?: 0.0).asTickTime(),

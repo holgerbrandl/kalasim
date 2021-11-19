@@ -41,7 +41,7 @@ fun main() {
 
         MOVIES.forEach { movie ->
             val numLeftQueue = theater.numReneged[movie]!!
-            val soldOutSince = theater.tickets[movie]!!.occupancyMonitor.stepFun()
+            val soldOutSince = theater.tickets[movie]!!.occupancyTimeline.stepFun()
                 // find the first time when tickets were sold out
                 .first { it.second == 1.0 }.first.roundAny(2)
 
@@ -51,7 +51,7 @@ fun main() {
 
 //        // Visualize ticket sales
 //        val plotData = theater.tickets.values.flatMap {
-//            it.occupancyMonitor.stepFun().map { sf -> Triple(it.name, sf.first, sf.second) }
+//            it.occupancyTimeline.stepFun().map { sf -> Triple(it.name, sf.first, sf.second) }
 //        }
 //
 //        plotData.asDataFrame().plot(x = "second", y = "third")

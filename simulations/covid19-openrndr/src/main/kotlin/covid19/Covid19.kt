@@ -1,7 +1,7 @@
 package covid19
 
 import org.kalasim.*
-import org.kalasim.monitors.NumericLevelMonitor
+import org.kalasim.monitors.MetricTimeline
 import org.koin.core.component.get
 import java.util.*
 
@@ -25,7 +25,7 @@ class Infection(val person: Person) : Component() {
 
     init {
         person.sick = true
-        get<NumericLevelMonitor>().inc()
+        get<MetricTimeline>().inc()
     }
 
     override fun process() = sequence {
@@ -41,7 +41,7 @@ class Infection(val person: Person) : Component() {
         hold(cureProb().run { if (this < 0) 0 else this })
         person.sick = false
         person.immune = true
-        get<NumericLevelMonitor>().dec()
+        get<MetricTimeline>().dec()
 
         // undo quarantaine
 //        person.activate()
@@ -112,7 +112,7 @@ class PersonTracker(environment: Environment) {
 class Covid19 : Environment() {
     init {
         dependency { PersonTracker(this) }
-        dependency { NumericLevelMonitor("sick_monitor") }
+        dependency { MetricTimeline("sick_monitor") }
 
         traceCollector()
 

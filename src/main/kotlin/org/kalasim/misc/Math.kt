@@ -5,8 +5,7 @@ import org.apache.commons.math3.stat.descriptive.AggregateSummaryStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.apache.commons.math3.stat.descriptive.rank.Median
 import org.kalasim.asCMPairList
-import org.kalasim.monitors.FrequencyStatsMonitor
-import org.kalasim.monitors.LevelMonitor
+import org.kalasim.monitors.ValueTimeline
 
 internal fun Collection<Double>.median() = Median().evaluate(toDoubleArray())
 
@@ -20,9 +19,9 @@ fun <T : Number> List<T>.cumSum(): Iterable<Double> {
 
 fun List<StatisticalSummary>.merge() = AggregateSummaryStatistics.aggregate(this)
 
-fun <T> List<LevelMonitor<T>>.mergeStats() = map{it.statisticsSummary()}.merge()
+fun <T> List<ValueTimeline<T>>.mergeStats() = map{it.statisticsSummary()}.merge()
 //
-//fun List<NumericLevelMonitor>.mergeStats() = flatMap { it.statisticsSummary().pmf }.groupBy { it.first }
+//fun List<MetricTimeline>.mergeStats() = flatMap { it.statisticsSummary().pmf }.groupBy { it.first }
 //        .map { it.key to it.value.sumOf { it.second } }.asCMPairList().run {
 //            EnumeratedDistribution(this)
 //        }

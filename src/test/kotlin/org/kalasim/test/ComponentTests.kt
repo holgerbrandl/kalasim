@@ -155,7 +155,7 @@ class ComponentTests {
         run(2)
 
 
-        component.statusMonitor.printHistogram()
+        component.statusTimeline.printHistogram()
     }
 
     @Test

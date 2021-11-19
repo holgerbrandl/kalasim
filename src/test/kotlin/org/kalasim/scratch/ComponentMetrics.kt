@@ -45,7 +45,7 @@ fun main() {
         pStats.asDataFrame().printThis()
 
 
-        cg.arrivals.first().statusMonitor.summed().printConsole()
-        cg.arrivals.first().statusMonitor.summed().display()
+        cg.arrivals.first().statusTimeline.summed().printConsole()
+        cg.arrivals.first().statusTimeline.summed().display()
     }
 }

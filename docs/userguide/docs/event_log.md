@@ -51,16 +51,34 @@ Process finished with exit code 0
 
 Console logging is not active by default as it would considerably slow down larger simulations, and but must be enabled when creating a simulation with `createSimulation(enableConsoleLogger = true)`
 
+
+## Event Collector
+
+A more selective monitor that will just events of a certain type is the event collector. It needs to be created before running the simulation (or from the moment when events shall be collected).
+
+```kotlin
+class MyEvent(time : TickTime) : Event(time)
+
+// run the sim which create many events including some MyEvents
+env.run()
+
+val myEvents :List<MyEvent> = eventCollector<MyEvent>()
+
+// e.g. save them into a csv file with krangl
+myEvents.asDataFrame().writeCsv(File("my_events.csv"))
+```
+This collector will have a much reduced memory footprint compared to the [trace-collector](#trace-collector).
+
 ## Trace Collector
 
-Another built-in event listener is the trace collector, which simply records all events and puts them in a list for latter analysis. Events can also be accumulated
- by using `traceCollector()`
+Another built-in event listener is the trace collector, which simply records **all** events and puts them in a list for later analysis.
 
-For example to fetch all events related to resource requests we could filter by the corresponding event type
+For example to fetch all events in retrospect related to resource requests we could filter by the corresponding event type
 
 ```kotlin
 //{!api/EventCollector.kts!}
 ```
+
 
 ## Asynchronous Processing
 

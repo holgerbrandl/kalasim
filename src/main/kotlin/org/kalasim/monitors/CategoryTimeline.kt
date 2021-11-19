@@ -11,11 +11,11 @@ import org.kalasim.misc.DependencyContext
  *
  * @sample org.kalasim.misc.DokkaExamplesKt.freqLevelDemo
  */
-class FrequencyLevelMonitor<T>(
+class CategoryTimeline<T>(
     initialValue: T,
     name: String? = null,
     koin: Koin = DependencyContext.get()
-) : Monitor<T>(name, koin), LevelMonitor<T> {
+) : Monitor<T>(name, koin), ValueTimeline<T> {
 
     private val timestamps = listOf<Double>().toMutableList()
     private val values = ifEnabled { listOf<T>().toMutableList() }
@@ -64,7 +64,7 @@ class FrequencyLevelMonitor<T>(
 
     override fun get(time: Number): T? {
         require(time.toDouble() >= timestamps.first()) {
-            "query time must be greater than monitor start (${timestamps.first()})"
+            "query time must be greater than timeline start (${timestamps.first()})"
         }
 
         // https://youtrack.jetbrains.com/issue/KT-43776

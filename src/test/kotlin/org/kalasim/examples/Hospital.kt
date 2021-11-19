@@ -45,8 +45,8 @@ fun main() {
 
         run(100)
 
-        nurses.occupancyMonitor.display()
-        nurses.capacityMonitor.display()
+        nurses.occupancyTimeline.display()
+        nurses.capacityTimeline.display()
     }
 
     // analysis

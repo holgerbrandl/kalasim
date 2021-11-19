@@ -10,7 +10,7 @@ import org.kalasim.misc.ASSERT_MODE
 import org.kalasim.misc.AssertMode
 import org.kalasim.misc.JSON_INDENT
 import org.kalasim.misc.DependencyContext
-import org.kalasim.monitors.NumericLevelMonitor
+import org.kalasim.monitors.MetricTimeline
 import org.koin.core.Koin
 import org.koin.core.definition.Definition
 import org.koin.core.qualifier.Qualifier
@@ -200,10 +200,10 @@ open class Environment(
     }
 
     private val _tm: TickMetrics? = if (enableTickMetrics) TickMetrics(koin = koin) else null
-    val tickMetrics: NumericLevelMonitor
+    val tickMetrics: MetricTimeline
         get() {
             require(_tm != null) { "Use enableTickMetrics=true to enable tick metrics" }
-            return _tm.monitor
+            return _tm.timeline
         }
 
 

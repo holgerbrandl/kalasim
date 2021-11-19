@@ -51,6 +51,6 @@ createSimulation(true) {
     run(10)
 
     // assess the state of the simulation entities
-    car2.statusMonitor.printHistogram()
+    car2.statusTimeline.printHistogram()
     get<GasStation>().printStatistics()
 }

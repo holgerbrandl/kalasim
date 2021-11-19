@@ -1,8 +1,8 @@
 package org.kalasim
 
 import org.kalasim.misc.Jsonable
-import org.kalasim.monitors.FrequencyLevelMonitor
-import org.kalasim.monitors.NumericLevelMonitor
+import org.kalasim.monitors.CategoryTimeline
+import org.kalasim.monitors.MetricTimeline
 import org.kalasim.monitors.NumericStatisticMonitor
 import org.koin.core.Koin
 import org.kalasim.misc.DependencyContext
@@ -39,13 +39,13 @@ open class State<T>(
         }
 
 
-    val valueMonitor = FrequencyLevelMonitor(initialValue = value, koin = koin, name="State of '$name'")
+    val valueMonitor = CategoryTimeline(initialValue = value, koin = koin, name="State of '$name'")
 
     internal val waiters = ComponentQueue<Component>("waiters of ${this.name}", koin = koin)
 //    val waiters = PriorityQueue<Component>()
 
     /** Tracks the queue length level along time. */
-    val queueLength: NumericLevelMonitor
+    val queueLength: MetricTimeline
         get() = waiters.queueLengthMonitor
 
     /** Tracks the length of stay in the queue over time*/

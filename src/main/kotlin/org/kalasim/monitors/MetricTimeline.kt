@@ -20,11 +20,11 @@ import kotlin.math.sqrt
 /**
  * Allows to track a numeric quantity over time.
  *
- * @param initialValue initial value for a level monitor. It is important to set the value correctly. Default: 0
+ * @param initialValue initial value for a level timeline. It is important to set the value correctly. Default: 0
  */
-class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: Koin = DependencyContext.get()) :
+class MetricTimeline(name: String? = null, initialValue: Number = 0, koin: Koin = DependencyContext.get()) :
     Monitor<Number>(name, koin),
-    LevelMonitor<Number> {
+    ValueTimeline<Number> {
 
     private val timestamps = listOf<Double>().toMutableList()
     private val values = ifEnabled { listOf<Double>().toMutableList() }
@@ -42,7 +42,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
 
 
     /** Increment the current value by 1 and add it as value. Autostart with 0 if there is no prior value. */
-    operator fun inc(): NumericLevelMonitor {
+    operator fun inc(): MetricTimeline {
 //        val roundToInt = (values.lastOrNull() ?: 0.0).roundToInt()
         val roundToInt = values.last()
         addValue((roundToInt + 1))
@@ -50,7 +50,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
         return this
     }
 
-    operator fun dec(): NumericLevelMonitor {
+    operator fun dec(): MetricTimeline {
 //        val roundToInt = (values.lastOrNull() ?: 0.0).roundToInt()
         val roundToInt = values.last()
         addValue((roundToInt - 1))
@@ -60,7 +60,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
 
     override fun get(time: Number): Number {
         require(time.toDouble() >= timestamps.first()) {
-            "query time must be greater than monitor start (${timestamps.first()})"
+            "query time must be greater than timeline start (${timestamps.first()})"
         }
 
         return timestamps.zip(values.toList()).reversed().first { it.first <= time.toDouble() }.second
@@ -97,7 +97,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
     /** Returns the step function of this monitored value along the time axis. */
     override fun stepFun() = statsData().stepFun()
 
-    fun statistics(excludeZeros: Boolean = false) = NumericLevelMonitorStats(this, excludeZeros)
+    fun statistics(excludeZeros: Boolean = false) = MetricTimelineStats(this, excludeZeros)
 
     fun printHistogram(sortByWeight: Boolean = false, binCount: Int = NUM_HIST_BINS, valueBins: Boolean = false) {
         println("Summary of: '${name}'")
@@ -154,7 +154,7 @@ class NumericLevelMonitor(name: String? = null, initialValue: Number = 0, koin: 
 
 }
 
-class NumericLevelMonitorStats(nlm: NumericLevelMonitor, excludeZeros: Boolean = false) : Jsonable() {
+class MetricTimelineStats(nlm: MetricTimeline, excludeZeros: Boolean = false) : Jsonable() {
     val duration: Double
 
     val mean: Double?

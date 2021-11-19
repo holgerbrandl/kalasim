@@ -4,7 +4,7 @@ import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.junit.Test
 import org.kalasim.Environment
 import org.kalasim.asCMPairList
-import org.kalasim.monitors.FrequencyLevelMonitor
+import org.kalasim.monitors.CategoryTimeline
 
 
 // Adopted from example in https://www.salabim.org/manual/Monitor.html
@@ -16,7 +16,7 @@ fun freqLevelDemo() {
 
     val dist = EnumeratedDistribution(data.asCMPairList())
 
-    val dm = FrequencyLevelMonitor("bla")
+    val dm = CategoryTimeline("bla")
 
     repeat(1000) { dm.addValue(dist.sample()); dm.env.now += 1 }
 

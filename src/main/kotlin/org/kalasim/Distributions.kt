@@ -27,6 +27,7 @@ class Clipper(val dist: RealDistribution, val lower: Double, val upper: Double) 
 }
 
 /** Clip the values of the distribution to the provided interval. */
+// we could also adopt kotlin stdlib conventions and use coerceIn, coerceAtLeast and coerceAtMost
 fun RealDistribution.clip(lower: Number = 0, upper: Number = Double.MAX_VALUE) =
     Clipper(this, lower.toDouble(), upper.toDouble())
 

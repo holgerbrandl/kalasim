@@ -1,11 +1,12 @@
 package org.kalasim.plot.kravis
 
+import jetbrains.letsPlot.label.ggtitle
 import kravis.*
 import kravis.device.JupyterDevice
-import org.kalasim.TickTime
-import org.kalasim.monitors.FrequencyLevelMonitor
+import org.kalasim.*
+import org.kalasim.monitors.CategoryTimeline
 import org.kalasim.monitors.FrequencyTable
-import org.kalasim.monitors.NumericLevelMonitor
+import org.kalasim.monitors.MetricTimeline
 import org.kalasim.monitors.NumericStatisticMonitor
 import java.awt.GraphicsEnvironment
 
@@ -28,21 +29,18 @@ internal fun printWarning(msg: String) {
     System.err.println("[kalasim] $msg")
 }
 
-/** Show plots automatically without the need to call `show()`*/
-var AUTO_SHOW = false
-
 private fun GGPlot.showNotJupyter(): GGPlot = also {
-    if (SessionPrefs.OUTPUT_DEVICE !is JupyterDevice && AUTO_SHOW) {
+    if (SessionPrefs.OUTPUT_DEVICE !is JupyterDevice) {
         checkDisplay()
         show()
     }
 }
 
 
-fun NumericLevelMonitor.display(title: String = name, from: TickTime? = null, to:TickTime? = null): GGPlot {
+fun MetricTimeline.display(title: String = name, from: TickTime? = null, to: TickTime? = null): GGPlot {
     val data = stepFun()
-        .filter{ from == null || it.first >= from.value}
-        .filter{ to == null || it.first <= to.value}
+        .filter { from == null || it.first >= from.value }
+        .filter { to == null || it.first <= to.value }
 
     return data.plot(
         x = Pair<Double, Double>::first,
@@ -74,7 +72,10 @@ fun <T> FrequencyTable<T>.display(title: String? = null): GGPlot {
 }
 
 
-fun <T> FrequencyLevelMonitor<T>.display(title: String = name): GGPlot {
+fun <T> CategoryTimeline<T>.display(
+    title: String = name,
+    forceTickAxis: Boolean = false,
+): GGPlot {
     val nlmStatsData = statsData()
     val data = nlmStatsData.stepFun()
 
@@ -102,3 +103,46 @@ fun <T> FrequencyLevelMonitor<T>.display(title: String = name): GGPlot {
         .title(title)
         .showNotJupyter()
 }
+
+//
+// resources
+//
+
+fun List<ResourceActivityEvent>.display(title: String?): GGPlot {
+    return plot(y = { resource.name }, yend = { resource.name }, x = { start }, xend = { end }, color = { activity })
+        .geomSegment(size = 10.0)
+        .yLabel("Resource")
+        .also { if (title != null) ggtitle(title) }
+}
+
+
+/**
+ * @param forceTickAxis Even if a tick-transformation is defined, the x axis will show tick-times
+ */
+fun List<ResourceTimelineSegment>.display(
+    title: String?,
+    exclude: List<ResourceMetric> = listOf(
+        ResourceMetric.Capacity,
+        ResourceMetric.Occupancy,
+        ResourceMetric.Availability
+    ),
+    forceTickAxis: Boolean = false,
+): GGPlot {
+    val useWT = any { it.startWT != null } && !forceTickAxis
+    return filter { it.metric !in exclude }
+        .plot(x = { if (useWT) startWT else start }, y = { value }, color = { metric })
+        .geomStep()
+        .facetWrap("color", ncol = 1, scales = FacetScales.free_y)
+        .also { if (title != null) ggtitle(title) }
+}
+
+
+//
+// Components
+
+fun Component.display(
+    title: String = statusTimeline.name,
+    forceTickAxis: Boolean = false,
+): GGPlot = statusTimeline.display(title= title, forceTickAxis= forceTickAxis)
+
+

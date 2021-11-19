@@ -58,13 +58,13 @@ Level monitors tally levels along with the current (simulation) time. E.g. the n
 
 There are  2 implementations to support categorical and numerical attributes
 
-* `org.kalasim.FrequencyLevelMonitor`
-* `org.kalasim.NumericLevelMonitor`
+* `org.kalasim.CategoryTimeline`
+* `org.kalasim.MetricTimeline`
 
 
 Level monitors allow to query the value at a specific time
 ```kotlin
-val nlm = NumericLevelMonitor()
+val nlm = MetricTimeline()
 // ... collecting some data ...
 nlm[4]  // will print the value at time 4
 ```
@@ -210,7 +210,7 @@ VW                |       1 |  .14 | ******
 
 For numeric monitors it is possible to show values instead of ranges as bins
 ```kotlin
-val nlm = NumericLevelMonitor()
+val nlm = MetricTimeline()
 
 now += 2
 nlm.addValue(2)
@@ -226,7 +226,7 @@ nlm.printHistogram(valueBins = true)
 which will result by default in
 
 ```
-Histogram of: 'NumericLevelMonitor.1'
+Histogram of: 'MetricTimeline.1'
               bin | entries |  pct |                                         
 [.00, .60]        |     232 |  .23 | *********                               
 [.60, 1.20]       |       0 |  .00 |                                         
@@ -243,7 +243,7 @@ Histogram of: 'NumericLevelMonitor.1'
 However, when valueBins is enabled the histogram becomes
 
 ```
-Histogram of: 'NumericLevelMonitor.1'
+Histogram of: 'MetricTimeline.1'
               bin | entries |  pct |                                         
 0.0               |       2 |  .25 | **********                              
 2.0               |       2 |  .25 | **********                              
@@ -256,8 +256,8 @@ Histogram of: 'NumericLevelMonitor.1'
 
 Tt is possible to merge the resulting statistics of multiple monitors
 ```kotlin
-val flmA = FrequencyLevelMonitor(1)
-val flmB = FrequencyLevelMonitor(2)
+val flmA = CategoryTimeline(1)
+val flmB = CategoryTimeline(2)
 
 // ... run simulation 
 
@@ -284,7 +284,7 @@ Use-cases for slicing are
 It is possible to render monitors with the following extension functions
 ```kotlin
 NumericStatisticMonitor.display() 
-NumericLevelMonitor.display()
+MetricTimeline.display()
 ```
 
 ![](monitors_images/monitor.png)

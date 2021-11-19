@@ -21,7 +21,7 @@ class DemoTests {
 fun main() {
     val mm1Queue = MM1Queue().apply {
         run(100)
-        server.claimedMonitor.display().show()
+        server.claimedTimeline.display().show()
         server.requesters.lengthOfStayMonitor.display().show()
     }
 
