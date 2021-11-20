@@ -52,10 +52,11 @@ object ProcessGraph {
             hold(ticks = 23.0)
 
             // wait for an empty counter
-            request(clerk)
+            request(clerk) {
 
-            // billing process
-            hold(ticks = 2.0, priority = IMPORTANT)
+                // billing process
+                hold(ticks = 2.0, priority = IMPORTANT)
+            }
         }
     }
 }
