@@ -12,6 +12,7 @@ Major enhancements
 * Introduced [`ComponentList`](collections.md#list)
 * Implemented [ticks metrics](advanced.md#operational-control) monitor (fixes [#9](https://github.com/holgerbrandl/kalasim/issues/9))
 * New [timeline](https://www.kalasim.org/resource/#timeline) and [activity log](https://www.kalasim.org/resource/#activity-log)  attributes to resources for streamlined usage and capacity analysis  
+* Extended `display()` support API on all major components and their collections (including `Resource`, `Component` or `List<Component>`, `MetricTimeline`) (fixes [#18](https://github.com/holgerbrandl/kalasim/issues/18))
 
 Documentation
 

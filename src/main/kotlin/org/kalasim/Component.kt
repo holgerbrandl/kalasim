@@ -149,11 +149,6 @@ open class Component(
     }
 
 
-    /** The current simulation time*/
-    val now
-        get() = env.now
-
-
     open fun process() = this.let {
         sequence<Component> {
 //            while (true) { // disabled because too much abstraction

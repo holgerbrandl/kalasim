@@ -53,6 +53,10 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
         set(_) {
             throw RuntimeException("Tick transformation must be set via the environment")
         }
+
+    /** The current simulation time*/
+    val now
+        get() = env.now
 //        private set
 
 
