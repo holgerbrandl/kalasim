@@ -18,7 +18,7 @@ The core of *kalasim* is an event queue ordered by scheduled execution time, tha
 
 <!--https://stackoverflow.com/questions/19331362/using-an-image-caption-in-markdown-jekyll-->
 <figure>
-  <img src="../basics_images/event_loop.png"  alt="kalasim event model"/>
+  <img src="../basics_images/event_loop.svg"  alt="kalasim event model"/>
   <figcaption>Kalasim Execution Model</figcaption>
 </figure>
 
