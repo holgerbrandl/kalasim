@@ -1,7 +1,6 @@
 package org.kalasim.plot.kravis
 
 import jetbrains.letsPlot.label.ggtitle
-import krangl.*
 import kravis.*
 import kravis.device.JupyterDevice
 import org.kalasim.*
@@ -27,27 +26,39 @@ internal fun printWarning(msg: String) {
     System.err.println("[kalasim] $msg")
 }
 
-private fun GGPlot.showNotJupyter(): GGPlot = also {
-    if (SessionPrefs.OUTPUT_DEVICE !is JupyterDevice) {
+private fun GGPlot.showOptional(): GGPlot = also {
+    if (USE_KRAVIS_VIEWER && SessionPrefs.OUTPUT_DEVICE !is JupyterDevice) {
         checkDisplay()
         show()
     }
 }
 
+var USE_KRAVIS_VIEWER = false
 
-fun MetricTimeline.display(title: String = name, from: TickTime? = null, to: TickTime? = null): GGPlot {
+fun MetricTimeline.display(
+    title: String = name,
+    from: TickTime? = null,
+    to: TickTime? = null,
+    forceTickAxis: Boolean = false,
+): GGPlot {
     val data = stepFun()
         .filter { from == null || it.first >= from.value }
         .filter { to == null || it.first <= to.value }
 
-    return data.plot(
-        x = Pair<Double, Double>::first,
-        y = Pair<Double, Double>::second
-    ).xLabel("time")
+    val useWT = env.tickTransform != null && !forceTickAxis
+
+    fun wtTransform(tt: TickTime) = if (useWT) env.asWallTime(tt) else tt
+
+    return data
+        .plot(
+            x = { wtTransform(TickTime(first)) },
+            y = { wtTransform(TickTime(second)) }
+        )
+        .xLabel("Time")
         .yLabel("")
         .geomStep()
         .title(title)
-        .showNotJupyter()
+        .showOptional()
 }
 
 
@@ -57,7 +68,7 @@ fun NumericStatisticMonitor.display(title: String = name): GGPlot {
     return data.plot(x = { it })
         .geomHistogram()
         .title(title)
-        .showNotJupyter()
+        .showOptional()
 }
 
 fun <T> FrequencyTable<T>.display(title: String? = null): GGPlot {
@@ -66,7 +77,7 @@ fun <T> FrequencyTable<T>.display(title: String? = null): GGPlot {
     return data.plot(x = { it.first }, y = { it.second })
         .geomCol()
         .run { if (title != null) title(title) else this }
-        .showNotJupyter()
+        .showOptional()
 }
 
 
@@ -75,11 +86,15 @@ fun <T> CategoryTimeline<T>.display(
     forceTickAxis: Boolean = false,
 ): GGPlot {
     val nlmStatsData = statsData()
-    val data = nlmStatsData.stepFun()
+    val stepFun = nlmStatsData.stepFun()
+
+    val useWT = env.tickTransform != null && !forceTickAxis
+
+    fun wtTransform(tt: TickTime) = if (useWT) env.asWallTime(tt) else tt
 
     data class Segment<T>(val value: T, val start: Double, val end: Double)
 
-    val segments = data.zipWithNext().map {
+    val segments = stepFun.zipWithNext().map {
         Segment(
             it.first.second,
             it.first.first,
@@ -89,25 +104,26 @@ fun <T> CategoryTimeline<T>.display(
 
     // why cant we use "x".asDiscreteVariable here?
     return segments.plot(
-        x = Segment<T>::start,
-        y = Segment<T>::value,
-        xend = Segment<T>::end,
-        yend = Segment<T>::value
+        x = { wtTransform(TickTime(start)) },
+        y = { value },
+        xend = { wtTransform(TickTime(end)) },
+        yend = { value }
     )
-        .xLabel("time")
+        .xLabel("Time")
         .yLabel("")
         .geomSegment()
         .geomPoint()
         .title(title)
-        .showNotJupyter()
+        .showOptional()
 }
 
 //
 // resources
 //
 
-fun List<ResourceActivityEvent>.display(title: String?,
-                                        forceTickAxis: Boolean = false,
+fun List<ResourceActivityEvent>.display(
+    title: String?,
+    forceTickAxis: Boolean = false,
 ): GGPlot {
     val useWT = any { it.startWT != null } && !forceTickAxis
 
@@ -118,7 +134,9 @@ fun List<ResourceActivityEvent>.display(title: String?,
         color = { activity ?: "Other" })
         .geomSegment(size = 10.0)
         .yLabel("")
+        .xLabel("Time")
         .also { if (title != null) ggtitle(title) }
+        .showOptional()
 }
 
 
@@ -140,6 +158,7 @@ fun List<ResourceTimelineSegment>.display(
         .geomStep()
         .facetWrap("color", ncol = 1, scales = FacetScales.free_y)
         .also { if (title != null) ggtitle(title) }
+        .showOptional()
 }
 
 
@@ -154,25 +173,26 @@ fun Component.display(
 
 fun List<Component>.displayStateTimeline(
     title: String? = null,
-    componentName: String = "component",
+    componentName: String = "Component",
     forceTickAxis: Boolean = false,
 ): GGPlot {
 //    val df = csTimelineDF(componentName)
     val df = clistTimeline()
 
-    val useWT = first().tickTransform !=null && !forceTickAxis
-    fun wtTransform(tt: TickTime) = if(useWT) first().env.asWallTime(tt) else  tt
+    val useWT = first().tickTransform != null && !forceTickAxis
+    fun wtTransform(tt: TickTime) = if (useWT) first().env.asWallTime(tt) else tt
 
     return df.plot(
         y = { first.name },
         yend = { first.name },
         x = { wtTransform(TickTime(second.timestamp)) },
-        xend = { wtTransform(TickTime(second.timestamp + (second.duration?:0.0))) },
+        xend = { wtTransform(TickTime(second.timestamp + (second.duration ?: 0.0))) },
         color = { second.value }
     )
         .geomLine()
         .also { if (title != null) ggtitle(title) }
         .xLabel(componentName)
+        .showOptional()
 }
 
 //private fun List<Component>.csTimelineDF(componentName: String) = map { eqn ->
@@ -182,15 +202,16 @@ fun List<Component>.displayStateTimeline(
 //}.bindRows().rename("value" to "state")
 
 
-
 fun List<Component>.displayStateProportions(
     title: String? = null,
 ): GGPlot {
     val df = clistTimeline()
 
-    return df.plot(y = { first.name }, fill = {second.value}, weight = { second.duration})
+    return df.plot(y = { first.name }, fill = { second.value }, weight = { second.duration })
         .geomBar(position = PositionFill())
+        .xLabel("State Proportion")
         .also { if (title != null) ggtitle(title) }
+        .showOptional()
 }
 
 

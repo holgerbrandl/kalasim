@@ -2,25 +2,17 @@ package org.kalasim.test
 
 import io.kotest.assertions.fail
 import junit.framework.Assert
-import krangl.irisData
-import kravis.*
-import kravis.nshelper.plot
+import kravis.GGPlot
+import kravis.SessionPrefs
 import kravis.render.LocalR
-import org.junit.Assume
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
 import org.junit.rules.TestName
-import org.kalasim.ComponentGenerator
+import org.kalasim.OffsetTransform
 import org.kalasim.demo.MM1Queue
-import org.kalasim.plot.kravis.canDisplay
-import org.kalasim.plot.kravis.display
-import org.kalasim.plot.kravis.displayStateProportions
-import org.kalasim.plot.kravis.displayStateTimeline
-import org.koin.core.component.get
-import java.io.File
-import java.io.StringReader
-import java.io.StringWriter
+import org.kalasim.plot.kravis.*
+import java.io.*
+import java.time.Instant
+import java.util.concurrent.TimeUnit
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.stream.StreamResult
@@ -37,7 +29,7 @@ class DisplayTests : AbstractSvgPlotRegression() {
         // todo use more exciting standard model here with more dynamics
         val mm1 = MM1Queue()
 
-        mm1.run(100)
+        mm1.run(50)
 //        mm1.customers
 
         mm1.server.activities.display("MM1 Server Utilization")
@@ -50,6 +42,52 @@ class DisplayTests : AbstractSvgPlotRegression() {
             displayStateTimeline("MM1 Server Utilization")
                 .apply { assertExpected(this, "timeline") }
         }
+
+        mm1.server.claimedTimeline.display("Claimed Server Capacity")
+            .apply { assertExpected(this, "claimed") }
+
+
+        val customerTimeline =
+            mm1.componentGenerator.arrivals.first().statusTimeline
+
+        customerTimeline.display("Arrival State Timeline")
+            .apply { assertExpected(this, "arrival_state") }
+
+    }
+
+    @Test
+    fun `is should display the mm1 server utilization with walltime`() {
+
+        val mm1 = MM1Queue()
+
+        // redo but with set tick-transform
+        mm1.tickTransform = OffsetTransform(
+            offset = Instant.parse("2021-01-01T00:00:00.00Z"),
+            tickUnit = TimeUnit.MINUTES
+        )
+
+        mm1.run(50)
+
+
+        mm1.server.activities.display("MM1 Server Utilization")
+            .apply { assertExpected(this, "activities") }
+
+        with(mm1.componentGenerator.arrivals) {
+            displayStateTimeline("MM1 Server Utilization")
+                .apply { assertExpected(this, "timeline") }
+        }
+
+        mm1.server.claimedTimeline.display("Claimed Server Capacity")
+            .apply { assertExpected(this, "claimed") }
+
+        val customerTimeline =
+            mm1.componentGenerator.arrivals.first().statusTimeline
+
+        customerTimeline.display("Arrival State Timeline", forceTickAxis = true)
+            .apply { assertExpected(this, "arrival_state_forced") }
+
+        customerTimeline.display("Arrival State Timeline")
+            .apply { assertExpected(this, "arrival_state") }
     }
 }
 
