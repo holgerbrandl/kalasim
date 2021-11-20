@@ -24,6 +24,8 @@ consider `logCoreInteractions=false` as default
 
 ## v0.8
 
+**TODO** add display option to discard zero-duration intervals for simplified vis
+
 better work out https://www.kalasim.org/setup/ for novice users (e.g. use koans/or datalore share)
 
 simple optimizing example

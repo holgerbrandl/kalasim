@@ -52,7 +52,7 @@ fun MetricTimeline.display(
     return data
         .plot(
             x = { wtTransform(TickTime(first)) },
-            y = { wtTransform(TickTime(second)) }
+            y = { second }
         )
         .xLabel("Time")
         .yLabel("")
@@ -164,6 +164,7 @@ fun List<ResourceTimelineSegment>.display(
 
 //
 // Components
+//
 
 fun Component.display(
     title: String = statusTimeline.name,
@@ -189,7 +190,7 @@ fun List<Component>.displayStateTimeline(
         xend = { wtTransform(TickTime(second.timestamp + (second.duration ?: 0.0))) },
         color = { second.value }
     )
-        .geomLine()
+        .geomSegment()
         .also { if (title != null) ggtitle(title) }
         .xLabel(componentName)
         .showOptional()
@@ -238,7 +239,7 @@ fun List<Component>.displayStateProportions(
 //        .also { if (title != null) ggtitle(title) }
 //}
 
-private fun List<Component>.clistTimeline() = flatMap { eqn ->
+internal fun List<Component>.clistTimeline() = flatMap { eqn ->
     eqn.statusTimeline
         .statsData().asList().map { eqn to it }
 }

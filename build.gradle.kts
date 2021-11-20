@@ -39,12 +39,12 @@ dependencies {
     testImplementation(kotlin("test-junit"))
     testImplementation("io.kotest:kotest-assertions-core:4.6.3")
 
-    implementation("com.github.holgerbrandl:krangl:0.17")
+    implementation("com.github.holgerbrandl:krangl:0.17.1")
 
     compileOnly("com.github.holgerbrandl:kravis:0.8.1")
     testImplementation("com.github.holgerbrandl:kravis:0.8.1")
 
-    compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:3.0.2")
+    compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:3.1.0")
     testImplementation("org.jetbrains.lets-plot:lets-plot-batik:2.2.0")
     //    testImplementation("org.jetbrains.lets-plot:lets-plot-jfx:1.5.4")
 
@@ -59,7 +59,7 @@ dependencies {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }
 
 
