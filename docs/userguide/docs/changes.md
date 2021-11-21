@@ -18,8 +18,9 @@ Documentation
 
 * New chapter about [collections](collections.md)
 * Revised [resource](resource.md) documentation
-* New example: [Hospital](examples/hospital.md)
+* Rewritten [ATM](https://www.kalasim.org/examples/atm_queue/) example to better illustrate parallelization 
 * New example [Bridge Games](examples/bridge_game.md)
+* Started canonical complex simulation example: [Hospital](examples/emergency_room.md)
 
 Minor enhancements
 

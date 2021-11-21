@@ -12,7 +12,7 @@ import krangl.count
 import krangl.dataFrameOf
 import krangl.print
 import org.kalasim.*
-import org.kalasim.demo.MM1Queue
+import org.kalasim.examples.MM1Queue
 import org.kalasim.plot.letsplot.display
 import org.koin.core.Koin
 import org.koin.core.component.get

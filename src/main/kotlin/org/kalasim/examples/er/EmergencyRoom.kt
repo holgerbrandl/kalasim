@@ -1,20 +1,10 @@
-package org.kalasim.examples.hospital
-
-import krangl.DataFrameRow
-import krangl.count
-import krangl.dataFrameOf
-import krangl.print
+import PatientStatus.*
+import Severity.*
 import org.kalasim.*
-import org.kalasim.examples.hospital.PatientStatus.DeceasedWhileWaiting
-import org.kalasim.examples.hospital.PatientStatus.Waiting
-import org.kalasim.examples.hospital.Severity.*
 import org.kalasim.monitors.MetricTimeline
-import org.kalasim.plot.kravis.display
-import org.koin.core.component.get
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
-
 
 enum class InjuryType {
     AnimalBites, Bruises, Burns, Dislocations, Fractures, SprainsAndStrains, Cuts, Scratches
@@ -110,7 +100,7 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
 
             // pick him/her up from the waiting area
             er.waitingLine.remove(patient)
-            patient.patientStatus.value = PatientStatus.InSurgery
+            patient.patientStatus.value = InSurgery
 
             // check setup state of room
             val injuryType = patient.type
@@ -142,10 +132,10 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
                 val isDeceased = surgerySuccessProbability[patient.severity.value]!! > env.random.nextDouble()
                 if (isDeceased) {
                     get<EmergencyRoom>().treatedMonitor.inc()
-                    patient.patientStatus.value = PatientStatus.Released
+                    patient.patientStatus.value = Released
                 } else {
                     get<EmergencyRoom>().deceasedMonitor.inc()
-                    patient.patientStatus.value = PatientStatus.DeceasedInSurgery
+                    patient.patientStatus.value = DeceasedInSurgery
                 }
 
                 log("surgery of ${patient} completed ${if (isDeceased) "with" else "without"} success")
@@ -193,7 +183,7 @@ class FifoNurse : HeadNurse {
     }
 }
 
-val SetupAvoidanceNurse = HeadNurse { er, room -> // simple fifo
+val RefittingAvoidanceNurse = HeadNurse { er, room -> // simple fifo
     val sameTypePatients = er.waitingLine.filter { it.type == room.setup.value }
 
     val firstBySeverity = sameTypePatients.sortedWith(bySeverity).firstOrNull()
@@ -271,7 +261,7 @@ class EmergencyRoom(
     // incoming patients
     init {
         val typeDist = enumerated(InjuryType.values())
-        val sevDist = enumerated(values().zip(listOf(0.05, 0.1, 0.2, 0.3, 0.45)).toMap())
+        val sevDist = enumerated(Severity.values().zip(listOf(0.05, 0.1, 0.2, 0.3, 0.45)).toMap())
 
         val cg = ComponentGenerator(
             iat = exponential(0.2),
@@ -304,41 +294,3 @@ class EmergencyRoom(
     }
 }
 
-fun main() {
-    val sim = EmergencyRoom(SetupAvoidanceNurse).apply {
-
-        // run for a week
-        run(24 * 14)
-
-        // analysis
-        incomingMonitor.display("Incoming Patients")
-        treatedMonitor.display("Treated Patients")
-        deceasedMonitor.display("Deceased Patients")
-
-        get<EmergencyRoom>().apply {
-            rooms[0].setup.valueMonitor.display().show()
-            rooms[1].setup.valueMonitor.display().show()
-
-            rooms[1].statusMonitor.display().show()
-        }
-
-        waitingLine.queueLengthMonitor.display().show()
-        waitingLine.lengthOfStayMonitor.display().show()
-
-        val arrivals = get<ComponentGenerator<Patient>>().arrivals
-//        arrivals.asDataFrame().print()
-
-
-        val df = arrivals.map {
-            mapOf(
-                "type" to it.type.toString(),
-                "status" to it.patientStatus.value.toString(),
-                "severity" to it.severity.value.toString()
-            ) as DataFrameRow
-        }.let { dataFrameOf(it) }
-
-        df.count("status").print()
-
-        // visualize room setup as gant chart
-    }
-}

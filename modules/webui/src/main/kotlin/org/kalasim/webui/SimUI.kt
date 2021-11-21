@@ -1,7 +1,7 @@
 package org.kalasim.webui
 
 import org.kalasim.ClockSync
-import org.kalasim.demo.MM1Queue
+import org.kalasim.examples.MM1Queue
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder

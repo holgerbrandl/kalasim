@@ -1,7 +1,7 @@
 package org.kalasim.test
 
 import org.kalasim.OffsetTransform
-import org.kalasim.demo.MM1Queue
+import org.kalasim.examples.MM1Queue
 import org.kalasim.plot.letsplot.display
 import java.time.Instant
 import java.util.concurrent.TimeUnit

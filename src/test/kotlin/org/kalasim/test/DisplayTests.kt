@@ -8,7 +8,7 @@ import kravis.render.LocalR
 import org.junit.*
 import org.junit.rules.TestName
 import org.kalasim.OffsetTransform
-import org.kalasim.demo.MM1Queue
+import org.kalasim.examples.MM1Queue
 import org.kalasim.plot.kravis.*
 import java.io.*
 import java.time.Instant

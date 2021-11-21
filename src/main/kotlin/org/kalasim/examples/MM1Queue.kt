@@ -1,4 +1,4 @@
-package org.kalasim.demo
+package org.kalasim.examples
 
 import org.apache.commons.math3.distribution.ExponentialDistribution
 import org.kalasim.*

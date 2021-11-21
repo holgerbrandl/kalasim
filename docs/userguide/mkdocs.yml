@@ -58,9 +58,11 @@ nav:
     - Dining Philosophers: examples/dining_philosophers.md
     - Office Tower: examples/office_tower.md
     - The Ferryman: examples/ferryman.md
+    - Emergyency Room: examples/emergency_room.md
 
   - Advanced:
     - advanced.md
+    - examples/misc.md
 
   - About:
     - about.md

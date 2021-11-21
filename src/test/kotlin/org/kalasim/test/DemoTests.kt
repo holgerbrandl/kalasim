@@ -11,7 +11,7 @@ import krangl.irisData
 import krangl.print
 import krangl.toMap
 import org.kalasim.InteractionEvent
-import org.kalasim.demo.MM1Queue
+import org.kalasim.examples.MM1Queue
 import org.kalasim.plot.letsplot.display
 
 class DemoTests {

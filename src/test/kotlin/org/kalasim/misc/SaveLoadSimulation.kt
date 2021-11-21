@@ -7,7 +7,7 @@ import org.kalasim.Component
 import org.kalasim.Environment
 import org.kalasim.Resource
 import org.kalasim.createSimulation
-import org.kalasim.demo.MM1Queue
+import org.kalasim.examples.MM1Queue
 import java.util.*
 
 object XStreamPersistence {
