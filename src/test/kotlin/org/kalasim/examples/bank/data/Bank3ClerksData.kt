@@ -3,7 +3,6 @@ package org.kalasim.examples.bank.data
 
 
 import org.kalasim.*
-import org.koin.core.component.get
 import org.koin.core.component.inject
 
 

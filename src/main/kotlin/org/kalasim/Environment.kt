@@ -13,6 +13,7 @@ import org.kalasim.misc.DependencyContext
 import org.kalasim.monitors.MetricTimeline
 import org.koin.core.Koin
 import org.koin.core.definition.Definition
+import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
@@ -149,6 +150,15 @@ open class Environment(
 
     @Suppress("EXPERIMENTAL_OVERRIDE")
     override fun getKoin(): Koin = _koin
+
+    //redeclare to simplify imports
+    /** Resolves a dependency in the simulation. Dependencies can be disambiguated by using a qualifier.*/
+    inline fun <reified T : Any> get(
+        qualifier: Qualifier? = null,
+        noinline parameters: ParametersDefinition? = null
+    ): T =
+        getKoin().get(qualifier, parameters)
+
 
     init {
 

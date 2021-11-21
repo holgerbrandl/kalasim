@@ -1207,13 +1207,6 @@ open class Component(
         }
     }
 
-    //redeclare to simplify imports
-//    @OptIn(KoinApiExtension::class)
-    inline fun <reified T : Any> KoinComponent.get(
-        qualifier: Qualifier? = null,
-        noinline parameters: ParametersDefinition? = null
-    ): T =
-        getKoin().get(qualifier, parameters)
 
 
     internal fun requestedQuantity(resource: Resource) = requests[resource]

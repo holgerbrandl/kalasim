@@ -5,7 +5,6 @@ import org.kalasim.*
 import org.kalasim.plot.kravis.display
 import org.kalasim.misc.printThis
 import org.kalasim.monitors.MetricTimeline
-import org.koin.core.component.get
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 

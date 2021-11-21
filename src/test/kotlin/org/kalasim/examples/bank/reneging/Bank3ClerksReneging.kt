@@ -3,7 +3,6 @@ package org.kalasim.examples.bank.reneging
 
 import org.kalasim.*
 import org.kalasim.misc.printThis
-import org.koin.core.component.get
 import org.koin.core.component.inject
 
 

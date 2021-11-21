@@ -8,6 +8,9 @@ import org.kalasim.misc.Jsonable
 import org.kalasim.misc.printThis
 import org.koin.core.Koin
 import org.kalasim.misc.DependencyContext
+import org.koin.core.component.*
+import org.koin.core.parameter.ParametersDefinition
+import org.koin.core.qualifier.Qualifier
 
 
 @Suppress("EXPERIMENTAL_API_USAGE")
@@ -44,6 +47,15 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
     final override fun getKoin(): Koin = simKoin
 
 
+    //redeclare to simplify imports
+    /** Resolves a dependency in the simulation. Dependencies can be disambiguated by using a qualifier.*/
+    inline fun <reified T : Any> get(
+        qualifier: Qualifier? = null,
+        noinline parameters: ParametersDefinition? = null
+    ): T =
+        getKoin().get(qualifier, parameters)
+
+
     internal fun logInternal(action: String) = log {
         with(env) { InteractionEvent(now, curComponent, this@SimulationEntity, action) }
     }
@@ -59,6 +71,9 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
         get() = env.now
 //        private set
 
+
+    val random
+        get() = env.random
 
     /**
      * Records a state-change event.

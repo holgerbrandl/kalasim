@@ -5,7 +5,6 @@ import io.kotest.matchers.shouldBe
 import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
-import org.koin.core.component.get
 
 class StateTests {
 

@@ -4,7 +4,6 @@ package org.kalasim.examples.bank.oneclerk
 import org.kalasim.*
 import org.kalasim.plot.kravis.canDisplay
 import org.kalasim.plot.kravis.display
-import org.koin.core.component.get
 import org.koin.core.component.inject
 
 
