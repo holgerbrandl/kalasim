@@ -8,7 +8,8 @@ createSimulation {
     object : Component(){
         override fun process() = sequence {
             hold(10)
-            env.main.activate()
+            activate()
+
         }
     }
 
