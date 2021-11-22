@@ -51,6 +51,8 @@ Process finished with exit code 0
 
 Console logging is not active by default as it would considerably slow down larger simulations, and but must be enabled when creating a simulation with `createSimulation(enableConsoleLogger = true)`
 
+!!!note 
+    The user can change the width of individual columns with `ConsoleTraceLogger.setColumnWidth()`
 
 ## Event Collector
 

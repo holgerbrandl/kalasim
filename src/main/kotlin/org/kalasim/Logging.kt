@@ -10,8 +10,6 @@ import java.util.logging.Level
 import kotlin.math.absoluteValue
 
 
-internal val TRACE_COL_WIDTHS = mutableListOf(10, 22, 22, 45, 35)
-
 enum class ResourceEventType { CLAIMED, RELEASED, PUT }
 
 class ResourceEvent(
@@ -122,6 +120,22 @@ fun interface EventFilter {
 
 
 class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
+
+
+    enum class TraceTableColumn{ time, current, receiver, action, info }
+
+    companion object{
+        internal val TRACE_COL_WIDTHS = mutableListOf(10, 22, 22, 45, 35)
+
+        fun setColumnWidth(column:TraceTableColumn, width:Int) = when(column){
+            TraceTableColumn.time -> TRACE_COL_WIDTHS[0] = width
+            TraceTableColumn.current -> TRACE_COL_WIDTHS[1] = width
+            TraceTableColumn.receiver -> TRACE_COL_WIDTHS[2] = width
+            TraceTableColumn.action -> TRACE_COL_WIDTHS[3] = width
+            TraceTableColumn.info -> TRACE_COL_WIDTHS[4] = width
+        }
+    }
+
 
     var hasPrintedHeader = false
     var lastElement: InteractionEvent? = null
