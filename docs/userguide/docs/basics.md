@@ -79,23 +79,52 @@ To configure references, an `Environment` can also be instantiated by configurin
 
 ## Dependency Injection
 
-Kalasim is building on top of [koin](https://insert-koin.io/) to inject dependencies between elements of a simulation.
+Kalasim is building on top of [koin](https://insert-koin.io/) to inject dependencies between elements of a simulation. This allows creating simulation entities such as resources, components or states conveniently without passing around references.
 
-As pragmatic approach, it is using a global application context by default, but does allow for parallel simulations with [Koin Isolation](https://medium.com/koin-developers/ready-for-koin-2-0-2722ab59cac3). For a simulation example with multiple `Environment` see `https://github.com/holgerbrandl/kalasim/tree/master/src/test/kotlin/org/kalasim/test/EnvTests.kt`
+```kotlin
+class Car() : Component() {
 
-To create simulation entities such as resources, components or states, a simulation context needs o be instantiated first. This  context is a of type `KalasimContext`. It is automatically created when calling `createSimulation` or by instantiating a new simulation `Environment`. This context is kept as a static reference, so the user may omit it when creating simulation entities. Example:
+    val gasStation by inject<GasStation>()
+
+    override fun process() = sequence {
+        request(gasStation) {
+            hold(2, "refill")
+        }
+
+        val trafficLight = get<TrafficLight>()
+        wait(trafficLight, "green")
+    }
+}
+
+createSimulation{
+    dependency { TrafficLight() }
+    dependency { GasStation() }
+    
+    Car()
+}
+```
+As shown in the example, the user can simply pull dependencies from the simulation environment using `get<T>()` or `inject<T>()`. This is realized with via [Koin Context Isolation](https://insert-koin.io/docs/reference/koin-core/context-isolation/) provided by a thread-local `DependencyContext`. This  context is a of type `KalasimContext`. It is automatically created when calling `createSimulation` or by instantiating a new simulation `Environment`. This context is kept as a static reference, so the user may omit it when creating simulation entities. Typically, dependency context management is fully transparent to the user.
+
 
 ```kotlin
 Environment().apply{
-    val devices = Resource(name = "devices", capacity = 3)
-    
+    // implicit context provisioning (recommended)
+    val inUse = State(true)
+
     // explicit context provisioning
-    val inUse = State(true, koin=getKoin())
-    
-    // implicit context provisioning
-    val inUse2 = State(true)
+    val inUse2 = State(true, koin=getKoin())
 }
 ```
+
+In the latter case, the context reference is provided explicitly. This is usually not needed nor recommended.
+
+### Threadsafe Registry
+
+Because of its [thread locality](https://www.baeldung.com/java-threadlocal) awareness, the dependency resolver of `kalasim` allows for parallel simulations. That means, that even when running multiple simulations in parallel in different threads, the user does not have to provide a dependency context (called `koin`) argument when creating new simulation entities (such as [components](component.md)). 
+
+For a simulation example with multiple parallel `Environment`s see [ATM Queue](examples/atm_queue.md#parallel-whatif)
+
+### Simple Types
 
 Koin does not allow injecting simple types. To inject simple variables, consider using a wrapper class. Example
 

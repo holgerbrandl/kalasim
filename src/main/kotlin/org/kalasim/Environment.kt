@@ -176,8 +176,7 @@ open class Environment(
 
             // https://github.com/InsertKoinIO/koin/issues/972
 //        CustomContext.startKoin(koinContext = CustomContext()) { modules(module { single { this@Environment } }) }
-            DependencyContext.startKoin() {
-            }.koin
+            DependencyContext.startKoin()
         }
 
 
@@ -281,7 +280,11 @@ open class Environment(
             main.reschedule(scheduledTime, priority, urgent, null, "run", SCHEDULED)
         }
 
+        // restore dependency context
+        DependencyContext.setKoin(_koin)
+
         running = true
+
         while (running) {
             step()
         }

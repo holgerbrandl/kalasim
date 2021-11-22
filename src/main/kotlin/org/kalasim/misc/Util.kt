@@ -1,6 +1,7 @@
 package org.kalasim.misc
 
 import com.google.gson.GsonBuilder
+import kotlinx.coroutines.*
 import org.apache.commons.math3.util.Precision
 import org.json.JSONObject
 import java.text.DecimalFormat
@@ -62,7 +63,7 @@ fun <A, B> cartesianProduct(
 
 //https://kotlinlang.slack.com/archives/C0B8Q383C/p1610224701103600
 // Same can be achieved with List(10){ foo() }
-fun <T> repeat(n:Int, builder: (Int) -> T) = (1..n).map{ builder(it)}
+fun <T> repeat(n: Int, builder: (Int) -> T) = (1..n).map { builder(it) }
 
 
 // https://stackoverflow.com/questions/48007311/how-do-i-infinitely-repeat-a-sequence-in-kotlin
@@ -71,12 +72,31 @@ fun <T> Iterable<T>.repeat() = sequence {
 }
 
 
+//
+// Parallel collection utilities
+//
+
+fun <A, B> Iterable<A>.fastMap(
+    numThreads: Int = Runtime.getRuntime().availableProcessors(),
+    f: suspend (A) -> B
+): List<B> = runBlocking {
+    map { async(newFixedThreadPoolContext(numThreads, "")) { f(it) } }.map { it.await() }
+}
+
+fun <A, B> Iterable<A>.fastForEach(
+    numThreads: Int = Runtime.getRuntime().availableProcessors(),
+    f: suspend (A) -> B
+): Unit = fastMap(numThreads, f).forEach{}
+
+
 /** The environment mode also allows you to detect common bugs in your implementation. */
-enum class AssertMode{
+enum class AssertMode {
     /** Productive mode, where asserts that may impact performance are disabled. */
     OFF,
+
     /** Disables compute-intensive asserts. This will have a minimal to moderate performance impact on simulations. */
     LIGHT,
+
     /** Full introspection, this will have a measurable performance impact on simulations. */
     FULL
 }
@@ -84,3 +104,4 @@ enum class AssertMode{
 var ASSERT_MODE = AssertMode.LIGHT
 
 fun Double?.roundAny(n: Int = 3) = if (this == null) this else Precision.round(this, n)
+

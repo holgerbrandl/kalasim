@@ -3,12 +3,14 @@ package org.kalasim.test
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.*
+import krangl.cumSum
+import krangl.mean
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.junit.Test
 import org.kalasim.*
-import org.kalasim.misc.DependencyContext
+import org.kalasim.misc.*
 import org.koin.core.Koin
-import org.koin.core.component.get
 import org.koin.core.error.NoBeanDefFoundException
 import org.koin.dsl.koinApplication
 import java.time.Duration
@@ -45,9 +47,10 @@ class EnvTests {
         env2.run(10)
 
         // make sure that the global context has not yet been started
-        shouldThrow<IllegalStateException> {
-            DependencyContext.get()
-        }
+//        shouldThrow<IllegalStateException> {
+//            DependencyContext.get()
+//        }
+        // this assertion is no longer valid as `run` sets the context
     }
 
     @Test
@@ -122,7 +125,7 @@ class EnvTests {
             object : Component() {
                 var waitCounter = 1
                 override fun process() = sequence {
-                    while(true) {
+                    while (true) {
                         hold(1)
                         // doe something insanely complex that takes 2seconds
                         Thread.sleep(waitCounter++ * 1000L)
@@ -164,5 +167,42 @@ class EnvTests {
             run(ticks = 5)
             now shouldBe 10.tt
         }
+    }
+
+    @Test
+    fun `it should restore koin in before running sims in parallel`() {
+        class QueueCustomer(mu: Double, val atm: Resource) : Component() {
+            val ed = exponential(mu)
+
+            override fun process() = sequence {
+                request(atm){
+                    hold(ed.sample())
+                }
+            }
+        }
+
+        class Queue(lambda: Double, val mu: Double) : Environment() {
+            val atm = dependency { Resource("atm", 1) }
+
+            init {
+                ComponentGenerator(iat = exponential(lambda)) {
+                    QueueCustomer(mu, atm)
+                }
+            }
+        }
+
+        val lambdas = (1..20).map { 0.25 }.cumSum()
+        val mus = (1..20).map { 0.25 }.cumSum()
+
+        val atms = cartesianProduct(lambdas, mus).asIterable().map { (lambda, mu) ->
+            Queue(lambda, mu)
+        }
+
+        // simulate in parallel
+        atms.fastMap { it.run(100) }
+
+        // to average over all configs does not make much sense conceptually, but allows to test for regressions
+        val meanQLength = atms.map { it.get<Resource>().statistics.requesters.lengthStats.mean!! }.mean()
+        meanQLength shouldBe(22.37 plusOrMinus 0.1)
     }
 }

@@ -31,6 +31,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.10")
 
     api("com.github.holgerbrandl:jsonbuilder:0.9")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+
     implementation("com.google.code.gson:gson:2.8.8")
 
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
@@ -54,7 +56,6 @@ dependencies {
     //https://youtrack.jetbrains.com/issue/KT-44197
 
     testImplementation(kotlin("script-runtime"))
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
 
 }
 

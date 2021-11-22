@@ -57,15 +57,13 @@ fun main() {
 class AtmCustomer(
     val mu: Double,
     val atm: Resource,
-    koin: Koin = DependencyContext.get()
-) : Component(koin = koin) {
+) : Component() {
     val ed = exponential(mu)
 
     override fun process() = sequence {
-        request(atm)
-
-        hold(ed.sample())
-        release(atm)
+        request(atm){
+            hold(ed.sample())
+        }
     }
 }
 
@@ -74,7 +72,7 @@ class AtmQueue(val lambda: Double, val mu: Double) : Environment() {
 
     init {
         ComponentGenerator(iat = exponential(lambda)) {
-            AtmCustomer(mu, atm, koin = getKoin())
+            AtmCustomer(mu, atm)
         }
     }
 }

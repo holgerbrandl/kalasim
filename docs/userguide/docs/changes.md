@@ -6,24 +6,25 @@ Not released yet
 
 Major enhancements
 
-* Dramatically improved simulation performance
-* Introduced `AssertMode`s (`Full`, `Light` (default), `None`) to enable/disable internal [consistency checks](https://www.kalasim.org/advanced/#internal-state-validation). This will optimize performance by another ~20% (depending on simulation logic)
-* Improved event logging API
+* Reworked event & metrics logging API
 * Introduced [`ComponentList`](collections.md#list)
 * Implemented [ticks metrics](advanced.md#operational-control) monitor (fixes [#9](https://github.com/holgerbrandl/kalasim/issues/9))
 * New [timeline](https://www.kalasim.org/resource/#timeline) and [activity log](https://www.kalasim.org/resource/#activity-log)  attributes to resources for streamlined usage and capacity analysis  
 * Extended `display()` support API on all major components and their collections (including `Resource`, `Component` or `List<Component>`, `MetricTimeline`) (fixes [#18](https://github.com/holgerbrandl/kalasim/issues/18))
+* Thread-local context registry enabled via [Koin Context Isolation](https://insert-koin.io/docs/reference/koin-core/context-isolation/) (fixes [#20](https://github.com/holgerbrandl/kalasim/issues/20))
+* Dramatically improved simulation performance
 
 Documentation
 
 * New chapter about [collections](collections.md)
 * Revised [resource](resource.md) documentation
-* Rewritten [ATM](https://www.kalasim.org/examples/atm_queue/) example to better illustrate parallelization 
+* Rewritten [ATM](https://www.kalasim.org/examples/atm_queue/) example to better illustrate parallelization and generators
 * New example [Bridge Games](examples/bridge_game.md)
-* Started canonical complex simulation example: [Hospital](examples/emergency_room.md)
+* Started new canonical complex simulation example: [emergency room](examples/emergency_room.md)
 
 Minor enhancements
 
+* Introduced `AssertMode`s (`Full`, `Light` (default), `None`) to enable/disable internal [consistency checks](https://www.kalasim.org/advanced/#internal-state-validation). This will optimize performance by another ~20% (depending on simulation logic)
 * Improved request priority API
 * Allow for runtime reconfiguration of `ClockSync` to enable adjustable simulation speed
 * Lifted `Component` sub-type requirement from `ComponentQueue`
