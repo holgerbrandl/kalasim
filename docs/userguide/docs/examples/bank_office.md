@@ -280,7 +280,7 @@ Now, we assume that clients are not going to the queue when there are more than 
 
 The model code is:
 
-```kotlin hl_lines="34 48-58 74 75"
+```kotlin hl_lines="32 46-56 72 73"
 //{!bank/reneging/Bank3ClerksReneging.kt!}
 ```
 
@@ -322,7 +322,7 @@ Now we show how  balking and reneging can be implemented with resources.
 
 The model code is:
 
-```kotlin hl_lines="24 26 27"
+```kotlin hl_lines="23 25 26"
 //{!bank/reneging_resources/Bank3ClerksRenegingResources.kt!}
 ```
 
@@ -349,7 +349,7 @@ Another useful concept for modelling are [states](../state.md). In this case, we
 
 The model code is:
 
-```kotlin hl_lines="23 36 51"
+```kotlin hl_lines="22 35 50"
 //{!bank/state/Bank3ClerksState.kt!}
 ```
 
