@@ -9,15 +9,13 @@ consider `logCoreInteractions=false` as default
 
 ## v0.7
 
-**{todo}** [#18](https://github.com/holgerbrandl/kalasim/issues/18) respect ticktrafo in built-in visualizations 
 
 **{todo}** mandatory jsonable on sim-entities feels cumbersome
 
 **{todo}** use standard sl4j for simulation logging or at least provide adapter
 
-**{todo}** provide heatmap of component-list status --> and document it as 'built-in vis' in the corresponding section
 
-**{todo}** storeRefs --> trackArrivals
+**{todo}** storeRefs -F-> trackArrivals
 * revisit storing/streaming of metrics (with time limit)
 * memory profiling of hospital 
 
