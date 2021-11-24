@@ -36,7 +36,7 @@ dependencies {
   //  api("io.github.microutils:kotlin-logging:1.12.5")
 //    api("org.slf4j:slf4j-simple:1.7.32")
 
-  //  implementation("com.google.code.gson:gson:2.8.8")
+    implementation("com.google.code.gson:gson:2.8.8")
 
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
