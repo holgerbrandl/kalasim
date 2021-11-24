@@ -69,7 +69,7 @@ class MonitorTests {
 
     @Test
     fun `Frequency level stats should be correct`() = createTestSimulation {
-        val m = CategoryTimeline<Car>(AUDI)
+        val m = CategoryTimeline(AUDI)
 //        m.addValue(AUDI)
         now = 2.tt
 
@@ -126,7 +126,7 @@ class MonitorTests {
 
     @Test
     fun `CategoryTimeline should allow to retrieve a value for now but not before recording start`() = createTestSimulation {
-        val nlm = CategoryTimeline<String>("foo")
+        val nlm = CategoryTimeline("foo")
 
         now += 2
         nlm.addValue("bar")
@@ -166,7 +166,7 @@ class MonitorTests {
             val nsm = CategoryMonitor<Int>()
 
             nsm.addValue(2)
-            nsm.disable()
+            nsm.enabled = false
 
             shouldThrow<IllegalArgumentException> {
                 nsm.statistics.size

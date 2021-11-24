@@ -3,16 +3,9 @@ package org.kalasim
 import org.kalasim.ComponentState.*
 import org.kalasim.ResourceEventType.*
 import org.kalasim.ResourceSelectionPolicy.*
-import org.kalasim.misc.ASSERT_MODE
-import org.kalasim.misc.AssertMode
-import org.kalasim.misc.Jsonable
-import org.kalasim.misc.TRACE_DF
+import org.kalasim.misc.*
 import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
-import org.koin.core.component.KoinComponent
-import org.kalasim.misc.DependencyContext
-import org.koin.core.parameter.ParametersDefinition
-import org.koin.core.qualifier.Qualifier
 import java.util.*
 import kotlin.math.min
 import kotlin.reflect.KFunction1
@@ -32,8 +25,8 @@ internal const val DEFAULT_QUEUE_PRIORITY = 0
 data class Priority(val value: Int)
 
 // adopted from
-val LOWEST= Priority(-20)
-val LOW= Priority(-10)
+val LOWEST = Priority(-20)
+val LOW = Priority(-10)
 val NORMAL = Priority(DEFAULT_QUEUE_PRIORITY)
 val IMPORTANT = Priority(20)
 val CRITICAL = Priority(20)
@@ -61,6 +54,7 @@ open class Component(
 ) :
 //    KoinComponent,
     SimulationEntity(name, koin) {
+
 
     private var oneOfRequest: Boolean = false
 
@@ -92,15 +86,33 @@ open class Component(
         internal set(value) {
             field = value
             statusTimeline.addValue(value)
+
+//            if (trackingPolicy.logStateChangeEvents) log(stateChangeEvent())
         }
 
     val statusTimeline = CategoryTimeline(componentState, "status of ${this.name}", koin)
 
 
+    // define how logging is executed in this component
+    var trackingPolicy: ComponentTrackingConfig = ComponentTrackingConfig()
+        set(newPolicy) {
+            field = newPolicy
+
+            with(newPolicy) {
+                statusTimeline.enabled = trackComponentState
+            }
+        }
+
     init {
-        val dataSuffix = if(process == null && this.name != MAIN) " data" else ""
+        trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
+    }
+
+    init {
+        val dataSuffix = if (process == null && this.name != MAIN) " data" else ""
         env.addComponent(this)
-        logInternal(now, env.curComponent, this, "create", dataSuffix)
+        log(trackingPolicy.logCreation) {
+            EntityCreatedEvent(now, env.curComponent, this, dataSuffix)
+        }
 
 
         // if its a generator treat it as such
@@ -114,15 +126,16 @@ open class Component(
         // has provided another process pointer (other than `process`)
         val overriddenProcess = this.javaClass.getMethod("process").declaringClass.simpleName != "Component"
 
-        if(at != null || (process != null && (process.name != "process" || overriddenProcess))) {
-            val scheduledTime = if(at == null) {
+        if (at != null || (process != null && (process.name != "process" || overriddenProcess))) {
+            val scheduledTime = if (at == null) {
                 env.now + delay.toDouble()
             } else {
                 at + delay.toDouble()
             }
 
-            reschedule(scheduledTime, priority, false, null, "activate", SCHEDULED)
+            reschedule(scheduledTime, priority, false, null, "activated", SCHEDULED)
         }
+
     }
 
 
@@ -132,10 +145,10 @@ open class Component(
 //            if(process!!.returnType.toString().startsWith("kotlin.sequences.Sequence"))
 //        }
 
-        return if(process != null) {
+        return if (process != null) {
             val isGenerator = process.returnType.toString().startsWith("kotlin.sequences.Sequence")
 
-            if(isGenerator) {
+            if (isGenerator) {
                 @Suppress("UNCHECKED_CAST")
                 val sequence = process.call(this)
                 GenProcessInternal(this, sequence, process.name)
@@ -215,7 +228,7 @@ open class Component(
      * For `passivate` contract see [user manual](https://www.kalasim.org/component/#passivate)
      */
     fun passivate() {
-        remainingDuration = if(componentState == CURRENT) {
+        remainingDuration = if (componentState == CURRENT) {
             0.0
         } else {
             requireNotData()
@@ -228,9 +241,11 @@ open class Component(
         scheduledTime = null
         componentState = PASSIVE
 
-        logInternal(now, env.curComponent, this, "passivate")
+        if (trackingPolicy.logStateChangeEvents) log(stateChangeEvent())
     }
 
+    fun stateChangeEvent(details: String? = null) =
+        ComponentStateChangeEvent(now, env.curComponent, this, componentState, details)
 
     private var interruptedStatus: ComponentState? = null
 
@@ -244,7 +259,7 @@ open class Component(
     fun interrupt() {
         require(componentState != CURRENT) { "Current component can no be interrupted" }
 
-        if(componentState == INTERRUPTED) {
+        if (componentState == INTERRUPTED) {
             interruptLevel++
         } else {
             requireNotData()
@@ -255,7 +270,7 @@ open class Component(
             componentState = INTERRUPTED
         }
 
-        logInternal("interrupt (level=$interruptLevel)")
+        logInternal(trackingPolicy.logInteractionEvents, "interrupt (level=$interruptLevel)")
     }
 
     /** Resumes an interrupted component. Can only be applied to interrupted components.
@@ -276,34 +291,34 @@ open class Component(
 
         interruptLevel--
 
-        if(interruptLevel != 0 && !all) {
-            logInternal("resume stalled (interrupt level=$interruptLevel)")
+        if (interruptLevel != 0 && !all) {
+            logInternal(trackingPolicy.logInteractionEvents, "resume stalled (interrupt level=$interruptLevel)")
         } else {
             componentState = interruptedStatus!!
 
-            logInternal("resume ($componentState)")
+            logInternal(trackingPolicy.logInteractionEvents, "resume ($componentState)")
 
-            when(componentState) {
+            when (componentState) {
                 PASSIVE -> {
-                    logInternal("passivate")
+                    logInternal(trackingPolicy.logInteractionEvents, "passivate")
                 }
                 STANDBY -> {
                     scheduledTime = env.now
                     env.addStandBy(this)
-                    logInternal("standby")
+                    logInternal(trackingPolicy.logInteractionEvents, "standby")
                 }
                 in listOf(SCHEDULED, WAITING, REQUESTING) -> {
-                    val reason = when(componentState) {
+                    val reason = when (componentState) {
                         WAITING -> {
-                            if(waits.isNotEmpty()) tryWait()
-                            "wait"
+                            if (waits.isNotEmpty()) tryWait()
+                            "waiting"
                         }
                         REQUESTING -> {
                             tryRequest()
-                            "request"
+                            "requesting"
                         }
                         SCHEDULED -> {
-                            "hold"
+                            "holding"
                         }
                         else -> "unknown"
                     }
@@ -338,7 +353,7 @@ open class Component(
      * For `cancel` contract see [user manual](https://www.kalasim.org/component/#cancel)
      */
     fun cancel() {
-        if(componentState != CURRENT) {
+        if (componentState != CURRENT) {
             requireNotData()
             requireNotInterrupted()
             remove()
@@ -350,7 +365,8 @@ open class Component(
 
         componentState = DATA
 
-        logInternal(now, env.curComponent, this, "cancel")
+        if (trackingPolicy.logStateChangeEvents) log(stateChangeEvent("canceled"))
+
     }
 
     /**
@@ -361,7 +377,7 @@ open class Component(
      * For `standby` contract see [user manual](https://www.kalasim.org/component/#standby)
      */
     suspend fun SequenceScope<Component>.standby(): Unit = yieldCurrent {
-        if(componentState != CURRENT) {
+        if (componentState != CURRENT) {
             requireNotMain()
             requireNotData()
             requireNotInterrupted()
@@ -374,7 +390,7 @@ open class Component(
 
         componentState = STANDBY
 
-        logInternal(now, env.curComponent, this@Component)
+        if (trackingPolicy.logStateChangeEvents) log(stateChangeEvent())
     }
 
 
@@ -499,7 +515,7 @@ open class Component(
         honorBlock: (suspend SequenceScope<Component>.(Resource?) -> Unit)? = null
     ) {
         yieldCurrent {
-            if(componentState != CURRENT) {
+            if (componentState != CURRENT) {
                 requireNotMain()
                 requireNotData()
                 requireNotInterrupted()
@@ -525,7 +541,7 @@ open class Component(
             resourceRequests.forEach { (r, quantity, priority) ->
                 var q = quantity
 
-                if(r.preemptive && resourceRequests.size > 1) {
+                if (r.preemptive && resourceRequests.size > 1) {
                     throw IllegalArgumentException("preemptive resources do not support multiple resource requests")
                 }
 
@@ -546,21 +562,23 @@ open class Component(
                 //            enterSorted(r.requesters, priority)
                 r.requesters.add(this@Component, priority = priority)
 
-                logInternal(now, env.curComponent, this@Component, reqText)
+                if (trackingPolicy.logInteractionEvents) {
+                    log(InteractionEvent(now, env.curComponent, this@Component, reqText))
+                }
 
-                if(r.preemptive) {
+                if (r.preemptive) {
                     var av = r.availableQuantity
                     val thisClaimers = r.claimers.q
 
                     val bumpCandidates = mutableListOf<Component>()
                     //                val claimComponents = thisClaimers.map { it.c }
-                    for(cqe in thisClaimers) {
-                        if(av >= q) {
+                    for (cqe in thisClaimers) {
+                        if (av >= q) {
                             break
                         }
 
                         // check if prior of component
-                        if((priority?.value ?: 0) <= (cqe.priority?.value ?: 0)) {
+                        if ((priority?.value ?: 0) <= (cqe.priority?.value ?: 0)) {
                             break
                         }
 
@@ -568,10 +586,10 @@ open class Component(
                         bumpCandidates.add(cqe.component)
                     }
 
-                    if(av >= 0) {
+                    if (av >= 0) {
                         bumpCandidates.forEach {
                             it.releaseInternal(r, bumpedBy = this@Component)
-                            logInternal("$it bumped from $r by ${this@Component}")
+                            logInternal(trackingPolicy.logInteractionEvents, "$it bumped from $r by ${this@Component}")
                             it.activate()
                         }
                     }
@@ -579,33 +597,37 @@ open class Component(
             }
 
             requests.forEach { (resource, quantity) ->
-                if(quantity < resource.minq)
+                if (quantity < resource.minq)
                     resource.minq = quantity
             }
 
             tryRequest()
 
-            if(requests.isNotEmpty()) {
+            if (requests.isNotEmpty()) {
                 reschedule(
                     scheduledTime!!, priority = priority, urgent = urgent,
-                    caller = "request", newStatus = REQUESTING
+                    caller = "requesting", newStatus = REQUESTING
                 )
             }
         }
 
-        if(honorBlock != null) {
+        if (honorBlock != null) {
             // suspend{ ... }
             val before = now
-            honorBlock(if(oneOf)  claims.toList().last().first else null)
+            honorBlock(if (oneOf) claims.toList().last().first else null)
 
             val after = now
 
             // salabim says: It is possible to check which resource has been claimed with `Component.claimers()`.
-            resourceRequests.filter{ it.r.claimers.contains(this@Component)}.forEach {
+            resourceRequests.filter { it.r.claimers.contains(this@Component) }.forEach {
                 release(it)
-                val rse = ResourceActivityEvent(before, after, this@Component, it.r, description, it.quantity)
-                (it.r.activities as MutableList<ResourceActivityEvent>).add(rse)
-                log(rse)
+
+                if (it.r.trackingPolicy.trackActivities) {
+                    val rse =
+                        ResourceActivityEvent(before, after, this@Component, it.r, description, it.quantity)
+                    (it.r.activities as MutableList<ResourceActivityEvent>).add(rse)
+                    log(rse)
+                }
 
             }
         }
@@ -614,10 +636,10 @@ open class Component(
 
     // TODO what is the reasoning here
     private fun honorAll(): List<Pair<Resource, Double>>? {
-        for((r, requestedQuantity) in requests) {
-            if(requestedQuantity > r.capacity - r.claimed + EPS) {
+        for ((r, requestedQuantity) in requests) {
+            if (requestedQuantity > r.capacity - r.claimed + EPS) {
                 return null
-            } else if(-requestedQuantity > r.claimed + EPS) {
+            } else if (-requestedQuantity > r.claimed + EPS) {
                 return null
             }
         }
@@ -626,14 +648,14 @@ open class Component(
     }
 
     private fun honorAny(): List<Pair<Resource, Double>>? {
-        for(request in requests) {
+        for (request in requests) {
             val (r, requestedQuantity) = request
 
-            if(requestedQuantity >0 ) {
-                if(requestedQuantity <= r.capacity - r.claimed + EPS) {
+            if (requestedQuantity > 0) {
+                if (requestedQuantity <= r.capacity - r.claimed + EPS) {
                     return listOf(r to requestedQuantity)
                 }
-            } else if(-requestedQuantity <= r.claimed + EPS) {
+            } else if (-requestedQuantity <= r.claimed + EPS) {
                 return listOf(r to requestedQuantity)
             }
         }
@@ -642,30 +664,29 @@ open class Component(
     }
 
     internal open fun tryRequest(): Boolean {
-        if(componentState == INTERRUPTED) return false
+        if (componentState == INTERRUPTED) return false
 
-        val rHonor = if(oneOfRequest) honorAny() else honorAll()
+        val rHonor = if (oneOfRequest) honorAny() else honorAll()
 
-        if(rHonor.isNullOrEmpty()) return false
+        if (rHonor.isNullOrEmpty()) return false
 
         requests
 //            .filterNot { it.key.anonymous }
             .forEach { (resource, quantity) ->
                 // proceed just if request was honored claim it
-                if(rHonor.any { it.first == resource }) {
+                if (rHonor.any { it.first == resource }) {
                     resource.claimed += quantity //this will also update the timeline
 
-
-                    log{
+                    log(trackingPolicy.logInteractionEvents) {
                         ResourceEvent(env.now, env.curComponent, this, resource, CLAIMED, quantity)
                     }
 
-                    if(!resource.anonymous) {
+                    if (!resource.anonymous) {
                         val thisPrio = resource.requesters.q.firstOrNull { it.component == this }?.priority
                         claims.merge(resource, quantity, Double::plus)
 
                         //also register as claimer in resource if not yet present
-                        if(resource.claimers.q.none { it.component == this }) {
+                        if (resource.claimers.q.none { it.component == this }) {
                             resource.claimers.add(this, thisPrio)
                         }
                     }
@@ -677,7 +698,7 @@ open class Component(
         requests.clear()
         remove()
 
-        val honorInfo = rHonor.firstOrNull()!!.first.name + (if(rHonor.size > 1) "++" else "")
+        val honorInfo = rHonor.firstOrNull()!!.first.name + (if (rHonor.size > 1) "++" else "")
 
         reschedule(now, NORMAL, false, null, "Request honored by $honorInfo", SCHEDULED)
 
@@ -686,7 +707,6 @@ open class Component(
 
         return true
     }
-
 
 
     /**
@@ -707,7 +727,7 @@ open class Component(
      */
     fun isClaiming(resource: Resource? = null): Boolean {
         @Suppress("IfThenToElvis")
-        return if(resource == null) {
+        return if (resource == null) {
             TODO("claiming test without resource is not yet implemented as this would require a registry in SimulationEntity")
 //            env.queue.filter{ it is ComponentQueue<*> }.map{(it as ComponentQueue<*>).contains(this)}
 //            for q in self._qmembers:
@@ -739,7 +759,9 @@ open class Component(
         scheduledTime = null
         simProcess = null
 
-        logInternal(now, env.curComponent, this, "Ended")
+        if (trackingPolicy.logStateChangeEvents) {
+            log(stateChangeEvent("Ended"))
+        }
     }
 
     private fun requireNotData() =
@@ -761,7 +783,7 @@ open class Component(
     ) {
         require(scheduledTime >= env.now) { "scheduled time (${scheduledTime}) before now (${env.now})" }
 
-        if(ASSERT_MODE == AssertMode.FULL) {
+        if (ASSERT_MODE == AssertMode.FULL) {
             require(this !in env.queue) {
                 "component must not be in queue when rescheduling but must be removed already at this point"
             }
@@ -773,25 +795,18 @@ open class Component(
 
         require(this.scheduledTime != null) { "reschedule with null time is unlikely to have meaningful semantics" }
 
-        if(this.scheduledTime != null) {
+        if (this.scheduledTime != null) {
             env.push(this, scheduledTime, priority, urgent)
         }
 
-        if(logCoreInteractions) {
-            //todo implement extra
-            val extra = "scheduled for ${formatWithInf(scheduledTime)}"
-            // line_no: reference to source position
-            // 9+ --> continue generator
-            // 13 --> no plus means: generator start
+        if (trackingPolicy.logStateChangeEvents) {
+            val extra = ", scheduled for ${formatWithInf(scheduledTime)}"
 
-
-            // calculate scheduling delta
-            val delta = if(this.scheduledTime == env.now || (this.scheduledTime?.value == Double.MAX_VALUE)) "" else {
+            val delta = if (this.scheduledTime == env.now || (this.scheduledTime?.value == Double.MAX_VALUE)) "" else {
                 "+" + TRACE_DF.format(scheduledTime - env.now) + " "
             }
 
-            // print trace
-            logInternal(now, env.curComponent, this, ("$caller $delta ${description ?: ""}").trim(), extra)
+            log(stateChangeEvent(("$caller $delta ${description ?: ""}").trim() + extra))
         }
     }
 
@@ -830,8 +845,8 @@ open class Component(
 
         var p: ProcessPointer? = null
 
-        if(process == null) {
-            if(componentState == DATA) {
+        if (process == null) {
+            if (componentState == DATA) {
                 //                require(this.simProcess != null) { "no process for data component" }
                 // note: not applicable, because the test would be if Component has a method called process, which it does by design
 
@@ -843,16 +858,16 @@ open class Component(
 
         var extra = ""
 
-        if(p != null) {
+        if (p != null) {
             this.simProcess = ingestFunPointer(p)
 
             extra = "process=${p.name}"
         }
 
-        if(componentState != CURRENT) {
+        if (componentState != CURRENT) {
             remove()
-            if(p != null) {
-                if(!(keepRequest || keepWait)) {
+            if (p != null) {
+                if (!(keepRequest || keepWait)) {
                     checkFail()
                 }
             } else {
@@ -860,27 +875,27 @@ open class Component(
             }
         }
 
-        val scheduledTime = if(at == null) {
+        val scheduledTime = if (at == null) {
             env.now + delay.toDouble()
         } else {
             at + delay.toDouble()
         }
 
-        reschedule(scheduledTime, priority, urgent, null, "activate $extra", SCHEDULED)
+        reschedule(scheduledTime, priority, urgent, null, "Activating $extra", SCHEDULED)
 
         return this
     }
 
     internal fun checkFail() {
-        if(requests.isNotEmpty()) {
-            logInternal("request failed")
+        if (requests.isNotEmpty()) {
+            logInternal(trackingPolicy.logInteractionEvents, "request failed")
             requests.forEach { it.key.removeRequester(this) }
             requests.clear()
             failed = true
         }
 
-        if(waits.isNotEmpty()) {
-            logInternal("wait failed")
+        if (waits.isNotEmpty()) {
+            logInternal(trackingPolicy.logInteractionEvents, "wait failed")
             waits.forEach { it.state.waiters.remove(this) }
 
             waits.clear()
@@ -951,7 +966,7 @@ open class Component(
         priority: Priority = NORMAL,
         urgent: Boolean = false
     ) {
-        if(componentState != PASSIVE && componentState != CURRENT) {
+        if (componentState != PASSIVE && componentState != CURRENT) {
             requireNotData()
             requireNotInterrupted()
             remove()
@@ -967,7 +982,7 @@ open class Component(
     fun getThis() = this
 
     fun callProcess() {
-        require(simProcess != null){"component '${name}' must have active process to be called"}
+        require(simProcess != null) { "component '${name}' must have active process to be called" }
         simProcess!!.call()
     }
 
@@ -1006,16 +1021,16 @@ open class Component(
      *     </ul>
      */
     fun release(vararg releaseRequests: ResourceRequest) {
-        for((resource, quantity) in releaseRequests) {
+        for ((resource, quantity) in releaseRequests) {
             require(!resource.anonymous) { " It is not possible to release from an anonymous resource, this way. Use Resource.release() in that case." }
 
             releaseInternal(resource, quantity)
         }
 
-        if(releaseRequests.isEmpty()) {
-            logInternal("Releasing all claimed resources ${claims}")
+        if (releaseRequests.isEmpty()) {
+            logInternal(trackingPolicy.logInteractionEvents, "Releasing all claimed resources ${claims}")
 
-            for((r, _) in claims) {
+            for ((r, _) in claims) {
                 releaseInternal(r)
             }
         }
@@ -1025,9 +1040,9 @@ open class Component(
     private fun releaseInternal(resource: Resource, q: Double? = null, bumpedBy: Component? = null) {
         require(resource in claims) { "$name not claiming from resource ${resource.name}" }
 
-        val quantity = if(q == null) {
+        val quantity = if (q == null) {
             claims[resource]!!
-        } else if(q > claims[resource]!!) {
+        } else if (q > claims[resource]!!) {
             claims[resource]!!
         } else {
             q
@@ -1035,13 +1050,13 @@ open class Component(
 
         resource.claimed -= quantity
 
-        log{
+        log(resource.trackingPolicy.logClaimRelease) {
             ResourceEvent(env.now, env.curComponent, this, resource, RELEASED, quantity)
         }
 
         claims[resource] = claims[resource]!! - quantity
 
-        if(claims[resource]!! < EPS) {
+        if (claims[resource]!! < EPS) {
             leave(resource.claimers)
             claims.remove(resource)
         }
@@ -1050,7 +1065,7 @@ open class Component(
         require(!resource.claimers.isEmpty() || resource.claimed == 0.0) { "rounding error in claimed quantity" }
         // fix if(claimers.isEmpty()) field= 0.0
 
-        if(bumpedBy == null) resource.tryRequest()
+        if (bumpedBy == null) resource.tryRequest()
     }
 
 
@@ -1078,7 +1093,7 @@ open class Component(
         failDelay: Number? = null
     ) = wait(
         StateRequest(state) { state.value == waitFor },
-        priority=priority,
+        priority = priority,
 //        *states.map { StateRequest(it) }.toTypedArray(),
         failAt = failAt,
         failDelay = failDelay,
@@ -1107,7 +1122,7 @@ open class Component(
         failDelay: Number? = null,
         all: Boolean = false
     ) = yieldCurrent {
-        if(componentState != CURRENT) {
+        if (componentState != CURRENT) {
             requireNotMain()
             requireNotData()
             requireNotInterrupted()
@@ -1136,24 +1151,24 @@ open class Component(
 
         tryWait()
 
-        if(waits.isNotEmpty()) {
+        if (waits.isNotEmpty()) {
             reschedule(
                 scheduledTime!!,
                 priority = priority,
                 urgent = urgent,
-                caller = "wait",
+                caller = "waiting",
                 newStatus = WAITING
             )
         }
     }
 
     internal fun tryWait(): Boolean {
-        if(componentState == INTERRUPTED) {
+        if (componentState == INTERRUPTED) {
             return false
         }
 
         @Suppress("UNCHECKED_CAST")
-        val honored = if(waitAll) {
+        val honored = if (waitAll) {
             waits.all { sr ->
                 (sr as StateRequest<Any>).let {
                     it.predicate(it.state.value)
@@ -1168,7 +1183,7 @@ open class Component(
         }
 
 
-        if(honored) {
+        if (honored) {
             waits.forEach { sr ->
                 sr.state.waiters.remove(this)
             }
@@ -1176,7 +1191,7 @@ open class Component(
             waits.clear()
             remove()
 
-            reschedule(env.now, NORMAL, false, null, "wait", SCHEDULED)
+            reschedule(env.now, NORMAL, false, null, "waiting", SCHEDULED)
         }
 
         return honored
@@ -1193,7 +1208,7 @@ open class Component(
     }
 
 
-     override val info: Jsonable
+    override val info: Jsonable
         get() = ComponentInfo(this)
 
 
@@ -1202,11 +1217,10 @@ open class Component(
 
         builder()
 
-        if(initialStatus == CURRENT) {
+        if (initialStatus == CURRENT) {
             yield(this@Component)
         }
     }
-
 
 
     internal fun requestedQuantity(resource: Resource) = requests[resource]
@@ -1230,7 +1244,7 @@ open class Component(
     ): Resource {
         require(resources.isNotEmpty()) { "Resources listing must not be empty" }
 
-        val selected = when(policy) {
+        val selected = when (policy) {
             SHORTEST_QUEUE -> {
                 resources.minByOrNull { it.requesters.size }!!
             }
@@ -1246,7 +1260,7 @@ open class Component(
                 return resources[curValue]
             }
             FIRST_AVAILABLE -> {
-                while(resources.all { it.availableQuantity < quantity.toDouble() }) {
+                while (resources.all { it.availableQuantity < quantity.toDouble() }) {
                     standby()
                 }
 
@@ -1287,15 +1301,15 @@ open class Component(
 
         val queueListener = object : QueueChangeListener<T>() {
             override fun added(component: T) {
-                if(queue.size >= batchSize) {
+                if (queue.size >= batchSize) {
                     activate()
                 }
             }
         }
 
-        if(queue.size < batchSize) {
+        if (queue.size < batchSize) {
             queue.addChangeListener(queueListener)
-            if(timeout!=null) hold(timeout) else passivate()
+            if (timeout != null) hold(timeout) else passivate()
         }
 
         val actualBatchSize = min(batchSize, queue.size)
@@ -1305,6 +1319,7 @@ open class Component(
 
         return batch
     }
+
 }
 
 internal val SELECT_SCOPE_IDX = mutableMapOf<Int, Int>()
@@ -1336,8 +1351,8 @@ class GenProcessInternal(val component: Component, seq: Sequence<Component>, ove
     override fun call() {
         try {
             iterator.next()
-        } catch(e: NoSuchElementException) {
-            if(e.message!=null) e.printStackTrace()
+        } catch (e: NoSuchElementException) {
+            if (e.message != null) e.printStackTrace()
             component.terminate()
         }
     }
@@ -1367,13 +1382,13 @@ infix fun ResourceRequest.andPriority(priority: Priority) = ResourceRequest(this
 //    data class StateRequest<T>(val s: State<T>, val value: T? = null, val priority: Int? = null)
 data class StateRequest<T>(val state: State<T>, val priority: Priority? = null, val predicate: (T) -> Boolean) {
     override fun equals(other: Any?): Boolean {
-        if(this === other) return true
-        if(javaClass != other?.javaClass) return false
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
         other as StateRequest<*>
 
-        if(state != other.state) return false
-        if(predicate != other.predicate) return false
+        if (state != other.state) return false
+        if (predicate != other.predicate) return false
 
         return true
     }
@@ -1388,7 +1403,7 @@ data class StateRequest<T>(val state: State<T>, val priority: Priority? = null, 
 infix fun <T> State<T>.turns(value: T) = StateRequest(this) { it == value }
 
 private fun formatWithInf(time: TickTime) =
-    if(time.value == Double.MAX_VALUE || time.value.isInfinite()) "<inf>" else TRACE_DF.format(time.value)
+    if (time.value == Double.MAX_VALUE || time.value.isInfinite()) "<inf>" else TRACE_DF.format(time.value)
 
 
 data class ComponentLifecycleRecord(
@@ -1413,7 +1428,7 @@ fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {
     return ComponentLifecycleRecord(
         c.name,
         c.creationTime,
-        inDataSince = if(c.isData) c.statusTimeline.statsData().timepoints.last().asTickTime() else null,
+        inDataSince = if (c.isData) c.statusTimeline.statsData().timepoints.last().asTickTime() else null,
         (histogram.get(DATA) ?: 0.0).asTickTime(),
         (histogram[CURRENT] ?: 0.0).asTickTime(),
         (histogram[STANDBY] ?: 0.0).asTickTime(),

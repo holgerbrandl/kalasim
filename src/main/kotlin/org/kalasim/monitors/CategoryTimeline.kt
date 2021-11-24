@@ -12,10 +12,13 @@ import org.kalasim.misc.DependencyContext
  * @sample org.kalasim.misc.DokkaExamplesKt.freqLevelDemo
  */
 class CategoryTimeline<T>(
-    initialValue: T,
+    val initialValue: T,
     name: String? = null,
     koin: Koin = DependencyContext.get()
 ) : Monitor<T>(name, koin), ValueTimeline<T> {
+
+    override var enabled: Boolean = true
+
 
     private val timestamps = listOf<Double>().toMutableList()
     private val values = ifEnabled { listOf<T>().toMutableList() }
@@ -24,8 +27,9 @@ class CategoryTimeline<T>(
         reset(initialValue)
     }
 
+
     override fun reset(initial: T) {
-        enabled = true
+        require(enabled){ "resetting a disabled timeline is unlikely to have meaningful semantics"}
 
         values.clear()
         timestamps.clear()

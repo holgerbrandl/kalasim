@@ -8,7 +8,7 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.DATA
 import org.kalasim.ComponentState.SCHEDULED
-import org.kalasim.misc.printThis
+import org.kalasim.misc.*
 import kotlin.test.fail
 
 class ComponentTests {
@@ -64,22 +64,23 @@ class ComponentTests {
 
             run(5)
         }
-    }.stdout shouldBe """time      current               receiver              action                                       info                               
---------- --------------------- --------------------- -------------------------------------------- ----------------------------------
-.00                             main                  create
-.00       main                  tester                create
-.00                                                   activate                                     scheduled for .00
-.00                             main                  run +5.00                                    scheduled for 5.00
-.00       tester                tester                wait                                         scheduled for .00
-.00                                                   hold +1.00                                   scheduled for 1.00
-1.00                            Resource.1            Created                                      capacity=1
-1.00                            tester                Requesting 1.0 from Resource.1 with prio...
+    }.stdout shouldBe """time      current               receiver              action                                                           info                               
+--------- --------------------- --------------------- ---------------------------------------------------------------- ----------------------------------
+.00                             main                  Created
+.00       main                  tester                Created
+.00                                                   Activated, scheduled for .00                                     New state: scheduled
+.00                             main                  Running +5.00, scheduled for 5.00                                New state: scheduled
+.00       tester                State.1               Created                                                          Initial state: true
+.00                             tester                Waiting, scheduled for .00                                       New state: scheduled
+.00                                                   Hold +1.00, scheduled for 1.00                                   New state: scheduled
+1.00                            Resource.1            Created                                                          capacity=1
+1.00                            tester                Requesting 1.0 from Resource.1 with priority null and oneof=...
 1.00                                                  Claimed 1.0 from 'tester'
-1.00                                                  Request honored by Resource.1                scheduled for 1.00
-1.00                                                  hold +1.00                                   scheduled for 2.00
+1.00                                                  Request honored by Resource.1, scheduled for 1.00                New state: scheduled
+1.00                                                  Hold +1.00, scheduled for 2.00                                   New state: scheduled
 2.00                                                  Released 1.0 from 'tester'
-2.00                                                  ResourceActivityEvent(start=1.00, end=2....
-2.00                                                  Ended""".trimIndent()
+2.00                                                  ResourceActivityEvent(start=1.00, end=2.00, requester=tester...
+2.00                                                  Ended                                                            New state: data""".trimIndent()
 
 
     @Test
@@ -97,21 +98,19 @@ class ComponentTests {
 
     @Test
     fun `it should allow to disable interaction logging`() = createTestSimulation {
+        trackingPolicyFactory.disableAll()
 
-        val r = Resource().apply {  logCoreInteractions=false}
-        val s: State<String> = State("foo").apply {  logCoreInteractions=false}
+        val r = Resource()//.apply {  trackingPolicy = ResourceTrackingConfig(logClaimRelease = false ) }
+        val s: State<String> = State("foo")
 
         val c = object : Component("foo") {
-            init {
-                logCoreInteractions = false
-            }
 
             override fun process() = sequence {
                 hold(2)
 
                 s.value = "bar"
 
-                request(r){
+                request(r) {
 //                                    s.value = "bar"
                 }
 
@@ -123,11 +122,48 @@ class ComponentTests {
 
         run(10)
 
-        tc.traces.apply{
-            size shouldBe 3
+        tc.traces.apply {
+            size shouldBe 2
             last().shouldBeInstanceOf<InteractionEvent>()
             (last() as InteractionEvent).action shouldBe "work done"
         }
+    }
+
+    @Test
+    fun `it should allow to register and consume custom trakcing policies`() = createTestSimulation {
+        class CustomConfig(val logSmthg: Boolean = true) : TrackingConfig
+
+        trackingPolicyFactory.register(CustomConfig()) {
+            it.name.startsWith("Customer")
+        }
+
+        var configuredLog = false
+
+        object : Component("Customer1") {
+            override fun process() = sequence<Component> {
+                if (env.trackingPolicyFactory.getPolicy<CustomConfig>(getThis()).logSmthg) {
+                    println("custom configured logging")
+                    configuredLog = true
+                }
+            }
+        }
+
+        // do some random stuff to ensure that this does not interfere with custom tracking config
+        val r = Resource()//.apply {  trackingPolicy = ResourceTrackingConfig(logClaimRelease = false ) }
+        val s: State<String> = State("foo")
+
+        object : Component("foo") {
+            override fun process() = sequence {
+                hold(2)
+                s.value = "bar"
+                request(r) {}
+                log("work done")
+            }
+        }
+
+        run(10)
+
+        configuredLog shouldBe true
     }
 
 
@@ -135,7 +171,7 @@ class ComponentTests {
     fun `it should enforce that either hold or until is not null in hold`() = createTestSimulation {
         val c = object : Component("foo") {
             override fun process() = sequence {
-                hold(until=null)
+                hold(until = null)
                 fail("it should not allow calling hold with duration and until being both null ")
             }
         }

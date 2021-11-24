@@ -4,23 +4,23 @@
 ## Next steps
 
 consider `logCoreInteractions=false` as default 
+* revisit storing/streaming of metrics (with time limit)
+* memory profiling of hospital
 
-**TODO** complete and publish hospital example
+get rid of components  or make it optional
 
 ## v0.7
 
 
 **{todo}** mandatory jsonable on sim-entities feels cumbersome
 
-**{todo}** use standard sl4j for simulation logging or at least provide adapter
-
-
 **{todo}** storeRefs -F-> trackArrivals
-* revisit storing/streaming of metrics (with time limit)
-* memory profiling of hospital 
 
 
 ## v0.8
+
+**TODO** complete and publish hospital example
+
 
 **TODO** add display option to discard zero-duration intervals for simplified vis
 

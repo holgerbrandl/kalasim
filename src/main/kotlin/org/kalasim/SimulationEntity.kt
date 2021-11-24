@@ -4,10 +4,8 @@ package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
 import org.json.JSONObject
-import org.kalasim.misc.Jsonable
-import org.kalasim.misc.printThis
+import org.kalasim.misc.*
 import org.koin.core.Koin
-import org.kalasim.misc.DependencyContext
 import org.koin.core.component.*
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
@@ -23,11 +21,6 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
     /** The time when the component was instantiated. */
     val creationTime = env.now
 
-    /**
-     *  Indicates if interaction events from this entity should be logged. This applies to core interactions only and
-     *  not to user-triggered log events
-     */
-    var logCoreInteractions = true;
 
     open val info: Jsonable = object : Jsonable() {
         override fun toJson(): JSONObject {
@@ -56,7 +49,7 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
         getKoin().get(qualifier, parameters)
 
 
-    internal fun logInternal(action: String) = log {
+    internal fun logInternal(enabled: Boolean, action: String) = log(enabled) {
         with(env) { InteractionEvent(now, curComponent, this@SimulationEntity, action) }
     }
 
@@ -86,23 +79,9 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
 //        env.apply { log(now, curComponent, source, action, details) }
 
 
-    /**
-     * Records a state-change event.
-     *
-     * @param time The current simulation time
-     * @param curComponent  Modification consuming component
-     * @param source Modification causing simulation entity
-     * @param action Describing the nature if the event
-     * @param details More details characterizing the state change
-     */
-    protected fun logInternal(
-        time: TickTime,
-        curComponent: Component?,
-        source: SimulationEntity?,
-        action: String? = null,
-        details: String? = null
-    ) = log {
-        InteractionEvent(time, curComponent, source, action, details)
+
+    protected fun logCreation(created: SimulationEntity?, details: String? = null) {
+        log(InteractionEvent(now, env.curComponent, created, details))
     }
 
 
@@ -120,15 +99,15 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
      * @param event A structured event log record. Users may want to sub-class `Event` to provide their
      *              own structured log record formats.
      */
+    // note do not use internally (because not managed by tracking-configuration)
     fun log(event: Event) {
         env.publishEvent(event)
     }
 
 
-    fun log(function: () -> Event) {
-        if(logCoreInteractions) {
-            val event = function()
-            log(event)
+    internal fun log(enabled: Boolean, builder: () -> Event) {
+        if (enabled) {
+            log(builder())
         }
     }
 }

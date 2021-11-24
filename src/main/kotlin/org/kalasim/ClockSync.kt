@@ -1,5 +1,6 @@
 package org.kalasim
 
+import org.kalasim.misc.ComponentTrackingConfig
 import org.koin.core.Koin
 import org.kalasim.misc.DependencyContext
 import java.time.Duration
@@ -20,9 +21,11 @@ class ClockSync(
     koin: Koin = DependencyContext.get()
 ) : Component(koin = koin) {
 
+
     init {
+        trackingPolicy  = ComponentTrackingConfig(false, false)
         // disable trace monitoring for clock control
-        env.traceFilters.add { it is InteractionEvent && it.curComponent is ClockSync }
+//        env.traceFilters.add { it is InteractionEvent && it.curComponent is ClockSync }
 
         changeTickDuration(tickDuration)
     }

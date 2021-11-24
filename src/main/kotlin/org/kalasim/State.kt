@@ -1,11 +1,10 @@
 package org.kalasim
 
-import org.kalasim.misc.Jsonable
+import org.kalasim.misc.*
 import org.kalasim.monitors.CategoryTimeline
 import org.kalasim.monitors.MetricTimeline
 import org.kalasim.monitors.NumericStatisticMonitor
 import org.koin.core.Koin
-import org.kalasim.misc.DependencyContext
 
 /**
  * States together with the Component.wait() method provide a powerful way of process interaction.
@@ -21,7 +20,7 @@ open class State<T>(
     koin: Koin = DependencyContext.get()
 ) : SimulationEntity(name, koin) {
 
-    private var isTriggerCxt:Boolean = false
+    private var isTriggerCxt: Boolean = false
 
     var value: T = initialValue
         set(value) {
@@ -30,16 +29,16 @@ open class State<T>(
             field = value
 
             // todo ensure that this is called also for the initial value
-            valueMonitor.addValue(value)
+            timeline.addValue(value)
 
 //            if (Thread.currentThread().getStackTrace()[2].methodName != "trigger") {
-            if(!isTriggerCxt){
+            if (!isTriggerCxt) {
                 tryWait()
             }
         }
 
 
-    val valueMonitor = CategoryTimeline(initialValue = value, koin = koin, name="State of '$name'")
+    val timeline = CategoryTimeline(initialValue = value, koin = koin, name = "State of '$name'")
 
     internal val waiters = ComponentQueue<Component>("waiters of ${this.name}", koin = koin)
 //    val waiters = PriorityQueue<Component>()
@@ -51,6 +50,27 @@ open class State<T>(
     /** Tracks the length of stay in the queue over time*/
     val lengthOfStay: NumericStatisticMonitor
         get() = waiters.lengthOfStayMonitor
+
+
+    var trackingPolicy: StateTrackingConfig = StateTrackingConfig()
+        set(newPolicy) {
+            field = newPolicy
+
+            with(newPolicy) {
+                lengthOfStay.enabled = trackQueueStatistics
+                queueLength.enabled = trackQueueStatistics
+
+                timeline.enabled = trackValue
+            }
+        }
+
+    init {
+        trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
+
+        log(trackingPolicy.logCreation) {
+            EntityCreatedEvent(now, env.curComponent,this, "Initial state: $value")
+        }
+    }
 
     override fun toString(): String = super.toString() + "[${value}]"
 
@@ -66,17 +86,17 @@ open class State<T>(
      * @param max Maximum number of components to be honored for the trigger value
      */
     fun trigger(value: T, valueAfter: T = this.value, max: Int = Int.MAX_VALUE) {
-        logInternal(
-            env.now,
-            env.curComponent,
-            this,
-            "value = ${value} --> ${valueAfter} allow $max components",
-            "trigger"
-        )
+        log(trackingPolicy.logTriggers) {
+            InteractionEvent(
+                env.now,
+                env.curComponent,
+                this,
+                "value = ${value} --> ${valueAfter} allow $max components",
+                "trigger"
+            )
+        }
 
-
-
-        withoutAutoTry{
+        withoutAutoTry {
             this.value = value
         }
         tryWait(max)
@@ -85,10 +105,10 @@ open class State<T>(
         tryWait()
     }
 
-    fun withoutAutoTry(smthg: ()->Unit){
-        isTriggerCxt=true
+    fun withoutAutoTry(smthg: () -> Unit) {
+        isTriggerCxt = true
         smthg()
-        isTriggerCxt=false
+        isTriggerCxt = false
     }
 
     private fun tryWait(maxHonor: Int = Int.MAX_VALUE) {
@@ -102,7 +122,7 @@ open class State<T>(
 
     fun printHistograms() {
         waiters.printHistogram()
-        valueMonitor.printHistogram()
+        timeline.printHistogram()
     }
 
     public override val info

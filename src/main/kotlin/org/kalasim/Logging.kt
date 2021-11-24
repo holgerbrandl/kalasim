@@ -1,10 +1,11 @@
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
+import mu.KotlinLogging
 import org.json.JSONObject
-import org.kalasim.misc.Jsonable
-import org.kalasim.misc.TRACE_DF
-import org.kalasim.misc.roundAny
+import org.kalasim.misc.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.logging.Level
 import kotlin.math.absoluteValue
@@ -25,26 +26,29 @@ class ResourceEvent(
     val capacity: Double = resource.capacity
     val occupancy: Double = resource.occupancy
     val requesters: Int = resource.requesters.size
-//    val requested: Int = resource.requesters.q.map{ it.component.requests.filter{ it.key == resource}}
+
+    //    val requested: Int = resource.requesters.q.map{ it.component.requests.filter{ it.key == resource}}
     val claimers: Int = resource.claimers.size
 
 
     override fun renderAction() =
-        "${type.toString().lowercase(Locale.ENGLISH).capitalize()} ${amount.absoluteValue.roundAny(2)} from '${requester.name}'"
+        "${
+            type.toString().lowercase(Locale.ENGLISH).capitalize()
+        } ${amount.absoluteValue.roundAny(2)} from '${requester.name}'"
 
-        override fun toJson() = json {
-            "time" to time
-            "current" to curComponent?.name
-            "requester" to requester.name
-            "resource" to resource.name
-            "type" to type
-            "amount" to amount
-            "capacity" to capacity
-            "claimed" to claimed
-            "occupancy" to occupancy
-            "requesters" to requesters
-            "claimers" to claimers
-        }
+    override fun toJson() = json {
+        "time" to time
+        "current" to curComponent?.name
+        "requester" to requester.name
+        "resource" to resource.name
+        "type" to type
+        "amount" to amount
+        "capacity" to capacity
+        "claimed" to claimed
+        "occupancy" to occupancy
+        "requesters" to requesters
+        "claimers" to claimers
+    }
 
 }
 
@@ -55,7 +59,7 @@ data class ResourceActivityEvent(
     val resource: Resource,
     val activity: String?,
     val claimedQuantity: Double
-) : Event(end){
+) : Event(end) {
     val startWT = resource.env.tickTransform?.tick2wallTime(start)
     val endWT = resource.env.tickTransform?.tick2wallTime(end)
 }
@@ -104,6 +108,21 @@ abstract class Event(
     }
 }
 
+class EntityCreatedEvent(
+    time: TickTime,
+    val creator: Component?,
+    val simEntity: SimulationEntity,
+    val details: String? = null
+) : Event(time)
+
+class ComponentStateChangeEvent(
+    time: TickTime,
+    curComponent: Component? = null,
+    simEntity: SimulationEntity,
+    state: ComponentState,
+    details: String? = null
+) : InteractionEvent(time, curComponent,simEntity, details, "New state: "+ state.toString().lowercase())
+
 
 fun interface EventListener {
     fun consume(event: Event)
@@ -118,16 +137,15 @@ fun interface EventFilter {
 }
 
 
-
 class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
 
 
-    enum class TraceTableColumn{ time, current, receiver, action, info }
+    enum class TraceTableColumn { time, current, receiver, action, info }
 
-    companion object{
-        internal val TRACE_COL_WIDTHS = mutableListOf(10, 22, 22, 45, 35)
+    companion object {
+        internal val TRACE_COL_WIDTHS = mutableListOf(10, 22, 22, 65, 35)
 
-        fun setColumnWidth(column:TraceTableColumn, width:Int) = when(column){
+        fun setColumnWidth(column: TraceTableColumn, width: Int) = when (column) {
             TraceTableColumn.time -> TRACE_COL_WIDTHS[0] = width
             TraceTableColumn.current -> TRACE_COL_WIDTHS[1] = width
             TraceTableColumn.receiver -> TRACE_COL_WIDTHS[2] = width
@@ -138,13 +156,15 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
 
 
     var hasPrintedHeader = false
-    var lastElement: InteractionEvent? = null
+    var lastCurrent: Component? = null
+    var lastReceiver: SimulationEntity? = null
+
 
 
     override fun consume(event: Event) {
-        if(event.logLevel.intValue() < logLevel.intValue()) return
+        if (event.logLevel.intValue() < logLevel.intValue()) return
 
-        if(!hasPrintedHeader) {
+        if (!hasPrintedHeader) {
             hasPrintedHeader = true
 
             val header = listOf(
@@ -161,23 +181,36 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
 
         with(event) {
 
-            val traceLine: List<String?> = if(this is InteractionEvent) {
-                val ccChanged = curComponent != lastElement?.curComponent
-                val receiverChanged = source != lastElement?.source
+            val traceLine: List<String?> = when (this) {
+                is InteractionEvent -> {
+                    val ccChanged = curComponent != lastCurrent
+                    val receiverChanged = source != lastReceiver
 
-                listOf(
-                    TRACE_DF.format(time.value),
-                    if(ccChanged) curComponent?.name else null,
-                    if(receiverChanged) source?.name else null,
-//                ((source?.name ?: "") + " " + (renderAction() ?: "")).trim(),
-                    renderAction(),
-                    renderDetails()
-                ).apply {
-                    // update last element
-                    lastElement = this@with
+                    listOf(
+                        TRACE_DF.format(time.value),
+                        if (ccChanged) curComponent?.name else null,
+                        if (receiverChanged) source?.name else null,
+        //                ((source?.name ?: "") + " " + (renderAction() ?: "")).trim(),
+                        renderAction().capitalize(),
+                        renderDetails()
+                    ).apply {
+                        // update last element
+                        lastCurrent = this@with.curComponent
+                        lastReceiver = this@with.source
+                    }
                 }
-            } else {
-                listOf(TRACE_DF.format(time.value), "", "", toString())
+                is EntityCreatedEvent -> {
+                    val ccChanged = creator != lastCurrent
+
+                    listOf(TRACE_DF.format(time.value), if (ccChanged) creator?.name else null, simEntity.name , "Created", details).apply {
+                        // update last element
+                        lastCurrent = this@with.creator
+                        lastReceiver = this@with.simEntity
+                    }
+                }
+                else -> {
+                    listOf(TRACE_DF.format(time.value), "", "", toString())
+                }
             }
 
             val renderedLine = traceLine.renderTraceLine().trim()
@@ -191,7 +224,7 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
         .zip(TRACE_COL_WIDTHS)
         .map { (str, padLength) ->
             val padded = str.padEnd(padLength)
-            if(str.length >= padLength) {
+            if (str.length >= padLength) {
                 padded.dropLast(str.length - padLength + 5) + "... "
             } else padded
         }
@@ -219,15 +252,12 @@ class TraceCollector(val traces: MutableList<Event> = mutableListOf()) : EventLi
 }
 
 
-
-
-inline fun <reified E: Event> Environment.eventCollector(): List<E> {
+inline fun <reified E : Event> Environment.eventCollector(): List<E> {
     val traces: MutableList<E> = mutableListOf()
 
-    addEventListener{
-        if(it is E) traces.add(it)
+    addEventListener {
+        if (it is E) traces.add(it)
     }
 
     return traces.toList()
 }
-

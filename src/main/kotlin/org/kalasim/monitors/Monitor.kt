@@ -16,12 +16,11 @@ abstract class Monitor<T>(
 ) : SimulationEntity(name, koin) {
 
     /** Disable or enable data collection in a timeline. */
-    var enabled: Boolean = true
-        protected set
+    open var enabled: Boolean = true
 
-    fun disable() {
-        enabled = false
-    }
+//    fun disable() {
+//        enabled = false
+//    }
 
 
     fun <T> ifEnabled(query: () -> T): T {

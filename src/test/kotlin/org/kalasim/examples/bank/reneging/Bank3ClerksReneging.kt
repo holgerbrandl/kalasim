@@ -89,10 +89,10 @@ fun main() {
 
         val waitingLine: ComponentQueue<Customer> = get()
 
-        waitingLine.lengthOfStayMonitor.disable()
+        waitingLine.lengthOfStayMonitor.enabled = false
         run(1500.0)
 
-        waitingLine.lengthOfStayMonitor.enable()
+        waitingLine.lengthOfStayMonitor.enabled = true
         run(500.0)
 
         // with console

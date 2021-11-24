@@ -223,8 +223,15 @@ class Doctor(name: String, val qualification: List<InjuryType>) : Resource(name)
 
 class EmergencyRoom(
 //    nurse: HeadNurse = FifoNurse()
-    nurse: HeadNurse = FifoNurse()
+    nurse: HeadNurse = FifoNurse(),
+    disableMetrics: Boolean = true
 ) : Environment(true) {
+
+    val waitingAreaSize = 300
+
+    init {
+        if (disableMetrics) trackingPolicyFactory.disableAll()
+    }
 
     // todo also here having sorted queue is causing almost more problems than solving
 //    val waitingLine = ComponentQueue(comparator = compareBy <Patient>{ it.severity.value }, name = "ER Waiting Area")
@@ -255,6 +262,14 @@ class EmergencyRoom(
     val treatedMonitor = MetricTimeline("treated patients")
     val incomingMonitor = MetricTimeline("incoming patients")
 
+    init {
+        if (disableMetrics) {
+            deceasedMonitor.enabled = false
+            treatedMonitor.enabled = false
+            incomingMonitor.enabled = false
+        }
+    }
+
     val nurse = nurse
 
 
@@ -266,17 +281,17 @@ class EmergencyRoom(
         val cg = ComponentGenerator(
             iat = exponential(0.2),
 //            total = 800,
-            storeRefs = true
+            storeRefs = false
         ) {
             val patient = Patient(typeDist.sample(), State(sevDist.sample()), State(Waiting))
 
             // todo this is not pretty; How to model time-dependent iat?
             // reduce new patients during the night
             val isDay = (now.value % 24) in 8.0..18.0
-            if (isDay || random.nextDouble() > 0.9) {
+            if ((isDay || random.nextDouble() > 0.9) && waitingLine.size <= waitingAreaSize) {
                 register(patient)
             } else {
-                println("skipping patient (out-of-office")
+//                println("skipping patient (out-of-office")
             }
 
             patient

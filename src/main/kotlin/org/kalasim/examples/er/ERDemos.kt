@@ -4,38 +4,23 @@ import EmergencyRoom
 import Patient
 import RefittingAvoidanceNurse
 import krangl.*
-import org.kalasim.ComponentGenerator
-import org.kalasim.SimulationEntity
+import org.kalasim.*
+import org.kalasim.misc.ComponentTrackingConfig
 import org.kalasim.plot.kravis.display
 import kotlin.to
 
 object InfinteER {
     @JvmStatic
     fun main(args: Array<String>) {
-        val er = EmergencyRoom().apply {
-//            enable
+        val er = EmergencyRoom(disableMetrics=true).apply {
+
+            run(100000)
         }
+
+        // memory analysis
+        println()
     }
 }
-
-
-//class ReportingManager{
-//
-////    Metrics
-//    class EventType
-//    class EventRule
-//
-////    val registry<EventType, EventRule>()
-//
-//     fun  report(simEntity: SimulationEntity, et: EventType){
-//         val rule = registry[et]
-//         rule.accepts(simEntity)
-//
-//
-//     }
-//
-//
-//}
 
 object SimpleER {
     @JvmStatic
@@ -51,8 +36,8 @@ object SimpleER {
             deceasedMonitor.display("Deceased Patients")
 
             get<EmergencyRoom>().apply {
-                rooms[0].setup.valueMonitor.display().show()
-                rooms[1].setup.valueMonitor.display().show()
+                rooms[0].setup.timeline.display().show()
+                rooms[1].setup.timeline.display().show()
 
                 rooms[1].statusTimeline.display().show()
             }

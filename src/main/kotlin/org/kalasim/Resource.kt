@@ -4,10 +4,9 @@ package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
 import krangl.*
-import org.kalasim.misc.Jsonable
+import org.kalasim.misc.*
 import org.kalasim.monitors.MetricTimeline
 import org.koin.core.Koin
-import org.kalasim.misc.DependencyContext
 
 // TODO Analyze we we support the same preemptible contract as simmer (Ucar2019, p11) (in particular restart)
 
@@ -110,14 +109,32 @@ open class Resource(
     val occupancyTimeline = MetricTimeline("Occupancy of ${this.name}", koin = koin)
 
 
+    var trackingPolicy: ResourceTrackingConfig = ResourceTrackingConfig()
+        set(newPolicy) {
+            field = newPolicy
+
+            with(newPolicy) {
+                capacityTimeline.enabled = trackUtilization
+                claimedTimeline.enabled = trackUtilization
+                availabilityTimeline.enabled = trackUtilization
+                occupancyTimeline.enabled = trackUtilization
+
+                requesters.lengthOfStayMonitor.enabled = trackQueueStatistics
+                requesters.queueLengthMonitor.enabled = trackQueueStatistics
+                claimers.lengthOfStayMonitor.enabled = trackQueueStatistics
+                claimers.queueLengthMonitor.enabled = trackQueueStatistics
+            }
+        }
+
     init {
-        logInternal(
-            env.now,
-            env.curComponent,
-            this,
-            "Created",
-            "capacity=$capacity " + if (anonymous) "anonymous" else ""
-        )
+        trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
+    }
+
+
+    init {
+        log(trackingPolicy.logCreation){
+            EntityCreatedEvent(now, env.curComponent, this, "capacity=$capacity " + if (anonymous) "anonymous" else "")
+        }
     }
 
     fun tryRequest(): Boolean {
@@ -199,7 +216,7 @@ open class Resource(
 enum class ResourceMetric { Capacity, Claimed, Requesters, Claimers, Occupancy, Availability }
 
 data class ResourceTimelineSegment(
-    val resource : Resource,
+    val resource: Resource,
     val start: TickTime,
     val end: TickTime?,
     val duration: Double?,
@@ -222,7 +239,7 @@ data class ResourceTimelineSegment(
 //    }
 
     val startWT = resource.env.tickTransform?.tick2wallTime(start)
-    val endWT = end?.let{resource.env.tickTransform?.tick2wallTime(it)}
+    val endWT = end?.let { resource.env.tickTransform?.tick2wallTime(it) }
 }
 
 

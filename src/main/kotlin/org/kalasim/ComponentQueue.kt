@@ -4,15 +4,12 @@ import com.github.holgerbrandl.jsonbuilder.json
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.json.JSONObject
-import org.kalasim.misc.JSON_INDENT
-import org.kalasim.misc.Jsonable
+import org.kalasim.misc.*
 import org.kalasim.misc.printThis
-import org.kalasim.misc.roundAny
 import org.kalasim.monitors.MetricTimeline
 import org.kalasim.monitors.MetricTimelineStats
 import org.kalasim.monitors.NumericStatisticMonitor
 import org.koin.core.Koin
-import org.kalasim.misc.DependencyContext
 import java.util.*
 
 data class CQElement<C>(val component: C, val enterTime: TickTime, val priority: Priority? = null)
@@ -45,7 +42,9 @@ class ComponentQueue<C>(
                 { comparator.compare(o1.component, o2.component) },
                 { it.enterTime })
         },
-        koin)
+        koin
+    )
+
 
     val size: Int
         get() = q.size
@@ -56,6 +55,22 @@ class ComponentQueue<C>(
     //    val ass = AggregateSummaryStatistics()
     val queueLengthMonitor = MetricTimeline("Length of ${this.name}", koin = koin)
     val lengthOfStayMonitor = NumericStatisticMonitor("Length of stay in ${this.name}", koin = koin)
+
+
+    var trackingPolicy: ComponentCollectionTrackingConfig = ComponentCollectionTrackingConfig()
+        set(newPolicy) {
+            field = newPolicy
+
+            with(newPolicy) {
+                queueLengthMonitor.enabled = trackQueueStatistics
+                lengthOfStayMonitor.enabled = trackQueueStatistics
+            }
+        }
+
+    init {
+        trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
+    }
+
 
     fun add(component: C, priority: Priority? = null): Boolean {
 //        log(component, "Entering $name")
@@ -75,11 +90,13 @@ class ComponentQueue<C>(
         changeListeners.forEach { it.polled(cqe.component) }
         updateExitStats(cqe)
 
-        if(cqe.component is Component) {
-            logInternal(env.now, env.curComponent, cqe.component as Component, "Left $name", null)
-        }else{
-            logInternal(env.now, env.curComponent, null, "${cqe.component} left $name", null)
 
+        log(trackingPolicy.trackQueueStatistics) {
+            if (cqe.component is Component) {
+                InteractionEvent(env.now, env.curComponent, cqe.component as Component, "Left $name", null)
+            } else {
+                InteractionEvent(env.now, env.curComponent, null, "${cqe.component} left $name", null)
+            }
         }
 
         return cqe.component

@@ -19,10 +19,14 @@ open class CategoryMonitor<T>(
     koin: Koin = DependencyContext.get()
 ) : Monitor<T>(name, koin), ValueMonitor<T> {
 
+//    override var enabled: Boolean = true
+//        set(isEnabled) {
+//            field = isEnabled
+//
+//            // todo is this what we want to do here?
+////            reset()
+//        }
 
-    fun enable() {
-        enabled = true
-    }
 
     private val frequencies = mutableMapOf<T, Long>()
         get() = ifEnabled { field }
@@ -45,7 +49,7 @@ open class CategoryMonitor<T>(
         // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
         println("Histogram of: '${name}'")
 //        frequencies.mapValues { it.value.toDouble() }
-            info.counts.printConsole(values = values, sortByWeight = sortByWeight)
+        info.counts.printConsole(values = values, sortByWeight = sortByWeight)
     }
 
     open fun getPct(value: T): Double = frequencies[value]!!.toDouble() / total
@@ -62,8 +66,8 @@ open class CategoryMonitor<T>(
 }
 
 class FrequencyStatsSummary<T>(internal val counts: FrequencyTable<T>) : Jsonable() {
-    override fun toJson(): JSONObject = json{
-        counts.forEach{ it.key to counts[it.key]!!.toLong()}
+    override fun toJson(): JSONObject = json {
+        counts.forEach { it.key to counts[it.key]!!.toLong() }
     }
 }
 
@@ -119,7 +123,7 @@ internal fun <T> FrequencyTable<T>.printConsole(
 }
 
 //https://stackoverflow.com/questions/64325428/kotlin-reduce-list-of-map-to-a-single-map
-fun <T> List<CategoryMonitor<T>>.mergeStats() : FrequencyTable<T> = map{ it.statistics}.run{
+fun <T> List<CategoryMonitor<T>>.mergeStats(): FrequencyTable<T> = map { it.statistics }.run {
 //    val maps = listOf(mapOf("fo" to 1, "fop" to 2), mapOf("bar" to 1, "fo" to 2))
 
     return flatMap { it.entries }

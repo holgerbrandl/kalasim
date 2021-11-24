@@ -6,10 +6,7 @@ import org.apache.commons.math3.random.RandomGenerator
 import org.json.JSONObject
 import org.kalasim.ComponentState.*
 import org.kalasim.Defaults.DEFAULT_SEED
-import org.kalasim.misc.ASSERT_MODE
-import org.kalasim.misc.AssertMode
-import org.kalasim.misc.JSON_INDENT
-import org.kalasim.misc.DependencyContext
+import org.kalasim.misc.*
 import org.kalasim.monitors.MetricTimeline
 import org.koin.core.Koin
 import org.koin.core.definition.Definition
@@ -113,8 +110,8 @@ open class Environment(
 
     private val eventListeners = listOf<EventListener>().toMutableList()
 
-
-    val traceFilters = mutableListOf<EventFilter>()
+    val trackingPolicyFactory = TrackingPolicyFactory()
+//    val traceFilters = mutableListOf<EventFilter>()
 
     init {
 //        traceFilters.add(EventFilter {
@@ -277,7 +274,7 @@ open class Environment(
         } else {
             val scheduledTime = calcScheduleTime(until, ticks)
 
-            main.reschedule(scheduledTime, priority, urgent, null, "run", SCHEDULED)
+            main.reschedule(scheduledTime, priority, urgent, null, "running", SCHEDULED)
         }
 
         // restore dependency context
@@ -358,7 +355,7 @@ open class Environment(
 
 
     internal fun publishEvent(event: Event) {
-        if (traceFilters.any { it.matches(event) }) return
+//        if (traceFilters.any { it.matches(event) }) return
 
         eventListeners.forEach {
             it.consume(event)
@@ -428,6 +425,9 @@ open class Environment(
     }
 }
 
+
+
+
 data class QueueElement(
     val component: Component,
     val time: TickTime,
@@ -481,3 +481,5 @@ inline fun <reified T> Environment.dependency(qualifier: Qualifier? = null, buil
 
     return something
 }
+
+

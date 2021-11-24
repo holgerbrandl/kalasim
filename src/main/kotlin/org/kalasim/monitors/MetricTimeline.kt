@@ -22,9 +22,13 @@ import kotlin.math.sqrt
  *
  * @param initialValue initial value for a level timeline. It is important to set the value correctly. Default: 0
  */
-class MetricTimeline(name: String? = null, initialValue: Number = 0, koin: Koin = DependencyContext.get()) :
+class MetricTimeline(name: String? = null, private val initialValue: Number = 0, koin: Koin = DependencyContext.get()) :
     Monitor<Number>(name, koin),
     ValueTimeline<Number> {
+
+
+    override var enabled: Boolean = true
+
 
     private val timestamps = listOf<Double>().toMutableList()
     private val values = ifEnabled { listOf<Double>().toMutableList() }
@@ -33,8 +37,9 @@ class MetricTimeline(name: String? = null, initialValue: Number = 0, koin: Koin 
         addValue(initialValue)
     }
 
+
     override fun addValue(value: Number) {
-        if(!enabled) return
+        if (!enabled) return
 
         timestamps.add(env.now.value)
         values.add(value.toDouble())
@@ -84,7 +89,7 @@ class MetricTimeline(name: String? = null, initialValue: Number = 0, koin: Koin 
         val timepointsExt = timestamps + env.now.value
         val durations = timepointsExt.toMutableList().zipWithNext { first, second -> second - first }
 
-        return if(excludeZeros) {
+        return if (excludeZeros) {
             val (durFilt, valFilt) = durations.zip(valuesLst).filter { it.second > 0 }.unzip()
             val (_, timestampsFilt) = timestamps.zip(valuesLst).filter { it.second > 0 }.unzip()
 
@@ -105,7 +110,7 @@ class MetricTimeline(name: String? = null, initialValue: Number = 0, koin: Koin 
 
         println("Histogram of: '${name}'")
 
-        if(valueBins) {
+        if (valueBins) {
             val freq = Frequency()
 
             values.forEach { freq.addValue(it) }
@@ -144,7 +149,7 @@ class MetricTimeline(name: String? = null, initialValue: Number = 0, koin: Koin 
         get() = statistics(false)
 
     override fun reset(initial: Number) {
-        enabled = true
+        require(enabled){ "resetting a disabled timeline is unlikely to have meaningful semantics"}
 
         values.clear()
         timestamps.clear()
@@ -173,7 +178,7 @@ class MetricTimelineStats(nlm: MetricTimeline, excludeZeros: Boolean = false) : 
         min = data.values.minOrNull()
         max = data.values.maxOrNull()
 
-        if(data.durations.any { it != 0.0 }) {
+        if (data.durations.any { it != 0.0 }) {
             val durationsArray = data.durations.toDoubleArray()
             mean = Mean().evaluate(data.values.toDoubleArray(), durationsArray)
             standardDeviation = sqrt(Variance().evaluate(data.values.toDoubleArray(), durationsArray))

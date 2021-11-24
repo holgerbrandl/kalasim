@@ -14,6 +14,10 @@ import kotlin.math.roundToInt
 
 class NumericStatisticMonitor(name: String? = null, koin: Koin = DependencyContext.get()) :
     Monitor<Number>(name, koin), ValueMonitor<Number> {
+
+    override var enabled: Boolean = true
+
+
     private val sumStats = ifEnabled { DescriptiveStatistics() }
 
     val values: DoubleArray
@@ -95,9 +99,6 @@ class NumericStatisticMonitor(name: String? = null, koin: Koin = DependencyConte
         return NumericStatisticMonitorStats(stats)
     }
 
-    fun enable() {
-        enabled = true
-    }
 
     override val info: Jsonable
         get() = statistics(false)
