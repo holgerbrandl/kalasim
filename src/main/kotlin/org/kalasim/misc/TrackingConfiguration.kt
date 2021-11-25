@@ -27,7 +27,7 @@ data class StateTrackingConfig(
     val logTriggers: Boolean = true
 ) : TrackingConfig
 
-data class ComponentCollectionTrackingConfig(val trackQueueStatistics: Boolean = true) : TrackingConfig
+data class ComponentCollectionTrackingConfig(val trackCollectionStatistics: Boolean = true) : TrackingConfig
 
 typealias EntityFilter = (SimulationEntity) -> Boolean
 
@@ -47,6 +47,7 @@ class TrackingPolicyFactory {
 
         return when (entity) {
             is ComponentQueue<*> -> defaultCollectionConfig
+            is ComponentList<*> -> defaultCollectionConfig
             is Component -> defaultComponentConfig
             is Resource -> defaultResourceConfig
             is State<*> -> defaultStateConfig

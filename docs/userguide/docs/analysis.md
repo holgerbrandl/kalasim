@@ -59,5 +59,20 @@ By design `kalasim` does not make use of parallelism. So when scaling up executi
 <!--See also 4.2 in Ucar2019-->
 
 
+## Component Tracking
 
+To prevent memory leaks, the [environment](basics.md#simulation-environment) just keeps track of scheduled components, that is components that are queued for execution. In some situations the user may want to track all components irrespective of their queuing status. This can be achieved by setting up a component collector **before** creating the components
+
+```kotlin
+createSimulation{
+    val cc = componentCollector()
+
+    // create components
+    Component("foo")
+    Component("bar")
+    
+    // analyze all components created until this point
+    cc.size // will be 2
+}
+```
 

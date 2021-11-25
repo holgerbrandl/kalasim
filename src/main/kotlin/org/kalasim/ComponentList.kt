@@ -1,14 +1,12 @@
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
-import org.kalasim.misc.JSON_INDENT
-import org.kalasim.misc.Jsonable
+import org.kalasim.misc.*
 import org.kalasim.misc.printThis
 import org.kalasim.monitors.MetricTimeline
 import org.kalasim.monitors.MetricTimelineStats
 import org.kalasim.monitors.NumericStatisticMonitor
 import org.koin.core.Koin
-import org.kalasim.misc.DependencyContext
 import java.util.*
 
 
@@ -21,7 +19,6 @@ import java.util.*
 class ComponentList<C>(
     name: String? = null,
     val list: MutableList<C> = LinkedList<C>(),
-    private val trackStayStatistics: Boolean = true,
     koin: Koin = DependencyContext.get()
 ) : SimulationEntity(name, koin), MutableList<C> by list {
 
@@ -31,6 +28,21 @@ class ComponentList<C>(
 
     internal val stayTracker = mutableMapOf<C, TickTime>()
 
+    var trackingPolicy: ComponentCollectionTrackingConfig = ComponentCollectionTrackingConfig()
+        set(newPolicy) {
+            field = newPolicy
+
+            with(newPolicy) {
+                queueLengthMonitor.enabled = trackCollectionStatistics
+                lengthOfStayMonitor.enabled = trackCollectionStatistics
+            }
+        }
+
+
+    init {
+        trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
+    }
+
     override fun add(element: C): Boolean {
         list.add(element)
 
@@ -38,9 +50,7 @@ class ComponentList<C>(
 
         queueLengthMonitor.addValue(size)
 
-        if (trackStayStatistics) {
-            stayTracker[element] = env.now
-        }
+        stayTracker[element] = env.now
 
         return true
     }
@@ -52,9 +62,8 @@ class ComponentList<C>(
         if (removed) {
             changeListeners.forEach { it.removed(element) }
 
-            if (trackStayStatistics) {
-                lengthOfStayMonitor.addValue((env.now - stayTracker[element]!!))
-            }
+            val insertTime = stayTracker.remove(element)!!
+            lengthOfStayMonitor.addValue((env.now - insertTime))
 
             queueLengthMonitor.addValue(size)
         }
@@ -93,13 +102,13 @@ class ComponentList<C>(
         get() = ComponentListInfo(this)
 }
 
-class ComponentListInfo<T>(cq: ComponentList<T>) : Jsonable() {
+class ComponentListInfo<T>(cl: ComponentList<T>) : Jsonable() {
 
     data class Entry(val component: String, val enterTime: TickTime?)
 
-    val name = cq.name
-    val timestamp = cq.env.now
-    val queue = cq.map { Entry(it.toString(), cq.stayTracker[it]) }.toList()
+    val name = cl.name
+    val timestamp = cl.env.now
+    val queue = cl.map { Entry(it.toString(), cl.stayTracker[it]) }.toList()
 }
 
 //todo this duplicates the impl in ComponentQueue

@@ -7,6 +7,38 @@ The beauty of discrete event simulation is its very limited vocabulary which sti
 * [Generators](component.md#component-generator)
 
 
+## Simulation Environment
+
+All entities are in a simulation are governed by a simulation environment context. Every simulation lives in exactly one such environment. The environment provides means for [controlled randomization](#randomness--distributions), [dependency injection](#dependency-injection), and most importantly manages the [event queue](#event-queue).
+
+The environment context of a kalasim simulation is an instance of  `org.kalasim.Environment`, which can be created using simple instantiation or via a builder called `createSimulation`
+
+```kotlin
+val env : Environment = createSimulation(enableConsoleLogger = true){
+    // Create simulation entities in here 
+    Car()
+    Resource("Car Wash")
+}.run(5.0)
+```
+
+Very often, the user will define custom Environments to streamline simulation API experience.
+
+```kotlin
+class MySim(val numCustomers:Int = 5) : Environment(){
+    val customers = List(numCustomers){ Customer(it) }
+}
+
+val sim = MySim(10)
+sim.run()
+
+// analyze customers
+sim.customers.first().statusTimelme.display()
+
+```
+
+To configure references first, an `Environment` can also be instantiated by configuring dependencies first with `configureEnvironment`. Check out the [Traffic](examples/traffic.md) example to learn how that works.
+
+
 ## Event Queue
 
 The core of *kalasim* is an event queue ordered by scheduled execution time, that maintains a list of events to be executed. To provide good insert, delete and update performance, `kalasim` is using a [`PriorityQueue`](https://docs.oracle.com/javase/7/docs/api/java/util/PriorityQueue.html) internally. Components are actively and passively scheduled for reevaluating their state. Technically, event execution refers to the continuation of a component's generator or execution function.
@@ -57,24 +89,6 @@ So the key points to recall are
 * Real world events may appear to happen at the same discretized simulation time
 * Simulation events are processed one after another, even if they are scheduled for the same time
 * Race-conditions between events can be avoided by setting a `priority`
-
-
-## Simulation Runtime Environment
-
-The execution context of a kalasim simulation is an `Environment`, which can be created with
-
-```kotlin
-val env : Environment = createSimulation(enableConsoleLogger = true){
-    // Create components in here 
-    Car()
-    
-    // To disambiguate between multiple simulations, provide a reference to the koin context
-    // The koin argument can be omitted if just a single simulation is being used
-    Component(koin=getKoin())
-}.run(5.0)
-```
-
-To configure references, an `Environment` can also be instantiated by configuring dependencies first with `configureEnvironment`. Check out the [Traffic](examples/traffic.md) example to learn how that works.
 
 
 ## Dependency Injection

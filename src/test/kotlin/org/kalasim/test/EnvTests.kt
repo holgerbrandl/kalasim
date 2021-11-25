@@ -144,6 +144,8 @@ class EnvTests {
     @Test
     fun `it should run until event queue is empty`() {
         createSimulation {
+            val cc = componentCollector()
+
             object : Component() {
                 override fun process() = sequence<Component> {
                     hold(10)
@@ -152,6 +154,8 @@ class EnvTests {
 
             run(until = null)
             now shouldBe 10.tt
+
+            cc.size shouldBe 1
         }
     }
 

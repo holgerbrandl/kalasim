@@ -88,10 +88,6 @@ open class Environment(
     startTime: TickTime = TickTime(0.0)
 ) : SimContext {
 
-    @Deprecated("serves no purposes and creates a memory leaks as objects are nowhere releases")
-    private val components: MutableList<Component> = listOf<Component>().toMutableList()
-
-
     private var running: Boolean = false
 
     val rg: RandomGenerator = JDKRandomGenerator(randomSeed)
@@ -228,8 +224,9 @@ open class Environment(
 
     @Deprecated("not really needed and shall be removed")
     fun addComponent(c: Component): Boolean {
-        require(!components.contains(c)) { "we must not add a component twice" }
-        return components.add(c)
+//        require(!components.contains(c)) { "we must not add a component twice" }
+//        return components.add(c)
+        return true
     }
 
 
@@ -410,18 +407,14 @@ open class Environment(
         }
     }
 
-    fun toJson(includeComponents: Boolean = false): JSONObject = json {
-        if (includeComponents) {
-            "components" to components.map { it.info.toJson() }
-        }
-        "num_components" to components.size
+    fun toJson(): JSONObject = json {
         "now" to now
         "queue" to queue.toList().map { it.name }.toTypedArray()
     }
 
     @Suppress("EXPERIMENTAL_OVERRIDE")
     override fun toString(): String {
-        return toJson(false).toString(JSON_INDENT)
+        return toJson().toString(JSON_INDENT)
     }
 }
 

@@ -67,6 +67,34 @@ There are multiple ways to improve the performance of a simulation.
 
 To further fine-tune and optimize simulation performance and to reveal bottlenecks, a JVM profiler (such as [yourkit](https://www.yourkit.com/)) can be used. Both call-counts and spent-time analysis have been proven useful here. 
 
+## Continuous Simulation
+
+For some use-cases, simulations may for a very long tick and wall time. To prevent internal metrics gathering from consuming all available memory, it needs to be disabled or at least configured carefully. This can be achieved, but either disabling metric provides such as [timelines and monitors](monitors.md) or by setting a sensible default strategy using the `env.trackingPolicyFactory`
+
+```kotlin
+// first define the policy and matcher
+env.trackingPolicyFactory
+    .register(ResourceTrackingConfig().copy(trackUtilization = false)) {
+            it.name.startsWith("Counter")
+}
+
+// Second, we can create entities that will comply to the polices if being matched
+val r = Resource("Counter 22")
+```
+
+For each entity type a corresponding `TrackinConfig` can be provisioned along with an entity matcher to narrow down its scope.
+
+!!!note
+    Tracking configuration policies must be set before instantiating simulation entities to be used. After entities have been created, the user can still configure via `c.trackingConfig`.
+
+To disable all metrics and to minimize internal event logging, the user can run `env.trackingPolicyFactory.disableAll()`
+
+The same mechanism applies also fine-tune the internal [event logging](event_log.md). By disabling some -  not-needed for production - events, simulation performance can be improved significantly.
+
+The user can also register her own `TrackConfig` implementations using the factory. See [here](https://github.com/holgerbrandl/kalasim/blob/4f284e6f52ab9ab2f09b6bf5331f4fd413476702/src/test/kotlin/org/kalasim/test/ComponentTests.kt#L134-L134) for simple example. 
+
+
+
 ## Save and Load Simulations
 
 <!-- TODO learn from https://github.com/r-simmer/simmer.json -->

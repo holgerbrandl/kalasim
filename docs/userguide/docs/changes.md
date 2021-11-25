@@ -39,7 +39,8 @@ request(doctorFoo, doctorBar, oneOf=true){ doctor ->
 
 Breaking changes
 
-* Renamed `MetricTimeline` to `MetricTimeline` 
+* Removed `components` from `Environment` and created `componentCollector` as optional replacement
+* Redesigned events & metrics API 
 * Updated to `koin` v3.1 (fixes [#15](https://github.com/holgerbrandl/kalasim/issues/15)): `GlobalContext` has been replaced with `DependencyContext`
 * Established use of `TickTime` across the entire API to disambiguate simulation time instants from durations, which are still modelled as `Double`
 * Changed `Component.now `and `Environment.now` to new value class `TickTime` for better type safety

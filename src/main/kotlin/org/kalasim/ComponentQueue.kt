@@ -62,8 +62,8 @@ class ComponentQueue<C>(
             field = newPolicy
 
             with(newPolicy) {
-                queueLengthMonitor.enabled = trackQueueStatistics
-                lengthOfStayMonitor.enabled = trackQueueStatistics
+                queueLengthMonitor.enabled = trackCollectionStatistics
+                lengthOfStayMonitor.enabled = trackCollectionStatistics
             }
         }
 
@@ -91,7 +91,7 @@ class ComponentQueue<C>(
         updateExitStats(cqe)
 
 
-        log(trackingPolicy.trackQueueStatistics) {
+        log(trackingPolicy.trackCollectionStatistics) {
             if (cqe.component is Component) {
                 InteractionEvent(env.now, env.curComponent, cqe.component as Component, "Left $name", null)
             } else {

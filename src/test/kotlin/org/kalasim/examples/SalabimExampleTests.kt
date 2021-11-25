@@ -117,7 +117,7 @@ class SalabimExampleTests {
 
         print(avgQueueMeans)
 
-        if(false) {
+        if (false) {
             avgQueueMeans
                 .plot(x = { it.first }, y = { (it.second.ss as DescriptiveStatistics).median })
                 .geomPoint()
@@ -148,6 +148,7 @@ class SalabimExampleTests {
             run(1500.0)
 
             waitingLine.lengthOfStayMonitor.enabled = true
+//            waitingLine.lengthOfStayMonitor.reset()
             run(500.0)
         }
 
@@ -174,20 +175,20 @@ class SalabimExampleTests {
               "name": "waitingline",
               "length_of_stay": {
                 "all": {
-                  "entries": 194,
-                  "median": 6.427,
-                  "mean": 5.642,
-                  "ninety_pct_quantile": 16.256,
-                  "standard_deviation": 6.427,
-                  "ninetyfive_pct_quantile": 18.217
+                  "entries": 50,
+                  "median": 7.185,
+                  "mean": 10.497,
+                  "ninety_pct_quantile": 18.284,
+                  "standard_deviation": 7.185,
+                  "ninetyfive_pct_quantile": 21.968
                 },
                 "excl_zeros": {
-                  "entries": 133,
-                  "median": 6.24,
-                  "mean": 8.229,
-                  "ninety_pct_quantile": 17.659,
-                  "standard_deviation": 6.24,
-                  "ninetyfive_pct_quantile": 19.847
+                  "entries": 45,
+                  "median": 6.602,
+                  "mean": 11.664,
+                  "ninety_pct_quantile": 19.167,
+                  "standard_deviation": 6.602,
+                  "ninetyfive_pct_quantile": 22.567
                 }
               },
               "type": "QueueStatistics",

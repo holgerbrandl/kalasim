@@ -1,11 +1,8 @@
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
-import mu.KotlinLogging
 import org.json.JSONObject
 import org.kalasim.misc.*
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.logging.Level
 import kotlin.math.absoluteValue
@@ -260,4 +257,15 @@ inline fun <reified E : Event> Environment.eventCollector(): List<E> {
     }
 
     return traces.toList()
+}
+
+/** Collects all components created in the parent environment. */
+fun  Environment.componentCollector(): List<Component> {
+    val components: MutableList<Component> = mutableListOf()
+
+    addEventListener {
+        if (it is EntityCreatedEvent && it.simEntity is Component) components.add(it.simEntity)
+    }
+
+    return components
 }
