@@ -8,6 +8,7 @@ import jetbrains.letsPlot.label.ggtitle
 import jetbrains.letsPlot.label.xlab
 import jetbrains.letsPlot.label.ylab
 import jetbrains.letsPlot.letsPlot
+import jetbrains.letsPlot.scale.scaleXDateTime
 import krangl.*
 import org.kalasim.*
 import org.kalasim.monitors.*
@@ -89,6 +90,7 @@ fun <T> CategoryTimeline<T>.display(
             xlab("time") +
             ylab("") +
             ggtitle(title)
+                .also { if (useWT) it + scaleXDateTime() }
 }
 
 
@@ -116,6 +118,7 @@ fun List<ResourceActivityEvent>.display(
             ylab("") +
             xlab("Time")
                 .also { if (title != null) ggtitle(title) }
+                .also { if (useWT) it + scaleXDateTime() }
 }
 
 
@@ -143,6 +146,7 @@ fun List<ResourceTimelineSegment>.display(
             // scales arg not yet supported https://github.com/JetBrains/lets-plot/issues/479
             facetWrap("color", ncol = 1)
                 .also { if (title != null) ggtitle(title) }
+                .also { if (useWT) it + scaleXDateTime() }
 }
 
 
@@ -183,6 +187,7 @@ fun List<Component>.displayStateTimeline(
         color = "value"
     } + xlab(componentName)
         .also { if (title != null) ggtitle(title) }
+        .also { if (useWT) it + scaleXDateTime() }
 }
 
 
