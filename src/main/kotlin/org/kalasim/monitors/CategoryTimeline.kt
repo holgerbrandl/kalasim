@@ -17,9 +17,6 @@ class CategoryTimeline<T>(
     koin: Koin = DependencyContext.get()
 ) : Monitor<T>(name, koin), ValueTimeline<T> {
 
-    override var enabled: Boolean = true
-
-
     private val timestamps = listOf<Double>().toMutableList()
     private val values = ifEnabled { listOf<T>().toMutableList() }
 

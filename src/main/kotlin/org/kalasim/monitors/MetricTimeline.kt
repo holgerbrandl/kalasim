@@ -26,10 +26,6 @@ class MetricTimeline(name: String? = null, private val initialValue: Number = 0,
     Monitor<Number>(name, koin),
     ValueTimeline<Number> {
 
-
-    override var enabled: Boolean = true
-
-
     private val timestamps = listOf<Double>().toMutableList()
     private val values = ifEnabled { listOf<Double>().toMutableList() }
 
