@@ -130,8 +130,12 @@ class ComponentTests {
     }
 
     @Test
-    fun `it should allow to register and consume custom trakcing policies`() = createTestSimulation {
+    fun `it should allow to register and consume custom tracking policies`() = createTestSimulation {
         class CustomConfig(val logSmthg: Boolean = true) : TrackingConfig
+
+        trackingPolicyFactory.register(ResourceTrackingConfig().copy(trackUtilization = false)) {
+            it.name.startsWith("Counter")
+        }
 
         trackingPolicyFactory.register(CustomConfig()) {
             it.name.startsWith("Customer")
