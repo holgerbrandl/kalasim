@@ -118,7 +118,7 @@ open class Component(
         this.simProcess = ingestFunPointer(process)
 
         // the contract for initial auto-scheduling is
-        // either the user has set `at` which clearly indicates the intent for schedulingg the component
+        // either the user has set `at` which clearly indicates the intent for scheduling the component
         // or
         // the has overridden `Component` and has overridden `process`
         // or

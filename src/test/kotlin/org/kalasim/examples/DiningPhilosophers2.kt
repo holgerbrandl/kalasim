@@ -41,7 +41,7 @@ fun main() {
                 Philosopher(name, forks[idx], forks[(idx + 1).rem(forks.size)])
             }
 
-            traceCollector()
+            eventLog()
         }
     }
 
@@ -51,7 +51,7 @@ fun main() {
     // Analysis (gather monitoring data (as in simmer:get_mon_arrivals)
     data class RequestRecord(val requester: String, val timestamp: TickTime, val resource: String, val quantity: Double)
 
-    val tc = sim.get<TraceCollector>()
+    val tc = sim.get<EventLog>()
     val requests = tc.filterIsInstance<ResourceEvent>().map {
         val amountDirected = (if(it.type == ResourceEventType.RELEASED) -1 else 1) * it.amount
         RequestRecord(it.requester.name, it.time, it.resource.name, amountDirected)

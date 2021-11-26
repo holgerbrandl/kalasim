@@ -22,7 +22,7 @@ class QueueTests {
             add { waitingLine }
         }
 
-        env.addEventListener(TraceCollector())
+        env.addEventListener(EventLog())
 
         waitingLine.add(Foo())
         waitingLine.add(Foo())
@@ -78,7 +78,7 @@ class QueueTests {
             val c1 = Component("comp1", at = 3.tt)
             val c2 = Component("comp2", at = 3.tt)
 
-            val tc = TraceCollector().also { addEventListener(it) }
+            val tc = EventLog().also { addEventListener(it) }
 
 
             queue.first() shouldBe c1
@@ -86,7 +86,7 @@ class QueueTests {
 
             run(10)
 
-            tc.traces.filterIsInstance<InteractionEvent>()
+            tc.events.filterIsInstance<InteractionEvent>()
                 .filter { it.renderAction() == "Ended" }
                 .apply {
                     size shouldBe 2
@@ -104,7 +104,7 @@ class QueueTests {
             val c1 = Component("comp1", at = 3.tt)
             val c2 = Component("comp2", at = 3.tt, priority = IMPORTANT)
 
-            val tc = TraceCollector().also { addEventListener(it) }
+            val tc = EventLog().also { addEventListener(it) }
 
 
             queue.first() shouldBe c2

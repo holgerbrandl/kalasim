@@ -118,11 +118,11 @@ class ComponentTests {
             }
         }
 
-        val tc = traceCollector()
+        val tc = eventLog()
 
         run(10)
 
-        tc.traces.apply {
+        tc.events.apply {
             size shouldBe 2
             last().shouldBeInstanceOf<InteractionEvent>()
             (last() as InteractionEvent).action shouldBe "work done"
@@ -340,7 +340,7 @@ class ComponentTests {
             }
         }
 
-        val tc = TraceCollector().apply { addEventListener(this) }
+        val tc = EventLog().apply { addEventListener(this) }
 
         run(20)
 

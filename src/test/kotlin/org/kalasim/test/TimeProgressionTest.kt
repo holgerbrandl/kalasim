@@ -4,13 +4,13 @@ import io.kotest.matchers.shouldNotBe
 import org.junit.Test
 import org.kalasim.Component
 import org.kalasim.Environment
-import org.kalasim.TraceCollector
+import org.kalasim.EventLog
 
 class TimeProgressionTest {
 
     @Test
     fun `time should progress along with simulation`() {
-        val tr = TraceCollector()
+        val tr = EventLog()
 
         class Car : Component() {
             //            override suspend fun SequenceScope<Component>.process(it: Component) {

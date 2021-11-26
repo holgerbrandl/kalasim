@@ -228,28 +228,34 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
         .joinToString("")
 }
 
-/** Collects all events on the kalasim event bus. */
-fun Environment.traceCollector(): TraceCollector {
-    val tc = dependency { TraceCollector() }
+/** Collects all events on the kalasim event bus. See [Event Log](https://www.kalasim.org/event_log/) for details. */
+//@Deprecated("Use ", replaceWith = ReplaceWith("collect<Event>()"))
+fun Environment.eventLog(): EventLog {
+    val tc = dependency { EventLog() }
     addEventListener(tc)
 
     return tc
 }
 
-class TraceCollector(val traces: MutableList<Event> = mutableListOf()) : EventListener,
-    MutableList<Event> by traces {
-//    val traces = mutableListOf<Event>()
+/** A list of all events that were created in a simulation run.  See [Event Log](https://www.kalasim.org/event_log/) for details. */
+class EventLog(val events: MutableList<Event> = mutableListOf()) : EventListener,
+    MutableList<Event> by events {
+//    val events = mutableListOf<Event>()
 
     override fun consume(event: Event) {
-        traces.add(event)
+        events.add(event)
     }
 
-    operator fun invoke() = traces
-//    operator fun get(index: Int): Event = traces[index]
+    operator fun invoke() = events
+//    operator fun get(index: Int): Event = events[index]
 }
 
 
-inline fun <reified E : Event> Environment.eventCollector(): List<E> {
+/**
+ * Subscribe to events of a ceratin type and return a reference to a list into which these events are deposited.
+ * See [Event Log](https://www.kalasim.org/event_log/) for details.
+ */
+inline fun <reified E : Event> Environment.collect(): List<E> {
     val traces: MutableList<E> = mutableListOf()
 
     addEventListener {
@@ -259,7 +265,9 @@ inline fun <reified E : Event> Environment.eventCollector(): List<E> {
     return traces.toList()
 }
 
-/** Collects all components created in the parent environment. */
+/**
+ * Collects all components created in the parent environment. See [Event Log](https://www.kalasim.org/event_log/) for details.
+ */
 fun  Environment.componentCollector(): List<Component> {
     val components: MutableList<Component> = mutableListOf()
 

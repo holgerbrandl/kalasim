@@ -13,7 +13,7 @@ class GeneratorTest {
     @Test
     fun testCustomerGenerator() {
 
-        val tc = TraceCollector()
+        val tc = EventLog()
 
         Environment().apply {
 
@@ -22,7 +22,7 @@ class GeneratorTest {
             ComponentGenerator(iat = ExponentialDistribution(2.0), total = 4) { Customer() }
         }.run(100.0)
 
-        val customers = tc.traces
+        val customers = tc.events
             .filterIsInstance<EntityCreatedEvent>()
             .map { it.simEntity }
             .filterNotNull().distinct()

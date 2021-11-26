@@ -16,7 +16,7 @@ fun main() {
         val doctors = Resource("doctors", 2)
         val admin = Resource("admin", 1)
 
-        traceCollector()
+        eventLog()
 
         class Patient: Component(){
             override fun process() = sequence {
@@ -49,7 +49,7 @@ fun main() {
     }
 
     // analysis
-    val tc = sim.get<TraceCollector>()
+    val tc = sim.get<EventLog>()
     val requests: List<ResourceEvent> = tc.filterIsInstance<ResourceEvent>()
     println(requests.first())
 
@@ -111,4 +111,4 @@ fun List<String>.display() {
 
 
 }
-//fun TraceCollector.get
+//fun EventLog.get

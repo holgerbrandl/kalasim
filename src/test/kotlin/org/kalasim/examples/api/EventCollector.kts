@@ -2,7 +2,7 @@
 import org.kalasim.*
 
 createSimulation(enableConsoleLogger = true) {
-    val tc = traceCollector()
+    val tc = eventLog()
 
     tc.filter { it is InteractionEvent && it.source?.name == "foo" }
 

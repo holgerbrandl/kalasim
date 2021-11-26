@@ -37,7 +37,7 @@ class Philosopher(name: String, val leftFork: Fork, val rightFork: Fork) : Compo
 }
 
 val sim = createSimulation(true) {
-    traceCollector()
+    eventLog()
 
     // create forks and resources
     val names = listOf("Socrates", "Pythagoras", "Plato", "Aristotle")
@@ -53,7 +53,7 @@ val sim = createSimulation(true) {
 // Analysis (gather monitoring data (as in simmer:get_mon_arrivals)
 data class RequestRecord(val requester: String, val timestamp: TickTime, val resource: String, val quantity: Double)
 
-val tc = sim.get<TraceCollector>()
+val tc = sim.get<EventLog>()
 val requests = tc.filterIsInstance<ResourceEvent>().map {
     val amountDirected = (if(it.type == ResourceEventType.RELEASED) -1 else 1) * it.amount
     RequestRecord(it.requester.name, it.time, it.resource.name, amountDirected)
