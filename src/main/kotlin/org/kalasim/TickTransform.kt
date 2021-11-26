@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit
 data class TickTime(val value: Double) : Comparable<TickTime> {
     override operator fun compareTo(other: TickTime): Int = value.compareTo(other.value)
     operator fun compareTo(other: Int): Int = value.compareTo(other)
+    operator fun compareTo(other: Double): Int = value.compareTo(other)
 
     operator fun minus(duration: Double): TickTime = TickTime(value - duration)
     operator fun plus(duration: Number): TickTime = TickTime(value + duration.toDouble())
