@@ -3,16 +3,8 @@
 
 ## Next steps
 
-consider `logCoreInteractions=false` as default 
-* revisit storing/streaming of metrics (with time limit)
-* memory profiling of hospital
-
-get rid of components  or make it optional
-
 ## v0.7
 
-
-**{todo}** mandatory jsonable on sim-entities feels cumbersome
 
 **{todo}** storeRefs -F-> trackArrivals
 
@@ -21,7 +13,6 @@ get rid of components  or make it optional
 
 **TODO** complete and publish hospital example
 
-
 **TODO** add display option to discard zero-duration intervals for simplified vis
 
 better work out https://www.kalasim.org/setup/ for novice users (e.g. use koans/or datalore share)
@@ -29,6 +20,7 @@ better work out https://www.kalasim.org/setup/ for novice users (e.g. use koans/
 simple optimizing example
 
 https://groups.google.com/g/salabim/c/iK6o7umeXKc/m/l3t59WbKBgAJ?utm_medium=email&utm_source=footer
+
 ---
 
 **{todo}** finish elevator example with visualization

@@ -1,4 +1,4 @@
-The beauty of discrete event simulation is its very limited vocabulary which still allow expressing complex system dynamics. In essence, `kalasim` relies on just a handful of types to model a simulation.
+The beauty of discrete event simulation is its very limited vocabulary which still allow expressing complex system dynamics. In essence, `kalasim` relies on just a handful of elements to model real-world processes.
 
 * [Components](component.md)
 * [Resources](resource.md)
@@ -21,6 +21,8 @@ val env : Environment = createSimulation(enableConsoleLogger = true){
 }.run(5.0)
 ```
 
+Within its environment, a simulation contains one or multiple [components](component.md) with [process definition](component.md#process-definition)s that define their behavior and interplay with other simulation entities.
+
 Very often, the user will define custom Environments to streamline simulation API experience.
 
 ```kotlin
@@ -32,11 +34,35 @@ val sim = MySim(10)
 sim.run()
 
 // analyze customers
-sim.customers.first().statusTimelme.display()
+sim.customers.first().statusTimeline.display()
 
 ```
 
 To configure references first, an `Environment` can also be instantiated by configuring dependencies first with `configureEnvironment`. Check out the [Traffic](examples/traffic.md) example to learn how that works.
+
+
+## Running a simulation
+
+In a discrete event simulation a clear distinction is made between real time and simulation time. With *real time* we refer to the wall-clock time. It represents the execution time of the experiment. The *simulation time* is an attribute of the simulator.
+
+!!! tip 
+    The user can define a [transformation](advanced.md#tick-transformation) to map the internal clock to her wall-time clock
+
+As shown in the example from above a simulation is usually started with `sim.run(ticks)`. Here `ticks` is the number of ticks, that is simulation time units. The simulation will progress for `ticks`. By doing so we may stop right in the middle of a [process](component.md#process-interaction).
+
+Alternatively, we can also run until the event queue is empty (or forever depending on the model) by omitting the argument: 
+
+```kotlin
+sim.run(23) // run for 23 ticks
+sim.run(5) // run for some more ticks
+
+sim.run(until=42.tickTime) // run until internal simulation clock is 23 
+
+sim.run() // run until event queue is empty
+```
+
+!!! tip
+    A component can always stop the current simulation by calling `stopSimulation()` in its [process definition](component.md#process-definition). See [here](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/examples/api/StopSimulation.kt) for fully worked out example.
 
 
 ## Event Queue

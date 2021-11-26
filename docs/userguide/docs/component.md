@@ -12,7 +12,10 @@ val component = Component()
 
 *Data*  components may be placed in a queue. This component will not be activated as there is no associated process method.
 
-In order to make an *active*  component it is necessary to first define a class. There has to be at least one sequence generator method, normally called `process`:
+
+## Process Definition
+
+In order to make an *active*  component it is necessary to extend `Component` to provide (at least) one sequence generator method, normally called `process`:
 
 
 ```
@@ -25,13 +28,11 @@ class Ship: Component(){
 }
 ```
 
+The **process definition**s of the components in a simulation define its dynamics. Writing down the process definition is the key modelling task when using `kalasim`.  
 
-Normally, the process will contain at least one [`yield`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence-scope/yield.html) statement. But that's not a requirement.
+Normally, the process will contain at least one [`yield`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence-scope/yield.html) statement. By doing so, the component can hand-back control to the simulation engine at defined points when a component needs to wait. Typically, the user must not use `yield` directly, but rather the provided [process interaction](#process-interaction) methods.
 
-
-Typically, the user must not use `yield` directly, but rather the provided [process interaction](#process-interaction) methods.
-
-Creation and activation can be combined by making a new instance of the class:
+Creation and activation are by default combined when creating a new `Component` instance:
 
 ```kotlin
 val ship1 = Ship()
@@ -39,11 +40,11 @@ val ship2 = Ship()
 val ship3 = Ship()
 ```
 
-This causes three Ships to be created and to start them at Sim.process().
-The ships will be named automatically `Ship.0` unless a name
-is provided.
+This causes three ships to be created and to be [activated](component.md#activate), that is _scheduled_ for execution in the simulation's [event queue](basics.md#event-queue).
 
-If no process method is found for `Ship`, the ship will be a data component.
+Components will be named automatically, using the pattern `[Class Name].[Instance Number]`. Here, there would be `Ship.1` to `Ship.3` unless a name is provided via the `name` parameter of the parent constructor of `Component`.
+
+If no process method is found for a component (such as `Ship`), the component will become a [data](#lifecycle) component.
 In that case, it may become active by means of an `activate()` statement:
 
 ```kotlin

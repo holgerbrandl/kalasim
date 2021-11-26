@@ -43,5 +43,5 @@ We always welcome pull requests. :-)
 
 Feel welcome to post questions and ideas in the project's [gitter chat](https://gitter.im/holgerbrandl/kalasim)
 
-Feel also invited to chat with us in the [kotlinlang.slack.com](http://kotlinlang.slack.com) in the `#datascience` channel.
+Feel also invited to chat with us in the [kotlinlang.slack.com](http://kotlinlang.slack.com) in the `#kalasim` channel.
 

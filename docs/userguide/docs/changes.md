@@ -24,6 +24,7 @@ Documentation
 
 Minor enhancements
 
+* Added possibility [stop](basics.md#running-a-simulation) a simulation from a process definition using ``stopSimulation`
 * Introduced `AssertMode`s (`Full`, `Light` (default), `None`) to enable/disable internal [consistency checks](https://www.kalasim.org/advanced/#internal-state-validation). This will optimize performance by another ~20% (depending on simulation logic)
 * Improved request priority API
 * Allow for runtime reconfiguration of `ClockSync` to enable adjustable simulation speed
