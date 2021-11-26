@@ -222,13 +222,6 @@ open class Environment(
         return (this)
     }
 
-    @Deprecated("not really needed and shall be removed")
-    fun addComponent(c: Component): Boolean {
-//        require(!components.contains(c)) { "we must not add a component twice" }
-//        return components.add(c)
-        return true
-    }
-
 
     /**
      * Start execution of the simulation
@@ -352,21 +345,11 @@ open class Environment(
 
 
     internal fun publishEvent(event: Event) {
-//        if (traceFilters.any { it.matches(event) }) return
-
         eventListeners.forEach {
             it.consume(event)
-//            if(it.filter == null || it.filter!!.matches(event)) it.consume(event)
         }
     }
 
-    operator fun <T : Component> plus(componentGenerator: ComponentGenerator<T>): Environment {
-        addComponent(componentGenerator); return (this)
-    }
-
-    operator fun plus(component: Component): Environment {
-        addComponent(component); return (this)
-    }
 
     fun remove(c: Component) {
         unschedule(c)

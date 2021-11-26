@@ -109,7 +109,6 @@ open class Component(
 
     init {
         val dataSuffix = if (process == null && this.name != MAIN) " data" else ""
-        env.addComponent(this)
         log(trackingPolicy.logCreation) {
             EntityCreatedEvent(now, env.curComponent, this, dataSuffix)
         }
