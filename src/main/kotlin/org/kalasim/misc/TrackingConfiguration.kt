@@ -10,7 +10,12 @@ data class ComponentTrackingConfig(
     val logStateChangeEvents: Boolean = true,
     val logInteractionEvents: Boolean = true,
     val trackComponentState: Boolean = true
-) : TrackingConfig
+) : TrackingConfig{
+
+    companion object{
+        val NONE = ComponentTrackingConfig(false, false, false, false)
+    }
+}
 
 data class ResourceTrackingConfig(
     val logCreation: Boolean = true,
@@ -18,16 +23,32 @@ data class ResourceTrackingConfig(
     val trackQueueStatistics: Boolean = true,
     val trackUtilization: Boolean = true,
     val trackActivities: Boolean = true
-) : TrackingConfig
+) : TrackingConfig{
+
+    companion object{
+        val NONE = ResourceTrackingConfig(false, false, false, false)
+    }
+}
 
 data class StateTrackingConfig(
     val logCreation: Boolean = true,
     val trackQueueStatistics: Boolean = true,
     val trackValue: Boolean = true,
     val logTriggers: Boolean = true
-) : TrackingConfig
+) : TrackingConfig{
 
-data class ComponentCollectionTrackingConfig(val trackCollectionStatistics: Boolean = true) : TrackingConfig
+    companion object{
+        val NONE = StateTrackingConfig(false, false, false, false)
+    }
+}
+
+data class ComponentCollectionTrackingConfig(val trackCollectionStatistics: Boolean = true) : TrackingConfig{
+
+    companion object{
+        val NONE = ComponentCollectionTrackingConfig(false)
+    }
+}
+
 
 typealias EntityFilter = (SimulationEntity) -> Boolean
 
