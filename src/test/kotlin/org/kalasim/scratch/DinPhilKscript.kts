@@ -13,7 +13,6 @@ import krangl.lag
 import krangl.writeCSV
 import org.kalasim.*
 import org.kalasim.misc.repeat
-import org.koin.core.component.get
 import java.io.File
 
 

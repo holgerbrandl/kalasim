@@ -3,7 +3,6 @@ package org.kalasim.test
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.*
 import krangl.cumSum
 import krangl.mean
 import org.apache.commons.math3.distribution.UniformRealDistribution
@@ -209,4 +208,29 @@ class EnvTests {
         val meanQLength = atms.map { it.get<Resource>().statistics.requesters.lengthStats.mean!! }.mean()
         meanQLength shouldBe(22.37 plusOrMinus 0.1)
     }
+
+
+    @Test
+    fun `it should stop a simulation`()  = createTestSimulation {
+        val events = traceCollector()
+
+        object : Component(){
+            override fun process() = sequence {
+                hold(10, "something is about to happen")
+                stopSimulation()
+                hold(10, "this ain't happening today")
+            }
+        }
+
+        run() // try spinning the wheel until it should be stopped
+
+        println("sim time after interruption is ${now}")
+        events.size shouldBe 4
+
+        run() // try spinning the wheel until the queue runs dry
+
+        events.size shouldBe 5
+        println("sim time after running dry is ${now}")
+    }
+
 }

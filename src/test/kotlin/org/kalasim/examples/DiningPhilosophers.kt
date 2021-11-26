@@ -6,7 +6,6 @@ import kravis.geomSegment
 import kravis.plot
 import org.kalasim.*
 import org.kalasim.misc.repeat
-import org.koin.core.component.get
 
 
 fun main() {

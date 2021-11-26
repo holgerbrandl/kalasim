@@ -748,6 +748,14 @@ open class Component(
         env.remove(this)
     }
 
+    /**
+     * Stops the current simulation while preserving its queue and process state, and returns to the call site of `run()`.
+     * See https://www.kalasim.org/basics/#running-a-simulation).  */
+    suspend fun SequenceScope<Component>.stopSimulation() {
+        yield(env.main.activate())
+    }
+
+
     fun terminate() {
         // we need to wrap claims as another map to avoid concurrent modification
         claims.toMutableMap().forEach { (resource, _) ->
@@ -1318,7 +1326,6 @@ open class Component(
 
         return batch
     }
-
 }
 
 internal val SELECT_SCOPE_IDX = mutableMapOf<Int, Int>()

@@ -7,7 +7,6 @@ import kravis.geomStep
 import kravis.plot
 import org.kalasim.*
 import org.kalasim.plot.kravis.display
-import org.koin.core.component.get
 import kotlin.collections.listOf
 
 fun main() {

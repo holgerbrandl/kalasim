@@ -67,7 +67,7 @@ class ComponentTests {
     }.stdout shouldBe """time      current               receiver              action                                                           info                               
 --------- --------------------- --------------------- ---------------------------------------------------------------- ----------------------------------
 .00                             main                  Created
-.00       main                  tester                Created
+.00                             tester                Created
 .00                                                   Activated, scheduled for .00                                     New state: scheduled
 .00                             main                  Running +5.00, scheduled for 5.00                                New state: scheduled
 .00       tester                State.1               Created                                                          Initial state: true
