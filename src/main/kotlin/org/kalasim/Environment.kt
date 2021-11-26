@@ -17,7 +17,7 @@ import org.koin.dsl.module
 import java.util.*
 
 
-const val MAIN = "main"
+internal const val MAIN = "main"
 
 typealias KoinModule = org.koin.core.module.Module
 
@@ -136,13 +136,12 @@ open class Environment(
     var curComponent: Component? = null
         private set
 
-    var main: Component
-        private set
+    val main: Component
 
-    val _koin: Koin
+    internal val _koin: Koin
 
     @Suppress("EXPERIMENTAL_OVERRIDE")
-    override fun getKoin(): Koin = _koin
+    final override fun getKoin(): Koin = _koin
 
     //redeclare to simplify imports
     /** Resolves a dependency in the simulation. Dependencies can be disambiguated by using a qualifier.*/
@@ -185,8 +184,8 @@ open class Environment(
 
 
 
-        main = Component(name = "main", process = null, koin = getKoin())
-        setCurrent(main)
+        main = Component(name = MAIN, process = null, koin = getKoin())
+//        setCurrent(main)
 
         // declare dependencies
         if (dependencies != null) {
@@ -202,6 +201,7 @@ open class Environment(
     }
 
     private val _tm: TickMetrics? = if (enableTickMetrics) TickMetrics(koin = koin) else null
+
     val tickMetrics: MetricTimeline
         get() {
             require(_tm != null) { "Use enableTickMetrics=true to enable tick metrics" }
@@ -399,9 +399,9 @@ open class Environment(
     override fun toString(): String {
         return toJson().toString(JSON_INDENT)
     }
+
+    fun log(msg: String) = main.log(msg)
 }
-
-
 
 
 data class QueueElement(
