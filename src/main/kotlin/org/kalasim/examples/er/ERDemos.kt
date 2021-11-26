@@ -5,7 +5,6 @@ import Patient
 import RefittingAvoidanceNurse
 import krangl.*
 import org.kalasim.*
-import org.kalasim.misc.ComponentTrackingConfig
 import org.kalasim.plot.kravis.display
 import kotlin.to
 
@@ -45,8 +44,8 @@ object SimpleER {
             waitingLine.queueLengthMonitor.display().show()
             waitingLine.lengthOfStayMonitor.display().show()
 
-            val arrivals = get<ComponentGenerator<Patient>>().arrivals
-//        arrivals.asDataFrame().print()
+            val arrivals = get<ComponentGenerator<Patient>>().history
+//        history.asDataFrame().print()
 
 
             val df = arrivals.map {

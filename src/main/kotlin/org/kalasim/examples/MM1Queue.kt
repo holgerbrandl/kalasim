@@ -30,12 +30,12 @@ class MM1Queue(
 
         println(
             "rho is ${rho}. With rho>1 the system would be unstable, " +
-                    "because there are more arrivals then the server can serve."
+                    "because there are more history then the server can serve."
         )
 
         server = dependency {  Resource("server", 1) }
 
-        componentGenerator = ComponentGenerator(iat = exponential(lambda), storeRefs = true) {
+        componentGenerator = ComponentGenerator(iat = exponential(lambda), keepHistory = true) {
             Customer(mu)
         }
     }

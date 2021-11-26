@@ -281,7 +281,7 @@ class EmergencyRoom(
         val cg = ComponentGenerator(
             iat = exponential(0.2),
 //            total = 800,
-            storeRefs = false
+            keepHistory = false
         ) {
             val patient = Patient(typeDist.sample(), State(sevDist.sample()), State(Waiting))
 

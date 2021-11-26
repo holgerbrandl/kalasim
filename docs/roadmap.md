@@ -5,10 +5,6 @@
 
 ## v0.7
 
-
-**{todo}** storeRefs -F-> trackArrivals
-
-
 ## v0.8
 
 **TODO** complete and publish hospital example

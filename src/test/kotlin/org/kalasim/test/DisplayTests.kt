@@ -35,7 +35,7 @@ class DisplayTests : AbstractSvgPlotRegression() {
         mm1.server.activities.display("MM1 Server Utilization")
             .apply { assertExpected(this, "activities") }
 
-        with(mm1.componentGenerator.arrivals) {
+        with(mm1.componentGenerator.history) {
             displayStateProportions("MM1 Server Utilization")
                 .apply { assertExpected(this, "proportions") }
 
@@ -48,7 +48,7 @@ class DisplayTests : AbstractSvgPlotRegression() {
 
 
         val customerTimeline =
-            mm1.componentGenerator.arrivals.first().statusTimeline
+            mm1.componentGenerator.history.first().statusTimeline
 
         customerTimeline.display("Arrival State Timeline")
             .apply { assertExpected(this, "arrival_state") }
@@ -72,7 +72,7 @@ class DisplayTests : AbstractSvgPlotRegression() {
         mm1.server.activities.display("MM1 Server Utilization")
             .apply { assertExpected(this, "activities") }
 
-        with(mm1.componentGenerator.arrivals) {
+        with(mm1.componentGenerator.history) {
             displayStateTimeline("MM1 Server Utilization")
                 .apply { assertExpected(this, "timeline") }
         }
@@ -81,7 +81,7 @@ class DisplayTests : AbstractSvgPlotRegression() {
             .apply { assertExpected(this, "claimed") }
 
         val customerTimeline =
-            mm1.componentGenerator.arrivals.first().statusTimeline
+            mm1.componentGenerator.history.first().statusTimeline
 
         customerTimeline.display("Arrival State Timeline", forceTickAxis = true)
             .apply { assertExpected(this, "arrival_state_forced") }

@@ -34,18 +34,18 @@ fun main() {
             }
         }
 
-        val cg = ComponentGenerator(exponential(1), storeRefs = true) { Vehicle() }
+        val cg = ComponentGenerator(exponential(1), keepHistory = true) { Vehicle() }
 
         run(1000)
 
         //gather arrival data
-        val pStats: List<ComponentLifecycleRecord> = cg.arrivals.map { it.toLifeCycleRecord() }
+        val pStats: List<ComponentLifecycleRecord> = cg.history.map { it.toLifeCycleRecord() }
 
         // convert to krangl data-frame
         pStats.asDataFrame().printThis()
 
 
-        cg.arrivals.first().statusTimeline.summed().printConsole()
-        cg.arrivals.first().statusTimeline.summed().display()
+        cg.history.first().statusTimeline.summed().printConsole()
+        cg.history.first().statusTimeline.summed().display()
     }
 }

@@ -19,11 +19,11 @@ fun main() {
 
 //    mm1.server.activities.display("MM1 Server Utilization").show()
 
-//    mm1.componentGenerator.arrivals.displayStateTimeline("MM1 Server Utilization").show()
+//    mm1.componentGenerator.history.displayStateTimeline("MM1 Server Utilization").show()
 
 
 //    val customerTimeline =
-//        mm1.componentGenerator.arrivals.first().statusTimeline
+//        mm1.componentGenerator.history.first().statusTimeline
 //
 //    customerTimeline.display("Arrival State Timeline").show()
 

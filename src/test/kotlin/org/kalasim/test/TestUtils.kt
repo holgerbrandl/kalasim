@@ -49,7 +49,7 @@ internal fun createTestSimulation(enableConsoleLogger: Boolean = true, builder: 
 }
 
 
-/** Converts a list of fixed arrivals into a inter-arrival distribution. Once the list is exhausted it will throw an
+/** Converts a list of fixed history into a inter-arrival distribution. Once the list is exhausted it will throw an
  * error. This is mainly useful for testing.
  *
  * Note: the thrown NoSuchElementException will cause the event-loop to terminate a consuming ComponentGenerator

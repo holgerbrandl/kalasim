@@ -23,7 +23,7 @@ fun main() {
 
         println(
             "rho is ${rho}. With rho>1 the system would be unstable, " +
-                    "because there are more arrivals then the atm can serve."
+                    "because there are more history then the atm can serve."
         )
 
         val atm = Resource("atm", 1)
