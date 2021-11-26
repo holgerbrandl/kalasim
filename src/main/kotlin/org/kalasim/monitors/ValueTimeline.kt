@@ -1,6 +1,7 @@
 package org.kalasim.monitors
 
 import org.apache.commons.math3.distribution.EnumeratedDistribution
+import org.kalasim.TickTime
 import org.kalasim.asCMPairList
 import org.koin.core.Koin
 import org.kalasim.misc.DependencyContext
@@ -29,6 +30,12 @@ interface ValueTimeline<T> {
     fun addValue(value: T)
 
     fun statisticsSummary(): EnumeratedDistribution<T>
+
+    /** Resets the timeline to its current value. Mainly needed to periodic history cleanups in long running simulations. */
+    fun resetToCurrent()
+
+    /** Discards all history before the given time. */
+    fun clearHistory(before: TickTime)
 }
 
 

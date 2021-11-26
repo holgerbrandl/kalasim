@@ -122,4 +122,20 @@ class CategoryTimeline<T>(
 
     override val info: Jsonable
         get() = ImplementMe()
+
+    override fun resetToCurrent() = reset(get(now)!!)
+
+    override fun clearHistory(before: TickTime) {
+        val startFromIdx = timestamps.withIndex().firstOrNull { before > it.value }?.index
+
+        if (startFromIdx == null) return
+
+        for (i in 0 until startFromIdx) {
+            val newTime = timestamps.subList(0, startFromIdx)
+            val newValues = values.subList(0, startFromIdx)
+
+            timestamps.apply { clear(); addAll(newTime) }
+            values.apply { clear(); addAll(newValues) }
+        }
+    }
 }

@@ -145,7 +145,7 @@ class MetricTimeline(name: String? = null, private val initialValue: Number = 0,
         get() = statistics(false)
 
     override fun reset(initial: Number) {
-        require(enabled){ "resetting a disabled timeline is unlikely to have meaningful semantics"}
+        require(enabled) { "resetting a disabled timeline is unlikely to have meaningful semantics" }
 
         values.clear()
         timestamps.clear()
@@ -153,6 +153,21 @@ class MetricTimeline(name: String? = null, private val initialValue: Number = 0,
         addValue(initial)
     }
 
+    override fun resetToCurrent() = reset(get(now))
+
+    override fun clearHistory(before: TickTime) {
+        val startFromIdx = timestamps.withIndex().firstOrNull { before > it.value }?.index
+
+        if (startFromIdx == null) return
+
+        for (i in 0 until startFromIdx) {
+            val newTime = timestamps.subList(0, startFromIdx)
+            val newValues = values.subList(0, startFromIdx)
+
+            timestamps.apply { clear(); addAll(newTime) }
+            values.apply { clear(); addAll(newValues) }
+        }
+    }
 }
 
 class MetricTimelineStats(nlm: MetricTimeline, excludeZeros: Boolean = false) : Jsonable() {
