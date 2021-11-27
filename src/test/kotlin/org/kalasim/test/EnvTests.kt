@@ -166,8 +166,8 @@ class EnvTests {
         }
 
         createSimulation {
-            run(ticks = 5)
-            run(ticks = 5)
+            run(duration = 5)
+            run(duration = 5)
             now shouldBe 10.tt
         }
     }

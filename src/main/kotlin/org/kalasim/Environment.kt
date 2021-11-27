@@ -232,17 +232,17 @@ open class Environment(
      *  If neither `until` nor `duration` are specified, the main component will be reactivated at
      * the time there are no more events on the event-list, i.e. possibly not at Double.MAX_VAULE. If you want to keep a simulation    *  running simply call `run(Double.MAX_VALUE)`.
      *
-     * @param ticks Time to run
+     * @param duration Time to run
      * @param until Absolute tick-time until the which the simulation should run
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
     fun run(
-        ticks: Ticks? = null,
+        duration: Ticks? = null,
 //        until: TickTime? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
-    ) = run(ticks?.value, null, priority, urgent)
+    ) = run(duration?.value, null, priority, urgent)
 
     /**
      * Start execution of the simulation
@@ -250,22 +250,22 @@ open class Environment(
      *  If neither `until` nor `ticks` are specified, the main component will be reactivated at
      * the time there are no more events on the event-list, i.e. possibly not at Double.MAX_VAULE. If you want to keep a simulation    *  running simply call `run(Double.MAX_VALUE)`.
      *
-     * @param ticks Time to run
+     * @param duration Time to run
      * @param until Absolute tick-time until the which the simulation should run
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
     fun run(
-        ticks: Number? = null,
+        duration: Number? = null,
         until: TickTime? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
     ): Environment {
         // also see https://simpy.readthedocs.io/en/latest/topical_guides/environments.html
-        if (ticks == null && until == null) {
+        if (duration == null && until == null) {
             endOnEmptyEventlist = true
         } else {
-            val scheduledTime = calcScheduleTime(until, ticks)
+            val scheduledTime = calcScheduleTime(until, duration)
 
             main.reschedule(scheduledTime, priority, urgent, null, "running", SCHEDULED)
         }

@@ -8,9 +8,7 @@ import org.kalasim.misc.*
 import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
 import kotlin.math.min
-import kotlin.reflect.KClass
 import kotlin.reflect.KFunction1
-import kotlin.reflect.jvm.kotlinFunction
 
 
 internal const val EPS = 1E-8
@@ -968,17 +966,17 @@ open class Component(
      *
      * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
      *
-     * @param ticks Time to hold. Either `duration` or `till` must be specified.
+     * @param duration Time to hold. Either `duration` or `till` must be specified.
      * @param priority If a component has the same time on the event list, this component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
     suspend fun SequenceScope<Component>.hold(
-        ticks: Ticks? = null,
+        duration: Ticks? = null,
         description: String? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
     ) = yieldCurrent {
-        this@Component.hold(ticks?.value, description, null, priority, urgent)
+        this@Component.hold(duration?.value, description, null, priority, urgent)
     }
 
     /**
@@ -986,19 +984,19 @@ open class Component(
      *
      * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
      *
-     * @param ticks Time to hold. Either `duration` or `till` must be specified.
+     * @param duration Time to hold. Either `duration` or `till` must be specified.
      * @param until Absolute time until the component should be held
      * @param priority If a component has the same time on the event list, this component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
     suspend fun SequenceScope<Component>.hold(
-        ticks: Number? = null,
+        duration: Number? = null,
         description: String? = null,
         until: TickTime? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
     ) = yieldCurrent {
-        this@Component.hold(ticks, description, until, priority, urgent)
+        this@Component.hold(duration, description, until, priority, urgent)
     }
 
     /**

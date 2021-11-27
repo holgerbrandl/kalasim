@@ -49,13 +49,13 @@ object ProcessGraph {
 
         override fun process() = sequence {
             // do shopping
-            hold(ticks = 23.0)
+            hold(duration = 23.0)
 
             // wait for an empty counter
             request(clerk) {
 
                 // billing process
-                hold(ticks = 2.0, priority = IMPORTANT)
+                hold(duration = 2.0, priority = IMPORTANT)
             }
         }
     }

@@ -199,14 +199,14 @@ class ResourceTests {
         class Customer(val clerk: Resource) : Component() {
 
             override fun process() = sequence {
-                hold(ticks = 5.0)
+                hold(duration = 5.0)
 
                 request(clerk)
-                hold(ticks = 2.0, priority = IMPORTANT)
+                hold(duration = 2.0, priority = IMPORTANT)
                 release(clerk)
 
                 passivate()
-                hold(ticks = 5.0)
+                hold(duration = 5.0)
             }
         }
 
