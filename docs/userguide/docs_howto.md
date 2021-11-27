@@ -72,3 +72,13 @@ jupyter nbconvert --kernel=kotlin --to markdown  atm_queue.ipynb --out  atm_queu
 
 ```
 
+## Atom Feed
+
+https://ravenreader.app/
+
+https://www.uuidgenerator.net/
+
+
+https://validator.w3.org/feed/docs/atom.html
+
+https://github.com/PDOK/atom-generator

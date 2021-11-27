@@ -2,7 +2,9 @@
 
 ## v0.7 
 
-Not released yet 
+Released 2021-11-27
+
+
 
 Major enhancements
 

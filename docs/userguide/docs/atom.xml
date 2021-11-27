@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+    <title>The Kalasim Blog</title>
+    <subtitle>Simulation</subtitle>
+    <link href="https://kalasim.org/" rel="self" />
+    <link href="https://kalasim.org/" />
+    <id>urn:uuid:5c32a224-9258-48d2-90d1-3fef0d8345ab</id>
+    <updated>2011-11-28T18:00:00Z</updated>
+
+
+    <entry>
+        <title>Kalasim v0.7 Released</title>
+        <link href="https://kalasim.org/articles/kalasim_v07/"/>
+<!--        <link rel="alternate" type="text/html" href="http://example.org/2003/12/13/atom03.html"/>-->
+<!--        <link rel="edit" href="http://example.org/2003/12/13/atom03/edit"/>-->
+        <id>urn:uuid:053d8080-a41a-4c73-a9bf-f4d0256751aa</id>
+        <updated>2011-11-28T18:00:00Z</updated>
+        <summary>Read what's new about in kalasim v0.7</summary>
+        <content type="xhtml">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Read about the new features in kalasim v0.7</p>
+            </div>
+        </content>
+        <author>
+            <name>Holger Brandl</name>
+<!--            <email>johndoe@example.com</email>-->
+        </author>
+    </entry>
+
+</feed>

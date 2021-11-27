@@ -69,7 +69,7 @@ To further fine-tune and optimize simulation performance and to reveal bottlenec
 
 ## Continuous Simulation
 
-For some use-cases, simulations may for a very long tick and wall time. To prevent internal metrics gathering from consuming all available memory, it needs to be disabled or at least configured carefully. This can be achieved, but either disabling metric provides such as [timelines and monitors](monitors.md) or by setting a sensible default strategy using the `env.trackingPolicyFactory`
+For some use-cases, simulations may for a very long tick and wall time. To prevent internal metrics gathering from consuming all available memory, it needs to be disabled or at least configured carefully. This can be achieved, but either disabling [timelines and monitors](monitors.md) manually, or by setting a sensible default strategy using the `env.trackingPolicyFactory`
 
 ```kotlin
 // first define the policy and matcher

@@ -1,0 +1,3 @@
+## Kalasim v0.7
+
+With this milestone release, we have stabilized the core API considerably, improved its performance dramatically while adding features all over the place.
