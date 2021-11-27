@@ -211,8 +211,7 @@ open class Environment(
             return _tm.timeline
         }
 
-
-    private var endOnEmptyEventlist = false
+//    private var endOnEmptyEventlist = false
 
     private val standBy = listOf<Component>().toMutableList()
     private val pendingStandBy = listOf<Component>().toMutableList()
@@ -263,7 +262,7 @@ open class Environment(
     ): Environment {
         // also see https://simpy.readthedocs.io/en/latest/topical_guides/environments.html
         if (duration == null && until == null) {
-            endOnEmptyEventlist = true
+//            endOnEmptyEventlist = true
         } else {
             val scheduledTime = calcScheduleTime(until, duration)
 
@@ -303,12 +302,14 @@ open class Environment(
 
             time to c
         } else {
-            val t = if (endOnEmptyEventlist) {
-                publishEvent(InteractionEvent(now, curComponent, null, null, "run end; no events left"))
+            publishEvent(InteractionEvent(now, curComponent, null, null, "run end; no events left"))
+            val t =
+//                if (endOnEmptyEventlist) {
+//                publishEvent(InteractionEvent(now, curComponent, null, null, "run end; no events left"))
                 now
-            } else {
-                TickTime(Double.MAX_VALUE)
-            }
+//            } else {
+//                TickTime(Double.MAX_VALUE)
+//            }
 
             t to main
         }
