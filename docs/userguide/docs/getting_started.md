@@ -1,4 +1,4 @@
-# How to get started with simulation?
+# How to get started with `kalasim`?
 
 [comment]: <> (## getting started)
 
