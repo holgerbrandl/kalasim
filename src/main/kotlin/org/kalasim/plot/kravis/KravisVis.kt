@@ -122,7 +122,7 @@ fun <T> CategoryTimeline<T>.display(
 //
 
 fun List<ResourceActivityEvent>.display(
-    title: String?,
+    title: String? = null,
     forceTickAxis: Boolean = false,
 ): GGPlot {
     val useWT = any { it.startWT != null } && !forceTickAxis
@@ -144,7 +144,7 @@ fun List<ResourceActivityEvent>.display(
  * @param forceTickAxis Even if a tick-transformation is defined, the x axis will show tick-times
  */
 fun List<ResourceTimelineSegment>.display(
-    title: String?,
+    title: String? = null,
     exclude: List<ResourceMetric> = listOf(
         ResourceMetric.Capacity,
         ResourceMetric.Occupancy,

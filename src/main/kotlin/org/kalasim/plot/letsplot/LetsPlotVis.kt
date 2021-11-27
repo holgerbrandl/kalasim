@@ -95,7 +95,7 @@ fun <T> CategoryTimeline<T>.display(
 
 
 fun List<ResourceActivityEvent>.display(
-    title: String?,
+    title: String? = null,
     forceTickAxis: Boolean = false,
 ): Plot {
     val useWT = any { it.startWT != null } && !forceTickAxis
@@ -123,7 +123,7 @@ fun List<ResourceActivityEvent>.display(
 
 
 fun List<ResourceTimelineSegment>.display(
-    title: String?,
+    title: String? = null,
     exclude: List<ResourceMetric> = listOf(
         ResourceMetric.Capacity,
         ResourceMetric.Occupancy,
