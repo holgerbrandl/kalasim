@@ -13,19 +13,17 @@ class GeneratorTest {
     @Test
     fun testCustomerGenerator() {
 
-        val tc = EventLog()
+        val eventLog = EventLog()
 
         Environment().apply {
-
-            addEventListener(tc)
+            addEventListener(eventLog)
 
             ComponentGenerator(iat = ExponentialDistribution(2.0), total = 4) { Customer() }
         }.run(100.0)
 
-        val customers = tc.events
+        val customers = eventLog()
             .filterIsInstance<EntityCreatedEvent>()
-            .map { it.simEntity }
-            .filterNotNull().distinct()
+            .map { it.simEntity }.distinct()
             .filter { it.name.startsWith("Customer") }
 
         assertEquals(4, customers.size, "incorrect expected customer cont")

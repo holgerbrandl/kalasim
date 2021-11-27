@@ -78,6 +78,11 @@ object Defaults {
     const val DEFAULT_SEED = 42
 }
 
+
+internal class MainComponent(koin:Koin): Component(MAIN, koin = koin) {
+    override fun process()= sequence<Component> {}
+}
+
 @Suppress("EXPERIMENTAL_API_USAGE")
 open class Environment(
     enableConsoleLogger: Boolean = false,
@@ -183,9 +188,7 @@ open class Environment(
         }))
 
 
-
-        main = Component(name = MAIN, process = null, koin = getKoin())
-//        setCurrent(main)
+        main = MainComponent(getKoin())
 
         // declare dependencies
         if (dependencies != null) {

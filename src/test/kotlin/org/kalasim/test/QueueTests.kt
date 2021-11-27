@@ -1,6 +1,7 @@
 package org.kalasim.test
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.*
@@ -75,8 +76,13 @@ class QueueTests {
 //                override fun process(): Sequence<Component> = super.process()
 //            }
 
-            val c1 = Component("comp1", at = 3.tt)
-            val c2 = Component("comp2", at = 3.tt)
+            val c1 = object: Component("comp1", at = 3.tt){
+                override fun process() = sequence<Component> {}
+            }
+            val c2 = object : Component("comp2", at = 3.tt){
+                override fun process() = sequence<Component> {}
+            }
+
 
             val tc = EventLog().also { addEventListener(it) }
 
@@ -101,9 +107,12 @@ class QueueTests {
 //                override fun process(): Sequence<Component> = super.process()
 //            }
 
-            val c1 = Component("comp1", at = 3.tt)
-            val c2 = Component("comp2", at = 3.tt, priority = IMPORTANT)
-
+            val c1 = object: Component("comp1", at = 3.tt){
+                override fun process() = sequence<Component> {}
+            }
+            val c2 = object:  Component("comp2", at = 3.tt, priority = IMPORTANT){
+                override fun process() = sequence<Component> {}
+            }
             val tc = EventLog().also { addEventListener(it) }
 
 

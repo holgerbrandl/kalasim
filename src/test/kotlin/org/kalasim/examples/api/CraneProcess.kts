@@ -3,17 +3,24 @@ import org.kalasim.Component
 import org.kalasim.ProcessPointer
 import org.kalasim.createSimulation
 
-class Crane(process: ProcessPointer? = Component::process) : Component(process = process) {
+class Crane(
+    process: ProcessPointer? = Component::process
+) : Component(process = Crane::load) {
     fun unload() = sequence<Component> {
-        // yield ...
+        // hold, request, wait ...
+    }
+
+    fun load() = sequence<Component> {
+        // hold, request, wait ...
     }
 }
 
 createSimulation {
-    val crane1 = Crane()
-    crane1.activate(process = Crane::unload)
+    val crane1 = Crane() // load will be activated be default
 
-    // conceptually, the API supports also process definition at instantiation.
-    Crane(process = Crane::unload)
+    val crane2 = Crane(process = Crane::load) // force unloading at start
+
+    val crane3 = Crane(process = Crane::unload) // force unloading at start
+    crane3.activate(process = Crane::load) // activate other process
 }
 

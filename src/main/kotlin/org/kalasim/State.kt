@@ -68,7 +68,7 @@ open class State<T>(
         trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
 
         log(trackingPolicy.logCreation) {
-            EntityCreatedEvent(now, env.curComponent,this, "Initial state: $value")
+            EntityCreatedEvent(now, env.curComponent,this, "Initial value: $value")
         }
     }
 

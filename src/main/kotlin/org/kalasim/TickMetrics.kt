@@ -5,7 +5,6 @@ import org.kalasim.monitors.MetricTimeline
 import org.koin.core.Koin
 import kotlin.math.round
 
-typealias process = SequenceScope<Component>
 
 /** Allows introspection of time-complexity of the underlying computations. The user may want to use the built-in env.tickMetrics timeline to analyze how much time is spent per time unit (aka tick).
  *

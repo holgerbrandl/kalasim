@@ -2,77 +2,49 @@
 
 Components are the key elements of a simulation.
 
-Components can be either  in *data* or an *active* [lifecycle](#lifecycle) state. An *active*  component has one or more *process*  descriptions and is activated at some point of time. We can [transition](#process-interaction) a *data*  component to *active* with [`activate()`](#activate). An *active* component can become `DATA` either with a [`cancel()`](#cancel) or by reaching the end of a process method.
+Components can be either  in `DATA` or an `ACTIVE` [lifecycle](#lifecycle) state. An `ACTIVE`  component has one or more [process definitions](#process-definition) of which one was activated at some point in time. 
 
-It is easy to create a data component by:
+
+With [`activate()`](#activate) we can chang `DATA` components to `ACTIVE` if is has an associated process definition.
+
+An `ACTIVE` component can become `DATA` either with a [`cancel()`](#cancel) or by reaching the end of a [definition](#process-definition).
+
+It is very easy to create a `DATA` components
 
 ```kotlin
 val component = Component()
 ```
 
-*Data*  components may be placed in a queue. This component will not be activated as there is no associated process method.
+Components will interact with each other through a well-defined vocabulary of [process interaction](#process-interaction) methods.
 
+!!!info
+    By default, Components will be named automatically, using the pattern `[Class Name].[Instance Number]` unless a custom name is provided via the `name` parameter in `Component(name="Foo")`.
 
 ## Process Definition
 
-In order to make an *active*  component it is necessary to extend `Component` to provide (at least) one sequence generator method, normally called `process`:
-
-
-```
-class Ship: Component(){
-    override fun process() = sequence {
-        ...
-        yield(...)
-        ...
-    }
-}
-```
-
-The **process definition**s of the components in a simulation define its dynamics. Writing down the process definition is the key modelling task when using `kalasim`.  
-
-Normally, the process will contain at least one [`yield`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence-scope/yield.html) statement. By doing so, the component can hand-back control to the simulation engine at defined points when a component needs to wait. Typically, the user must not use `yield` directly, but rather the provided [process interaction](#process-interaction) methods.
-
-Creation and activation are by default combined when creating a new `Component` instance:
-
-```kotlin
-val ship1 = Ship()
-val ship2 = Ship()
-val ship3 = Ship()
-```
-
-This causes three ships to be created and to be [activated](component.md#activate), that is _scheduled_ for execution in the simulation's [event queue](basics.md#event-queue).
-
-Components will be named automatically, using the pattern `[Class Name].[Instance Number]`. Here, there would be `Ship.1` to `Ship.3` unless a name is provided via the `name` parameter of the parent constructor of `Component`.
-
-If no process method is found for a component (such as `Ship`), the component will become a [data](#lifecycle) component.
-In that case, it may become active by means of an `activate()` statement:
-
-```kotlin
-//{!api/CraneProcess.kts!}
-```
-
-Effectively, creation and start of `crane1` and `crane2` is the same.
-
-In most practical scenarios, the `process` parameter is omitted in the method signature.
-
-Although not very common, it is possible to activate a component at a certain time or with a specified delay:
-
-```kotlin
-ship1.activate(at=100)
-ship2.activate(delay=50)
-```
-
-<!--TODO consider if we should use the notion of a trajectory as done in simmer-->
-
-## Creation of a component
 
 Although it is possible to create a component directly with `val x = Component()`, this
-makes it very hard to make that component into an active component, because there's no process method. So, nearly always we define our simulation entities by extending `org.kalasim.Component` and by providing a _process definition_ which details out the component's life cycle:
+makes it very hard to make that component into an active component, because there's no process method. So, nearly always we define our simulation entities by extending `Component` and by providing a _process definition_ which details out the component's life cycle:
+
+!!!important
+    The process definition of a component defines its dynamics and interplay with other simulation entities. Writing down the process definition is the **key** modelling task when using `kalasim`.
+
+If there is no process definition, a component will always be a [data](#lifecycle) component.
+
+There are 3 supported methods to provide a process definition.
+
+### 1. Extend `process`
+
+Let's start with the most common method. In order to make an *active*  component it is necessary to extend `Component` to provide (at least) one sequence generator method, normally called `process`:
 
 ```kotlin
 class Car: Component(){
     override fun process() = sequence {
-        hold(1) // or whatever
+        wait(customerArrived)
+      
+        request(driver){
+            hold(4, "driving")
+        }
     }
 }
 ```
@@ -83,12 +55,62 @@ The result is that car is put on the future [event list](basics.md#event-queue) 
 
 It is also possible to set a time at which the component (car) becomes active, like `val car = Car(at=10)`. This requires an additional constructor argument to be passed on to `Component` as in `class Car(at:Number): Component(delay=at)`.
 
-Instead of starting at process, the component may be initialized to start at another (generator) method,
-like `car=Car(process=Car::wash)`.
 
-Finally, if there is a process method, you can disable the automatic activation (i.e. make it a data component), by specifying `process = null`.
+Creation and activation are by default combined when creating a new `Component` instance:
 
-If there is no process method, and process= is not given, the component will be a data component.
+```kotlin
+val car1 = Car()
+val car2 = Car()
+val car3 = Car()
+```
+
+This causes three cars to be created and to be [activated](component.md#activate), that is _scheduled_ for execution in the simulation's [event queue](basics.md#event-queue).
+
+Normally, any process definition will contain at least one [`yield`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence-scope/yield.html) statement. By doing so, the component can hand-back control to the simulation engine at defined points when a component needs to wait. Typically, the user must not use `yield` directly, but rather the provided [process interaction](#process-interaction) methods.
+
+
+### 2. Extend `repeatedProcess`
+
+A very common pattern in process definition, iteratively executed processes. This could be modelled with 
+
+```kotlin
+class Machine : Component(){
+    override fun process() = sequence {
+        while(true) {
+          wait(hasMaterial)
+          hold(7, "drilling")
+        }
+    }
+}
+```
+
+This can be expressed more elegantly with `repeatedProcess`:
+
+```kotlin
+class Machine : Component(){
+    override fun repeatedProcess() = sequence {
+        wait(hasMaterial)
+        hold(7, "drilling")
+    }
+}
+```
+
+!!!info
+
+    Finally, if there is a `process` or `repeatedProcess` method, you can disable the automatic activation (i.e. make it a data component), by specifying `Component(process = Component::none)`.
+
+### 3. Process Reference
+
+A component may be initialized to start at another process definition method. This is achieved by passing a reference to this method which must be part of the component's class definition, like `val car = Car(process = Car::wash)`.
+
+
+It is also possible to prepare multiple process definition, which may become active later by means of an `activate()` statement:
+
+```kotlin
+//{!api/CraneProcess.kts!}
+```
+
+Effectively, creation and start of `crane1` and `crane2` is the same.
 
 
 ## Lifecycle
@@ -191,7 +213,15 @@ car1.activate(process=null) //  activate @ wash
 * If the component is `INTERRUPTED`, the component will be activated at the specified time.
 
 !!! note
-    It is not possible to `activate` the `CURRENT` component, and `kalasim` will throw an error in this situation. The effect of a "self"-activate would be that the component becomes scheduled, thus this is essentially equivalent to the preferred hold method, so please use `hold` instead. In rare situations processes need to be restarted. If so, use yield for activation and provide the process pointer `yield(activate(process = Component::process))` which will bypass the internal requirement that the activated component mustt not be `CURRENT`.
+    It is not possible to `activate` the `CURRENT` component, and `kalasim` will throw an error in this situation. The effect of a "self"-activate would be that the component becomes scheduled, thus this is essentially equivalent to the preferred hold method, so please use `hold` instead. In rare situations processes need to be restarted. If so, use yield for activation and provide the process pointer `yield(activate(process = Component::process))` which will bypass the internal requirement that the activated component must not be `CURRENT`.
+
+
+Although not very common, it is possible to activate a component at a certain time or with a specified delay:
+
+```kotlin
+ship1.activate(at=100)
+ship2.activate(delay=50)
+```
 
 
 ### hold

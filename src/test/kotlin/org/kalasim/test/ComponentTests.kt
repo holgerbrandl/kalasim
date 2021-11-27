@@ -11,6 +11,13 @@ import org.kalasim.ComponentState.SCHEDULED
 import org.kalasim.misc.*
 import kotlin.test.fail
 
+
+internal class NoOpComponent( name: String? = null) : Component(name) {
+    override fun process() = sequence<Component> {
+        println("Hello from  ${name}")
+    }
+}
+
 class ComponentTests {
 
     @Ignore
@@ -23,18 +30,64 @@ class ComponentTests {
     }
 
     @Test
-    fun `components should be in DATA by default unless a process is defines`() = createTestSimulation {
+    fun `components should be in DATA by default unless a process is defined`() = createTestSimulation {
 
-        object : Component() {
-            override fun process(): Sequence<Component> {
-                return super.process()
-            }
-        }.componentState shouldBe SCHEDULED
+//        object : Component() {
+//            override fun process() = sequence<Component> {
+//                println() // just needed to prevent IDE pruning of overriding method
+//            }
+//        }.componentState shouldBe SCHEDULED
 
 
         Component("foo").componentState shouldBe DATA
 
         Component("foo", process = Component::process).componentState shouldBe DATA
+    }
+
+
+    @Test
+    fun `it should reactivate a custom process definition after being DATA`() = createTestSimulation {
+        var counter = 0
+
+        class MyComponent : Component(process = MyComponent::myProcess) {
+             fun myProcess() = sequence<Component> {
+                 hold(1)
+                 println("hello from $name")
+                 counter++
+             }
+        }
+
+        val c = MyComponent()
+
+        c.componentState shouldBe SCHEDULED
+
+        run(2)
+        counter shouldBe 1
+        c.componentState shouldBe DATA
+
+        c.activate(delay = 1)
+        c.componentState shouldBe SCHEDULED
+
+        run()
+
+        c.componentState shouldBe DATA
+        counter shouldBe 2
+    }
+
+
+    @Test
+    fun `it should allow to run a cyclic process`() = createTestSimulation {
+        var repeatCounter = 0
+        object : Component() {
+            override fun repeatedProcess() = sequence {
+                hold(1)
+                repeatCounter++
+            }
+        }
+
+        run(8)
+
+        repeatCounter shouldBe 7
     }
 
 
@@ -48,12 +101,33 @@ class ComponentTests {
         c.componentState shouldBe DATA
     }
 
+
+    @Test
+    fun `it must enforce a process definition when using at`() = createTestSimulation {
+        shouldThrow<IllegalArgumentException> {
+            Component("comp1", at = 3.tt)
+        }
+    }
+
+    @Test
+    fun `it shall allow supress automatic activation of a process definition`() = createTestSimulation {
+        object : Component(process = Component::none){
+            override fun process(): Sequence<Component> {
+                fail()
+            }
+        }
+
+        run()
+    }
+
+
+
     @Test
     fun `it should log to the console`() = captureOutput {
 
         createTestSimulation(true) {
             object : Component("tester") {
-                override fun process() = sequence<Component> {
+                override fun process() = sequence {
                     wait(State(true), true)
                     hold(1)
                     request(Resource()) {
@@ -70,7 +144,7 @@ class ComponentTests {
 .00                             tester                Created
 .00                                                   Activated, scheduled for .00                                     New state: scheduled
 .00                             main                  Running +5.00, scheduled for 5.00                                New state: scheduled
-.00       tester                State.1               Created                                                          Initial state: true
+.00       tester                State.1               Created                                                          Initial value: true
 .00                             tester                Waiting, scheduled for .00                                       New state: scheduled
 .00                                                   Hold +1.00, scheduled for 1.00                                   New state: scheduled
 1.00                            Resource.1            Created                                                          capacity=1
@@ -188,12 +262,11 @@ class ComponentTests {
 
     @Test
     fun `it should track status changes`() = createTestSimulation {
-        val component = Component("foo")
+        val component = NoOpComponent("foo")
 
         run(2)
         component.activate(delay = 1)
         run(2)
-
 
         component.statusTimeline.printHistogram()
     }
@@ -219,12 +292,11 @@ class ComponentTests {
             c.activate()
         """
 
-        val c = Component()
+        val c = NoOpComponent("foo")
 
         run(1)
         c.activate()
         run(1)
-
     }
 
 

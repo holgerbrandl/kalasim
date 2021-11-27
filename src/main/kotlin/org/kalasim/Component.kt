@@ -1,14 +1,16 @@
 package org.kalasim
 
 import org.kalasim.ComponentState.*
-import org.kalasim.ResourceEventType.*
+import org.kalasim.ResourceEventType.CLAIMED
+import org.kalasim.ResourceEventType.RELEASED
 import org.kalasim.ResourceSelectionPolicy.*
 import org.kalasim.misc.*
 import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
-import java.util.*
 import kotlin.math.min
+import kotlin.reflect.KClass
 import kotlin.reflect.KFunction1
+import kotlin.reflect.jvm.kotlinFunction
 
 
 internal const val EPS = 1E-8
@@ -32,6 +34,12 @@ val IMPORTANT = Priority(20)
 val CRITICAL = Priority(20)
 
 
+//typealias ProcessDefinition = SequenceScope<Component>
+typealias ProcessContext = SequenceScope<Component>
+//typealias ProcessDefinition = suspend SequenceScope<Component>.() -> Unit
+typealias ProcessDefinition = Sequence<Component>
+
+interface NoAuto
 /**
  * A kalasim component is used as component (primarily for queueing) or as a component with a process.
  * Usually, a component will be defined as a subclass of Component.
@@ -49,11 +57,11 @@ open class Component(
     at: TickTime? = null,
     delay: Number = 0,
     priority: Priority = NORMAL,
-    process: ProcessPointer? = Component::process,
-    koin: Koin = DependencyContext.get()
-) :
-//    KoinComponent,
-    SimulationEntity(name, koin) {
+    process: ProcessPointer? = null,
+    koin: Koin = DependencyContext.get(),
+    // to be reenabled/reworked as part of https://github.com/holgerbrandl/kalasim/issues/11
+//    builder: SequenceScope<Component>.() -> Unit = {   }
+) : SimulationEntity(name, koin) {
 
 
     private var oneOfRequest: Boolean = false
@@ -108,24 +116,51 @@ open class Component(
     }
 
     init {
-        val dataSuffix = if (process == null && this.name != MAIN) " data" else ""
+//        val dataSuffix = if (process == null && this.name != MAIN) " data" else ""
         log(trackingPolicy.logCreation) {
-            EntityCreatedEvent(now, env.curComponent, this, dataSuffix)
+            EntityCreatedEvent(now, env.curComponent, this)
         }
-
-
-        // if its a generator treat it as such
-        this.simProcess = ingestFunPointer(process)
 
         // the contract for initial auto-scheduling is
         // either the user has set `at` which clearly indicates the intent for scheduling the component
         // or
-        // the has overridden `Component` and has overridden `process`
+        // the user has overridden `process`
+        // or
+        // the user has overridden `repeatedProcess`
         // or
         // has provided another process pointer (other than `process`)
-        val overriddenProcess = this.javaClass.getMethod("process").declaringClass.simpleName != "Component"
 
-        if (at != null || (process != null && (process.name != "process" || overriddenProcess))) {
+        val overriddenProcess = javaClass.getMethod("process").declaringClass.simpleName != "Component"
+        val overriddenRepeated = javaClass.getMethod("repeatedProcess").declaringClass.simpleName != "Component"
+        val customProcess = process != null && process.name != "process"
+        val isNone = process != null && process.name == "none"
+
+        require(!overriddenProcess || !overriddenRepeated || !customProcess) {
+            "Just one custom process can be provided. So either provide a custom pointer, or override process, or override repeatedProcess"
+        }
+
+        val processPointer: KFunction1<Nothing, Sequence<Component>>? = when {
+            isNone -> null
+            overriddenProcess -> Component::process
+            overriddenRepeated -> Component::processLoop
+            customProcess -> process
+            else -> null
+        }
+
+        if (processPointer != null) {
+            this.simProcess = ingestFunPointer(processPointer)
+        }
+
+        //  what's the point of scheduling it at `at`  without a process definition?
+        //  --> main is one major reason, we need the engine to progress the time until a given point
+        if (at != null || delay.toDouble() > 0.0) {
+            require(simProcess != null) {
+                "component '${name}' must have process definition to be scheduled"
+            }
+        }
+
+//        if (at != null || (process != null && (process.name != "process" || overriddenProcess))) {
+        if (simProcess !=null && this !is MainComponent) {
             val scheduledTime = if (at == null) {
                 env.now + delay.toDouble()
             } else {
@@ -134,9 +169,9 @@ open class Component(
 
             reschedule(scheduledTime, priority, false, null, "activated", SCHEDULED)
         }
-
     }
 
+    private var lastProcess: ProcessPointer? = null
 
     private fun ingestFunPointer(process: ProcessPointer?): SimProcess? {
 //        if(process != null ){
@@ -146,6 +181,8 @@ open class Component(
 
         return if (process != null) {
             val isGenerator = process.returnType.toString().startsWith("kotlin.sequences.Sequence")
+
+            lastProcess = process
 
             if (isGenerator) {
                 @Suppress("UNCHECKED_CAST")
@@ -161,14 +198,27 @@ open class Component(
     }
 
 
-    open fun process() = this.let {
-        sequence<Component> {
-//            while (true) { // disabled because too much abstraction
-//            process(it)
-//            process()
-//            }
+    /** Used to suppress component activation in presenence of a process definition.*/
+    fun none() = sequence<Component> {}
+
+    open fun process() = sequence<Component> {
+        TODO("Invalid state. Please file a bug report")
+    }
+
+    open fun repeatedProcess() = sequence<Component> {
+        TODO("Invalid state. Please file a bug report")
+    }
+
+    internal fun processLoop() = sequence {
+        while (true) {
+            yieldAll(repeatedProcess())
         }
     }
+
+//    open fun ProcessContext.repeatedProcess() = sequence<Component> { }
+//
+//    open fun repeatedProcess() = sequence<Component> { }
+
 
     /** Generator function that implements "process". This can be overwritten in component classes a convenience alternative to process itself.*/
     // no longer needed  and redundant API
@@ -850,30 +900,25 @@ open class Component(
             // workaround yield(activate(process = Component::process))
         }
 
-        var p: ProcessPointer? = null
-
-        if (process == null) {
-            if (componentState == DATA) {
-                //                require(this.simProcess != null) { "no process for data component" }
-                // note: not applicable, because the test would be if Component has a method called process, which it does by design
-
-                p = Component::process
+        // todo why this convoluted logic??
+        val processPointer: ProcessPointer? = process
+            ?: if (componentState == DATA) {
+                lastProcess
+            } else {
+                null
             }
-        } else {
-            p = process
-        }
 
         var extra = ""
 
-        if (p != null) {
-            this.simProcess = ingestFunPointer(p)
+        if (processPointer != null) {
+            this.simProcess = ingestFunPointer(processPointer)
 
-            extra = "process=${p.name}"
+            extra = "process=${processPointer.name}"
         }
 
         if (componentState != CURRENT) {
             remove()
-            if (p != null) {
+            if (processPointer != null) {
                 if (!(keepRequest || keepWait)) {
                     checkFail()
                 }
