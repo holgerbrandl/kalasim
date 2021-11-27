@@ -7,7 +7,7 @@
     <link href="https://kalasim.org/" rel="self" />
     <link href="https://kalasim.org/" />
     <id>urn:uuid:5c32a224-9258-48d2-90d1-3fef0d8345ab</id>
-    <updated>2011-11-28T18:00:00Z</updated>
+    <updated>2021-11-28T18:00:00Z</updated>
 
 
     <entry>
@@ -16,7 +16,7 @@
 <!--        <link rel="alternate" type="text/html" href="http://example.org/2003/12/13/atom03.html"/>-->
 <!--        <link rel="edit" href="http://example.org/2003/12/13/atom03/edit"/>-->
         <id>urn:uuid:053d8080-a41a-4c73-a9bf-f4d0256751aa</id>
-        <updated>2011-11-28T18:00:00Z</updated>
+        <updated>2021-11-28T18:00:00Z</updated>
         <summary>Read what's new about in kalasim v0.7</summary>
         <content type="xhtml">
             <div xmlns="http://www.w3.org/1999/xhtml">
