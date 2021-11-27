@@ -4,6 +4,7 @@
 
 Released 2021-11-27
 
+See [release announcement](articles/2021-11-27-kalasim-v07.md)
 
 
 Major enhancements
