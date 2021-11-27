@@ -26,9 +26,10 @@ nav:
   - Home:
     - Introduction: index.md
     - Theory: theory.md
+    - Getting Started: getting_started.md
     - Setup: setup.md
     - FAQ: faq.md
-    - What's New: changes.md
+    - What's New?: changes.md
 
   - Basics:
     - Simulation Basics: basics.md
