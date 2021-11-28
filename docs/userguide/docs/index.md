@@ -4,7 +4,7 @@
 
 `kalasim` is a [discrete event simulator](theory.md#what-is-discrete-event-simulation) that enables complex, performant, dynamic process models. It provides a statically typed API, dependency injection, modern persistence, structured logging and automation capabilities.
 
-kalasim is designed for simulation practitioners, process analysts and industrial engineers, who need to go beyond the limitations of existing simulation tools to model and optimize their business-critical use-cases. So, we deliberately took some time with this release to gather and analyze feedback from our users.
+kalasim is designed for simulation practitioners, process analysts and industrial engineers, who need to go beyond the limitations of existing simulation tools to model and optimize their business-critical use-cases.
 
 In contrast to many other simulation tools, `kalasim` is neither low-code nor no-code. It is _code-first_ to enable change tracking, scaling, refactoring, CI/CD, unit-tests, and the rest of the gang that makes simulation development fun.
 
