@@ -39,6 +39,7 @@ urgency for the patient.
 ---
 ## Later
 
+**TODO** for branch vis, we could use a similar technique as in https://www.supplychaindataanalytics.com/animated-monte-carlo-simulation-with-gganimate-in-r/
 
 **TODO** work out logistics example similar to <https://www.supplychaindataanalytics.com/monte-carlo-simulation-in-r-for-warehouse-location-risk-assessment/>
 
