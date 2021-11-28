@@ -3,8 +3,6 @@
 
 ## Next steps
 
-## v0.7
-
 ## v0.8
 
 **TODO** complete and publish hospital example
@@ -40,6 +38,9 @@ urgency for the patient.
 
 ---
 ## Later
+
+
+**TODO** work out logistics example similar to <https://www.supplychaindataanalytics.com/monte-carlo-simulation-in-r-for-warehouse-location-risk-assessment/>
 
 **{todo}** review simjulia <https://simjuliajl.readthedocs.io/en/stable/topical_guides/5_shared_resources.html#containers>
 

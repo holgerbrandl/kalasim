@@ -26,7 +26,7 @@ if [[ $kalasim_version == *"-SNAPSHOT" ]]; then
   exit 1
 fi
 
-## skip this step when doing a
+## skip this step when doing a preview release
 kscript src/test/kotlin/org/kalasim/misc/PatchVersion.kts "${kalasim_version:1}"
 
 git status
