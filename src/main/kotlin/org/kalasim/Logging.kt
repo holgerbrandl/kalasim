@@ -262,7 +262,7 @@ inline fun <reified E : Event> Environment.collect(): List<E> {
         if (it is E) traces.add(it)
     }
 
-    return traces.toList()
+    return traces
 }
 
 /**

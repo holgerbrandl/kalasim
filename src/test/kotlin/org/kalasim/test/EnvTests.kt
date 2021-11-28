@@ -118,6 +118,19 @@ class EnvTests {
         (System.currentTimeMillis() - timeBefore) / 1000.0 shouldBe 5.0.plusOrMinus(1.0)
     }
 
+
+    @Test
+    fun `it should allow collecting events by type`() = createTestSimulation(true) {
+        ClockSync(Duration.ofMillis(500))
+
+        val creations = collect<EntityCreatedEvent>()
+        val cg = ComponentGenerator(exponential(1), total = 10) { Component() }
+
+        run(10)
+
+        creations.size shouldBe (cg.total + 1) // +1 because of main
+    }
+
     @Test
     fun `it should fail with exception if simulation is too slow `() {
         createSimulation(true) {
@@ -178,7 +191,7 @@ class EnvTests {
             val ed = exponential(mu)
 
             override fun process() = sequence {
-                request(atm){
+                request(atm) {
                     hold(ed.sample())
                 }
             }
@@ -206,15 +219,15 @@ class EnvTests {
 
         // to average over all configs does not make much sense conceptually, but allows to test for regressions
         val meanQLength = atms.map { it.get<Resource>().statistics.requesters.lengthStats.mean!! }.mean()
-        meanQLength shouldBe(22.37 plusOrMinus 0.1)
+        meanQLength shouldBe (22.37 plusOrMinus 0.1)
     }
 
 
     @Test
-    fun `it should stop a simulation`()  = createTestSimulation {
+    fun `it should stop a simulation`() = createTestSimulation {
         val events = eventLog()
 
-        object : Component(){
+        object : Component() {
             override fun process() = sequence {
                 hold(10, "something is about to happen")
                 stopSimulation()

@@ -110,7 +110,7 @@ class ComponentTests {
     }
 
     @Test
-    fun `it shall allow supress automatic activation of a process definition`() = createTestSimulation {
+    fun `it shall allow suppress automatic activation of a process definition`() = createTestSimulation {
         object : Component(process = Component::none){
             override fun process(): Sequence<Component> {
                 fail()
