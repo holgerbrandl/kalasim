@@ -1,6 +1,7 @@
 package org.kalasim.scratch
 
 import org.kalasim.*
+import org.kalasim.Priority.Companion.IMPORTANT
 
 class ResourceDocu {
 

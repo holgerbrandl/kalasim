@@ -6,6 +6,7 @@ import org.apache.commons.math3.random.RandomGenerator
 import org.json.JSONObject
 import org.kalasim.ComponentState.*
 import org.kalasim.Defaults.DEFAULT_SEED
+import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.misc.*
 import org.kalasim.monitors.MetricTimeline
 import org.koin.core.Koin
@@ -239,7 +240,7 @@ open class Environment(
     fun run(
         duration: Ticks? = null,
 //        until: TickTime? = null,
-        priority: Priority = NORMAL,
+        priority: Priority = Priority.NORMAL,
         urgent: Boolean = false
     ) = run(duration?.value, null, priority, urgent)
 

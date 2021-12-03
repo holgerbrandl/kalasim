@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.DATA
+import org.kalasim.Priority.Companion.IMPORTANT
 import kotlin.math.roundToInt
 import kotlin.test.assertEquals
 

@@ -1,6 +1,7 @@
 package org.kalasim
 
 import org.kalasim.ComponentState.*
+import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.ResourceEventType.CLAIMED
 import org.kalasim.ResourceEventType.RELEASED
 import org.kalasim.ResourceSelectionPolicy.*
@@ -22,14 +23,16 @@ enum class ComponentState {
 
 internal const val DEFAULT_QUEUE_PRIORITY = 0
 
-data class Priority(val value: Int)
-
-// adopted from
-val LOWEST = Priority(-20)
-val LOW = Priority(-10)
-val NORMAL = Priority(DEFAULT_QUEUE_PRIORITY)
-val IMPORTANT = Priority(20)
-val CRITICAL = Priority(20)
+data class Priority(val value: Int){
+    companion object{
+        // adopted from
+        val LOWEST = Priority(-20)
+        val LOW = Priority(-10)
+        val NORMAL = Priority(DEFAULT_QUEUE_PRIORITY)
+        val IMPORTANT = Priority(20)
+        val CRITICAL = Priority(30)
+    }
+}
 
 
 //typealias ProcessDefinition = SequenceScope<Component>

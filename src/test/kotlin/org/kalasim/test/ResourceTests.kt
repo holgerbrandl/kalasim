@@ -8,6 +8,7 @@ import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.junit.Assert
 import org.junit.Test
 import org.kalasim.*
+import org.kalasim.Priority.Companion.IMPORTANT
 import org.kalasim.ResourceSelectionPolicy.*
 import java.time.Instant
 import java.util.concurrent.TimeUnit

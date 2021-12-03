@@ -1,6 +1,7 @@
 package org.kalasim
 
 import org.apache.commons.math3.distribution.RealDistribution
+import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.misc.Jsonable
 import org.koin.core.Koin
 import org.kalasim.misc.DependencyContext
@@ -31,7 +32,7 @@ class ComponentGenerator<T>(
     var until: TickTime = TickTime(Double.MAX_VALUE),
     val total: Int = Int.MAX_VALUE,
     name: String? = null,
-    priority: Priority = NORMAL,
+    priority: Priority = Priority.NORMAL,
     val keepHistory: Boolean = false,
     koin: Koin = DependencyContext.get(),
     val builder: Environment.(counter: Int) -> T
