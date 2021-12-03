@@ -187,7 +187,7 @@ The scheme below shows how interaction relate to component state transitions:
 
 ### activate
 
-Activate will schedule execution at the specified time. If you do not specify a process, the current process will scheduled for *continuation*. If a `process` argument is provided, the process will be *started* (or *restarted* if it is equal to the currently active process).
+Activate will schedule execution at the specified time. If no time is specified, execution will be scheduled for the current simulation time. If you do not specify a process, the current process will be scheduled for *continuation*. If a `process` argument is provided, the process will be *started* (or *restarted* if it is equal to the currently active process).
 
 ```kotlin
 val car0 = Car(process=null)  // data component
