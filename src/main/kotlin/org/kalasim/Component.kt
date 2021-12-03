@@ -684,7 +684,7 @@ open class Component(
     }
 
 
-    // TODO what is the reasoning here
+    /** Determine if all current requests of this component could be honored. */
     private fun honorAll(): List<Pair<Resource, Double>>? {
         for ((r, requestedQuantity) in requests) {
             if (requestedQuantity > r.capacity - r.claimed + EPS) {

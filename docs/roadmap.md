@@ -5,6 +5,13 @@
 
 ## v0.8
 
+**TODO** log output is misleading
+
+```
+10.00     lateConsumer          lateConsumer          Requesting 1.0 from Resource.1 with priority null ...
+10.00                                                 Claimed 1.0 from 'lateConsumer'
+```
+
 **TODO** continue exploring https://openrndr.org/ or https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/chapter01/chapter1.html (which seems more popular and is also very active)
 
 **TODO** complete and publish hospital example

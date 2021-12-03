@@ -202,6 +202,7 @@ class ResourceTests {
         object : Component("earlyConsumer") {
             override fun process() = sequence {
                 hold(duration = 5.0)
+
                 request(resource) {
                     hold(duration = 5.0)
                 }
@@ -213,9 +214,10 @@ class ResourceTests {
         object : Component("big_consumer") {
             override fun process() = sequence {
                 hold(duration = 7.0)
+
                 request(resource withQuantity 2 andPriority Priority.CRITICAL) {
-                    hold(duration = 5.0, "consumed complete resource" )
                     criticalRequestHonored = true
+                    hold(duration = 5.0, "consumed complete resource" )
                 }
             }
         }
@@ -223,6 +225,7 @@ class ResourceTests {
         object : Component("lateConsumer") {
             override fun process() = sequence {
                 hold(duration = 10.0)
+
                 request(resource){
                     criticalRequestHonored shouldBe  true // because it should be honoured after the big consumer
                     hold(duration = 5.0, "late consumption" )
