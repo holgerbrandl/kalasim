@@ -195,6 +195,48 @@ class ResourceTests {
     }
 
     @Test
+    fun `it should respect request priorities when mixing request sizes`() = createTestSimulation(true) {
+
+        val resource = Resource(capacity = 2)
+
+        object : Component("earlyConsumer") {
+            override fun process() = sequence {
+                hold(duration = 5.0)
+                request(resource) {
+                    hold(duration = 5.0)
+                }
+            }
+        }
+
+        var criticalRequestHonored = false
+
+        object : Component("big_consumer") {
+            override fun process() = sequence {
+                hold(duration = 7.0)
+                request(resource withQuantity 2 andPriority Priority.CRITICAL) {
+                    hold(duration = 5.0, "consumed complete resource" )
+                    criticalRequestHonored = true
+                }
+            }
+        }
+
+        object : Component("lateConsumer") {
+            override fun process() = sequence {
+                hold(duration = 10.0)
+                request(resource){
+                    criticalRequestHonored shouldBe  true // because it should be honoured after the big consumer
+                    hold(duration = 5.0, "late consumption" )
+                }
+            }
+        }
+
+        run()
+
+        criticalRequestHonored shouldBe true
+    }
+
+
+   @Test
     fun `it should reevaluate requests upon capacity changes`() {
 
         class Customer(val clerk: Resource) : Component() {
