@@ -14,6 +14,8 @@
 
 **TODO** continue exploring https://openrndr.org/ or https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/chapter01/chapter1.html (which seems more popular and is also very active)
 
+**TODO** https://docs.korge.org/korge/
+
 **TODO** complete and publish hospital example
 
 **TODO** add display option to discard zero-duration intervals for simplified vis
