@@ -482,6 +482,7 @@ open class Component(
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
      * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given. It is possible to check which resource has been claimed with `Component.claimers()`.
      * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
+     * @param priority If multiple components compete for the same resource, requests with higher priority will have precedence.
      * @param schedulePriority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
@@ -489,13 +490,15 @@ open class Component(
     suspend fun SequenceScope<Component>.request(
         resources: Collection<Resource>,
         description: String? = null,
+        priority: Priority? = null,
         failAt: TickTime? = null,
         failDelay: Number? = null,
         oneOf: Boolean = false,
         schedulePriority: Priority = NORMAL,
         honorBlock: (suspend SequenceScope<Component>.(Resource?) -> Unit)? = null
     ) = request(
-        *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
+        *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY andPriority priority }.toTypedArray(),
+        description= description,
         failAt = failAt,
         failDelay = failDelay,
         oneOf = oneOf,
@@ -515,6 +518,7 @@ open class Component(
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
      * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given. It is possible to check which resource has been claimed with `Component.claimers()`.
      * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
+     * @param priority If multiple components compete for the same resource, requests with higher priority will have precedence.
      * @param schedulePriority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
@@ -522,13 +526,14 @@ open class Component(
     suspend fun SequenceScope<Component>.request(
         vararg resources: Resource,
         description: String? = null,
+        priority: Priority? = null,
         failAt: TickTime? = null,
         failDelay: Number? = null,
         oneOf: Boolean = false,
         schedulePriority: Priority = NORMAL,
         honorBlock: (suspend SequenceScope<Component>.(Resource?) -> Unit)? = null
     ) = request(
-        *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
+        *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY andPriority priority }.toTypedArray(),
         description = description,
         failAt = failAt,
         failDelay = failDelay,
@@ -1431,7 +1436,7 @@ infix fun Resource.withQuantity(quantity: Number) = ResourceRequest(this, quanti
 infix fun Resource.withPriority(priority: Int) = ResourceRequest(this, priority = Priority(priority))
 infix fun Resource.withPriority(priority: Priority) = ResourceRequest(this, priority = priority)
 
-infix fun ResourceRequest.andPriority(priority: Priority) = ResourceRequest(this.r, this.quantity, priority)
+infix fun ResourceRequest.andPriority(priority: Priority?) = ResourceRequest(this.r, this.quantity, priority)
 
 //    data class StateRequest<T>(val s: State<T>, val value: T? = null, val priority: Int? = null)
 data class StateRequest<T>(val state: State<T>, val priority: Priority? = null, val predicate: (T) -> Boolean) {
