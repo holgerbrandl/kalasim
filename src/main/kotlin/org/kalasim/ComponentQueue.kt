@@ -29,21 +29,21 @@ class ComponentQueue<C>(
     koin: Koin = DependencyContext.get()
 ) : SimulationEntity(name, koin) {
 
-    constructor(
-        name: String? = null,
-        comparator: Comparator<C>,
-        koin: Koin = DependencyContext.get()
-    ) : this(
-        name,
-        PriorityQueue { o1, o2 ->
-            compareValuesBy(
-                o1,
-                o2,
-                { comparator.compare(o1.component, o2.component) },
-                { it.enterTime })
-        },
-        koin
-    )
+//    constructor(
+//        name: String? = null,
+//        comparator: Comparator<C>,
+//        koin: Koin = DependencyContext.get()
+//    ) : this(
+//        name,
+//        PriorityQueue { o1, o2 ->
+//            compareValuesBy(
+//                o1,
+//                o2,
+//                { comparator.compare(o1.component, o2.component) },
+//                { it.enterTime })
+//        },
+//        koin
+//    )
 
 
     val size: Int
