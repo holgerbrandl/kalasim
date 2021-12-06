@@ -1,5 +1,11 @@
 # Kalasim Release History
 
+## v0.8-SNAPSHOT
+
+Not yet released
+
+* Added `RequestScopeContext` to honor-block of `request` including `requestingSince` time (relates to [#27](https://github.com/holgerbrandl/kalasim/issues/27)) 
+
 ## v0.7 
 
 Released 2021-11-27
