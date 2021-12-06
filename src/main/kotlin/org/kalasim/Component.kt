@@ -23,6 +23,8 @@ enum class ComponentState {
 
 internal const val DEFAULT_QUEUE_PRIORITY = 0
 
+// note: Salabim Changlog: "The default priority of a requested resource is now inf, which means the lowest possible priority."
+/** Describes the priority of a process or request. Higher values will be scheduled earlier or claimed earlier respectively. */
 data class Priority(val value: Int){
     companion object{
         // adopted from
@@ -480,7 +482,7 @@ open class Component(
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
      * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given. It is possible to check which resource has been claimed with `Component.claimers()`.
      * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
-     * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
+     * @param schedulePriority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
      */
@@ -490,14 +492,14 @@ open class Component(
         failAt: TickTime? = null,
         failDelay: Number? = null,
         oneOf: Boolean = false,
-        priority: Priority = NORMAL,
+        schedulePriority: Priority = NORMAL,
         honorBlock: (suspend SequenceScope<Component>.(Resource?) -> Unit)? = null
     ) = request(
         *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
         failAt = failAt,
         failDelay = failDelay,
         oneOf = oneOf,
-        priority = priority,
+        schedulePriority = schedulePriority,
         honorBlock = honorBlock
     )
 
@@ -513,7 +515,7 @@ open class Component(
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
      * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given. It is possible to check which resource has been claimed with `Component.claimers()`.
      * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
-     * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
+     * @param schedulePriority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
      */
@@ -523,7 +525,7 @@ open class Component(
         failAt: TickTime? = null,
         failDelay: Number? = null,
         oneOf: Boolean = false,
-        priority: Priority = NORMAL,
+        schedulePriority: Priority = NORMAL,
         honorBlock: (suspend SequenceScope<Component>.(Resource?) -> Unit)? = null
     ) = request(
         *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY }.toTypedArray(),
@@ -531,7 +533,7 @@ open class Component(
         failAt = failAt,
         failDelay = failDelay,
         oneOf = oneOf,
-        priority = priority,
+        schedulePriority = schedulePriority,
         honorBlock = honorBlock
     )
 
@@ -546,7 +548,7 @@ open class Component(
      * @param failDelay  if the request is not honored before now+fail_delay,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
      * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given. It is possible to check which resource has been claimed with `Component.claimers()`.
-     * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
+     * @param schedulePriority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
@@ -557,7 +559,7 @@ open class Component(
         failAt: TickTime? = null,
         failDelay: Number? = null,
         oneOf: Boolean = false,
-        priority: Priority = NORMAL,
+        schedulePriority: Priority = NORMAL,
         urgent: Boolean = false,
         // try to avoid argument by inferring from stacktrace
         calledFrom: String? = null,
@@ -622,7 +624,7 @@ open class Component(
 
                     val bumpCandidates = mutableListOf<Component>()
                     //                val claimComponents = thisClaimers.map { it.c }
-                    for (cqe in thisClaimers) {
+                    for (cqe in thisClaimers.toList().reversed()) {
                         if (av >= q) {
                             break
                         }
@@ -655,7 +657,7 @@ open class Component(
 
             if (requests.isNotEmpty()) {
                 reschedule(
-                    scheduledTime!!, priority = priority, urgent = urgent,
+                    scheduledTime!!, priority = schedulePriority, urgent = urgent,
                     caller = "requesting", newStatus = REQUESTING
                 )
             }
@@ -713,7 +715,7 @@ open class Component(
         return null
     }
 
-    internal open fun tryRequest(): Boolean {
+    internal fun tryRequest(): Boolean {
         if (componentState == INTERRUPTED) return false
 
         val rHonor = if (oneOfRequest) honorAny() else honorAll()
