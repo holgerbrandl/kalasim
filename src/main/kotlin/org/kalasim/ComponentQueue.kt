@@ -14,8 +14,6 @@ import java.util.*
 
 data class CQElement<C>(val component: C, val enterTime: TickTime, val priority: Priority? = null)
 
-//TODO add opt-out for queue monitoring
-
 class ComponentQueue<C>(
     name: String? = null,
 //    val q: Queue<CQElement<T>> = LinkedList()
@@ -23,7 +21,7 @@ class ComponentQueue<C>(
         compareValuesBy(
             o1,
             o2,
-            { it.priority?.value },
+            { it.priority?.value?.times(-1) ?: 0 },
             { it.enterTime })
     },
     koin: Koin = DependencyContext.get()

@@ -8,7 +8,11 @@ import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.junit.Assert
 import org.junit.Test
 import org.kalasim.*
+import org.kalasim.Priority.Companion.CRITICAL
 import org.kalasim.Priority.Companion.IMPORTANT
+import org.kalasim.Priority.Companion.LOW
+import org.kalasim.Priority.Companion.LOWEST
+import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.ResourceSelectionPolicy.*
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -193,6 +197,38 @@ class ResourceTests {
         bc1.isData shouldBe true
         bc2.isScheduled shouldBe true
     }
+
+    @Test
+    fun `it should respect request priorities`() = createTestSimulation {
+        val r = Resource(capacity = 2)
+
+        val results = mutableListOf<Priority?>()
+
+        class PrioComponent(val wait:Number, val claim:Number, val prio: Priority?=null) : Component(){
+            override fun process() =sequence {
+                hold(wait)
+                request(ResourceRequest(r, priority = prio)){
+                    results.add(prio)
+                    hold(claim)
+                }
+            }
+        }
+
+        PrioComponent(1,20, null)
+        PrioComponent(2,20, null)
+        PrioComponent(3, 20, null)
+        PrioComponent(4, 20, null)
+        PrioComponent(5, 20, IMPORTANT)
+        PrioComponent(6, 20, LOWEST)
+        PrioComponent(7, 20, LOW)
+        PrioComponent(8, 20, NORMAL)
+        PrioComponent(9, 20, CRITICAL)
+
+        run()
+
+        results shouldBe listOf(null, null, CRITICAL, IMPORTANT, null, null, NORMAL, LOW, LOWEST)
+    }
+
 
     @Test
     fun `it should respect request priorities when mixing request sizes`() = createTestSimulation(true) {
