@@ -495,7 +495,7 @@ open class Component(
         failDelay: Number? = null,
         oneOf: Boolean = false,
         schedulePriority: Priority = NORMAL,
-        honorBlock: (suspend SequenceScope<Component>.(Resource?) -> Unit)? = null
+        honorBlock: (suspend SequenceScope<Component>.(RequestScopeContext) -> Unit)? = null
     ) = request(
         *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY andPriority priority }.toTypedArray(),
         description= description,
@@ -531,7 +531,7 @@ open class Component(
         failDelay: Number? = null,
         oneOf: Boolean = false,
         schedulePriority: Priority = NORMAL,
-        honorBlock: (suspend SequenceScope<Component>.(Resource?) -> Unit)? = null
+        honorBlock: (suspend SequenceScope<Component>.(RequestScopeContext) -> Unit)? = null
     ) = request(
         *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY andPriority priority }.toTypedArray(),
         description = description,
@@ -569,8 +569,10 @@ open class Component(
         // try to avoid argument by inferring from stacktrace
         calledFrom: String? = null,
         // see https://stackoverflow.com/questions/46098105/is-there-a-way-to-open-and-close-a-stream-easily-at-kotlin
-        honorBlock: (suspend SequenceScope<Component>.(Resource?) -> Unit)? = null
+        honorBlock: (suspend SequenceScope<Component>.(RequestScopeContext) -> Unit)? = null
     ) {
+        val requestStart =now
+
         yieldCurrent {
             if (componentState != CURRENT) {
                 requireNotMain()
@@ -671,7 +673,7 @@ open class Component(
         if (honorBlock != null) {
             // suspend{ ... }
             val before = now
-            honorBlock(if (oneOf) claims.toList().last().first else null)
+            honorBlock(RequestScopeContext(if (oneOf) claims.toList().last().first else null, requestStart))
 
             val after = now
 
@@ -1437,6 +1439,8 @@ infix fun Resource.withPriority(priority: Int) = ResourceRequest(this, priority 
 infix fun Resource.withPriority(priority: Priority) = ResourceRequest(this, priority = priority)
 
 infix fun ResourceRequest.andPriority(priority: Priority?) = ResourceRequest(this.r, this.quantity, priority)
+
+data class RequestScopeContext(val resource: Resource?, val requestingSince: TickTime )
 
 //    data class StateRequest<T>(val s: State<T>, val value: T? = null, val priority: Int? = null)
 data class StateRequest<T>(val state: State<T>, val priority: Priority? = null, val predicate: (T) -> Boolean) {
