@@ -121,7 +121,7 @@ internal fun Any.nameOrDefault(name: String?, nameCache: MutableMap<String, Int>
     name ?: this.javaClass.defaultName(nameCache)
 
 internal fun Class<*>.defaultName(nameCache: MutableMap<String, Int>) =
-    simpleName + "." + getComponentCounter(simpleName, nameCache)
+    simpleName.ifEmpty { "Component" } + "." + getComponentCounter(simpleName, nameCache)
 
 private fun getComponentCounter(className: String, nameCache: MutableMap<String, Int>) =
     nameCache.merge(className, 1, Int::plus)

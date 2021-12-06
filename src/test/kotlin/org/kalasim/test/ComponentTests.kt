@@ -20,6 +20,14 @@ internal class NoOpComponent( name: String? = null) : Component(name) {
 
 class ComponentTests {
 
+    @Test
+    fun `it assign sensible names to anonymous object components`() = createTestSimulation {
+        val c = object : Component() {}
+
+        c.name shouldBe "Component.1"
+    }
+
+
     @Ignore
     @Test
     fun `it should create components outside of an environment`() {
@@ -302,8 +310,6 @@ class ComponentTests {
 
     @Test
     fun `it support resume after interrupt`() = createTestSimulation {
-
-
         val tool = object : Component("tool") {
             override fun process() = sequence<Component> {
                 hold(10)
@@ -331,8 +337,6 @@ class ComponentTests {
     @Test
     // https://github.com/salabim/salabim/issues/24
     fun `all interactions should fail for an interrupted component`() = createTestSimulation {
-
-
         val tool = object : Component("tool") {
             override fun process() = sequence<Component> {
                 hold(10)
@@ -368,8 +372,6 @@ class ComponentTests {
 
     @Test
     fun `it should interrupt and resume a passive component`() = createTestSimulation {
-
-
         val tool = object : Component("tool") {
             override fun process() = sequence {
                 passivate()
@@ -403,6 +405,7 @@ class ComponentTests {
 //                yield(getThis())
             }
         }
+
         val mechanic = object : Component("controller") {
             override fun process() = sequence<Component> {
                 with(c) {
