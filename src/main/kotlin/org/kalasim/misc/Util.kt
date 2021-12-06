@@ -103,5 +103,6 @@ enum class AssertMode {
 
 var ASSERT_MODE = AssertMode.LIGHT
 
-fun Double?.roundAny(n: Int = 3) = if (this == null) this else Precision.round(this, n)
+//fun Double?.roundAny(n: Int = 3) = if (this == null) this else Precision.round(this, n)
+fun Double.roundAny(n: Int = 3) = Precision.round(this, n)
 

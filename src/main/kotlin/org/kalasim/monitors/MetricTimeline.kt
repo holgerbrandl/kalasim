@@ -207,9 +207,9 @@ class MetricTimelineStats(nlm: MetricTimeline, excludeZeros: Boolean = false) : 
 
     override fun toJson() = json {
         "duration" to duration
-        "mean" to mean.roundAny()
-        "standard_deviation" to standardDeviation.roundAny()
-        "min" to min.roundAny()
-        "max" to max.roundAny()
+        "mean" to mean?.roundAny()
+        "standard_deviation" to standardDeviation?.roundAny()
+        "min" to min?.roundAny()
+        "max" to max?.roundAny()
     }
 }
