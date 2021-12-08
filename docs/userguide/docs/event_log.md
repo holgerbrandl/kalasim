@@ -94,6 +94,12 @@ Trace logs a suitable for standard kotlin collection processing. E.g. we could s
 In the example, we can think of a channel as a pipe between two coroutines. For details see the great articlle [_Kotlin: Diving in to Coroutines and Channels_]( 
 https://proandroiddev.com/kotlin-coroutines-channels-csp-android-db441400965f).
 
+Alternatively, we can use the simpler `AsyncEventListener` DSL to process the events:
+
+```kotlin
+//{!analysis/LogChannelConsumerDsl.kts!}
+```
+
 ## Logging Configuration
 
 Typically, only some types of event logging are required in a given simulation. To optimize simulation performance, the engine allows to suppress selectivly per event type and simulation entity. This is configured via [tracking policy factory](advanced.md#continuous-simulation) 
