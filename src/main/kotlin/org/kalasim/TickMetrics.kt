@@ -12,7 +12,7 @@ import kotlin.math.round
 class TickMetrics(
     val sampleTicks: Double = 1.0,
     val enableMonitor: Boolean = true,
-    val enableMetricEvents: Boolean = false,
+    val enableMetricEvents: Boolean = true,
     koin: Koin? = null
 ) : Component(koin = koin ?: DependencyContext.get()) {
 
