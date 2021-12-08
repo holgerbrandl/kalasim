@@ -8,7 +8,7 @@ A single car, a driver, and red traffic light in the middle of the night.
 <i><a href="https://pxhere.com/en/photo/385193">Red Light</a>, Matthias Ripp (CC BY 2.0)</i>
 </p>
 
-Let’s start with a very simple model. The example demonstrates the main mode of operation, the core API and the component process model implemented in `kalasim`. We want to build a simulation where a single car is driving around for a some time before arriving at its destination.
+Let’s start with a very simple model. The example demonstrates the main mode of operation, the core API and the component process model implemented in `kalasim`. We want to build a simulation where a single car is driving around for a some time before stopping in front of a red traffic light.
 
 ```kotlin
 //{!api/Car.kts!}
