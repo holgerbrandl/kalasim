@@ -125,7 +125,7 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
                 val surgeryTime = stressFactor * severityWeightedSurgeryTime
                 hold(
                     surgeryTime,
-                    description = "Surgery of patient ${patient} in room ${this@Room} by doctor ${doctor}"
+                    description = "Surgery of patient $patient in room ${this@Room} by doctor $doctor"
                 )
 
                 // was it successful? This depends on the severity of the injury
@@ -138,7 +138,7 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
                     patient.patientStatus.value = DeceasedInSurgery
                 }
 
-                log("surgery of ${patient} completed ${if (isDeceased) "with" else "without"} success")
+                log("surgery of $patient completed ${if (isDeceased) "with" else "without"} success")
             }
         }
     }
@@ -152,7 +152,7 @@ val Patient.severityWeightedSurgeryTime: Double
         return severityFactor * nonUrgentSurgeryTimes[type]!!
     }
 
-val setupTimes = InjuryType.values().map { it to Random.nextInt(5, 10).toDouble() / 60.0 }.toMap()
+val setupTimes = InjuryType.values().associateWith { Random.nextInt(5, 10).toDouble() / 60.0 }
 
 val nonUrgentSurgeryTimes =
     InjuryType.values().zip(Random(1).run { List(InjuryType.values().size) { nextDouble(0.1, 0.4) } }).toMap()
@@ -161,9 +161,7 @@ val surgerySuccessProbability = Severity.values().zip(listOf(1.0, 1.0, 1.0, 0.9,
 
 
 /** Observations */
-class ErMetrics {
-
-}
+class ErMetrics
 
 fun interface HeadNurse {
     fun nextOne(er: EmergencyRoom, room: Room): Patient?
@@ -223,7 +221,7 @@ class Doctor(name: String, val qualification: List<InjuryType>) : Resource(name)
 
 class EmergencyRoom(
 //    nurse: HeadNurse = FifoNurse()
-    nurse: HeadNurse = FifoNurse(),
+    val nurse: HeadNurse = FifoNurse(),
     disableMetrics: Boolean = true
 ) : Environment(true) {
 
@@ -269,8 +267,6 @@ class EmergencyRoom(
             incomingMonitor.enabled = false
         }
     }
-
-    val nurse = nurse
 
 
     // incoming patients

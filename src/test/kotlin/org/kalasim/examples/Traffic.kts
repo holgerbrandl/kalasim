@@ -29,7 +29,7 @@ class Car(val trafficLight: TrafficLight) : Component() {
     }
 }
 
-class Car2() : Component() {
+class Car2 : Component() {
 
     val gasStation by inject<GasStation>()
 

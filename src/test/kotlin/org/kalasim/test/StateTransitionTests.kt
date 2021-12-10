@@ -80,35 +80,37 @@ class StateTransitionTests {
             createTestSimulation(true) {
 
                 val r = Resource()
-                val s = State<String>("foo")
+                val s = State("foo")
 
                 val other = object : Component("other") {
-                    override fun process() = sequence<Component> {
-                        log("starting process!")
-                        hold(100)
+                    override fun process() =
+                        sequence {
+                            log("starting process!")
+                            hold(100)
 
-                        log("other process continued")
-                        hold(100)
-                    }
+                            log("other process continued")
+                            hold(100)
+                        }
                 }
 
 
                 val comp = object : Component() {
 
-                    override fun process() = sequence<Component> {
-                        other.passivate()
-                        hold(4)
+                    override fun process() =
+                        sequence {
+                            other.passivate()
+                            hold(4)
 
-                        other.activate()
-                        hold(4)
+                            other.activate()
+                            hold(4)
 
-                        other.cancel()
-                        hold(4)
+                            other.cancel()
+                            hold(4)
 
-                        other.activate()
-                        other.hold(2)
-                        hold(4)
-                    }
+                            other.activate()
+                            other.hold(2)
+                            hold(4)
+                        }
                 }
 
                 // note this is a compiler test only. the example is not meaningful

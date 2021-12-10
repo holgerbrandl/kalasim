@@ -17,8 +17,8 @@ fun main() {
         // note: it's not really needed to model the theater (because it has no process), but we follow the julia model here
         val theater = object {
             val tickets =
-                MOVIES.map { it to DepletableResource("room ${MOVIES.indexOf(it)}", capacity = TICKETS) }.toMap()
-            val numReneged = MOVIES.map { it to 0 }.toMap().toMutableMap()
+                MOVIES.associateWith { DepletableResource("room ${MOVIES.indexOf(it)}", capacity = TICKETS) }
+            val numReneged = MOVIES.associateWith { 0 }.toMutableMap()
             val counter = Resource("counter", capacity = 1)
         }
 

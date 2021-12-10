@@ -12,9 +12,9 @@ import org.kalasim.misc.*
 import kotlin.test.fail
 
 
-internal class NoOpComponent( name: String? = null) : Component(name) {
+internal class NoOpComponent(name: String? = null) : Component(name) {
     override fun process() = sequence<Component> {
-        println("Hello from  ${name}")
+        println("Hello from  $name")
     }
 }
 
@@ -58,11 +58,12 @@ class ComponentTests {
         var counter = 0
 
         class MyComponent : Component(process = MyComponent::myProcess) {
-             fun myProcess() = sequence<Component> {
-                 hold(1)
-                 println("hello from $name")
-                 counter++
-             }
+            fun myProcess() =
+                sequence {
+                    hold(1)
+                    println("hello from $name")
+                    counter++
+                }
         }
 
         val c = MyComponent()
@@ -119,7 +120,7 @@ class ComponentTests {
 
     @Test
     fun `it shall allow suppress automatic activation of a process definition`() = createTestSimulation {
-        object : Component(process = Component::none){
+        object : Component(process = Component::none) {
             override fun process(): Sequence<Component> {
                 fail()
             }
@@ -127,7 +128,6 @@ class ComponentTests {
 
         run()
     }
-
 
 
     @Test
@@ -262,7 +262,7 @@ class ComponentTests {
             }
         }
 
-        shouldThrow<IllegalArgumentException>() {
+        shouldThrow<IllegalArgumentException> {
             run(5)
         }
     }
@@ -311,21 +311,23 @@ class ComponentTests {
     @Test
     fun `it support resume after interrupt`() = createTestSimulation {
         val tool = object : Component("tool") {
-            override fun process() = sequence<Component> {
-                hold(10)
-                log("production finished")
-            }
+            override fun process() =
+                sequence {
+                    hold(10)
+                    log("production finished")
+                }
         }
 
         val mechanic = object : Component("tool") {
-            override fun process() = sequence<Component> {
-                hold(1)
-                tool.interrupt()
+            override fun process() =
+                sequence {
+                    hold(1)
+                    tool.interrupt()
 
-                // do maintenance
-                hold(2)
-                tool.resume()
-            }
+                    // do maintenance
+                    hold(2)
+                    tool.resume()
+                }
         }
 
         run(20)
@@ -338,29 +340,31 @@ class ComponentTests {
     // https://github.com/salabim/salabim/issues/24
     fun `all interactions should fail for an interrupted component`() = createTestSimulation {
         val tool = object : Component("tool") {
-            override fun process() = sequence<Component> {
-                hold(10)
-                log("production finished")
-            }
+            override fun process() =
+                sequence {
+                    hold(10)
+                    log("production finished")
+                }
         }
 
         val mechanic = object : Component("tool") {
-            override fun process() = sequence<Component> {
-                hold(1)
-                tool.interrupt()
+            override fun process() =
+                sequence {
+                    hold(1)
+                    tool.interrupt()
 
-                hold(1)
-                shouldThrow<IllegalArgumentException> {
+                    hold(1)
+                    shouldThrow<IllegalArgumentException> {
+                        tool.hold(1)
+                    }
+
+                    // do maintenance
+                    hold(2)
+                    tool.resume()
+
                     tool.hold(1)
+
                 }
-
-                // do maintenance
-                hold(2)
-                tool.resume()
-
-                tool.hold(1)
-
-            }
         }
 
         run(20)
@@ -399,20 +403,22 @@ class ComponentTests {
     @Test
     fun `it should  hold on someones elses behalf`() = createTestSimulation(true) {
         val c = object : Component("other") {
-            override fun process() = sequence<Component> {
-                println("huhu")
-                hold(1)
+            override fun process() =
+                sequence {
+                    println("huhu")
+                    hold(1)
 //                yield(getThis())
-            }
+                }
         }
 
         val mechanic = object : Component("controller") {
-            override fun process() = sequence<Component> {
-                with(c) {
-                    hold(1)
+            override fun process() =
+                sequence<Component> {
+                    with(c) {
+                        hold(1)
+                    }
+                    println("huhu2")
                 }
-                println("huhu2")
-            }
         }
 
         val tc = EventLog().apply { addEventListener(this) }
@@ -428,12 +434,13 @@ class ComponentTests {
         class MyException(msg: String) : IllegalArgumentException(msg)
 
         object : Component("other") {
-            override fun process() = sequence<Component> {
+            override fun process() =
+                sequence {
 
-                hold(1)
+                    hold(1)
 
-                throw MyException("something went wrong")
-            }
+                    throw MyException("something went wrong")
+                }
         }
 
         shouldThrow<MyException> { run(10) }

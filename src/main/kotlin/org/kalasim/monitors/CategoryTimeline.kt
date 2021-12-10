@@ -1,10 +1,10 @@
 package org.kalasim.monitors
 
 import org.kalasim.TickTime
+import org.kalasim.misc.DependencyContext
 import org.kalasim.misc.ImplementMe
 import org.kalasim.misc.Jsonable
 import org.koin.core.Koin
-import org.kalasim.misc.DependencyContext
 
 /**
  * Level monitors tally levels along with the current (simulation) time. e.g. the number of parts a machine is working on.
@@ -17,8 +17,8 @@ class CategoryTimeline<T>(
     koin: Koin = DependencyContext.get()
 ) : Monitor<T>(name, koin), ValueTimeline<T> {
 
-    private val timestamps = listOf<Double>().toMutableList()
-    private val values = ifEnabled { listOf<T>().toMutableList() }
+    private val timestamps = mutableListOf<Double>()
+    private val values = ifEnabled { mutableListOf<T>() }
 
     init {
         reset(initialValue)
@@ -26,7 +26,7 @@ class CategoryTimeline<T>(
 
 
     override fun reset(initial: T) {
-        require(enabled){ "resetting a disabled timeline is unlikely to have meaningful semantics"}
+        require(enabled) { "resetting a disabled timeline is unlikely to have meaningful semantics" }
 
         values.clear()
         timestamps.clear()
@@ -48,7 +48,7 @@ class CategoryTimeline<T>(
             .zip(values)
             .groupBy { it.second }
             .mapValues { (_, values) ->
-                values.map { it.first }.sum()
+                values.sumOf { it.first }
             }
 
         val total = freqHist.values.sum()
@@ -56,11 +56,11 @@ class CategoryTimeline<T>(
         return (freqHist[value] ?: error("Invalid or non-observed state")) / total
     }
 
-    private fun xDuration(): DoubleArray {
-        return timestamps.toMutableList()
-            .apply { add(env.now.value) }.zipWithNext { first, second -> second - first }
+    private fun xDuration(): DoubleArray =
+        timestamps.toMutableList()
+            .apply { add(env.now.value) }
+            .zipWithNext { first, second -> second - first }
             .toDoubleArray()
-    }
 
 
     override fun get(time: Number): T? {
@@ -76,7 +76,9 @@ class CategoryTimeline<T>(
 
     override fun total(value: T): Double = statsData().run {
         // https://youtrack.jetbrains.com/issue/KT-43776
-        values.zip(durations).filter { it.first == value }.map { it.second }.sum()
+        values.zip(durations)
+            .filter { it.first == value }
+            .sumOf { it.second }
     }
 
     fun printHistogram(values: List<T>? = null, sortByWeight: Boolean = false) {
@@ -85,7 +87,7 @@ class CategoryTimeline<T>(
         println("# Levels: ${this.values.distinct().size}")
         println()
 
-        if(this.values.size <= 1){
+        if (this.values.size <= 1) {
             println("Skipping histogram of '$name' because of to few data")
             return
         }
@@ -99,10 +101,10 @@ class CategoryTimeline<T>(
     /** Accumulated retention time of the ComponentState. Only visited states will be included. */
     fun summed(): FrequencyTable<T> = xDuration().zip(this.values)
         .groupBy { (_, value) -> value }
-        .map { it.key to it.value.sumOf { (it.first) } }.toMap()
+        .map { kv -> kv.key to kv.value.sumOf { (it.first) } }.toMap()
 
 
-    override fun  statisticsSummary() = statsData().statisticalSummary()
+    override fun statisticsSummary() = statsData().statisticalSummary()
 
     fun statsData(): LevelStatsData<T> {
         require(values.isNotEmpty()) { "data must not be empty when preparing statistics of $name" }
@@ -126,9 +128,7 @@ class CategoryTimeline<T>(
     override fun resetToCurrent() = reset(get(now)!!)
 
     override fun clearHistory(before: TickTime) {
-        val startFromIdx = timestamps.withIndex().firstOrNull { before > it.value }?.index
-
-        if (startFromIdx == null) return
+        val startFromIdx = timestamps.withIndex().firstOrNull { before > it.value }?.index ?: return
 
         for (i in 0 until startFromIdx) {
             val newTime = timestamps.subList(0, startFromIdx)

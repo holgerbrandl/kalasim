@@ -131,7 +131,7 @@ val manyGames = org.kalasim.misc.repeat(10000) {
 }
 
 val avgSurvivors = manyGames.map { it.numSurvivors }.average()
-println("The average number of survivors is ${avgSurvivors}")
+println("The average number of survivors is $avgSurvivors")
 ```
 
     The average number of survivors is 5.436
@@ -198,7 +198,7 @@ Now, we calculate the probability of having less than two survivors. That's in p
 
 ```kotlin
 val probLT2Players = manyGames.count { it.numSurvivors < 2 }.toDouble() / manyGames.size
-println("The probability for less than 2 players is ${probLT2Players}")
+println("The probability for less than 2 players is $probLT2Players")
 ```
 
     The probability for less than 2 players is 0.0771

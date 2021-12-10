@@ -28,7 +28,7 @@ class CustomerGenerator(val waitingLine: ComponentQueue<Customer>) : Component()
 class Customer : Component()
 
 
-class Clerk() : Component() {
+class Clerk : Component() {
 
     override fun process() = sequence {
         val waitingLine = get<ComponentQueue<Customer>>()

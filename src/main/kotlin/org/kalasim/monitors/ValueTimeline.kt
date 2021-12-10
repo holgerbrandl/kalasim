@@ -3,8 +3,8 @@ package org.kalasim.monitors
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.kalasim.TickTime
 import org.kalasim.asCMPairList
-import org.koin.core.Koin
 import org.kalasim.misc.DependencyContext
+import org.koin.core.Koin
 
 
 interface ValueTimeline<T> {
@@ -40,10 +40,10 @@ interface ValueTimeline<T> {
 
 
 fun <T> LevelStatsData<T>.statisticalSummary(): EnumeratedDistribution<T> {
-    val distData = values.zip(durations).groupBy { it.first }
-        .mapValues { (_, values) ->
-            values.map { it.second }.sum()
-        }.asCMPairList()
+    val distData =
+        values.zip(durations).groupBy { it.first }
+            .mapValues { (_, values) -> values.sumOf { it.second } }
+            .asCMPairList()
 
     return EnumeratedDistribution(distData)
 }
@@ -63,7 +63,7 @@ data class LevelStatsData<T>(
      *                  at the end of the list. This is in particular helpful when visualizing these data
      */
     fun asList(includeNow: Boolean = true): List<LevelStateRecord<T>> {
-        val durationsExt = if(includeNow) durations + null else durations
+        val durationsExt = if (includeNow) durations + null else durations
         return stepFun().zip(durationsExt).map { LevelStateRecord(it.first.first, it.first.second, it.second) }
     }
 }

@@ -6,7 +6,7 @@ import kotlinx.coroutines.runBlocking
 
 object BufferTakeAll {
     fun dressMaker(): Flow<Int> = flow {
-        for(i in 1..3) {
+        for (i in 1..3) {
             println("Dress $i in the making")
             delay(100)
             println("Dress $i ready for sale")
@@ -15,7 +15,7 @@ object BufferTakeAll {
     }
 
     @JvmStatic
-    fun main(args:Array<String>) = runBlocking {
+    fun main(args: Array<String>) = runBlocking {
         dressMaker()
             .buffer()
             .collect { value ->
@@ -38,22 +38,23 @@ object ConflateThrifty {
     }
 
     @JvmStatic
-    fun main(args:Array<String>)  = runBlocking<Unit> {
-        dressMaker()
-            .conflate()
-            .collect { value ->
-                println("Dress $value bought for use")
-                delay(300)
-                println("Dress $value completely used")
-            }
-    }
+    fun main(args: Array<String>) =
+        runBlocking {
+            dressMaker()
+                .conflate()
+                .collect { value ->
+                    println("Dress $value bought for use")
+                    delay(300)
+                    println("Dress $value completely used")
+                }
+        }
 
 }
 
 
 object CollectLatest {
     fun dressMaker(): Flow<Int> = flow {
-        for(i in 1..3) {
+        for (i in 1..3) {
             println("Dress $i in the making")
             delay(100)
             println("Dress $i ready for sale")
@@ -62,12 +63,13 @@ object CollectLatest {
     }
 
     @JvmStatic
-    fun main(args:Array<String>)  = runBlocking<Unit> {
-        dressMaker()
-            .collectLatest { value ->
-                println("Dress $value bought for use")
-                delay(300)
-                println("Dress $value completely used")
-            }
-    }
+    fun main(args: Array<String>) =
+        runBlocking {
+            dressMaker()
+                .collectLatest { value ->
+                    println("Dress $value bought for use")
+                    delay(300)
+                    println("Dress $value completely used")
+                }
+        }
 }

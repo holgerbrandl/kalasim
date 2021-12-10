@@ -118,7 +118,7 @@ class ComponentStateChangeEvent(
     simEntity: SimulationEntity,
     state: ComponentState,
     details: String? = null
-) : InteractionEvent(time, curComponent,simEntity, details, "New state: "+ state.toString().lowercase())
+) : InteractionEvent(time, curComponent, simEntity, details, "New state: " + state.toString().lowercase())
 
 
 fun interface EventListener {
@@ -157,7 +157,6 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
     var lastReceiver: SimulationEntity? = null
 
 
-
     override fun consume(event: Event) {
         if (event.logLevel.intValue() < logLevel.intValue()) return
 
@@ -172,7 +171,7 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
                 "info"
             )
             println(header.renderTraceLine())
-            println(TRACE_COL_WIDTHS.map { "-".repeat(it - 1) }.joinToString(separator = " "))
+            println(TRACE_COL_WIDTHS.joinToString(separator = " ") { "-".repeat(it - 1) })
         }
 
 
@@ -187,7 +186,7 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
                         TRACE_DF.format(time.value),
                         if (ccChanged) curComponent?.name else null,
                         if (receiverChanged) source?.name else null,
-        //                ((source?.name ?: "") + " " + (renderAction() ?: "")).trim(),
+                        //                ((source?.name ?: "") + " " + (renderAction() ?: "")).trim(),
                         renderAction().capitalize(),
                         renderDetails()
                     ).apply {
@@ -199,7 +198,13 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
                 is EntityCreatedEvent -> {
                     val ccChanged = creator != lastCurrent
 
-                    listOf(TRACE_DF.format(time.value), if (ccChanged) creator?.name else null, simEntity.name , "Created", details).apply {
+                    listOf(
+                        TRACE_DF.format(time.value),
+                        if (ccChanged) creator?.name else null,
+                        simEntity.name,
+                        "Created",
+                        details
+                    ).apply {
                         // update last element
                         lastCurrent = this@with.creator
                         lastReceiver = this@with.simEntity
@@ -217,15 +222,15 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
     }
 
 
-    private fun List<String?>.renderTraceLine(): String = map { (it ?: "") }
-        .zip(TRACE_COL_WIDTHS)
-        .map { (str, padLength) ->
-            val padded = str.padEnd(padLength)
-            if (str.length >= padLength) {
-                padded.dropLast(str.length - padLength + 5) + "... "
-            } else padded
-        }
-        .joinToString("")
+    private fun List<String?>.renderTraceLine(): String =
+        map { (it ?: "") }
+            .zip(TRACE_COL_WIDTHS)
+            .joinToString("") { (str, padLength) ->
+                val padded = str.padEnd(padLength)
+                if (str.length >= padLength) {
+                    padded.dropLast(str.length - padLength + 5) + "... "
+                } else padded
+            }
 }
 
 /** Collects all events on the kalasim event bus. See [Event Log](https://www.kalasim.org/event_log/) for details. */
@@ -268,7 +273,7 @@ inline fun <reified E : Event> Environment.collect(): List<E> {
 /**
  * Collects all components created in the parent environment. See [Event Log](https://www.kalasim.org/event_log/) for details.
  */
-fun  Environment.componentCollector(): List<Component> {
+fun Environment.componentCollector(): List<Component> {
     val components: MutableList<Component> = mutableListOf()
 
     addEventListener {

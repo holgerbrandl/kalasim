@@ -108,11 +108,9 @@ abstract class AbstractSvgPlotRegression {
         val svgDoc = plotFile.readText().run { prettyFormat(this, 4) }.trim()
         //        val obtained = prettyFormat(svgDoc, 4).trim()
 
-        val methodName = name.methodName
+        val methodName = name.methodName ?: return // because we're running not in test mode
 
-        if (methodName == null) return // because we're running not in test mode
-
-        val file = File(testDataDir, methodName.replace(" ", "_") + "${subtest?.let { "." + it } ?: ""}.svg")
+        val file = File(testDataDir, methodName.replace(" ", "_") + "${subtest?.let { ".$it" } ?: ""}.svg")
         if (!file.exists()) {
             file.writeText(svgDoc)
             fail("could not find expected result.")

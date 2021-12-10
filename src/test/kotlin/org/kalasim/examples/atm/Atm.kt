@@ -28,7 +28,7 @@ fun main() {
 
         val atm = Resource("atm", 1)
 
-        class Customer() : Component() {
+        class Customer : Component() {
             val ed = exponential(mu)
 
             override fun process() = sequence {

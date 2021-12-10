@@ -8,13 +8,13 @@ import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.moment.Variance
 import org.kalasim.TickTime
 import org.kalasim.asCMPairList
+import org.kalasim.misc.DependencyContext
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.buildHistogram
 import org.kalasim.misc.printHistogram
 import org.kalasim.misc.printThis
 import org.kalasim.misc.roundAny
 import org.koin.core.Koin
-import org.kalasim.misc.DependencyContext
 import kotlin.math.sqrt
 
 /**
@@ -26,8 +26,8 @@ class MetricTimeline(name: String? = null, private val initialValue: Number = 0,
     Monitor<Number>(name, koin),
     ValueTimeline<Number> {
 
-    private val timestamps = listOf<Double>().toMutableList()
-    private val values = ifEnabled { listOf<Double>().toMutableList() }
+    private val timestamps = mutableListOf<Double>()
+    private val values = ifEnabled { mutableListOf<Double>() }
 
     init {
         addValue(initialValue)
@@ -71,7 +71,7 @@ class MetricTimeline(name: String? = null, private val initialValue: Number = 0,
 
     override fun total(value: Number): Double = statsData().run {
         // https://youtrack.jetbrains.com/issue/KT-43776
-        values.zip(durations).filter { it.first == value }.map { it.second }.sum()
+        values.zip(durations).filter { it.first == value }.sumOf { it.second }
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -111,10 +111,12 @@ class MetricTimeline(name: String? = null, private val initialValue: Number = 0,
 
             values.forEach { freq.addValue(it) }
 
-            val colData: Map<Double, Double> = statistics().data.run {
-                durations.zip(values).groupBy { (_, value) -> value }
-                    .map { it.key to it.value.sumOf { it.first } }
-            }.toMap()
+            val colData: Map<Double, Double> =
+                statistics().data.run {
+                    durations.zip(values)
+                        .groupBy { (_, value) -> value }
+                        .map { kv -> kv.key to kv.value.sumOf { it.first } }
+                }.toMap()
 
             // inherently wrong because does not take into account durations
 //            val byValueHist = freq
@@ -127,7 +129,8 @@ class MetricTimeline(name: String? = null, private val initialValue: Number = 0,
             // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
             val hist: List<Pair<Double, Double>> = statistics().data.run {
                 val aggregatedMonitor: List<Pair<Double, Double>> =
-                    durations.zip(values).groupBy { (_, value) -> value }.map { it.key to it.value.sumOf { it.first } }
+                    durations.zip(values).groupBy { (_, value) -> value }
+                        .map { kv -> kv.key to kv.value.sumOf { it.first } }
 
                 aggregatedMonitor
             }
@@ -156,9 +159,7 @@ class MetricTimeline(name: String? = null, private val initialValue: Number = 0,
     override fun resetToCurrent() = reset(get(now))
 
     override fun clearHistory(before: TickTime) {
-        val startFromIdx = timestamps.withIndex().firstOrNull { before > it.value }?.index
-
-        if (startFromIdx == null) return
+        val startFromIdx = timestamps.withIndex().firstOrNull { before > it.value }?.index ?: return
 
         for (i in 0 until startFromIdx) {
             val newTime = timestamps.subList(0, startFromIdx)

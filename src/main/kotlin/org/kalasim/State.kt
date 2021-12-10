@@ -68,7 +68,7 @@ open class State<T>(
         trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
 
         log(trackingPolicy.logCreation) {
-            EntityCreatedEvent(now, env.curComponent,this, "Initial value: $value")
+            EntityCreatedEvent(now, env.curComponent, this, "Initial value: $value")
         }
     }
 
@@ -91,7 +91,7 @@ open class State<T>(
                 env.now,
                 env.curComponent,
                 this,
-                "value = ${value} --> ${valueAfter} allow $max components",
+                "value = $value --> $valueAfter allow $max components",
                 "trigger"
             )
         }
@@ -115,7 +115,7 @@ open class State<T>(
         var mx = maxHonor
         waiters.q.map { it.component }.takeWhile {
             // wait max times but consider honor return state of tryWait
-            if (it.tryWait()) mx--;
+            if (it.tryWait()) mx--
             mx > 0
         }
     }
@@ -125,7 +125,7 @@ open class State<T>(
         timeline.printHistogram()
     }
 
-    public override val info
+    override val info
         get() = StateInfo(env.now, name, value.toString(), waiters.q.map { it.component.name })
 }
 
