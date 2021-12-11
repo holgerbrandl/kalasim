@@ -1,6 +1,8 @@
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
 import org.apache.commons.math3.random.JDKRandomGenerator
 import org.apache.commons.math3.random.RandomGenerator
 import org.json.JSONObject
@@ -110,7 +112,10 @@ open class Environment(
         get() = eventQueue.map { it.component }
 
 
-    private val eventListeners = mutableListOf<EventListener>()
+
+    // This is not private because addEventListener is inlined.
+    val eventListeners = listOf<EventListener>().toMutableList()
+
 
     val trackingPolicyFactory = TrackingPolicyFactory()
 //    val traceFilters = mutableListOf<EventFilter>()
@@ -342,6 +347,16 @@ open class Environment(
     internal fun addStandBy(component: Component) {
         standBy.add(component)
     }
+
+    inline fun <reified T : Event> addEventListener(
+        scope: CoroutineScope = GlobalScope,
+        crossinline block: (T) -> Unit
+    ): EventListener =
+        AsyncEventListener()
+            .also { listener ->
+                listener.start(scope, block)
+                eventListeners.add(listener)
+            }
 
     fun addEventListener(listener: EventListener) = eventListeners.add(listener)
 
