@@ -17,6 +17,7 @@
 **TODO** https://docs.korge.org/korge/
 
 **TODO** complete and publish hospital example
+* https://www.sciencedirect.com/science/article/pii/S037722172101002X?dgcid=rss_sd_all
 
 **TODO** add display option to discard zero-duration intervals for simplified vis
 
