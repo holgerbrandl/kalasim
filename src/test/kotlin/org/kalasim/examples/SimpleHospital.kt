@@ -7,7 +7,6 @@ import kravis.geomStep
 import kravis.plot
 import org.kalasim.*
 import org.kalasim.plot.kravis.display
-import kotlin.collections.listOf
 
 fun main() {
     val sim = createSimulation(true) {
@@ -18,26 +17,26 @@ fun main() {
 
         eventLog()
 
-        class Patient: Component(){
+        class Patient : Component() {
             override fun process() = sequence {
                 // add an intake activity
-                request(nurses){
+                request(nurses) {
                     hold(normal(15).sample())
                 }
 
                 // add a consultation activity
-                request(doctors){
+                request(doctors) {
                     hold(normal(20).sample())
                 }
 
                 // add a planning activity
-                request(admin){
+                request(admin) {
                     hold(normal(5).sample())
                 }
             }
         }
 
-        ComponentGenerator(normal(10,2)){
+        ComponentGenerator(normal(10, 2)) {
             Patient()
         }
 
@@ -58,25 +57,29 @@ fun main() {
 
 
     // see org/kalasim/examples/DiningPhilosophers.kt:57
-    val records =  requests
+    val records = requests
         .groupBy { it.requester }
-        .mapValues { it.value.sortedWith(compareBy({it.requester.name}, {it.time})) }
+        .mapValues { kv -> kv.value.sortedWith(compareBy({ it.requester.name }, { it.time })) }
         .values.flatten()
 //    println(records)
-    records.forEach{ println("$it")}
+    records.forEach { println("$it") }
 
 
-     records.displayTimeline()
+    records.displayTimeline()
 
 //    sim.components
     // component state heatmap
 
 }
 
-fun List<ResourceEvent>.displayTimeline(resources:List<Resource>? = null, items:List<String> =listOf("capacity", "requesters", "claimers"), avg :Boolean = true): GGPlot {
+fun List<ResourceEvent>.displayTimeline(
+    resources: List<Resource>? = null,
+    items: List<String> = listOf("capacity", "requesters", "claimers"),
+    avg: Boolean = true
+): GGPlot {
     // see https://github.com/r-simmer/simmer.plot/blob/master/R/plot.resources.R
 
-    val data = this.filter{ resources==null || resources.contains(it.resource)}
+    val data = this.filter { resources == null || resources.contains(it.resource) }
 
     val env = data.first().requester.env
 
@@ -88,12 +91,12 @@ fun List<ResourceEvent>.displayTimeline(resources:List<Resource>? = null, items:
     var df = data.asDataFrame()
 //        .remove("type", "requester", "occupancy", "amount")
         .select("time", "resource", "capacity", "claimed", "requesters")
-        .gather("statistic", "value", { listOf("capacity", "claimed", "requesters")})
+        .gather("statistic", "value", { listOf("capacity", "claimed", "requesters") })
 //        .sortedBy("resource", "time")
 
     // calculate smooth aggregate
-    df = df.groupBy("resource", "value").addColumn("mean"){ (it["value"] * (it["time"].lead() - it["time"])).cumSum()/ it["time"]}.ungroup()
-
+    df = df.groupBy("resource", "value")
+        .addColumn("mean") { (it["value"] * (it["time"].lead() - it["time"])).cumSum() / it["time"] }.ungroup()
 
 
     // TODO replicate end of each resource until end of simulation
@@ -102,7 +105,7 @@ fun List<ResourceEvent>.displayTimeline(resources:List<Resource>? = null, items:
     // complement step fun until now
 
 
-    return df.plot(x="time", y=if(avg) "mean" else "value", color="statistic")
+    return df.plot(x = "time", y = if (avg) "mean" else "value", color = "statistic")
         .xLabel("time").yLabel("").geomStep(alpha = 0.6).facetWrap("resource")
 }
 

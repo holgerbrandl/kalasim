@@ -18,6 +18,6 @@ fun main() {
 
         run() // try spinning the wheel until the queue runs dry
 
-        println("sim time after interruption is ${now}")
+        println("sim time after interruption is $now")
     }
 }

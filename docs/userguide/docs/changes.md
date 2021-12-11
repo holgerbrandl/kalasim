@@ -41,8 +41,8 @@ Minor enhancements
 * Fixed `oneOf` in `request()`
 * Redesigned `honorBlock` in `request()` to return `Unit` and to provide claimed resource via `it` 
 ```kotlin
-request(doctorFoo, doctorBar, oneOf=true){ doctor ->
-    println("patient treated by ${doctor}")
+request(doctorFoo, doctorBar, oneOf = true) { doctor ->
+    println("patient treated by $doctor")
 }
 ```
 * Added `RealDistribution.clip` to allow zero-inflated distribution models with controlled randomization

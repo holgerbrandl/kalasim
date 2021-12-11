@@ -35,7 +35,7 @@ The ATM example is inspired from the `simmer` paper [Ucar et al. 2019](https://w
 
     val atm = Resource("atm", 1)
 
-    class Customer() : Component() {
+    class Customer : Component() {
         val ed = exponential(mu)
 
         override fun process() = sequence {

@@ -15,21 +15,23 @@ fun main() {
 
             var isBusy = true
 
-            override fun process() = sequence<Component> {
-                while(true){
-                    isBusy = !isBusy
-                    hold(3)
+            override fun process() =
+                sequence {
+                    while (true) {
+                        isBusy = !isBusy
+                        hold(3)
+                    }
                 }
-            }
         }
 
         val customer = object : Component() {
-            override fun process() = sequence<Component> {
-                waitPredicate{ !waiter.isBusy }
-            }
+            override fun process() =
+                sequence {
+                    waitPredicate { !waiter.isBusy }
+                }
 
             suspend fun SequenceScope<Component>.waitPredicate(predicate: () -> Boolean) {
-                while(!predicate()) standby()
+                while (!predicate()) standby()
             }
         }
 

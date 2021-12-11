@@ -52,7 +52,7 @@ class ClockSync(
 
             //wait until we have caught up with wall clock
             val simTimeSinceStart =
-                Duration.between(simStart, simStart.plusMillis((syncConfig.tickMs * env.now.value).roundToLong()));
+                Duration.between(simStart, simStart.plusMillis((syncConfig.tickMs * env.now.value).roundToLong()))
             val wallTimeSinceStart = Duration.between(simStart, Instant.now())
 
             val sleepDuration = simTimeSinceStart - wallTimeSinceStart

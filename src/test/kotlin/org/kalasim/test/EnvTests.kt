@@ -136,13 +136,14 @@ class EnvTests {
         createSimulation(true) {
             object : Component() {
                 var waitCounter = 1
-                override fun process() = sequence {
-                    while (true) {
-                        hold(1)
-                        // doe something insanely complex that takes 2seconds
-                        Thread.sleep(waitCounter++ * 1000L)
+                override fun process() =
+                    sequence {
+                        while (true) {
+                            hold(1)
+                            // doe something insanely complex that takes 2seconds
+                            Thread.sleep(waitCounter++ * 1000L)
+                        }
                     }
-                }
             }
 
             ClockSync(Duration.ofSeconds(1), maxDelay = Duration.ofSeconds(3))
@@ -159,9 +160,10 @@ class EnvTests {
             val cc = componentCollector()
 
             object : Component() {
-                override fun process() = sequence<Component> {
-                    hold(10)
-                }
+                override fun process() =
+                    sequence {
+                        hold(10)
+                    }
             }
 
             run(until = null)
@@ -237,13 +239,13 @@ class EnvTests {
 
         run() // try spinning the wheel until it should be stopped
 
-        println("sim time after interruption is ${now}")
+        println("sim time after interruption is $now")
         events.size shouldBe 4
 
         run() // try spinning the wheel until the queue runs dry
 
         events.size shouldBe 5
-        println("sim time after running dry is ${now}")
+        println("sim time after running dry is $now")
     }
 
 }
