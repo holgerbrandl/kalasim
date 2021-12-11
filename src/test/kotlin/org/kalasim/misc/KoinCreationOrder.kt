@@ -9,7 +9,7 @@ class Foo(val bar: Bar) { init {
 }
 }
 
-class Bar() { init {
+class Bar { init {
     println(javaClass)
 }
 }

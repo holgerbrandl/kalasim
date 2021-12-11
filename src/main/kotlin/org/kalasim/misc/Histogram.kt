@@ -44,8 +44,9 @@ internal fun DescriptiveStatistics.buildHistogram(
 // Console backend
 
 internal fun Histogram.printHistogram(colWidth: Double = 40.0) {
-    listOf("bin", "entries", "pct", "").zip(listOf(17, 7, 4, colWidth.toInt())).map { it.first.padStart(it.second) }
-        .joinToString(" | ").printThis()
+    listOf("bin", "entries", "pct", "").zip(listOf(17, 7, 4, colWidth.toInt()))
+        .joinToString(" | ") { it.first.padStart(it.second) }
+        .printThis()
 
     bins.forEach { (lower, upper, value) ->
         val scaledValue : Double = value.toDouble() / n
@@ -54,7 +55,8 @@ internal fun Histogram.printHistogram(colWidth: Double = 40.0) {
 
         val pct = JSON_DF.format(scaledValue)
         val stars = "*".repeat((scaledValue * colWidth).roundToInt()).padEnd(colWidth.roundToInt(), ' ')
-        listOf(range.padEnd(17), value.toString().padStart(7), pct.padStart(4), stars).joinToString(" | ")
+        listOf(range.padEnd(17), value.toString().padStart(7), pct.padStart(4), stars)
+            .joinToString(" | ")
             .printThis()
     }
 

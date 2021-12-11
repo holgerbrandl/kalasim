@@ -22,9 +22,8 @@ internal fun captureOutput(expr: () -> Any): CapturedOutput {
     val baosOut = ByteArrayOutputStream()
     val baosErr = ByteArrayOutputStream()
 
-    System.setOut(PrintStream(baosOut));
-    System.setErr(PrintStream(baosErr));
-
+    System.setOut(PrintStream(baosOut))
+    System.setErr(PrintStream(baosErr))
 
     // run the expression
     expr()

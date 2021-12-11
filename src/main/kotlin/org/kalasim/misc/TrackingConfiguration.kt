@@ -79,7 +79,7 @@ class TrackingPolicyFactory {
 
     fun disableAll() {
          defaultComponentConfig = ComponentTrackingConfig(false, false,false, false)
-         defaultResourceConfig = ResourceTrackingConfig(false, false, false, false, false, )
+         defaultResourceConfig = ResourceTrackingConfig(false, false, false, false, false )
          defaultStateConfig = StateTrackingConfig(false, false, false,false)
          defaultCollectionConfig = ComponentCollectionTrackingConfig(false)
     }

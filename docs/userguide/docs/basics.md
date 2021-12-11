@@ -122,7 +122,7 @@ So the key points to recall are
 Kalasim is building on top of [koin](https://insert-koin.io/) to inject dependencies between elements of a simulation. This allows creating simulation entities such as resources, components or states conveniently without passing around references.
 
 ```kotlin
-class Car() : Component() {
+class Car : Component() {
 
     val gasStation by inject<GasStation>()
 

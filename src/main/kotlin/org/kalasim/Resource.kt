@@ -269,8 +269,8 @@ val Resource.timeline: List<ResourceTimelineSegment>
         statsDF = statsDF.addColumn("resource") { this@timeline }
 
         // convert to tick-time
-        statsDF = statsDF.addColumn("start") { it["start"].map<Double> { TickTime(it) } }
-        statsDF = statsDF.addColumn("end") { it["end"].map<Double> { TickTime(it) } }
+        statsDF = statsDF.addColumn("start") { expr -> expr["start"].map<Double> { TickTime(it) } }
+        statsDF = statsDF.addColumn("end") { expr -> expr["end"].map<Double> { TickTime(it) } }
 
         // optionally add walltimes
 //        if (env.tickTransform != null) {

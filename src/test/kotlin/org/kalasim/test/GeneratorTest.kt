@@ -8,7 +8,7 @@ import kotlin.test.fail
 
 class GeneratorTest {
 
-    class Customer : Component() {}
+    class Customer : Component()
 
     @Test
     fun testCustomerGenerator() {
@@ -38,10 +38,7 @@ class GeneratorTest {
 
         cg.cancel()
 
-
-        cg.addConsumer{ it ->
-            fail()
-        }
+        cg.addConsumer { fail() }
 
         run(10)
     }
@@ -52,17 +49,11 @@ class GeneratorTest {
 
         run(10)
 
-
-        cg.addConsumer{ it ->
-            cg.cancel()
-        }
+        cg.addConsumer { cg.cancel() }
 
         run(3)
 
-
-        cg.addConsumer{ it ->
-            fail()
-        }
+        cg.addConsumer { fail() }
 
         run(10)
     }

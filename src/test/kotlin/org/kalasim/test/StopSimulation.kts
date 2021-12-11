@@ -15,5 +15,5 @@ createSimulation {
 
     run()
 
-    println("sim time after interruption is ${now}")
+    println("sim time after interruption is $now")
 }

@@ -11,7 +11,7 @@ fun main() {
         }
     }
 
-    val pq = PriorityQueue<DynamicPrioElement> { o1, o2 -> compareValuesBy(o1, o2, { it.priority }) }
+    val pq = PriorityQueue<DynamicPrioElement> { o1, o2 -> compareValuesBy(o1, o2) { it.priority } }
 
     val dpeFoo = DynamicPrioElement("foo", 1)
     val dpeBar = DynamicPrioElement("bar", 2)

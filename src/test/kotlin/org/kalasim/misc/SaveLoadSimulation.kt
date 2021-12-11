@@ -13,7 +13,7 @@ import java.util.*
 object XStreamPersistence {
     @JvmStatic
     fun main(args: Array<String>) {
-        class Foo() : Component()
+        class Foo : Component()
 
 //        val env = createSimulation {
 //            Foo()
@@ -32,7 +32,7 @@ object XStreamPersistence {
 
 //    env.getKoin()
         println(xstream.toXML(env))
-        xstream.addPermission(AnyTypePermission.ANY); // to prevent https://stackoverflow.com/questions/30812293/com-thoughtworks-xstream-security-forbiddenclassexception
+        xstream.addPermission(AnyTypePermission.ANY) // to prevent https://stackoverflow.com/questions/30812293/com-thoughtworks-xstream-security-forbiddenclassexception
         val restoredEnv: Environment = xstream.fromXML(envXML) as Environment
 
         println("running restored simulation")
@@ -86,7 +86,7 @@ object XStreamPQ {
         val xstream = XStream()
         val envXML = xstream.toXML(q)
 
-        xstream.addPermission(AnyTypePermission.ANY); // to prevent https://stackoverflow.com/questions/30812293/com-thoughtworks-xstream-security-forbiddenclassexception
+        xstream.addPermission(AnyTypePermission.ANY) // to prevent https://stackoverflow.com/questions/30812293/com-thoughtworks-xstream-security-forbiddenclassexception
         val qRestored: PriorityQueue<String> = xstream.fromXML(envXML) as PriorityQueue<String>
 
         qRestored.add("bar")
@@ -115,7 +115,7 @@ object XStreamPQ2 {
         val envXML = xstream.toXML(q)
         println(envXML)
 
-        xstream.addPermission(AnyTypePermission.ANY); // to prevent https://stackoverflow.com/questions/30812293/com-thoughtworks-xstream-security-forbiddenclassexception
+        xstream.addPermission(AnyTypePermission.ANY) // to prevent https://stackoverflow.com/questions/30812293/com-thoughtworks-xstream-security-forbiddenclassexception
 
         val qRestored: PriorityQueue<String> = xstream.fromXML(envXML) as PriorityQueue<String>
 

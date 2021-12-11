@@ -44,8 +44,8 @@ object LetsPlotASimulation {
         p.show()
 
 
-        (letsPlot(irisData.toMap()) + geom_boxplot(){ x="Species" ; y="Petal.Length" }).show()
-        (letsPlot(irisData.toMap()) + geom_point(){ x="Petal.Width" ; y="Petal.Length" }).show()
+        (letsPlot(irisData.toMap()) + geom_boxplot{ x="Species" ; y="Petal.Length" }).show()
+        (letsPlot(irisData.toMap()) + geom_point{ x="Petal.Width" ; y="Petal.Length" }).show()
 
     }
 }

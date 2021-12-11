@@ -13,7 +13,6 @@ import krangl.*
 import org.kalasim.*
 import org.kalasim.monitors.*
 import org.kalasim.plot.kravis.clistTimeline
-import java.io.File
 
 
 fun MetricTimeline.display(
@@ -31,7 +30,7 @@ fun MetricTimeline.display(
     fun wtTransform(tt: TickTime) = if (useWT) env.asWallTime(tt) else tt.value
 
     return data.asDataFrame()
-        .addColumn("first") { it["first"].map<Double> { wtTransform(TickTime(it)) } }
+        .addColumn("first") { expr -> expr["first"].map<Double> { wtTransform(TickTime(it)) } }
         .letsPlot() +
             geomStep { x = "first"; y = "second" } + ggtitle(title)
 }
@@ -73,9 +72,9 @@ fun <T> CategoryTimeline<T>.display(
             it.second.first
         )
     }.asDataFrame()
-        .addColumn("start") { it["start"].map<Double> { wtTransform(TickTime(it)) } }
-        .addColumn("end") { it["end"].map<Double> { wtTransform(TickTime(it)) } }
-        .addColumn("value") { it["value"].map<ComponentState> { it.toString() } }
+        .addColumn("start") { expr -> expr["start"].map<Double> { wtTransform(TickTime(it)) } }
+        .addColumn("end") { expr -> expr["end"].map<Double> { wtTransform(TickTime(it)) } }
+        .addColumn("value") { expr -> expr["value"].map<ComponentState> { it.toString() } }
 
 
     // why cant we use "x".asDiscreteVariable here?
@@ -102,9 +101,9 @@ fun List<ResourceActivityEvent>.display(
 
     val plotData = asDataFrame()
         .unfold<Resource>("resource", listOf("name"))
-        .addColumn("activity") { it["activity"].toStrings().map { it ?: "Other" } }
-        .addColumn("start") { it["start"].map<TickTime> { it.value } }
-        .addColumn("end") { it["end"].map<TickTime> { it.value } }
+        .addColumn("activity") { expr -> expr["activity"].toStrings().map { it ?: "Other" } }
+        .addColumn("start") { expr -> expr["start"].map<TickTime> { it.value } }
+        .addColumn("end") { expr -> expr["end"].map<TickTime> { it.value } }
 
     return plotData.letsPlot() +
             geomSegment(size = 10) {
@@ -135,7 +134,7 @@ fun List<ResourceTimelineSegment>.display(
 
 
     return filter { it.metric !in exclude }.asDataFrame()
-        .addColumn("start") { it["start"].map<TickTime> { it.value } }
+        .addColumn("start") { expr -> expr["start"].map<TickTime> { it.value } }
         .letsPlot() +
             geomStep {
 
@@ -174,9 +173,9 @@ fun List<Component>.displayStateTimeline(
         .asDataFrame()
         .unfold<Component>("first", listOf("name"))
         .unfold<LevelStateRecord<ComponentState>>("second", listOf("timestamp", "duration", "value"))
-        .addColumn("start") { it["timestamp"].map<Double> { wtTransform(TickTime(it)) } }
-        .addColumn("end") { (it["timestamp"] + it["timestamp"]).map<Double> { wtTransform(TickTime(it)) } }
-        .addColumn("value") { it["value"].map<ComponentState> { it.toString() } }
+        .addColumn("start") { expr -> expr["timestamp"].map<Double> { wtTransform(TickTime(it)) } }
+        .addColumn("end") { expr -> (expr["timestamp"] + expr["timestamp"]).map<Double> { wtTransform(TickTime(it)) } }
+        .addColumn("value") { expr -> expr["value"].map<ComponentState> { it.toString() } }
 
 
     return df.letsPlot() + geomSegment {
@@ -199,7 +198,7 @@ fun List<Component>.displayStateProportions(
         .unfold<Component>("first", listOf("name"))
         .unfold<LevelStateRecord<ComponentState>>("second", listOf("timestamp", "duration", "value"))
 
-    return df.letsPlot() + geomBar() {
+    return df.letsPlot() + geomBar {
         y = "name"
         fill = "value"
         weight = "duration"

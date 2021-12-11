@@ -12,26 +12,28 @@ fun main() {
         val refilPermitted = State(false)
 
         object : Component("refillController") {
-            override fun process() = sequence<Component> {
-                while(true) {
-                    hold(uniform(0, 10)())
-                    refilPermitted.value = true
-                    hold(uniform(0, 10)())
-                    refilPermitted.value = false
+            override fun process() =
+                sequence {
+                    while (true) {
+                        hold(uniform(0, 10)())
+                        refilPermitted.value = true
+                        hold(uniform(0, 10)())
+                        refilPermitted.value = false
+                    }
                 }
-            }
         }
 
         class Vehicle : Component() {
             val uni = uniform(0, 10)
 
-            override fun process() = sequence {
-                hold(uni())
-                wait(refilPermitted, true)
-                request(fuelPump) {
-                    hold(3)
+            override fun process() =
+                sequence {
+                    hold(uni())
+                    wait(refilPermitted, true)
+                    request(fuelPump) {
+                        hold(3)
+                    }
                 }
-            }
         }
 
         val cg = ComponentGenerator(exponential(1), keepHistory = true) { Vehicle() }

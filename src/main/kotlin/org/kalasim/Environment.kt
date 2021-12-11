@@ -80,8 +80,8 @@ object Defaults {
 }
 
 
-internal class MainComponent(koin:Koin): Component(MAIN, koin = koin) {
-    override fun process()= sequence<Component> {}
+internal class MainComponent(koin: Koin) : Component(MAIN, koin = koin) {
+    override fun process() = sequence<Component> {}
 }
 
 @Suppress("EXPERIMENTAL_API_USAGE")
@@ -99,7 +99,7 @@ open class Environment(
     val rg: RandomGenerator = JDKRandomGenerator(randomSeed)
     val random: kotlin.random.Random = kotlin.random.Random(randomSeed.toLong())
 
-    internal val nameCache = mapOf<String, Int>().toMutableMap()
+    internal val nameCache = mutableMapOf<String, Int>()
 
     // As discussed in https://github.com/holgerbrandl/kalasim/issues/8, we could alternatively use a fibonacci
     // heap for better performance
@@ -110,7 +110,7 @@ open class Environment(
         get() = eventQueue.map { it.component }
 
 
-    private val eventListeners = listOf<EventListener>().toMutableList()
+    private val eventListeners = mutableListOf<EventListener>()
 
     val trackingPolicyFactory = TrackingPolicyFactory()
 //    val traceFilters = mutableListOf<EventFilter>()
@@ -214,8 +214,8 @@ open class Environment(
 
 //    private var endOnEmptyEventlist = false
 
-    private val standBy = listOf<Component>().toMutableList()
-    private val pendingStandBy = listOf<Component>().toMutableList()
+    private val standBy = mutableListOf<Component>()
+    private val pendingStandBy = mutableListOf<Component>()
 
 
 //    fun build(vararg compoennts: Component) = components.forEach { this + it }

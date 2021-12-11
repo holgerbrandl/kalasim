@@ -2,11 +2,11 @@ package org.kalasim.monitors
 
 import com.github.holgerbrandl.jsonbuilder.json
 import org.json.JSONObject
+import org.kalasim.misc.DependencyContext
 import org.kalasim.misc.JSON_DF
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.printThis
 import org.koin.core.Koin
-import org.kalasim.misc.DependencyContext
 import kotlin.math.roundToInt
 
 /**
@@ -41,8 +41,8 @@ open class CategoryMonitor<T>(
     override fun reset() = frequencies.clear()
 
     open fun printHistogram(values: List<T>? = null, sortByWeight: Boolean = false) {
-        println("Summary of: '${name}'")
-        println("# Records: ${total}")
+        println("Summary of: '$name'")
+        println("# Records: $total")
         println("# Levels: ${frequencies.keys.size}")
         println()
 
@@ -102,8 +102,10 @@ internal fun <T> FrequencyTable<T>.printConsole(
 
     val n = hist.sumOf { it.second }
 
-    listOf("bin", "values", "pct", "").zip(listOf(17, 7, 4, colWidth.toInt())).map { it.first.padStart(it.second) }
-        .joinToString(" | ").printThis()
+    listOf("bin", "values", "pct", "")
+        .zip(listOf(17, 7, 4, colWidth.toInt()))
+        .joinToString(" | ") { it.first.padStart(it.second) }
+        .printThis()
 
     hist.forEach { (bin, binValue) ->
         val scaledValue = binValue / n

@@ -25,8 +25,8 @@ internal const val DEFAULT_QUEUE_PRIORITY = 0
 
 // note: Salabim Changlog: "The default priority of a requested resource is now inf, which means the lowest possible priority."
 /** Describes the priority of a process or request. Higher values will be scheduled earlier or claimed earlier respectively. */
-data class Priority(val value: Int){
-    companion object{
+data class Priority(val value: Int) {
+    companion object {
         // adopted from
         val LOWEST = Priority(-20)
         val LOW = Priority(-10)
@@ -43,6 +43,7 @@ typealias ProcessContext = SequenceScope<Component>
 typealias ProcessDefinition = Sequence<Component>
 
 interface NoAuto
+
 /**
  * A kalasim component is used as component (primarily for queueing) or as a component with a process.
  * Usually, a component will be defined as a subclass of Component.
@@ -69,9 +70,9 @@ open class Component(
 
     private var oneOfRequest: Boolean = false
 
-    internal val requests = mapOf<Resource, Double>().toMutableMap()
-    private val waits = listOf<StateRequest<*>>().toMutableList()
-    val claims = mapOf<Resource, Double>().toMutableMap()
+    internal val requests = mutableMapOf<Resource, Double>()
+    private val waits = mutableListOf<StateRequest<*>>()
+    val claims = mutableMapOf<Resource, Double>()
 
     var failed: Boolean = false
         private set
@@ -163,7 +164,7 @@ open class Component(
         }
 
 //        if (at != null || (process != null && (process.name != "process" || overriddenProcess))) {
-        if (simProcess !=null && this !is MainComponent) {
+        if (simProcess != null && this !is MainComponent) {
             val scheduledTime = if (at == null) {
                 env.now + delay.toDouble()
             } else {
@@ -384,7 +385,7 @@ open class Component(
                     )
 
                 }
-                else -> error("Unexpected interrupt status ${componentState} is $name")
+                else -> error("Unexpected interrupt status $componentState is $name")
             }
         }
 
@@ -498,7 +499,7 @@ open class Component(
         honorBlock: (suspend SequenceScope<Component>.(RequestScopeContext) -> Unit)? = null
     ) = request(
         *resources.map { it withQuantity DEFAULT_REQUEST_QUANTITY andPriority priority }.toTypedArray(),
-        description= description,
+        description = description,
         failAt = failAt,
         failDelay = failDelay,
         oneOf = oneOf,
@@ -571,7 +572,7 @@ open class Component(
         // see https://stackoverflow.com/questions/46098105/is-there-a-way-to-open-and-close-a-stream-easily-at-kotlin
         honorBlock: (suspend SequenceScope<Component>.(RequestScopeContext) -> Unit)? = null
     ) {
-        val requestStart =now
+        val requestStart = now
 
         yieldCurrent {
             if (componentState != CURRENT) {
@@ -598,7 +599,7 @@ open class Component(
             oneOfRequest = oneOf
 
             resourceRequests.forEach { (r, quantity, priority) ->
-                var q = quantity
+                val q = quantity
 
                 if (r.preemptive && resourceRequests.size > 1) {
                     throw IllegalArgumentException("preemptive resources do not support multiple resource requests")
@@ -616,7 +617,7 @@ open class Component(
                 requests.merge(r, q, Double::plus)
 
                 val reqText =
-                    (calledFrom ?: "") + "Requesting ${q} from ${r.name} with priority ${priority} and oneof=${oneOf}"
+                    (calledFrom ?: "") + "Requesting $q from ${r.name} with priority $priority and oneof=$oneOf"
 
                 //            enterSorted(r.requesters, priority)
                 r.requesters.add(this@Component, priority = priority)
@@ -1090,7 +1091,7 @@ open class Component(
         }
 
         if (releaseRequests.isEmpty()) {
-            logInternal(trackingPolicy.logInteractionEvents, "Releasing all claimed resources ${claims}")
+            logInternal(trackingPolicy.logInteractionEvents, "Releasing all claimed resources $claims")
 
             for ((r, _) in claims) {
                 releaseInternal(r)
@@ -1317,7 +1318,7 @@ open class Component(
                 val curValue = SELECT_SCOPE_IDX.putIfAbsent(mapKey, 0) ?: 0
 
                 // increment for future calls
-                SELECT_SCOPE_IDX.put(mapKey, (curValue + 1).rem(resources.size))
+                SELECT_SCOPE_IDX[mapKey] = (curValue + 1).rem(resources.size)
 
                 return resources[curValue]
             }
@@ -1440,7 +1441,7 @@ infix fun Resource.withPriority(priority: Priority) = ResourceRequest(this, prio
 
 infix fun ResourceRequest.andPriority(priority: Priority?) = ResourceRequest(this.r, this.quantity, priority)
 
-data class RequestScopeContext(val resource: Resource?, val requestingSince: TickTime )
+data class RequestScopeContext(val resource: Resource?, val requestingSince: TickTime)
 
 //    data class StateRequest<T>(val s: State<T>, val value: T? = null, val priority: Int? = null)
 data class StateRequest<T>(val state: State<T>, val priority: Priority? = null, val predicate: (T) -> Boolean) {

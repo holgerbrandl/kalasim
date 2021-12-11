@@ -77,9 +77,9 @@ survivalProbByNo.plot(x = { it.first }, y = { it.second }).geomCol().labs(
 
 // Calculate the probability of having less than two survivors
 val probLT2Players = manyGames.count { it.playersLeft < 2 }.toDouble() / manyGames.size
-println("the probability for less than 2 players is ${probLT2Players}")
+println("the probability for less than 2 players is $probLT2Players")
 
-println("On average ${avgSurvivors} players will survive the game of squid")
+println("On average $avgSurvivors players will survive the game of squid")
 
 // re-run our simulations, but with an increasing number of steps. To keep things simple, I run 1,000 iterations of the game over an increasing number of steps from 10 to 30:
 val stepSims = (10..30).flatMap { numSteps ->
