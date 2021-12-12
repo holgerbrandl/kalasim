@@ -1,7 +1,7 @@
 package org.kalasim.misc
 
 import org.koin.core.Koin
-Updatimport org.koin.dsl.koinApplication
+import org.koin.dsl.koinApplication
 
 /**
  * Global context - current Koin Application available globally
