@@ -463,6 +463,7 @@ open class Component(
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
      */
+    // todo why is a yielding function. It will never be scheduled!
     suspend fun SequenceScope<Component>.put(
         vararg resourceRequests: ResourceRequest,
         failAt: TickTime? = null,

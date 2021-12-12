@@ -411,6 +411,12 @@ val tank = DepletableResource(capacity = 10, initialLevel = 5)
 ```
 We can declare its maximum capacity and its initial fill level. The latter is optional and defaults to the capacity of the resource.
 
+In addition to the `Resource` attributs, depletable resources have the following attributes to streamline model building
+
+* `level` - Indicates the current level of the resource
+* `isDepleted` - Indicates if depletable resource is depleted (level==0)
+* `isFull` - Indicates if depletable resource is at full capacity
+
 Alternatively, it possible to use the `Component.put()` method, where quantities of anonymous resources are negated. For symmetry reasons, `kalasim` also offers the `Component.get()` method, which is behaves exactly like `Component.request()`.
 
 The model below illustrates the use of `get` and `put`. See the [Gas Station](examples/gas_station.md) simulation for a living example.
