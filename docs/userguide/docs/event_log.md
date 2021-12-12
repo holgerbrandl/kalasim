@@ -1,18 +1,19 @@
-# Event Log
+# Events
 
-To analyze a simulation, you may want to monitor entity creation and process progression. You may also want to trace which process caused an event or which processes waited for an event. `kalasim` is collecting these data for all  [simulation entities](basics.md) and in also within its [interaction model](component.md#process-interaction).
+To analyze state changes in a simulation model, we may want to monitor [component](component.md) creation, the [event queue](basics.md#event-queue), or the [interplay](component.md#process-interaction) between simulation entities. We may  want to trace which process caused an event, or which processes waited for resource. Or a model may require other custom state change events to be monitored. 
 
+`kalasim` triggers a rich set of built-int events, which are gathered automatically for  [interactions](component.md#process-interaction), entity creation, and [resource requests](resource.md). It also allows for custom event types that can be triggered in [process definitions](component.md#process-definition).
 
-The event log is modelled as a sequence of `org.kalasim.Event`s that can be consumed with a `org.kalasim.EventListener`. We follow a classical  publish-subscribe pattern here, where users can easily attach different event sinks such as consoles, files, rest-endpoints, databases, or in-place-analytics.
+The event log is modelled as a sequence of `org.kalasim.Event`s that can be consumed with one more multiple `org.kalasim.EventListener`s. The classical  publish-subscribe pattern is used here. Consumers can easily route events into such as consoles, files, rest-endpoints, databases, or in-place-analytics.
 
-To get started, we can register a new event handler with `addEventListener`. Since the an `EventListener` is modelled as a [functional interface](https://kotlinlang.org/docs/fun-interfaces.html), the syntax is very concise:
+To get started, we can register new event handlers with `addEventListener(org.kalasim.EventListener)`. Since an `EventListener` is modelled as a [functional interface](https://kotlinlang.org/docs/fun-interfaces.html), the syntax is very concise:
 ```kotlin
 createSimulation { 
     addEventListener{ it: Event -> println(it)}    
 }
 ```
 
-Event listener implementations typically do not consume all events but filter for specific types or simulation entities. This filtering can be implemented in the listener or by providing a filter
+Event listener implementations typically do not want to consume all events but filter for specific types or simulation entities. This filtering can be implemented in the listener or by providing a the type of interest, when adding the listener.
 
 ```kotlin hl_lines="1000"
 {!api/CustomEvent.kts!}
@@ -74,19 +75,19 @@ For example to fetch all events in retrospect related to resource requests we co
 
 ## Asynchronous Event Consumption
 
-Sometimes, events must not consumed in the simulation thread, but asynchronously. To do so we can setup a [coroutines channel](https://kotlinlang.org/docs/reference/coroutines/channels.html) for log events to be consumed asynchronously. These technicalities are already internalized in `addAsyncEventLister` which can be parameterized with a custom [coroutine scope](https://kotlinlang.org/docs/coroutines-basics.html) if needed. So to consume, events asychonrously, we can do:
+Sometimes, events can not be consumed in the simulation thread, but must be processed asynchronously. To do so we could use a custom thread or we could setup a [coroutines channel](https://kotlinlang.org/docs/reference/coroutines/channels.html) for log events to be consumed asynchronously. These technicalities are already internalized in `addAsyncEventLister` which can be parameterized with a custom [coroutine scope](https://kotlinlang.org/docs/coroutines-basics.html) if needed. So to consume, events asynchronously, we can do:
 
 ```kotlin
 //{!analysis/LogChannelConsumerDsl.kts!}
 ```
 
-In the example, we can think of a channel as a pipe between two coroutines. For details see the great articlle [_Kotlin: Diving in to Coroutines and Channels_]( 
+In the example, we can think of a channel as a pipe between two coroutines. For details see the great article [_Kotlin: Diving in to Coroutines and Channels_]( 
 https://proandroiddev.com/kotlin-coroutines-channels-csp-android-db441400965f).
 
 
 ## Logging Configuration
 
-Typically, only some types of event logging are required in a given simulation. To optimize simulation performance, the engine allows to suppress selectivly per event type and simulation entity. This is configured via [tracking policy factory](advanced.md#continuous-simulation) 
+Typically, only some types of event logging are required in a given simulation. To optimize simulation performance, the engine allows to suppress selectively per event type and simulation entity. This is configured via [tracking policy factory](advanced.md#continuous-simulation) 
 
 ## Tabular Interface
 
