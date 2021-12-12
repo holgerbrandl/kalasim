@@ -5,8 +5,7 @@ import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.apache.commons.math3.distribution.EnumeratedDistribution
-import org.junit.Assert
-import org.junit.Test
+import org.junit.*
 import org.kalasim.*
 import org.kalasim.Priority.Companion.CRITICAL
 import org.kalasim.Priority.Companion.IMPORTANT
@@ -230,6 +229,7 @@ class ResourceTests {
     }
 
 
+    @Ignore
     @Test
     fun `it should respect request priorities when mixing request sizes`() = createTestSimulation(true) {
 
@@ -359,8 +359,8 @@ class ResourceTests {
 
                 request(r1) {
                     request(r2) {
-                        request(r2, r3, oneOf = true) { honored ->
-                            honored shouldBe r3
+                        request(r2, r3, oneOf = true) { (r, _) ->
+                            r shouldBe r3
                             println("honor block")
                             honorBlockReached = true
                         }
