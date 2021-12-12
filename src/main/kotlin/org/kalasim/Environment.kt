@@ -132,7 +132,7 @@ open class Environment(
     }
 
     var now = startTime
-        internal set
+        internal set // todo since this is just used for testing, we could also maybe simply use run(newTime)
 
     fun now() = now
 

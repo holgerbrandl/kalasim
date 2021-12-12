@@ -184,11 +184,51 @@ class MonitorTests {
     // TODO test the others
 }
 
-/* Test the monitors and their stats can be merge jor a joint analysis. */
-class MergeMonitorTests {
+
+/* Test the monitors can be merged. */
+class MergeTimelineTests {
 
     @Test
-    fun `it should merge NLM`() = createTestSimulation {
+    fun `it should metric timelines`() = createTestSimulation {
+        val mtA = MetricTimeline()
+        val mtB = MetricTimeline()
+
+        now = 5.tt
+        mtA.addValue(23)
+
+        now = 10.tt
+        mtB.addValue(3)
+
+        now = 12.tt
+        mtB.addValue(5)
+
+        now = 14.tt
+        mtA.addValue(10)
+
+        //merge statistics
+
+        val addedTL = mtA + mtB
+
+        println(addedTL.timestamps)
+        println(addedTL.values)
+
+        addedTL.values shouldBe listOf(0.0, 23.0, 26.0, 28.0, 15.0)
+        addedTL.timestamps shouldBe listOf(0.0, 5.0, 10.0, 12.0, 14.0)
+
+        // just make sure that the other ops do not error do not error
+        println(mtA + mtB)
+        println(mtA - mtB)
+        println(mtA * mtB)
+        println(mtA / mtB)
+    }
+}
+
+
+/* Test if monitors stats can be merged. */
+class MergeMonitorStatsTests {
+
+    @Test
+    fun `it should merge NLM stats`() = createTestSimulation {
         val nlmA = MetricTimeline()
         val nlmB = MetricTimeline()
 
@@ -207,11 +247,13 @@ class MergeMonitorTests {
         //merge statistics
         val mergedStats: EnumeratedDistribution<Number> = listOf(nlmA, nlmB).mergeStats()
         println(mergedStats)
+
+        // TODO tadd actual assert
     }
 
 
     @Test
-    fun `it should merge FLM`() = createTestSimulation {
+    fun `it should merge FLM stats`() = createTestSimulation {
         val flmA = CategoryTimeline(1)
         val flmB = CategoryTimeline(2)
 
@@ -228,11 +270,13 @@ class MergeMonitorTests {
         now = 5.tt
         val mergedStats: EnumeratedDistribution<Int> = listOf(flmA, flmB).mergeStats()
         println(mergedStats)
+
+        // TODO tadd actual assert
     }
 
 
     @Test
-    fun `it should merge NSM`() = createTestSimulation {
+    fun `it should merge NSM stats`() = createTestSimulation {
         // note NSM.statistics() // delegates to StatisticalSummary (so should be mergeable as well)
         val nsmA = NumericStatisticMonitor()
         val nsmB = NumericStatisticMonitor() // delegates to StatisticalSummary (so should be mergeable as well)
@@ -254,7 +298,7 @@ class MergeMonitorTests {
 
 
     @Test
-    fun `it should merge FSM`() = createTestSimulation {
+    fun `it should merge FSM stats`() = createTestSimulation {
         val fsmA = CategoryMonitor<Int>()
         val fsmB = CategoryMonitor<Int>()
 
@@ -274,6 +318,7 @@ class MergeMonitorTests {
 
         //todo test this
         print(mergedDist)
-    }
 
+        // TODO tadd actual assert
+    }
 }

@@ -47,7 +47,7 @@ object DeterministicRefuel {
         class GasStation : Resource(capacity = 2.0)
 
         class TankTruck : Component() {
-            val fuelPump: Resource by inject(qualifier = named(FUEL_PUMP))
+            val fuelPump: DepletableResource by inject(qualifier = named(FUEL_PUMP))
 
             override fun process() = sequence {
                 hold(TANK_TRUCK_TIME)
@@ -64,7 +64,7 @@ object DeterministicRefuel {
             // in particular useful for untypes resources and components
 
             //            val gasStation : Resource by inject(qualifier = named("gas_station"))
-            val fuelPump: Resource by inject(qualifier = named(FUEL_PUMP))
+            val fuelPump: DepletableResource by inject(qualifier = named(FUEL_PUMP))
 
             override fun process() = sequence {
                 val fuelTankLevel = FUEL_TANK_LEVEL.sample()
@@ -108,12 +108,13 @@ object DeterministicRefuel {
 
             run(SIM_TIME)
 
-            val fuelPump = get<Resource>(qualifier = named(FUEL_PUMP))
+            val fuelPump = get<DepletableResource>(qualifier = named(FUEL_PUMP))
 
             fuelPump.apply {
                 capacityTimeline.printHistogram()
                 claimedTimeline.printHistogram()
                 availabilityTimeline.printHistogram()
+                occupancyTimeline.printHistogram()
             }
 
 

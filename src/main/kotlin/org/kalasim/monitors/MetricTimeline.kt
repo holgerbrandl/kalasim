@@ -8,13 +8,13 @@ import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.moment.Variance
 import org.kalasim.TickTime
 import org.kalasim.asCMPairList
-import org.kalasim.misc.DependencyContext
-import org.kalasim.misc.Jsonable
+import org.kalasim.misc.*
 import org.kalasim.misc.buildHistogram
 import org.kalasim.misc.printHistogram
 import org.kalasim.misc.printThis
-import org.kalasim.misc.roundAny
 import org.koin.core.Koin
+import java.util.*
+import kotlin.math.max
 import kotlin.math.sqrt
 
 /**
@@ -22,12 +22,14 @@ import kotlin.math.sqrt
  *
  * @param initialValue initial value for a level timeline. It is important to set the value correctly. Default: 0
  */
-class MetricTimeline(name: String? = null, private val initialValue: Number = 0, koin: Koin = DependencyContext.get()) :
-    Monitor<Number>(name, koin),
-    ValueTimeline<Number> {
+class MetricTimeline(
+        name: String? = null,
+        private val initialValue: Number = 0,
+        koin: Koin = DependencyContext.get()
+) : Monitor<Number>(name, koin), ValueTimeline<Number> {
 
-    private val timestamps = mutableListOf<Double>()
-    private val values = ifEnabled { mutableListOf<Double>() }
+    internal val timestamps = mutableListOf<Double>()
+    internal val values = ifEnabled { mutableListOf<Double>() }
 
     init {
         addValue(initialValue)
@@ -112,11 +114,11 @@ class MetricTimeline(name: String? = null, private val initialValue: Number = 0,
             values.forEach { freq.addValue(it) }
 
             val colData: Map<Double, Double> =
-                statistics().data.run {
-                    durations.zip(values)
-                        .groupBy { (_, value) -> value }
-                        .map { kv -> kv.key to kv.value.sumOf { it.first } }
-                }.toMap()
+                    statistics().data.run {
+                        durations.zip(values)
+                                .groupBy { (_, value) -> value }
+                                .map { kv -> kv.key to kv.value.sumOf { it.first } }
+                    }.toMap()
 
             // inherently wrong because does not take into account durations
 //            val byValueHist = freq
@@ -129,16 +131,16 @@ class MetricTimeline(name: String? = null, private val initialValue: Number = 0,
             // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
             val hist: List<Pair<Double, Double>> = statistics().data.run {
                 val aggregatedMonitor: List<Pair<Double, Double>> =
-                    durations.zip(values).groupBy { (_, value) -> value }
-                        .map { kv -> kv.key to kv.value.sumOf { it.first } }
+                        durations.zip(values).groupBy { (_, value) -> value }
+                                .map { kv -> kv.key to kv.value.sumOf { it.first } }
 
                 aggregatedMonitor
             }
 
             val stats =
-                DescriptiveStatistics(
-                    EnumeratedDistribution(hist.asCMPairList()).sample(1000, arrayOf<Double>()).toDoubleArray()
-                )
+                    DescriptiveStatistics(
+                            EnumeratedDistribution(hist.asCMPairList()).sample(1000, arrayOf<Double>()).toDoubleArray()
+                    )
 
             stats.buildHistogram(binCount).printHistogram()
         }
@@ -170,6 +172,72 @@ class MetricTimeline(name: String? = null, private val initialValue: Number = 0,
         }
     }
 }
+
+
+internal enum class ArithmeticOp {
+    Plus, Minus, Times, Div;
+
+    override fun toString() = when (this) {
+        Plus -> "+"
+        Minus -> "-"
+        Times -> "*"
+        Div -> "/"
+    }
+}
+
+
+//
+// Timeline Arithmetics
+//
+
+operator fun MetricTimeline.plus(other: MetricTimeline) = combineInternal(this, other, ArithmeticOp.Plus)
+operator fun MetricTimeline.minus(other: MetricTimeline) = combineInternal(this, other, ArithmeticOp.Minus)
+operator fun MetricTimeline.times(other: MetricTimeline) = combineInternal(this, other, ArithmeticOp.Times)
+operator fun MetricTimeline.div(other: MetricTimeline) = combineInternal(this, other, ArithmeticOp.Div)
+
+operator fun MetricTimeline.div(factor: Number): MetricTimeline {
+    val constMT = MetricTimeline("Constant $factor", initialValue = factor).apply {
+        timestamps.apply { clear(); add(timestamps.first()) }
+    }
+    return combineInternal(this, constMT, ArithmeticOp.Div)
+}
+
+fun List<MetricTimeline>.mean() = reduce { acc, mt -> acc + mt } / size
+
+private fun combineInternal(mt: MetricTimeline, other: MetricTimeline, mode: ArithmeticOp): MetricTimeline {
+    // also see
+    // https://www.geeksforgeeks.org/merge-two-sorted-linked-lists/
+    // https://stackoverflow.com/questions/1774256/java-code-review-merge-sorted-lists-into-a-single-sorted-list
+    val joinTime = TreeSet<Double>().apply { addAll(mt.timestamps); addAll(other.timestamps); add(mt.now.value) }
+
+    val minTime = max(mt.timestamps.first(), other.timestamps.first())
+//    val maxTime = Math.min(mt.timestamps.last(), other.timestamps.last())
+    val maxTime = mt.now.value
+//    val timeRange = minTime..maxTime
+
+    val merged = MetricTimeline("'${mt.name}' ${mode} '${other.name}'").apply {
+        timestamps.clear()
+        values.clear()
+    }
+
+    joinTime.dropWhile { it < minTime }.takeWhile { it <= maxTime }.forEach { time ->
+        merged.timestamps.add(time)
+        val value = when (mode) {
+            ArithmeticOp.Plus -> mt[time].toDouble() + other[time].toDouble()
+            ArithmeticOp.Minus -> mt[time].toDouble() - other[time].toDouble()
+            ArithmeticOp.Times -> mt[time].toDouble() * other[time].toDouble()
+            ArithmeticOp.Div -> mt[time].toDouble() / other[time].toDouble()
+        }
+        merged.values.add(value)
+    }
+
+    return merged
+}
+
+
+//
+// Statistical Summary
+//
 
 class MetricTimelineStats(nlm: MetricTimeline, excludeZeros: Boolean = false) : Jsonable() {
     val duration: Double

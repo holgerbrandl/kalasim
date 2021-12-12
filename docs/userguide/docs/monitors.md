@@ -252,9 +252,26 @@ Histogram of: 'MetricTimeline.1'
 
 
 
-##  Merging of Monitors
+##  Monitors Arithmetics
 
-Tt is possible to merge the resulting statistics of multiple monitors
+It is possible to merge the metric timeline monitors
+
+```kotlin
+val mtA = MetricTimeline()
+val mtB = MetricTimeline()
+
+// we can do all types of arithmetics
+mtA + mtB
+mtA - mtB
+mtA / mtB
+mtA * mtB
+
+// or work out their average over time
+listOf(mtA, mtB).mean()
+```
+
+It is also possible to merge the resulting statistics of multiple monitors
+
 ```kotlin
 val flmA = CategoryTimeline(1)
 val flmB = CategoryTimeline(2)
