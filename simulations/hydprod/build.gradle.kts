@@ -2,11 +2,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 plugins {
-    kotlin("jvm") version "1.5.21"
+    kotlin("jvm")  version "1.5.31"
     `maven-publish`
 }
 
-group = "org.kalasim.examples"
+group = "org.kalasim.sims"
 version = "1.0-SNAPSHOT"
 
 
@@ -16,8 +16,9 @@ repositories {
 }
 
 dependencies {
+//    implementation(project ("kalasim"))
+    api("com.github.holgerbrandl:kalasim:0.7.4-SNAPSHOT")
 
-    api("com.github.holgerbrandl:kalasim:0.7.3")
     api("com.github.holgerbrandl:kravis:0.8.1")
 
     testImplementation(kotlin("test"))
@@ -35,3 +36,8 @@ publishing {
         }
     }
 }
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "11"
+}
+
