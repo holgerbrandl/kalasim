@@ -454,7 +454,7 @@ open class Component(
 
 
     /**
-     * Request anonymous resources.
+     * Restores capacity of anonymous resources. This is intentionally also suspendable, as a component may need to wait until a component has the capacity to consume the new quanity.
      *
      * For `request` contract see [user manual](https://www.kalasim.org/component/#request)
      *
@@ -463,7 +463,6 @@ open class Component(
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
      */
-    // todo why is a yielding function. It will never be scheduled!
     suspend fun SequenceScope<Component>.put(
         vararg resourceRequests: ResourceRequest,
         failAt: TickTime? = null,
@@ -611,7 +610,7 @@ open class Component(
                 //                q = -q
                 //            }
 
-                require(q >= 0 || r.anonymous) { "quantity <0" }
+                require(q >= 0 || r.depletable) { "quantity <0" }
 
                 //  is same resource is specified several times, just add them up
                 //https://stackoverflow.com/questions/53826903/increase-value-in-mutable-map
@@ -724,6 +723,9 @@ open class Component(
         return null
     }
 
+    /**
+     * @return true if the pending request was honored
+     */
     internal fun tryRequest(): Boolean {
         if (componentState == INTERRUPTED) return false
 
@@ -731,9 +733,7 @@ open class Component(
 
         if (rHonor.isNullOrEmpty()) return false
 
-        requests
-//            .filterNot { it.key.anonymous }
-            .forEach { (resource, quantity) ->
+        requests.forEach { (resource, quantity) ->
                 // proceed just if request was honored claim it
                 if (rHonor.any { it.first == resource }) {
                     resource.claimed += quantity //this will also update the timeline
@@ -742,7 +742,7 @@ open class Component(
                         ResourceEvent(env.now, env.curComponent, this, resource, CLAIMED, quantity)
                     }
 
-                    if (!resource.anonymous) {
+                    if (!resource.depletable) {
                         val thisPrio = resource.requesters.q.firstOrNull { it.component == this }?.priority
                         claims.merge(resource, quantity, Double::plus)
 
@@ -764,7 +764,7 @@ open class Component(
         reschedule(now, NORMAL, false, null, "Request honored by $honorInfo", SCHEDULED)
 
         // process negative put requests (todo can't we handle them separately)
-        rHonor.filter { it.first.anonymous }.forEach { it.first.tryRequest() }
+        rHonor.filter { it.first.depletable }.forEach { it.first.tryRequest() }
 
         return true
     }
@@ -1086,7 +1086,7 @@ open class Component(
      */
     fun release(vararg releaseRequests: ResourceRequest) {
         for ((resource, quantity) in releaseRequests) {
-            require(!resource.anonymous) { " It is not possible to release from an anonymous resource, this way. Use Resource.release() in that case." }
+            require(!resource.depletable) { " It is not possible to release from an anonymous resource, this way. Use Resource.release() in that case." }
 
             releaseInternal(resource, quantity)
         }
@@ -1268,6 +1268,7 @@ open class Component(
      */
     fun leave(q: ComponentQueue<*>) {
 //        log("Leaving ${q.name}")
+        @Suppress("UNCHECKED_CAST")
         (q as ComponentQueue<Component>).remove(this)
     }
 

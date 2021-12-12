@@ -13,12 +13,12 @@ class DepletableResourceTests {
 
     @Test
     fun `it allow filling and emptying from 0 to capacity limit`() = createTestSimulation(true) {
-        val gasSupply = DepletableResource(capacity = 10)
+        val gasSupply = DepletableResource(capacity = 100, initialLevel = 0)
 
         // add new gas continuously
         object : Component("Pipeline") {
             override fun repeatedProcess() = sequence {
-                hold(1, "refilling supply tank")
+                hold(10, "refilling supply tank")
 
                 put(gasSupply withQuantity 2)
             }
@@ -34,14 +34,14 @@ class DepletableResourceTests {
 
         val cg = ComponentGenerator(iat = exponential(10), keepHistory = true) { Car(tankSize()) }
 
-        run(100)
+        run(1000)
 
         with(gasSupply) {
             claimers.size shouldBe 0
             level shouldBeGreaterThan 0.0
-            level shouldBeLessThan 0.0
 
-            claimedTimeline.display("supply fill status").show()
+            claimedTimeline.display().show()
+            levelTimeline.display().show()
         }
 
         // ensure that at least the first car was sucessfully refilled

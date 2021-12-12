@@ -405,9 +405,9 @@ An alternative more direct approach to achieve round-robin resource selection (e
 
 For depletable (which are also referred to as _anonymous_) resources, it may be not allowed to exceed the capacity and have a component wait for enough (claimed) capacity to be available. That may be accomplished by using a negative quantity in the `Component.request()` call.
 
-To create a depleteable resource we **{done}**
+To create a depletable resource we do
 ```kotlin
-val tank = DepletableResource(capacity = 10, initialLevel = 5)
+val tank = DepletableResource(capacity = 10, initialLevel = 3)
 ```
 We can declare its maximum capacity and its initial fill level. The latter is optional and defaults to the capacity of the resource.
 

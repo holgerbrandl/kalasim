@@ -174,6 +174,11 @@ class MetricTimeline(
 }
 
 
+//
+// Timeline Arithmetics
+//
+
+
 internal enum class ArithmeticOp {
     Plus, Minus, Times, Div;
 
@@ -184,11 +189,6 @@ internal enum class ArithmeticOp {
         Div -> "/"
     }
 }
-
-
-//
-// Timeline Arithmetics
-//
 
 operator fun MetricTimeline.plus(other: MetricTimeline) = combineInternal(this, other, ArithmeticOp.Plus)
 operator fun MetricTimeline.minus(other: MetricTimeline) = combineInternal(this, other, ArithmeticOp.Minus)
@@ -232,6 +232,15 @@ private fun combineInternal(mt: MetricTimeline, other: MetricTimeline, mode: Ari
     }
 
     return merged
+}
+
+
+// not pretty but allows assigning new names to merged timelines without make SimEntity.name var.
+internal fun MetricTimeline.copy(name: String = this.name): MetricTimeline = MetricTimeline(name).apply {
+    values.clear()
+    values.addAll(this@copy.values)
+    timestamps.clear()
+    timestamps.addAll(this@copy.timestamps)
 }
 
 

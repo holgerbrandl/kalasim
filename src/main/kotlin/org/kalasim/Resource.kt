@@ -4,9 +4,12 @@ package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
 import krangl.*
-import org.kalasim.misc.*
 import org.kalasim.monitors.MetricTimeline
+import org.kalasim.monitors.div
+import org.kalasim.monitors.minus
 import org.koin.core.Koin
+import org.kalasim.misc.*
+import org.kalasim.monitors.copy
 
 // TODO Analyze we we support the same preemptible contract as simmer (Ucar2019, p11) (in particular restart)
 
@@ -17,11 +20,11 @@ import org.koin.core.Koin
  * For full contract and description see [user manual](https://www.kalasim.org/resource/#depletable-resource)
  */
 open class DepletableResource(
-    name: String? = null,
-    capacity: Number,
-    initialLevel: Number = capacity,
-    preemptive: Boolean = false,
-    koin: Koin = DependencyContext.get()
+        name: String? = null,
+        capacity: Number,
+        initialLevel: Number = capacity,
+        preemptive: Boolean = false,
+        koin: Koin = DependencyContext.get()
 ) : Resource(name = name, capacity = capacity, preemptive = preemptive, koin = koin) {
 
     // TODO we must test that a depeletable resource is not refilled above its capacity limit
@@ -32,14 +35,25 @@ open class DepletableResource(
 
     /** Indicates if depletable resource is depleted (level==0) */
     val isDepleted
-        get() = claimed.toInt() == 0
+        get() = level == 0.0
 
-    /** Indicates the current level of the resource. Technically is a synonym for `claimed` */
-    var level
-        get() = claimed
-        set(newLevel) {
-            release(claimed-level)
-        }
+
+    /** Indicates the current level of the resource. Technically is a synonym for `capacity - claimed` */
+    val level
+        get() = capacity - claimed
+
+//        set(newLevel) {
+//            if (claimed > newLevel) release(capacity - claimed - level)
+//        }
+
+//    val levelTimeline = MetricTimeline("Level of ${this.name}", initialValue = availableQuantity, koin = koin)
+//
+//    override fun updatedDerivedMetrics() {
+//        levelTimeline.addValue(level)
+//    }
+
+    val levelTimeline
+        get() = (capacityTimeline - claimedTimeline).copy("Level of ${this@DepletableResource.name}")
 
     // todo finish a proper level monitor for depletable resources
 //    var levelMonitor
@@ -50,10 +64,11 @@ open class DepletableResource(
 //    get() = capacityTimeline - claimedTimeline
 
     init {
-        anonymous = true
+        depletable = true
         claimed = capacity.toDouble() - initialLevel.toDouble()
     }
 }
+
 
 /**
  * @param preemptive If a component requests from a preemptive resource, it may bump component(s) that are claiming from
@@ -61,13 +76,13 @@ the resource, provided these have a lower priority = higher value). If component
 whether the component is bumped or still claiming at any point where they can be bumped.
  */
 open class Resource(
-    name: String? = null,
-    capacity: Number = 1,
-    val preemptive: Boolean = false,
-    koin: Koin = DependencyContext.get()
+        name: String? = null,
+        capacity: Number = 1,
+        val preemptive: Boolean = false,
+        koin: Koin = DependencyContext.get()
 ) : SimulationEntity(name = name, simKoin = koin) {
 
-    internal var anonymous: Boolean = false
+    internal var depletable: Boolean = false
 
     var minq: Double = Double.MAX_VALUE
 
@@ -82,7 +97,7 @@ open class Resource(
             field = value
 
             capacityTimeline.addValue(capacity)
-            updatedDerivedMetrics()
+//            updatedDerivedMetrics()
 
             tryRequest()
         }
@@ -96,13 +111,13 @@ open class Resource(
             field = x
 
             // this ugly hak is needed to avoid tracking of initialLevel setting in DR constructor
-            if(this is DepletableResource && diffQuantity == 0.0 && requesters.isEmpty()) return
+            if (this is DepletableResource && diffQuantity == 0.0 && requesters.isEmpty()) return
 
-            if(field < EPS)
+            if (field < EPS)
                 field = 0.0
 
             claimedTimeline.addValue(x)
-            updatedDerivedMetrics()
+//            updatedDerivedMetrics()
 
 //            if(this is DepletableResource && )
 //            val action = if (diffQuantity > 0) "Released" else "Claimed"
@@ -113,13 +128,8 @@ open class Resource(
         }
 
 
-    private fun updatedDerivedMetrics() {
-        availabilityTimeline.addValue(availableQuantity)
-        occupancyTimeline.addValue(occupancy)
-    }
-
     val occupancy: Double
-        get() = if(capacity < 0) 0.0 else claimed / capacity
+        get() = if (capacity < 0) 0.0 else claimed / capacity
 
     val availableQuantity: Double
         get() = capacity - claimed
@@ -128,10 +138,15 @@ open class Resource(
     val capacityTimeline = MetricTimeline("Capacity of ${super.name}", initialValue = capacity, koin = koin)
     val claimedTimeline = MetricTimeline("Claimed quantity of ${this.name}", koin = koin)
 
-    // **TODO**  technically availability and occupancy can be derived and may be omitted to reduce memory footprint
-    val availabilityTimeline =
-        MetricTimeline("Available quantity of ${this.name}", initialValue = availableQuantity, koin = koin)
-    val occupancyTimeline = MetricTimeline("Occupancy of ${this.name}", koin = koin)
+    //    val availabilityTimeline =
+//            MetricTimeline("Available quantity of ${this.name}", initialValue = availableQuantity, koin = koin)
+//    val occupancyTimeline = MetricTimeline("Occupancy of ${this.name}", koin = koin)
+    val availabilityTimeline
+        get() = (capacityTimeline - claimedTimeline) //.also { it.name = "Occupancy of ${this.name}"}
+
+    //    val occupancyTimeline = MetricTimeline("Occupancy of ${this.name}", koin = koin)
+    val occupancyTimeline
+        get() = claimedTimeline / capacityTimeline
 
 
     var trackingPolicy: ResourceTrackingConfig = ResourceTrackingConfig()
@@ -141,8 +156,9 @@ open class Resource(
             with(newPolicy) {
                 capacityTimeline.enabled = trackUtilization
                 claimedTimeline.enabled = trackUtilization
-                availabilityTimeline.enabled = trackUtilization
-                occupancyTimeline.enabled = trackUtilization
+
+//                availabilityTimeline.enabled = trackUtilization
+//                occupancyTimeline.enabled = trackUtilization
 
                 requesters.lengthOfStayMonitor.enabled = trackQueueStatistics
                 requesters.queueLengthMonitor.enabled = trackQueueStatistics
@@ -158,25 +174,27 @@ open class Resource(
 
     init {
         log(trackingPolicy.logCreation) {
-            EntityCreatedEvent(now, env.curComponent, this, "capacity=$capacity " + if(anonymous) "anonymous" else "")
+            EntityCreatedEvent(now, env.curComponent, this, "capacity=$capacity " + if (depletable) "anonymous" else "")
         }
     }
 
     fun tryRequest(): Boolean {
+        if (depletable) {
+            // note: trying seems to lack any function in salabim; It is always reset after the while loop in a tryrequest
+            do {
+                val wasHonored = with(requesters.q) {
+                    isNotEmpty() && peek().component.tryRequest()
+                }
+            } while (wasHonored)
 
-        if(anonymous) {
-            // TODO trying not implemented
-            while(requesters.q.isNotEmpty()) {
-                requesters.q.peek().component.tryRequest()
-            }
         } else {
-            while(requesters.q.isNotEmpty()) {
+            while (requesters.q.isNotEmpty()) {
                 //try honor as many requests as possible
-                if(minq > (capacity - claimed + EPS)) {
+                if (minq > (capacity - claimed + EPS)) {
                     break
                 }
 
-                if(!requesters.q.peek().component.tryRequest()) {
+                if (!requesters.q.peek().component.tryRequest()) {
                     // if we can honor this request, we must stop here (to respect request prioritites
                     break
                 }
@@ -193,7 +211,7 @@ open class Resource(
      */
     fun release(quantity: Number? = null) {
         // TODO Split resource types into QuantityResource and Resource or similar
-        if(anonymous) {
+        if (depletable) {
             val q = quantity?.toDouble() ?: claimed
 
             claimed = -q
@@ -207,7 +225,7 @@ open class Resource(
         } else {
             require(quantity != null) { "quantity missing for non-anonymous resource" }
 
-            while(claimers.isNotEmpty()) {
+            while (claimers.isNotEmpty()) {
                 claimers.q.first().component.release(this)
             }
         }
@@ -215,7 +233,7 @@ open class Resource(
 
     fun removeRequester(component: Component) {
         requesters.remove(component)
-        if(requesters.isEmpty()) minq = Double.MAX_VALUE
+        if (requesters.isEmpty()) minq = Double.MAX_VALUE
     }
 
     /** Prints a summary of statistics of a resource. */
@@ -241,12 +259,12 @@ open class Resource(
 enum class ResourceMetric { Capacity, Claimed, Requesters, Claimers, Occupancy, Availability }
 
 data class ResourceTimelineSegment(
-    val resource: Resource,
-    val start: TickTime,
-    val end: TickTime?,
-    val duration: Double?,
-    val metric: ResourceMetric,
-    val value: Double,
+        val resource: Resource,
+        val start: TickTime,
+        val end: TickTime?,
+        val duration: Double?,
+        val metric: ResourceMetric,
+        val value: Double,
 //    val start_wt: Instant? = null,
 //    val end_wt: Instant? = null
 ) {
@@ -270,23 +288,19 @@ data class ResourceTimelineSegment(
 
 val Resource.timeline: List<ResourceTimelineSegment>
     get() {
-        val capStats =
-            capacityTimeline.statsData().asList().asDataFrame()
+        val capStats = capacityTimeline.statsData().asList().asDataFrame()
                 .addColumn("Metric") { ResourceMetric.Capacity }
-        val claimStats =
-            claimedTimeline.statsData().asList().asDataFrame()
+        val claimStats = claimedTimeline.statsData().asList().asDataFrame()
                 .addColumn("Metric") { ResourceMetric.Claimed }
-        val occStats =
-            occupancyTimeline.statsData().asList().asDataFrame()
+        val occStats = occupancyTimeline.statsData().asList().asDataFrame()
                 .addColumn("Metric") { ResourceMetric.Occupancy }
-        val availStats =
-            occupancyTimeline.statsData().asList().asDataFrame()
+        val availStats = occupancyTimeline.statsData().asList().asDataFrame()
                 .addColumn("Metric") { ResourceMetric.Availability }
 
         val requesters = requesters.queueLengthMonitor.statsData().asList().asDataFrame()
-            .addColumn("Metric") { ResourceMetric.Requesters }
+                .addColumn("Metric") { ResourceMetric.Requesters }
         val claimers = claimers.queueLengthMonitor.statsData().asList().asDataFrame()
-            .addColumn("Metric") { ResourceMetric.Claimers }
+                .addColumn("Metric") { ResourceMetric.Claimers }
 
         var statsDF = bindRows(capStats, claimStats, availStats, occStats, requesters, claimers)
         statsDF = statsDF.rename("timestamp" to "start")
