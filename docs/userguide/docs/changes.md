@@ -6,6 +6,9 @@ Not yet released
 
 * Added `RequestScopeContext` to honor-block of `request` including `requestingSince` time (relates to [#27](https://github.com/holgerbrandl/kalasim/issues/27)) 
 
+Minor enhancements
+* Reworked distribution support API for better API experience to enable controlled randomization in process models
+
 ## v0.7 
 
 Released 2021-11-27

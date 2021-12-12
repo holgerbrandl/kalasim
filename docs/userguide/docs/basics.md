@@ -191,13 +191,12 @@ createSimulation(randomSeed = 123){
 }
 ```
 
-With random generator, the following [distributions](https://github.com/holgerbrandl/kalasim/blob/master/src/main/kotlin/org/kalasim/Distributions.kt) are supported out of the box (with common defaults where possible) as extension functions on `Component` and `Environment`:
+With random generator, the following [number distributions](https://github.com/holgerbrandl/kalasim/blob/master/src/main/kotlin/org/kalasim/Distributions.kt) are supported out of the box (with common defaults where possible) as extension functions on `Component` and `Environment`:
 
 * `uniform(lower=0, upper=1)`
 * `discreteUniform(lower, upper)`
 * `exponential(mean)`
 * `normal(mean=0, sd=1)`
-
 
 Whenever, distributions are needed in method signatures in `kalasim`, the more general interface `org.apache.commons.math3.distribution.RealDistribution` is being used to support a much [wider variety](https://commons.apache.org/proper/commons-math/javadocs/api-3.4/org/apache/commons/math3/distribution/RealDistribution.html) of distributions if needed. So we can also use other implementations as well. For example
 
@@ -208,10 +207,33 @@ ComponentGenerator(iat=NakagamiDistribution(1,0.3)){ Customer() }
 The API also include some convenience wrappers to provide fixed values for argument of `RealDistribution`. E.g. consider the  time until a request is considered as failed:
 
 ```kotlin
-val dist =  3.asConstantDist()
+val dist =  constant(3)
 ComponentGenerator(iat=dist){ Customer() }
 ```
 
 Here, `3` is converted into a `org.apache.commons.math3.distribution.ConstantRealDistribution`.
 
 Also, `RealDistribution.clip(0)` will cap the sampled values at 0 (or any other value,  allowing zero-inflated distribution models with controlled randomization
+
+!!important
+    All distribution helpers to allow controlled randomization are available only form an `Environment` or `SimulationContext` only. That's because kalasim needs the context to associate the correct internal random generator to each distribution.
+
+
+Similarly, also distributions over arbitrary types are supported via `enumerated`. This does not just work with `enums` but with arbitrary types including [data classes](https://kotlinlang.org/docs/data-classes.html).
+
+```kotlin
+enum class Fruit{Apple, Banana, Peach}
+
+// create a uniform distribution over the fruits
+val fruit = enumerated(values())
+// sample the fruits
+val aFruit : Fruit = fruit()
+
+// create a uniform distribution over the fruits
+val biasedFruit = enumerated(Apple to 0.7, Banana to 0.1, Peach to 0.2 )
+// sample the biased fruits
+biasedFruit()
+```
+            
+Controlled randomization is a key aspect of every process simulation. Make sure to always strive for repeatability by not using randomization outside of what the simulation context provides. 
+ 

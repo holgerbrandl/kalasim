@@ -32,7 +32,7 @@ class GeneratorTest {
 
     @Test
     fun `it should allow to stop a generator from outside`() = createTestSimulation {
-        val cg = ComponentGenerator(iat = fixed(1), keepHistory = true) { it.toString() }
+        val cg = ComponentGenerator(iat = constant(1), keepHistory = true) { it.toString() }
 
         run(10)
 
@@ -45,7 +45,7 @@ class GeneratorTest {
 
     @Test
     fun `it should allow to stop a generator from inside`() = createTestSimulation {
-        val cg = ComponentGenerator(iat = fixed(1), keepHistory = true) { it.toString() }
+        val cg = ComponentGenerator(iat = constant(1), keepHistory = true) { it.toString() }
 
         run(10)
 

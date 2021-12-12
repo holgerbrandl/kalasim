@@ -4,11 +4,12 @@ import org.apache.commons.math3.distribution.*
 import java.lang.Double.min
 import kotlin.math.max
 
-/** Distribution support API */
+/** Distribution support API. Because we want to support distribution helpers in environment and simulation entities, we must implement most of the stuff twice */
 
+@Deprecated("Use fixed instead", ReplaceWith("constant(this)"))
 fun Number.asDist() = ConstantRealDistribution(this.toDouble())
 
-fun fixed(value: Number) = ConstantRealDistribution(value.toDouble())
+fun constant(value: Number) = ConstantRealDistribution(value.toDouble())
 
 operator fun RealDistribution.invoke(): Double = sample()
 operator fun IntegerDistribution.invoke(): Int = sample()
@@ -41,9 +42,25 @@ fun Environment.uniform(lower: Number = 1, upper: Number = 0) =
     UniformRealDistribution(rg, lower.toDouble(), upper.toDouble())
 
 
+// since it's common that users want to create an integer distribution from a range, we highlight the incorrect API usage
+
+// https://dev.to/mreichelt/the-hidden-kotlin-gem-you-didn-t-think-you-ll-love-deprecations-with-replacewith-3blo
+@Deprecated(
+    "To sample from an integer range, use discreteUniform instead for better efficiency",
+    replaceWith = ReplaceWith("discreteUniform(range.first, range.laste)")
+)
+fun SimulationEntity.enumerated(range: IntRange) = enumerated(*(range.toList().toTypedArray()))
+@Deprecated(
+    "To sample from an integer range, use discreteUniform instead for better efficiency",
+    replaceWith = ReplaceWith("discreteUniform(range.first, range.laste)")
+)
+fun Environment.enumerated(range: IntRange) = enumerated(*(range.toList().toTypedArray()))
+
+
+@JvmName("enumeratedArray")
+fun <T> SimulationEntity.enumerated(elements: Array<T>): EnumeratedDistribution<T> = enumerated(*elements)
 fun <T> SimulationEntity.enumerated(vararg elements: T) =
     enumerated((elements.map { it to 1.0 / elements.size }).toMap())
-
 fun <T> SimulationEntity.enumerated(elements: Map<T, Double>) = env.enumerated(elements)
 
 @JvmName("enumeratedArray")
@@ -52,9 +69,8 @@ fun <T> Environment.enumerated(vararg elements: T) = enumerated((elements.map { 
 fun <T> Environment.enumerated(elements: Map<T, Double>) = EnumeratedDistribution(rg, elements.toList().asCMPairList())
 
 
+internal typealias   CMPair<K, V> = org.apache.commons.math3.util.Pair<K, V>
 
-typealias   CMPair<K, V> = org.apache.commons.math3.util.Pair<K, V>
-
-fun <T, S> List<Pair<T, S>>.asCMPairList(): List<CMPair<T, S>> = map { CMPair(it.first, it.second) }
-fun <T, S> Map<T, S>.asCMPairList(): List<CMPair<T, S>> = map { CMPair(it.key, it.value) }
+internal fun <T, S> List<Pair<T, S>>.asCMPairList(): List<CMPair<T, S>> = map { CMPair(it.first, it.second) }
+internal fun <T, S> Map<T, S>.asCMPairList(): List<CMPair<T, S>> = map { CMPair(it.key, it.value) }
 
