@@ -9,13 +9,14 @@ import kotlinx.coroutines.launch
 import org.kalasim.Event
 import org.kalasim.EventListener
 
-class AsyncEventListener() : EventListener {
+class AsyncEventListener(val scope: CoroutineScope = GlobalScope) : EventListener {
     val eventChannel = Channel<Event>()
 
-    inline fun <reified T : Event> start(scope: CoroutineScope = GlobalScope, crossinline block: (event: T) -> Unit) {
+    inline fun <reified T : Event> start(crossinline block: (event: T) -> Unit) {
         scope.launch {
             eventChannel.receiveAsFlow()
                 .collect { event: Event ->
+                    println("received event ${event}")
                     if (event is T)
                         block.invoke(event)
                 }
@@ -23,7 +24,8 @@ class AsyncEventListener() : EventListener {
     }
 
     override fun consume(event: Event) {
-        GlobalScope.launch {
+        scope.launch {
+//            println("adding event ${event} to channel")
             eventChannel.trySend(event)
         }
     }

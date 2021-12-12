@@ -3,6 +3,11 @@ package org.kalasim.test
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import krangl.cumSum
 import krangl.mean
 import org.apache.commons.math3.distribution.UniformRealDistribution
@@ -12,6 +17,7 @@ import org.kalasim.misc.*
 import org.koin.core.Koin
 import org.koin.core.error.NoBeanDefFoundException
 import org.koin.dsl.koinApplication
+import java.lang.Thread.sleep
 import java.time.Duration
 
 class EnvTests {
@@ -103,6 +109,36 @@ class EnvTests {
 
         println(env1._koin)
         println(env2._koin)
+    }
+
+
+    @Test
+    fun `it should consume events asynchronously`() = createTestSimulation {
+        ComponentGenerator(iat = constant(1)) { Component("Car.${it}") }
+
+        var consumed = false
+
+
+        // add an asynchronous log consumer
+        val asyncListener = addAsyncEventListener<EntityCreatedEvent> { event ->
+            if (event.simEntity.name == "Car.1") {
+                println("Consumed async!")
+                consumed = true
+            }
+        }
+
+        // Start another channel consumer
+//        GlobalScope.launch {
+//            asyncListener.eventChannel.receiveAsFlow()
+//                .collect { consumed = true }
+//        }
+
+        // run the simulation
+        run(5)
+
+        sleep(4000)
+
+        consumed shouldBe true
     }
 
     @Test

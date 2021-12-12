@@ -112,9 +112,7 @@ open class Environment(
         get() = eventQueue.map { it.component }
 
 
-
-    // This is not private because addEventListener is inlined.
-    val eventListeners = listOf<EventListener>().toMutableList()
+    private val eventListeners = listOf<EventListener>().toMutableList()
 
 
     val trackingPolicyFactory = TrackingPolicyFactory()
@@ -344,19 +342,25 @@ open class Environment(
     }
 
 
-    internal fun addStandBy(component: Component) {
-        standBy.add(component)
+    //
+    // Events
+    //
+
+
+    inline fun <reified T : Event> addAsyncEventListener(
+        scope: CoroutineScope = GlobalScope,
+        crossinline block: (T) -> Unit
+    ) = AsyncEventListener(scope).also { listener ->
+        listener.start(block)
+        addEventListener(listener)
     }
 
     inline fun <reified T : Event> addEventListener(
-        scope: CoroutineScope = GlobalScope,
         crossinline block: (T) -> Unit
-    ): EventListener =
-        AsyncEventListener()
-            .also { listener ->
-                listener.start(scope, block)
-                eventListeners.add(listener)
-            }
+    ) = addEventListener {
+        if (it !is T) return@addEventListener
+        block(it)
+    }
 
     fun addEventListener(listener: EventListener) = eventListeners.add(listener)
 
@@ -368,6 +372,16 @@ open class Environment(
         eventListeners.forEach {
             it.consume(event)
         }
+    }
+
+
+    //
+    // Misc
+    //
+
+
+    internal fun addStandBy(component: Component) {
+        standBy.add(component)
     }
 
 
@@ -393,7 +407,7 @@ open class Environment(
 
     private var queueCounter: Int = 0
 
-    fun push(component: Component, scheduledTime: TickTime, priority: Priority, urgent: Boolean) {
+    internal fun push(component: Component, scheduledTime: TickTime, priority: Priority, urgent: Boolean) {
         queueCounter++
 
 //        https://bezkoder.com/kotlin-priority-queue/

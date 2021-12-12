@@ -1,15 +1,7 @@
-import org.kalasim.Component
-import org.kalasim.Event
-import org.kalasim.createSimulation
+import org.kalasim.*
+
+class MyEvent(val context: String, time: TickTime) : Event(time)
 
 createSimulation {
-    addEventListener{ println(it)}
-
-    class MyEvent(msg:String) : Event(now())
-
-    object: Component(){
-//        override fun process() = sequence<Component> {
-//            log(MyEvent("something magical happened"))
-//        }
-    }
+    addEventListener<MyEvent>{ println(it.context)}
 }
