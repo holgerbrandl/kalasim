@@ -819,6 +819,7 @@ open class Component(
 
 
     fun terminate() {
+        // todo strictly speaking this should fail in assert mode = FULL, as the user should take care to release claims
         // we need to wrap claims as another map to avoid concurrent modification
         claims.toMutableMap().forEach { (resource, _) ->
             release(resource)

@@ -11,7 +11,6 @@ import org.kalasim.plot.kravis.display
 
 class DepletableResourceTests {
 
-    @Ignore
     @Test
     fun `it allow filling and emptying from 0 to capacity limit`() = createTestSimulation(true) {
         val gasSupply = DepletableResource(capacity = 100, initialLevel = 0)
@@ -22,6 +21,7 @@ class DepletableResourceTests {
                 hold(10, "refilling supply tank")
 
                 put(gasSupply withQuantity 2)
+                println("new level is ${gasSupply.level}")
             }
         }
 
@@ -29,7 +29,9 @@ class DepletableResourceTests {
 
         class Car(val tankSize: Int) : Component() {
             override fun process() = sequence {
-                request(gasSupply withQuantity this@Car.tankSize)
+                request(gasSupply withQuantity this@Car.tankSize){
+                    println("refilled ${this@Car}")
+                }
             }
         }
 
@@ -45,6 +47,7 @@ class DepletableResourceTests {
             levelTimeline.display().show()
         }
 
+        TickTime(Double.POSITIVE_INFINITY).toString()
         // ensure that at least the first car was sucessfully refilled
         cg.history.first().componentState shouldBe ComponentState.PASSIVE
     }

@@ -21,7 +21,7 @@ data class TickTime(val value: Double) : Comparable<TickTime> {
     constructor(instant: Number) : this(instant.toDouble())
 
     override fun toString(): String {
-        return TRACE_DF.format(value)
+        return if(value.isInfinite()) "INF" else TRACE_DF.format(value)
     }
 
 }
