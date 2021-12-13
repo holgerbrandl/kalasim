@@ -139,6 +139,12 @@ class EnvTests {
         sleep(4000)
 
         consumed shouldBe true
+
+        removeEventListener(asyncListener)
+
+        // Give the channel a chance to wind down
+        sleep(1000)
+        asyncListener.isClosed shouldBe true
     }
 
     @Test

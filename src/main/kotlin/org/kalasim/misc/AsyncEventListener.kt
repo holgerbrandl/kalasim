@@ -1,40 +1,46 @@
 package org.kalasim.misc
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.kalasim.Event
 import org.kalasim.EventListener
+import java.util.concurrent.Executors.newSingleThreadExecutor
+import java.util.concurrent.Future
+import java.util.concurrent.atomic.AtomicReference
 
-class AsyncEventListener(val scope: CoroutineScope = GlobalScope) : EventListener {
-    val eventChannel = Channel<Event>()
+class AsyncEventListener : EventListener {
+    // These should be private, but the inline forces us to be public.
+    val eventChannel = Channel<Event>(Channel.UNLIMITED)
+    val future: AtomicReference<Future<*>> = AtomicReference()
+
+    val isClosed: Boolean get() = future.get()?.isDone ?: false
 
     inline fun <reified T : Event> start(crossinline block: (event: T) -> Unit) {
-        scope.launch {
-            eventChannel
-                .receiveAsFlow()
-                //.onEach { println("received event ${it::class.simpleName}") }
-                .filter { it is T }
-                .collect { event: Event -> block.invoke(event as T) }
-        }
+        future.set(newSingleThreadExecutor().submit {
+            runBlocking {
+                for(event in eventChannel) {
+                    println("received event ${event::class.simpleName}")
+                    if(event is T)
+                        block(event)
+                }
+            }
+        })
     }
 
     override fun consume(event: Event) {
         runBlocking {
             launch {
-                println("adding event $event to channel")
-                eventChannel.trySend(event)
-                    .also { result ->
-                        println("result: $result")
-                        if (result.isFailure)
-                            println("Failed to add event $event to channel")
-                    }
+                //println("adding event $event to channel")
+                eventChannel.trySend(event).also { result ->
+                    if(result.isFailure)
+                        error("Failed to add event $event to channel")
+                }
             }
         }
+    }
+
+    fun stop() {
+        eventChannel.close()
     }
 }

@@ -1,8 +1,6 @@
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 import org.apache.commons.math3.random.JDKRandomGenerator
 import org.apache.commons.math3.random.RandomGenerator
 import org.json.JSONObject
@@ -345,15 +343,11 @@ open class Environment(
     //
     // Events
     //
-
-
-    inline fun <reified T : Event> addAsyncEventListener(
-        scope: CoroutineScope = GlobalScope,
-        crossinline block: (T) -> Unit
-    ) = AsyncEventListener(scope).also { listener ->
-        listener.start(block)
-        addEventListener(listener)
-    }
+    inline fun <reified T : Event> addAsyncEventListener(crossinline block: (T) -> Unit) =
+            AsyncEventListener().also { listener ->
+                listener.start(block)
+                addEventListener(listener)
+            }
 
     inline fun <reified T : Event> addEventListener(
         crossinline block: (T) -> Unit
@@ -365,7 +359,11 @@ open class Environment(
     fun addEventListener(listener: EventListener) = eventListeners.add(listener)
 
     @Suppress("unused")
-    fun removeEventListener(tr: EventListener) = eventListeners.remove(tr)
+    fun removeEventListener(tr: EventListener): Boolean {
+        if (tr is AsyncEventListener)
+            tr.stop()
+        return eventListeners.remove(tr)
+    }
 
 
     internal fun publishEvent(event: Event) {
