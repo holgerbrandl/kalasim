@@ -18,7 +18,6 @@ import org.kalasim.examples.bank.oneclerk.Customer
 import org.kalasim.examples.bank.reneging.CustomerGenerator
 import org.kalasim.misc.median
 import org.kalasim.test.captureOutput
-import org.koin.core.component.get
 import org.koin.core.context.stopKoin
 
 
@@ -144,10 +143,10 @@ class SalabimExampleTests {
             val waitingLine: ComponentQueue<org.kalasim.examples.bank.reneging.Customer> =
                 get()
 
-            waitingLine.lengthOfStayMonitor.enabled = false
+            waitingLine.lengthOfStayTimeline.enabled = false
             run(1500.0)
 
-            waitingLine.lengthOfStayMonitor.enabled = true
+            waitingLine.lengthOfStayTimeline.enabled = true
 //            waitingLine.lengthOfStayMonitor.reset()
             run(500.0)
         }

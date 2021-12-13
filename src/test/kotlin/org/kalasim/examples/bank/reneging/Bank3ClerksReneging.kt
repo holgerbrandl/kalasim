@@ -89,15 +89,15 @@ fun main() {
 
         val waitingLine: ComponentQueue<Customer> = get()
 
-        waitingLine.lengthOfStayMonitor.enabled = false
+        waitingLine.lengthOfStayTimeline.enabled = false
         run(1500.0)
 
-        waitingLine.lengthOfStayMonitor.enabled = true
+        waitingLine.lengthOfStayTimeline.enabled = true
         run(500.0)
 
         // with console
-        waitingLine.lengthOfStayMonitor.printHistogram()
-        waitingLine.queueLengthMonitor.printHistogram()
+        waitingLine.lengthOfStayTimeline.printHistogram()
+        waitingLine.queueLengthTimeline.printHistogram()
 
         // with kravis
 //        waitingLine.queueLengthMonitor.display()

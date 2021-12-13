@@ -69,8 +69,8 @@ fun main() {
 //        waitingLine.lengthOfStayMonitor.printHistogram()
 //        waitingLine.queueLengthMonitor.printHistogram()
 
-            waitingLine.queueLengthMonitor.display()
-            waitingLine.lengthOfStayMonitor.display()
+            waitingLine.queueLengthTimeline.display()
+            waitingLine.lengthOfStayTimeline.display()
         }
 
 //        waitingLine.stats.toJson().toString(2).printThis()

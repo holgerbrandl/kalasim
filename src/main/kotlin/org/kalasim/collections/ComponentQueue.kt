@@ -1,3 +1,4 @@
+@file:Suppress("PackageDirectoryMismatch")
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
@@ -6,13 +7,12 @@ import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.json.JSONObject
 import org.kalasim.misc.*
 import org.kalasim.misc.printThis
-import org.kalasim.monitors.MetricTimeline
 import org.kalasim.monitors.MetricTimelineStats
-import org.kalasim.monitors.NumericStatisticMonitor
 import org.koin.core.Koin
 import java.util.*
 
 data class CQElement<C>(val component: C, val enterTime: TickTime, val priority: Priority? = null)
+
 
 class ComponentQueue<C>(
     name: String? = null,
@@ -24,63 +24,31 @@ class ComponentQueue<C>(
             { it.priority?.value?.times(-1) ?: 0 },
             { it.enterTime })
     },
+    capacity: Int = Int.MAX_VALUE,
     koin: Koin = DependencyContext.get()
-) : SimulationEntity(name, koin) {
-
-//    constructor(
-//        name: String? = null,
-//        comparator: Comparator<C>,
-//        koin: Koin = DependencyContext.get()
-//    ) : this(
-//        name,
-//        PriorityQueue { o1, o2 ->
-//            compareValuesBy(
-//                o1,
-//                o2,
-//                { comparator.compare(o1.component, o2.component) },
-//                { it.enterTime })
-//        },
-//        koin
-//    )
+) : ComponentCollection<C>(name, capacity, koin) {
 
 
-    val size: Int
+    override val size: Int
         get() = q.size
 
     val components
         get() = q.map { it.component }
 
-    //    val ass = AggregateSummaryStatistics()
-    val queueLengthMonitor = MetricTimeline("Length of ${this.name}", koin = koin)
-    val lengthOfStayMonitor = NumericStatisticMonitor("Length of stay in ${this.name}", koin = koin)
-
-
-    var trackingPolicy: ComponentCollectionTrackingConfig = ComponentCollectionTrackingConfig()
-        set(newPolicy) {
-            field = newPolicy
-
-            with(newPolicy) {
-                queueLengthMonitor.enabled = trackCollectionStatistics
-                lengthOfStayMonitor.enabled = trackCollectionStatistics
-            }
-        }
-
-    init {
-        trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
-    }
-
 
     fun add(component: C, priority: Priority? = null): Boolean {
+        checkCapacity()
 //        log(component, "Entering $name")
 
         val added = q.add(CQElement(component, env.now, priority))
 
         changeListeners.forEach { it.added(component) }
 
-        queueLengthMonitor.addValue(q.size.toDouble())
+        queueLengthTimeline.addValue(q.size.toDouble())
 
         return added
     }
+
 
     fun poll(): C {
         val cqe = q.poll()
@@ -116,12 +84,11 @@ class ComponentQueue<C>(
     private fun updateExitStats(cqe: CQElement<C>) {
         val (_, enterTime) = cqe
 
-        lengthOfStayMonitor.addValue((env.now - enterTime))
-        queueLengthMonitor.addValue(q.size.toDouble())
+        lengthOfStayTimeline.addValue((env.now - enterTime))
+        queueLengthTimeline.addValue(q.size.toDouble())
     }
 
     fun contains(c: C): Boolean = q.any { it.component == c }
-
 
     fun isEmpty() = size == 0
 
@@ -129,31 +96,13 @@ class ComponentQueue<C>(
 
     fun printStats() = stats.print()
 
-    fun printHistogram() {
-        if (lengthOfStayMonitor.values.size < 2) {
-            println("Skipping histogram of '$name' because of to few data")
-        } else {
-            lengthOfStayMonitor.printHistogram()
-            queueLengthMonitor.printHistogram()
-        }
-    }
-
-    private val changeListeners = mutableListOf<QueueChangeListener<C>>()
-
-    fun addChangeListener(changeListener: QueueChangeListener<C>): QueueChangeListener<C> {
-        changeListeners.add(changeListener); return changeListener
-    }
-
-    fun removeChangeListener(changeListener: QueueChangeListener<C>) = changeListeners.remove(changeListener)
-
-    /** Update queue position of component after property changes. */
+       /** Update queue position of component after property changes. */
     fun updateOrderOf(c: C) {
         val element = q.find { it.component == c }
 
         q.remove(element)
         q.add(element)
     }
-
 
     val stats: QueueStatistics
         get() = QueueStatistics(this)
@@ -185,11 +134,11 @@ class QueueStatistics(cq: ComponentQueue<*>) {
     val name = cq.name
     val timestamp = cq.env.now
 
-    val lengthStats = cq.queueLengthMonitor.statistics(false)
-    val lengthStatsExclZeros = MetricTimelineStats(cq.queueLengthMonitor, excludeZeros = true)
+    val lengthStats = cq.queueLengthTimeline.statistics(false)
+    val lengthStatsExclZeros = MetricTimelineStats(cq.queueLengthTimeline, excludeZeros = true)
 
-    val lengthOfStayStats = cq.lengthOfStayMonitor.statistics()
-    val lengthOfStayStatsExclZeros = cq.lengthOfStayMonitor.statistics(excludeZeros = true)
+    val lengthOfStayStats = cq.lengthOfStayTimeline.statistics()
+    val lengthOfStayStatsExclZeros = cq.lengthOfStayTimeline.statistics(excludeZeros = true)
 
     // Partial support for weighted percentiles was added in https://github.com/apache/commons-math/tree/fe29577cdbcf8d321a0595b3ef7809c8a3ce0166
     // Update once released, use jitpack or publish manually
@@ -234,7 +183,7 @@ internal fun Double?.nanAsNull(): Double? = if (this != null && isNaN()) null el
 //private fun DoubleArray.standardDeviation(): Double = StandardDeviation(false).evaluate(this)
 
 
-open class QueueChangeListener<C> {
+open class CollectionChangeListener<C> {
     open fun added(component: C) {}
     open fun removed(component: C) {}
     open fun polled(component: C) {}

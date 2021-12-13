@@ -160,10 +160,10 @@ open class Resource(
 //                availabilityTimeline.enabled = trackUtilization
 //                occupancyTimeline.enabled = trackUtilization
 
-                requesters.lengthOfStayMonitor.enabled = trackQueueStatistics
-                requesters.queueLengthMonitor.enabled = trackQueueStatistics
-                claimers.lengthOfStayMonitor.enabled = trackQueueStatistics
-                claimers.queueLengthMonitor.enabled = trackQueueStatistics
+                requesters.lengthOfStayTimeline.enabled = trackQueueStatistics
+                requesters.queueLengthTimeline.enabled = trackQueueStatistics
+                claimers.lengthOfStayTimeline.enabled = trackQueueStatistics
+                claimers.queueLengthTimeline.enabled = trackQueueStatistics
             }
         }
 
@@ -297,9 +297,9 @@ val Resource.timeline: List<ResourceTimelineSegment>
         val availStats = occupancyTimeline.statsData().asList().asDataFrame()
                 .addColumn("Metric") { ResourceMetric.Availability }
 
-        val requesters = requesters.queueLengthMonitor.statsData().asList().asDataFrame()
+        val requesters = requesters.queueLengthTimeline.statsData().asList().asDataFrame()
                 .addColumn("Metric") { ResourceMetric.Requesters }
-        val claimers = claimers.queueLengthMonitor.statsData().asList().asDataFrame()
+        val claimers = claimers.queueLengthTimeline.statsData().asList().asDataFrame()
                 .addColumn("Metric") { ResourceMetric.Claimers }
 
         var statsDF = bindRows(capStats, claimStats, availStats, occStats, requesters, claimers)

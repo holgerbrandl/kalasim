@@ -1,7 +1,6 @@
 //Bank3ClerksStandby.kt
 import org.kalasim.*
 import org.kalasim.plot.kravis.display
-import org.koin.core.component.get
 import org.koin.core.component.inject
 
 
@@ -45,6 +44,6 @@ fun main() {
     env.get<ComponentQueue<Customer>>().apply {
         printInfo()
         printStats()
-        lengthOfStayMonitor.display()
+        lengthOfStayTimeline.display()
     }
 }

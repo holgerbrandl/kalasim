@@ -1,3 +1,4 @@
+@file:Suppress("PackageDirectoryMismatch")
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
@@ -18,37 +19,25 @@ import java.util.*
  */
 class ComponentList<C>(
     name: String? = null,
-    val list: MutableList<C> = LinkedList<C>(),
+    capacity: Int =Int.MAX_VALUE,
+    private val list: MutableList<C> = LinkedList<C>(),
     koin: Koin = DependencyContext.get()
-) : SimulationEntity(name, koin), MutableList<C> by list {
-
-    //    val ass = AggregateSummaryStatistics()
-    val queueLengthMonitor = MetricTimeline("Length of ${this.name}", koin = koin)
-    val lengthOfStayMonitor = NumericStatisticMonitor("Length of stay in ${this.name}", koin = koin)
+) : ComponentCollection<C>(name, capacity, koin), MutableList<C> by list {
 
     internal val stayTracker = mutableMapOf<C, TickTime>()
-
-    var trackingPolicy: ComponentCollectionTrackingConfig = ComponentCollectionTrackingConfig()
-        set(newPolicy) {
-            field = newPolicy
-
-            with(newPolicy) {
-                queueLengthMonitor.enabled = trackCollectionStatistics
-                lengthOfStayMonitor.enabled = trackCollectionStatistics
-            }
-        }
-
 
     init {
         trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
     }
 
     override fun add(element: C): Boolean {
+        checkCapacity()
+
         list.add(element)
 
         changeListeners.forEach { it.added(element) }
 
-        queueLengthMonitor.addValue(size)
+        queueLengthTimeline.addValue(size)
 
         stayTracker[element] = env.now
 
@@ -63,37 +52,17 @@ class ComponentList<C>(
             changeListeners.forEach { it.removed(element) }
 
             val insertTime = stayTracker.remove(element)!!
-            lengthOfStayMonitor.addValue((env.now - insertTime))
+            lengthOfStayTimeline.addValue((env.now - insertTime))
 
-            queueLengthMonitor.addValue(size)
+            queueLengthTimeline.addValue(size)
         }
 
         return removed
     }
 
-
     fun printStats() = stats.print()
 
-    // todo refactor that out or remove entirely
-    fun printHistogram() {
-        if (lengthOfStayMonitor.values.size < 2) {
-            println("Skipping histogram of '$name' because of to few data")
-        } else {
-            lengthOfStayMonitor.printHistogram()
-            queueLengthMonitor.printHistogram()
-        }
-    }
-
-    private val changeListeners = mutableListOf<ComponentListChangeListener<C>>()
-
-    fun addChangeListener(changeListener: ComponentListChangeListener<C>): ComponentListChangeListener<C> {
-        changeListeners.add(changeListener); return changeListener
-    }
-
-    fun removeChangeListener(changeListener: ComponentListChangeListener<C>) = changeListeners.remove(changeListener)
-
     fun poll(): C? = firstOrNull().also { remove(it) }
-
 
     val stats: ComponentListStatistics
         get() = ComponentListStatistics(this)
@@ -118,11 +87,11 @@ class ComponentListStatistics(cq: ComponentList<*>) {
     val name = cq.name
     val timestamp = cq.env.now
 
-    val lengthStats = cq.queueLengthMonitor.statistics(false)
-    val lengthStatsExclZeros = MetricTimelineStats(cq.queueLengthMonitor, excludeZeros = true)
+    val lengthStats = cq.queueLengthTimeline.statistics(false)
+    val lengthStatsExclZeros = MetricTimelineStats(cq.queueLengthTimeline, excludeZeros = true)
 
-    val lengthOfStayStats = cq.lengthOfStayMonitor.statistics()
-    val lengthOfStayStatsExclZeros = cq.lengthOfStayMonitor.statistics(excludeZeros = true)
+    val lengthOfStayStats = cq.lengthOfStayTimeline.statistics()
+    val lengthOfStayStatsExclZeros = cq.lengthOfStayTimeline.statistics(excludeZeros = true)
 
     // Partial support for weighted percentiles was added in https://github.com/apache/commons-math/tree/fe29577cdbcf8d321a0595b3ef7809c8a3ce0166
     // Update once released, use jitpack or publish manually
@@ -148,9 +117,3 @@ class ComponentListStatistics(cq: ComponentList<*>) {
     fun print() = toJson().toString(JSON_INDENT).printThis()
 }
 
-
-open class ComponentListChangeListener<C> {
-    open fun added(component: C) {}
-    open fun removed(component: C) {}
-    open fun polled(component: C) {}
-}

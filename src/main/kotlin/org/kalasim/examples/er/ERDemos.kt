@@ -41,8 +41,8 @@ object SimpleER {
                 rooms[1].statusTimeline.display().show()
             }
 
-            waitingLine.queueLengthMonitor.display().show()
-            waitingLine.lengthOfStayMonitor.display().show()
+            waitingLine.queueLengthTimeline.display().show()
+            waitingLine.lengthOfStayTimeline.display().show()
 
             val arrivals = get<ComponentGenerator<Patient>>().history
 //        history.asDataFrame().print()

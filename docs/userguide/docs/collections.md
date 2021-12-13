@@ -71,3 +71,16 @@ Statistics
 
 * `stats` - Current state snapshot of queue statistics regarding length and length of stay
 * `info` - Json-structured summary of the list/queue
+
+
+## Capacity
+
+Collections support a `capacity` and an accompanying `capacityTimeline` to set a maximum capacity. If this capacity is exceeded a `CapacityExceededException` is being thrown. 
+
+A capacity can be reduced (similar to [resources](resource.md)) by setting a new one
+```asciidoc
+val queue = ComponentQueue(capacity=5)
+queue.capacity = 10
+```
+
+When setting a capacity that is lower than the current collection size, a `CapacityExceededException` is being thrown. 

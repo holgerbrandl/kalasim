@@ -3,7 +3,6 @@ package org.kalasim.examples.bank.reneging_resources
 
 
 import org.kalasim.*
-import org.koin.core.component.get
 
 
 //var numBalked = LevelMonitoredInt(0)
@@ -46,8 +45,8 @@ fun main() {
         val clerks = get<Resource>()
 
         // with console
-        clerks.requesters.queueLengthMonitor.printHistogram()
-        clerks.requesters.lengthOfStayMonitor.printHistogram()
+        clerks.requesters.queueLengthTimeline.printHistogram()
+        clerks.requesters.lengthOfStayTimeline.printHistogram()
 
         // with kravis
 //        clerks.requesters.queueLengthMonitor.display()

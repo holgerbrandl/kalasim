@@ -65,7 +65,7 @@ fun main() {
     waitingLine.stats.print()
 
     if(canDisplay()) {
-        waitingLine.queueLengthMonitor.display()
-        waitingLine.lengthOfStayMonitor.display()
+        waitingLine.queueLengthTimeline.display()
+        waitingLine.lengthOfStayTimeline.display()
     }
 }

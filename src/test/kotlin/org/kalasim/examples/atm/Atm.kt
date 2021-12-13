@@ -8,7 +8,6 @@ import kravis.plot
 import org.kalasim.*
 import org.kalasim.misc.*
 import org.kalasim.plot.kravis.display
-import org.koin.core.Koin
 
 //https://youtrack.jetbrains.com/issue/KT-44062
 
@@ -45,10 +44,10 @@ fun main() {
         run(2000)
 
         atm.occupancyTimeline.display()
-        atm.requesters.queueLengthMonitor.display()
-        atm.requesters.lengthOfStayMonitor.display()
+        atm.requesters.queueLengthTimeline.display()
+        atm.requesters.lengthOfStayTimeline.display()
 
-        println(atm.requesters.lengthOfStayMonitor.statistics())
+        println(atm.requesters.lengthOfStayTimeline.statistics())
     }
 }
 

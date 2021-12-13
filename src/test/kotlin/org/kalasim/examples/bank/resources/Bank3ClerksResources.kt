@@ -4,7 +4,6 @@ package org.kalasim.examples.bank.resources
 import org.kalasim.*
 import org.kalasim.plot.kravis.canDisplay
 import org.kalasim.plot.kravis.display
-import org.koin.core.component.get
 
 
 class Customer(private val clerks: Resource) : Component() {
@@ -29,7 +28,7 @@ fun main() {
 
         if(canDisplay()) {
             claimedTimeline.display()
-            requesters.queueLengthMonitor.display()
+            requesters.queueLengthTimeline.display()
         }
 
         printStatistics()

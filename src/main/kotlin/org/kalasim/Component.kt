@@ -1364,7 +1364,7 @@ open class Component(
 
         require(batchSize > 0) { "Batch size must be positive" }
 
-        val queueListener = object : QueueChangeListener<T>() {
+        val queueListener = object : CollectionChangeListener<T>() {
             override fun added(component: T) {
                 if (queue.size >= batchSize) {
                     activate()
