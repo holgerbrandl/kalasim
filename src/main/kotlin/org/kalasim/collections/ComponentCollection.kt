@@ -10,10 +10,10 @@ import org.koin.core.Koin
 
 
 class CapacityExceededException(
-    val componentCollection: ComponentCollection<*>,
+    val source: SimulationEntity,
     msg: String,
     val timestamp: TickTime,
-    val capacity: Int
+    val capacity: Number
 ) : Exception(msg)
 
 

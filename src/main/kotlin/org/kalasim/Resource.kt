@@ -91,10 +91,12 @@ open class Resource(
     val claimers = ComponentQueue<Component>("claimers of ${this.name}", koin = koin)
 
     var capacity = capacity.toDouble()
-        set(value) {
-            require(value >= claimed) { "can not reduce capacity below current claims" }
+        set(newCapacity) {
+            if(newCapacity < claimed) {
+                throw CapacityExceededException(this, "can not reduce capacity below current claims", now, newCapacity)
+            }
 
-            field = value
+            field = newCapacity
 
             capacityTimeline.addValue(capacity)
 //            updatedDerivedMetrics()
@@ -185,8 +187,8 @@ open class Resource(
                 val wasHonored = with(requesters.q) {
                     isNotEmpty() && peek().component.tryRequest()
                 }
+                println(wasHonored)
             } while (wasHonored)
-
         } else {
             while (requesters.q.isNotEmpty()) {
                 //try honor as many requests as possible
