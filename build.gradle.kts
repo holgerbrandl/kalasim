@@ -26,7 +26,7 @@ dependencies {
 
     //cant upgrade because of https://github.com/InsertKoinIO/koin/issues/939
 //    implementation("org.koin:koin-core:2.1.6")
-    api("io.insert-koin:koin-core:3.1.3")
+    api("io.insert-koin:koin-core:3.1.4")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.10")
 
@@ -42,8 +42,10 @@ dependencies {
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
 
     testImplementation(kotlin("test-junit"))
+    @Suppress("GradlePackageUpdate") // disabled because v5.0.1 is based on kotlin 1.6
     testImplementation("io.kotest:kotest-assertions-core:4.6.3")
 
+    // **TODO** move to api to require users to pull it in if needed
     implementation("com.github.holgerbrandl:krangl:0.17.1")
 
     compileOnly("com.github.holgerbrandl:kravis:0.8.1")
