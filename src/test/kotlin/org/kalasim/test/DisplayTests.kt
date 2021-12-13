@@ -18,11 +18,19 @@ import javax.xml.transform.TransformerFactory
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.stream.StreamSource
 
+
 class DisplayTests : AbstractSvgPlotRegression() {
 
     override val testDataDir: File
         get() = File("src/test/resources/display/kravis")
 
+    @Before
+    fun beforeMethod() {
+        // Only run tests that rely on for brandl or if users has exported KALASIM_RUN_DISPLAY_TESTS as 'true'
+        // https://stackoverflow.com/questions/1689242/conditionally-ignoring-tests-in-junit-4
+        val runDisplaytests = System.getProperty("KALASIM_RUN_DISPLAY_TESTS").toBoolean() || System.getProperty("user.name") == "brandl"
+        Assume.assumeTrue(runDisplaytests);
+    }
 
     @Test
     fun `is should display the mm1 server utilization`() {

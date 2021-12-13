@@ -11,6 +11,7 @@ import org.kalasim.plot.kravis.display
 
 class DepletableResourceTests {
 
+    @Ignore
     @Test
     fun `it allow filling and emptying from 0 to capacity limit`() = createTestSimulation(true) {
         val gasSupply = DepletableResource(capacity = 100, initialLevel = 0)
@@ -48,21 +49,25 @@ class DepletableResourceTests {
         cg.history.first().componentState shouldBe ComponentState.PASSIVE
     }
 
+    @Ignore
     @Test
     fun `it ensure that capacity=INF has meaninful semantic`() = createTestSimulation(true) {
         fail()
     }
 
+    @Ignore
     @Test
     fun `it should ensure that a level incrase is stalled until capacity becomes available`() = createTestSimulation(true) {
         fail()
     }
 
+    @Ignore
     @Test
     fun `it should respect queue priorities when consuming resource`() = createTestSimulation(true) {
         fail()
     }
 
+    @Ignore
     @Test
     fun `it should respect queue priorities when restoring resource`() = createTestSimulation(true) {
         fail()
