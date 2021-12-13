@@ -484,7 +484,7 @@ open class Component(
      * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given. It is possible to check which resource has been claimed with `Component.claimers()`.
      * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
      * @param priority If multiple components compete for the same resource, requests with higher priority will have precedence.
-     * @param schedulePriority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
+     * @param schedulePriority Priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
      */
@@ -520,7 +520,7 @@ open class Component(
      * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given. It is possible to check which resource has been claimed with `Component.claimers()`.
      * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
      * @param priority If multiple components compete for the same resource, requests with higher priority will have precedence.
-     * @param schedulePriority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
+     * @param schedulePriority Priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
      */
@@ -554,7 +554,7 @@ open class Component(
      * @param failDelay  if the request is not honored before now+fail_delay,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
      * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given. It is possible to check which resource has been claimed with `Component.claimers()`.
-     * @param schedulePriority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
+     * @param schedulePriority Priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
@@ -1143,9 +1143,9 @@ open class Component(
      * @param state state variable
      * @param waitFor State value to wait for
      * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
-     * @param failDelay  If the request is not honored before now+fail_delay,
+     * @param failDelay If the request is not honored before now+fail_delay,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
-     * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
+     * @param priority Priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      */
 // todo states may have different types so this methods does not make real sense here.
 //  Either remove type from state or enforce the user to call wait multiple times
@@ -1176,7 +1176,7 @@ open class Component(
      * @param failDelay  If the request is not honored before now+fail_delay,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
      * @param all If `false` (default), continue, if any of the given state/values is met. if `true`, continue if all of the given state/values are met.
-     * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
+     * @param priority Priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      */
     suspend fun SequenceScope<Component>.wait(
         vararg stateRequests: StateRequest<*>,

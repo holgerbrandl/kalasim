@@ -3,6 +3,34 @@
 
 ## Next steps
 
+[salabim 21.1.7](https://mail.google.com/mail/u/0/#inbox/FMfcgzGllVgcWzCKtwHNCjgLLqMPccJG) feature backport
+
+* Queue capacity
+```
+Queues can now have limited capacity, by setting the capacity parameter of Queue(), e.g.
+    q = sim.Queue('q', capacity=5)
+If a queue exceeds that capacity, a QueueFullError exception will be raised.
+So, it is possible to do
+    try:
+        c.enter(q)
+    except sim.QueueFullError:
+        experienced_full += 1
+     
+Queue.capacity is a level monitor that can be changed like
+    q.capacity.value = 10
+, so it is also possible to make a normal unrestricted queue into a queue with a
+limited capacity.
+    q = sim.Queue('q')
+    ...
+    q.capacity.value = 5
+Important: if the queue contains more components than the new capacity, all
+components will stay in the queue.
+```
+
+* Bug in the interpretation of multiple states in Component.wait() fixed.
+
+
+
 ## v0.8
 
 **TODO** log output is misleading
