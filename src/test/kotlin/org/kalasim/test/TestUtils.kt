@@ -2,6 +2,7 @@ package org.kalasim.test
 
 import org.apache.commons.math3.distribution.AbstractRealDistribution
 import org.apache.commons.math3.distribution.ConstantRealDistribution
+import org.kalasim.Component
 import org.kalasim.Environment
 import org.kalasim.createSimulation
 import org.kalasim.misc.cumSum
@@ -46,6 +47,24 @@ internal fun captureOutput(expr: () -> Any): CapturedOutput {
 internal fun createTestSimulation(enableConsoleLogger: Boolean = true, builder: Environment.() -> Unit) {
     createSimulation(enableConsoleLogger, builder = builder)
 }
+
+
+//relates to https://github.com/holgerbrandl/kalasim/issues/11
+//internal fun testComponent(enableConsoleLogger: Boolean = true, block:  suspend SequenceScope<Component>.() -> Unit) = createTestSimulation {
+//
+//    object : Component() {
+//        override fun process() = sequence {
+//            block()
+//        }
+//    }
+//
+//}
+//
+//fun main() {
+//    testComponent {
+//        hold(1)
+//    }
+//}
 
 
 /** Converts a list of fixed history into a inter-arrival distribution. Once the list is exhausted it will throw an
