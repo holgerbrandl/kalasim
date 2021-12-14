@@ -1,6 +1,7 @@
 # Welcome to `kalasim`
 
-[ ![Download](https://img.shields.io/github/v/release/holgerbrandl/kalasim) ](https://github.com/holgerbrandl/kalasim/releases)  [![Build Status](https://github.com/holgerbrandl/kalasim/workflows/build/badge.svg)](https://github.com/holgerbrandl/kalasim/actions?query=workflow%3Abuild) [![Gitter](https://badges.gitter.im/kalasim.svg)](https://gitter.im/holgerbrandl/kalasim) [![slack](https://img.shields.io/badge/kotlinlang%20slack-kalasim-yellowgreen)](https://kotlinlang.slack.com/messages/kalasim/)
+[ ![Download](https://img.shields.io/github/v/release/holgerbrandl/kalasim) ](https://github.com/holgerbrandl/kalasim/releases)  [![Build Status](https://github.com/holgerbrandl/kalasim/workflows/build/badge.svg)](https://github.com/holgerbrandl/kalasim/actions?query=workflow%3Abuild)  [![slack](https://img.shields.io/badge/kotlinlang%20slack-kalasim-yellowgreen)](https://kotlinlang.slack.com/messages/kalasim/)
+[![github-discussions](https://img.shields.io/badge/discuss-kalasim-orange)](https://github.com/holgerbrandl/kalasim/discussions)
 
 `kalasim` is a [discrete event simulator](theory.md#what-is-discrete-event-simulation) that enables complex, performant, dynamic process models. It provides a statically typed API, dependency injection, modern persistence, structured logging and automation capabilities.
 

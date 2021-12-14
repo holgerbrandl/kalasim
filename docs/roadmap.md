@@ -67,6 +67,13 @@ https://github.com/citiususc/hipster
 https://www.baeldung.com/java-a-star-pathfinding
 
 ---
+visualization
+
+https://medium.com/@benjaminmbrown/real-time-data-visualization-with-d3-crossfilter-and-websockets-in-python-tutorial-dba5255e7f0e
+* ktor backend for serving https://www.youtube.com/watch?v=wXpEKouOV3E&t=1926s&ab_channel=KotlinbyJetBrains
+
+
+---
 
 **TODO** add planning example from classical scheduling theory
 parallel maschines --> solve with or tools or optaplanner
