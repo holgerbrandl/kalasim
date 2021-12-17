@@ -109,7 +109,7 @@ There are different predefined priorities which correspond the following sort-le
 * `LOWEST` (-20)
 * `LOW` (-10)
 * `NORMAL` (0)
-* `IMPORTANT` (20)
+* `IMPORTANT` (10)
 * `CRITICAL` (20)
 
 The user can also create more fine-grained priorities with `Priority(23)`
@@ -403,7 +403,13 @@ An alternative more direct approach to achieve round-robin resource selection (e
 
 ##  Depletable Resources
 
-For depletable (which are also referred to as _anonymous_) resources, it may be not allowed to exceed the capacity and have a component wait for enough (claimed) capacity to be available. That may be accomplished by using a negative quantity in the `Component.request()` call.
+For depletable (which are also sometimes referred to as _anonymous_) resources, it may be not allowed to exceed the capacity and have a component wait for enough (claimed) capacity to be available. That may be accomplished by using a negative quantity in the `Component.request()` call. However, to clarify the semantics of resource depletion, the API includes a dedicated `DepletableResource`. 
+
+* A depletable resource can be consumed with `Component.take()`.
+* A depletable resource can refilled/recharged with `Component.put()`.
+
+!!!info
+   Both `put()` and `take` are just typesafe wrappers around [`request()`](#resources).  With `put()` quantities of resources are negated before calling `Component.request()` internally.
 
 To create a depletable resource we do
 ```kotlin
@@ -417,9 +423,14 @@ In addition to the `Resource` attributs, depletable resources have the following
 * `isDepleted` - Indicates if depletable resource is depleted (level==0)
 * `isFull` - Indicates if depletable resource is at full capacity
 
-Alternatively, it possible to use the `Component.put()` method, where quantities of anonymous resources are negated. For symmetry reasons, `kalasim` also offers the `Component.get()` method, which is behaves exactly like `Component.request()`.
+It may happen that a `put` would fail because its quantity would exceed the depletable resource's `capacity`. With `PutOverflowMode` different modes can be configured to handle such situations if just a _single_
 
-The model below illustrates the use of `get` and `put`. See the [Gas Station](examples/gas_station.md) simulation for a living example.
+1. `CAP` - Cap request at capacity level (Default)
+2. `FAIL`-  Fail if request size exceeds resource capacity.
+3. `SCHEDULE` - Schedule put if necessary, hoping for a later capacity increase.
+
+
+The model below illustrates the use of `take` and `put`. See the [Gas Station](examples/gas_station.md) simulation for a living example.
 
 
 ## Pre-emptive Resources

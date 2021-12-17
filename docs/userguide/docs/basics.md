@@ -96,7 +96,7 @@ There are different predefined priorities which correspond the following sort-le
 * `LOWEST` (-20)
 * `LOW` (-10)
 * `NORMAL` (0)
-* `IMPORTANT` (20)
+* `IMPORTANT` (10)
 * `CRITICAL` (20)
 
 The user can also create more fine-grained priorities with `Priority(23)`
@@ -215,11 +215,11 @@ Here, `3` is converted into a `org.apache.commons.math3.distribution.ConstantRea
 
 Also, `RealDistribution.clip(0)` will cap the sampled values at 0 (or any other value,  allowing zero-inflated distribution models with controlled randomization
 
-!!important
-    All distribution helpers to allow controlled randomization are available only form an `Environment` or `SimulationContext` only. That's because kalasim needs the context to associate the correct internal random generator to each distribution.
+!!!important
+    All randomization/distribution helpers are accessible  from an `Environment` or `SimulationEntity` context only. That's because kalasim needs the context to associate the correct internal random generator.
 
 
-Similarly, also distributions over arbitrary types are supported via `enumerated`. This does not just work with `enums` but with arbitrary types including [data classes](https://kotlinlang.org/docs/data-classes.html).
+Apart fom numeric distributions, also distributions over arbitrary types are supported via `enumerated()`. This does not just work with [`enums`](https://kotlinlang.org/docs/enum-classes.html) but with arbitrary types including [data classes](https://kotlinlang.org/docs/data-classes.html).
 
 ```kotlin
 enum class Fruit{Apple, Banana, Peach}
@@ -229,9 +229,9 @@ val fruit = enumerated(values())
 // sample the fruits
 val aFruit : Fruit = fruit()
 
-// create a uniform distribution over the fruits
+// create a non-uniform distribution over the fruits
 val biasedFruit = enumerated(Apple to 0.7, Banana to 0.1, Peach to 0.2 )
-// sample the biased fruits
+// sample the distribution
 biasedFruit()
 ```
             

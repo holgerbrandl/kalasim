@@ -27,7 +27,6 @@ open class DepletableResource(
         koin: Koin = DependencyContext.get()
 ) : Resource(name = name, capacity = capacity, preemptive = preemptive, koin = koin) {
 
-    // TODO we must test that a depeletable resource is not refilled above its capacity limit
 
     /** Indicates if depletable resource is at full capacity. */
     val isFull: Boolean
@@ -96,10 +95,16 @@ open class Resource(
                 throw CapacityExceededException(this, "can not reduce capacity below current claims", now, newCapacity)
             }
 
+            val capacityDiff = newCapacity-field
             field = newCapacity
 
             capacityTimeline.addValue(capacity)
 //            updatedDerivedMetrics()
+
+            if(this is DepletableResource){
+                // maintain the fill level of depletable resources
+                claimed += capacityDiff
+            }
 
             tryRequest()
         }
