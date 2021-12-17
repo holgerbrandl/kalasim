@@ -2,8 +2,8 @@
 package org.kalasim.examples
 
 import org.kalasim.*
-import org.kalasim.plot.kravis.display
 import org.kalasim.monitors.NumericStatisticMonitor
+import org.kalasim.plot.kravis.display
 
 createSimulation {
 

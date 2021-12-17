@@ -1,6 +1,5 @@
 //Traffic.kts
 import org.kalasim.*
-import org.koin.core.component.get
 import org.koin.core.component.inject
 
 class TrafficLight : State<String>("red")

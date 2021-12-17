@@ -1,7 +1,6 @@
 package org.kalasim.test
 
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.*

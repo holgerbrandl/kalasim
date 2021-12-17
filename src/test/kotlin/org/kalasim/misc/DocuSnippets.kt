@@ -31,9 +31,7 @@ class ResourceDocu {
 
                     release(clerks, quantity = 2.0) // release some quantity
 
-                    release(clerks) // release entiry claim
-
-
+                    release(clerks) // release entire claim
                 }
         }
 

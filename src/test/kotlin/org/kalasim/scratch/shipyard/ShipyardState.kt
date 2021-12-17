@@ -1,6 +1,9 @@
 package org.kalasim.scratch.shipyard
 
-import org.kalasim.*
+import org.kalasim.Component
+import org.kalasim.DepletableResource
+import org.kalasim.State
+import org.kalasim.createSimulation
 import org.kalasim.plot.kravis.display
 
 // wait for a terminal to accumulate enough goods before starting shipment. This implementation essentially does not request until the resource level is sufficient for the request

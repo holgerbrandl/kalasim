@@ -1,11 +1,8 @@
 package org.kalasim.test
 
-import org.apache.commons.math3.distribution.AbstractRealDistribution
 import org.apache.commons.math3.distribution.ConstantRealDistribution
-import org.kalasim.Component
 import org.kalasim.Environment
 import org.kalasim.createSimulation
-import org.kalasim.misc.cumSum
 import org.kalasim.tickTime
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream

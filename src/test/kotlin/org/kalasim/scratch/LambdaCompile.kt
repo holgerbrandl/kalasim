@@ -1,9 +1,3 @@
-import org.kalasim.Defaults
-import org.kalasim.Environment
-import org.kalasim.Event
-import org.kalasim.createSimulation
-import org.koin.dsl.koinApplication
-
 // see https://youtrack.jetbrains.com/issue/KT-44631
 
 //class Something{

@@ -2,7 +2,8 @@
 package org.kalasim.examples.elevator
 
 import org.kalasim.*
-import org.kalasim.examples.elevator.Car.DoorState.*
+import org.kalasim.examples.elevator.Car.DoorState.CLOSED
+import org.kalasim.examples.elevator.Car.DoorState.OPEN
 import org.kalasim.examples.elevator.Direction.*
 import org.kalasim.misc.repeat
 

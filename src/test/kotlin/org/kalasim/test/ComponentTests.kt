@@ -8,7 +8,9 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.DATA
 import org.kalasim.ComponentState.SCHEDULED
-import org.kalasim.misc.*
+import org.kalasim.misc.ResourceTrackingConfig
+import org.kalasim.misc.TrackingConfig
+import org.kalasim.misc.printThis
 import kotlin.test.fail
 
 

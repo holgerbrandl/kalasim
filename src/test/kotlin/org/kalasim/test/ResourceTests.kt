@@ -5,7 +5,9 @@ import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.apache.commons.math3.distribution.EnumeratedDistribution
-import org.junit.*
+import org.junit.Assert
+import org.junit.Ignore
+import org.junit.Test
 import org.kalasim.*
 import org.kalasim.Priority.Companion.CRITICAL
 import org.kalasim.Priority.Companion.IMPORTANT
