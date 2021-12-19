@@ -136,6 +136,13 @@ There are different predefined priorities which correspond the following sort-le
 
 The user can also create more fine-grained priorities with `Priority(23)`
 
+## Capacity Limit Modes     
+
+It may happen that `request` (regular resources), `take` or `put` (depletable resources) would fail because the request quantity exceeds the resource's `capacity`. A `CapacityLimitMode` can be configured to handle such situations gracefully:
+
+1. `FAIL`-  Fail with a `CapacityLimitException` if request size exceeds resource capacity. (Default)
+2. `SCHEDULE` - Schedule request even the current `capacity` won't ever honor the request, hoping for a later capacity increase.
+3. `CAP` - [Depletable resources](#depletable-resources) also support capping `put` requests at capacity level 
 
 ## Multiple resources
 
@@ -445,11 +452,6 @@ In addition to the `Resource` attributs, depletable resources have the following
 * `isDepleted` - Indicates if depletable resource is depleted (level==0)
 * `isFull` - Indicates if depletable resource is at full capacity
 
-It may happen that a `put` would fail because its quantity would exceed the depletable resource's `capacity`. With `PutOverflowMode` different modes can be configured to handle such situations if just a _single_
-
-1. `CAP` - Cap request at capacity level (Default)
-2. `FAIL`-  Fail if request size exceeds resource capacity.
-3. `SCHEDULE` - Schedule put if necessary, hoping for a later capacity increase.
 
 
 The model below illustrates the use of `take` and `put`. See the [Gas Station](examples/gas_station.md) simulation for a living example.

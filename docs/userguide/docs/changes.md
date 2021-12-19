@@ -8,7 +8,8 @@ Not yet released
 * [#35](https://github.com/holgerbrandl/kalasim/pull/35) Improved support for asynchronous event consumption (contributed by [pambrose](https://github.com/pambrose) via PR)
 * New: [Timeline Arithmetics](monitors.md#monitors-arithmetics). It is now possible to perform stream arithmetics on timeline attributes
 * Reduced memory requirements of [resource](resource.md) monitoring by 50% by inferring `occupancy` and `availability` using [Timeline Arithmetics](monitors.md#monitors-arithmetics)
-* [#38](https://github.com/holgerbrandl/kalasim/issues/38) Extended and improved API support for [depletable resources](resource.md#depletable-resources). In particular new error handling modes for `put` were added.
+* [#38](https://github.com/holgerbrandl/kalasim/issues/38) Extended and improved API support for [depletable resources](resource.md#depletable-resources). 
+* Introduced different [modes](resource.md#capacity-limit-modes) if resource requests exceed resource capacity. 
 
 
 Minor enhancements

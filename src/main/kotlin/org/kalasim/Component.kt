@@ -7,6 +7,8 @@ import org.kalasim.ResourceSelectionPolicy.*
 import org.kalasim.misc.*
 import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
+import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.reflect.KFunction1
 
@@ -470,6 +472,20 @@ open class Component(
     )
 
 
+    /** Define error behavior if `put` exceeds the capacity of a depletable resource .*/
+    enum class CapacityLimitMode {
+
+        /** Fail if request size exceeds resource capacity.*/
+        FAIL,
+
+        /** Schedule put if necessary, hoping for a later capacity increase.*/
+        SCHEDULE,
+
+        /** Cap put requests at capacity level */
+        CAP
+    }
+
+
     /**
      * Restores capacity of a depletable resource. This is intentionally also suspendable, as a component may need to wait until a component has the capacity to consume the new quantity.
      *
@@ -486,29 +502,13 @@ open class Component(
         failPriority: Priority? = null,
         failAt: TickTime? = null,
         failDelay: Number? = null,
-        overflowMode: PutOverflowMode = PutOverflowMode.CAP,
-    ) {
-        val quantity = when (overflowMode) {
-            PutOverflowMode.CAP -> {
-                if (quantity.toDouble() > resource.capacity - resource.level) {
-                    resource.capacity - resource.level
-                } else {
-                    quantity
-                }
-            }
-            PutOverflowMode.FAIL -> throw CapacityExceededException(
-                resource,
-                "Can not put a total of more its capacity ${resource.capacity} into $resource",
-                now,
-                resource.capacity
-            )
-            PutOverflowMode.SCHEDULE -> quantity
-        }
-
-        put(
-            ResourceRequest(resource, quantity.toDouble(), failPriority), failAt = failAt, failDelay = failDelay
-        )
-    }
+        capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
+    ) = put(
+        ResourceRequest(resource, quantity.toDouble(), failPriority),
+        failAt = failAt,
+        failDelay = failDelay,
+        capacityLimitMode = capacityLimitMode
+    )
 
     /**
      * Restores capacity of anonymous resources. This is intentionally also suspendable, as a component may need to wait until a component has the capacity to consume the new quantity.
@@ -526,22 +526,11 @@ open class Component(
         failAt: TickTime? = null,
         failDelay: Number? = null,
         failPriority: Priority = NORMAL,
+        capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
     ) = request(
         *resourceRequests.map { it.copy(quantity = -1.0 * it.quantity) }.toTypedArray(),
-        failAt = failAt, failDelay = failDelay, failPriority = failPriority
+        failAt = failAt, failDelay = failDelay, failPriority = failPriority, capacityLimitMode = capacityLimitMode
     )
-
-    /** Define error behavior if `put` exceeds the capacity of a depletable resource .*/
-    enum class PutOverflowMode {
-        /** Cap request at capacity level */
-        CAP,
-
-        /** Fail if request size exceeds resource capacity.*/
-        FAIL,
-
-        /** Schedule put if necessary, hoping for a later capacity increase.*/
-        SCHEDULE
-    }
 
     /**
      * Request from a resource or resources.
@@ -563,12 +552,13 @@ open class Component(
     suspend fun SequenceScope<Component>.request(
         resources: Collection<Resource>,
         description: String? = null,
-        quantity: Number  =  DEFAULT_REQUEST_QUANTITY,
+        quantity: Number = DEFAULT_REQUEST_QUANTITY,
         priority: Priority? = null,
         oneOf: Boolean = false,
         failAt: TickTime? = null,
         failDelay: Number? = null,
         failPriority: Priority = NORMAL,
+        capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
         honorBlock: (suspend SequenceScope<Component>.(RequestScopeContext) -> Unit)? = null
     ) = request(
         *resources.map { it withQuantity quantity andPriority priority }.toTypedArray(),
@@ -577,6 +567,7 @@ open class Component(
         failDelay = failDelay,
         oneOf = oneOf,
         failPriority = failPriority,
+        capacityLimitMode = capacityLimitMode,
         honorBlock = honorBlock
     )
 
@@ -601,12 +592,13 @@ open class Component(
     suspend fun SequenceScope<Component>.request(
         vararg resources: Resource,
         description: String? = null,
-        quantity: Number  =  DEFAULT_REQUEST_QUANTITY,
+        quantity: Number = DEFAULT_REQUEST_QUANTITY,
         priority: Priority? = null,
         oneOf: Boolean = false,
         failAt: TickTime? = null,
         failDelay: Number? = null,
         failPriority: Priority = NORMAL,
+        capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
         honorBlock: (suspend SequenceScope<Component>.(RequestScopeContext) -> Unit)? = null
     ) = request(
         *resources.map { it withQuantity quantity andPriority priority }.toTypedArray(),
@@ -615,6 +607,7 @@ open class Component(
         failDelay = failDelay,
         oneOf = oneOf,
         failPriority = failPriority,
+        capacityLimitMode = capacityLimitMode,
         honorBlock = honorBlock
     )
 
@@ -637,12 +630,12 @@ open class Component(
     suspend fun SequenceScope<Component>.request(
         vararg resourceRequests: ResourceRequest,
         description: String? = null,
-
         oneOf: Boolean = false,
         urgent: Boolean = false,
         failAt: TickTime? = null,
         failDelay: Number? = null,
         failPriority: Priority = NORMAL,
+        capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
         // try to avoid argument by inferring from stacktrace
         calledFrom: String? = null,
         // see https://stackoverflow.com/questions/46098105/is-there-a-way-to-open-and-close-a-stream-easily-at-kotlin
@@ -650,13 +643,29 @@ open class Component(
     ) {
         val requestStart = now
 
-        resourceRequests.firstOrNull { it.quantity > it.r.capacity }?.also {
-            throw CapacityExceededException(
-                it.r,
-                "Request of quantity ${it.quantity} can never succeed",
-                now,
-                it.r.capacity
-            )
+        @Suppress("NAME_SHADOWING")
+        val resourceRequests: List<ResourceRequest> = when (capacityLimitMode) {
+            CapacityLimitMode.FAIL -> resourceRequests.firstOrNull { abs(it.quantity) > it.resource.capacity }?.let {
+                throw CapacityLimitException(
+                    it.resource,
+                    "Request of quantity ${it.quantity} can never succeed",
+                    now,
+                    it.resource.capacity
+                )
+            } ?: resourceRequests.asList()
+
+            CapacityLimitMode.SCHEDULE -> resourceRequests.asList()
+
+            CapacityLimitMode.CAP -> resourceRequests.map {
+                with(it) {
+                    val rr = if (quantity < 0 && resource is DepletableResource) {
+                        copy(quantity = -1 * max(resource.capacity - resource.level, quantity))
+                    } else {
+                        throw RuntimeException("CAP mode is just supported for put requests")
+                    }
+                    rr
+                }
+            }
         }
 
         yieldCurrent {
@@ -765,13 +774,13 @@ open class Component(
             val after = now
 
             // salabim says: It is possible to check which resource has been claimed with `Component.claimers()`.
-            resourceRequests.filter { it.r.claimers.contains(this@Component) }.forEach {
+            resourceRequests.filter { it.resource.claimers.contains(this@Component) }.forEach {
                 release(it)
 
-                if (it.r.trackingPolicy.trackActivities) {
+                if (it.resource.trackingPolicy.trackActivities) {
                     val rse =
-                        ResourceActivityEvent(before, after, this@Component, it.r, description, it.quantity)
-                    (it.r.activities as MutableList<ResourceActivityEvent>).add(rse)
+                        ResourceActivityEvent(before, after, this@Component, it.resource, description, it.quantity)
+                    (it.resource.activities as MutableList<ResourceActivityEvent>).add(rse)
                     log(rse)
                 }
 
@@ -783,8 +792,8 @@ open class Component(
     /** Determine if all current requests of this component could be honored. */
     private fun honorAll(): List<Pair<Resource, Double>>? {
         for ((r, requestedQuantity) in requests) {
-            if(requestedQuantity<0){
-                require(r is DepletableResource){
+            if (requestedQuantity < 0) {
+                require(r is DepletableResource) {
                     "can not request negative quantivy from non-depletable resource"
                 }
             }
@@ -1536,7 +1545,7 @@ class SimpleProcessInternal(val component: Component, val funPointer: ProcessPoi
 internal const val DEFAULT_REQUEST_QUANTITY = 1.0
 
 data class ResourceRequest(
-    val r: Resource,
+    val resource: Resource,
     val quantity: Double = DEFAULT_REQUEST_QUANTITY,
     val priority: Priority? = null
 )
@@ -1545,7 +1554,7 @@ infix fun Resource.withQuantity(quantity: Number) = ResourceRequest(this, quanti
 infix fun Resource.withPriority(priority: Int) = ResourceRequest(this, priority = Priority(priority))
 infix fun Resource.withPriority(priority: Priority) = ResourceRequest(this, priority = priority)
 
-infix fun ResourceRequest.andPriority(priority: Priority?) = ResourceRequest(this.r, this.quantity, priority)
+infix fun ResourceRequest.andPriority(priority: Priority?) = ResourceRequest(this.resource, this.quantity, priority)
 
 data class RequestScopeContext(val resource: Resource?, val requestingSince: TickTime)
 

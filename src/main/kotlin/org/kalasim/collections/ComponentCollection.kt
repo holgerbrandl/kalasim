@@ -9,7 +9,7 @@ import org.kalasim.monitors.NumericStatisticMonitor
 import org.koin.core.Koin
 
 
-class CapacityExceededException(
+class CapacityLimitException(
     val source: SimulationEntity,
     msg: String,
     val timestamp: TickTime,
@@ -29,7 +29,7 @@ abstract class ComponentCollection<C>(
         set(newCapacity) {
             if (newCapacity > size) {
                 val msg = "can not reduce capacity to $newCapacity below current collection size of $size"
-                throw CapacityExceededException(this, msg, now, newCapacity)
+                throw CapacityLimitException(this, msg, now, newCapacity)
             }
 
             field = newCapacity
@@ -40,7 +40,7 @@ abstract class ComponentCollection<C>(
 
     internal fun checkCapacity() {
         if (size > capacity) {
-            throw CapacityExceededException(this, "Can not more items to collection", now, capacity)
+            throw CapacityLimitException(this, "Can not more items to collection", now, capacity)
         }
     }
 

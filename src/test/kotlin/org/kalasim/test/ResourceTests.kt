@@ -205,18 +205,18 @@ class ResourceTests {
 
         val results = mutableListOf<Priority?>()
 
-        class PrioComponent(val wait:Number, val claim:Number, val prio: Priority?=null) : Component(){
-            override fun process() =sequence {
+        class PrioComponent(val wait: Number, val claim: Number, val prio: Priority? = null) : Component() {
+            override fun process() = sequence {
                 hold(wait)
-                request(ResourceRequest(r, priority = prio)){
+                request(ResourceRequest(r, priority = prio)) {
                     results.add(prio)
                     hold(claim)
                 }
             }
         }
 
-        PrioComponent(1,20, null)
-        PrioComponent(2,20, null)
+        PrioComponent(1, 20, null)
+        PrioComponent(2, 20, null)
         PrioComponent(3, 20, null)
         PrioComponent(4, 20, null)
         PrioComponent(5, 20, IMPORTANT)
@@ -255,7 +255,7 @@ class ResourceTests {
 
                 request(resource withQuantity 2 andPriority Priority.CRITICAL) {
                     criticalRequestHonored = true
-                    hold(duration = 5.0, "consumed complete resource" )
+                    hold(duration = 5.0, "consumed complete resource")
                 }
             }
         }
@@ -264,9 +264,9 @@ class ResourceTests {
             override fun process() = sequence {
                 hold(duration = 10.0)
 
-                request(resource){
-                    criticalRequestHonored shouldBe  true // because it should be honoured after the big consumer
-                    hold(duration = 5.0, "late consumption" )
+                request(resource) {
+                    criticalRequestHonored shouldBe true // because it should be honoured after the big consumer
+                    hold(duration = 5.0, "late consumption")
                 }
             }
         }
@@ -276,8 +276,11 @@ class ResourceTests {
         criticalRequestHonored shouldBe true
     }
 
-
-   @Test
+//    @Ignore(
+//        "its unclear if this should be suppoted to be more consistent with depletable resources. " +
+//                "Usually capacity changes should be rare, so failing here seems to make sens"
+//    )
+    @Test
     fun `it should reevaluate requests upon capacity changes`() {
 
         class Customer(val clerk: Resource) : Component() {
@@ -285,7 +288,7 @@ class ResourceTests {
             override fun process() = sequence {
                 hold(duration = 5.0)
 
-                request(clerk)
+                request(clerk, capacityLimitMode = CapacityLimitMode.SCHEDULE)
                 hold(duration = 2.0, priority = IMPORTANT)
                 release(clerk)
 

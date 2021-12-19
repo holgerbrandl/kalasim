@@ -104,7 +104,7 @@ open class Resource(
     var capacity = capacity.toDouble()
         set(newCapacity) {
             if (newCapacity < claimed) {
-                throw CapacityExceededException(this, "can not reduce capacity below current claims", now, newCapacity)
+                throw CapacityLimitException(this, "can not reduce capacity below current claims", now, newCapacity)
             }
 
             val capacityDiff = newCapacity - field
@@ -204,7 +204,7 @@ open class Resource(
                 val wasHonored = with(requesters.q) {
                     isNotEmpty() && peek().component.tryRequest()
                 }
-//                println(wasHonored)
+                println(wasHonored)
             } while (wasHonored)
         } else {
             while (requesters.q.isNotEmpty()) {

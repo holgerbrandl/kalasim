@@ -34,20 +34,20 @@ class DepletableResourceTests {
 
                 gasSupply.level shouldBe 30
 
-                shouldThrow<CapacityExceededException> {
-                    put(gasSupply, 1000, overflowMode = PutOverflowMode.FAIL)
+                shouldThrow<CapacityLimitException> {
+                    put(gasSupply, 1000, capacityLimitMode = CapacityLimitMode.FAIL)
                 }
 
                 gasSupply.level shouldBe 30
 
                 // Test cap mode
-                put(gasSupply, 1000, overflowMode = PutOverflowMode.CAP)
+                put(gasSupply, 1000, capacityLimitMode = CapacityLimitMode.CAP)
                 gasSupply.level shouldBe 100
 
                 take(gasSupply, 80)
 
                 // Test schedule mode
-                put(gasSupply, 1000, overflowMode = PutOverflowMode.SCHEDULE, failAt = 10.tt)
+                put(gasSupply, 1000, capacityLimitMode = CapacityLimitMode.SCHEDULE, failAt = 10.tt)
                 now shouldBe 10.tt
                 gasSupply.level shouldBe 20
 
@@ -57,7 +57,7 @@ class DepletableResourceTests {
 
                 //make sure to not allow consuming more than fill level
                 val levelBefore = gasSupply.level
-                shouldThrow<CapacityExceededException> {
+                shouldThrow<CapacityLimitException> {
                     take(gasSupply, 200)
                 }
                 levelBefore shouldBe gasSupply.level
@@ -140,8 +140,8 @@ class DepletableResourceTests {
             dp.level shouldBe 0
 
             object : Component() {
-                override fun process() = sequence {
-                    put(dp, 200, overflowMode = PutOverflowMode.SCHEDULE)
+                override fun process() = sequence<Component> {
+                    put(dp, 200, capacityLimitMode = CapacityLimitMode.SCHEDULE)
 
                     now shouldBe 20.tt
                     dp.level shouldBe 200
