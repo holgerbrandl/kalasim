@@ -699,6 +699,7 @@ open class Component(
 
                 //  is same resource is specified several times, just add them up
                 //https://stackoverflow.com/questions/53826903/increase-value-in-mutable-map
+                // todo this may not not be correct for a RelaxedFCFS honor policy or a SQF --> replace entirely with list?
                 requests.merge(r, q, Double::plus)
 
                 val reqText =
@@ -815,12 +816,15 @@ open class Component(
     }
 
     /**
-     * @return true if the pending request was honored
+     * Check if any or all (depending on on-of-setting)  request(s) to resources can be honored, and perform the
+     * claims accordingly.
+     *
+     * @return `true` if the pending request(s) were honored
      */
     internal fun tryRequest(): Boolean {
         if (componentState == INTERRUPTED) return false
 
-        val rHonor = if (oneOfRequest) honorAny() else honorAll()
+        val rHonor: List<Pair<Resource, Double>>? = if (oneOfRequest) honorAny() else honorAll()
 
         if (rHonor.isNullOrEmpty()) return false
 
