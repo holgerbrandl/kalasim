@@ -1,10 +1,7 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 //val kotlinVersion = KotlinVersion.CURRENT
 
 plugins {
-    kotlin("jvm") version "1.5.31"
-//    kotlin("jvm") version "1.6.10"
+    kotlin("jvm") version "1.6.10"
 
     `maven-publish`
     signing
@@ -30,7 +27,10 @@ dependencies {
 //    implementation("org.koin:koin-core:2.1.6")
     api("io.insert-koin:koin-core:3.1.4")
 
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.10")
+//    implementation("org.jetbrains.kotlin::1.5.10")
+    implementation(kotlin("kotlin-reflect"))
+
+
 
     api("com.github.holgerbrandl:jsonbuilder:0.9")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
@@ -66,9 +66,9 @@ dependencies {
 
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
-}
+//tasks.withType<KotlinCompile> {
+//    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+//}
 
 
 //https://gist.github.com/domnikl/c19c7385927a7bef7217aa036a71d807
