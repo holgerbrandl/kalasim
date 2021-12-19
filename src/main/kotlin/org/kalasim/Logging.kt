@@ -8,7 +8,7 @@ import java.util.logging.Level
 import kotlin.math.absoluteValue
 
 
-enum class ResourceEventType { CLAIMED, RELEASED, PUT }
+enum class ResourceEventType { CLAIMED, RELEASED, PUT, TAKE }
 
 class ResourceEvent(
     time: TickTime,

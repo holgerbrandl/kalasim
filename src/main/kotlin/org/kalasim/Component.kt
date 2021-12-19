@@ -2,8 +2,7 @@ package org.kalasim
 
 import org.kalasim.ComponentState.*
 import org.kalasim.Priority.Companion.NORMAL
-import org.kalasim.ResourceEventType.CLAIMED
-import org.kalasim.ResourceEventType.RELEASED
+import org.kalasim.ResourceEventType.*
 import org.kalasim.ResourceSelectionPolicy.*
 import org.kalasim.misc.*
 import org.kalasim.monitors.CategoryTimeline
@@ -831,7 +830,12 @@ open class Component(
                 resource.claimed += quantity //this will also update the timeline
 
                 log(trackingPolicy.logInteractionEvents) {
-                    ResourceEvent(env.now, env.curComponent, this, resource, CLAIMED, quantity)
+                    val type = when {
+                        resource !is DepletableResource -> CLAIMED
+                        quantity < 0 -> PUT
+                        else -> TAKE
+                    }
+                    ResourceEvent(env.now, env.curComponent, this, resource, type, quantity)
                 }
 
                 if (!resource.depletable) {
