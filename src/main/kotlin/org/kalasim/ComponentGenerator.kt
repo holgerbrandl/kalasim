@@ -1,10 +1,9 @@
 package org.kalasim
 
 import org.apache.commons.math3.distribution.RealDistribution
-import org.kalasim.Priority.Companion.NORMAL
+import org.kalasim.misc.DependencyContext
 import org.kalasim.misc.Jsonable
 import org.koin.core.Koin
-import org.kalasim.misc.DependencyContext
 
 /**
  * A component generator can be used to generate components.
@@ -51,12 +50,12 @@ class ComponentGenerator<T>(
     fun doIat(): Sequence<Component> = sequence {
         var numGenerated = 0
 
-        val iatSeq = sequence { if(forceStart) yield(0.0); while(true) yield(iat()) }.iterator()
+        val iatSeq = sequence { if (forceStart) yield(0.0); while (true) yield(iat()) }.iterator()
 
-        while(true) {
+        while (true) {
             val interArrivalTime = iatSeq.next()
 
-            if((env.now + interArrivalTime) > until || isData) {
+            if ((env.now + interArrivalTime) > until || isData) {
 //                yield(activate(at = until, process = ComponentGenerator<T>::doFinalize))
                 break
             }
@@ -68,9 +67,9 @@ class ComponentGenerator<T>(
 
             consumers.forEach { it.consume(created) }
 
-            if(keepHistory) (history as MutableList<T>).add(created)
+            if (keepHistory) (history as MutableList<T>).add(created)
 
-            if(numGenerated >= total) break
+            if (numGenerated >= total) break
         }
     }
 

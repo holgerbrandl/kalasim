@@ -15,7 +15,7 @@ class MM1Queue(
     val traces: EventLog = eventLog()
 
     class Customer(mu: Double) : Component() {
-        val ed = ExponentialDistribution(env.rg, mu )
+        val ed = ExponentialDistribution(env.rg, mu)
 
         override fun process() = sequence {
             request(get<Resource>()) {
@@ -33,7 +33,7 @@ class MM1Queue(
                     "because there are more history then the server can serve."
         )
 
-        server = dependency {  Resource("server", 1) }
+        server = dependency { Resource("server", 1) }
 
         componentGenerator = ComponentGenerator(iat = exponential(lambda), keepHistory = true) {
             Customer(mu)

@@ -6,9 +6,9 @@ createSimulation(enableTickMetrics = true) {
 
     object : Component() {
         override fun process() = sequence {
-            while(true) {
+            while (true) {
                 // create some artificial non-linear compute load
-                if(now.value < 7)
+                if (now.value < 7)
                     Thread.sleep((now.value * 100).toLong())
                 else {
                     Thread.sleep(100)

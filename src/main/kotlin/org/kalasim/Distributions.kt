@@ -50,6 +50,7 @@ fun Environment.uniform(lower: Number = 1, upper: Number = 0) =
     replaceWith = ReplaceWith("discreteUniform(range.first, range.laste)")
 )
 fun SimulationEntity.enumerated(range: IntRange) = enumerated(*(range.toList().toTypedArray()))
+
 @Deprecated(
     "To sample from an integer range, use discreteUniform instead for better efficiency",
     replaceWith = ReplaceWith("discreteUniform(range.first, range.laste)")
@@ -61,6 +62,7 @@ fun Environment.enumerated(range: IntRange) = enumerated(*(range.toList().toType
 fun <T> SimulationEntity.enumerated(elements: Array<T>): EnumeratedDistribution<T> = enumerated(*elements)
 fun <T> SimulationEntity.enumerated(vararg elements: T) =
     enumerated((elements.map { it to 1.0 / elements.size }).toMap())
+
 fun <T> SimulationEntity.enumerated(elements: Map<T, Double>) = env.enumerated(elements)
 
 @JvmName("enumeratedArray")

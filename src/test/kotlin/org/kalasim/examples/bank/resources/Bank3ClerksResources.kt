@@ -26,7 +26,7 @@ fun main() {
     env.get<Resource>().apply {
         printInfo()
 
-        if(canDisplay()) {
+        if (canDisplay()) {
             claimedTimeline.display()
             requesters.queueLengthTimeline.display()
         }

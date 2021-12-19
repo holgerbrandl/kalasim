@@ -8,5 +8,5 @@ createSimulation(enableConsoleLogger = true) {
 
     val claims = tc //
         .filterIsInstance<ResourceEvent>()
-        .filter{ it.type == ResourceEventType.CLAIMED}
+        .filter { it.type == ResourceEventType.CLAIMED }
 }.run(5.0)

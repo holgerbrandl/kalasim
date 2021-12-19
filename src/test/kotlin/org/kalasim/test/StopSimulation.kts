@@ -5,7 +5,7 @@ import org.kalasim.createSimulation
 
 createSimulation {
 
-    object : Component(){
+    object : Component() {
         override fun process() = sequence {
             hold(10)
             activate()

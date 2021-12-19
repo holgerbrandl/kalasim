@@ -3,8 +3,8 @@
 package org.kalasim.monitors
 
 import org.kalasim.SimulationEntity
-import org.koin.core.Koin
 import org.kalasim.misc.DependencyContext
+import org.koin.core.Koin
 
 
 // See https://commons.apache.org/proper/commons-math/userguide/stat.html
@@ -40,7 +40,6 @@ interface ValueMonitor<T> {
 
     fun addValue(value: T)
 }
-
 
 
 internal val NUM_HIST_BINS = 10

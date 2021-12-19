@@ -26,7 +26,7 @@ val tl = MyEventConsumer()
 // Start a log consumer
 GlobalScope.launch {
     tl.ordersChannel.receiveAsFlow().filter {
-       it is InteractionEvent &&  it.curComponent?.name == "ComponentGenerator.1"
+        it is InteractionEvent && it.curComponent?.name == "ComponentGenerator.1"
     }.collect {
         println(it)
     }

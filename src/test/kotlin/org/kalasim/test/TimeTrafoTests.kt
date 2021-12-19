@@ -21,7 +21,7 @@ class TimeTrafoTests {
 
         asWallTime(15.tt) shouldNotBe asWallTime(15.32.tt)
 
-        asWallTime(15.tt) shouldBe  Instant.parse("2021-01-24T12:15:00Z")
+        asWallTime(15.tt) shouldBe Instant.parse("2021-01-24T12:15:00Z")
 
         Duration.ofSeconds(300).asTicks() shouldNotBe Duration.ofSeconds(350).asTicks()
         Duration.ofSeconds(30).asTicks() shouldBe 0.5
@@ -38,7 +38,7 @@ class TimeTrafoTests {
             override fun process() = sequence {
 
                 addEventListener {
-                    if(it !is TimeTrafoTestEvent) return@addEventListener
+                    if (it !is TimeTrafoTestEvent) return@addEventListener
 
                     println("tick time is ${asWallTime(now)}")
 

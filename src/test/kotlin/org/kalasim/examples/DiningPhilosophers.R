@@ -4,60 +4,61 @@ pacman::p_load(simmer)
 pacman::p_load(simmer.plot)
 require(tidyverse)
 
-simulate <- function(fork_seq, time, thinking=function() rexp(1, 1), eating=function() rexp(1, 1), lag=0.1, seed=313) {
-    set.seed(seed)
+simulate <- function(fork_seq, time, thinking = function() rexp(1, 1), eating = function() rexp(1, 1), lag = 0.1, seed = 313) {
+  set.seed(seed)
 
-    env <- simmer("Dining philosophers")
+  env <- simmer("Dining philosophers")
 
-    for (i in seq_along(fork_seq)) {
-        philosopher <- names(fork_seq)[[i]]
-        forks <- paste0("fork_", fork_seq[[i]])
+  for (i in seq_along(fork_seq)) {
+    philosopher <- names(fork_seq)[[i]]
+    forks <- paste0("fork_", fork_seq[[i]])
 
-        dining <- trajectory() %>%
-            timeout(thinking) %>%
-            seize(forks[[1]]) %>%
-            timeout(lag) %>%
-            seize(forks[[2]]) %>%
-            timeout(eating) %>%
-            release(forks[[1]]) %>%
-            release(forks[[2]]) %>%
-            rollback(7) # back to think
+    dining <- trajectory() %>%
+      timeout(thinking) %>%
+      seize(forks[[1]]) %>%
+      timeout(lag) %>%
+      seize(forks[[2]]) %>%
+      timeout(eating) %>%
+      release(forks[[1]]) %>%
+      release(forks[[2]]) %>%
+      rollback(7) # back to think
 
-        env %>%
-            add_resource(paste0("fork_", i)) %>%
-            add_generator(paste0(philosopher, "_"), dining, at(0))
-    }
+    env %>%
+      add_resource(paste0("fork_", i)) %>%
+      add_generator(paste0(philosopher, "_"), dining, at(0))
+  }
 
-    run(env, time)
+  run(env, time)
 }
 
 
 ## visualize with gantt
 states <- c("hungry", "eating")
 
-env %>% get_mon_arrivals(per_resource=TRUE) %>% tbl_df
+env %>%
+  get_mon_arrivals(per_resource = TRUE) %>%
+  tbl_df
 
-philosophers_gantt <- function(env, size=15) env %>%
-    get_mon_arrivals(per_resource = TRUE) %>%
-    transform(
+philosophers_gantt <- function(env, size = 15) env %>%
+  get_mon_arrivals(per_resource = TRUE) %>%
+  transform(
     philosopher = sub("_[0-9]*", "", name),
     state = factor(states, states)
-    ) %>%
-    ggplot(aes(y = philosopher, yend = philosopher)) +
-    xlab("time") +
-    geom_segment(aes(x = start_time, xend = end_time, color = state), size = size)
+  ) %>%
+  ggplot(aes(y = philosopher, yend = philosopher)) +
+  xlab("time") +
+  geom_segment(aes(x = start_time, xend = end_time, color = state), size = size)
 
 fork_seq <- list(
-Socrates = c(1, 2),
-Pythagoras = c(2, 3),
-Plato = c(3, 4),
-Aristotle = c(4, 1)
+  Socrates = c(1, 2),
+  Pythagoras = c(2, 3),
+  Plato = c(3, 4),
+  Aristotle = c(4, 1)
 )
 
 simulate(fork_seq, time = 50) %>%
-    print() %>%
-    philosophers_gantt() + theme_bw()
-
+  print() %>%
+  philosophers_gantt() + theme_bw()
 
 
 env = simulate(fork_seq, time = 50)
@@ -82,12 +83,12 @@ env
 
 env %>% get_mon_arrivals() %>% tbl_df
 env %>%
-    get_mon_arrivals(per_resource = TRUE) %>%
-    transform(
+  get_mon_arrivals(per_resource = TRUE) %>%
+  transform(
     philosopher = sub("_[0-9]*", "", name),
     state = factor(states, states)
-    ) %>%
-    tbl_df
+  ) %>%
+  tbl_df
 # # A tibble: 116 x 6
 # name         start_time end_time activity_time resource replication
 # <chr>             <dbl>    <dbl>         <dbl> <chr>          <int>
@@ -107,7 +108,7 @@ fork_seq$Aristotle <- rev(fork_seq$Aristotle)
 fork_seq$Aristotle <- rev(fork_seq$Aristotle)
 
 simulate(fork_seq, time = 50) %>%
-    print() %>%
-    philosophers_gantt() + theme_bw()
+  print() %>%
+  philosophers_gantt() + theme_bw()
 
 env %>% philosophers_gantt() + theme_bw()

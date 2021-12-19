@@ -34,7 +34,7 @@ class QueueTests {
         // add a consumer
         object : Component() {
             override fun process() = sequence {
-                while(waitingLine.isNotEmpty()) {
+                while (waitingLine.isNotEmpty()) {
                     waitingLine.poll()
                     // wait for it...
                     hold(5.0)
@@ -76,10 +76,10 @@ class QueueTests {
 //                override fun process(): Sequence<Component> = super.process()
 //            }
 
-            val c1 = object: Component("comp1", at = 3.tt){
+            val c1 = object : Component("comp1", at = 3.tt) {
                 override fun process() = sequence<Component> {}
             }
-            val c2 = object : Component("comp2", at = 3.tt){
+            val c2 = object : Component("comp2", at = 3.tt) {
                 override fun process() = sequence<Component> {}
             }
 
@@ -107,10 +107,10 @@ class QueueTests {
 //                override fun process(): Sequence<Component> = super.process()
 //            }
 
-            val c1 = object: Component("comp1", at = 3.tt){
+            val c1 = object : Component("comp1", at = 3.tt) {
                 override fun process() = sequence<Component> {}
             }
-            val c2 = object:  Component("comp2", at = 3.tt, priority = IMPORTANT){
+            val c2 = object : Component("comp2", at = 3.tt, priority = IMPORTANT) {
                 override fun process() = sequence<Component> {}
             }
             val tc = EventLog().also { addEventListener(it) }

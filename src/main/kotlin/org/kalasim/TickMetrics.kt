@@ -16,23 +16,23 @@ class TickMetrics(
     koin: Koin? = null
 ) : Component(koin = koin ?: DependencyContext.get()) {
 
-    val timeline =  MetricTimeline(name)
+    val timeline = MetricTimeline(name)
 
     override fun process() = sequence {
 //        hold(ceil(now.value))
 
-        while(true) {
+        while (true) {
             val before = System.currentTimeMillis()
             hold(sampleTicks)
             val after = System.currentTimeMillis()
 
-            val tickDuration = round((after - before).toDouble()/sampleTicks).toInt()
+            val tickDuration = round((after - before).toDouble() / sampleTicks).toInt()
 
-            if(enableMetricEvents) {
+            if (enableMetricEvents) {
                 log(MetricEvent(now, tickDuration))
             }
 
-            if(enableMonitor){
+            if (enableMonitor) {
                 timeline.addValue(tickDuration)
             }
         }

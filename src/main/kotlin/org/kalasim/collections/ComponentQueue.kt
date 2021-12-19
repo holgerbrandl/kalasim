@@ -1,4 +1,5 @@
 @file:Suppress("PackageDirectoryMismatch")
+
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
@@ -6,7 +7,6 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.json.JSONObject
 import org.kalasim.misc.*
-import org.kalasim.misc.printThis
 import org.kalasim.monitors.MetricTimelineStats
 import org.koin.core.Koin
 import java.util.*
@@ -96,7 +96,7 @@ class ComponentQueue<C>(
 
     fun printStats() = stats.print()
 
-       /** Update queue position of component after property changes. */
+    /** Update queue position of component after property changes. */
     fun updateOrderOf(c: C) {
         val element = q.find { it.component == c }
 

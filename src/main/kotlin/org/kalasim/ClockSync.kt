@@ -1,8 +1,8 @@
 package org.kalasim
 
 import org.kalasim.misc.ComponentTrackingConfig
-import org.koin.core.Koin
 import org.kalasim.misc.DependencyContext
+import org.koin.core.Koin
 import java.time.Duration
 import java.time.Instant
 import kotlin.math.roundToLong
@@ -23,7 +23,7 @@ class ClockSync(
 
 
     init {
-        trackingPolicy  = ComponentTrackingConfig(false, false)
+        trackingPolicy = ComponentTrackingConfig(false, false)
         // disable trace monitoring for clock control
 //        env.traceFilters.add { it is InteractionEvent && it.curComponent is ClockSync }
 
@@ -32,7 +32,7 @@ class ClockSync(
 
     private lateinit var syncConfig: SyncConfiguration
 
-     fun changeTickDuration(tickDuration: Duration) {
+    fun changeTickDuration(tickDuration: Duration) {
         syncConfig = SyncConfiguration(
             tickMs = tickDuration.toMillis().toDouble(),
             holdTime = 1.0 / syncsPerTick.toDouble()

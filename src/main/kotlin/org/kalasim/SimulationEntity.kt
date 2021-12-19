@@ -79,7 +79,6 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
 //        env.apply { log(now, curComponent, source, action, details) }
 
 
-
     protected fun logCreation(created: SimulationEntity?, details: String? = null) {
         log(InteractionEvent(now, env.curComponent, created, details))
     }

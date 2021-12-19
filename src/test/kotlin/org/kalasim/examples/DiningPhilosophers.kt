@@ -18,7 +18,7 @@ fun main() {
         val eating = exponential(1)
 
         override fun process() = sequence {
-            while(true) {
+            while (true) {
                 hold(thinking())
                 request(leftFork) {
                     hold(0.1) // wait before taking the second fork
@@ -50,7 +50,7 @@ fun main() {
 
     val tc = sim.get<EventLog>()
     val requests = tc.filterIsInstance<ResourceEvent>().map {
-        val amountDirected = (if(it.type == ResourceEventType.RELEASED) -1 else 1) * it.amount
+        val amountDirected = (if (it.type == ResourceEventType.RELEASED) -1 else 1) * it.amount
         RequestRecord(it.requester.name, it.time, it.resource.name, amountDirected)
     }
 
@@ -59,7 +59,7 @@ fun main() {
         .groupBy("requester")
         .sortedBy("requester", "timestamp")
         .addColumn("end_time") { it["timestamp"].lag() }
-        .addColumn("state") { rowNumber.map { if(it.rem(2) == 0) "hungry" else "eating" } }
+        .addColumn("state") { rowNumber.map { if (it.rem(2) == 0) "hungry" else "eating" } }
         .filter { it["quantity"] gt 0 }
         .ungroup()
 

@@ -10,9 +10,9 @@ data class ComponentTrackingConfig(
     val logStateChangeEvents: Boolean = true,
     val logInteractionEvents: Boolean = true,
     val trackComponentState: Boolean = true
-) : TrackingConfig{
+) : TrackingConfig {
 
-    companion object{
+    companion object {
         val NONE = ComponentTrackingConfig(false, false, false, false)
     }
 }
@@ -23,9 +23,9 @@ data class ResourceTrackingConfig(
     val trackQueueStatistics: Boolean = true,
     val trackUtilization: Boolean = true,
     val trackActivities: Boolean = true
-) : TrackingConfig{
+) : TrackingConfig {
 
-    companion object{
+    companion object {
         val NONE = ResourceTrackingConfig(false, false, false, false)
     }
 }
@@ -35,16 +35,16 @@ data class StateTrackingConfig(
     val trackQueueStatistics: Boolean = true,
     val trackValue: Boolean = true,
     val logTriggers: Boolean = true
-) : TrackingConfig{
+) : TrackingConfig {
 
-    companion object{
+    companion object {
         val NONE = StateTrackingConfig(false, false, false, false)
     }
 }
 
-data class ComponentCollectionTrackingConfig(val trackCollectionStatistics: Boolean = true) : TrackingConfig{
+data class ComponentCollectionTrackingConfig(val trackCollectionStatistics: Boolean = true) : TrackingConfig {
 
-    companion object{
+    companion object {
         val NONE = ComponentCollectionTrackingConfig(false)
     }
 }
@@ -62,7 +62,7 @@ class TrackingPolicyFactory {
     var defaultCollectionConfig = ComponentCollectionTrackingConfig()
 
     inline fun <reified T : TrackingConfig> getPolicy(entity: SimulationEntity): T {
-        val config = policies.firstOrNull { it.first(entity)  && it.second is T }?.second
+        val config = policies.firstOrNull { it.first(entity) && it.second is T }?.second
 
         if (config != null) return config as T
 
@@ -78,10 +78,10 @@ class TrackingPolicyFactory {
     }
 
     fun disableAll() {
-         defaultComponentConfig = ComponentTrackingConfig(false, false,false, false)
-         defaultResourceConfig = ResourceTrackingConfig(false, false, false, false, false )
-         defaultStateConfig = StateTrackingConfig(false, false, false,false)
-         defaultCollectionConfig = ComponentCollectionTrackingConfig(false)
+        defaultComponentConfig = ComponentTrackingConfig(false, false, false, false)
+        defaultResourceConfig = ResourceTrackingConfig(false, false, false, false, false)
+        defaultStateConfig = StateTrackingConfig(false, false, false, false)
+        defaultCollectionConfig = ComponentCollectionTrackingConfig(false)
     }
 
     fun register(customPolicy: TrackingConfig, filter: EntityFilter) {

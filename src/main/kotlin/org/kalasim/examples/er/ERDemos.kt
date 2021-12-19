@@ -3,15 +3,17 @@ package org.kalasim.examples.er
 import EmergencyRoom
 import Patient
 import RefittingAvoidanceNurse
-import krangl.*
-import org.kalasim.*
+import krangl.DataFrameRow
+import krangl.count
+import krangl.dataFrameOf
+import krangl.print
+import org.kalasim.ComponentGenerator
 import org.kalasim.plot.kravis.display
-import kotlin.to
 
 object InfinteER {
     @JvmStatic
     fun main(args: Array<String>) {
-        val er = EmergencyRoom(disableMetrics=true).apply {
+        val er = EmergencyRoom(disableMetrics = true).apply {
 
             run(100000)
         }

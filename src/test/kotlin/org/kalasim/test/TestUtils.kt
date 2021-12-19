@@ -71,9 +71,9 @@ internal fun createTestSimulation(enableConsoleLogger: Boolean = true, builder: 
  */
 fun Environment.inversedIatDist(vararg arrivalTimes: Number) = object : ConstantRealDistribution(-1.0) {
 
-    val values = (listOf(now) + arrivalTimes.map{it.toDouble().tickTime})
+    val values = (listOf(now) + arrivalTimes.map { it.toDouble().tickTime })
         .zipWithNext()
-        .map{ (prev, curVal )-> (curVal -prev) }
+        .map { (prev, curVal) -> (curVal - prev) }
         .iterator()
 
 

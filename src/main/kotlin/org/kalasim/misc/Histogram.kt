@@ -5,12 +5,11 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import kotlin.math.roundToInt
 
 
-
 data class HistogramBin(val lowerBound: Double, val upperBound: Double, val value: Long)
 
-class Histogram(val bins: List<HistogramBin>){
+class Histogram(val bins: List<HistogramBin>) {
     val n = bins.sumOf { it.value }
-    val legacyFormat = bins.map{ (it.lowerBound to it.upperBound) to it.value}
+    val legacyFormat = bins.map { (it.lowerBound to it.upperBound) to it.value }
 }
 
 // extensions to build histogram
@@ -35,7 +34,7 @@ internal fun DescriptiveStatistics.buildHistogram(
 
     val intervals = (listOf(distribution.binStats[0].min) + distribution.upperBounds.toList()).zipWithNext()
 
-    return intervals.zip(distribution.binStats.map { it.n }).map{
+    return intervals.zip(distribution.binStats.map { it.n }).map {
         HistogramBin(it.first.first, it.first.second, it.second)
     }.let { Histogram(it) }
 }
@@ -49,7 +48,7 @@ internal fun Histogram.printHistogram(colWidth: Double = 40.0) {
         .printThis()
 
     bins.forEach { (lower, upper, value) ->
-        val scaledValue : Double = value.toDouble() / n
+        val scaledValue: Double = value.toDouble() / n
 
         val range = "[${JSON_DF.format(lower)}, ${JSON_DF.format(upper)}]"
 

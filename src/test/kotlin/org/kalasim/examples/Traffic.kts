@@ -43,27 +43,27 @@ class Car2 : Component() {
     }
 }
 
-        createSimulation(true) {
-            // Add a traffic light so that we can refer to it via koin get<T>()
-            dependency { TrafficLight() }
+createSimulation(true) {
+    // Add a traffic light so that we can refer to it via koin get<T>()
+    dependency { TrafficLight() }
 
-            // Also add a resource with a limited capacity
-            dependency { GasStation(2) }
+    // Also add a resource with a limited capacity
+    dependency { GasStation(2) }
 
-            val car1 = Car(get())
-            val car2 = Car(get())
-            val car3 = Car(get())
+    val car1 = Car(get())
+    val car2 = Car(get())
+    val car3 = Car(get())
 
-            // run for 10 ticks
-            run(10)
+    // run for 10 ticks
+    run(10)
 
-            // toggle the traffic light
-            get<TrafficLight>().value = "green"
+    // toggle the traffic light
+    get<TrafficLight>().value = "green"
 
-            // run for another 10 ticks
-            run(10)
+    // run for another 10 ticks
+    run(10)
 
-            // assess the state of the simulation entities
-            car2.statusTimeline.printHistogram()
-            get<GasStation>().printStatistics()
-        }
+    // assess the state of the simulation entities
+    car2.statusTimeline.printHistogram()
+    get<GasStation>().printStatistics()
+}

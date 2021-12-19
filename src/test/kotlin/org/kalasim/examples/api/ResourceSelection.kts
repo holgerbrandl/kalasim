@@ -21,6 +21,6 @@ createSimulation(false) {
         }
     }
 
-    ComponentGenerator(exponential(1)){ Patient()}
+    ComponentGenerator(exponential(1)) { Patient() }
     run(100)
 }

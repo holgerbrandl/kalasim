@@ -103,47 +103,49 @@ class MonitorTests {
     }
 
     @Test
-    fun `MetricTimeline should allow to retrieve a value for now but not before recording start`() = createTestSimulation {
-        val nlm = MetricTimeline()
+    fun `MetricTimeline should allow to retrieve a value for now but not before recording start`() =
+        createTestSimulation {
+            val nlm = MetricTimeline()
 
-        now += 2
-        nlm.addValue(2)
+            now += 2
+            nlm.addValue(2)
 
-        now += 2
-        nlm.addValue(6)
-        now += 4
+            now += 2
+            nlm.addValue(6)
+            now += 4
 
 
-        // first we try a get that should fail because it precedes simulation start
-        shouldThrow<java.lang.IllegalArgumentException> {
-            nlm[-1.0]
+            // first we try a get that should fail because it precedes simulation start
+            shouldThrow<java.lang.IllegalArgumentException> {
+                nlm[-1.0]
+            }
+
+            // now we try to get a value for `now`
+            nlm[now] shouldBe 6
         }
-
-        // now we try to get a value for `now`
-        nlm[now] shouldBe 6
-    }
 
 
     @Test
-    fun `CategoryTimeline should allow to retrieve a value for now but not before recording start`() = createTestSimulation {
-        val nlm = CategoryTimeline("foo")
+    fun `CategoryTimeline should allow to retrieve a value for now but not before recording start`() =
+        createTestSimulation {
+            val nlm = CategoryTimeline("foo")
 
-        now += 2
-        nlm.addValue("bar")
+            now += 2
+            nlm.addValue("bar")
 
-        now += 2
-        nlm.addValue("kalasim")
-        now += 4
+            now += 2
+            nlm.addValue("kalasim")
+            now += 4
 
 
-        // first we try a get that should fail because it precedes simulation start
-        shouldThrow<java.lang.IllegalArgumentException> {
-            nlm[-1.0]
+            // first we try a get that should fail because it precedes simulation start
+            shouldThrow<java.lang.IllegalArgumentException> {
+                nlm[-1.0]
+            }
+
+            // now we try to get a value for `now`
+            nlm[now] shouldBe "kalasim"
         }
-
-        // now we try to get a value for `now`
-        nlm[now] shouldBe "kalasim"
-    }
 
     @Test
     fun `it should correctly calculate numeric  stats`() = createTestSimulation {

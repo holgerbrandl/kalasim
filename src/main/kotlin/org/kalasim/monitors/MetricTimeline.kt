@@ -9,9 +9,6 @@ import org.apache.commons.math3.stat.descriptive.moment.Variance
 import org.kalasim.TickTime
 import org.kalasim.asCMPairList
 import org.kalasim.misc.*
-import org.kalasim.misc.buildHistogram
-import org.kalasim.misc.printHistogram
-import org.kalasim.misc.printThis
 import org.koin.core.Koin
 import java.util.*
 import kotlin.math.max
@@ -23,9 +20,9 @@ import kotlin.math.sqrt
  * @param initialValue initial value for a level timeline. It is important to set the value correctly. Default: 0
  */
 class MetricTimeline(
-        name: String? = null,
-        private val initialValue: Number = 0,
-        koin: Koin = DependencyContext.get()
+    name: String? = null,
+    private val initialValue: Number = 0,
+    koin: Koin = DependencyContext.get()
 ) : Monitor<Number>(name, koin), ValueTimeline<Number> {
 
     internal val timestamps = mutableListOf<Double>()
@@ -114,11 +111,11 @@ class MetricTimeline(
             values.forEach { freq.addValue(it) }
 
             val colData: Map<Double, Double> =
-                    statistics().data.run {
-                        durations.zip(values)
-                                .groupBy { (_, value) -> value }
-                                .map { kv -> kv.key to kv.value.sumOf { it.first } }
-                    }.toMap()
+                statistics().data.run {
+                    durations.zip(values)
+                        .groupBy { (_, value) -> value }
+                        .map { kv -> kv.key to kv.value.sumOf { it.first } }
+                }.toMap()
 
             // inherently wrong because does not take into account durations
 //            val byValueHist = freq
@@ -131,16 +128,16 @@ class MetricTimeline(
             // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
             val hist: List<Pair<Double, Double>> = statistics().data.run {
                 val aggregatedMonitor: List<Pair<Double, Double>> =
-                        durations.zip(values).groupBy { (_, value) -> value }
-                                .map { kv -> kv.key to kv.value.sumOf { it.first } }
+                    durations.zip(values).groupBy { (_, value) -> value }
+                        .map { kv -> kv.key to kv.value.sumOf { it.first } }
 
                 aggregatedMonitor
             }
 
             val stats =
-                    DescriptiveStatistics(
-                            EnumeratedDistribution(hist.asCMPairList()).sample(1000, arrayOf<Double>()).toDoubleArray()
-                    )
+                DescriptiveStatistics(
+                    EnumeratedDistribution(hist.asCMPairList()).sample(1000, arrayOf<Double>()).toDoubleArray()
+                )
 
             stats.buildHistogram(binCount).printHistogram()
         }

@@ -21,7 +21,7 @@ data class TickTime(val value: Double) : Comparable<TickTime> {
     constructor(instant: Number) : this(instant.toDouble())
 
     override fun toString(): String {
-        return if(value.isInfinite()) "INF" else TRACE_DF.format(value)
+        return if (value.isInfinite()) "INF" else TRACE_DF.format(value)
     }
 
 }
@@ -72,7 +72,7 @@ interface TickTransform {
 class OffsetTransform(val offset: Instant = Instant.now(), val tickUnit: TimeUnit = TimeUnit.MINUTES) : TickTransform {
     override fun tick2wallTime(tickTime: TickTime): Instant {
         val ttValue = tickTime.value
-        val durationSinceOffset = when(tickUnit) {
+        val durationSinceOffset = when (tickUnit) {
             TimeUnit.NANOSECONDS -> Duration.ofNanos(ttValue.toLong())
             TimeUnit.MICROSECONDS -> Duration.ofNanos((ttValue * 1000).toLong())
             TimeUnit.MILLISECONDS -> Duration.ofNanos((ttValue * 1000000).toLong())
@@ -92,7 +92,7 @@ class OffsetTransform(val offset: Instant = Instant.now(), val tickUnit: TimeUni
     }
 
     // todo improve precision of transformation
-    override fun durationAsTicks(duration: Duration): Double = when(tickUnit) {
+    override fun durationAsTicks(duration: Duration): Double = when (tickUnit) {
         TimeUnit.NANOSECONDS -> duration.toNanos()
         TimeUnit.MICROSECONDS -> duration.toNanos() / 1000.0
         TimeUnit.MILLISECONDS -> duration.toNanos() / 1000000.0
@@ -144,10 +144,9 @@ interface SimContext : KoinComponent {
 fun Environment.asTicks(duration: Duration): Double = duration.asTicks()
 
 /** Transforms an wall `Instant` to simulation time.*/
-fun Environment.asTickTime(instant: Instant)= instant.asTickTime()
-
+fun Environment.asTickTime(instant: Instant) = instant.asTickTime()
 
 
 /** Transforms a simulation time (typically `now`) to the corresponding wall time. */
-fun Environment.asWallTime(time: TickTime)= time.asWallTime()
-fun Environment.asWallTimeOrNull(time: TickTime)= time.asWallTime()
+fun Environment.asWallTime(time: TickTime) = time.asWallTime()
+fun Environment.asWallTimeOrNull(time: TickTime) = time.asWallTime()

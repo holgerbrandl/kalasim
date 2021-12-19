@@ -4,7 +4,10 @@ import jetbrains.letsPlot.label.ggtitle
 import kravis.*
 import kravis.device.JupyterDevice
 import org.kalasim.*
-import org.kalasim.monitors.*
+import org.kalasim.monitors.CategoryTimeline
+import org.kalasim.monitors.FrequencyTable
+import org.kalasim.monitors.MetricTimeline
+import org.kalasim.monitors.NumericStatisticMonitor
 import java.awt.GraphicsEnvironment
 
 internal fun canDisplay() = !GraphicsEnvironment.isHeadless() && hasR()

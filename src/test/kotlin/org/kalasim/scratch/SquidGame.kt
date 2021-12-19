@@ -31,12 +31,12 @@ fun main() {
 
         // state
         var stepsLeft = numSteps
-        var survivors= mutableListOf<Int>()
+        var survivors = mutableListOf<Int>()
 
         val numTrials: Int
             get() = numSteps - survivors.size
 
-        val numSurvivors : Int
+        val numSurvivors: Int
             get() = survivors.size
 
         fun playerSurvived(playerNo: Int) = survivors.contains(playerNo)
@@ -45,16 +45,16 @@ fun main() {
             object : Component() {
                 override fun process() = sequence {
                     queue@
-                    for(player in 1..numPlayers){
+                    for (player in 1..numPlayers) {
                         hold(min(stepTime(), 100.0)) // cap time at 100sec
 
-                        while(stepsLeft-- > 0){
-                            if(decision()) continue@queue
+                        while (stepsLeft-- > 0) {
+                            if (decision()) continue@queue
                         }
 
                         survivors.add(player)
 
-                        if(now > maxDuration) break // this wrong, here we need to model
+                        if (now > maxDuration) break // this wrong, here we need to model
                     }
                 }
             }

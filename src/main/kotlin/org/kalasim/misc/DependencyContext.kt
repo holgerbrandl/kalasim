@@ -15,7 +15,7 @@ object DependencyContext {
 //    private var koin: Koin? = null
 
     fun get(): Koin = threadLocalValue.get()
-            ?: error("KoinApplication has not been started. See https://www.kalasim.org/faq/#how-to-fix-koinapplication-has-not-been-started")
+        ?: error("KoinApplication has not been started. See https://www.kalasim.org/faq/#how-to-fix-koinapplication-has-not-been-started")
     // previous version without thread-local (to enable fast rollback in case this turns out to be a bad idea
 //    fun get(): Koin = koin
 //        ?: error("KoinApplication has not been started. See https://www.kalasim.org/faq/#how-to-fix-koinapplication-has-not-been-started")

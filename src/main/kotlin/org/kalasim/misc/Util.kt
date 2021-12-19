@@ -88,7 +88,7 @@ fun <A, B> Iterable<A>.fastMap(
 fun <A, B> Iterable<A>.fastForEach(
     numThreads: Int = Runtime.getRuntime().availableProcessors(),
     f: suspend (A) -> B
-): Unit = fastMap(numThreads, f).forEach{}
+): Unit = fastMap(numThreads, f).forEach {}
 
 
 /** The environment mode also allows you to detect common bugs in your implementation. */

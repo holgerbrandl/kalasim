@@ -276,7 +276,7 @@ class ResourceTests {
         criticalRequestHonored shouldBe true
     }
 
-//    @Ignore(
+    //    @Ignore(
 //        "its unclear if this should be suppoted to be more consistent with depletable resources. " +
 //                "Usually capacity changes should be rare, so failing here seems to make sens"
 //    )

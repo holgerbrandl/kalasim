@@ -14,7 +14,7 @@ class Customer(
     override fun process() = sequence {
         waitingLine.add(this@Customer)
 
-        if(clerk.isPassive) clerk.activate()
+        if (clerk.isPassive) clerk.activate()
 
         passivate()
     }
@@ -25,8 +25,8 @@ class Clerk : Component() {
     val waitingLine: ComponentQueue<Customer> by inject()
 
     override fun process() = sequence {
-        while(true) {
-            while(waitingLine.isEmpty()) passivate()
+        while (true) {
+            while (waitingLine.isEmpty()) passivate()
 
             val customer = waitingLine.poll()
 
@@ -41,7 +41,7 @@ class CustomerGenerator : Component() {
     //    var numCreated  = 0
     override fun process() = sequence {
 //        if(numCreated++ >5 ) return@sequence
-        while(true) {
+        while (true) {
             Customer(get(), get())
 
             hold(uniform(5.0, 15.1).sample())
@@ -64,7 +64,7 @@ fun main() {
 
     waitingLine.stats.print()
 
-    if(canDisplay()) {
+    if (canDisplay()) {
         waitingLine.queueLengthTimeline.display()
         waitingLine.lengthOfStayTimeline.display()
     }

@@ -65,7 +65,7 @@ class AtmCustomer(
     val ed = exponential(mu)
 
     override fun process() = sequence {
-        request(atm){
+        request(atm) {
             hold(ed.sample())
         }
     }

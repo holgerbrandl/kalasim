@@ -8,7 +8,7 @@ fun main() {
 
     createSimulation {
 
-        object : Component(){
+        object : Component() {
             override fun process() = sequence {
                 hold(10, "something is about to happen")
                 stopSimulation()

@@ -3,13 +3,9 @@ package org.kalasim.monitors
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.json.JSONObject
-import org.kalasim.misc.Jsonable
-import org.kalasim.misc.buildHistogram
-import org.kalasim.misc.printHistogram
-import org.kalasim.misc.printThis
+import org.kalasim.misc.*
 import org.kalasim.toJson
 import org.koin.core.Koin
-import org.kalasim.misc.DependencyContext
 import kotlin.math.roundToInt
 
 class NumericStatisticMonitor(name: String? = null, koin: Koin = DependencyContext.get()) :
@@ -42,7 +38,6 @@ class NumericStatisticMonitor(name: String? = null, koin: Koin = DependencyConte
     }
 
 
-
     override fun reset() = sumStats.clear()
 
 
@@ -71,10 +66,10 @@ class NumericStatisticMonitor(name: String? = null, koin: Koin = DependencyConte
         println("Summary of: '${name}'")
         statistics().printThis()
 
-        if(values.size>2) {
+        if (values.size > 2) {
             println("Histogram of: '${name}'")
             sumStats.buildHistogram(binCount).printHistogram()
-        }else{
+        } else {
             println("Skipping histogram of '$name' because of to few data")
         }
     }

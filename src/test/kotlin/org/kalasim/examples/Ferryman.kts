@@ -33,7 +33,7 @@ createSimulation {
     ComponentGenerator(uniform(0, 15)) { Passenger() }
         .addConsumer { fm.left2Right.add(it) }
 
-    ComponentGenerator(uniform(0,12)) { Passenger() }
+    ComponentGenerator(uniform(0, 12)) { Passenger() }
         .addConsumer { fm.right2Left.add(it) }
 
     run(10000)

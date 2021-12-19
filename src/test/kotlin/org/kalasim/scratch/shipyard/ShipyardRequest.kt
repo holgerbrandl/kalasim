@@ -24,7 +24,7 @@ fun main() {
 
         object : Component("ship") {
             override fun process() = sequence {
-                request(terminal.tank withQuantity 30, description= "waiting for goods") {
+                request(terminal.tank withQuantity 30, description = "waiting for goods") {
                     hold(30, "shipping goods")
                 }
             }

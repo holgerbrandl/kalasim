@@ -36,7 +36,8 @@ class DisplayTests : AbstractSvgPlotRegression() {
     fun beforeMethod() {
         // Only run tests that rely on for brandl or if users has exported KALASIM_RUN_DISPLAY_TESTS as 'true'
         // https://stackoverflow.com/questions/1689242/conditionally-ignoring-tests-in-junit-4
-        val runDisplaytests = System.getProperty("KALASIM_RUN_DISPLAY_TESTS").toBoolean() || System.getProperty("user.name") == "brandl"
+        val runDisplaytests =
+            System.getProperty("KALASIM_RUN_DISPLAY_TESTS").toBoolean() || System.getProperty("user.name") == "brandl"
         Assume.assumeTrue(runDisplaytests);
     }
 
@@ -169,7 +170,7 @@ abstract class AbstractSvgPlotRegression {
         // prevent these tests from running on github-CI
         // https://stackoverflow.com/questions/1689242/conditionally-ignoring-tests-in-junit-4
         // An assumption failure causes the test to be ignored.
-        Assume.assumeTrue(canDisplay() && System.getenv("SKIP_DISPLAY_TESTS")==null)
+        Assume.assumeTrue(canDisplay() && System.getenv("SKIP_DISPLAY_TESTS") == null)
 
 //        SessionPrefs.RENDER_BACKEND = RserveEngine()
 //        SessionPrefs.RENDER_BACKEND = Docker("holgerbrandl/kravis_core:3.5.1")
