@@ -14,19 +14,40 @@ import org.kalasim.monitors.copy
 // TODO Analyze we we support the same preemptible contract as simmer (Ucar2019, p11) (in particular restart)
 
 
+/** See [user manual](https://www.kalasim.org/resource/#request-honor-policies). */
+sealed class RequestHonorPolicy {
+    object StrictFCFS : RequestHonorPolicy()
+    object RelaxedFCFS : RequestHonorPolicy()
+    object SQF : RequestHonorPolicy()
+
+    class WeightedSQF(val alpha: Double) : RequestHonorPolicy() {
+        init {
+            require(alpha in 0.0..1.0) { "alpha must be between 0 and 1 " }
+        }
+    }
+}
+
+
+
 /**
- * A resource with a maximum `capacity` and a fill level for which claims are not tracked and do not need to be released.
+ * A resource with a maximum `capacity` and a fill `level` for which claims are not tracked and do not need to be released. For full contract and description see [user manual](https://www.kalasim.org/resource/#depletable-resource)
  *
- * For full contract and description see [user manual](https://www.kalasim.org/resource/#depletable-resource)
+ * @param honorPolicy The order in which multiple competing resource requests are honored. See [honor policies](https://www.kalasim.org/resource/#request-honor-policies)
  */
 open class DepletableResource(
-        name: String? = null,
-        capacity: Number,
-        initialLevel: Number = capacity,
-        preemptive: Boolean = false,
-        koin: Koin = DependencyContext.get()
-) : Resource(name = name, capacity = capacity, preemptive = preemptive, koin = koin) {
-
+    name: String? = null,
+    capacity: Number,
+    initialLevel: Number = capacity,
+    honorPolicy: RequestHonorPolicy = RequestHonorPolicy.StrictFCFS,
+    preemptive: Boolean = false,
+    koin: Koin = DependencyContext.get()
+) : Resource(
+    name = name,
+    capacity = capacity,
+    honorPolicy = honorPolicy,
+    preemptive = preemptive,
+    koin = koin
+) {
 
     /** Indicates if depletable resource is at full capacity. */
     val isFull: Boolean
@@ -41,10 +62,6 @@ open class DepletableResource(
     val level
         get() = capacity - claimed
 
-//        set(newLevel) {
-//            if (claimed > newLevel) release(capacity - claimed - level)
-//        }
-
 //    val levelTimeline = MetricTimeline("Level of ${this.name}", initialValue = availableQuantity, koin = koin)
 //
 //    override fun updatedDerivedMetrics() {
@@ -54,13 +71,6 @@ open class DepletableResource(
     val levelTimeline
         get() = (capacityTimeline - claimedTimeline).copy("Level of ${this@DepletableResource.name}")
 
-    // todo finish a proper level monitor for depletable resources
-//    var levelMonitor
-//        get() = MetricTimeline("Level of ${this.name}", koin = getKoin()).apply {
-//            capacityTimeline.statsData().asList().forEach(){
-//            }
-//        }
-//    get() = capacityTimeline - claimedTimeline
 
     init {
         depletable = true
@@ -70,15 +80,17 @@ open class DepletableResource(
 
 
 /**
- * @param preemptive If a component requests from a preemptive resource, it may bump component(s) that are claiming from
-the resource, provided these have a lower priority = higher value). If component is bumped, it releases the resource and is the activated, thus essentially stopping the current action (usually hold or passivate). Therefore, it is necessary that a component claiming from a preemptive resource should check
-whether the component is bumped or still claiming at any point where they can be bumped.
+ * A simulation entity with a limited capacity, that can be requested by other simulation components. For details see https://www.kalasim.org/resource/
+ *
+ * @param honorPolicy The order in which multiple competing resource requests are honored. See [honor policies](https://www.kalasim.org/resource/#request-honor-policies)
+ * @param preemptive Indicates if a resource should allow preemptive requests. See [preemptive resources](https://www.kalasim.org/resource/#pre-emptive-resources).
  */
 open class Resource(
-        name: String? = null,
-        capacity: Number = 1,
-        val preemptive: Boolean = false,
-        koin: Koin = DependencyContext.get()
+    name: String? = null,
+    capacity: Number = 1,
+    val honorPolicy: RequestHonorPolicy = RequestHonorPolicy.StrictFCFS,
+    val preemptive: Boolean = false,
+    koin: Koin = DependencyContext.get()
 ) : SimulationEntity(name = name, simKoin = koin) {
 
     internal var depletable: Boolean = false
@@ -91,17 +103,17 @@ open class Resource(
 
     var capacity = capacity.toDouble()
         set(newCapacity) {
-            if(newCapacity < claimed) {
+            if (newCapacity < claimed) {
                 throw CapacityExceededException(this, "can not reduce capacity below current claims", now, newCapacity)
             }
 
-            val capacityDiff = newCapacity-field
+            val capacityDiff = newCapacity - field
             field = newCapacity
 
             capacityTimeline.addValue(capacity)
 //            updatedDerivedMetrics()
 
-            if(this is DepletableResource){
+            if (this is DepletableResource) {
                 // maintain the fill level of depletable resources
                 claimed += capacityDiff
             }
@@ -192,7 +204,7 @@ open class Resource(
                 val wasHonored = with(requesters.q) {
                     isNotEmpty() && peek().component.tryRequest()
                 }
-                println(wasHonored)
+//                println(wasHonored)
             } while (wasHonored)
         } else {
             while (requesters.q.isNotEmpty()) {
@@ -266,12 +278,12 @@ open class Resource(
 enum class ResourceMetric { Capacity, Claimed, Requesters, Claimers, Occupancy, Availability }
 
 data class ResourceTimelineSegment(
-        val resource: Resource,
-        val start: TickTime,
-        val end: TickTime?,
-        val duration: Double?,
-        val metric: ResourceMetric,
-        val value: Double,
+    val resource: Resource,
+    val start: TickTime,
+    val end: TickTime?,
+    val duration: Double?,
+    val metric: ResourceMetric,
+    val value: Double,
 //    val start_wt: Instant? = null,
 //    val end_wt: Instant? = null
 ) {
@@ -296,18 +308,18 @@ data class ResourceTimelineSegment(
 val Resource.timeline: List<ResourceTimelineSegment>
     get() {
         val capStats = capacityTimeline.statsData().asList().asDataFrame()
-                .addColumn("Metric") { ResourceMetric.Capacity }
+            .addColumn("Metric") { ResourceMetric.Capacity }
         val claimStats = claimedTimeline.statsData().asList().asDataFrame()
-                .addColumn("Metric") { ResourceMetric.Claimed }
+            .addColumn("Metric") { ResourceMetric.Claimed }
         val occStats = occupancyTimeline.statsData().asList().asDataFrame()
-                .addColumn("Metric") { ResourceMetric.Occupancy }
+            .addColumn("Metric") { ResourceMetric.Occupancy }
         val availStats = occupancyTimeline.statsData().asList().asDataFrame()
-                .addColumn("Metric") { ResourceMetric.Availability }
+            .addColumn("Metric") { ResourceMetric.Availability }
 
         val requesters = requesters.queueLengthTimeline.statsData().asList().asDataFrame()
-                .addColumn("Metric") { ResourceMetric.Requesters }
+            .addColumn("Metric") { ResourceMetric.Requesters }
         val claimers = claimers.queueLengthTimeline.statsData().asList().asDataFrame()
-                .addColumn("Metric") { ResourceMetric.Claimers }
+            .addColumn("Metric") { ResourceMetric.Claimers }
 
         var statsDF = bindRows(capStats, claimStats, availStats, occStats, requesters, claimers)
         statsDF = statsDF.rename("timestamp" to "start")

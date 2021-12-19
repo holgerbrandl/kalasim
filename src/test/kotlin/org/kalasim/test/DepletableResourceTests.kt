@@ -153,10 +153,35 @@ class DepletableResourceTests {
             run()
         }
 
-    @Ignore
+
     @Test
     fun `it should respect queue priorities when consuming resource`() = createTestSimulation(true) {
-        fail()
+        val dp = DepletableResource(capacity = 100, initialLevel = 0)
+
+        dp.level shouldBe 0
+
+        val c1 = object : Component() {
+            override fun process() = sequence {
+                take(dp, 50)
+            }
+        }
+
+        val c2 = object : Component() {
+            override fun process() = sequence {
+                take(dp, 50, priority = Priority.IMPORTANT)
+            }
+        }
+
+        object : Component() {
+            override fun process() = sequence {
+                put(dp, 80)
+                c1.componentState shouldBe ComponentState.REQUESTING
+                c2.componentState shouldBe ComponentState.PASSIVE
+            }
+        }
+
+        run()
+        dp.level shouldBe 39.0
     }
 
     @Ignore
@@ -165,10 +190,3 @@ class DepletableResourceTests {
         fail()
     }
 }
-//
-//fun main() {
-//    DepletableResourceTests().`it allow filling and emptying from 0 to capacity limit`()
-//    Thread.sleep(10000)
-//}
-//
-
