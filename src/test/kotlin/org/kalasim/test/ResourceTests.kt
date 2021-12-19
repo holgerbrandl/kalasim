@@ -45,10 +45,10 @@ class ResourceTests {
             object : Component() {
 
                 override fun process() = sequence {
-                    while (true) {
+                    while(true) {
                         request(resource withQuantity 1 andPriority Priority(prioPDF.sample()))
                         hold(1)
-                        if (!isClaiming(resource)) {
+                        if(!isClaiming(resource)) {
                             break
                         } else {
                             release(resource)
@@ -100,7 +100,7 @@ class ResourceTests {
             override fun process() = sequence {
                 hold(preRequestHold)
 
-                if (requestPriority != null) {
+                if(requestPriority != null) {
                     request(resource withPriority requestPriority)
                 } else {
                     request(resource)
@@ -108,9 +108,9 @@ class ResourceTests {
 
                 hold(postRequestHold)
 
-                if (isBumped(resource)) {
+                if(isBumped(resource)) {
                     log("got bumped from $resource")
-                    if (failOnBump) Assert.fail()
+                    if(failOnBump) Assert.fail()
                     return@sequence
                 }
 
@@ -599,6 +599,5 @@ class ResourceSelectionTests {
         c.obtainedResources shouldBe (resources + resources + resources)
     }
 }
-
 
 

@@ -658,12 +658,11 @@ open class Component(
 
             CapacityLimitMode.CAP -> resourceRequests.map {
                 with(it) {
-                    val rr = if (quantity < 0 && resource is DepletableResource) {
+                    if(quantity < 0 && resource is DepletableResource) {
                         copy(quantity = -1 * max(resource.capacity - resource.level, quantity))
                     } else {
                         throw RuntimeException("CAP mode is just supported for put requests")
                     }
-                    rr
                 }
             }
         }
@@ -872,7 +871,7 @@ open class Component(
 
         reschedule(now, NORMAL, false, null, "Request honored by $honorInfo", SCHEDULED)
 
-        // process negative put requests (todo can't we handle them separately)
+        // process negative put requests (todo can't we handle them separately) Is this needed at all?
         rHonor.filter { it.first.depletable }.forEach {
             it.first.tryRequest()
         }
@@ -1173,7 +1172,7 @@ open class Component(
      * @param  quantity  quantity to be released. If not specified, the resource will be emptied completely.
      * For non-anonymous resources, all components claiming from this resource will be released.
      */
-    fun release(resource: Resource, quantity: Double = Double.MAX_VALUE) = release(ResourceRequest(resource, quantity))
+    fun release(resource: Resource, quantity: Number = Double.MAX_VALUE) = release(ResourceRequest(resource, quantity.toDouble()))
 
 
     /**
@@ -1199,7 +1198,7 @@ open class Component(
      */
     fun release(vararg releaseRequests: ResourceRequest) {
         for ((resource, quantity) in releaseRequests) {
-            require(!resource.depletable) { " It is not possible to release from an anonymous resource, this way. Use Resource.release() in that case." }
+            require(!resource.depletable) { " It is not possible to release from an depletable resource, this way. Use Resource.release() in that case." }
 
             releaseInternal(resource, quantity)
         }

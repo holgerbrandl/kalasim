@@ -102,7 +102,7 @@ request(clerks withQuantity 2)
 ## Request Honor Policies
 
 * **Strict first come, first serve (S-FCFS)**. With the policy requests will be honored by order of appearance. So, it  actually will wait to honour "big" requests, if if smaller requests that could honored already are queueing up already. This is the the default, as we assume this the most intuitive behavior in most situations.
-* **Relaxed first come, first serve (R-FCFS)**: honour first claimable request first. This will prefer small requests, i.e. requests for a small quantity, over big requests.
+* **Relaxed first come, first serve (R-FCFS)**: honour first claimable request first. This will honor small requests evern if larger requests are already waiting longer in line.
 * **Smallest Quantity First (SQF)** (to maximize "customer" throughput) with FCFS to resolve ambiguities. This will maximize the total number of requests being honored, whereas large requests may need to wait for a long time.
 * **Weighted SQF**: Here the user can supply a weight `α` that is used to compute an ordering based on `quantity*(1-α)+ time_since_insert*α)`. This will progressively weigh insert-time against request quantity, to ensure that also larger request will finally be honored even if new small requests are coming in.
 

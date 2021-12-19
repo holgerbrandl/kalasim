@@ -27,6 +27,8 @@ sealed class RequestHonorPolicy {
             require(alpha in 0.0..1.0) { "alpha must be between 0 and 1 " }
         }
     }
+
+    // todo what about a WeightedFCFS (is it the same as SQL with small alpha?
 }
 
 
@@ -198,14 +200,14 @@ open class Resource(
         }
     }
 
-    fun tryRequest(): Boolean {
+    internal fun tryRequest(): Boolean {
         if (depletable) {
             // note: trying seems to lack any function in salabim; It is always reset after the while loop in a tryrequest
             do {
                 val wasHonored = with(requesters.q) {
                     isNotEmpty() && peek().component.tryRequest()
                 }
-                println(wasHonored)
+//                println(wasHonored)
             } while (wasHonored)
         } else {
             while (requesters.q.isNotEmpty()) {
@@ -215,7 +217,7 @@ open class Resource(
                 }
 
                 if (!requesters.q.peek().component.tryRequest()) {
-                    // if we can honor this request, we must stop here (to respect request prioritites
+                    // if we can honor this request, we must stop here (to respect request priorities
                     break
                 }
             }
@@ -243,7 +245,7 @@ open class Resource(
             tryRequest()
 
         } else {
-            require(quantity != null) { "quantity missing for non-anonymous resource" }
+            require(quantity != null) { "quantity missing for non-depletable resource" }
 
             while (claimers.isNotEmpty()) {
                 claimers.q.first().component.release(this)
