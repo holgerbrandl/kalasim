@@ -10,6 +10,7 @@ Not yet released
 * Reduced memory requirements of [resource](resource.md) monitoring by 50% by inferring `occupancy` and `availability` using [Timeline Arithmetics](monitors.md#monitors-arithmetics)
 * [#38](https://github.com/holgerbrandl/kalasim/issues/38) Extended and improved API support for [depletable resources](resource.md#depletable-resources). 
 * Introduced different [modes](resource.md#capacity-limit-modes) if resource requests exceed resource capacity. 
+* Added `ComponentQueue.asSortedList()` to sorted copy of underlying priority queue 
 
 
 Minor enhancements

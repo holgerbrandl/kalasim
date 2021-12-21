@@ -17,13 +17,10 @@ data class CQElement<C>(val component: C, val enterTime: TickTime, val priority:
 class ComponentQueue<C>(
     name: String? = null,
 //    val q: Queue<CQElement<T>> = LinkedList()
-    val q: Queue<CQElement<C>> = PriorityQueue { o1, o2 ->
-        compareValuesBy(
-            o1,
-            o2,
-            { it.priority?.value?.times(-1) ?: 0 },
-            { it.enterTime })
+    val comparator: Comparator<CQElement<C>> = Comparator { o1: CQElement<C>, o2: CQElement<C> ->
+        compareValuesBy(o1, o2, { it.priority?.value?.times(-1) ?: 0 }, { it.enterTime })
     },
+    val q: Queue<CQElement<C>> = PriorityQueue(comparator),
     capacity: Int = Int.MAX_VALUE,
     koin: Koin = DependencyContext.get()
 ) : ComponentCollection<C>(name, capacity, koin) {
@@ -34,6 +31,8 @@ class ComponentQueue<C>(
 
     val components
         get() = q.map { it.component }
+
+    fun asSortedList() = q.toList().sortedWith(comparator)
 
 
     fun add(component: C, priority: Priority? = null): Boolean {
@@ -58,7 +57,7 @@ class ComponentQueue<C>(
 
 
         log(trackingPolicy.trackCollectionStatistics) {
-            if (cqe.component is Component) {
+            if(cqe.component is Component) {
                 InteractionEvent(env.now, env.curComponent, cqe.component as Component, "Left $name", null)
             } else {
                 InteractionEvent(env.now, env.curComponent, null, "${cqe.component} left $name", null)
@@ -170,7 +169,7 @@ fun StatisticalSummary.toJson(): JSONObject {
         "mean" to mean.roundAny().nanAsNull()
         "standard_deviation" to standardDeviation.roundAny().nanAsNull()
 
-        if (this@toJson is DescriptiveStatistics) {
+        if(this@toJson is DescriptiveStatistics) {
             "median" to standardDeviation.roundAny().nanAsNull()
             "ninety_pct_quantile" to getPercentile(90.0).roundAny().nanAsNull()
             "ninetyfive_pct_quantile" to getPercentile(95.0).roundAny().nanAsNull()
@@ -178,7 +177,7 @@ fun StatisticalSummary.toJson(): JSONObject {
     }
 }
 
-internal fun Double?.nanAsNull(): Double? = if (this != null && isNaN()) null else this
+internal fun Double?.nanAsNull(): Double? = if(this != null && isNaN()) null else this
 
 //private fun DoubleArray.standardDeviation(): Double = StandardDeviation(false).evaluate(this)
 
