@@ -10,6 +10,8 @@ honor policy notes
 
 **TODO** clean up all compiler warnings
 
+**TODO** better name and documentation for `curComponent`
+
 ## v0.8
 
 **TODO** log output is misleading

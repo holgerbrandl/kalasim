@@ -1,5 +1,6 @@
 package org.kalasim.test
 
+import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.*
@@ -93,10 +94,45 @@ class RegularHonorPolicyTest {
 
     @Test
     fun `it should allow using a weighted SQF`() {
-        val takes = fruitStore(RequestHonorPolicy.WeightedFCFS(0.4))
+        val takes = fruitStore(RequestHonorPolicy.WeightedFCFS(0.01))
 
         takes.map {
             it.requester.name.replace("Customer.", "").toInt()
-        } shouldBe listOf(4, 5, 1, 2, 3)
+        } shouldBe listOf(3, 4, 1, 5, 2, 6)  // note: this was inferred from the test and not worked out on paper
+    }
+
+    @Test
+    fun `it should honor huge request eventually when using weighted SQF`() = createTestSimulation(false) {
+        val lawyers = Resource(capacity = 10, honorPolicy = RequestHonorPolicy.WeightedFCFS(0.1))
+
+        dependency { lawyers }
+
+        val cg = ComponentGenerator(iat = exponential(6)) {
+            object : Component() {
+                override fun process() = sequence {
+                    request(lawyers) {
+                        hold(25)
+                    }
+                }
+            }
+        }
+
+        // refill the shelf after 5o ticks
+        object : Component("huge request") {
+            override fun process() = sequence {
+                // wait for requests to gather
+                hold(200)
+
+                request(lawyers, quantity = 10) {
+                    stopSimulation()
+                }
+            }
+        }
+
+        val runFor = 1000
+        run(runFor)
+
+        println("num created ${cg.numGenerated}")
+        now shouldBeLessThan TickTime(runFor)
     }
 }

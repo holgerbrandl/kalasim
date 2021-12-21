@@ -10,16 +10,25 @@ import org.kalasim.misc.*
 import org.kalasim.monitors.MetricTimelineStats
 import org.koin.core.Koin
 import java.util.*
+import kotlin.Comparator
 
 data class CQElement<C>(val component: C, val enterTime: TickTime, val priority: Priority? = null)
+
+//fun <C> PriorityFCFSQueueComparator() = compareBy<CQElement<C>>(
+//    { it.priority?.value?.times(-1) ?: 0 },
+//    { it.enterTime }
+//)
+
+class  PriorityFCFSQueueComparator<C>() : Comparator<CQElement<C>> {
+    override fun compare(o1: CQElement<C>, o2: CQElement<C>): Int  =
+        compareValuesBy(o1, o2, { it.priority?.value?.times(-1) ?: 0 }, { it.enterTime })
+}
 
 
 class ComponentQueue<C>(
     name: String? = null,
-//    val q: Queue<CQElement<T>> = LinkedList()
-    val comparator: Comparator<CQElement<C>> = Comparator { o1: CQElement<C>, o2: CQElement<C> ->
-        compareValuesBy(o1, o2, { it.priority?.value?.times(-1) ?: 0 }, { it.enterTime })
-    },
+    val comparator: Comparator<CQElement<C>> = PriorityFCFSQueueComparator(),
+    // for queue alternatives see https://docs.oracle.com/javase/tutorial/collections/implementations/queue.html
     val q: Queue<CQElement<C>> = PriorityQueue(comparator),
     capacity: Int = Int.MAX_VALUE,
     koin: Koin = DependencyContext.get()

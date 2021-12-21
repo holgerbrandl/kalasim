@@ -12,23 +12,44 @@ import org.kalasim.monitors.copy
 import org.kalasim.monitors.div
 import org.kalasim.monitors.minus
 import org.koin.core.Koin
+import java.util.*
+import kotlin.random.Random
 
 // TODO Analyze we we support the same preemptible contract as simmer (Ucar2019, p11) (in particular restart)
 
 
-/** See [user manual](https://www.kalasim.org/resource/#request-honor-policies). */
+/** A policy that defines in what order requests are honored. See [user manual](https://www.kalasim.org/resource/#request-honor-policies). */
 sealed class RequestHonorPolicy {
     object StrictFCFS : RequestHonorPolicy()
     object RelaxedFCFS : RequestHonorPolicy()
     object SQF : RequestHonorPolicy()
+    object RANDOM : RequestHonorPolicy()
 
-    class WeightedFCFS(val alpha: Double) : RequestHonorPolicy() {
-        init {
-            require(alpha in 0.0..1.0) { "alpha must be between 0 and 1 " }
+    class WeightedFCFS(
+        val alpha: Number,
+        val capTimeDiffAt: Number? = null,
+        val capQuantityAt: Number? = null
+    ) : RequestHonorPolicy() {
+
+        /** Calculate weighted score of quantity and ticks sind request. Requests resulting in large values will be honored first. */
+        fun computeRequestWeight(timeSinceRequest: Double, requestQuantity: Double): Double {
+            require(capTimeDiffAt == null || capTimeDiffAt.toDouble() > 0)
+            require(capQuantityAt == null || capQuantityAt.toDouble() > 0)
+
+            val timeDiffTrimmed = trimOptional(timeSinceRequest, capTimeDiffAt?.toDouble())
+            val quantityTrimmed = trimOptional(requestQuantity, capQuantityAt?.toDouble())
+
+            return (alpha.toDouble() * timeDiffTrimmed) / quantityTrimmed
+            // static
         }
-    }
 
-    // todo what about a WeightedFCFS (is it the same as SQL with small alpha?
+        private fun trimOptional(value: Double, maxValue: Double?) =
+            if(maxValue != null && value > maxValue) maxValue else value
+
+//        init {
+//            require(alpha in 0.0..1.0) { "alpha must be between 0 and 1 " }
+//        }
+    }
 }
 
 
@@ -81,6 +102,15 @@ open class DepletableResource(
     }
 }
 
+class SQFComparator(val resource: Resource) : Comparator<CQElement<Component>> {
+    override fun compare(o1: CQElement<Component>, o2: CQElement<Component>): Int = compareValuesBy(o1, o2,
+        { it.priority?.value?.times(-1) ?: 0 },
+        { it.component.requests[resource]!! }
+    )
+}
+
+class RandomComparator(val random: Random) : Comparator<CQElement<Component>> {
+    override fun compare(o1: CQElement<Component>, o2: CQElement<Component>): Int = random.nextInt()}
 
 /**
  * A simulation entity with a limited capacity, that can be requested by other simulation components. For details see https://www.kalasim.org/resource/
@@ -102,18 +132,15 @@ open class Resource(
 
 
     // should we this make readonly from outside?
-    val requesters = when(honorPolicy) {
-        RequestHonorPolicy.SQF -> {
-            ComponentQueue("requesters of ${this.name}",
-                comparator = Comparator<CQElement<Component>> { o1, o2 ->
-                    compareValuesBy(o1, o2,
-                        { it.priority?.value?.times(-1) ?: 0 },
-                        { it.component.requests[this]!! })
-                }, koin = koin
-            )
-        }
-        else -> ComponentQueue("requesters of ${this.name}", koin = koin)
-    }
+    val requesters = ComponentQueue(
+        "requesters of ${this.name}",
+        comparator = when(honorPolicy) {
+            RequestHonorPolicy.SQF -> SQFComparator(this)
+            RequestHonorPolicy.RANDOM -> RandomComparator(random)
+            else -> PriorityFCFSQueueComparator()
+        },
+        koin = koin
+    )
 
     val claimers = ComponentQueue<Component>("claimers of ${this.name}", koin = koin)
 
@@ -139,7 +166,8 @@ open class Resource(
 
 
     // https://stackoverflow.com/questions/41214452/why-dont-property-initializers-call-a-custom-setter
-    var claimed: Double = 0.0
+    var claimed
+            : Double = 0.0
         internal set(x) {
             val diffQuantity = field - x
 
@@ -163,10 +191,12 @@ open class Resource(
         }
 
 
-    val occupancy: Double
+    val occupancy
+            : Double
         get() = if(capacity < 0) 0.0 else claimed / capacity
 
-    val availableQuantity: Double
+    val availableQuantity
+            : Double
         get() = capacity - claimed
 
 
@@ -184,7 +214,8 @@ open class Resource(
         get() = claimedTimeline / capacityTimeline
 
 
-    var trackingPolicy: ResourceTrackingConfig = ResourceTrackingConfig()
+    var trackingPolicy
+            : ResourceTrackingConfig = ResourceTrackingConfig()
         set(newPolicy) {
             field = newPolicy
 
@@ -209,7 +240,12 @@ open class Resource(
 
     init {
         log(trackingPolicy.logCreation) {
-            EntityCreatedEvent(now, env.curComponent, this, "capacity=$capacity " + if(depletable) "anonymous" else "")
+            EntityCreatedEvent(
+                now,
+                env.curComponent,
+                this,
+                "capacity=$capacity " + if(depletable) "anonymous" else ""
+            )
         }
     }
 
@@ -227,18 +263,13 @@ open class Resource(
             when(honorPolicy) {
                 RequestHonorPolicy.RelaxedFCFS -> {
                     // Note: This is an insanely expensive operation, as we need to resort the requesters queue
-
-                    requesters.q.toList()
-                        .sortedWith(requesters.comparator)
+                    (requesters.q as PriorityQueue).sortedIterator()
                         .filter { canHonorQuantity(it.component.requests[this]!!) }
-                        .takeWhile {
-                            val requestedSucceeded = it.component.tryRequest()
-//                            require(requestedSucceeded) { "request must not fail at this stage" }
-
-                            requestedSucceeded
-                        }
+                        .takeWhile { it.component.tryRequest() }
+                        .count() // actually triyger otherwise lazy sequence
                 }
-                RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS -> {
+                RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS, RequestHonorPolicy.RANDOM -> {
+                    // original port from salabim
                     while(requesters.q.isNotEmpty()) {
                         //try honor as many requests as possible
                         if(minq > (capacity - claimed + EPS)) {
@@ -252,23 +283,38 @@ open class Resource(
                     }
                 }
                 is RequestHonorPolicy.WeightedFCFS -> {
+                    // Note: This is an insanely expensive operation, as we need to resort the requesters queue
+                    val sortedWith = requesters.q.toList()
+                        .sortedWith { o1, o2 ->
+                            compareValuesBy(
+                                o1, o2,
+                                { it.priority?.value?.times(-1) ?: 0 },
+                                {
+                                    val requestQuantity = it.component.requests[this]!!
+                                    val timeSinceRequest = now - it.enterTime
 
-
+                                    -1 * honorPolicy.computeRequestWeight(timeSinceRequest, requestQuantity)
+                                },
+//                                { it.enterTime }
+                            )
+                        }
+                    @Suppress("ConvertCallChainIntoSequence")
+                    sortedWith
+                        .filter { canHonorQuantity(it.component.requests[this]!!) }
+                        .takeWhile { it.component.tryRequest() }
+                        .count() // actually trigger otherwise lazy sequence
                 }
             }
         }
     }
 
     internal fun canComponentHonorQuantity(component: Component, quantity: Double) = when(honorPolicy) {
-        RequestHonorPolicy.RelaxedFCFS -> {
+        RequestHonorPolicy.RANDOM, RequestHonorPolicy.RelaxedFCFS, is RequestHonorPolicy.WeightedFCFS -> {
             canHonorQuantity(quantity)
         }
         RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS -> {
             // note: it's looks the same as StrictFCFS, but the queue comparator is different
             requesters.q.peek().component == component && canHonorQuantity(quantity)
-        }
-        is RequestHonorPolicy.WeightedFCFS -> {
-            TODO()
         }
     }
 
@@ -288,7 +334,9 @@ open class Resource(
      * @param  quantity  quantity to be released. If not specified, the resource will be emptied completely.
      * For non-anonymous resources, all components claiming from this resource will be released.
      */
-    fun release(quantity: Number? = null) {
+    fun release(
+        quantity: Number? = null
+    ) {
         // TODO Split resource types into QuantityResource and Resource or similar
         if(depletable) {
             val q = quantity?.toDouble() ?: claimed
@@ -318,18 +366,26 @@ open class Resource(
     /** Prints a summary of statistics of a resource. */
     fun printStatistics() = println(statistics.toString())
 
-    override val info: Jsonable
+    override val info
+            : Jsonable
         get() = ResourceInfo(this)
 
-    val statistics: ResourceStatistics
+    val statistics
+            : ResourceStatistics
         get() = ResourceStatistics(this)
 
 
-    val activities: List<ResourceActivityEvent> = mutableListOf()
+    val activities
+            : List<ResourceActivityEvent> = mutableListOf()
 //    val timeline = env.eventCollector<RequestScopeEvent>()
 
 }
 
+internal fun <E> PriorityQueue<E>.sortedIterator() = sequence {
+    val pqCopy = PriorityQueue(this@sortedIterator)
+
+    while(pqCopy.isNotEmpty()) yield(pqCopy.poll())
+}
 
 //
 // Resource timeline for streamlined analytics

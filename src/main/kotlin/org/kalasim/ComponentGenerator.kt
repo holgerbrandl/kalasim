@@ -47,8 +47,10 @@ class ComponentGenerator<T>(
     fun addConsumer(consumer: CompGenObserver<T>) = consumers.add(consumer)
     fun removeConsumer(consumer: CompGenObserver<T>) = consumers.remove(consumer)
 
+    var numGenerated = 0
+        private set
+
     fun doIat(): Sequence<Component> = sequence {
-        var numGenerated = 0
 
         val iatSeq = sequence { if (forceStart) yield(0.0); while (true) yield(iat()) }.iterator()
 
