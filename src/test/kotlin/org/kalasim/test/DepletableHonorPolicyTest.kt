@@ -82,7 +82,7 @@ class DepletableHonorPolicyTest {
 
     @Test
     fun `it should allow using a weighted SQF`() {
-        val takes = fruitStore(RequestHonorPolicy.WeightedSQF(0.4))
+        val takes = fruitStore(RequestHonorPolicy.WeightedFCFS(0.4))
 
         TODO() // complete test defintion
 

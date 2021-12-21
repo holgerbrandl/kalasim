@@ -53,7 +53,7 @@ fun fruitStore(honorPolicy: RequestHonorPolicy): List<ResourceEvent> {
 val events = fruitStore(RequestHonorPolicy.RelaxedFCFS)
 //val events = fruitStore(RequestHonorPolicy.StrictFCFS)
 //val events = fruitStore(RequestHonorPolicy.SQF).map{ it.requester}
-//val events = fruitStore(RequestHonorPolicy.WeightedSQF(0.4)).map{ it.requester}
+//val events = fruitStore(RequestHonorPolicy.WeightedFCFS(0.4)).map{ it.requester}
 
 //events.forEach { println(it) }
 

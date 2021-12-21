@@ -12,7 +12,6 @@ import org.kalasim.monitors.copy
 import org.kalasim.monitors.div
 import org.kalasim.monitors.minus
 import org.koin.core.Koin
-import java.util.*
 
 // TODO Analyze we we support the same preemptible contract as simmer (Ucar2019, p11) (in particular restart)
 
@@ -23,7 +22,7 @@ sealed class RequestHonorPolicy {
     object RelaxedFCFS : RequestHonorPolicy()
     object SQF : RequestHonorPolicy()
 
-    class WeightedSQF(val alpha: Double) : RequestHonorPolicy() {
+    class WeightedFCFS(val alpha: Double) : RequestHonorPolicy() {
         init {
             require(alpha in 0.0..1.0) { "alpha must be between 0 and 1 " }
         }
@@ -101,8 +100,21 @@ open class Resource(
 
     var minq: Double = Double.MAX_VALUE
 
+
     // should we this make readonly from outside?
-    val requesters = ComponentQueue<Component>("requesters of ${this.name}", koin = koin)
+    val requesters = when(honorPolicy) {
+        RequestHonorPolicy.SQF -> {
+            ComponentQueue("requesters of ${this.name}",
+                comparator = Comparator<CQElement<Component>> { o1, o2 ->
+                    compareValuesBy(o1, o2,
+                        { it.priority?.value?.times(-1) ?: 0 },
+                        { it.component.requests[this]!! })
+                }, koin = koin
+            )
+        }
+        else -> ComponentQueue("requesters of ${this.name}", koin = koin)
+    }
+
     val claimers = ComponentQueue<Component>("claimers of ${this.name}", koin = koin)
 
     var capacity = capacity.toDouble()
@@ -201,27 +213,71 @@ open class Resource(
         }
     }
 
-    internal fun tryRequest(): Boolean {
-        if (depletable) {
+    internal fun tryRequest() {
+        // todo move to sub-class
+        if(depletable) {
             // note: trying seems to lack any function in salabim; It is always reset after the while loop in a tryrequest
             do {
                 val wasHonored = with(requesters.q) {
                     isNotEmpty() && peek().component.tryRequest()
                 }
 //                println(wasHonored)
-            } while (wasHonored)
+            } while(wasHonored)
         } else {
-            while (requesters.q.isNotEmpty()) {
-                //try honor as many requests as possible
-                if (minq > (capacity - claimed + EPS)) {
-                    break
-                }
+            when(honorPolicy) {
+                RequestHonorPolicy.RelaxedFCFS -> {
+                    // Note: This is an insanely expensive operation, as we need to resort the requesters queue
 
-                if (!requesters.q.peek().component.tryRequest()) {
-                    // if we can honor this request, we must stop here (to respect request priorities
-                    break
+                    requesters.q.toList()
+                        .sortedWith(requesters.comparator)
+                        .filter { canHonorQuantity(it.component.requests[this]!!) }
+                        .takeWhile {
+                            val requestedSucceeded = it.component.tryRequest()
+//                            require(requestedSucceeded) { "request must not fail at this stage" }
+
+                            requestedSucceeded
+                        }
+                }
+                RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS -> {
+                    while(requesters.q.isNotEmpty()) {
+                        //try honor as many requests as possible
+                        if(minq > (capacity - claimed + EPS)) {
+                            break
+                        }
+
+                        if(!requesters.q.peek().component.tryRequest()) {
+                            // if we can not honor this request, we must stop here (to respect request priorities)
+                            break
+                        }
+                    }
+                }
+                is RequestHonorPolicy.WeightedFCFS -> {
+
+
                 }
             }
+        }
+    }
+
+    internal fun canComponentHonorQuantity(component: Component, quantity: Double) = when(honorPolicy) {
+        RequestHonorPolicy.RelaxedFCFS -> {
+            canHonorQuantity(quantity)
+        }
+        RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS -> {
+            // note: it's looks the same as StrictFCFS, but the queue comparator is different
+            requesters.q.peek().component == component && canHonorQuantity(quantity)
+        }
+        is RequestHonorPolicy.WeightedFCFS -> {
+            TODO()
+        }
+    }
+
+
+    internal fun canHonorQuantity(quantity: Double): Boolean {
+        if(quantity > 0 && quantity > capacity - claimed + EPS) {
+            return false
+        } else if(-quantity > claimed + EPS) {
+            return false
         }
 
         return true

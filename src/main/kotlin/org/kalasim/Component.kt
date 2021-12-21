@@ -791,38 +791,40 @@ open class Component(
 
     /** Determine if all current requests of this component could be honored. */
     private fun honorAll(): List<Pair<Resource, Double>>? {
-        for ((r, requestedQuantity) in requests) {
+        for ((resource, requestedQuantity) in requests) {
             if (requestedQuantity < 0) {
-                require(r is DepletableResource) {
-                    "can not request negative quantivy from non-depletable resource"
+                require(resource is DepletableResource) {
+                    "can not request negative quantity from non-depletable resource"
                 }
             }
 
-            if (requestedQuantity > 0 && requestedQuantity > r.capacity - r.claimed + EPS) {
-                return null
-            } else if (-requestedQuantity > r.claimed + EPS) {
-                return null
-            }
+            if(!resource.canComponentHonorQuantity(this, requestedQuantity)) return null
         }
 
         return requests.toList()
     }
 
+
     private fun honorAny(): List<Pair<Resource, Double>>? {
         for (request in requests) {
-            val (r, requestedQuantity) = request
+            val (resource, requestedQuantity) = request
 
-            if (requestedQuantity > 0) {
-                if (requestedQuantity <= r.capacity - r.claimed + EPS) {
-                    return listOf(r to requestedQuantity)
-                }
-            } else if (-requestedQuantity <= r.claimed + EPS) {
-                return listOf(r to requestedQuantity)
+            if(resource.canComponentHonorQuantity(this, requestedQuantity)){
+                return listOf(resource to requestedQuantity)
             }
+//            if (requestedQuantity > 0) {
+//                if (requestedQuantity <= resource.capacity - resource.claimed + EPS) {
+//                    return listOf(resource to requestedQuantity)
+//                }
+//            } else if (-requestedQuantity <= resource.claimed + EPS) {
+//                return listOf(resource to requestedQuantity)
+//            }
         }
 
         return null
     }
+
+
 
     /**
      * Check if any or all (depending on on-of-setting)  request(s) to resources can be honored, and perform the

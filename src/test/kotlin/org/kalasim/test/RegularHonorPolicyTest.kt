@@ -3,7 +3,6 @@ package org.kalasim.test
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.*
-import org.kalasim.misc.printThis
 
 class RegularHonorPolicyTest {
 
@@ -28,9 +27,12 @@ class RegularHonorPolicyTest {
             Customer(1, 5)
             Customer(6, 6)
             Customer(15, 3)
-            Customer(24, 1)
-            Customer(40, 3)
-            Customer(44, 2) // sum=20
+
+            Customer(24, 1)  //release after request
+
+            Customer(30, 3)
+
+            Customer(37, 2)
 
             // refill the shelf after 5o ticks
             object : Component("release-manager") {
@@ -42,7 +44,7 @@ class RegularHonorPolicyTest {
                     // incrementally refill banana shelf
                     repeat(5) {
                         release(lawyers, quantity = 4)
-                        hold(10)
+                        hold(4)
                     }
 
                     stopSimulation() // because otherwise customer will release when being terminated
@@ -55,17 +57,20 @@ class RegularHonorPolicyTest {
             run()
 
             println("remaining level after running for ${now}: ${(resourceEvents.first().resource).claimed}")
-            return resourceEvents.filter { it.type == ResourceEventType.TAKE }
+            return resourceEvents.filter { it.type == ResourceEventType.CLAIMED }.drop(1) // drop the initial request
         }
     }
 
     @Test
     fun `it should allow using a relaxed FCFS`() {
         val takes = fruitStore(RequestHonorPolicy.RelaxedFCFS)
-        takes.map { "${it.requester} (${it.time})" }.joinToString(", ").printThis()
+
+//        takes.map { "${it.requester} (${it.time})" }.joinToString(", ").printThis()
+//        takes.forEach{ println(it)}
+
         takes.map {
             it.requester.name.replace("Customer.", "").toInt()
-        } shouldBe listOf(4, 5, 6, 1, 2, 3)
+        } shouldBe listOf(3, 4, 1, 5, 2, 6)
     }
 
     @Test
@@ -74,7 +79,7 @@ class RegularHonorPolicyTest {
 
         takes.map {
             it.requester.name.replace("Customer.", "").toInt()
-        } shouldBe listOf(1, 2, 3, 4, 5)
+        } shouldBe listOf(1, 2, 3, 4, 5, 6)
     }
 
     @Test
@@ -83,14 +88,12 @@ class RegularHonorPolicyTest {
 
         takes.map {
             it.requester.name.replace("Customer.", "").toInt()
-        } shouldBe listOf(4, 5, 1, 2, 3)
+        } shouldBe listOf(3, 4, 1, 5, 2, 6) // that's unfortunately the same as for R-FCFS in this example
     }
 
     @Test
     fun `it should allow using a weighted SQF`() {
-        val takes = fruitStore(RequestHonorPolicy.WeightedSQF(0.4))
-
-        TODO() // complete test defintion
+        val takes = fruitStore(RequestHonorPolicy.WeightedFCFS(0.4))
 
         takes.map {
             it.requester.name.replace("Customer.", "").toInt()
