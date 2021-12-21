@@ -13,6 +13,7 @@ class RegularHonorPolicyTest {
         override fun process() = sequence {
             hold(arrivalTime)
             request(lawyers, quantity = requestQuantity)
+            hold(1000)
             // usually we would use a request scope and relase the resource when done, but here we don't
         }
     }
@@ -24,17 +25,18 @@ class RegularHonorPolicyTest {
 
             dependency { lawyers }
 
-            Customer(1, 4)
-            Customer(6, 5)
+            Customer(1, 5)
+            Customer(6, 6)
             Customer(15, 3)
             Customer(24, 1)
             Customer(40, 3)
-            Customer(44, 2)
+            Customer(44, 2) // sum=20
 
             // refill the shelf after 5o ticks
-            object : Component() {
+            object : Component("release-manager") {
                 override fun process() = sequence {
                     request(lawyers, quantity = lawyers.capacity) // law firm is fully booked
+                    lawyers.claimed shouldBe 20
                     hold(20)
 
                     // incrementally refill banana shelf
@@ -42,6 +44,8 @@ class RegularHonorPolicyTest {
                         release(lawyers, quantity = 4)
                         hold(10)
                     }
+
+                    stopSimulation() // because otherwise customer will release when being terminated
                 }
             }
         }
@@ -50,7 +54,7 @@ class RegularHonorPolicyTest {
             val resourceEvents = collect<ResourceEvent>()
             run()
 
-            println("remaining level after running for ${now}: ${(resourceEvents.first().resource as DepletableResource).level}")
+            println("remaining level after running for ${now}: ${(resourceEvents.first().resource).claimed}")
             return resourceEvents.filter { it.type == ResourceEventType.TAKE }
         }
     }

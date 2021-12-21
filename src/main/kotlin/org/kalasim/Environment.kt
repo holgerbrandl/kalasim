@@ -107,6 +107,7 @@ open class Environment(
     // heap for better performance
     private val eventQueue = PriorityQueue<QueueElement>()
 
+    // TODO Fix order or add introspection API https://stackoverflow.com/questions/8129122/how-to-iterate-over-a-priorityqueue
     /** Unmodifiable view on `eventQueue`. */
     val queue: List<Component>
         get() = eventQueue.map { it.component }

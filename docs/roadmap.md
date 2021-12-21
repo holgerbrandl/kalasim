@@ -3,6 +3,9 @@
 
 ## Next steps
 
+honor policy notes
+* relaxedFCFS is expense in java because we can not traverse the sorted list
+
 ## v0.8
 
 **TODO** log output is misleading

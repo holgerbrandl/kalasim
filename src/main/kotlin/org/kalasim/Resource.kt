@@ -12,6 +12,7 @@ import org.kalasim.monitors.copy
 import org.kalasim.monitors.div
 import org.kalasim.monitors.minus
 import org.koin.core.Koin
+import java.util.*
 
 // TODO Analyze we we support the same preemptible contract as simmer (Ucar2019, p11) (in particular restart)
 
@@ -106,7 +107,7 @@ open class Resource(
 
     var capacity = capacity.toDouble()
         set(newCapacity) {
-            if (newCapacity < claimed) {
+            if(newCapacity < claimed) {
                 throw CapacityLimitException(this, "can not reduce capacity below current claims", now, newCapacity)
             }
 
@@ -116,7 +117,7 @@ open class Resource(
             capacityTimeline.addValue(capacity)
 //            updatedDerivedMetrics()
 
-            if (this is DepletableResource) {
+            if(this is DepletableResource) {
                 // maintain the fill level of depletable resources
                 claimed += capacityDiff
             }
@@ -133,9 +134,9 @@ open class Resource(
             field = x
 
             // this ugly hak is needed to avoid tracking of initialLevel setting in DR constructor
-            if (this is DepletableResource && diffQuantity == 0.0 && requesters.isEmpty()) return
+            if(this is DepletableResource && diffQuantity == 0.0 && requesters.isEmpty()) return
 
-            if (field < EPS)
+            if(field < EPS)
                 field = 0.0
 
             claimedTimeline.addValue(x)
@@ -151,7 +152,7 @@ open class Resource(
 
 
     val occupancy: Double
-        get() = if (capacity < 0) 0.0 else claimed / capacity
+        get() = if(capacity < 0) 0.0 else claimed / capacity
 
     val availableQuantity: Double
         get() = capacity - claimed
@@ -196,7 +197,7 @@ open class Resource(
 
     init {
         log(trackingPolicy.logCreation) {
-            EntityCreatedEvent(now, env.curComponent, this, "capacity=$capacity " + if (depletable) "anonymous" else "")
+            EntityCreatedEvent(now, env.curComponent, this, "capacity=$capacity " + if(depletable) "anonymous" else "")
         }
     }
 
@@ -233,7 +234,7 @@ open class Resource(
      */
     fun release(quantity: Number? = null) {
         // TODO Split resource types into QuantityResource and Resource or similar
-        if (depletable) {
+        if(depletable) {
             val q = quantity?.toDouble() ?: claimed
 
             claimed = -q
@@ -247,7 +248,7 @@ open class Resource(
         } else {
             require(quantity != null) { "quantity missing for non-depletable resource" }
 
-            while (claimers.isNotEmpty()) {
+            while(claimers.isNotEmpty()) {
                 claimers.q.first().component.release(this)
             }
         }
@@ -255,7 +256,7 @@ open class Resource(
 
     fun removeRequester(component: Component) {
         requesters.remove(component)
-        if (requesters.isEmpty()) minq = Double.MAX_VALUE
+        if(requesters.isEmpty()) minq = Double.MAX_VALUE
     }
 
     /** Prints a summary of statistics of a resource. */

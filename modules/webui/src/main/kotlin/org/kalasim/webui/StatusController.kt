@@ -64,6 +64,6 @@ class StatusController(val simProvider: SimProvider) {
     }
 }
 
-data class NamedState(val name: String, val state: ComponentState)
-data class SimState(val now: Double, val states: List<NamedState>)
-data class SimControl(val speed: Double, val numGenerations: Int)
+class NamedState(val name: String, val state: ComponentState)
+class SimState(val now: Double, val states: List<NamedState>)
+class SimControl(val speed: Double, val numGenerations: Int)

@@ -87,6 +87,7 @@ open class Component(
     // TODO 0.6 get rid of this field (not needed because can be always retrieved from eventList if needed
     //  What are performance implications?
     var scheduledTime: TickTime? = null
+        internal set
 
     private var remainingDuration: Double? = null
 

@@ -59,6 +59,25 @@ git push origin :refs/tags/refs/heads/master
 <https://medium.com/mobile-app-development-publication/kotlin-flow-buffer-is-like-a-fashion-adoption-31630a9cdb00>
 ![](.dev_notes_images/flowmodes.png)
 
+## Priortiy Queue
+
+https://newbedev.com/how-to-iterate-over-a-priorityqueue
+
+> It's not a sorted array, so that you can just go from one element to the one with the lesser priority.
+> 
+> Peeking (read the top element heap in the heap) is constant time O(1) because it looks at the smallest element.
+> 
+> To get the second next one you must dequeue the smallest top element, that's how it works.
+> Dequeing (re-heapify = O(log n) time) isn't just a matter of taking that element out, the underlying structure rearranges itself in order to bring the element with the least priority first.
+        
+
+Workaround https://stackoverflow.com/questions/8129122/how-to-iterate-over-a-priorityqueue --> sort it outside using the queue comparator
+```kotlin
+Arrays.sort(theActualArray, pq.comparer())
+Arrays.sort(pq.toArray())
+```
+
+
 ## misc
 
 
