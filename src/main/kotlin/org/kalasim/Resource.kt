@@ -100,6 +100,19 @@ open class DepletableResource(
         depletable = true
         claimed = capacity.toDouble() - initialLevel.toDouble()
     }
+
+
+
+
+    override fun canComponentHonorQuantity(component: Component, quantity: Double) = when(honorPolicy) {
+        RequestHonorPolicy.RANDOM, RequestHonorPolicy.RelaxedFCFS, is RequestHonorPolicy.WeightedFCFS -> {
+            canHonorQuantity(quantity)
+        }
+        RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS -> {
+            // note: it's looks the same as StrictFCFS, but the queue comparator is different
+            (quantity < 0 || requesters.q.peek().component == component) && canHonorQuantity(quantity)
+        }
+    }
 }
 
 class SQFComparator(val resource: Resource) : Comparator<CQElement<Component>> {
@@ -110,7 +123,8 @@ class SQFComparator(val resource: Resource) : Comparator<CQElement<Component>> {
 }
 
 class RandomComparator(val random: Random) : Comparator<CQElement<Component>> {
-    override fun compare(o1: CQElement<Component>, o2: CQElement<Component>): Int = random.nextInt()}
+    override fun compare(o1: CQElement<Component>, o2: CQElement<Component>): Int = random.nextInt()
+}
 
 /**
  * A simulation entity with a limited capacity, that can be requested by other simulation components. For details see https://www.kalasim.org/resource/
@@ -250,23 +264,13 @@ open class Resource(
     }
 
     internal fun tryRequest() {
-        // todo move to sub-class
-        if(depletable) {
-            // note: trying seems to lack any function in salabim; It is always reset after the while loop in a tryrequest
-            do {
-                val wasHonored = with(requesters.q) {
-                    isNotEmpty() && peek().component.tryRequest()
-                }
-//                println(wasHonored)
-            } while(wasHonored)
-        } else {
             when(honorPolicy) {
                 RequestHonorPolicy.RelaxedFCFS -> {
-                    // Note: This is an insanely expensive operation, as we need to resort the requesters queue
+                    // Note: This is an insanely expensive operation, as we need to to build another sorted copy of the requesters queue
                     (requesters.q as PriorityQueue).sortedIterator()
                         .filter { canHonorQuantity(it.component.requests[this]!!) }
                         .takeWhile { it.component.tryRequest() }
-                        .count() // actually triyger otherwise lazy sequence
+                        .count() // actually trigger otherwise lazy sequence
                 }
                 RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS, RequestHonorPolicy.RANDOM -> {
                     // original port from salabim
@@ -305,10 +309,9 @@ open class Resource(
                         .count() // actually trigger otherwise lazy sequence
                 }
             }
-        }
     }
 
-    internal fun canComponentHonorQuantity(component: Component, quantity: Double) = when(honorPolicy) {
+    internal open fun canComponentHonorQuantity(component: Component, quantity: Double) = when(honorPolicy) {
         RequestHonorPolicy.RANDOM, RequestHonorPolicy.RelaxedFCFS, is RequestHonorPolicy.WeightedFCFS -> {
             canHonorQuantity(quantity)
         }
@@ -329,34 +332,6 @@ open class Resource(
         return true
     }
 
-    /** Releases all claims or a specified quantity
-     *
-     * @param  quantity  quantity to be released. If not specified, the resource will be emptied completely.
-     * For non-anonymous resources, all components claiming from this resource will be released.
-     */
-    fun release(
-        quantity: Number? = null
-    ) {
-        // TODO Split resource types into QuantityResource and Resource or similar
-        if(depletable) {
-            val q = quantity?.toDouble() ?: claimed
-
-            claimed = -q
-
-            // done within decrementing claimedQuantity
-//            occupancyTimeline.addValue(if (capacity <= 0) 0 else claimedQuantity / capacity)
-//            availableQuantityMonitor.addValue(capacity - claimedQuantity)
-
-            tryRequest()
-
-        } else {
-            require(quantity != null) { "quantity missing for non-depletable resource" }
-
-            while(claimers.isNotEmpty()) {
-                claimers.q.first().component.release(this)
-            }
-        }
-    }
 
     fun removeRequester(component: Component) {
         requesters.remove(component)
@@ -384,7 +359,9 @@ open class Resource(
 internal fun <E> PriorityQueue<E>.sortedIterator() = sequence {
     val pqCopy = PriorityQueue(this@sortedIterator)
 
-    while(pqCopy.isNotEmpty()) yield(pqCopy.poll())
+    while(pqCopy.isNotEmpty()) {
+        yield(pqCopy.poll())
+    }
 }
 
 //

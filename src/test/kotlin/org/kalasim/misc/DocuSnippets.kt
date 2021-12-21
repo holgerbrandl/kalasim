@@ -20,25 +20,24 @@ class ResourceDocu {
                     }
                     // no need to release it, if a `honorBlock` is provided it will be released automatically
 
-
                     // api to request resources with custom quantity and priorities
+                    request(clerks, quantity =  2, priority = IMPORTANT)
+
+                    // it also provides a more streamlined dsl support
                     request(clerks withQuantity 2)
                     request(clerks withQuantity 1, assistance withQuantity 2)
                     request(clerks withPriority 1)
                     request(clerks withQuantity 3.4 andPriority Priority(1))
 
+
                     hold(2) // consume it
 
+                    // note the requests from above are accumulated and need to be released manually
                     release(clerks, quantity = 2.0) // release some quantity
 
                     release(clerks) // release entire claim
                 }
         }
-
-        // we can also release all claims from the resource itself
-        val r = Resource("clerks", capacity = 3)
-        r.release(2.0)
-
     }
 }
 

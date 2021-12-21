@@ -1,6 +1,7 @@
 package org.kalasim.test
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.doubles.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import junit.framework.Assert.fail
@@ -111,7 +112,7 @@ class DepletableResourceTests {
 
         TickTime(Double.POSITIVE_INFINITY).toString()
         // ensure that at least the first car was sucessfully refilled
-        cg.history.first().componentState shouldBe ComponentState.PASSIVE
+        cg.history.first().componentState shouldBe ComponentState.DATA
     }
 
 
@@ -139,7 +140,7 @@ class DepletableResourceTests {
 
             dp.level shouldBe 0
 
-            object : Component() {
+            val c = object : Component() {
                 override fun process() = sequence<Component> {
                     put(dp, 200, capacityLimitMode = CapacityLimitMode.SCHEDULE)
 
@@ -150,7 +151,9 @@ class DepletableResourceTests {
 
             run(20)
             dp.capacity = 500.0
-            run()
+            run(1)
+
+            queue shouldNotContain c
         }
 
 
@@ -176,12 +179,12 @@ class DepletableResourceTests {
             override fun process() = sequence {
                 put(dp, 80)
                 c1.componentState shouldBe ComponentState.REQUESTING
-                c2.componentState shouldBe ComponentState.PASSIVE
+                c2.componentState shouldBe ComponentState.SCHEDULED
             }
         }
 
         run()
-        dp.level shouldBe 39.0
+        dp.level shouldBe 30.0
     }
 
     @Ignore

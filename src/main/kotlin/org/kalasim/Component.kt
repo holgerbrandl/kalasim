@@ -714,7 +714,6 @@ open class Component(
                 val reqText =
                     (calledFrom ?: "") + "Requesting $q from ${r.name} with priority $priority and oneof=$oneOf"
 
-                //            enterSorted(r.requesters, priority)
                 r.requesters.add(this@Component, priority = priority)
 
                 if (trackingPolicy.logInteractionEvents) {
@@ -874,8 +873,9 @@ open class Component(
 
         reschedule(now, NORMAL, false, null, "Request honored by $honorInfo", SCHEDULED)
 
-        // process negative put requests (todo can't we handle them separately) Is this needed at all?
-        rHonor.filter { it.first.depletable }.forEach {
+        // process negative put requests
+        rHonor.filter { it.second<0 }.forEach {
+            require(it.first.depletable)
             it.first.tryRequest()
         }
 

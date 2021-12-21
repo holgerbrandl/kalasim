@@ -2,14 +2,16 @@
 
 ## v0.8-SNAPSHOT
 
-Not yet released
+Milestone Enhancements
+* Added [honor policies](resource.md#request-honor-policies) to allow for more configurable request queue consumption
+* New: [Timeline Arithmetics](monitors.md#monitors-arithmetics). It is now possible to perform stream arithmetics on timeline attributes
+* Introduced different [modes](resource.md#capacity-limit-modes) if resource requests exceed resource capacity.
 
+Major Enhancements
 * Added `RequestScopeContext` to honor-block of `request` including `requestingSince` time (relates to [#27](https://github.com/holgerbrandl/kalasim/issues/27)) 
 * [#35](https://github.com/holgerbrandl/kalasim/pull/35) Improved support for asynchronous event consumption (contributed by [pambrose](https://github.com/pambrose) via PR)
-* New: [Timeline Arithmetics](monitors.md#monitors-arithmetics). It is now possible to perform stream arithmetics on timeline attributes
 * Reduced memory requirements of [resource](resource.md) monitoring by 50% by inferring `occupancy` and `availability` using [Timeline Arithmetics](monitors.md#monitors-arithmetics)
 * [#38](https://github.com/holgerbrandl/kalasim/issues/38) Extended and improved API support for [depletable resources](resource.md#depletable-resources). 
-* Introduced different [modes](resource.md#capacity-limit-modes) if resource requests exceed resource capacity. 
 * Added `ComponentQueue.asSortedList()` to sorted copy of underlying priority queue 
 
 
@@ -17,6 +19,7 @@ Minor enhancements
 
 * Added `capacity` to [component collections](collections.md)
 * Reworked [distribution support API](basics.md#randomness--distributions) for better API experience to enable controlled randomization in process models
+* Removed `Resource.release()` because of incomplete and unclear semantics
 
 
 ## v0.7 
