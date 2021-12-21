@@ -42,7 +42,7 @@ We always welcome pull requests. :-)
 
 ## Support
 
-Feel welcome to post questions and ideas in the project's [gitter chat](https://gitter.im/holgerbrandl/kalasim)
+Feel welcome to post questions and ideas in the project's [discussion forum](https://github.com/holgerbrandl/kalasim/discussions)
 
 Feel also invited to chat with us in the [kotlinlang.slack.com](http://kotlinlang.slack.com) in the `#kalasim` channel.
 

@@ -78,8 +78,6 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/holgerbrandl
-    - icon: fontawesome/brands/gitter
-      link: https://gitter.im/holgerbrandl/kalasim
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/holgerbrandl
     - icon: fontawesome/brands/linkedin

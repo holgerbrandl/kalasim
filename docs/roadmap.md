@@ -4,7 +4,10 @@
 ## Next steps
 
 honor policy notes
-* relaxedFCFS is expense in java because we can not traverse the sorted list
+* relaxedFCFS is expense in java because we can not traverse the sorted list (can not consume sorted queue)
+
+
+**TODO** clean up all compiler warnings
 
 ## v0.8
 
