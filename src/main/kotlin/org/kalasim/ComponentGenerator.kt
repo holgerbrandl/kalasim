@@ -2,7 +2,6 @@ package org.kalasim
 
 import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.misc.DependencyContext
-import org.kalasim.misc.Jsonable
 import org.koin.core.Koin
 
 /**
@@ -45,6 +44,7 @@ class ComponentGenerator<T>(
 
     private val consumers = mutableListOf<CompGenObserver<T>>()
     fun addConsumer(consumer: CompGenObserver<T>) = consumers.add(consumer)
+    @Suppress("unused")
     fun removeConsumer(consumer: CompGenObserver<T>) = consumers.remove(consumer)
 
     var numGenerated = 0
@@ -79,7 +79,7 @@ class ComponentGenerator<T>(
 //        log(env.now, env.curComponent, this@ComponentGenerator, "till reached")
 //    }
 
-    override val info: Jsonable
+    override val info: ComponentGeneratorInfo<T>
         get() = ComponentGeneratorInfo(this)
 }
 

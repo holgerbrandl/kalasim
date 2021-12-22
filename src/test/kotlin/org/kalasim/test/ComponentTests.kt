@@ -33,7 +33,7 @@ class ComponentTests {
         DependencyContext.stopKoin()
 
         shouldThrow<MissingDependencyContextException> {
-            Component("foo").info.printThis()
+            Component("foo")
         }
     }
 
@@ -60,6 +60,9 @@ class ComponentTests {
     fun `it should capture component state with info`() = createTestSimulation {
         val info = Component("foo").info
         run(10)
+
+        info.status shouldBe DATA
+        info.scheduledTime shouldBe null
 
         info.toString() shouldBe """
             {

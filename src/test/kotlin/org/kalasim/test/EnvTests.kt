@@ -10,7 +10,10 @@ import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.analysis.EntityCreatedEvent
-import org.kalasim.misc.*
+import org.kalasim.misc.AssertMode
+import org.kalasim.misc.DependencyContext
+import org.kalasim.misc.cartesianProduct
+import org.kalasim.misc.fastMap
 import org.koin.core.Koin
 import org.koin.core.error.NoBeanDefFoundException
 import org.koin.dsl.koinApplication
@@ -177,7 +180,7 @@ class EnvTests {
                         while(true) {
                             hold(1)
                             // doe something insanely complex that takes 2seconds
-                            Thread.sleep(waitCounter++ * 1000L)
+                            sleep(waitCounter++ * 1000L)
                         }
                     }
             }
@@ -186,6 +189,8 @@ class EnvTests {
 
             shouldThrow<ClockOverloadException> {
                 run(10)
+            }.apply {
+                simTime shouldBeLessThan 10.tt
             }
         }
     }
@@ -285,7 +290,7 @@ class EnvTests {
     }
 
     @Test
-    fun `assert-modes should be correctly ordered`(){
+    fun `assert-modes should be correctly ordered`() {
         AssertMode.OFF shouldBeLessThan AssertMode.LIGHT
         AssertMode.LIGHT shouldBeLessThan AssertMode.FULL
     }

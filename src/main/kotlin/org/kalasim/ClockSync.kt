@@ -23,7 +23,7 @@ class ClockSync(
 
 
     init {
-        trackingPolicy = ComponentTrackingConfig(false, false)
+        trackingPolicy = ComponentTrackingConfig(logCreation = false, logStateChangeEvents = false)
         // disable trace monitoring for clock control
 //        env.traceFilters.add { it is InteractionEvent && it.curComponent is ClockSync }
 

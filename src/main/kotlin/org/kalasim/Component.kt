@@ -1408,7 +1408,7 @@ open class Component(
     }
 
 
-    override val info: Jsonable
+    override val info: ComponentInfo
         get() = ComponentInfo(this)
 
 
@@ -1428,8 +1428,8 @@ open class Component(
     /** Captures the current state of a `Component`*/
     open class ComponentInfo(c: Component) : Jsonable() {
         val name = c.name
+        val now = c.now
         val status = c.componentState
-        val creationTime = c.creationTime
         val scheduledTime = c.scheduledTime
 
         val claims = c.claims.map { it.key.name to it.value }.toMap()

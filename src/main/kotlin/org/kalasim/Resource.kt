@@ -1,4 +1,4 @@
-@file:Suppress("EXPERIMENTAL_API_USAGE")
+//@file:Suppress("EXPERIMENTAL_API_USAGE")
 
 package org.kalasim
 
@@ -75,18 +75,20 @@ open class DepletableResource(
     koin = koin
 ) {
 
+    /** Indicates the current level of the resource. Technically is a synonym for `capacity - claimed` */
+    val level
+        get() = capacity - claimed
+
+
     /** Indicates if depletable resource is at full capacity. */
     val isFull: Boolean
-        get() = claimed == capacity
+        get() = level == capacity
 
     /** Indicates if depletable resource is depleted (level==0) */
     val isDepleted
         get() = level == 0.0
 
 
-    /** Indicates the current level of the resource. Technically is a synonym for `capacity - claimed` */
-    val level
-        get() = capacity - claimed
 
 //    val levelTimeline = MetricTimeline("Level of ${this.name}", initialValue = availableQuantity, koin = koin)
 //

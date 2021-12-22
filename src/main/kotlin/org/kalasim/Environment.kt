@@ -71,7 +71,7 @@ fun createSimulation(
         enableTickMetrics = enableTickMetrics,
         dependencies = dependencies,
         randomSeed = randomSeed,
-        koin = if (useCustomKoin) koinApplication { }.koin else null
+        koin = if(useCustomKoin) koinApplication { }.koin else null
     ).apply(builder)
 
 
@@ -137,6 +137,7 @@ open class Environment(
     var now = startTime
         internal set // todo since this is just used for testing, we could also maybe simply use run(newTime)
 
+    @Deprecated(message = "Use property instead. To be removed in v0.9", replaceWith = ReplaceWith("now"))
     fun now() = now
 
 //    val foo  = 3.ticks
@@ -150,9 +151,9 @@ open class Environment(
 
     val main: Component
 
+    @Suppress("PropertyName")
     internal val _koin: Koin
 
-    @Suppress("EXPERIMENTAL_OVERRIDE")
     final override fun getKoin(): Koin = _koin
 
     //redeclare to simplify imports
@@ -169,7 +170,7 @@ open class Environment(
         // start console logger
 
 //        addTraceListener { print(it) }
-        if (enableConsoleLogger) {
+        if(enableConsoleLogger) {
             addEventListener(ConsoleTraceLogger())
         }
 
@@ -198,7 +199,7 @@ open class Environment(
         main = MainComponent(getKoin())
 
         // declare dependencies
-        if (dependencies != null) {
+        if(dependencies != null) {
 //            val deps = dependencies ?: (module(createdAtStart = true) { })
             getKoin().loadModules(listOf(dependencies))
 //        KoinContextHandler.get()._scopeRegistry.rootScope.createEagerInstances()
@@ -210,7 +211,7 @@ open class Environment(
 
     }
 
-    private val _tm: TickMetrics? = if (enableTickMetrics) TickMetrics(koin = koin) else null
+    private val _tm: TickMetrics? = if(enableTickMetrics) TickMetrics(koin = koin) else null
 
     val tickMetrics: MetricTimeline
         get() {
@@ -226,35 +227,36 @@ open class Environment(
 
 //    fun build(vararg compoennts: Component) = components.forEach { this + it }
 
-    fun build(builder: (Environment.() -> Unit)): Environment {
-        builder(this)
-        return (this)
-    }
+    // seesm unused. To be deleted in v0.9
+//    fun build(builder: (Environment.() -> Unit)): Environment {
+//        builder(this)
+//        return (this)
+//    }
 
 
     /**
      * Start execution of the simulation
      *
-     *  If neither `until` nor `duration` are specified, the main component will be reactivated at
-     * the time there are no more events on the event-list, i.e. possibly not at Double.MAX_VAULE. If you want to keep a simulation    *  running simply call `run(Double.MAX_VALUE)`.
+     * If neither `until` nor `ticks` are specified, the main component will be reactivated at
+     * the time there are no more events on the event-list, i.e. possibly not at Double.MAX_VALUE. If you want
+     * to keep a simulation running simply call `run(Double.MAX_VALUE)`.
      *
      * @param duration Time to run
-     * @param until Absolute tick-time until the which the simulation should run
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
     fun run(
         duration: Ticks? = null,
-//        until: TickTime? = null,
-        priority: Priority = Priority.NORMAL,
+        priority: Priority = NORMAL,
         urgent: Boolean = false
     ) = run(duration?.value, null, priority, urgent)
 
     /**
      * Start execution of the simulation
      *
-     *  If neither `until` nor `ticks` are specified, the main component will be reactivated at
-     * the time there are no more events on the event-list, i.e. possibly not at Double.MAX_VAULE. If you want to keep a simulation    *  running simply call `run(Double.MAX_VALUE)`.
+     * If neither `until` nor `ticks` are specified, the main component will be reactivated at
+     * the time there are no more events on the event-list, i.e. possibly not at Double.MAX_VALUE. If you want
+     * to keep a simulation running simply call `run(Double.MAX_VALUE)`.
      *
      * @param duration Time to run
      * @param until Absolute tick-time until the which the simulation should run
@@ -268,7 +270,7 @@ open class Environment(
         urgent: Boolean = false
     ): Environment {
         // also see https://simpy.readthedocs.io/en/latest/topical_guides/environments.html
-        if (duration == null && until == null) {
+        if(duration == null && until == null) {
 //            endOnEmptyEventlist = true
         } else {
             val scheduledTime = calcScheduleTime(until, duration)
@@ -281,14 +283,14 @@ open class Environment(
 
         running = true
 
-        while (running) {
+        while(running) {
             step()
         }
 
         return (this)
     }
 
-    /** Executes the next step of the future event list */
+    /** Executes the next step of the future event list. */
     private fun step() {
 
         pendingStandBy.removeIf { it.componentState != STANDBY }
@@ -304,7 +306,7 @@ open class Environment(
         standBy.clear()
 
 
-        val (time, component) = if (eventQueue.isNotEmpty()) {
+        val (time, component) = if(eventQueue.isNotEmpty()) {
             val (c, time, _, _) = eventQueue.poll()
 
             time to c
@@ -327,7 +329,7 @@ open class Environment(
 
         setCurrent(component)
 
-        if (component == main) {
+        if(component == main) {
             running = false
             return
         }
@@ -360,8 +362,8 @@ open class Environment(
 
     inline fun <reified T : Event> addEventListener(
         crossinline block: (T) -> Unit
-    ) = addEventListener listener@ {
-        if (it !is T) return@listener
+    ) = addEventListener listener@{
+        if(it !is T) return@listener
         block(it)
     }
 
@@ -393,7 +395,7 @@ open class Environment(
         unschedule(c)
 
         // TODO what is happening here, can we simplify that?
-        if (c.componentState == STANDBY) {
+        if(c.componentState == STANDBY) {
             standBy.remove(c)
             pendingStandBy.remove(c)
         }
@@ -404,7 +406,7 @@ open class Environment(
             it.component == c
         }
 
-        if (queueElem != null) {
+        if(queueElem != null) {
             eventQueue.remove(queueElem)
         }
     }
@@ -420,7 +422,7 @@ open class Environment(
         eventQueue.add(QueueElement(component, scheduledTime, Priority(-priority.value), queueCounter, urgent))
 
         // consistency checks
-        if (ASSERT_MODE == AssertMode.FULL) {
+        if(ASSERT_MODE == AssertMode.FULL) {
             require(queue.none(Component::isPassive)) { "passive component must not be in event queue" }
 
             // ensure that no scheduled components have the same name
@@ -466,7 +468,7 @@ data class QueueElement(
 
 fun Environment.calcScheduleTime(until: TickTime?, duration: Number?): TickTime {
     return (until?.value to duration?.toDouble()).let { (till, duration) ->
-        if (till == null) {
+        if(till == null) {
             require(duration != null) { "neither duration nor till specified" }
             now.value + duration
         } else {

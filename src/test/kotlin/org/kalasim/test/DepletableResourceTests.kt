@@ -3,6 +3,7 @@ package org.kalasim.test
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.doubles.shouldBeGreaterThan
+import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.*
@@ -12,6 +13,16 @@ import org.kalasim.plot.kravis.display
 //**TODO**  may we should also test that take works with honorAll?
 
 class DepletableResourceTests {
+
+    @Test
+    fun `it should realize depletable resource semantics`() = createTestSimulation(true) {
+        DepletableResource(capacity = 100, initialLevel = 0).apply {
+            isFull shouldBe false
+            isDepleted shouldBe true
+            level shouldBe 0
+            claimed shouldBe capacity
+        }
+    }
 
     @Test
     fun `it should allow to consume and refill a depletable resource`() = createTestSimulation(true) {
@@ -75,6 +86,9 @@ class DepletableResourceTests {
     @Test
     fun `it allow filling and emptying from 0 to capacity limit`() = createTestSimulation(true) {
         val gasSupply = DepletableResource(capacity = 100, initialLevel = 0)
+
+        gasSupply.isFull shouldBe false
+        gasSupply.isDepleted shouldBe true
 
         // add new gas continuously
         object : Component("Pipeline") {
