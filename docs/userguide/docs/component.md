@@ -1,11 +1,11 @@
 # Component
 
-Components are the key elements of a simulation.
+Components are the key elements of a simulation. By means of [process definition](#process-definition) of the business process in study, components allow modeling the interplay with other simulation components as well as its timing.
 
 Components can be either  in `DATA` or an `ACTIVE` [lifecycle](#lifecycle) state. An `ACTIVE`  component has one or more [process definitions](#process-definition) of which one was activated at some point in time. 
 
 
-With [`activate()`](#activate) we can chang `DATA` components to `ACTIVE` if is has an associated process definition.
+With [`activate()`](#activate) we can change a `DATA` component to `ACTIVE`, if it has an associated process definition.
 
 An `ACTIVE` component can become `DATA` either with a [`cancel()`](#cancel) or by reaching the end of a [definition](#process-definition).
 

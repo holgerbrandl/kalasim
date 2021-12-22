@@ -1405,7 +1405,7 @@ open class Component(
 
     internal fun requestedQuantity(resource: Resource) = requests[resource]
 
-    /** Captures the current state of a `State`*/
+    /** Captures the current state of a `Component`*/
     open class ComponentInfo(c: Component) : Jsonable() {
         val name = c.name
         val status = c.componentState
