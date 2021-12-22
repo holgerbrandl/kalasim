@@ -1,5 +1,7 @@
 package org.kalasim
 
+import org.kalasim.analysis.EntityCreatedEvent
+import org.kalasim.analysis.InteractionEvent
 import org.kalasim.misc.DependencyContext
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.StateTrackingConfig
@@ -67,6 +69,7 @@ open class State<T>(
         }
 
     init {
+        @Suppress("LeakingThis")
         trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
 
         log(trackingPolicy.logCreation) {

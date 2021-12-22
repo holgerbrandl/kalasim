@@ -61,7 +61,7 @@ val myEvents :List<MyEvent> = eventCollector<MyEvent>()
 // e.g. save them into a csv file with krangl
 myEvents.asDataFrame().writeCsv(File("my_events.csv"))
 ```
-This collector will have a much reduced memory footprint compared to the [event log](#event-log).
+This collector will have a much reduced memory footprint compared to the [event log](#events).
 
 ## Event Log
 
@@ -117,6 +117,6 @@ The transformation step is optional, `List<Event>` can be transformed `asDataFra
 
 When working with jupyter, we can harvest the kernel's built-in rendering capabilities to render events. Note that we need to filter for specific event type to capture all attributes.
 
-![](jupyter_event_log.png)
+![](jupyter_events.png)
 
 For a fully worked out example see 

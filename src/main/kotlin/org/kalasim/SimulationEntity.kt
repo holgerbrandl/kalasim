@@ -4,6 +4,7 @@ package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
 import org.json.JSONObject
+import org.kalasim.analysis.InteractionEvent
 import org.kalasim.misc.*
 import org.koin.core.Koin
 import org.koin.core.component.*

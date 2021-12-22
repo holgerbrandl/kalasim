@@ -6,6 +6,7 @@ import com.github.holgerbrandl.jsonbuilder.json
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.json.JSONObject
+import org.kalasim.analysis.InteractionEvent
 import org.kalasim.misc.*
 import org.kalasim.monitors.MetricTimelineStats
 import org.koin.core.Koin

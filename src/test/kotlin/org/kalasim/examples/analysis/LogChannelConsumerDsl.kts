@@ -1,5 +1,6 @@
 //LogChannelConsumerDsl.kt
 import org.kalasim.*
+import org.kalasim.analysis.InteractionEvent
 
 createSimulation {
     ComponentGenerator(iat = constant(1)) { Component("Car.${it}") }

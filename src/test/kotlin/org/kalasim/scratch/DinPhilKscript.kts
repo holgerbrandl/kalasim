@@ -12,6 +12,8 @@ import krangl.gt
 import krangl.lag
 import krangl.writeCSV
 import org.kalasim.*
+import org.kalasim.analysis.ResourceEvent
+import org.kalasim.analysis.ResourceEventType
 import org.kalasim.misc.repeat
 import java.io.File
 

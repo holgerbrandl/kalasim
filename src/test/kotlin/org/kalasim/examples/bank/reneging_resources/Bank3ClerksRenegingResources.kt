@@ -3,6 +3,7 @@ package org.kalasim.examples.bank.reneging_resources
 
 
 import org.kalasim.*
+import org.kalasim.monitors.printHistogram
 
 
 //var numBalked = LevelMonitoredInt(0)

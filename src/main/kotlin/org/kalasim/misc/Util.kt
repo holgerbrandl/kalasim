@@ -1,8 +1,8 @@
 package org.kalasim.misc
 
 import com.google.gson.GsonBuilder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.math3.util.Precision
 import org.json.JSONObject
@@ -20,6 +20,7 @@ internal fun Any.printThis() {
 }
 
 
+@Suppress("FunctionName")
 internal fun ImplementMe(): Nothing =
     TODO("Not yet implemented. Please file a ticket under https://github.com/holgerbrandl/kalasim/issues")
 
@@ -70,7 +71,7 @@ fun <T> repeat(n: Int, builder: (Int) -> T) = (1..n).map { builder(it) }
 
 // https://stackoverflow.com/questions/48007311/how-do-i-infinitely-repeat-a-sequence-in-kotlin
 fun <T> Iterable<T>.repeat() = sequence {
-    while (true) yieldAll(this@repeat)
+    while(true) yieldAll(this@repeat)
 }
 
 
@@ -79,21 +80,25 @@ fun <T> Iterable<T>.repeat() = sequence {
 //
 
 fun <A, B> Iterable<A>.fastMap(
-    numThreads: Int = Runtime.getRuntime().availableProcessors(),
+//    numThreads: Int = Runtime.getRuntime().availableProcessors(),
     f: suspend (A) -> B
 ): List<B> = runBlocking {
-    map { async(newFixedThreadPoolContext(numThreads, "")) { f(it) } }.map { it.await() }
+    map { async(Dispatchers.Default) { f(it) } }.map { it.await() }
 }
 
+@Suppress("unused")
 fun <A, B> Iterable<A>.fastForEach(
-    numThreads: Int = Runtime.getRuntime().availableProcessors(),
+//    numThreads: Int = Runtime.getRuntime().availableProcessors(),
     f: suspend (A) -> B
-): Unit = fastMap(numThreads, f).forEach {}
+) {
+    fastMap(f).count() // count is just needed to force computations
+}
 
 
 /** The environment mode also allows you to detect common bugs in your implementation. */
 enum class AssertMode {
     /** Productive mode, where asserts that may impact performance are disabled. */
+    @Suppress("unused") // we may want to add some test-coverage for that one as well
     OFF,
 
     /** Disables compute-intensive asserts. This will have a minimal to moderate performance impact on simulations. */
@@ -108,3 +113,9 @@ var ASSERT_MODE = AssertMode.LIGHT
 //fun Double?.roundAny(n: Int = 3) = if (this == null) this else Precision.round(this, n)
 fun Double.roundAny(n: Int = 3) = Precision.round(this, n)
 
+/**
+ * Replacement for Kotlin's deprecated `capitalize()` function.
+ *
+ * From https://stackoverflow.com/questions/67843986/is-there-a-shorter-replacement-for-kotlins-deprecated-string-capitalize-funct
+ */
+fun String.titlecaseFirstChar() = replaceFirstChar(Char::titlecase)

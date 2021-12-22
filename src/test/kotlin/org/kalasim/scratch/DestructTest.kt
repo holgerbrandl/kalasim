@@ -1,3 +1,5 @@
+@file:Suppress("USELESS_CAST", "UNUSED_VARIABLE")
+
 package org.kalasim.scratch
 
 //https://kotlinlang.org/docs/reference/generics.html#star-projections

@@ -7,6 +7,7 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.DATA
 import org.kalasim.ComponentState.SCHEDULED
+import org.kalasim.analysis.InteractionEvent
 import org.kalasim.misc.*
 import kotlin.test.fail
 
@@ -49,6 +50,26 @@ class ComponentTests {
         Component("foo").componentState shouldBe DATA
 
         Component("foo", process = Component::process).componentState shouldBe DATA
+
+
+
+    }
+
+
+    @Test
+    fun `it should capture component state with info`() = createTestSimulation {
+        val info = Component("foo").info
+        run(10)
+
+        info.toString() shouldBe """
+            {
+              "scheduledTime": null,
+              "creationTime": {"value": 0},
+              "name": "foo",
+              "claims": {},
+              "requests": {},
+              "status": "DATA"
+            }""".trimIndent()
     }
 
 
@@ -184,7 +205,7 @@ class ComponentTests {
         val r = Resource()//.apply {  trackingPolicy = ResourceTrackingConfig(logClaimRelease = false ) }
         val s: State<String> = State("foo")
 
-        val c = object : Component("foo") {
+        object : Component("foo") {
 
             override fun process() = sequence {
                 hold(2)
@@ -254,7 +275,7 @@ class ComponentTests {
 
     @Test
     fun `it should enforce that either hold or until is not null in hold`() = createTestSimulation {
-        val c = object : Component("foo") {
+        object : Component("foo") {
             override fun process() = sequence {
                 hold(until = null)
                 fail("it should not allow calling hold with duration and until being both null ")
@@ -281,7 +302,7 @@ class ComponentTests {
     @Test
     fun `it should preserve process definition after being data`() = createTestSimulation {
         // note: regression test, because initially broken
-        val salabimTwin = """
+        @Suppress("UNUSED_VARIABLE") val salabimTwin = """
             import salabim as sim
 
 
@@ -410,7 +431,7 @@ class ComponentTests {
                 }
         }
 
-        val mechanic = object : Component("controller") {
+        object : Component("mechanic") {
             override fun process() =
                 sequence<Component> {
                     with(c) {

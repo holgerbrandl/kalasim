@@ -105,7 +105,7 @@ class OffsetTransform(val offset: Instant = Instant.now(), val tickUnit: TimeUni
     }.toDouble()
 }
 
-internal val MISSING_TICK_TRAFO_ERROR = "Tick transformation not configured. "
+internal const val MISSING_TICK_TRAFO_ERROR = "Tick transformation not configured."
 
 
 @Suppress("EXPERIMENTAL_API_USAGE")

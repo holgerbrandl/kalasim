@@ -4,6 +4,7 @@ import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.*
+import org.kalasim.analysis.EntityCreatedEvent
 import kotlin.test.assertEquals
 
 

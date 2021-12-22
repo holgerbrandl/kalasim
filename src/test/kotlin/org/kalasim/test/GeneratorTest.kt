@@ -3,6 +3,7 @@ package org.kalasim.test
 import org.apache.commons.math3.distribution.ExponentialDistribution
 import org.junit.Test
 import org.kalasim.*
+import org.kalasim.analysis.EntityCreatedEvent
 import kotlin.test.assertEquals
 import kotlin.test.fail
 

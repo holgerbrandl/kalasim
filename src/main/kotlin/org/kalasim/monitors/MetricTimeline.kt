@@ -99,50 +99,6 @@ class MetricTimeline(
 
     fun statistics(excludeZeros: Boolean = false) = MetricTimelineStats(this, excludeZeros)
 
-    fun printHistogram(sortByWeight: Boolean = false, binCount: Int = NUM_HIST_BINS, valueBins: Boolean = false) {
-        println("Summary of: '${name}'")
-        statistics().toJson().printThis()
-
-        println("Histogram of: '${name}'")
-
-        if (valueBins) {
-            val freq = Frequency()
-
-            values.forEach { freq.addValue(it) }
-
-            val colData: Map<Double, Double> =
-                statistics().data.run {
-                    durations.zip(values)
-                        .groupBy { (_, value) -> value }
-                        .map { kv -> kv.key to kv.value.sumOf { it.first } }
-                }.toMap()
-
-            // inherently wrong because does not take into account durations
-//            val byValueHist = freq
-//                .valuesIterator().iterator().asSequence().toList()
-//                .map { it to freq.getCount(it) }
-
-            colData.printConsole(sortByWeight = sortByWeight)
-        } else {
-
-            // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
-            val hist: List<Pair<Double, Double>> = statistics().data.run {
-                val aggregatedMonitor: List<Pair<Double, Double>> =
-                    durations.zip(values).groupBy { (_, value) -> value }
-                        .map { kv -> kv.key to kv.value.sumOf { it.first } }
-
-                aggregatedMonitor
-            }
-
-            val stats =
-                DescriptiveStatistics(
-                    EnumeratedDistribution(hist.asCMPairList()).sample(1000, arrayOf<Double>()).toDoubleArray()
-                )
-
-            stats.buildHistogram(binCount).printHistogram()
-        }
-    }
-
     override val info: Jsonable
         get() = statistics(false)
 
@@ -167,6 +123,50 @@ class MetricTimeline(
             timestamps.apply { clear(); addAll(newTime) }
             values.apply { clear(); addAll(newValues) }
         }
+    }
+}
+
+fun MetricTimeline.printHistogram(sortByWeight: Boolean = false, binCount: Int = NUM_HIST_BINS, valueBins: Boolean = false) {
+    println("Summary of: '${name}'")
+    statistics().toJson().printThis()
+
+    println("Histogram of: '${name}'")
+
+    if (valueBins) {
+        val freq = Frequency()
+
+        values.forEach { freq.addValue(it) }
+
+        val colData: Map<Double, Double> =
+            statistics().data.run {
+                durations.zip(values)
+                    .groupBy { (_, value) -> value }
+                    .map { kv -> kv.key to kv.value.sumOf { it.first } }
+            }.toMap()
+
+        // inherently wrong because does not take into account durations
+//            val byValueHist = freq
+//                .valuesIterator().iterator().asSequence().toList()
+//                .map { it to freq.getCount(it) }
+
+        colData.printConsole(sortByWeight = sortByWeight)
+    } else {
+
+        // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
+        val hist: List<Pair<Double, Double>> = statistics().data.run {
+            val aggregatedMonitor: List<Pair<Double, Double>> =
+                durations.zip(values).groupBy { (_, value) -> value }
+                    .map { kv -> kv.key to kv.value.sumOf { it.first } }
+
+            aggregatedMonitor
+        }
+
+        val stats =
+            DescriptiveStatistics(
+                EnumeratedDistribution(hist.asCMPairList()).sample(1000, arrayOf<Double>()).toDoubleArray()
+            )
+
+        stats.buildHistogram(binCount).printHistogram()
     }
 }
 

@@ -1,22 +1,17 @@
 package org.kalasim.examples.er
 
-import EmergencyRoom
-import Patient
-import RefittingAvoidanceNurse
-import krangl.DataFrameRow
 import krangl.count
 import krangl.dataFrameOf
 import krangl.print
 import org.kalasim.ComponentGenerator
 import org.kalasim.plot.kravis.display
 
-object InfinteER {
+object InfiniteER {
     @JvmStatic
     fun main(args: Array<String>) {
-        val er = EmergencyRoom(disableMetrics = true).apply {
+        val er = EmergencyRoom(disableMetrics = true)
 
-            run(100000)
-        }
+        er.run(100000)
 
         // memory analysis
         println()
@@ -26,7 +21,7 @@ object InfinteER {
 object SimpleER {
     @JvmStatic
     fun main(args: Array<String>) {
-        val sim = EmergencyRoom(RefittingAvoidanceNurse).apply {
+        EmergencyRoom(RefittingAvoidanceNurse).apply {
 
             // run for a week
             run(24 * 14)
@@ -55,7 +50,7 @@ object SimpleER {
                     "type" to it.type.toString(),
                     "status" to it.patientStatus.value.toString(),
                     "severity" to it.severity.value.toString()
-                ) as DataFrameRow
+                )
             }.let { dataFrameOf(it) }
 
             df.count("status").print()

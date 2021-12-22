@@ -1,8 +1,8 @@
 package org.kalasim.test
 
-import jetbrains.letsPlot.geom.geom_boxplot
-import jetbrains.letsPlot.geom.geom_density
-import jetbrains.letsPlot.geom.geom_point
+import jetbrains.letsPlot.geom.geomBoxplot
+import jetbrains.letsPlot.geom.geomDensity
+import jetbrains.letsPlot.geom.geomPoint
 import jetbrains.letsPlot.ggsize
 import jetbrains.letsPlot.intern.Plot
 import jetbrains.letsPlot.letsPlot
@@ -10,13 +10,10 @@ import krangl.asDataFrame
 import krangl.irisData
 import krangl.print
 import krangl.toMap
-import org.kalasim.InteractionEvent
+import org.kalasim.analysis.InteractionEvent
 import org.kalasim.examples.MM1Queue
 import org.kalasim.plot.letsplot.display
 
-class DemoTests {
-//TODO
-}
 
 fun main() {
     val mm1Queue = MM1Queue().apply {
@@ -28,6 +25,7 @@ fun main() {
     mm1Queue.traces.filterIsInstance<InteractionEvent>().asDataFrame().print()
 }
 
+
 object LetsPlotASimulation {
     @JvmStatic
     fun main(args: Array<String>) {
@@ -38,14 +36,14 @@ object LetsPlotASimulation {
         )
 
         var p: Plot = letsPlot(data)
-        p += geom_density(color = "dark_green", alpha = .3) { x = "rating"; fill = "cond" }
+        p += geomDensity(color = "dark_green", alpha = .3) { x = "rating"; fill = "cond" }
         p + ggsize(500, 250)
 //        p.show()
         p.show()
 
 
-        (letsPlot(irisData.toMap()) + geom_boxplot { x = "Species"; y = "Petal.Length" }).show()
-        (letsPlot(irisData.toMap()) + geom_point { x = "Petal.Width"; y = "Petal.Length" }).show()
+        (letsPlot(irisData.toMap()) + geomBoxplot { x = "Species"; y = "Petal.Length" }).show()
+        (letsPlot(irisData.toMap()) + geomPoint { x = "Petal.Width"; y = "Petal.Length" }).show()
 
     }
 }

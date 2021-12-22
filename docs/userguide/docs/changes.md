@@ -3,11 +3,13 @@
 ## v0.8-SNAPSHOT
 
 Milestone Enhancements
+
 * Added [honor policies](resource.md#request-honor-policies) to allow for more configurable request queue consumption
 * New: [Timeline Arithmetics](monitors.md#monitors-arithmetics). It is now possible to perform stream arithmetics on timeline attributes
 * Introduced different [modes](resource.md#capacity-limit-modes) if resource requests exceed resource capacity.
 
 Major Enhancements
+
 * Added `RequestScopeContext` to honor-block of `request` including `requestingSince` time (relates to [#27](https://github.com/holgerbrandl/kalasim/issues/27)) 
 * [#35](https://github.com/holgerbrandl/kalasim/pull/35) Improved support for asynchronous event consumption (contributed by [pambrose](https://github.com/pambrose) via PR)
 * Reduced memory requirements of [resource](resource.md) monitoring by 50% by inferring `occupancy` and `availability` using [Timeline Arithmetics](monitors.md#monitors-arithmetics)
@@ -144,7 +146,7 @@ Major Enhancements
 * Added first [jupyter notebook](https://github.com/holgerbrandl/kalasim/blob/master/simulations/notebooks/dining.ipynb) example
 * New [depletable resource](https://www.kalasim.org/resource/#depletable-resources) type
 * New [statistical distributions](https://www.kalasim.org/basics/#randomness-distributions) API
-* New more structured event logging. See [user manual](https://www.kalasim.org/analysis/#event-log)
+* New more structured event logging. See [user manual](https://www.kalasim.org/analysis/#events)
 * Implemented support for [real-time simulations](https://www.kalasim.org/advanced/#clock-synchronization)
 * New example [Dining Philosophers](https://www.kalasim.org/examples/dining_philosophers/)
 * New example [Movie Theater](https://www.kalasim.org/examples/movie_theater/)

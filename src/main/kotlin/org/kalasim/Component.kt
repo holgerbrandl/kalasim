@@ -2,8 +2,9 @@ package org.kalasim
 
 import org.kalasim.ComponentState.*
 import org.kalasim.Priority.Companion.NORMAL
-import org.kalasim.ResourceEventType.*
+import org.kalasim.analysis.ResourceEventType.*
 import org.kalasim.ResourceSelectionPolicy.*
+import org.kalasim.analysis.*
 import org.kalasim.misc.*
 import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
@@ -119,6 +120,7 @@ open class Component(
         }
 
     init {
+        @Suppress("LeakingThis")
         trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
     }
 
@@ -167,6 +169,7 @@ open class Component(
         }
 
 //        if (at != null || (process != null && (process.name != "process" || overriddenProcess))) {
+        @Suppress("LeakingThis")
         if(simProcess != null && this !is MainComponent) {
             val scheduledTime = if(at == null) {
                 env.now + delay.toDouble()
@@ -196,8 +199,8 @@ open class Component(
                 val sequence = process.call(this)
                 GenProcessInternal(this, sequence, process.name)
             } else {
-                TODO("add test coverage here")
-                SimpleProcessInternal(this, process, process.name)
+                error("non-generating processes are no longer supported. If you feel this is a bug please file an issue at https://github.com/holgerbrandl/kalasim/issues")
+//                SimpleProcessInternal(this, process, process.name)
             }
         } else {
             null
@@ -458,7 +461,7 @@ open class Component(
      * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failDelay Skip and set `failed` if the request is not honored before `now + failDelay`,
      *
-     * @sample org.kalasim.scratch.ResourceDocu.main
+     * @sample org.kalasim.dokka.resourceHowTo
      */    // note: in salabim this is called get, but we renamed it because it's an active process not passive reception
     suspend fun SequenceScope<Component>.take(
         resource: DepletableResource,
@@ -500,7 +503,7 @@ open class Component(
      * @param failDelay Skip and set `failed` if the request is not honored before `now + failDelay`,
      * @param failPriority Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      *
-     * @sample org.kalasim.scratch.ResourceDocu.main
+     * @sample org.kalasim.dokka.resourceHowTo
      */
     suspend fun SequenceScope<Component>.put(
         resource: DepletableResource,
@@ -531,7 +534,7 @@ open class Component(
      * @param failDelay Skip and set `failed` if the request is not honored before `now + failDelay`,
      * @param failPriority Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      *
-     * @sample org.kalasim.scratch.ResourceDocu.main
+     * @sample org.kalasim.dokka.resourceHowTo
      */
     suspend fun SequenceScope<Component>.put(
         vararg resourceRequests: ResourceRequest,
@@ -565,7 +568,7 @@ open class Component(
      * @param failPriority Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly.
      *
-     * @sample org.kalasim.scratch.ResourceDocu.main
+     * @sample org.kalasim.dokka.resourceHowTo
      */
     suspend fun SequenceScope<Component>.request(
         resources: Collection<Resource>,
@@ -605,7 +608,7 @@ open class Component(
      * @param failPriority Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
      *
-     * @sample org.kalasim.scratch.ResourceDocu.main
+     * @sample org.kalasim.dokka.resourceHowTo
      */
     suspend fun SequenceScope<Component>.request(
         vararg resources: Resource,
@@ -643,7 +646,7 @@ open class Component(
      * @param failPriority Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      * @param honorBlock If provided, it will wait until resource requests are honored, execute the block, and release the resources accordingly
      *
-     * @sample org.kalasim.scratch.ResourceDocu.main
+     * @sample org.kalasim.dokka.resourceHowTo
      */
     suspend fun SequenceScope<Component>.request(
         vararg resourceRequests: ResourceRequest,
@@ -1554,12 +1557,13 @@ class GenProcessInternal(val component: Component, seq: Sequence<Component>, ove
     }
 }
 
-class SimpleProcessInternal(val component: Component, val funPointer: ProcessPointer, override val name: String) :
-    SimProcess {
-    override fun call() {
-        funPointer.call(component)
-    }
-}
+// Disabled because never used and seems obsolete. Just kept for salabim-compat until a first major release
+//class SimpleProcessInternal(val component: Component, val funPointer: ProcessPointer, override val name: String) :
+//    SimProcess {
+//    override fun call() {
+//        funPointer.call(component)
+//    }
+//}
 
 internal const val DEFAULT_REQUEST_QUANTITY = 1.0
 

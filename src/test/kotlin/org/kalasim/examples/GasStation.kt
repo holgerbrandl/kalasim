@@ -3,6 +3,7 @@ package org.kalasim.examples
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
 import org.kalasim.misc.printThis
+import org.kalasim.monitors.printHistogram
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 

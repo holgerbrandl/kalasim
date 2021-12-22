@@ -6,6 +6,7 @@ import kravis.facetWrap
 import kravis.geomStep
 import kravis.plot
 import org.kalasim.*
+import org.kalasim.analysis.ResourceEvent
 import org.kalasim.plot.kravis.display
 
 fun main() {

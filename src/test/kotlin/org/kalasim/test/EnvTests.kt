@@ -1,6 +1,7 @@
 package org.kalasim.test
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import krangl.cumSum
@@ -8,9 +9,8 @@ import krangl.mean
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.junit.Test
 import org.kalasim.*
-import org.kalasim.misc.DependencyContext
-import org.kalasim.misc.cartesianProduct
-import org.kalasim.misc.fastMap
+import org.kalasim.analysis.EntityCreatedEvent
+import org.kalasim.misc.*
 import org.koin.core.Koin
 import org.koin.core.error.NoBeanDefFoundException
 import org.koin.dsl.koinApplication
@@ -118,7 +118,7 @@ class EnvTests {
 
         // add an asynchronous log consumer
         val asyncListener = addAsyncEventListener<EntityCreatedEvent> { event ->
-            if (event.entity.name == "Car.1") {
+            if(event.entity.name == "Car.1") {
                 println("Consumed async!")
                 consumed = true
             }
@@ -174,7 +174,7 @@ class EnvTests {
                 var waitCounter = 1
                 override fun process() =
                     sequence {
-                        while (true) {
+                        while(true) {
                             hold(1)
                             // doe something insanely complex that takes 2seconds
                             Thread.sleep(waitCounter++ * 1000L)
@@ -284,4 +284,9 @@ class EnvTests {
         println("sim time after running dry is $now")
     }
 
+    @Test
+    fun `assert-modes should be correctly ordered`(){
+        AssertMode.OFF shouldBeLessThan AssertMode.LIGHT
+        AssertMode.LIGHT shouldBeLessThan AssertMode.FULL
+    }
 }

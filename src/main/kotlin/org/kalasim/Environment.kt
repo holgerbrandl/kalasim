@@ -9,6 +9,8 @@ import org.json.JSONObject
 import org.kalasim.ComponentState.*
 import org.kalasim.Defaults.DEFAULT_SEED
 import org.kalasim.Priority.Companion.NORMAL
+import org.kalasim.analysis.ConsoleTraceLogger
+import org.kalasim.analysis.InteractionEvent
 import org.kalasim.misc.*
 import org.kalasim.monitors.MetricTimeline
 import org.koin.core.Koin
@@ -292,7 +294,7 @@ open class Environment(
         pendingStandBy.removeIf { it.componentState != STANDBY }
 
         pendingStandBy.removeFirstOrNull()?.let {
-            setCurrent(it, "standby")
+            setCurrent(it) // , "standby" --> removed field in  v0.8
             it.callProcess()
             return
         }
@@ -334,7 +336,7 @@ open class Environment(
         component.callProcess()
     }
 
-    private fun setCurrent(c: Component, info: String? = null) {
+    private fun setCurrent(c: Component) {
         c.componentState = CURRENT
         c.scheduledTime = null
 
@@ -358,11 +360,12 @@ open class Environment(
 
     inline fun <reified T : Event> addEventListener(
         crossinline block: (T) -> Unit
-    ) = addEventListener {
-        if (it !is T) return@addEventListener
+    ) = addEventListener listener@ {
+        if (it !is T) return@listener
         block(it)
     }
 
+    // todo deprecate this in favor of the reeified version
     fun addEventListener(listener: EventListener) = eventListeners.add(listener)
 
     @Suppress("unused")

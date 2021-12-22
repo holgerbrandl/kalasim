@@ -1,4 +1,4 @@
-package org.kalasim.misc
+package org.kalasim.dokka
 
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.junit.Test

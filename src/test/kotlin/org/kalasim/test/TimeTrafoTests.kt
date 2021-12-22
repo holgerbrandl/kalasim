@@ -14,7 +14,7 @@ class TimeTrafoTests {
 
 
     @Test
-    fun `it should preserve precision when transforming ticks to walltime`() = createTestSimulation {
+    fun `it should preserve precision when transforming ticks to wall time`() = createTestSimulation {
         val baseTime = Instant.parse("2021-01-24T12:00:00.00Z")
 
         tickTransform = OffsetTransform(baseTime, TimeUnit.MINUTES)
@@ -47,6 +47,9 @@ class TimeTrafoTests {
                 }
 
                 hold(asTicks(Duration.ofMinutes(90)))
+
+                asTickTime(now.asWallTime()) shouldBe now
+
                 log(TimeTrafoTestEvent(now))
             }
         }

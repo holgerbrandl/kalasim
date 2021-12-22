@@ -6,6 +6,7 @@ import org.kalasim.misc.ComponentCollectionTrackingConfig
 import org.kalasim.misc.DependencyContext
 import org.kalasim.monitors.MetricTimeline
 import org.kalasim.monitors.NumericStatisticMonitor
+import org.kalasim.monitors.printHistogram
 import org.koin.core.Koin
 
 
@@ -62,6 +63,7 @@ abstract class ComponentCollection<C>(
         }
 
     init {
+        @Suppress("LeakingThis")
         trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
     }
 

@@ -12,7 +12,7 @@ import kotlin.math.roundToInt
 /**
  * Frequency tally levels irrespective of current (simulation) time.
  *
- * @sample org.kalasim.misc.DokkaExamplesKt.freqLevelDemo
+ * @sample org.kalasim.dokka.freqLevelDemo
  */
 open class CategoryMonitor<T>(
     name: String? = null,
@@ -28,7 +28,7 @@ open class CategoryMonitor<T>(
 //        }
 
 
-    private val frequencies = mutableMapOf<T, Long>()
+    internal val frequencies = mutableMapOf<T, Long>()
         get() = ifEnabled { field }
 
     override fun addValue(value: T) {
@@ -39,18 +39,6 @@ open class CategoryMonitor<T>(
 
 
     override fun reset() = frequencies.clear()
-
-    open fun printHistogram(values: List<T>? = null, sortByWeight: Boolean = false) {
-        println("Summary of: '$name'")
-        println("# Records: $total")
-        println("# Levels: ${frequencies.keys.size}")
-        println()
-
-        // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
-        println("Histogram of: '${name}'")
-//        frequencies.mapValues { it.value.toDouble() }
-        info.counts.printConsole(values = values, sortByWeight = sortByWeight)
-    }
 
     open fun getPct(value: T): Double = frequencies[value]!!.toDouble() / total
 
@@ -63,6 +51,18 @@ open class CategoryMonitor<T>(
 
     override val info: FrequencyStatsSummary<T>
         get() = FrequencyStatsSummary(statistics)
+}
+
+fun <T> CategoryMonitor<T>.printHistogram(values: List<T>? = null, sortByWeight: Boolean = false) {
+    println("Summary of: '$name'")
+    println("# Records: $total")
+    println("# Levels: ${frequencies.keys.size}")
+    println()
+
+    // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
+    println("Histogram of: '${name}'")
+//        frequencies.mapValues { it.value.toDouble() }
+    info.counts.printConsole(values = values, sortByWeight = sortByWeight)
 }
 
 class FrequencyStatsSummary<T>(internal val counts: FrequencyTable<T>) : Jsonable() {

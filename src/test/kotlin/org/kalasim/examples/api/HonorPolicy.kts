@@ -1,6 +1,8 @@
 package org.kalasim.examples.api
 
 import org.kalasim.*
+import org.kalasim.analysis.ResourceEvent
+import org.kalasim.analysis.ResourceEventType
 
 
 class Customer(val arrivalTime: Int, val requestQuantity: Int) : Component() {

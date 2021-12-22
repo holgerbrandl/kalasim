@@ -4,6 +4,8 @@ package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
 import krangl.*
+import org.kalasim.analysis.EntityCreatedEvent
+import org.kalasim.analysis.ResourceActivityEvent
 import org.kalasim.misc.DependencyContext
 import org.kalasim.misc.Jsonable
 import org.kalasim.misc.ResourceTrackingConfig
@@ -147,6 +149,7 @@ open class Resource(
 
 
     // should we this make readonly from outside?
+    @Suppress("LeakingThis")
     val requesters = ComponentQueue(
         "requesters of ${this.name}",
         comparator = when(honorPolicy) {
@@ -249,6 +252,7 @@ open class Resource(
         }
 
     init {
+        @Suppress("LeakingThis")
         trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
 
         log(trackingPolicy.logCreation) {

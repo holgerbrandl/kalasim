@@ -1,5 +1,7 @@
-import PatientStatus.*
-import Severity.*
+package org.kalasim.examples.er
+
+import org.kalasim.examples.er.PatientStatus.*
+import org.kalasim.examples.er.Severity.*
 import org.kalasim.*
 import org.kalasim.monitors.MetricTimeline
 import kotlin.math.pow
@@ -79,14 +81,14 @@ data class Patient(
     private fun updatePatient(newSeverity: Severity) {
         this.severity.value = newSeverity
 
-        // to adjust the queue position, we need to remove and readd it to the queue
+        // to adjust the queue position, we need to remove and read it to the queue
         // disabled because just needed for component-queue
 //        get<EmergencyRoom>().waitingLine.updateOrderOf(this@Patient)
     }
 }
 
 
-/** Main actors. Rooms activly pull new work which is dispatched by the head-nurse. */
+/** Main actors. Rooms actively pull new work which is dispatched by the head-nurse. */
 class Room(name: String, var setup: State<InjuryType>) : Component(name) {
 
     override fun process() = sequence {
@@ -161,7 +163,7 @@ val surgerySuccessProbability = Severity.values().zip(listOf(1.0, 1.0, 1.0, 0.9,
 
 
 /** Observations */
-class ErMetrics
+//class ErMetrics
 
 fun interface HeadNurse {
     fun nextOne(er: EmergencyRoom, room: Room): Patient?
@@ -189,16 +191,18 @@ val RefittingAvoidanceNurse = HeadNurse { er, room -> // simple fifo
     // if we need to setup we setup to whats most needed in total count
 //    if(er.waitingLine.isEmpty()) return@HeadNurse null
 //    val maxSeverity = er.waitingLine.groupingBy { it.severity.value }.eachCount().maxByOrNull { it.value }!!
-//    return er.waitingLine.filter{it.severity.value ==maxSeverity.key}.sortedWith (bySeverity).firstOrNull()
+//    return er.waitingLine.filter{it.severity.value ==maxSeverity.key}.sortedWith (org.kalasim.examples.er.getBySeverity).firstOrNull()
 
     // or if no same type injuries are present, we could use the most severe patient
     firstBySeverity ?: er.waitingLine.sortedWith(bySeverity).firstOrNull()
 }
 
-val SetupAvoidanceNoMatterWhatNurse = HeadNurse { er, room -> // simple fifo
-    val sameTypePatients = er.waitingLine.filter { it.type == room.setup.value }
+// todo add considerate-nurse
 
-    val firstBySeverity = sameTypePatients.sortedWith(bySeverity).firstOrNull()
+@Suppress("unused")
+val SetupAvoidanceNoMatterWhatNurse = HeadNurse { er, _ -> // simple fifo
+//    val sameTypePatients = er.waitingLine.filter { it.type == room.setup.value }
+//    val firstBySeverity = sameTypePatients.sortedWith(bySeverity).firstOrNull()
 
     // if we need to setup we setup to whats most needed in total count
     if (er.waitingLine.isEmpty()) return@HeadNurse null
@@ -208,11 +212,13 @@ val SetupAvoidanceNoMatterWhatNurse = HeadNurse { er, room -> // simple fifo
 }
 
 
-val urgencyNurse = HeadNurse { er, room -> // simple fifo
+@Suppress("unused")
+val UrgencyNurse = HeadNurse { er, _ -> // simple fifo
     er.waitingLine.sortedWith(bySeverity).firstOrNull()
 }
 
-val ShortestTreatmentTimeNurse = HeadNurse { er, room ->
+@Suppress("unused")
+val ShortestTreatmentTimeNurse = HeadNurse { er, _ ->
     er.waitingLine.sortedWith(bySurgeryTime).firstOrNull()
 }
 

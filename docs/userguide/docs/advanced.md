@@ -62,7 +62,7 @@ Even if `kalasim` tries to provide a simplistic, efficient, declarative approach
 There are multiple ways to improve the performance of a simulation. 
 
 * Set the correct `AssertMode`: The assertion mode determines which internal consistency checks are being performed.  The mode can be set to `Full` (Slowest), `Light` (default) or `Off` (Fastest). Depending on simulation logic and complexity, this will improve performance by ~20%. 
-* Disable internal event logging: The [interaction model](component.md) is configured by default to provide insights into the simulation via the [event log](event_log.md). However, to optimize performance of a simulation a user may want to consume only custom event-types. If so, internal interaction logging can be disabled by setting `logCoreInteractions = false` when creating/configuring a [component](component.md).  
+* Disable internal event logging: The [interaction model](component.md) is configured by default to provide insights into the simulation via the [event log](events.md). However, to optimize performance of a simulation a user may want to consume only custom event-types. If so, internal interaction logging can be disabled by setting `logCoreInteractions = false` when creating/configuring a [component](component.md).  
 * Disable component statistics: Components and queues log various component statistics with built-in [monitors](monitors.md) which can be [disabled](monitors.md) to reduce compute and memory footprint of a simulation.   
 
 To further fine-tune and optimize simulation performance and to reveal bottlenecks, a JVM profiler (such as [yourkit](https://www.yourkit.com/)) can be used. Both call-counts and spent-time analysis have been proven useful here. 
@@ -89,7 +89,7 @@ For each entity type a corresponding `TrackinConfig` can be provisioned along wi
 
 To disable all metrics and to minimize internal event logging, the user can run `env.trackingPolicyFactory.disableAll()`
 
-The same mechanism applies also fine-tune the internal [event logging](event_log.md). By disabling some -  not-needed for production - events, simulation performance can be improved significantly.
+The same mechanism applies also fine-tune the internal [event logging](events.md). By disabling some -  not-needed for production - events, simulation performance can be improved significantly.
 
 The user can also register her own `TrackConfig` implementations using the factory. See [here](https://github.com/holgerbrandl/kalasim/blob/4f284e6f52ab9ab2f09b6bf5331f4fd413476702/src/test/kotlin/org/kalasim/test/ComponentTests.kt#L134-L134) for simple example. 
 
@@ -99,7 +99,7 @@ The user can also register her own `TrackConfig` implementations using the facto
 
 <!-- TODO learn from https://github.com/r-simmer/simmer.json -->
 
-`kalasim` does not include a default mechanism to serialize and deserialize simulations yet. However, it [seems](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/misc/SaveLoadSimulation.kt) that with [xstream](https://x-stream.github.io/) that `Environment` can be saved including its current simulation state across all included entities. It can be restored from the xml snapshot and continued with `run()`.
+`kalasim` does not include a default mechanism to serialize and deserialize simulations yet. However, it [seems](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/experimental/SaveLoadSimulation.kt) that with [xstream](https://x-stream.github.io/) that `Environment` can be saved including its current simulation state across all included entities. It can be restored from the xml snapshot and continued with `run()`.
 
  We have not [succeeded](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/misc/SaveLoadSimulation.kt#L39) to do the same with [gson](https://github.com/google/gson) yet. Also, some experiments with [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) were not that successful.
  

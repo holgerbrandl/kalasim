@@ -46,7 +46,7 @@ class NumericStatisticMonitor(name: String? = null, koin: Koin = DependencyConte
 
 //    fun statistics(): DescriptiveStatistics = DescriptiveStatistics(sumStats.values)
 
-    fun printHistogram(binCount: Int = NUM_HIST_BINS, valueBins: Boolean = false) {
+    fun printHistogram(binCount: Int = NUM_HIST_BINS) {
         //    val histJson = JSONArray(GSON.toJson(histogramScaled))
 
         //    json {

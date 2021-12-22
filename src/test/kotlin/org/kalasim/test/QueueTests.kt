@@ -6,6 +6,7 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.DATA
 import org.kalasim.Priority.Companion.IMPORTANT
+import org.kalasim.analysis.InteractionEvent
 import kotlin.math.roundToInt
 import kotlin.test.assertEquals
 

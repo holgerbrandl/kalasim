@@ -1,22 +1,17 @@
-//val kotlinVersion = KotlinVersion.CURRENT
-
 plugins {
     kotlin("jvm") version "1.6.10"
-
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
 }
 
-//group = "org.kalasim"
 group = "com.github.holgerbrandl"
 //version = "0.7-SNAPSHOT"
-version = "0.7.4-SNAPSHOT"
+version = "0.7.90-SNAPSHOT"
 
 
 repositories {
     mavenCentral()
-//    jcenter() // still needed because of lets-plot
 //    mavenLocal()
 }
 
@@ -38,8 +33,7 @@ dependencies {
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
 
     testImplementation(kotlin("test-junit"))
-    @Suppress("GradlePackageUpdate") // disabled because v5.0.1 is based on kotlin 1.6
-    testImplementation("io.kotest:kotest-assertions-core:4.6.3")
+    testImplementation("io.kotest:kotest-assertions-core:5.0.2")
 
     // **TODO** move to api to require users to pull it in if needed
     implementation("com.github.holgerbrandl:krangl:0.17.1")
@@ -57,7 +51,6 @@ dependencies {
     //https://youtrack.jetbrains.com/issue/KT-44197
 
     testImplementation(kotlin("script-runtime"))
-
 }
 
 //tasks.withType<KotlinCompile> {

@@ -96,7 +96,7 @@ class Harvester : Component() {
         state.value = SCANNING
 
 //        val stepInc = discreteUniform(-3,3)
-        val stepInc = enumerated(-3 .. 3)
+        val stepInc = discreteUniform(-3 , 3)
 
         while(true) {
             // find a close-by unexplored grid position

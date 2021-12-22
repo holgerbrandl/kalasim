@@ -14,6 +14,8 @@ honor policy notes
 
 **TODO** consider removing Component.requestedQuantity
 
+**TODO** explore kon for better multi-platform abilities
+
 ## v0.8
 
 **TODO** log output is misleading
@@ -59,7 +61,7 @@ https://medium.com/@benjaminmbrown/real-time-data-visualization-with-d3-crossfil
 ---
 
 **TODO** add planning example from classical scheduling theory
-parallel maschines --> solve with or tools or optaplanner
+parallel machines --> solve with or tools or optaplanner
 
 > Other relevant applications arise in the context of health-care, where, for example, patients have to be assigned to surgery rooms that must be
 equipped by considering the type (i.e., the family) of surgery to
@@ -69,17 +71,19 @@ urgency for the patient.
 ---
 ## Later
 
+**TODO** try to establish better default names by using similar concept as in `dataframe` 
+
 **TODO** nice pedestrian simulation with heatmap
 
 **TODO** for branch vis, we could use a similar technique as in https://www.supplychaindataanalytics.com/animated-monte-carlo-simulation-with-gganimate-in-r/
 
 **TODO** work out logistics example similar to <https://www.supplychaindataanalytics.com/monte-carlo-simulation-in-r-for-warehouse-location-risk-assessment/>
 
-**{todo}** review simjulia <https://simjuliajl.readthedocs.io/en/stable/topical_guides/5_shared_resources.html#containers>
+**{todo}** review `simjulia` <https://simjuliajl.readthedocs.io/en/stable/topical_guides/5_shared_resources.html#containers>
 
 **{todo}** should we support a resource queue limit ` queue_size = Inf)` (as in simmer ucar209,p19)
 
-**{todo}** Benchmark desim, salabim, simmer vs kalasim
+**{todo}** Benchmark `desim`, `salabim`, `simmer` vs `kalasim`
 * See Ucar2019  5.1 `Comparison with similar frameworks`
 
 ---

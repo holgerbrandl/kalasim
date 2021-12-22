@@ -11,6 +11,7 @@ import jetbrains.letsPlot.letsPlot
 import jetbrains.letsPlot.scale.scaleXDateTime
 import krangl.*
 import org.kalasim.*
+import org.kalasim.analysis.ResourceActivityEvent
 import org.kalasim.monitors.*
 import org.kalasim.plot.kravis.clistTimeline
 

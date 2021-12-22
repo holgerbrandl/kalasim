@@ -4,6 +4,7 @@ import jetbrains.letsPlot.label.ggtitle
 import kravis.*
 import kravis.device.JupyterDevice
 import org.kalasim.*
+import org.kalasim.analysis.ResourceActivityEvent
 import org.kalasim.monitors.CategoryTimeline
 import org.kalasim.monitors.FrequencyTable
 import org.kalasim.monitors.MetricTimeline
