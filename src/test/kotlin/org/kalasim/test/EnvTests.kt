@@ -136,6 +136,9 @@ class EnvTests {
         sleep(4000)
 
         consumed shouldBe true
+
+        // technically not needed here, but enabled for sake of test caverage
+        asyncListener.stop()
     }
 
     @Test
