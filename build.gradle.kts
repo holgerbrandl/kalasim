@@ -22,14 +22,8 @@ repositories {
 
 dependencies {
     api("org.apache.commons:commons-math3:3.6.1")
-
-    //cant upgrade because of https://github.com/InsertKoinIO/koin/issues/939
-//    implementation("org.koin:koin-core:2.1.6")
     api("io.insert-koin:koin-core:3.1.4")
-
-//    implementation("org.jetbrains.kotlin::1.5.10")
-    implementation(kotlin("kotlin-reflect"))
-
+    implementation(kotlin("reflect"))
 
 
     api("com.github.holgerbrandl:jsonbuilder:0.9")
