@@ -23,7 +23,7 @@ class GeneratorTest {
 
         val customers = eventLog()
             .filterIsInstance<EntityCreatedEvent>()
-            .map { it.simEntity }.distinct()
+            .map { it.entity }.distinct()
             .filter { it.name.startsWith("Customer") }
 
         assertEquals(4, customers.size, "incorrect expected customer cont")

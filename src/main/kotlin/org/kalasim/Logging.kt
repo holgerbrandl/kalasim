@@ -110,7 +110,7 @@ abstract class Event(
 class EntityCreatedEvent(
     time: TickTime,
     val creator: Component?,
-    val simEntity: SimulationEntity,
+    val entity: SimulationEntity,
     val details: String? = null
 ) : Event(time)
 
@@ -203,13 +203,13 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
                     listOf(
                         TRACE_DF.format(time.value),
                         if (ccChanged) creator?.name else null,
-                        simEntity.name,
+                        entity.name,
                         "Created",
                         details
                     ).apply {
                         // update last element
                         lastCurrent = this@with.creator
-                        lastReceiver = this@with.simEntity
+                        lastReceiver = this@with.entity
                     }
                 }
                 else -> {
@@ -279,7 +279,7 @@ fun Environment.componentCollector(): List<Component> {
     val components: MutableList<Component> = mutableListOf()
 
     addEventListener {
-        if (it is EntityCreatedEvent && it.simEntity is Component) components.add(it.simEntity)
+        if (it is EntityCreatedEvent && it.entity is Component) components.add(it.entity)
     }
 
     return components

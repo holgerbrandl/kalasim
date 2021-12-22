@@ -118,7 +118,7 @@ class EnvTests {
 
         // add an asynchronous log consumer
         val asyncListener = addAsyncEventListener<EntityCreatedEvent> { event ->
-            if (event.simEntity.name == "Car.1") {
+            if (event.entity.name == "Car.1") {
                 println("Consumed async!")
                 consumed = true
             }

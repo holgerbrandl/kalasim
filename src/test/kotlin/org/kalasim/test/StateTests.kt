@@ -142,7 +142,7 @@ class StateTests {
 
 
     @Test
-    @Ignore("because its unclear how to nicely")
+    @Ignore("Because its unclear how to do this nicely. The workaround it to use named koin-entities")
     // https://kotlinlang.slack.com/archives/C67HDJZ2N/p1607195460178600
     // https://github.com/InsertKoinIO/koin/issues/976
     fun `resolve generic parameters and honor multiple predicates without subclassing`() {
@@ -180,7 +180,7 @@ class StateTests {
 
             trafficLight.info.waiters.size shouldBe 1
 
-            // toogle state
+            // toggle state
             trafficLight.value = "green"
 
             run(10.0)

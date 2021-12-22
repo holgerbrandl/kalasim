@@ -1,7 +1,6 @@
 package org.kalasim.test
 
 import io.kotest.matchers.shouldBe
-import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.*
@@ -10,7 +9,6 @@ import kotlin.test.assertEquals
 
 class StateTransitionTests {
 
-    @Ignore
     @Test
     fun testCars() {
         val traces = mutableListOf<Event>()
@@ -32,16 +30,12 @@ class StateTransitionTests {
 
 //        events.forEach { println(it) }
 
-        val interactions = traces.filterIsInstance<InteractionEvent>()
+        val interactions = traces.filterIsInstance<EntityCreatedEvent>()
         // make sure multiple cars are created
         println("car events are ${interactions.map { it.toString() }}")
 
-        val cars = interactions.mapNotNull { it.source }.distinct().filter { it.name.startsWith("TestCar") }
-        assertEquals(6, cars.size, "expected cars count does not match")
-
-        assert(interactions[0].curComponent!!.name == MAIN)
-        assert(interactions[1].curComponent!!.name == MAIN)
-        assert(interactions[2].curComponent!!.name == MAIN)
+        val cars = interactions.map { it.entity }.distinct().filter { it.name.startsWith("TestCar") }
+        assertEquals(5, cars.size, "expected cars count does not match")
     }
 
 
