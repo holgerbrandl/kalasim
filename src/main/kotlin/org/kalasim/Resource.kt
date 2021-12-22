@@ -109,8 +109,9 @@ open class DepletableResource(
             canHonorQuantity(quantity)
         }
         RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS -> {
-            // note: it's looks the same as StrictFCFS, but the queue comparator is different
-            (quantity < 0 || requesters.q.peek().component == component) && canHonorQuantity(quantity)
+            // note: SQF looks the same as StrictFCFS, but the queue comparator is different
+//            (quantity < 0 || requesters.q.peek().component == component) && canHonorQuantity(quantity)
+            (quantity < 0 || (requesters.q as PriorityQueue).sortedIterator().filter { it.component.requests[this]!! >0 }.first().component == component) && canHonorQuantity(quantity)
         }
     }
 }
@@ -249,10 +250,7 @@ open class Resource(
 
     init {
         trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
-    }
 
-
-    init {
         log(trackingPolicy.logCreation) {
             EntityCreatedEvent(
                 now,
@@ -268,7 +266,14 @@ open class Resource(
                 RequestHonorPolicy.RelaxedFCFS -> {
                     // Note: This is an insanely expensive operation, as we need to to build another sorted copy of the requesters queue
                     (requesters.q as PriorityQueue).sortedIterator()
-                        .filter { canHonorQuantity(it.component.requests[this]!!) }
+                        .filter{
+                            // needed to avoid recursion errors when this iterator contains no longer valid request objects
+                            // without 'org.kalasim.test.DepletableHonorPolicyTest.it should allow using a relaxed FCFS' will fail
+                            it.component.requests.containsKey(this) }
+                        .filter {
+//                            require(it.component.requests.containsKey(this)){ "invalid requester queue state"}
+                            canHonorQuantity(it.component.requests[this]!!)
+                        }
                         .takeWhile { it.component.tryRequest() }
                         .count() // actually trigger otherwise lazy sequence
                 }
@@ -333,7 +338,7 @@ open class Resource(
     }
 
 
-    fun removeRequester(component: Component) {
+    internal fun removeRequester(component: Component) {
         requesters.remove(component)
         if(requesters.isEmpty()) minq = Double.MAX_VALUE
     }

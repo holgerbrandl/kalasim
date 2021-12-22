@@ -9,7 +9,7 @@ The beauty of discrete event simulation is its very limited vocabulary which sti
 
 ## Simulation Environment
 
-All entities in a simulation are governed by a environment context. Every simulation lives in exactly one such environment. The environment provides means for [controlled randomization](#randomness--distributions), [dependency injection](#dependency-injection), and most importantly manages the [event queue](#event-queue).
+All entities in a simulation are governed by an environment context. Every simulation lives in exactly one such environment. The environment provides means for [controlled randomization](#randomness--distributions), [dependency injection](#dependency-injection), and most importantly manages the [event queue](#event-queue).
 
 The environment context of a kalasim simulation is an instance of  `org.kalasim.Environment`, which can be created using simple instantiation or via a builder called `createSimulation`
 

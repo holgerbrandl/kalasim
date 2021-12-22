@@ -24,11 +24,11 @@ enum class ComponentState {
 
 internal const val DEFAULT_QUEUE_PRIORITY = 0
 
-// note: Salabim Changlog: "The default priority of a requested resource is now inf, which means the lowest possible priority."
+// note: Salabim Changelog: "The default priority of a requested resource is now inf, which means the lowest possible priority."
 /** Describes the priority of a process or request. Higher values will be scheduled earlier or claimed earlier respectively. */
+
 data class Priority(val value: Int) {
     companion object {
-        // adopted from
         val LOWEST = Priority(-20)
         val LOW = Priority(-10)
         val NORMAL = Priority(DEFAULT_QUEUE_PRIORITY)
@@ -154,21 +154,21 @@ open class Component(
             else -> null
         }
 
-        if (processPointer != null) {
+        if(processPointer != null) {
             this.simProcess = ingestFunPointer(processPointer)
         }
 
         //  what's the point of scheduling it at `at`  without a process definition?
         //  --> main is one major reason, we need the engine to progress the time until a given point
-        if (at != null || delay.toDouble() > 0.0) {
+        if(at != null || delay.toDouble() > 0.0) {
             require(simProcess != null) {
                 "component '${name}' must have process definition to be scheduled"
             }
         }
 
 //        if (at != null || (process != null && (process.name != "process" || overriddenProcess))) {
-        if (simProcess != null && this !is MainComponent) {
-            val scheduledTime = if (at == null) {
+        if(simProcess != null && this !is MainComponent) {
+            val scheduledTime = if(at == null) {
                 env.now + delay.toDouble()
             } else {
                 at + delay.toDouble()
@@ -186,12 +186,12 @@ open class Component(
 //            if(process!!.returnType.toString().startsWith("kotlin.sequences.Sequence"))
 //        }
 
-        return if (process != null) {
+        return if(process != null) {
             val isGenerator = process.returnType.toString().startsWith("kotlin.sequences.Sequence")
 
             lastProcess = process
 
-            if (isGenerator) {
+            if(isGenerator) {
                 @Suppress("UNCHECKED_CAST")
                 val sequence = process.call(this)
                 GenProcessInternal(this, sequence, process.name)
@@ -217,7 +217,7 @@ open class Component(
     }
 
     internal fun processLoop() = sequence {
-        while (true) {
+        while(true) {
             yieldAll(repeatedProcess())
         }
     }
@@ -284,7 +284,7 @@ open class Component(
      * For `passivate` contract see [user manual](https://www.kalasim.org/component/#passivate)
      */
     fun passivate() {
-        remainingDuration = if (componentState == CURRENT) {
+        remainingDuration = if(componentState == CURRENT) {
             0.0
         } else {
             requireNotData()
@@ -297,7 +297,7 @@ open class Component(
         scheduledTime = null
         componentState = PASSIVE
 
-        if (trackingPolicy.logStateChangeEvents) log(stateChangeEvent())
+        if(trackingPolicy.logStateChangeEvents) log(stateChangeEvent())
     }
 
     fun stateChangeEvent(details: String? = null) =
@@ -315,7 +315,7 @@ open class Component(
     fun interrupt() {
         require(componentState != CURRENT) { "Current component can no be interrupted" }
 
-        if (componentState == INTERRUPTED) {
+        if(componentState == INTERRUPTED) {
             interruptLevel++
         } else {
             requireNotData()
@@ -347,14 +347,14 @@ open class Component(
 
         interruptLevel--
 
-        if (interruptLevel != 0 && !all) {
+        if(interruptLevel != 0 && !all) {
             logInternal(trackingPolicy.logInteractionEvents, "resume stalled (interrupt level=$interruptLevel)")
         } else {
             componentState = interruptedStatus!!
 
             logInternal(trackingPolicy.logInteractionEvents, "resume ($componentState)")
 
-            when (componentState) {
+            when(componentState) {
                 PASSIVE -> {
                     logInternal(trackingPolicy.logInteractionEvents, "passivate")
                 }
@@ -364,9 +364,9 @@ open class Component(
                     logInternal(trackingPolicy.logInteractionEvents, "standby")
                 }
                 in listOf(SCHEDULED, WAITING, REQUESTING) -> {
-                    val reason = when (componentState) {
+                    val reason = when(componentState) {
                         WAITING -> {
-                            if (waits.isNotEmpty()) tryWait()
+                            if(waits.isNotEmpty()) tryWait()
                             "waiting"
                         }
                         REQUESTING -> {
@@ -409,7 +409,7 @@ open class Component(
      * For `cancel` contract see [user manual](https://www.kalasim.org/component/#cancel)
      */
     fun cancel() {
-        if (componentState != CURRENT) {
+        if(componentState != CURRENT) {
             requireNotData()
             requireNotInterrupted()
             remove()
@@ -421,7 +421,7 @@ open class Component(
 
         componentState = DATA
 
-        if (trackingPolicy.logStateChangeEvents) log(stateChangeEvent("canceled"))
+        if(trackingPolicy.logStateChangeEvents) log(stateChangeEvent("canceled"))
 
     }
 
@@ -433,7 +433,7 @@ open class Component(
      * For `standby` contract see [user manual](https://www.kalasim.org/component/#standby)
      */
     suspend fun SequenceScope<Component>.standby(): Unit = yieldCurrent {
-        if (componentState != CURRENT) {
+        if(componentState != CURRENT) {
             requireNotMain()
             requireNotData()
             requireNotInterrupted()
@@ -446,7 +446,7 @@ open class Component(
 
         componentState = STANDBY
 
-        if (trackingPolicy.logStateChangeEvents) log(stateChangeEvent())
+        if(trackingPolicy.logStateChangeEvents) log(stateChangeEvent())
     }
 
 
@@ -490,24 +490,33 @@ open class Component(
     /**
      * Restores capacity of a depletable resource. This is intentionally also suspendable, as a component may need to wait until a component has the capacity to consume the new quantity.
      *
-     * For `request` contract see [user manual](https://www.kalasim.org/component/#request)
+     * For `put` contract see [user manual](https://www.kalasim.org/resource/#depletable-resources)
      *
+     * @param resource A depletable resource.
+     * @param quantity The quantity to be refilled (default = 1).
+     * @param priority When multiple components compete for putting on the same resource, requests with higher priority will have precedence.
+     * @param description An optional description of the put request's nature/reason/cause.
      * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failDelay Skip and set `failed` if the request is not honored before `now + failDelay`,
+     * @param failPriority Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      *
      * @sample org.kalasim.scratch.ResourceDocu.main
      */
     suspend fun SequenceScope<Component>.put(
         resource: DepletableResource,
         quantity: Number = DEFAULT_REQUEST_QUANTITY,
-        failPriority: Priority? = null,
+        priority: Priority? = null,
+        description: String? = null,
         failAt: TickTime? = null,
         failDelay: Number? = null,
+        failPriority: Priority = NORMAL,
         capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
     ) = put(
-        ResourceRequest(resource, quantity.toDouble(), failPriority),
+        ResourceRequest(resource, quantity.toDouble(), priority),
+        description = description,
         failAt = failAt,
         failDelay = failDelay,
+        failPriority = failPriority,
         capacityLimitMode = capacityLimitMode
     )
 
@@ -516,6 +525,8 @@ open class Component(
      *
      * For `request` contract see [user manual](https://www.kalasim.org/component/#request)
      *
+     * @param resourceRequests Each `ResourceRequest` is a tuple of resource, quantity (default=-1 for put requests) and priority (default NORMAL). It can be created with the following DSl `resource withQuantity 3 and Priority HIGH`
+     * @param description An optional description of the put request's nature/reason/cause.
      * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failDelay Skip and set `failed` if the request is not honored before `now + failDelay`,
      * @param failPriority Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
@@ -524,13 +535,18 @@ open class Component(
      */
     suspend fun SequenceScope<Component>.put(
         vararg resourceRequests: ResourceRequest,
+        description: String? = null,
         failAt: TickTime? = null,
         failDelay: Number? = null,
         failPriority: Priority = NORMAL,
         capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
     ) = request(
         *resourceRequests.map { it.copy(quantity = -1.0 * it.quantity) }.toTypedArray(),
-        failAt = failAt, failDelay = failDelay, failPriority = failPriority, capacityLimitMode = capacityLimitMode
+        description = description,
+        failAt = failAt,
+        failDelay = failDelay,
+        failPriority = failPriority,
+        capacityLimitMode = capacityLimitMode
     )
 
     /**
@@ -541,6 +557,7 @@ open class Component(
      * @param resources Resources to be requested with a quantity of 1 and priority null.
      * @param quantity The quantity to be requested from each resource.
      * @param priority If multiple components compete for the same resource, requests with higher priority will have precedence.
+     * @param description An optional description of the request nature/reason/cause.
      * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given. It is possible to check which resource has been claimed with `Component.claimers()`.
      * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failDelay Skip and set `failed` if the request is not honored before `now + failDelay`,
@@ -618,7 +635,7 @@ open class Component(
      *
      * For `request` contract see [user manual](https://www.kalasim.org/component/#request)
      *
-     * @param resourceRequests Each `ResourceRequest` is a tuple of resource, quantity (default=1) and priority (default 0).
+     * @param resourceRequests Each `ResourceRequest` is a tuple of resource, quantity (default=1) and priority (default 0).  It can be created with the following DSl `resource withQuantity 3 and Priority HIGH`
      * @param oneOf If `true`, just one of the requests has to be met (or condition), where honoring follows the order given. It is possible to check which resource has been claimed with `Component.claimers()`.
      * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failDelay Skip and set `failed` if the request is not honored before `now + failDelay`,
@@ -645,7 +662,7 @@ open class Component(
         val requestStart = now
 
         @Suppress("NAME_SHADOWING")
-        val resourceRequests: List<ResourceRequest> = when (capacityLimitMode) {
+        val resourceRequests: List<ResourceRequest> = when(capacityLimitMode) {
             CapacityLimitMode.FAIL -> resourceRequests.firstOrNull { abs(it.quantity) > it.resource.capacity }?.let {
                 throw CapacityLimitException(
                     it.resource,
@@ -669,7 +686,7 @@ open class Component(
         }
 
         yieldCurrent {
-            if (componentState != CURRENT) {
+            if(componentState != CURRENT) {
                 requireNotMain()
                 requireNotData()
                 requireNotInterrupted()
@@ -695,7 +712,7 @@ open class Component(
             resourceRequests.forEach { (r, quantity, priority) ->
                 val q = quantity
 
-                if (r.preemptive && resourceRequests.size > 1) {
+                if(r.preemptive && resourceRequests.size > 1) {
                     throw IllegalArgumentException("preemptive resources do not support multiple resource requests")
                 }
 
@@ -716,23 +733,23 @@ open class Component(
 
                 r.requesters.add(this@Component, priority = priority)
 
-                if (trackingPolicy.logInteractionEvents) {
+                if(trackingPolicy.logInteractionEvents) {
                     log(InteractionEvent(now, env.curComponent, this@Component, reqText))
                 }
 
-                if (r.preemptive) {
+                if(r.preemptive) {
                     var av = r.availableQuantity
                     val thisClaimers = r.claimers.q
 
                     val bumpCandidates = mutableListOf<Component>()
                     //                val claimComponents = thisClaimers.map { it.c }
-                    for (cqe in thisClaimers.toList().reversed()) {
-                        if (av >= q) {
+                    for(cqe in thisClaimers.toList().reversed()) {
+                        if(av >= q) {
                             break
                         }
 
                         // check if prior of component
-                        if ((priority?.value ?: 0) <= (cqe.priority?.value ?: 0)) {
+                        if((priority?.value ?: 0) <= (cqe.priority?.value ?: 0)) {
                             break
                         }
 
@@ -740,7 +757,7 @@ open class Component(
                         bumpCandidates.add(cqe.component)
                     }
 
-                    if (av >= 0) {
+                    if(av >= 0) {
                         bumpCandidates.forEach {
                             it.releaseInternal(r, bumpedBy = this@Component)
                             logInternal(trackingPolicy.logInteractionEvents, "$it bumped from $r by ${this@Component}")
@@ -751,13 +768,13 @@ open class Component(
             }
 
             requests.forEach { (resource, quantity) ->
-                if (quantity < resource.minq)
+                if(quantity < resource.minq)
                     resource.minq = quantity
             }
 
             tryRequest()
 
-            if (requests.isNotEmpty()) {
+            if(requests.isNotEmpty()) {
                 reschedule(
                     scheduledTime!!, priority = failPriority, urgent = urgent,
                     caller = "requesting", newStatus = REQUESTING
@@ -765,10 +782,10 @@ open class Component(
             }
         }
 
-        if (honorBlock != null) {
+        if(honorBlock != null) {
             // suspend{ ... }
             val before = now
-            honorBlock(RequestScopeContext(if (oneOf) claims.toList().last().first else null, requestStart))
+            honorBlock(RequestScopeContext(if(oneOf) claims.toList().last().first else null, requestStart))
 
             val after = now
 
@@ -776,7 +793,7 @@ open class Component(
             resourceRequests.filter { it.resource.claimers.contains(this@Component) }.forEach {
                 release(it)
 
-                if (it.resource.trackingPolicy.trackActivities) {
+                if(it.resource.trackingPolicy.trackActivities) {
                     val rse =
                         ResourceActivityEvent(before, after, this@Component, it.resource, description, it.quantity)
                     (it.resource.activities as MutableList<ResourceActivityEvent>).add(rse)
@@ -790,8 +807,8 @@ open class Component(
 
     /** Determine if all current requests of this component could be honored. */
     private fun honorAll(): List<Pair<Resource, Double>>? {
-        for ((resource, requestedQuantity) in requests) {
-            if (requestedQuantity < 0) {
+        for((resource, requestedQuantity) in requests) {
+            if(requestedQuantity < 0) {
                 require(resource is DepletableResource) {
                     "can not request negative quantity from non-depletable resource"
                 }
@@ -805,10 +822,10 @@ open class Component(
 
 
     private fun honorAny(): List<Pair<Resource, Double>>? {
-        for (request in requests) {
+        for(request in requests) {
             val (resource, requestedQuantity) = request
 
-            if(resource.canComponentHonorQuantity(this, requestedQuantity)){
+            if(resource.canComponentHonorQuantity(this, requestedQuantity)) {
                 return listOf(resource to requestedQuantity)
             }
 //            if (requestedQuantity > 0) {
@@ -824,7 +841,6 @@ open class Component(
     }
 
 
-
     /**
      * Check if any or all (depending on on-of-setting)  request(s) to resources can be honored, and perform the
      * claims accordingly.
@@ -832,15 +848,15 @@ open class Component(
      * @return `true` if the pending request(s) were honored
      */
     internal fun tryRequest(): Boolean {
-        if (componentState == INTERRUPTED) return false
+        if(componentState == INTERRUPTED) return false
 
-        val rHonor: List<Pair<Resource, Double>>? = if (oneOfRequest) honorAny() else honorAll()
+        val rHonor: List<Pair<Resource, Double>>? = if(oneOfRequest) honorAny() else honorAll()
 
-        if (rHonor.isNullOrEmpty()) return false
+        if(rHonor.isNullOrEmpty()) return false
 
         requests.forEach { (resource, quantity) ->
             // proceed just if request was honored claim it
-            if (rHonor.any { it.first == resource }) {
+            if(rHonor.any { it.first == resource }) {
                 resource.claimed += quantity //this will also update the timeline
 
                 log(trackingPolicy.logInteractionEvents) {
@@ -852,12 +868,12 @@ open class Component(
                     ResourceEvent(env.now, env.curComponent, this, resource, type, quantity)
                 }
 
-                if (!resource.depletable) {
+                if(!resource.depletable) {
                     val thisPrio = resource.requesters.q.firstOrNull { it.component == this }?.priority
                     claims.merge(resource, quantity, Double::plus)
 
                     //also register as claimer in resource if not yet present
-                    if (resource.claimers.q.none { it.component == this }) {
+                    if(resource.claimers.q.none { it.component == this }) {
                         resource.claimers.add(this, thisPrio)
                     }
                 }
@@ -869,13 +885,13 @@ open class Component(
         requests.clear()
         remove()
 
-        val honorInfo = rHonor.firstOrNull()!!.first.name + (if (rHonor.size > 1) "++" else "")
+        val honorInfo = rHonor.firstOrNull()!!.first.name + (if(rHonor.size > 1) "++" else "")
 
         reschedule(now, NORMAL, false, null, "Request honored by $honorInfo", SCHEDULED)
 
         // process negative put requests
-        rHonor.filter { it.second<0 }.forEach {
-            require(it.first.depletable)
+        rHonor.filter { it.first.depletable }.forEach {
+//            require(it.first.depletable)
             it.first.tryRequest()
         }
 
@@ -902,7 +918,7 @@ open class Component(
      */
     fun isClaiming(resource: Resource? = null): Boolean {
         @Suppress("IfThenToElvis")
-        return if (resource == null) {
+        return if(resource == null) {
             TODO("claiming test without resource is not yet implemented as this would require a registry in SimulationEntity")
 //            env.queue.filter{ it is ComponentQueue<*> }.map{(it as ComponentQueue<*>).contains(this)}
 //            for q in self._qmembers:
@@ -943,7 +959,7 @@ open class Component(
         scheduledTime = null
         simProcess = null
 
-        if (trackingPolicy.logStateChangeEvents) {
+        if(trackingPolicy.logStateChangeEvents) {
             log(stateChangeEvent("Ended"))
         }
     }
@@ -967,7 +983,7 @@ open class Component(
     ) {
         require(scheduledTime >= env.now) { "scheduled time (${scheduledTime}) before now (${env.now})" }
 
-        if (ASSERT_MODE == AssertMode.FULL) {
+        if(ASSERT_MODE == AssertMode.FULL) {
             require(this !in env.queue) {
                 "component must not be in queue when rescheduling but must be removed already at this point"
             }
@@ -979,14 +995,14 @@ open class Component(
 
         require(this.scheduledTime != null) { "reschedule with null time is unlikely to have meaningful semantics" }
 
-        if (this.scheduledTime != null) {
+        if(this.scheduledTime != null) {
             env.push(this, scheduledTime, priority, urgent)
         }
 
-        if (trackingPolicy.logStateChangeEvents) {
+        if(trackingPolicy.logStateChangeEvents) {
             val extra = ", scheduled for ${formatWithInf(scheduledTime)}"
 
-            val delta = if (this.scheduledTime == env.now || (this.scheduledTime?.value == Double.MAX_VALUE)) "" else {
+            val delta = if(this.scheduledTime == env.now || (this.scheduledTime?.value == Double.MAX_VALUE)) "" else {
                 "+" + TRACE_DF.format(scheduledTime - env.now) + " "
             }
 
@@ -1029,7 +1045,7 @@ open class Component(
 
         // todo why this convoluted logic??
         val processPointer: ProcessPointer? = process
-            ?: if (componentState == DATA) {
+            ?: if(componentState == DATA) {
                 lastProcess
             } else {
                 null
@@ -1037,16 +1053,16 @@ open class Component(
 
         var extra = ""
 
-        if (processPointer != null) {
+        if(processPointer != null) {
             this.simProcess = ingestFunPointer(processPointer)
 
             extra = "process=${processPointer.name}"
         }
 
-        if (componentState != CURRENT) {
+        if(componentState != CURRENT) {
             remove()
-            if (processPointer != null) {
-                if (!(keepRequest || keepWait)) {
+            if(processPointer != null) {
+                if(!(keepRequest || keepWait)) {
                     checkFail()
                 }
             } else {
@@ -1054,7 +1070,7 @@ open class Component(
             }
         }
 
-        val scheduledTime = if (at == null) {
+        val scheduledTime = if(at == null) {
             env.now + delay.toDouble()
         } else {
             at + delay.toDouble()
@@ -1066,14 +1082,14 @@ open class Component(
     }
 
     internal fun checkFail() {
-        if (requests.isNotEmpty()) {
+        if(requests.isNotEmpty()) {
             logInternal(trackingPolicy.logInteractionEvents, "request failed")
             requests.forEach { it.key.removeRequester(this) }
             requests.clear()
             failed = true
         }
 
-        if (waits.isNotEmpty()) {
+        if(waits.isNotEmpty()) {
             logInternal(trackingPolicy.logInteractionEvents, "wait failed")
             waits.forEach { it.state.waiters.remove(this) }
 
@@ -1145,7 +1161,7 @@ open class Component(
         priority: Priority = NORMAL,
         urgent: Boolean = false
     ) {
-        if (componentState != PASSIVE && componentState != CURRENT) {
+        if(componentState != PASSIVE && componentState != CURRENT) {
             requireNotData()
             requireNotInterrupted()
             remove()
@@ -1175,7 +1191,8 @@ open class Component(
      * @param  quantity  quantity to be released. If not specified, the resource will be emptied completely.
      * For non-anonymous resources, all components claiming from this resource will be released.
      */
-    fun release(resource: Resource, quantity: Number = Double.MAX_VALUE) = release(ResourceRequest(resource, quantity.toDouble()))
+    fun release(resource: Resource, quantity: Number = Double.MAX_VALUE) =
+        release(ResourceRequest(resource, quantity.toDouble()))
 
 
     /**
@@ -1200,16 +1217,16 @@ open class Component(
      *     </ul>
      */
     fun release(vararg releaseRequests: ResourceRequest) {
-        for ((resource, quantity) in releaseRequests) {
+        for((resource, quantity) in releaseRequests) {
             require(!resource.depletable) { " It is not possible to release from an depletable resource, this way. Use Resource.release() in that case." }
 
             releaseInternal(resource, quantity)
         }
 
-        if (releaseRequests.isEmpty()) {
+        if(releaseRequests.isEmpty()) {
             logInternal(trackingPolicy.logInteractionEvents, "Releasing all claimed resources $claims")
 
-            for ((r, _) in claims) {
+            for((r, _) in claims) {
                 releaseInternal(r)
             }
         }
@@ -1219,9 +1236,9 @@ open class Component(
     private fun releaseInternal(resource: Resource, q: Double? = null, bumpedBy: Component? = null) {
         require(resource in claims) { "$name not claiming from resource ${resource.name}" }
 
-        val quantity = if (q == null) {
+        val quantity = if(q == null) {
             claims[resource]!!
-        } else if (q > claims[resource]!!) {
+        } else if(q > claims[resource]!!) {
             claims[resource]!!
         } else {
             q
@@ -1235,7 +1252,7 @@ open class Component(
 
         claims[resource] = claims[resource]!! - quantity
 
-        if (claims[resource]!! < EPS) {
+        if(claims[resource]!! < EPS) {
             leave(resource.claimers)
             claims.remove(resource)
         }
@@ -1244,7 +1261,7 @@ open class Component(
         require(!resource.claimers.isEmpty() || resource.claimed == 0.0) { "rounding error in claimed quantity" }
         // fix if(claimers.isEmpty()) field= 0.0
 
-        if (bumpedBy == null) resource.tryRequest()
+        if(bumpedBy == null) resource.tryRequest()
     }
 
 
@@ -1301,7 +1318,7 @@ open class Component(
         failPriority: Priority = NORMAL,
         all: Boolean = false
     ) = yieldCurrent {
-        if (componentState != CURRENT) {
+        if(componentState != CURRENT) {
             requireNotMain()
             requireNotData()
             requireNotInterrupted()
@@ -1330,7 +1347,7 @@ open class Component(
 
         tryWait()
 
-        if (waits.isNotEmpty()) {
+        if(waits.isNotEmpty()) {
             reschedule(
                 scheduledTime!!,
                 priority = failPriority,
@@ -1342,12 +1359,12 @@ open class Component(
     }
 
     internal fun tryWait(): Boolean {
-        if (componentState == INTERRUPTED) {
+        if(componentState == INTERRUPTED) {
             return false
         }
 
         @Suppress("UNCHECKED_CAST")
-        val honored = if (waitAll) {
+        val honored = if(waitAll) {
             waits.all { sr ->
                 (sr as StateRequest<Any>).let {
                     it.predicate(it.state.value)
@@ -1362,7 +1379,7 @@ open class Component(
         }
 
 
-        if (honored) {
+        if(honored) {
             waits.forEach { sr ->
                 sr.state.waiters.remove(this)
             }
@@ -1397,7 +1414,7 @@ open class Component(
 
         builder()
 
-        if (initialStatus == CURRENT) {
+        if(initialStatus == CURRENT) {
             yield(this@Component)
         }
     }
@@ -1424,7 +1441,7 @@ open class Component(
     ): Resource {
         require(resources.isNotEmpty()) { "Resources listing must not be empty" }
 
-        val selected = when (policy) {
+        val selected = when(policy) {
             SHORTEST_QUEUE -> {
                 resources.minByOrNull { it.requesters.size }!!
             }
@@ -1440,7 +1457,7 @@ open class Component(
                 return resources[curValue]
             }
             FIRST_AVAILABLE -> {
-                while (resources.all { it.availableQuantity < quantity.toDouble() }) {
+                while(resources.all { it.availableQuantity < quantity.toDouble() }) {
                     standby()
                 }
 
@@ -1481,15 +1498,15 @@ open class Component(
 
         val queueListener = object : CollectionChangeListener<T>() {
             override fun added(component: T) {
-                if (queue.size >= batchSize) {
+                if(queue.size >= batchSize) {
                     activate()
                 }
             }
         }
 
-        if (queue.size < batchSize) {
+        if(queue.size < batchSize) {
             queue.addChangeListener(queueListener)
-            if (timeout != null) hold(timeout) else passivate()
+            if(timeout != null) hold(timeout) else passivate()
         }
 
         val actualBatchSize = min(batchSize, queue.size)
@@ -1530,8 +1547,8 @@ class GenProcessInternal(val component: Component, seq: Sequence<Component>, ove
     override fun call() {
         try {
             iterator.next()
-        } catch (e: NoSuchElementException) {
-            if (e.message != null) e.printStackTrace()
+        } catch(e: NoSuchElementException) {
+            if(e.message != null) e.printStackTrace()
             component.terminate()
         }
     }
@@ -1563,13 +1580,13 @@ data class RequestScopeContext(val resource: Resource?, val requestingSince: Tic
 //    data class StateRequest<T>(val s: State<T>, val value: T? = null, val priority: Int? = null)
 data class StateRequest<T>(val state: State<T>, val priority: Priority? = null, val predicate: (T) -> Boolean) {
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if(this === other) return true
+        if(javaClass != other?.javaClass) return false
 
         other as StateRequest<*>
 
-        if (state != other.state) return false
-        if (predicate != other.predicate) return false
+        if(state != other.state) return false
+        if(predicate != other.predicate) return false
 
         return true
     }
@@ -1584,7 +1601,7 @@ data class StateRequest<T>(val state: State<T>, val priority: Priority? = null, 
 infix fun <T> State<T>.turns(value: T) = StateRequest(this) { it == value }
 
 private fun formatWithInf(time: TickTime) =
-    if (time.value == Double.MAX_VALUE || time.value.isInfinite()) "<inf>" else TRACE_DF.format(time.value)
+    if(time.value == Double.MAX_VALUE || time.value.isInfinite()) "<inf>" else TRACE_DF.format(time.value)
 
 
 data class ComponentLifecycleRecord(
@@ -1609,7 +1626,7 @@ fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {
     return ComponentLifecycleRecord(
         c.name,
         c.creationTime,
-        inDataSince = if (c.isData) c.statusTimeline.statsData().timepoints.last().asTickTime() else null,
+        inDataSince = if(c.isData) c.statusTimeline.statsData().timepoints.last().asTickTime() else null,
         (histogram.get(DATA) ?: 0.0).asTickTime(),
         (histogram[CURRENT] ?: 0.0).asTickTime(),
         (histogram[STANDBY] ?: 0.0).asTickTime(),

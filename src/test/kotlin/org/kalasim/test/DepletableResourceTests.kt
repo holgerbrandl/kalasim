@@ -4,8 +4,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.doubles.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
-import junit.framework.Assert.fail
-import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.plot.kravis.display
@@ -187,9 +185,41 @@ class DepletableResourceTests {
         dp.level shouldBe 30.0
     }
 
-    @Ignore
+
     @Test
     fun `it should respect queue priorities when restoring resource`() = createTestSimulation(true) {
-        fail()
+        val resource = DepletableResource(capacity = 10, initialLevel = 7)
+
+        var normalPutHonored = false
+
+        object : Component("EarlyProvider") {
+            override fun process() = sequence {
+                    // this put will be stalled because there it is currently fully charged
+                    put(resource, 7, description = "bla bla", capacityLimitMode = CapacityLimitMode.SCHEDULE)
+                    normalPutHonored = true
+            }
+        }
+
+        var prioPutHonored = false
+
+        object : Component("PrioProvide") {
+            override fun process() = sequence {
+                // this put will be stalled because there it is currently fully charged
+                put(resource, 7, Priority.IMPORTANT, capacityLimitMode = CapacityLimitMode.SCHEDULE)
+                prioPutHonored = true
+            }
+        }
+
+        object : Component("Consumer") {
+            override fun process() = sequence {
+                hold(duration = 5.0)
+                take(resource, 5)
+            }
+        }
+
+        run(10)
+
+        normalPutHonored shouldBe false
+        prioPutHonored shouldBe true
     }
 }

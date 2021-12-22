@@ -12,6 +12,8 @@ honor policy notes
 
 **TODO** better name and documentation for `curComponent`
 
+**TODO** consider removing Component.requestedQuantity
+
 ## v0.8
 
 **TODO** log output is misleading

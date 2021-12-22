@@ -438,7 +438,7 @@ For depletable (which are also sometimes referred to as _anonymous_) resources, 
 * A depletable resource can refilled/recharged with `Component.put()`.
 
 !!!info
-   Both `put()` and `take` are just typesafe wrappers around [`request()`](#resources).  With `put()` quantities of resources are negated before calling `Component.request()` internally.
+    Both `put()` and `take` are just typesafe wrappers around [`request()`](#resources).  With `put()` quantities of resources are negated before calling `Component.request()` internally.
 
 To create a depletable resource we do
 ```kotlin

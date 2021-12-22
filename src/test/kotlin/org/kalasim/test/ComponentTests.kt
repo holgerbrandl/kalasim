@@ -7,10 +7,7 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.DATA
 import org.kalasim.ComponentState.SCHEDULED
-import org.kalasim.misc.MissingDependencyContextException
-import org.kalasim.misc.ResourceTrackingConfig
-import org.kalasim.misc.TrackingConfig
-import org.kalasim.misc.printThis
+import org.kalasim.misc.*
 import kotlin.test.fail
 
 
@@ -32,6 +29,8 @@ class ComponentTests {
 
     @Test
     fun `it should not create components outside of an environment`() {
+        DependencyContext.stopKoin()
+
         shouldThrow<MissingDependencyContextException> {
             Component("foo").info.printThis()
         }

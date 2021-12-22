@@ -6,7 +6,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.junit.Assert
-import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.Priority.Companion.CRITICAL
@@ -231,7 +230,6 @@ class ResourceTests {
     }
 
 
-    @Ignore
     @Test
     fun `it should respect request priorities when mixing request sizes`() = createTestSimulation(true) {
 
@@ -276,10 +274,7 @@ class ResourceTests {
         criticalRequestHonored shouldBe true
     }
 
-    //    @Ignore(
-//        "its unclear if this should be suppoted to be more consistent with depletable resources. " +
-//                "Usually capacity changes should be rare, so failing here seems to make sens"
-//    )
+
     @Test
     fun `it should reevaluate requests upon capacity changes`() {
 

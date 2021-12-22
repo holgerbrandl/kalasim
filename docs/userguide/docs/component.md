@@ -96,7 +96,6 @@ class Machine : Component(){
 ```
 
 !!!info
-
     Finally, if there is a `process` or `repeatedProcess` method, you can disable the automatic activation (i.e. make it a data component), by specifying `Component(process = Component::none)`.
 
 ### 3. Process Reference

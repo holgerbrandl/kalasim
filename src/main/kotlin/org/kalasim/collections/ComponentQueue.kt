@@ -21,7 +21,7 @@ data class CQElement<C>(val component: C, val enterTime: TickTime, val priority:
 
 class  PriorityFCFSQueueComparator<C>() : Comparator<CQElement<C>> {
     override fun compare(o1: CQElement<C>, o2: CQElement<C>): Int  =
-        compareValuesBy(o1, o2, { it.priority?.value?.times(-1) ?: 0 }, { it.enterTime })
+        compareValuesBy(o1, o2, { it.priority?.value?.times(-1) ?: DEFAULT_QUEUE_PRIORITY }, { it.enterTime })
 }
 
 
