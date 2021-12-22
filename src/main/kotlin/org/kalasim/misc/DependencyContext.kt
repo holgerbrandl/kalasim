@@ -3,6 +3,9 @@ package org.kalasim.misc
 import org.koin.core.Koin
 import org.koin.dsl.koinApplication
 
+internal class MissingDependencyContextException : Exception(
+    "Simulation environment context is missing. Such a context is required to properly instantiate simulation entities. See https://www.kalasim.org/basics/#simulation-environment"
+)
 /**
  * Global context - current Koin Application available globally
  *
@@ -14,8 +17,7 @@ object DependencyContext {
 
 //    private var koin: Koin? = null
 
-    fun get(): Koin = threadLocalValue.get()
-        ?: error("KoinApplication has not been started. See https://www.kalasim.org/faq/#how-to-fix-koinapplication-has-not-been-started")
+    fun get(): Koin = threadLocalValue.get() ?: throw MissingDependencyContextException()
     // previous version without thread-local (to enable fast rollback in case this turns out to be a bad idea
 //    fun get(): Koin = koin
 //        ?: error("KoinApplication has not been started. See https://www.kalasim.org/faq/#how-to-fix-koinapplication-has-not-been-started")

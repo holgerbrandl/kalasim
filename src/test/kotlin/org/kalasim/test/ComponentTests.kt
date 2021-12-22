@@ -3,11 +3,11 @@ package org.kalasim.test
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.DATA
 import org.kalasim.ComponentState.SCHEDULED
+import org.kalasim.misc.MissingDependencyContextException
 import org.kalasim.misc.ResourceTrackingConfig
 import org.kalasim.misc.TrackingConfig
 import org.kalasim.misc.printThis
@@ -30,13 +30,11 @@ class ComponentTests {
     }
 
 
-    @Ignore
     @Test
-    fun `it should create components outside of an environment`() {
-        // todo should it? E.g. creation time would prevent that
-        Component("foo").info.printThis()
-
-        println("done")
+    fun `it should not create components outside of an environment`() {
+        shouldThrow<MissingDependencyContextException> {
+            Component("foo").info.printThis()
+        }
     }
 
     @Test
@@ -229,7 +227,7 @@ class ComponentTests {
 
         object : Component("Customer1") {
             override fun process() = sequence<Component> {
-                if (env.trackingPolicyFactory.getPolicy<CustomConfig>(getThis()).logSmthg) {
+                if(env.trackingPolicyFactory.getPolicy<CustomConfig>(getThis()).logSmthg) {
                     println("custom configured logging")
                     configuredLog = true
                 }

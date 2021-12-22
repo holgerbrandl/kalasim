@@ -38,7 +38,7 @@ In case you also wonder why `salabim` was named `salabim`, see [here](https://ww
 
 Admittedly, the provided [resource](resource.md) request syntax `request(resource)` feels a bit dated. It's designed in that way because we would need [multiple receiver](https://youtrack.jetbrains.com/issue/KT-10468) support for extensions functions to provide a more object-oriented API. However, extensions with multiple receivers are not (yet) supported by Kotlin.
 
-## How to fix `KoinApplication has not been started`?
+## How to fix `Simulation environment context is missing` error?
 
 You would need to create a simulation context before instantiating the resources, components or states. E.g. with
 
