@@ -61,6 +61,7 @@ data class ResourceActivityEvent(
     val endWT = resource.env.tickTransform?.tick2wallTime(end)
 }
 
+
 open class InteractionEvent(
     time: TickTime,
     val curComponent: Component? = null,
@@ -83,7 +84,6 @@ open class InteractionEvent(
         "action" to renderAction()
         "details" to renderDetails()
     }
-
 }
 
 class EntityCreatedEvent(

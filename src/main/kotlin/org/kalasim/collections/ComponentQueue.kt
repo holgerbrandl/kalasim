@@ -106,6 +106,8 @@ class ComponentQueue<C>(
     fun printStats() = stats.print()
 
     /** Update queue position of component after property changes. */
+    // TODO add test coverage
+    @Suppress("unused")
     fun updateOrderOf(c: C) {
         val element = q.find { it.component == c }
 

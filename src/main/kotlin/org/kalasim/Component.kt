@@ -1269,11 +1269,11 @@ open class Component(
 
 
     /**
-     * Wait for any or all of the given state values are met
+     * Wait for any or all of the given [state](https://www.kalasim.org/state) values are met.
      *
      * For `wait` contract see [user manual](https://www.kalasim.org/component/#wait)
      *
-     * @sample TODO
+     * @sample org.kalasim.dokka.statesHowTo
      *
      * @param state state variable
      * @param waitFor State value to wait for
@@ -1426,14 +1426,16 @@ open class Component(
     internal fun requestedQuantity(resource: Resource) = requests[resource]
 
     /** Captures the current state of a `Component`*/
-    open class ComponentInfo(c: Component) : Jsonable() {
-        val name = c.name
-        val now = c.now
-        val status = c.componentState
-        val scheduledTime = c.scheduledTime
+    @Suppress("unused")
+    open class ComponentInfo(component: Component) : Jsonable() {
+        val name = component.name
+        val creationTime: TickTime = component.creationTime
+        val now = component.now
+        val status = component.componentState
+        val scheduledTime = component.scheduledTime
 
-        val claims = c.claims.map { it.key.name to it.value }.toMap()
-        val requests = c.requests.map { it.key.name to it.value }.toMap()
+        val claims = component.claims.map { it.key.name to it.value }.toMap()
+        val requests = component.requests.map { it.key.name to it.value }.toMap()
     }
 
 

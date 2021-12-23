@@ -224,6 +224,13 @@ class ResourceTests {
         PrioComponent(8, 20, NORMAL)
         PrioComponent(9, 20, CRITICAL)
 
+
+        // make sure that we can extract correctly sorted copy of the request queue
+        run(10)
+        r.requesters.asSortedList().map {
+            it.component.name.substringAfterLast(".").toInt()
+        } shouldBe listOf(9, 5, 3, 4, 8, 7, 6)
+
         run()
 
         results shouldBe listOf(null, null, CRITICAL, IMPORTANT, null, null, NORMAL, LOW, LOWEST)

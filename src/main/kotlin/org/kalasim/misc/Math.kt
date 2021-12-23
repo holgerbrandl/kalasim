@@ -17,7 +17,6 @@ fun <T : Number> List<T>.cumSum(): Iterable<Double> =
         list + (list.last().toDouble() + curVal.toDouble())
     }
 
-
 fun List<StatisticalSummary>.merge(): StatisticalSummaryValues = AggregateSummaryStatistics.aggregate(this)
 
 fun <T> List<ValueTimeline<T>>.mergeStats() = map { it.statisticsSummary() }.merge()

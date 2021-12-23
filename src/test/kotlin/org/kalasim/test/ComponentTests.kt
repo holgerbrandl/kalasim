@@ -68,6 +68,7 @@ class ComponentTests {
             {
               "scheduledTime": null,
               "creationTime": {"value": 0},
+              "now": {"value": 0},
               "name": "foo",
               "claims": {},
               "requests": {},

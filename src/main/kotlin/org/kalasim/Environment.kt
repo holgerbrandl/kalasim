@@ -2,6 +2,7 @@ package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import org.apache.commons.math3.random.JDKRandomGenerator
 import org.apache.commons.math3.random.RandomGenerator
@@ -88,7 +89,6 @@ internal class MainComponent(koin: Koin) : Component(MAIN, koin = koin) {
     override fun process() = sequence<Component> {}
 }
 
-@Suppress("EXPERIMENTAL_API_USAGE")
 open class Environment(
     enableConsoleLogger: Boolean = false,
     enableTickMetrics: Boolean = false,
@@ -353,7 +353,7 @@ open class Environment(
 
 
     inline fun <reified T : Event> addAsyncEventListener(
-        scope: CoroutineScope = GlobalScope,
+        scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
         crossinline block: (T) -> Unit
     ) = AsyncEventListener(scope).also { listener ->
         listener.start(block)
@@ -367,7 +367,6 @@ open class Environment(
         block(it)
     }
 
-    // todo deprecate this in favor of the reeified version
     fun addEventListener(listener: EventListener) = eventListeners.add(listener)
 
     @Suppress("unused")
@@ -435,7 +434,6 @@ open class Environment(
         "queue" to queue.toList().map { it.name }.toTypedArray()
     }
 
-    @Suppress("EXPERIMENTAL_OVERRIDE")
     override fun toString(): String {
         return toJson().toString(JSON_INDENT)
     }

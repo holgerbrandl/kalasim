@@ -7,17 +7,17 @@ import java.util.logging.Level
 
 class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
 
-    enum class EventsTableColumn { time, current, receiver, action, info }
+    enum class EventsTableColumn { Time, Current, Receiver, Action, Info }
 
     companion object {
         val TRACE_COL_WIDTHS = mutableListOf(10, 22, 22, 55, 35)
 
         fun setColumnWidth(column: EventsTableColumn, width: Int) = when(column) {
-            EventsTableColumn.time -> TRACE_COL_WIDTHS[0] = width
-            EventsTableColumn.current -> TRACE_COL_WIDTHS[1] = width
-            EventsTableColumn.receiver -> TRACE_COL_WIDTHS[2] = width
-            EventsTableColumn.action -> TRACE_COL_WIDTHS[3] = width
-            EventsTableColumn.info -> TRACE_COL_WIDTHS[4] = width
+            EventsTableColumn.Time -> TRACE_COL_WIDTHS[0] = width
+            EventsTableColumn.Current -> TRACE_COL_WIDTHS[1] = width
+            EventsTableColumn.Receiver -> TRACE_COL_WIDTHS[2] = width
+            EventsTableColumn.Action -> TRACE_COL_WIDTHS[3] = width
+            EventsTableColumn.Info -> TRACE_COL_WIDTHS[4] = width
         }
     }
 

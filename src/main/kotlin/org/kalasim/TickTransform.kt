@@ -108,7 +108,6 @@ class OffsetTransform(val offset: Instant = Instant.now(), val tickUnit: TimeUni
 internal const val MISSING_TICK_TRAFO_ERROR = "Tick transformation not configured."
 
 
-@Suppress("EXPERIMENTAL_API_USAGE")
 interface SimContext : KoinComponent {
 
     var tickTransform: TickTransform?

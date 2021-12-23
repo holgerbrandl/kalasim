@@ -1,3 +1,5 @@
+@file:Suppress("PackageDirectoryMismatch")
+
 package org.kalasim
 
 import org.kalasim.misc.DependencyContext

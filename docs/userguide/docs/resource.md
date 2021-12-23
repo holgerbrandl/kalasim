@@ -25,7 +25,7 @@ Any [component](component.md) can `request` from a resource in its [process meth
 
 `request` has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
 
-Regular resources have a [queue](collections.md#queue) called `requesters` containing all components trying to claim from the resource. In addition, there is a queue `claimers` containing all components claiming from the resource. Both queues can not be modified but very useful for analysis.
+Regular resources have a [queue](collections.md#queue) called `requesters` containing all components trying to claim from the resource. In addition, there is a [list](collections.md#list) `claimers` containing all components claiming from the resource. Both queues can not be modified but are very useful for analysis.
 
 Notes
 
@@ -37,10 +37,10 @@ Notes
 
 ## Request Scope
 
-The most common usage pattern for resources is the _request scope_ which 
+The recommended `request` usage pattern for resources is the _request scope_ which 
 
-1. requests a resource, 
-2. executes some action,
+1. Requests a resource, 
+2. Executes some action,
 3. and finally releases the claimed resources 
 
 ```kotlin

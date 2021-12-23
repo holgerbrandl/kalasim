@@ -13,6 +13,7 @@ data class ComponentTrackingConfig(
 ) : TrackingConfig {
 
     companion object {
+        @Suppress("unused")
         val NONE = ComponentTrackingConfig(false, false, false, false)
     }
 }
@@ -26,7 +27,13 @@ data class ResourceTrackingConfig(
 ) : TrackingConfig {
 
     companion object {
-        val NONE = ResourceTrackingConfig(false, false, false, false)
+        @Suppress("unused")
+        val NONE = ResourceTrackingConfig(
+            logCreation = false,
+            logClaimRelease = false,
+            trackQueueStatistics = false,
+            trackUtilization = false
+        )
     }
 }
 
@@ -38,13 +45,20 @@ data class StateTrackingConfig(
 ) : TrackingConfig {
 
     companion object {
-        val NONE = StateTrackingConfig(false, false, false, false)
+        @Suppress("unused")
+        val NONE = StateTrackingConfig(
+            logCreation = false,
+            trackQueueStatistics = false,
+            trackValue = false,
+            logTriggers = false
+        )
     }
 }
 
 data class ComponentCollectionTrackingConfig(val trackCollectionStatistics: Boolean = true) : TrackingConfig {
 
     companion object {
+        @Suppress("unused")
         val NONE = ComponentCollectionTrackingConfig(false)
     }
 }
@@ -77,6 +91,7 @@ class TrackingPolicyFactory {
         } as T
     }
 
+    @Suppress("BooleanLiteralArgument")
     fun disableAll() {
         defaultComponentConfig = ComponentTrackingConfig(false, false, false, false)
         defaultResourceConfig = ResourceTrackingConfig(false, false, false, false, false)

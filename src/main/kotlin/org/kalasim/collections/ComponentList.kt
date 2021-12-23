@@ -12,8 +12,6 @@ import org.koin.core.Koin
 import java.util.*
 
 
-//TODO add opt-out for queue monitoring
-
 /**
  * Instrumented list with just weak insert order ordering that can be consumed by `poll`. Typically preferred over
  *  `ComponentQueue` if more advanced queue selection policies are needed (e.g. multi-server/service/tool dispatching).

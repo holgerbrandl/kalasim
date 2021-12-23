@@ -8,7 +8,7 @@ data class Foo(val bar: String) : Component() {
 }
 
 fun main() {
-    ConsoleTraceLogger.setColumnWidth(ConsoleTraceLogger.EventsTableColumn.time, 30)
+    ConsoleTraceLogger.setColumnWidth(ConsoleTraceLogger.EventsTableColumn.Time, 30)
 
     createSimulation(true) {
         Foo("").apply {

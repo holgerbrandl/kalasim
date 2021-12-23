@@ -1,19 +1,18 @@
-@file:Suppress("EXPERIMENTAL_OVERRIDE")
-
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
 import org.json.JSONObject
 import org.kalasim.analysis.InteractionEvent
-import org.kalasim.misc.*
+import org.kalasim.misc.DependencyContext
+import org.kalasim.misc.Jsonable
+import org.kalasim.misc.printThis
 import org.koin.core.Koin
-import org.koin.core.component.*
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 
 
-@Suppress("EXPERIMENTAL_API_USAGE")
 abstract class SimulationEntity(name: String? = null, val simKoin: Koin = DependencyContext.get()) : SimContext {
+
     val env = getKoin().get<Environment>()
 
     /** The (possibly auto-generated) name of this simulation entity.*/
@@ -69,21 +68,6 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
     val random
         get() = env.random
 
-    /**
-     * Records a state-change event.
-     *
-     * @param source Modification causing simulation entity
-     * @param action Describing the nature if the event
-     * @param details More details characterizing the state change
-     */
-//    fun <T : SimulationEntity> log(source: T, action: String?, details: String? = null) =
-//        env.apply { log(now, curComponent, source, action, details) }
-
-
-    protected fun logCreation(created: SimulationEntity?, details: String? = null) {
-        log(InteractionEvent(now, env.curComponent, created, details))
-    }
-
 
     /**
      * Records a state-change event.
@@ -117,8 +101,9 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
 // Auto-Naming
 //
 
-internal fun Any.nameOrDefault(name: String?, nameCache: MutableMap<String, Int>) =
-    name ?: this.javaClass.defaultName(nameCache)
+// To be removed in v0.9 (unclear intent & no call-sites)
+//internal fun Any.nameOrDefault(name: String?, nameCache: MutableMap<String, Int>) =
+//    name ?: this.javaClass.defaultName(nameCache)
 
 internal fun Class<*>.defaultName(nameCache: MutableMap<String, Int>) =
     simpleName.ifEmpty { "Component" } + "." + getComponentCounter(simpleName, nameCache)

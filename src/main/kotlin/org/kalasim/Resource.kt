@@ -1,5 +1,3 @@
-//@file:Suppress("EXPERIMENTAL_API_USAGE")
-
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
@@ -440,23 +438,16 @@ val Resource.timeline: List<ResourceTimelineSegment>
 //            statsDF = statsDF.addColumn("end_wt") { it["end"].map<TickTime> { env.asWallTime(it) } }
 //        }
 
-        val records = statsDF.rowsAs<ResourceTimelineSegment>().toList()
-
-//        statsDF.print()
-//        statsDF.schema()
-
-        // we also resample with a common time axis using
-        // val time = (capStats.keys + claimStats.keys + requesters.keys + claimers.keys).toList().sorted()
-//        listOf(1,2,3).map{         capacityTimeline[it] }
-
-        return records
+        return statsDF.rowsAs<ResourceTimelineSegment>().toList()
     }
 
+@Suppress("unused")
 class ResourceInfo(resource: Resource) : Jsonable() {
     val name: String = resource.name
-    val creationTime: TickTime = resource.creationTime
+    val now = resource.now
+    val creationTime = resource.creationTime
 
-    val claimedQuantity: Double = resource.claimed
+    val claimedQuantity = resource.claimed
     val capacity = resource.capacity
 
     // use a dedicated type here to see null prios in json

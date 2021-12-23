@@ -4,15 +4,15 @@ import org.apache.commons.math3.random.EmpiricalDistribution
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import kotlin.math.roundToInt
 
+// Extensions to build histograms
 
 data class HistogramBin(val lowerBound: Double, val upperBound: Double, val value: Long)
 
 class Histogram(val bins: List<HistogramBin>) {
     val n = bins.sumOf { it.value }
-    val legacyFormat = bins.map { (it.lowerBound to it.upperBound) to it.value }
+//    val legacyFormat = bins.map { (it.lowerBound to it.upperBound) to it.value }
 }
 
-// extensions to build histogram
 
 
 // https://stackoverflow.com/questions/10786465/how-to-generate-bins-for-histogram-using-apache-math-3-0-in-java

@@ -12,11 +12,10 @@ import org.koin.core.Koin
 
 /**
  * States together with the Component.wait() method provide a powerful way of process interaction.
-
-A state will have a certain value at a given time. In its simplest form a component can then wait for a specific value of a state. Once that value is reached, the component will be resumed.
-
-Definition is simple, like dooropen=sim.State('dooropen'). The default initial value is False, meaning the door is closed.
- * initial value of the state
+ *
+ * A state will have a certain value at a given time. In its simplest form a component can then wait for a specific value of a state. Once that value is reached, the component will be resumed.
+ *
+ * @sample org.kalasim.dokka.statesHowTo
  */
 open class State<T>(
     initialValue: T,
