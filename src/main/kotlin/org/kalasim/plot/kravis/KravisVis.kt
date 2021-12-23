@@ -14,10 +14,14 @@ import java.awt.GraphicsEnvironment
 internal fun canDisplay() = !GraphicsEnvironment.isHeadless() && hasR()
 
 fun hasR(): Boolean {
-    val rt = Runtime.getRuntime()
-    val proc = rt.exec("R --help")
-    proc.waitFor()
-    return proc.exitValue() == 0
+   try {
+       val rt = Runtime.getRuntime()
+       val proc = rt.exec("R --help")
+       proc.waitFor()
+       return proc.exitValue() == 0
+   }catch(e: Throwable){
+       return false
+   }
 }
 
 internal fun checkDisplay() {

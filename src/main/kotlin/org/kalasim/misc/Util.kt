@@ -7,12 +7,14 @@ import kotlinx.coroutines.runBlocking
 import org.apache.commons.math3.util.Precision
 import org.json.JSONObject
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.*
 
 
-var JSON_DF = DecimalFormat("###.00")
+internal var JSON_DF = DecimalFormat("###.00", DecimalFormatSymbols(Locale.ENGLISH))
 
 // move away from main namespace
-var TRACE_DF = DecimalFormat("###.00")
+internal var TRACE_DF = JSON_DF
 
 
 internal fun Any.printThis() {

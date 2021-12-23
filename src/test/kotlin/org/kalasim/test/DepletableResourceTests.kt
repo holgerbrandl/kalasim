@@ -118,8 +118,8 @@ class DepletableResourceTests {
             claimers.size shouldBe 0
             level shouldBeGreaterThan 0.0
 
-            claimedTimeline.display().show()
-            levelTimeline.display().show()
+//            claimedTimeline.display().show()
+//            levelTimeline.display().show()
         }
 
         TickTime(Double.POSITIVE_INFINITY).toString()
