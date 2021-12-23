@@ -89,7 +89,7 @@ Major Enhancements
 * Added `selectResource()` to [select from resources with policy](https://www.kalasim.org/resource/#resource-selection)
 ```kotlin
 val doctors = List(3) { Resource() }
-val selected = selectResource( doctors, policy = SHORTEST_QUEUE )
+val selected = selectResource( doctors, policy = ShortestQueue )
 ```
 
 * New suspending [`batch`](https://www.kalasim.org/component/#batching) interaction to group an entity stream into blocks

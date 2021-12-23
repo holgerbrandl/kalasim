@@ -1442,15 +1442,15 @@ open class Component(
     suspend fun SequenceScope<Component>.selectResource(
         resources: List<Resource>,
         quantity: Number = 1,
-        policy: ResourceSelectionPolicy = RANDOM
+        policy: ResourceSelectionPolicy = Random
     ): Resource {
         require(resources.isNotEmpty()) { "Resources listing must not be empty" }
 
         val selected = when(policy) {
-            SHORTEST_QUEUE -> {
+            ShortestQueue -> {
                 resources.minByOrNull { it.requesters.size }!!
             }
-            ROUND_ROBIN -> {
+            RoundRobin -> {
                 // note could also be achieved with listOf<Resource>().repeat().iterator()
                 val mapKey = listOf(this.hashCode(), resources.map { it.name }.hashCode()).hashCode()
                 // initialize if not yet done
@@ -1461,17 +1461,17 @@ open class Component(
 
                 return resources[curValue]
             }
-            FIRST_AVAILABLE -> {
+            FirstAvailable -> {
                 while(resources.all { it.availableQuantity < quantity.toDouble() }) {
                     standby()
                 }
 
                 resources.first { it.availableQuantity > quantity.toDouble() }
             }
-            RANDOM -> {
+            Random -> {
                 resources[discreteUniform(0, resources.size - 1).sample()]
             }
-            RANDOM_AVAILABLE -> {
+            RandomAvailable -> {
                 val available = resources.filter { it.availableQuantity >= quantity.toDouble() }
                 require(available.isNotEmpty()) { "Not all resources must be in use to use RANDOM_AVAILABE selection policy" }
 
@@ -1527,7 +1527,7 @@ internal val SELECT_SCOPE_IDX = mutableMapOf<Int, Int>()
 
 
 enum class ResourceSelectionPolicy {
-    SHORTEST_QUEUE, FIRST_AVAILABLE, RANDOM, RANDOM_AVAILABLE, ROUND_ROBIN
+    ShortestQueue, FirstAvailable, Random, RandomAvailable, RoundRobin
 }
 
 

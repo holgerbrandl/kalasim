@@ -15,7 +15,7 @@ Covers:
 
 ## Simulation
 
-To form groups of passengers before passing the waters, we use `batch()` in the ferryman's [process definition](../component.md#creation-of-a-component). It has multiple arguments:
+To form groups of passengers before passing the waters, we use `batch()` in the ferryman's [process definition](../component.md#process-definition). It has multiple arguments:
 
 * A mandatory [queue](../collections.md#queue) with elements of type `<T>` to be consumed
 * The size of the batch to be created. A positive integer is expected here.

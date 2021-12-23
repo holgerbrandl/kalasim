@@ -1,6 +1,6 @@
 //ResourceSelection.kts
 import org.kalasim.*
-import org.kalasim.ResourceSelectionPolicy.SHORTEST_QUEUE
+import org.kalasim.ResourceSelectionPolicy.ShortestQueue
 
 createSimulation(false) {
     val doctors = List(3) { Resource() }
@@ -12,7 +12,7 @@ createSimulation(false) {
             val selected = selectResource(
                 doctors,
                 quantity = requiredQuantity,
-                policy = SHORTEST_QUEUE
+                policy = ShortestQueue
             )
 
             request(selected withQuantity requiredQuantity) {

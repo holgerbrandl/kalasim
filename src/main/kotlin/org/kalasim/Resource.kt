@@ -25,6 +25,7 @@ sealed class RequestHonorPolicy {
     object SQF : RequestHonorPolicy()
     object RANDOM : RequestHonorPolicy()
 
+    @Suppress("MemberVisibilityCanBePrivate")
     class WeightedFCFS(
         val alpha: Number,
         val capTimeDiffAt: Number? = null,
@@ -40,7 +41,6 @@ sealed class RequestHonorPolicy {
             val quantityTrimmed = trimOptional(requestQuantity, capQuantityAt?.toDouble())
 
             return (alpha.toDouble() * timeDiffTrimmed) / quantityTrimmed
-            // static
         }
 
         private fun trimOptional(value: Double, maxValue: Double?) =

@@ -28,7 +28,7 @@ As players in the show can pick their start number, the episode - as well as the
 
 ## Model
 
-To answer this question, we will model and analyze the process with `kalasim`. At its heart - which is its [process definition](../component.md#creation-of-a-component) -  it is a very simplistic model that centers around simulating the participant's stepping on the tiles one after another while considering the _learning experience_ of earlier participants with lower start numbers.
+To answer this question, we will model and analyze the process with `kalasim`. At its heart - which is its [process definition](../component.md#process-definition) -  it is a very simplistic model that centers around simulating the participant's stepping on the tiles one after another while considering the _learning experience_ of earlier participants with lower start numbers.
 
 ```kotlin
 class SquidGame(

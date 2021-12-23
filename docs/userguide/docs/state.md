@@ -29,7 +29,7 @@ If we want a person to wait for an open door, we could say :
 wait(doorOpen, true)
 ```
 
-The person's [process definition](component.md#creation-of-a-component) will be suspended until the door is open.
+The person's [process definition](component.md#process-definition) will be suspended until the door is open.
 
 We can obtain the current value (e.g. for logging) with:
 

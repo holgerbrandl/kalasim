@@ -540,7 +540,7 @@ class ResourceSelectionTests {
 
         object : Component() {
             override fun process() = sequence {
-                val r = selectResource(resources, policy = FIRST_AVAILABLE)
+                val r = selectResource(resources, policy = FirstAvailable)
                 r shouldBe resources[1]
             }
         }
@@ -551,7 +551,7 @@ class ResourceSelectionTests {
     }
 
     @Test
-    fun `it should allow to select with SHORTEST_QUEUE`() = createTestSimulation(true) {
+    fun `it should allow to select with ShortestQueue`() = createTestSimulation(true) {
         val resources = List(3) { Resource() }
 
         class ResourceConsumer(val resource: Resource) : Component() {
@@ -566,7 +566,7 @@ class ResourceSelectionTests {
 
         object : Component() {
             override fun process() = sequence {
-                val r = selectResource(resources, policy = SHORTEST_QUEUE)
+                val r = selectResource(resources, policy = ShortestQueue)
                 r shouldBe resources[1]
             }
         }
@@ -577,7 +577,7 @@ class ResourceSelectionTests {
     }
 
     @Test
-    fun `it should allow to select with ROUND_ROBIN`() = createTestSimulation(true) {
+    fun `it should allow to select with RoundRobin`() = createTestSimulation(true) {
         val resources = List(3) { Resource() }
 
         val c = object : Component() {
@@ -586,7 +586,7 @@ class ResourceSelectionTests {
 
             override fun process() = sequence {
                 repeat(9) {
-                    val r = selectResource(resources, policy = ROUND_ROBIN)
+                    val r = selectResource(resources, policy = RoundRobin)
                     request(r) {
                         hold(1)
                     }

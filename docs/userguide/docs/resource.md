@@ -1,6 +1,6 @@
 # Resources
 
-Resources are a powerful way of process interaction.  Next to [process definitions](component.md#process-definition), resources are usually the most important elements of a simulation. Resources allow to model rate-limits which are omnipresent in every business process.
+Resources are a powerful way of process interaction.  Next to [process definitions](component.md#process-definition), resources are usually the most important elements of a simulation. Resources allow modeling rate-limits which are omnipresent in every business process.
 
 A resource has always a capacity (which can be zero and even negative). This capacity will be specified at time of creation, but can be changed later with `r.capacity = newCapacity`. Note that this may lead to requesting components to be honored if possible.
 
@@ -21,7 +21,7 @@ Regular resources are declared with:
 val clerks = Resource("clerks", capacity=3)
 ```
 
-Any [component](component.md) can `request` from a resource in its [process method](component.md#creation-of-a-component). The user must not use [`request`](component.md#request) outside of a component's  process definition.
+Any [component](component.md) can `request` from a resource in its [process method](component.md#process-definition). The user must not use [`request`](component.md#request) outside of a component's  process definition.
 
 `request` has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
 
@@ -86,7 +86,7 @@ After a release, all other requesting components will be checked whether their c
 
 ## Quantity
 
-Some requests may request more than 1 units from a requests. The number of requested resource units is called _request quantity_. Quantites are strictly positives, and kalasim also supports non-integer quantities. To request more than one unit from a resource, the user can use the follow API:
+Some requests may request more than 1 units from a resource. The number of requested resource units is called _request quantity_. Quantities are strictly positives, and kalasim also supports non-integer quantities. To request more than one unit from a resource, the user can use the follow API:
 
 ```kotlin
 // request 1 from clerks 
@@ -95,26 +95,34 @@ request(clerks)
 // request 2 elements from clerks
 request(clerks, quantity = 2) 
 
-// also an infix version is supported
+// also, an infix version is supported
 request(clerks withQuantity 2)
+
+
+// request can be decimals
+request(clerks, quantity = 1.234)
+
+// quantities must be positive. This will FAIL with an error
+request(clerks, quantity = -3) // will throw exception!
 ```
 
 ## Request Honor Policies
 
-* **Strict first come, first serve (S-FCFS)**. With the policy requests will be honored by order of appearance. So, it  actually will wait to honour "big" requests, if if smaller requests that could honored already are queueing up already. This is the the default, as we assume this the most intuitive behavior in most situations.
-* **Relaxed first come, first serve (R-FCFS)**: honour first claimable request first. This will honor small requests evern if larger requests are already waiting longer in line.
-* **Smallest Quantity First (SQF)** (to maximize "customer" throughput) with FCFS to resolve ambiguities. This will maximize the total number of requests being honored, whereas large requests may need to wait for a long time.
-* **Weighted SQF**: Here the user can supply a weight `α` that is used to compute an ordering based on `quantity*(1-α)+ time_since_insert*α)`. This will progressively weigh insert-time against request quantity, to ensure that also larger request will finally be honored even if new small requests are coming in.
+* **Strict first come, first serve** (`StrictFCFS`). With the policy requests will be honored by order of appearance. So, it  actually will wait to honour "big" requests, if smaller requests that could be honored already are queueing up already. This is the default, as we assume this the most intuitive behavior in most situations.
+* **Relaxed first come, first serve** (`RelaxedFCFS`): honour first claimable request first. This will honor small requests even if larger requests are already waiting longer in line.
+* **Smallest Quantity First** (`SQF`) (to maximize "customer" throughput) with FCFS to resolve ambiguities. This will maximize the total number of requests being honored, whereas large requests may need to wait for a long time.
+* **Weighted FCFS** (`WeightedFCSC`): Here the user can supply a weight `α` that is used to compute an ordering based on `α * time_since_insert / quantity`. This will progressively weigh the time since the request against request quantity. The policy will prefer smaller requests, but will ensure that also larger request are finally be honored.
+* **Random Order** (`Random`): This honor policy will honor requests in a random order.
 
 !!!important
-[priorities](#request-priority) that always take precedence over the honor policies. If a user sets a request priority, it will be respected first. That is, it does always try honouring by priority first, and only once all requests at the highest prio level are honoured, it will climb down the ladder. Within a priority-level the selected honor policy is applied.
+    [priorities](#request-priority) that always take precedence over the honor policy set for a resource. If a user sets a request priority, it will be respected first. That is, it does always try honouring by priority first, and only once all requests at the highest priority level are honoured, it will climb down the ladder. Within a priority-level the selected honor policy is applied.
 
 !!!note
-A SQF policy could also be realized by using the negated quantity as request priority. However, for sake of clarity is is recommended to use priorities to actual reflect business/domain needs, and use the provided SQL as baseline policy.
+    A SQF policy could also be realized by using the negated quantity as request priority. However, for sake of clarity is recommended to use priorities to actually reflect business/domain needs, and use the provided SQL as baseline policy.
 
-The principle applies to both regular but also [depletable resources](#depletable-resources). Just imagine an resource that is constantly low on supply. When new supply becomes available, the resource could serve as many requesters as possible. 
+The principle applies to both regular but also [depletable resources](#depletable-resources). Just imagine a resource that is constantly low on supply. When new supply becomes available, the resource could serve as many requesters as possible. 
 
-Also for non-anonymous resources this concept applies, e.g. in customer support, where customers require one or multiple mechanics, and the company decides to serve the least staffing-intense requests first. This is from what I understood so far not possible with the current resource model, and would also not be supported with the envisioned strict mode. It is IMHO analogous to a SJF policy, although the name is I guess a bit misleading as it relates more to task duration than quantity, and something more appropriate could be used to better clarify the intent to the user. In case of several requests with the same minimal quantity, FCFS could be used to impose a secondary ordering scheme. I hope this clarifies "Shortest Job First with FCFS as a secondary ordering scheme".
+Also, for non-anonymous resources this concept applies, e.g. in customer support, where customers require one or multiple mechanics, and the company decides to serve the least staffing-intense requests first. This is from what I understood so far not possible with the current resource model, and would also not be supported with the envisioned strict mode. It is IMHO analogous to a SJF policy, although the name is I guess a bit misleading as it relates more to task duration than quantity, and something more appropriate could be used to better clarify the intent to the user. In case of several requests with the same minimal quantity, FCFS could be used to impose a secondary ordering scheme. I hope this clarifies "Shortest Job First with FCFS as a secondary ordering scheme".
 
 ## Request Priority
 
@@ -386,7 +394,7 @@ If the capacity of a resource is constant, which is very common, the mean occupa
     
 When the capacity changes over time, it is recommended to use:
     
-    occupancy = r.claimedQuanityMonitor.statistics().mean / r.capacityMonitor.statistics().mean()
+    occupancy = r.claimedTimeline.statistics().mean / r.capacityTimeline.statistics().mean()
     
 to obtain the mean occupancy.
 
@@ -397,14 +405,15 @@ Note that the occupancy is set to 0 if the capacity of the resource is <= 0.
 <!--https://r-simmer.org/reference/select.html-->
 <!--Equivalent of simmer::select (See Ucar2019,p12) with multiple select policies-->
 
-There is a special mechanism to select resources dynamically. With `selectResource()` a resource can be  selected from a list of resources using a policy. There are several policies provided:
+There is a special mechanism to select resources dynamically. With `selectResource()` a resource can be  selected from a list of resources using a policy. There are several policies provided via `ResourceSelectionPolicy`:
 
-* `SHORTEST_QUEUE`: The resource with the shortest queue, i.e. the least busy resource is selected.
-* `ROUND_ROBIN`: Resources will be selected in a cyclical order.
-* `FIRST_AVAILABLE`: The first available resource is selected.
-* `RANDOM`: A resource is randomly selected.
+* `ShortestQueue`: The resource with the shortest queue, i.e. the least busy resource is selected.
+* `RoundRobin`: Resources will be selected in a cyclical order.
+* `FirstAvailable`: The first available resource is selected.
+* `RandomAvailable`: An available resource is randomly selected.
+* `Random`: A resource is randomly selected.
 
-The `*_AVAILABLE` policies check for resource availability (i.e. whether the current capacity is sufficient to honor the requested quantity (defaulting to `1`). Resources that do not meet this requirement will not be considered for selection. When using these policies, an error will be raised if all resources are unavailable.
+The `*Available` policies check for resource availability i.e. whether the current capacity is sufficient to honor the requested quantity (defaulting to `1`). Resources that do not meet this requirement will not be considered for selection. When using these policies, an error will be raised if all resources are unavailable.
 
 !!! warning
     With `selectResource`, a resource will be only selected. It won't actually [request](component.md#request) it.
@@ -446,7 +455,7 @@ val tank = DepletableResource(capacity = 10, initialLevel = 3)
 ```
 We can declare its maximum capacity and its initial fill level. The latter is optional and defaults to the capacity of the resource.
 
-In addition to the `Resource` attributs, depletable resources have the following attributes to streamline model building
+In addition to the `Resource` attributes, depletable resources have the following attributes to streamline model building
 
 * `level` - Indicates the current level of the resource
 * `isDepleted` - Indicates if depletable resource is depleted (level==0)
