@@ -16,6 +16,8 @@ honor policy notes
 
 **TODO** explore kon for better multi-platform abilities
 
+**TODO** consider using processcontext across the api 
+
 ## v0.8
 
 **TODO** log output is misleading

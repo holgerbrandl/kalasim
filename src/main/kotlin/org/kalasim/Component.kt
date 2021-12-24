@@ -1580,6 +1580,7 @@ infix fun Resource.withPriority(priority: Int) = ResourceRequest(this, priority 
 infix fun Resource.withPriority(priority: Priority) = ResourceRequest(this, priority = priority)
 
 infix fun ResourceRequest.andPriority(priority: Priority?) = ResourceRequest(this.resource, this.quantity, priority)
+infix fun ResourceRequest.andPriority(priority: Int) = andPriority(Priority(priority))
 
 data class RequestScopeContext(val resource: Resource?, val requestingSince: TickTime)
 

@@ -87,7 +87,6 @@ open class DepletableResource(
         get() = level == 0.0
 
 
-
 //    val levelTimeline = MetricTimeline("Level of ${this.name}", initialValue = availableQuantity, koin = koin)
 //
 //    override fun updatedDerivedMetrics() {
@@ -104,8 +103,6 @@ open class DepletableResource(
     }
 
 
-
-
     override fun canComponentHonorQuantity(component: Component, quantity: Double) = when(honorPolicy) {
         RequestHonorPolicy.RANDOM, RequestHonorPolicy.RelaxedFCFS, is RequestHonorPolicy.WeightedFCFS -> {
             canHonorQuantity(quantity)
@@ -113,7 +110,10 @@ open class DepletableResource(
         RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS -> {
             // note: SQF looks the same as StrictFCFS, but the queue comparator is different
 //            (quantity < 0 || requesters.q.peek().component == component) && canHonorQuantity(quantity)
-            (quantity < 0 || (requesters.q as PriorityQueue).sortedIterator().filter { it.component.requests[this]!! >0 }.first().component == component) && canHonorQuantity(quantity)
+            (quantity < 0 || (requesters.q as PriorityQueue).sortedIterator()
+                .filter { it.component.requests[this]!! > 0 }.first().component == component) && canHonorQuantity(
+                quantity
+            )
         }
     }
 }
@@ -126,7 +126,10 @@ class SQFComparator(val resource: Resource) : Comparator<CQElement<Component>> {
 }
 
 class RandomComparator(val random: Random) : Comparator<CQElement<Component>> {
-    override fun compare(o1: CQElement<Component>, o2: CQElement<Component>): Int = random.nextInt()
+    override fun compare(o1: CQElement<Component>, o2: CQElement<Component>): Int = compareValuesBy(o1, o2,
+        { it.priority?.value?.times(-1) ?: 0 },
+        { random.nextInt() }
+    )
 }
 
 /**
@@ -266,58 +269,59 @@ open class Resource(
     }
 
     internal fun tryRequest() {
-            when(honorPolicy) {
-                RequestHonorPolicy.RelaxedFCFS -> {
-                    // Note: This is an insanely expensive operation, as we need to to build another sorted copy of the requesters queue
-                    (requesters.q as PriorityQueue).sortedIterator()
-                        .filter{
-                            // needed to avoid recursion errors when this iterator contains no longer valid request objects
-                            // without 'org.kalasim.test.DepletableHonorPolicyTest.it should allow using a relaxed FCFS' will fail
-                            it.component.requests.containsKey(this) }
-                        .filter {
+        when(honorPolicy) {
+            RequestHonorPolicy.RelaxedFCFS -> {
+                // Note: This is an insanely expensive operation, as we need to to build another sorted copy of the requesters queue
+                (requesters.q as PriorityQueue).sortedIterator()
+                    .filter {
+                        // needed to avoid recursion errors when this iterator contains no longer valid request objects
+                        // without 'org.kalasim.test.DepletableHonorPolicyTest.it should allow using a relaxed FCFS' will fail
+                        it.component.requests.containsKey(this)
+                    }
+                    .filter {
 //                            require(it.component.requests.containsKey(this)){ "invalid requester queue state"}
-                            canHonorQuantity(it.component.requests[this]!!)
-                        }
-                        .takeWhile { it.component.tryRequest() }
-                        .count() // actually trigger otherwise lazy sequence
-                }
-                RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS, RequestHonorPolicy.RANDOM -> {
-                    // original port from salabim
-                    while(requesters.q.isNotEmpty()) {
-                        //try honor as many requests as possible
-                        if(minq > (capacity - claimed + EPS)) {
-                            break
-                        }
+                        canHonorQuantity(it.component.requests[this]!!)
+                    }
+                    .takeWhile { it.component.tryRequest() }
+                    .count() // actually trigger otherwise lazy sequence
+            }
+            RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS, RequestHonorPolicy.RANDOM -> {
+                // original port from salabim
+                while(requesters.q.isNotEmpty()) {
+                    //try honor as many requests as possible
+                    if(minq > (capacity - claimed + EPS)) {
+                        break
+                    }
 
-                        if(!requesters.q.peek().component.tryRequest()) {
-                            // if we can not honor this request, we must stop here (to respect request priorities)
-                            break
-                        }
+                    if(!requesters.q.peek().component.tryRequest()) {
+                        // if we can not honor this request, we must stop here (to respect request priorities)
+                        break
                     }
                 }
-                is RequestHonorPolicy.WeightedFCFS -> {
-                    // Note: This is an insanely expensive operation, as we need to resort the requesters queue
-                    val sortedWith = requesters.q.toList()
-                        .sortedWith { o1, o2 ->
-                            compareValuesBy(
-                                o1, o2,
-                                { it.priority?.value?.times(-1) ?: 0 },
-                                {
-                                    val requestQuantity = it.component.requests[this]!!
-                                    val timeSinceRequest = now - it.enterTime
-
-                                    -1 * honorPolicy.computeRequestWeight(timeSinceRequest, requestQuantity)
-                                },
-//                                { it.enterTime }
-                            )
-                        }
-                    @Suppress("ConvertCallChainIntoSequence")
-                    sortedWith
-                        .filter { canHonorQuantity(it.component.requests[this]!!) }
-                        .takeWhile { it.component.tryRequest() }
-                        .count() // actually trigger otherwise lazy sequence
-                }
             }
+            is RequestHonorPolicy.WeightedFCFS -> {
+                // Note: This is an insanely expensive operation, as we need to resort the requesters queue
+                val sortedWith = requesters.q.toList()
+                    .sortedWith { o1, o2 ->
+                        compareValuesBy(
+                            o1, o2,
+                            { it.priority?.value?.times(-1) ?: 0 },
+                            {
+                                val requestQuantity = it.component.requests[this]!!
+                                val timeSinceRequest = now - it.enterTime
+
+                                -1 * honorPolicy.computeRequestWeight(timeSinceRequest, requestQuantity)
+                            },
+//                                { it.enterTime }
+                        )
+                    }
+                @Suppress("ConvertCallChainIntoSequence")
+                sortedWith
+                    .filter { canHonorQuantity(it.component.requests[this]!!) }
+                    .takeWhile { it.component.tryRequest() }
+                    .count() // actually trigger otherwise lazy sequence
+            }
+        }
     }
 
     internal open fun canComponentHonorQuantity(component: Component, quantity: Double) = when(honorPolicy) {
