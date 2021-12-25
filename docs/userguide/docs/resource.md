@@ -138,22 +138,28 @@ request(clerks, quantity = -3) // will throw exception!
 
 When requesting, it may (and will) happen that a resource is currently fully claimed, and the request can not be honored right away. Requests may even queue up, if a resource is under more demand than it can serve. To resolve competing requests in an orderly fashion, kalasim supports different _honor policies_. An honor policy defines the order in which competing requests are honored.
 
+Honor policies are applied to both regular and also [depletable resources](#depletable-resources).
+
+
+Policy implementations extend `org.kalasim.RequestHonorPolicy`.The following policies are supported:
+
 * **Strict first come, first serve** (`StrictFCFS`, default). This policy will honor request in order of appearance. So, it actually will wait to honor "big" requests, even if smaller requests that could be honored already are queueing up already. This is the default policy in kalasim, as we assume this being the most intuitive behavior in most situations.
-* **Relaxed first come, first serve** (`RelaxedFCFS`): This policy will honor claimable requests first. It will honor small requests even if larger requests are already waiting longer in line. FCSS is used as secondary order scheme in situations where which multiple concurrent requests are present.
-* **Smallest Quantity First** (`SQF`) This policy tries to maximize "customer" throughput. Also this poliy will fall back to an FCFS to resolve ambiguities. It will maximize the total number of requests being honored, whereas large requests may need to wait for a long time.
+* **Relaxed first come, first serve** (`RelaxedFCFS`): This policy will honor claimable requests first. It will honor small requests even if larger requests are already waiting longer in line. FCFS is used as secondary order scheme in situations where which multiple concurrent requests are present.
+* **Smallest Quantity First** (`SQF`) This policy tries to maximize "customer" throughput. Also this policy will fall back to an FCFS to resolve ambiguities. It will maximize the total number of requests being honored, whereas large requests may need to wait for a long time. For depletable resources, just imagine a resource that is constantly low on supply. When new supply becomes available, the resource could serve as many requesters as possible. Also, for regular resources this concept applies, e.g. in customer support, where customers require one or multiple mechanics, and the company decides to serve the least staffing-intense requests first.
 * **Weighted FCFS** (`WeightedFCSC`): Here the user can supply a weight `α` that is used to compute an ordering based on `α * time_since_insert / quantity`. This will progressively weigh the time since the request against request quantity. The policy will prefer smaller requests, but will ensure that also larger request are finally be honored.
 * **Random Order** (`Random`): This honor policy will honor requests in a random order. Sometimes real world processes lack a structured policy to resolve concurrent demand, so it may help understanding the current situation, before working out a better planning strategy.
 
+As of now, the user can not provide custom `RequestHonorPolicy` implementations. To realize more sophisticated resource request regimes, she must implement their business specific request mechanism separately.
+
+
 !!!important
 
-    [priorities](#request-priority) always take precedence over the honor policy set for a resource. If a user sets a request priority, it will be respected first. That is, it does always try honoring by priority first, and only once all requests at the highest priority level are honored, it will climb down the ladder. Within a priority-level the selected honor policy is applied.
+    [Priorities](#request-priority) always take precedence over the honor policy set for a resource. If a user sets a request priority, it will be respected first. That is, it does always try honoring by priority first, and only once all requests at the highest priority level are honored, it will climb down the ladder. Within a priority-level the selected honor policy is applied.
 
 !!!note 
     
-    A SQF policy could also be realized by using the negated quantity as request priority. However, for sake of
-clarity is recommended to use priorities to actually reflect business/domain needs, and use the provided SQL as baseline policy.
+    A SQF policy could also be realized by using the negated quantity as request priority. However, for sake of clarity is recommended to use priorities to actually reflect business/domain needs, and use the provided SQL as baseline policy.
 
-Honor policies are applied to both regular and also [depletable resources](#depletable-resources). For depletable resources, jJust imagine a resource that is constantly low on supply. When new supply becomes available, the resource could serve as many requesters as possible. Also, for regular resources this concept applies, e.g. in customer support, where customers require one or multiple mechanics, and the company decides to serve the least staffing-intense requests first.
 
 ## Request Priority
 
@@ -166,13 +172,13 @@ request(clerks, priority = IMPORTANT)
 request(clerks withPriority IMPORTANT) 
 ```
 
-kalasim will order requests on a resource by priority.
+Irrespective of the used [honor policy](#request-honor-policies), kalasim will always honor requests on a resource sorted by priority.
 
-There are different predefined priorities which correspond the following sort-levels
+There are different predefined priorities which correspond to the following sort-levels
 
 * `LOWEST` (-20)
 * `LOW` (-10)
-* `NORMAL` (0)
+* `NORMAL` (0, Default)
 * `IMPORTANT` (10)
 * `CRITICAL` (20)
 
@@ -208,7 +214,7 @@ Typical use cases are staff models, where certain colleagues have similar but no
 
 ## Resource Selection
 
-To request alternative resources, the user can set the parameter `request(r1, r2 withQuantity 3, oneOf=true)`, which will would result in requesting 1 quantity from `r1` **OR** 2 quantities from `r2`. With `oneOf=true`, we express to the simulation engine, that fulfilling one claim over a range of equally suitable resources is sufficient.
+To request alternative resources, the user can set the parameter `request(r1, r2 withQuantity 3, oneOf=true)`, which will would result in requesting 1 quantity from `r1` **OR** 3 quantities from `r2`. With `oneOf=true`, we express to the simulation engine, that fulfilling one claim only is sufficient.
 
 
 <!--https://r-simmer.org/reference/select.html-->
@@ -284,7 +290,7 @@ Technically, the `timeline` is a `List<ResourceTimelineSegment>` that covers the
 Example (from [example notebook](https://github.com/holgerbrandl/kalasim/blob/master/simulations/notebooks/ResourceTimeline.ipynb)) that illustrates how the `timeline` can be used to visualize some aspects of the resource utilization over time.
 
 ```kotlin
-r.timelime
+r.timeline
     .filter { listOf(ResourceMetric.Capacity, ResourceMetric.Claimed).contains(it.metric) }
     .plot(x = { start }, y = { value }, color = { metric })
     .geomStep()
