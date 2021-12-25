@@ -6,27 +6,31 @@ import org.kalasim.State
 import org.kalasim.createSimulation
 import org.kalasim.plot.kravis.display
 
-// wait for a terminal to accumulate enough goods before starting shipment. This implementation essentially does not request until the resource level is sufficient for the request
+// Wait for a terminal to accumulate enough goods before starting shipment.
+//
+// This implementation essentially does not request until the resource level is sufficient for the request. This is just kept for educational reasons, although it is not wrong as detailed out below in the comment
 fun main() {
     createSimulation {
 
         val terminal = object : Component() {
-            val tankLevel = DepletableResource(capacity = 10)
+            val tank = DepletableResource(capacity = 10)
             val tankState = State(false)
 
             override fun process() = sequence {
                 while (true) {
                     hold(1)
-                    tankLevel.capacity += 2
-                    if (tankLevel.capacity > 10) {
+                    put(tank, 2)
+                    if (tank.level > 10) {
                         tankState.value = true
                     }
                 }
             }
         }
 
-        val ship = object : Component() {
+        object : Component() {
             override fun process() = sequence {
+                // FIXME: Actually, using wait(terminal.tankState) is a false friend here, as multiple ships would be triggered if the terminal has sufficient fuel, even if conceptually not all requests could be honored. So the correct solution is to use ShipyardRequest.kt
+
                 wait(terminal.tankState, true)
                 hold(30, "shipping goods")
             }
@@ -34,6 +38,6 @@ fun main() {
 
         run(50)
 
-        terminal.tankLevel.availabilityTimeline.display()
+        terminal.tank.availabilityTimeline.display()
     }
 }

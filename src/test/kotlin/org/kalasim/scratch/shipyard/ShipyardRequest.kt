@@ -6,7 +6,9 @@ import org.kalasim.createSimulation
 import org.kalasim.plot.kravis.display
 import org.kalasim.withQuantity
 
-// wait for a terminal to accumulate enough goods before starting shipment. In contrast to ResourcfulComponent.kt, we here do ot rely on a state for interation, but use built-in request capabilities to wait until enough material has accumulated.
+// Wait for a terminal to accumulate enough goods before starting shipment.
+//
+// In contrast to ShipyardState.kt, we here do ot rely on a state for interation, but use built-in request capabilities and a depletable resource to wait until enough cargo has accumulated.
 fun main() {
     createSimulation(true) {
 
@@ -14,9 +16,9 @@ fun main() {
             val tank = DepletableResource(capacity = 100, initialLevel = 10)
 
             override fun process() = sequence {
-                while (true) {
+                while(true) {
                     hold(1)
-                    put(tank withQuantity 2)
+                    put(tank, 2)
                     log("tankLevel is ${tank.availableQuantity}")
                 }
             }
