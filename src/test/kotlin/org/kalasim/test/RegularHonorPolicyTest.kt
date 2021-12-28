@@ -109,7 +109,7 @@ class RegularHonorPolicyTest {
 
         takes.map {
             it.requester.name.replace("Customer.", "").toInt()
-        } shouldBe listOf(4, 3, 2, 5, 1, 6)  // note: this was fixated after the first run
+        } shouldBe listOf(3, 4, 2, 5, 1, 6)  // note: this was fixated after the first run
     }
 
     @Test
