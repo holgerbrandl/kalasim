@@ -1,8 +1,10 @@
-package org.kalasim.examples
+@file:Suppress("PropertyName", "PrivatePropertyName")
+
+package org.kalasim.scratch
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
-import org.kalasim.misc.printThis
+import org.kalasim.examples.GasStation
 import org.kalasim.monitors.printHistogram
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -50,29 +52,30 @@ class Car(
     val tankSize: Double = FUEL_TANK_SIZE,
 ) : Component() {
 
-    // Sample an initial level
+    // sample an initial level
     val fuelTankLevel = FUEL_TANK_LEVEL.sample()
 
-    // Resolve dependencies
+    // dependencies
     val fuelPump = get<Resource>()
-    val stationTank: DepletableResource by inject(qualifier = named(FUEL_PUMP))
+//    val stationTank: DepletableResource by inject(qualifier = named(FUEL_PUMP))
+    val stationTank = get<DepletableResource>()
 
-    override fun process() = sequence {
+   override fun process() = sequence<Component> {
+       // find a free pump
+       request(fuelPump) {
 
-        request(fuelPump, description = "waiting for free pump") {
+           val litersRequired = tankSize - fuelTankLevel
 
-            val litersRequired = tankSize - fuelTankLevel
+           // Order a new Tank if the fuel-pump runs of out fuel
+           if((fuelPump.availableQuantity - litersRequired) / fuelPump.capacity * 100 < THRESHOLD) {
+               log("running out of fuel at $gasStation. Ordering new fuel truck...")
+               TankTruck()
+           }
 
-            // Order a new Tank if the fuel-pump runs of out fuel
-            if((fuelPump.availableQuantity - litersRequired) / fuelPump.capacity * 100 < THRESHOLD) {
-                log("Running out of fuel. Ordering new fuel truck...")
-                TankTruck()
-            }
-
-            take(stationTank, quantity = litersRequired)
-            hold(litersRequired / REFUELING_SPEED)
-        }
-    }
+           take(stationTank, quantity = litersRequired)
+           hold(litersRequired / REFUELING_SPEED)
+       }
+   }
 }
 
 
@@ -83,34 +86,35 @@ class GasStation : Environment() {
 
     init {
         // spin up sub-process that will produce cars
-        ComponentGenerator(iat = T_INTER) { Car() }
+        ComponentGenerator(iat = T_INTER) { Car(get()) }
 
         // todo test this
 //        dependency { this } // simplify dependency injection
     }
 }
 
-fun main() {
+val gasStation = GasStation()
 
-    val gasStation = GasStation()
+gasStation.run(SIM_TIME)
 
-    gasStation.run(SIM_TIME)
+// use dependency lookup to get tank
+//val tank = sim.get<DepletableResource>(qualifier = named(FUEL_PUMP))
 
-    // use dependency lookup to get tank
-    //val tank = sim.get<DepletableResource>(qualifier = named(FUEL_PUMP))
+// or accessor
+val tank = gasStation.tank
 
-    // or accessor
-    val tank = gasStation.tank
+// print some stats
+tank.capacityTimeline.printHistogram()
+tank.claimedTimeline.printHistogram()
+tank.availabilityTimeline.printHistogram()
 
-    // print some stats
-    tank.capacityTimeline.printHistogram()
-    tank.claimedTimeline.printHistogram()
-    tank.availabilityTimeline.printHistogram()
+//                capacityTimeline.display()
+//                claimedQuantityMonitor.display()
+//                availableQuantityMonitor.display()
 
-//    capacityTimeline.display()
-//    claimedQuantityMonitor.display()
-//    availableQuantityMonitor.display()
 
-    gasStation.fuelPumps.requesters.queueLengthTimeline.printThis()
-    gasStation.fuelPumps.requesters.lengthOfStayTimeline.printThis()
-}
+//https://youtrack.jetbrains.com/issue/KT-50566
+gasStation.fuelPumps.requesters.queueLengthTimeline.let{ println(it)}
+gasStation.fuelPumps.requesters.lengthOfStayTimeline.let{ println(it)}
+
+

@@ -14,7 +14,7 @@ Vehicles arriving at the gas station first request a fuel pump from the station.
 The gas stations fuel level is regularly monitored by gas station control. When the level drops below a certain threshold, a tank truck is called to refuel the gas station itself.
 
 ```kotlin
-//{!GasStation.kt!}
+//{!GasStation.kts!}
 ```
 
 Here,  we use both lazy injection with `inject<T>()` and instance retrieval with `get<T>()`. For details see [koin reference](https://doc.insert-koin.io/#/koin-core/injection-parameters)

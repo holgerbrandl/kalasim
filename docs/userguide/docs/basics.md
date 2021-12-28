@@ -125,6 +125,9 @@ Kalasim is building on top of [koin](https://insert-koin.io/) to inject dependen
 class Car : Component() {
 
     val gasStation by inject<GasStation>()
+    
+    // we can also distinguish different resources of the same type with a qualifier
+//    val gasStation2 : GasStation by inject(qualifier = named("gas_station_2"))
 
     override fun process() = sequence {
         request(gasStation) {
@@ -139,6 +142,9 @@ class Car : Component() {
 createSimulation{
     dependency { TrafficLight() }
     dependency { GasStation() }
+
+    // declare another gas station and specifiy 
+    dependency(qualifier = named(FUEL_PUMP)) {  }
     
     Car()
 }
@@ -157,6 +163,30 @@ Environment().apply{
 ```
 
 In the latter case, the context reference is provided explicitly. This is usually not needed nor recommended.
+
+Instead of sub-classing, we can also use qualifiers to refere to dependencies of the same type
+
+```kotlin
+class Car : Component() {
+
+    val gasStation1 : GasStation by inject(qualifier = named("gas_station_1"))
+    val gasStation2 : GasStation by inject(qualifier = named("gas_station_2"))
+
+    override fun process() = sequence {
+        // pick a random gas-station
+        request(gasStation, gasStation, oneOf = true) {
+            hold(2, "refill")
+        }
+    }
+}
+
+createSimulation{
+    dependency(qualifier = named("gas_station_1")) {  GasStation() }
+    dependency(qualifier = named("gas_station_2")) {  GasStation() }
+    
+    Car()
+}
+```
 
 ### Threadsafe Registry
 

@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.6.10"
+St//    kotlin("jvm") version "1.5.31"
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
