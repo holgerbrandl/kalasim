@@ -34,6 +34,8 @@ fun RealDistribution.clip(lower: Number = 0, upper: Number = Double.MAX_VALUE) =
 
 
 fun SimulationEntity.discreteUniform(lower: Int, upper: Int) = env.discreteUniform(lower, upper)
+fun SimulationEntity.discreteUniform(range: IntRange) = env.discreteUniform(range.first, range.last)
+fun Environment.discreteUniform(range: IntRange) = discreteUniform(range.first, range.last)
 fun Environment.discreteUniform(lower: Int, upper: Int) = UniformIntegerDistribution(rg, lower, upper)
 
 
