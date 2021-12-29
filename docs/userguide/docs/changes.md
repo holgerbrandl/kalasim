@@ -23,6 +23,10 @@ Minor enhancements
 * Reworked [distribution support API](basics.md#randomness--distributions) for better API experience to enable controlled randomization in process models
 * Removed `Resource.release()` because of incomplete and unclear semantics
 
+Documentation
+* [#38](https://github.com/holgerbrandl/kalasim/issues/38) Rewritten gas-station example to illustrate [depletable resource](resource.md#depletable-resources) usage
+* Added new datalore example workbook: [Extended Traffic](https://datalore.jetbrains.com/view/notebook/k1y5ufCMLdAWZOu1ztU2fV)
+
 
 ## v0.7 
 

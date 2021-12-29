@@ -10,7 +10,7 @@ To streamline the learning experience, we've organized our learning process sugg
 # I have experience with simulation
 
 1. Start by doing a crash course to learn some [kotlin programming basics](https://hyperskill.org/tracks/18) 
-2. Run the provided simulation examples in [datalore](https://datalore.jetbrains.com/notebook/WdAb9Z324er3ylG3e8nEbp/7w4nof8rUl4WLqyNblOovn/) in your browser
+2. Run the provided simulation examples [Simple Traffic](https://datalore.jetbrains.com/notebook/WdAb9Z324er3ylG3e8nEbp/7w4nof8rUl4WLqyNblOovn/) and [Extended Traffic](https://datalore.jetbrains.com/view/notebook/k1y5ufCMLdAWZOu1ztU2fV) in your browser (powered by [datalore](https://datalore.jetbrains.com/))
 3. Pick your favorite [example](examples.md) and try converting it into a [datalore](https://datalore.jetbrains.com/) notebook
 4. Try visualizing some [metrics](monitors.md) using the built-in [visualization](visualization.md) methods
 

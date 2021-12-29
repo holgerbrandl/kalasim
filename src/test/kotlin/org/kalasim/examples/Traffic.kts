@@ -2,44 +2,45 @@
 import org.kalasim.*
 import org.koin.core.component.inject
 
-class TrafficLight : State<String>("red")
+enum class TrafficLightState { RED, GREEN }
 
+/** A traffic light with 2 states. */
+class TrafficLight : State<TrafficLightState>(TrafficLightState.RED) {
+
+    fun toggleState() {
+        when(value) {
+            TrafficLightState.RED -> TrafficLightState.GREEN
+            TrafficLightState.GREEN -> TrafficLightState.RED
+        }
+    }
+}
+
+
+/** A simple controller that will toggle the state of the traffic-light */
+class TrafficLightController(val trafficLight: TrafficLight) : Component() {
+
+    override fun repeatedProcess() = sequence {
+        hold(6)
+        trafficLight.toggleState()
+    }
+}
+
+/** A gas station, where cars will stop for refill. */
 class GasStation(numPumps: Int = 6) : Resource(capacity = numPumps)
 
+/** A car with a process definition detailing out its way to the gas-station via a crossing. */
 class Car(val trafficLight: TrafficLight) : Component() {
 
     val gasStation by inject<GasStation>()
 
     override fun process() = sequence {
-        // wait until the traffic light is green
-        wait(trafficLight, "green")
+        // Wait until the traffic light is green
+        wait(trafficLight, TrafficLightState.GREEN)
 
-        // request a slot in the gas-station
-        request(gasStation)
-
-        // refill
-        hold(5)
-
-        // release pump
-        release(gasStation)
-
-        // change state of car to DATA
-        passivate()
-    }
-}
-
-class Car2 : Component() {
-
-    val gasStation by inject<GasStation>()
-
-    override fun process() = sequence {
-        // wait until the traffic light is green
+        // Request a slot in the gas-station
         request(gasStation) {
-            hold(2, "refill")
+            hold(5, description = "refilling")
         }
-
-        val trafficLight = get<TrafficLight>()
-        wait(trafficLight, "green")
     }
 }
 
@@ -50,20 +51,25 @@ createSimulation(true) {
     // Also add a resource with a limited capacity
     dependency { GasStation(2) }
 
-    val car1 = Car(get())
-    val car2 = Car(get())
-    val car3 = Car(get())
+    // Setup a traffic light controller to toggle the light
+    TrafficLightController(get())
 
-    // run for 10 ticks
+    // Setup a car generator with an exponentially distributed arrival time
+    ComponentGenerator(exponential(7)){ Car(get())}
+
+    // enable component tracking for later analytics
+    val cg = componentCollector()
+
+    // Run for 30 ticks
     run(10)
 
-    // toggle the traffic light
-    get<TrafficLight>().value = "green"
+    // Toggle the traffic light manually
+    get<TrafficLight>().value = TrafficLightState.GREEN
 
-    // run for another 10 ticks
+    // Run for another 10 ticks
     run(10)
 
-    // assess the state of the simulation entities
-    car2.statusTimeline.printHistogram()
+    // Assess the state of the simulation entities
+    cg.filterIsInstance<Car>().first().statusTimeline.printHistogram()
     get<GasStation>().printStatistics()
 }

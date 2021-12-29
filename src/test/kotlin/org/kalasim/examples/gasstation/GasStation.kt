@@ -27,6 +27,7 @@ val TANK_TRUCK_TIME = 300.0  // Seconds it takes the tank truck to arrive
 val INTER_ARRIVAL_TIME_RANGE = 10..100  // Create a car every [min, max] seconds
 val SIM_TIME = 20000.0  // Simulation time in seconds
 
+// todo review status of https://youtrack.jetbrains.com/issue/KT-50586
 
 private val FUEL_TANK = "fuel_pump"
 
