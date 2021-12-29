@@ -2,10 +2,9 @@
 
 package org.kalasim.scratch
 
-import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
-import org.kalasim.examples.GasStation
 import org.kalasim.monitors.printHistogram
+import org.kalasim.plot.kravis.display
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
@@ -17,24 +16,24 @@ import org.koin.core.qualifier.named
  * depleted, the car has to wait for the tank truck to arrive.
  */
 
+
 // based on SimPy example model
 val GAS_STATION_SIZE = 200.0  // liters
 val THRESHOLD = 25.0  // Threshold for calling the tank truck (in %)
 val FUEL_TANK_SIZE = 50.0  // liters
-val FUEL_TANK_LEVEL = UniformRealDistribution(5.0, 25.0) // Min/max levels of fuel tanks (in liters)
+val FUEL_TANK_LEVEL_RANGE = 5.. 25
 val REFUELING_SPEED = 2.0  // liters / second
 val TANK_TRUCK_TIME = 300.0  // Seconds it takes the tank truck to arrive
-val T_INTER = UniformRealDistribution(10.0, 100.0)  // Create a car every [min, max] seconds
-
-//    val SIM_TIME = 200000.0  // Original Simulation time in seconds
+val INTER_ARRIVAL_TIME_RANGE = 10..100  // Create a car every [min, max] seconds
 val SIM_TIME = 20000.0  // Simulation time in seconds
 
+private val FUEL_TANK = "fuel_pump"
 
-private val FUEL_PUMP = "fuel_pump"
-
-
+/** Arrives at the gas station after a certain delay and refuels it.*/
 class TankTruck : Component() {
-    val fuelPump: DepletableResource by inject(qualifier = named(FUEL_PUMP))
+    val fuelPump: DepletableResource by inject(qualifier = named(FUEL_TANK))
+
+    val unloaded = State(false)
 
     override fun process() = sequence {
         hold(TANK_TRUCK_TIME)
@@ -44,55 +43,64 @@ class TankTruck : Component() {
 
         // same effect, but different approach is to refill the missing quantity
         put(fuelPump, quantity = fuelPump.capacity - fuelPump.level)
+        unloaded.value = true
     }
 }
 
-// we can either inject by constructor...
+/** A car arrives at the gas station for refueling.
+ *
+ * It requests one of the gas station's fuel pumps and tries to get the
+ * desired amount of gas from it. If the stations reservoir is
+ * depleted, the car has to wait for the tank truck to arrive.
+ */
 class Car(
     val tankSize: Double = FUEL_TANK_SIZE,
 ) : Component() {
 
-    // sample an initial level
-    val fuelTankLevel = FUEL_TANK_LEVEL.sample()
+    // Sample an initial level
+    val fuelTankLevel = discreteUniform(FUEL_TANK_LEVEL_RANGE)()
 
-    // dependencies
+    // Resolve dependencies
     val fuelPump = get<Resource>()
-//    val stationTank: DepletableResource by inject(qualifier = named(FUEL_PUMP))
-    val stationTank = get<DepletableResource>()
+    val stationTank: DepletableResource by inject(qualifier = named(FUEL_TANK))
 
-   override fun process() = sequence<Component> {
-       // find a free pump
-       request(fuelPump) {
+    override fun process() = sequence {
+        request(fuelPump, description = "waiting for free pump") {
+            val litersRequired = tankSize - fuelTankLevel
 
-           val litersRequired = tankSize - fuelTankLevel
-
-           // Order a new Tank if the fuel-pump runs of out fuel
-           if((fuelPump.availableQuantity - litersRequired) / fuelPump.capacity * 100 < THRESHOLD) {
-               log("running out of fuel at $gasStation. Ordering new fuel truck...")
-               TankTruck()
-           }
-
-           take(stationTank, quantity = litersRequired)
-           hold(litersRequired / REFUELING_SPEED)
-       }
-   }
+            take(stationTank, quantity = litersRequired)
+            hold(litersRequired / REFUELING_SPEED)
+            println("finished $name")
+        }
+    }
 }
 
 
-class GasStation : Environment() {
-    val tank = dependency(qualifier = named(FUEL_PUMP)) { DepletableResource(FUEL_PUMP, GAS_STATION_SIZE) }
+class GasStation : Environment(true) {
+    val tank = dependency(qualifier = named(FUEL_TANK)) { DepletableResource(FUEL_TANK,
+        GAS_STATION_SIZE
+    ) }
 
     val fuelPumps = dependency { Resource(capacity = 2) }
 
     init {
-        // spin up sub-process that will produce cars
-        ComponentGenerator(iat = T_INTER) { Car(get()) }
+        // Generate new cars that arrive at the gas station.
+        ComponentGenerator(iat = with(INTER_ARRIVAL_TIME_RANGE) { uniform(first, last) }) { Car() }
 
-        // todo test this
-//        dependency { this } // simplify dependency injection
+        //Periodically check the level of the *fuel_pump* and call the tank truck if the level falls below a threshold.
+        object : Component("gas_station_control") {
+            override fun repeatedProcess() = sequence {
+                // Order a new truck if the fuel-pump runs of out fuel
+                if(tank.level / tank.capacity * 100 < THRESHOLD) {
+                    log("Running out of fuel (remaining ${tank.level}). Ordering new fuel truck...")
+                    wait(TankTruck().unloaded, true)
+                }
+
+                hold(10) // check every 10 seconds
+            }
+        }
     }
 }
-
 val gasStation = GasStation()
 
 gasStation.run(SIM_TIME)
@@ -104,17 +112,18 @@ gasStation.run(SIM_TIME)
 val tank = gasStation.tank
 
 // print some stats
-tank.capacityTimeline.printHistogram()
-tank.claimedTimeline.printHistogram()
-tank.availabilityTimeline.printHistogram()
+tank.levelTimeline.printHistogram()
 
-//                capacityTimeline.display()
-//                claimedQuantityMonitor.display()
-//                availableQuantityMonitor.display()
+tank.levelTimeline.display().show()
+//    claimedQuantityMonitor.display()
+//    availableQuantityMonitor.display()
+
+gasStation.fuelPumps.claimedTimeline.printHistogram()
 
 
 //https://youtrack.jetbrains.com/issue/KT-50566
 gasStation.fuelPumps.requesters.queueLengthTimeline.let{ println(it)}
 gasStation.fuelPumps.requesters.lengthOfStayTimeline.let{ println(it)}
+
 
 
