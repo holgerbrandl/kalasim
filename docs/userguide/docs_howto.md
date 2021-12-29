@@ -3,14 +3,19 @@
 Kalasim documentation is build with [mkdocs](https://www.mkdocs.org/).
 
 ```bash
+#pip install mkdocs
 #pip install mkdocs-material
 cd  /c/brandl_data/projects/scheduling/kalasim/docs/userguide
 
 #pip install markdown-include
 #pip install pymdown-extensions # not needed  
 
+# workaround for  https://github.com/mkdocs/mkdocs/issues/2469
+#pip install -Iv importlib_metadata==4.5.0
+
 #mkdocs new .
 
+mkdocs serve
 mkdocs serve
 
 mkdocs build
@@ -62,13 +67,17 @@ cd ${KALASIM_HOME}/docs/userguide/docs/examples
 
 ## build markdown from notebook
 
-## bridge-game
-jupyter nbconvert --kernel=kotlin --to markdown  bridge_game.ipynb  --out  bridge_game.md
+## Bridge-Game
+jupyter nbconvert --kernel=kotlin --to markdown bridge_game.ipynb  --out  bridge_game.md
 
 
 ## ATM
 jupyter nbconvert --kernel=kotlin --execute  atm_queue.ipynb  --to notebook --inplace
 jupyter nbconvert --kernel=kotlin --to markdown  atm_queue.ipynb --out  atm_queue.md
+
+## Gasstation
+jupyter nbconvert --kernel=kotlin --to markdown  gas_station.ipynb --out  gas_station.md
+
 
 ```
 

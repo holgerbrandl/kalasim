@@ -3,11 +3,9 @@ package org.kalasim.test
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.doubles.shouldBeGreaterThan
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.*
-import org.kalasim.plot.kravis.display
 
 
 //**TODO**  may we should also test that take works with honorAll?
@@ -22,6 +20,22 @@ class DepletableResourceTests {
             level shouldBe 0
             claimed shouldBe capacity
         }
+    }
+
+    @Test
+    fun `it should process an empty take`() = createTestSimulation(true) {
+        val dr = DepletableResource(capacity = 10, initialLevel = 0)
+
+        object : Component(){
+            override fun process() = sequence {
+                shouldThrow<InvalidRequestQuantity> {
+                    take(dr, 0.0)
+                    println("take succeeded")
+                }
+            }
+        }
+
+        run()
     }
 
     @Test
@@ -208,9 +222,9 @@ class DepletableResourceTests {
 
         object : Component("EarlyProvider") {
             override fun process() = sequence {
-                    // this put will be stalled because there it is currently fully charged
-                    put(resource, 7, description = "bla bla", capacityLimitMode = CapacityLimitMode.SCHEDULE)
-                    normalPutHonored = true
+                // this put will be stalled because there it is currently fully charged
+                put(resource, 7, description = "bla bla", capacityLimitMode = CapacityLimitMode.SCHEDULE)
+                normalPutHonored = true
             }
         }
 

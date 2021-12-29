@@ -31,7 +31,7 @@ class ResourceEvent(
     override fun renderAction() =
         "${
             type.toString().lowercase().titlecaseFirstChar()
-        } ${amount.absoluteValue.roundAny(2)} from '${requester.name}'"
+        } ${amount.absoluteValue.roundAny(2)} from '${resource.name}'"
 
     override fun toJson() = json {
         "time" to time
