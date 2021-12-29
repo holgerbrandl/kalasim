@@ -47,7 +47,7 @@ fun main() {
 
         // with console
         clerks.requesters.queueLengthTimeline.printHistogram()
-        clerks.requesters.lengthOfStayTimeline.printHistogram()
+        clerks.requesters.lengthOfStayStatistics.printHistogram()
 
         // with kravis
 //        clerks.requesters.queueLengthMonitor.display()

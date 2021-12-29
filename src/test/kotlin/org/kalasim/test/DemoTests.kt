@@ -19,7 +19,7 @@ fun main() {
     val mm1Queue = MM1Queue().apply {
         run(100)
         server.claimedTimeline.display().show()
-        server.requesters.lengthOfStayTimeline.display().show()
+        server.requesters.lengthOfStayStatistics.display().show()
     }
 
     mm1Queue.traces.filterIsInstance<InteractionEvent>().asDataFrame().print()

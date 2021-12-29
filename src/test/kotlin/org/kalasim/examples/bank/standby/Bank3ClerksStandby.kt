@@ -44,6 +44,6 @@ fun main() {
     env.get<ComponentQueue<Customer>>().apply {
         printInfo()
         printStats()
-        lengthOfStayTimeline.display()
+        lengthOfStayStatistics.display()
     }
 }

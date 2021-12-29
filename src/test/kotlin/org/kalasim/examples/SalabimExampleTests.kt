@@ -18,6 +18,7 @@ import org.kalasim.examples.bank.oneclerk.Customer
 import org.kalasim.examples.bank.reneging.CustomerGenerator
 import org.kalasim.misc.median
 import org.kalasim.test.captureOutput
+import org.kalasim.test.createTestSimulation
 import org.koin.core.context.stopKoin
 
 
@@ -143,10 +144,10 @@ class SalabimExampleTests {
             val waitingLine: ComponentQueue<org.kalasim.examples.bank.reneging.Customer> =
                 get()
 
-            waitingLine.lengthOfStayTimeline.enabled = false
+            waitingLine.lengthOfStayStatistics.enabled = false
             run(1500.0)
 
-            waitingLine.lengthOfStayTimeline.enabled = true
+            waitingLine.lengthOfStayStatistics.enabled = true
 //            waitingLine.lengthOfStayMonitor.reset()
             run(500.0)
         }
@@ -204,17 +205,20 @@ class SalabimExampleTests {
 
     @Test
     fun `bank with resource clerks should result in correct statistics`() {
-        // same logic as in Bank3ClerksResources.kt
-        val env = configureEnvironment {
-            add { Resource("clerks", capacity = 3) }
-        }.apply {
+
+     val env= createSimulation {
+            // same logic as in Bank3ClerksResources.kt
+            dependency { Resource("clerks", capacity = 3) }
+
             ComponentGenerator(
                 iat = UniformRealDistribution(
                     rg,
                     5.0,
                     15.0
                 )
-            ) { org.kalasim.examples.bank.resources.Customer(get()) }
+            ) {
+                org.kalasim.examples.bank.resources.Customer(get())
+            }
         }.run(5000)
 
         val clerks = env.get<Resource>()

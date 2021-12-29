@@ -249,9 +249,9 @@ fun main() {
                 println(
                     "%5d%5d%15.3f%15.3f".format(
                         it.level,
-                        it.queue.lengthOfStayTimeline.statistics().n,
+                        it.queue.lengthOfStayStatistics.statistics().n,
                         it.queue.queueLengthTimeline.statistics().mean,
-                        it.queue.lengthOfStayTimeline.statistics().mean
+                        it.queue.lengthOfStayStatistics.statistics().mean
                     )
                 )
             }

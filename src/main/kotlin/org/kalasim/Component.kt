@@ -101,8 +101,8 @@ open class Component(
     var componentState: ComponentState = DATA
         internal set(value) {
             field = value
-            statusTimeline.addValue(value)
 
+            statusTimeline.addValue(value)
 //            if (trackingPolicy.logStateChangeEvents) log(stateChangeEvent())
         }
 

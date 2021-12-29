@@ -36,6 +36,10 @@ class ComponentQueue<C>(
 ) : ComponentCollection<C>(name, capacity, koin) {
 
 
+    /** Length of queue timeline. Internally a simple wrapper around `sizeTimeline`.*/
+    val queueLengthTimeline
+        get() = sizeTimeline
+
     override val size: Int
         get() = q.size
 
@@ -53,7 +57,7 @@ class ComponentQueue<C>(
 
         changeListeners.forEach { it.added(component) }
 
-        queueLengthTimeline.addValue(q.size.toDouble())
+        sizeTimeline.addValue(q.size.toDouble())
 
         return added
     }
@@ -93,8 +97,8 @@ class ComponentQueue<C>(
     private fun updateExitStats(cqe: CQElement<C>) {
         val (_, enterTime) = cqe
 
-        lengthOfStayTimeline.addValue((env.now - enterTime))
-        queueLengthTimeline.addValue(q.size.toDouble())
+        lengthOfStayStatistics.addValue((env.now - enterTime))
+        sizeTimeline.addValue(q.size.toDouble())
     }
 
     fun contains(c: C): Boolean = q.any { it.component == c }
@@ -145,11 +149,11 @@ class QueueStatistics(cq: ComponentQueue<*>) {
     val name = cq.name
     val timestamp = cq.env.now
 
-    val lengthStats = cq.queueLengthTimeline.statistics(false)
-    val lengthStatsExclZeros = MetricTimelineStats(cq.queueLengthTimeline, excludeZeros = true)
+  val lengthStats = cq.sizeTimeline.statistics(false)
+    val lengthStatsExclZeros = MetricTimelineStats(cq.sizeTimeline, excludeZeros = true)
 
-    val lengthOfStayStats = cq.lengthOfStayTimeline.statistics()
-    val lengthOfStayStatsExclZeros = cq.lengthOfStayTimeline.statistics(excludeZeros = true)
+    val lengthOfStayStats = cq.lengthOfStayStatistics.statistics()
+    val lengthOfStayStatsExclZeros = cq.lengthOfStayStatistics.statistics(excludeZeros = true)
 
     // Partial support for weighted percentiles was added in https://github.com/apache/commons-math/tree/fe29577cdbcf8d321a0595b3ef7809c8a3ce0166
     // Update once released, use jitpack or publish manually

@@ -50,9 +50,9 @@ fun main() {
 
         atm.occupancyTimeline.display()
         atm.requesters.queueLengthTimeline.display()
-        atm.requesters.lengthOfStayTimeline.display()
+        atm.requesters.lengthOfStayStatistics.display()
 
-        println(atm.requesters.lengthOfStayTimeline.statistics())
+        println(atm.requesters.lengthOfStayStatistics.statistics())
     }
 }
 

@@ -119,8 +119,8 @@ object DeterministicRefuel {
             }
 
 
-            get<GasStation>().requesters.queueLengthTimeline.printThis()
-            get<GasStation>().requesters.lengthOfStayTimeline.printThis()
+            get<GasStation>().requesters.sizeTimeline.printThis()
+            get<GasStation>().requesters.lengthOfStayStatistics.printThis()
 
             // save the simulation state to file
 //            Json.encodeToString(this).println()

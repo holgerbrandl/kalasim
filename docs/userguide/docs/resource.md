@@ -501,6 +501,6 @@ If a component requests from a preemptive resource, it may bump component(s) tha
 Therefore, a component claiming from a preemptive resource should check whether the component is bumped or still
 claiming at any point where they can be bumped. This can be done with the method `Component.isClaiming(resource)` which is `true` if the component is claiming from the resource, or the opposite (Component.isBumped) which is `true` is the component is not claiming from the resource.
 
-Examples
+Examples using preemptive resources
 
 * [Machine Shop](examples/machine_shop.md)

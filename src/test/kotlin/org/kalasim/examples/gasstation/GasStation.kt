@@ -123,5 +123,5 @@ fun main() {
 
     gasStation.fuelPumps.claimedTimeline.printHistogram()
     gasStation.fuelPumps.requesters.queueLengthTimeline.printThis()
-    gasStation.fuelPumps.requesters.lengthOfStayTimeline.printThis()
+    gasStation.fuelPumps.requesters.lengthOfStayStatistics.printThis()
 }

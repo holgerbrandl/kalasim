@@ -70,7 +70,7 @@ fun main() {
 //        waitingLine.queueLengthMonitor.printHistogram()
 
             waitingLine.queueLengthTimeline.display()
-            waitingLine.lengthOfStayTimeline.display()
+            waitingLine.lengthOfStayStatistics.display()
         }
 
 //        waitingLine.stats.toJson().toString(2).printThis()

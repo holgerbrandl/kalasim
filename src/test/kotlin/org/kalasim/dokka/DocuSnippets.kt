@@ -52,7 +52,9 @@ fun resourceHowTo() {
                 request(clerks withQuantity 2)
                 request(clerks withQuantity 1, assistance withQuantity 2)
                 request(clerks withPriority 1)
+                request(clerks withPriority Priority(2))
                 request(clerks withQuantity 3.4 andPriority Priority(1))
+                request(clerks withQuantity 3.4 andPriority 3)
 
 
                 hold(2) // consume it

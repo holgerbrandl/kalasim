@@ -48,11 +48,11 @@ open class State<T>(
 
     /** Tracks the queue length level along time. */
     val queueLength: MetricTimeline
-        get() = waiters.queueLengthTimeline
+        get() = waiters.sizeTimeline
 
     /** Tracks the length of stay in the queue over time*/
     val lengthOfStay: NumericStatisticMonitor
-        get() = waiters.lengthOfStayTimeline
+        get() = waiters.lengthOfStayStatistics
 
 
     var trackingPolicy: StateTrackingConfig = StateTrackingConfig()

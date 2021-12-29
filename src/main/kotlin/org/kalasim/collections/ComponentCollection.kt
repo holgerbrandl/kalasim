@@ -47,8 +47,8 @@ abstract class ComponentCollection<C>(
 
 
     //    val ass = AggregateSummaryStatistics()
-    val queueLengthTimeline = MetricTimeline("Length of ${this.name}", koin = koin)
-    val lengthOfStayTimeline = NumericStatisticMonitor("Length of stay in ${this.name}", koin = koin)
+    val sizeTimeline = MetricTimeline("Size of ${this.name}", koin = koin)
+    val lengthOfStayStatistics = NumericStatisticMonitor("Length of stay in ${this.name}", koin = koin)
     val capacityTimeline = MetricTimeline("Capacity of ${this.name}", initialValue = capacity, koin = koin)
 
 
@@ -57,8 +57,8 @@ abstract class ComponentCollection<C>(
             field = newPolicy
 
             with(newPolicy) {
-                queueLengthTimeline.enabled = trackCollectionStatistics
-                lengthOfStayTimeline.enabled = trackCollectionStatistics
+                sizeTimeline.enabled = trackCollectionStatistics
+                lengthOfStayStatistics.enabled = trackCollectionStatistics
             }
         }
 
@@ -68,11 +68,11 @@ abstract class ComponentCollection<C>(
     }
 
     fun printHistogram() {
-        if (lengthOfStayTimeline.values.size < 2) {
+        if (lengthOfStayStatistics.values.size < 2) {
             println("Skipping histogram of '$name' because of to few data")
         } else {
-            lengthOfStayTimeline.printHistogram()
-            queueLengthTimeline.printHistogram()
+            lengthOfStayStatistics.printHistogram()
+            sizeTimeline.printHistogram()
         }
     }
 

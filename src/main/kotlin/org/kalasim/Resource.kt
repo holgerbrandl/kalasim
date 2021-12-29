@@ -247,10 +247,10 @@ open class Resource(
 //                availabilityTimeline.enabled = trackUtilization
 //                occupancyTimeline.enabled = trackUtilization
 
-                requesters.lengthOfStayTimeline.enabled = trackQueueStatistics
-                requesters.queueLengthTimeline.enabled = trackQueueStatistics
-                claimers.lengthOfStayTimeline.enabled = trackQueueStatistics
-                claimers.queueLengthTimeline.enabled = trackQueueStatistics
+                requesters.lengthOfStayStatistics.enabled = trackQueueStatistics
+                requesters.sizeTimeline.enabled = trackQueueStatistics
+                claimers.lengthOfStayStatistics.enabled = trackQueueStatistics
+                claimers.sizeTimeline.enabled = trackQueueStatistics
             }
         }
 
@@ -422,9 +422,9 @@ val Resource.timeline: List<ResourceTimelineSegment>
         val availStats = occupancyTimeline.statsData().asList().asDataFrame()
             .addColumn("Metric") { ResourceMetric.Availability }
 
-        val requesters = requesters.queueLengthTimeline.statsData().asList().asDataFrame()
+        val requesters = requesters.sizeTimeline.statsData().asList().asDataFrame()
             .addColumn("Metric") { ResourceMetric.Requesters }
-        val claimers = claimers.queueLengthTimeline.statsData().asList().asDataFrame()
+        val claimers = claimers.sizeTimeline.statsData().asList().asDataFrame()
             .addColumn("Metric") { ResourceMetric.Claimers }
 
         var statsDF = bindRows(capStats, claimStats, availStats, occStats, requesters, claimers)
@@ -459,7 +459,7 @@ class ResourceInfo(resource: Resource) : Jsonable() {
 
     data class ReqComp(val component: String, val quantity: Double?)
 
-    val requestingComponents = resource.requesters.q.toList().map {
+    val requestedBy = resource.requesters.q.toList().map {
         ReqComp(it.component.name, it.component.requestedQuantity(resource))
     }
 }

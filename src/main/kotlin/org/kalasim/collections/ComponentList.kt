@@ -36,7 +36,7 @@ class ComponentList<C>(
 
         changeListeners.forEach { it.added(element) }
 
-        queueLengthTimeline.addValue(size)
+        sizeTimeline.addValue(size)
 
         stayTracker[element] = env.now
 
@@ -51,9 +51,9 @@ class ComponentList<C>(
             changeListeners.forEach { it.removed(element) }
 
             val insertTime = stayTracker.remove(element)!!
-            lengthOfStayTimeline.addValue((env.now - insertTime))
+            lengthOfStayStatistics.addValue((env.now - insertTime))
 
-            queueLengthTimeline.addValue(size)
+            sizeTimeline.addValue(size)
         }
 
         return removed
@@ -81,16 +81,16 @@ class ComponentListInfo<T>(cl: ComponentList<T>) : Jsonable() {
 
 //todo this duplicates the impl in ComponentQueue
 @Suppress("MemberVisibilityCanBePrivate")
-class ComponentListStatistics(cq: ComponentList<*>) {
+class ComponentListStatistics(cl: ComponentList<*>) {
 
-    val name = cq.name
-    val timestamp = cq.env.now
+    val name = cl.name
+    val timestamp = cl.env.now
 
-    val lengthStats = cq.queueLengthTimeline.statistics(false)
-    val lengthStatsExclZeros = MetricTimelineStats(cq.queueLengthTimeline, excludeZeros = true)
+    val sizeStats = cl.sizeTimeline.statistics(false)
+    val sizeStatsExclZeros = MetricTimelineStats(cl.sizeTimeline, excludeZeros = true)
 
-    val lengthOfStayStats = cq.lengthOfStayTimeline.statistics()
-    val lengthOfStayStatsExclZeros = cq.lengthOfStayTimeline.statistics(excludeZeros = true)
+    val lengthOfStayStats = cl.lengthOfStayStatistics.statistics()
+    val lengthOfStayStatsExclZeros = cl.lengthOfStayStatistics.statistics(excludeZeros = true)
 
     // Partial support for weighted percentiles was added in https://github.com/apache/commons-math/tree/fe29577cdbcf8d321a0595b3ef7809c8a3ce0166
     // Update once released, use jitpack or publish manually
@@ -107,9 +107,9 @@ class ComponentListStatistics(cq: ComponentList<*>) {
             "excl_zeros" to lengthOfStayStatsExclZeros.toJson()
         }
 
-        "queue_length" to {
-            "all" to lengthStats.toJson()
-            "excl_zeros" to lengthStatsExclZeros.toJson()
+        "size" to {
+            "all" to sizeStats.toJson()
+            "excl_zeros" to sizeStatsExclZeros.toJson()
         }
     }
 
