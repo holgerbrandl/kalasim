@@ -110,8 +110,8 @@ open class DepletableResource(
         RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS -> {
             // note: SQF looks the same as StrictFCFS, but the queue comparator is different
 //            (quantity < 0 || requesters.q.peek().component == component) && canHonorQuantity(quantity)
-            (quantity < 0 || (requesters.q as PriorityQueue).sortedIterator()
-                .filter { it.component.requests[this]!! > 0 }.first().component == component) && canHonorQuantity(
+            (quantity <= 0 || (requesters.q as PriorityQueue).sortedIterator()
+                .filter { it.component.requests[this]!! > 0 }.firstOrNull()?.component == component) && canHonorQuantity(
                 quantity
             )
         }
