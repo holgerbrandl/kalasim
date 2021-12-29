@@ -2,9 +2,9 @@ package org.kalasim
 
 import org.kalasim.ComponentState.*
 import org.kalasim.Priority.Companion.NORMAL
-import org.kalasim.analysis.ResourceEventType.*
 import org.kalasim.ResourceSelectionPolicy.*
 import org.kalasim.analysis.*
+import org.kalasim.analysis.ResourceEventType.*
 import org.kalasim.misc.*
 import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
@@ -453,13 +453,25 @@ open class Component(
     }
 
 
+    @Throws(InvalidRequestQuantity::class)
+    private fun ensurePositiveQuantity(quantity: Number): Number {
+        if(quantity.toDouble() <=0){
+            throw InvalidRequestQuantity("Positive quantity expected but was $quantity.")
+        }
+        return quantity
+    }
+
+
     /**
      * Consumes capacity of a depletable resource. This is intentionally also suspendable, as a component may need to wait until a component has the capacity to consume the new quantity.
      *
      * For `take` contract see [user manual](https://www.kalasim.org/resource)
      *
+     * @param quantity A quantity to be consumed from the depletable resource
+     * @param priority When multiple components compete for taking from the same depletable resource, requests with higher priority will have precedence.
      * @param failAt if the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failDelay Skip and set `failed` if the request is not honored before `now + failDelay`,
+     * @param failPriority Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      *
      * @sample org.kalasim.dokka.resourceHowTo
      */    // note: in salabim this is called get, but we renamed it because it's an active process not passive reception
@@ -469,10 +481,12 @@ open class Component(
         priority: Priority? = null,
         failAt: TickTime? = null,
         failDelay: Number? = null,
+        failPriority: Priority = NORMAL,
     ): Unit = request(
-        resource withQuantity quantity andPriority priority,
+        resource withQuantity ensurePositiveQuantity(quantity) andPriority priority,
         failAt = failAt,
-        failDelay = failDelay
+        failDelay = failDelay,
+        failPriority = failPriority
     )
 
 
@@ -544,7 +558,9 @@ open class Component(
         failPriority: Priority = NORMAL,
         capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
     ) = request(
-        *resourceRequests.map { it.copy(quantity = -1.0 * it.quantity) }.toTypedArray(),
+        *resourceRequests
+            .map { it.copy(quantity = -1.0 * ensurePositiveQuantity(it.quantity).toDouble()) }
+            .toTypedArray(),
         description = description,
         failAt = failAt,
         failDelay = failDelay,
@@ -732,7 +748,8 @@ open class Component(
                 requests.merge(r, q, Double::plus)
 
                 val reqText =
-                    (calledFrom ?: "") + "Requesting $q from ${r.name} with priority $priority and oneof=$oneOf"
+                    (calledFrom ?: "") + "Requesting $q from '${r.name}' ${if(priority
+                    !=null) "with priority $priority" else ""} ${if(oneOf) "and oneof=$oneOf" else ""}".trim()
 
                 r.requesters.add(this@Component, priority = priority)
 
@@ -1644,3 +1661,7 @@ fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {
         (histogram[WAITING] ?: 0.0).asTickTime(),
     )
 }
+
+
+class InvalidRequestQuantity(msg: String) : Throwable(msg)
+
