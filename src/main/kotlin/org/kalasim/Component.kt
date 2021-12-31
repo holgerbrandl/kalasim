@@ -1357,25 +1357,53 @@ open class Component(
      *
      * @sample org.kalasim.dokka.statesHowTo
      *
-     * @param state state variable
-     * @param waitFor State value to wait for
+     * @param state A state variable
+     * @param waitFor The state value to wait for
+     * @param triggerPriority The queue priority to be used along with a [state change trigger](https://www.kalasim.org/state/#state-change-triggers)
      * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failDelay If the request is not honored before `now + failDelay`,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
      * @param failPriority Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
      */
-// todo states may have different types so this methods does not make real sense here.
-//  Either remove type from state or enforce the user to call wait multiple times
     suspend fun <T> SequenceScope<Component>.wait(
         state: State<T>,
         waitFor: T,
+        triggerPriority: Priority = NORMAL,
         failAt: TickTime? = null,
         failDelay: Number? = null,
         failPriority: Priority = NORMAL
     ) = wait(
-        StateRequest(state) { state.value == waitFor },
+        StateRequest(state, priority = triggerPriority) { state.value == waitFor },
         failPriority = failPriority,
-//        *states.map { StateRequest(it) }.toTypedArray(),
+        failAt = failAt,
+        failDelay = failDelay,
+    )
+
+    /**
+     * Wait for any or all of the given [state](https://www.kalasim.org/state) values are met.
+     *
+     * For `wait` contract see [user manual](https://www.kalasim.org/component/#wait)
+     *
+     * @sample org.kalasim.dokka.statesHowTo
+     *
+     * @param state A state variable
+    * @param triggerPriority The queue priority to be used along with a [state change trigger](https://www.kalasim.org/state/#state-change-triggers)
+ * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
+     * @param failDelay If the request is not honored before `now + failDelay`,
+    the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
+     * @param failPriority Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
+     * @param predicate The predicate on the state to wait for
+     */
+    suspend fun <T> SequenceScope<Component>.wait(
+        state: State<T>,
+        triggerPriority: Priority = NORMAL,
+        failAt: TickTime? = null,
+        failDelay: Number? = null,
+        failPriority: Priority = NORMAL,
+        predicate: (T) -> Boolean
+    ) = wait(
+        StateRequest(state, predicate = predicate, priority = triggerPriority),
+        failPriority = failPriority,
         failAt = failAt,
         failDelay = failDelay,
     )

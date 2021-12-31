@@ -37,15 +37,17 @@ We can obtain the current value (e.g. for logging) with:
 print("""door is ${if(doorOpen.value) "open" else "closed"}""")
 ```
 
-The value of a state is automatically monitored in the `State<T>.valueMonitor` level monitor.
+The value of a state is automatically monitored in the `State<T>.timeline` level monitor.
 
 All components waiting for a state are tracked in a (internal) queue, that can be obtained with `doorOpen.waiters`.
+
+## State Change Triggers
 
 If we just want at most one person to enter, we can use `trigger()` (which is a simple convenience wrapper around `wait)` with `doorOpen.trigger(true, max=1)`. The following will happen:
 
 1. Temporarily change the state to the provided value,
 2. Reschedule `max` components (or less if there are fewer/no `waiters`) for immediate process continuation,
-3. and finally restore the previous state value
+3. and finally restore the previous state value.
 
 
 ## Type Support
@@ -138,14 +140,16 @@ This is a more complicated but also more versatile way of specifying the honor-c
 #### Example 1
 
 ```kotlin
-wait(StateRequest(State("foo")) { listOf("bar", "test").contains(it) })
+val state = State("foo")
+wait(state) { listOf("bar", "test").contains(it) }
 ```
 The wait is honored if the `String` State becomes either `bar` or `test`.
 
 #### Example 2
 
 ```kotlin
-wait(StateRequest(State(3.0)) { it*3 < 42 })
+val intState = State(3.0)
+wait(intState) { it*3 < 42 }
 ```
 
 In this last example the wait is honored as soon as the value fulfils `it*3 < 42`.

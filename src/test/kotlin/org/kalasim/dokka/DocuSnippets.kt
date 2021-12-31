@@ -8,22 +8,28 @@ import org.kalasim.Priority.Companion.IMPORTANT
 
 fun statesHowTo() {
     createSimulation {
-        val trafficLight: State<String> =  State("red")
+        val trafficLight: State<String> = State("red")
 
         object : Component("Car") {
             override fun process() = sequence {
                 hold(14, "driving")
                 wait(trafficLight, "green")
                 hold(7, "driving again")
+
+                // or using predicate syntax
+                wait(trafficLight) { it.startsWith("gr") }
             }
         }
 
-        object : Component("TrafficController"){
-            override fun repeatedProcess()  = sequence {
+        object : Component("TrafficController") {
+            override fun repeatedProcess() = sequence {
                 hold(3)
                 trafficLight.value = "green"
                 hold(3)
                 trafficLight.value = "red"
+
+                // alternatively we could also use a state trigger
+                trafficLight.trigger("green", max = 1)
             }
         }
 

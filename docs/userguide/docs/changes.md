@@ -10,6 +10,7 @@ Milestone Enhancements
 
 Major Enhancements
 
+* [#43](https://github.com/holgerbrandl/kalasim/issues/43) Simplified states to consume [predicates](state.md#predicate-testing) directly in `wait()`
 * [#27](https://github.com/holgerbrandl/kalasim/issues/27) Made resource events more informative and consistent. These event now include a request-id to enable simplified bottleneck analyses  
 * Added `RequestScopeContext` to honor-block of `request` including `requestingSince` time
 * [#35](https://github.com/holgerbrandl/kalasim/pull/35) Improved support for asynchronous event consumption (contributed by [pambrose](https://github.com/pambrose) via PR)

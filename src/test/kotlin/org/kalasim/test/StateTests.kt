@@ -42,15 +42,14 @@ class StateTests {
             val trafficLight = get<State<String>>()
 
             fun waitForGreen() = sequence {
-                wait(trafficLight, "green")
+                // just to increase test-coverage we use a predicate here
+                wait(trafficLight, triggerPriority = Priority.IMPORTANT ){ it =="green"}
 
                 val stateRequest: StateRequest<String> = StateRequest(trafficLight) { it == "green" }
 //                val (state: State<String>, bar: Int?, predicate: (String) -> Boolean) = stateRequest
 
                 wait(stateRequest)
                 log("passing crossing")
-
-//                terminate()
             }
         }
 
