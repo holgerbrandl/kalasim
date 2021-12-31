@@ -61,15 +61,21 @@ Even if `kalasim` tries to provide a simplistic, efficient, declarative approach
 
 There are multiple ways to improve the performance of a simulation. 
 
-* Set the correct `AssertMode`: The assertion mode determines which internal consistency checks are being performed.  The mode can be set to `Full` (Slowest), `Light` (default) or `Off` (Fastest). Depending on simulation logic and complexity, this will improve performance by ~20%. 
-* Disable internal event logging: The [interaction model](component.md) is configured by default to provide insights into the simulation via the [event log](events.md). However, to optimize performance of a simulation a user may want to consume only custom event-types. If so, internal interaction logging can be disabled by setting `logCoreInteractions = false` when creating/configuring a [component](component.md).  
-* Disable component statistics: Components and queues log various component statistics with built-in [monitors](monitors.md) which can be [disabled](monitors.md) to reduce compute and memory footprint of a simulation.   
+1. Disable internal event logging: The [interaction model](component.md) is configured by default to provide insights into the simulation via the [event log](events.md). However, to optimize performance of a simulation a user may want to consume only custom event-types. If so, internal interaction logging can be adjusted by setting a [logging policy](#continuous-simulation).  
+2. Disable component statistics: Components and queues log various component statistics with built-in [monitors](monitors.md) which can be adjusted by setting a [logging policy](#continuous-simulation) to reduce compute and memory footprint of a simulation.  
+3. Set the correct `AssertMode`: The assertion mode determines which internal consistency checks are being performed.  The mode can be set to `Full` (Slowest), `Light` (default) or `Off` (Fastest). Depending on simulation logic and complexity, this will improve performance by ~20%.
+
 
 To further fine-tune and optimize simulation performance and to reveal bottlenecks, a JVM profiler (such as [yourkit](https://www.yourkit.com/)) can be used. Both call-counts and spent-time analysis have been proven useful here. 
 
 ## Continuous Simulation
 
-For some use-cases, simulations may for a very long tick and wall time. To prevent internal metrics gathering from consuming all available memory, it needs to be disabled or at least configured carefully. This can be achieved, but either disabling [timelines and monitors](monitors.md) manually, or by setting a sensible default strategy using the `env.trackingPolicyFactory`
+For some use-cases, simulations may for a very long tick and wall time. To prevent internal metrics gathering from consuming all available memory, it needs to be disabled or at least configured carefully. This can be achieved, but either disabling [timelines and monitors](monitors.md) manually on a per-entity basis, or by setting a sensible default strategy using the `Environment.trackingPolicyFactory`
+
+For each entity type a corresponding tracking-policy `TrackingConfig` can be provisioned along with an entity matcher to narrow down its scope. A _tracking-policy_ allows to change 
+
+1. How events are logs 
+2. How internal metrics are gathered
 
 ```kotlin
 // first define the policy and matcher
@@ -82,7 +88,13 @@ env.trackingPolicyFactory
 val r = Resource("Counter 22")
 ```
 
-For each entity type a corresponding `TrackinConfig` can be provisioned along with an entity matcher to narrow down its scope.
+There are different default implementations, but the user can also implement and register custom tracking-configurations.
+
+* ComponentTrackingConfig
+* ResourceTrackingConfig
+* StateTrackingConfig
+* ComponentCollectionTrackingConfig
+
 
 !!!note
     Tracking configuration policies must be set before instantiating simulation entities to be used. After entities have been created, the user can still configure via `c.trackingConfig`.
