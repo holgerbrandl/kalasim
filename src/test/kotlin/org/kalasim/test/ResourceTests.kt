@@ -440,8 +440,8 @@ class ResourceTests {
 
         r1.activities.apply {
             size shouldBe 1
-            first().start.value shouldBe 4.0
-            first().end.value shouldBe 6.0
+            first().requested.value shouldBe 4.0
+            first().released.value shouldBe 6.0
             first().activity shouldBe "foo"
         }
 

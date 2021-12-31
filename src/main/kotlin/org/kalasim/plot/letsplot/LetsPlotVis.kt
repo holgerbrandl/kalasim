@@ -98,7 +98,7 @@ fun List<ResourceActivityEvent>.display(
     title: String? = null,
     forceTickAxis: Boolean = false,
 ): Plot {
-    val useWT = any { it.startWT != null } && !forceTickAxis
+    val useWT = any { it.requestedWT != null } && !forceTickAxis
 
     val plotData = asDataFrame()
         .unfold<Resource>("resource", listOf("name"))

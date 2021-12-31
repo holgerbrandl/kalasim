@@ -104,12 +104,13 @@ class RegularHonorPolicyTest {
     }  @Test
 
 
+    // NOTE: This test will inevetiably fail, if more numbers were samples in the test-sim than when fixating the result
     fun `it should allow using a random policy`() {
         val takes = fruitStore(RequestHonorPolicy.RANDOM)
 
         takes.map {
             it.requester.name.replace("Customer.", "").toInt()
-        } shouldBe listOf(3, 4, 2, 5, 1, 6)  // note: this was fixated after the first run
+        } shouldBe listOf(3, 4, 1, 5, 2, 6)  // note: this was fixated after the first run
     }
 
     @Test

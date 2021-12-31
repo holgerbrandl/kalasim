@@ -25,6 +25,7 @@ import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.stream.StreamSource
+import kotlin.test.assertEquals
 
 
 class DisplayTests : AbstractSvgPlotRegression() {
@@ -138,7 +139,7 @@ abstract class AbstractSvgPlotRegression {
         val expected = file.readText().trim() //.run { prettyFormat(this, 4) }
 
         // note assertEquals would be cleaner but since its printing the complete diff, it's polluting the travis logs
-        //        assertEquals(expected, svgDoc)
+//                assertEquals(expected, svgDoc)
         val failMsg = "svg mismatch got:\n${svgDoc.lines().take(30).joinToString("\n")}"
         Assert.assertTrue(failMsg, expected.equals(svgDoc))
 

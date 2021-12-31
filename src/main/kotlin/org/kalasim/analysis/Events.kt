@@ -7,16 +7,19 @@ import org.kalasim.misc.roundAny
 import org.kalasim.misc.titlecaseFirstChar
 import kotlin.math.absoluteValue
 
-enum class ResourceEventType { CLAIMED, RELEASED, PUT, TAKE }
+enum class ResourceEventType { REQUESTED, CLAIMED, RELEASED, PUT, TAKE }
 
 
 class ResourceEvent(
     time: TickTime,
+    val requestId: Long,
     curComponent: Component?,
     val requester: SimulationEntity,
     val resource: Resource,
     val type: ResourceEventType,
-    val amount: Double
+    val amount: Double,
+    val priority: Priority?,
+    val bumpedBy: Component? = null
 ) : InteractionEvent(time, curComponent, requester) {
 
     val claimed: Double = resource.claimed
@@ -27,14 +30,24 @@ class ResourceEvent(
     //    val requested: Int = resource.requesters.q.map{ it.component.requests.filter{ it.key == resource}}
     val claimers: Int = resource.claimers.size
 
+    init {
+        if(bumpedBy != null) require(type == ResourceEventType.RELEASED)
+    }
 
-    override fun renderAction() =
-        "${
+    override fun renderAction(): String {
+        val prioInfo = if(priority != null) "with priority $priority" else ""
+
+        //if this is to be disabled later it should include which resources were requested as part of oneOf=false
+//         val honorInfo =  if(oneOf) "and oneof=$oneOf" else ""
+
+        return "${
             type.toString().lowercase().titlecaseFirstChar()
-        } ${amount.absoluteValue.roundAny(2)} from '${resource.name}'"
+        } ${amount.absoluteValue.roundAny(2)} from '${resource.name}' $prioInfo".trim()
+    }
 
     override fun toJson() = json {
         "time" to time
+        "request_id" to requestId
         "current" to curComponent?.name
         "requester" to requester.name
         "resource" to resource.name
@@ -50,15 +63,17 @@ class ResourceEvent(
 }
 
 data class ResourceActivityEvent(
-    val start: TickTime,
-    val end: TickTime,
+    val requested: TickTime,
+    val honored: TickTime,
+    val released: TickTime,
     val requester: Component,
     val resource: Resource,
     val activity: String?,
-    val claimedQuantity: Double
-) : Event(end) {
-    val startWT = resource.env.tickTransform?.tick2wallTime(start)
-    val endWT = resource.env.tickTransform?.tick2wallTime(end)
+    val claimedQuantity: Double,
+) : Event(released) {
+    val requestedWT = resource.env.tickTransform?.tick2wallTime(requested)
+    val honoredWT = resource.env.tickTransform?.tick2wallTime(honored)
+    val releasedWT = resource.env.tickTransform?.tick2wallTime(released)
 }
 
 

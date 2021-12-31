@@ -20,7 +20,7 @@ data class ComponentTrackingConfig(
 
 data class ResourceTrackingConfig(
     val logCreation: Boolean = true,
-    val logClaimRelease: Boolean = true,
+    val logResourceChanges: Boolean = true,
     val trackQueueStatistics: Boolean = true,
     val trackUtilization: Boolean = true,
     val trackActivities: Boolean = true
@@ -30,7 +30,7 @@ data class ResourceTrackingConfig(
         @Suppress("unused")
         val NONE = ResourceTrackingConfig(
             logCreation = false,
-            logClaimRelease = false,
+            logResourceChanges = false,
             trackQueueStatistics = false,
             trackUtilization = false
         )

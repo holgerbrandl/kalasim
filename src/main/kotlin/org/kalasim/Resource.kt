@@ -111,7 +111,7 @@ open class DepletableResource(
             // note: SQF looks the same as StrictFCFS, but the queue comparator is different
 //            (quantity < 0 || requesters.q.peek().component == component) && canHonorQuantity(quantity)
             (quantity <= 0 || (requesters.q as PriorityQueue).sortedIterator()
-                .filter { it.component.requests[this]!! > 0 }.firstOrNull()?.component == component) && canHonorQuantity(
+                .filter { it.component.requests[this]!!.quantity > 0 }.firstOrNull()?.component == component) && canHonorQuantity(
                 quantity
             )
         }
@@ -121,7 +121,7 @@ open class DepletableResource(
 class SQFComparator(val resource: Resource) : Comparator<CQElement<Component>> {
     override fun compare(o1: CQElement<Component>, o2: CQElement<Component>): Int = compareValuesBy(o1, o2,
         { it.priority?.value?.times(-1) ?: 0 },
-        { it.component.requests[resource]!! }
+        { it.component.requests[resource]!!.quantity }
     )
 }
 
@@ -280,7 +280,7 @@ open class Resource(
                     }
                     .filter {
 //                            require(it.component.requests.containsKey(this)){ "invalid requester queue state"}
-                        canHonorQuantity(it.component.requests[this]!!)
+                        canHonorQuantity(it.component.requests[this]!!.quantity)
                     }
                     .takeWhile { it.component.tryRequest() }
                     .count() // actually trigger otherwise lazy sequence
@@ -307,7 +307,7 @@ open class Resource(
                             o1, o2,
                             { it.priority?.value?.times(-1) ?: 0 },
                             {
-                                val requestQuantity = it.component.requests[this]!!
+                                val requestQuantity = it.component.requests[this]!!.quantity
                                 val timeSinceRequest = now - it.enterTime
 
                                 -1 * honorPolicy.computeRequestWeight(timeSinceRequest, requestQuantity)
@@ -317,7 +317,7 @@ open class Resource(
                     }
                 @Suppress("ConvertCallChainIntoSequence")
                 sortedWith
-                    .filter { canHonorQuantity(it.component.requests[this]!!) }
+                    .filter { canHonorQuantity(it.component.requests[this]!!.quantity) }
                     .takeWhile { it.component.tryRequest() }
                     .count() // actually trigger otherwise lazy sequence
             }

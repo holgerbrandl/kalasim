@@ -10,7 +10,8 @@ Milestone Enhancements
 
 Major Enhancements
 
-* Added `RequestScopeContext` to honor-block of `request` including `requestingSince` time (relates to [#27](https://github.com/holgerbrandl/kalasim/issues/27)) 
+* [#27](https://github.com/holgerbrandl/kalasim/issues/27) Made resource events more informative and consistent. These event now include a request-id to enable simplified bottleneck analyses  
+* Added `RequestScopeContext` to honor-block of `request` including `requestingSince` time
 * [#35](https://github.com/holgerbrandl/kalasim/pull/35) Improved support for asynchronous event consumption (contributed by [pambrose](https://github.com/pambrose) via PR)
 * Reduced memory requirements of [resource](resource.md) monitoring by 50% by inferring `occupancy` and `availability` using [Timeline Arithmetics](monitors.md#monitors-arithmetics)
 * [#38](https://github.com/holgerbrandl/kalasim/issues/38) Extended and improved API support for [depletable resources](resource.md#depletable-resources). 

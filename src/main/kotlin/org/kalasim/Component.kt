@@ -8,9 +8,7 @@ import org.kalasim.analysis.ResourceEventType.*
 import org.kalasim.misc.*
 import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.math.*
 import kotlin.reflect.KFunction1
 
 
@@ -28,7 +26,7 @@ internal const val DEFAULT_QUEUE_PRIORITY = 0
 // note: Salabim Changelog: "The default priority of a requested resource is now inf, which means the lowest possible priority."
 /** Describes the priority of a process or request. Higher values will be scheduled earlier or claimed earlier respectively. */
 
-data class Priority(val value: Int) {
+data class Priority(val value: Int) : Comparable<Priority?> {
     companion object {
         val LOWEST = Priority(-20)
         val LOW = Priority(-10)
@@ -36,15 +34,33 @@ data class Priority(val value: Int) {
         val IMPORTANT = Priority(20)
         val CRITICAL = Priority(30)
     }
+
+    override fun compareTo(other: Priority?): Int = compareValuesBy(this, other ?: NORMAL) { value }
 }
 
 
+// TODO reassess if we should use these type-aliases
 //typealias ProcessDefinition = SequenceScope<Component>
-typealias ProcessContext = SequenceScope<Component>
+//private typealias ProcessContext = SequenceScope<Component>
 //typealias ProcessDefinition = suspend SequenceScope<Component>.() -> Unit
-typealias ProcessDefinition = Sequence<Component>
+//private typealias ProcessDefinition = Sequence<Component>
 
-interface NoAuto
+
+internal data class RequestContext(
+    val requestId: Long,
+    val quantity: Double,
+    val priority: Priority?,
+    val requestedAt: TickTime?,
+    val honoredAt: TickTime?,
+) {
+    fun merge(rc: RequestContext): RequestContext {
+        require(priority == rc.priority) { "Merging components with different priorities is not supported" }
+        return copy(
+            quantity = quantity + rc.quantity
+        )
+    }
+}
+
 
 /**
  * A kalasim component is used as component (primarily for queueing) or as a component with a process.
@@ -72,9 +88,11 @@ open class Component(
 
     private var oneOfRequest: Boolean = false
 
-    internal val requests = mutableMapOf<Resource, Double>()
+    internal val requests = mutableMapOf<Resource, RequestContext>()
+    internal val claims = mutableMapOf<Resource, RequestContext>()
+
     private val waits = mutableListOf<StateRequest<*>>()
-    val claims = mutableMapOf<Resource, Double>()
+
 
     /** Will be `true` if a component's request was not honored in time, or a wait predicate was not met before it timed outs. */
     var failed: Boolean = false
@@ -455,7 +473,7 @@ open class Component(
 
     @Throws(InvalidRequestQuantity::class)
     private fun ensurePositiveQuantity(quantity: Number): Number {
-        if(quantity.toDouble() <=0){
+        if(quantity.toDouble() <= 0) {
             throw InvalidRequestQuantity("Positive quantity expected but was $quantity.")
         }
         return quantity
@@ -678,7 +696,7 @@ open class Component(
         // see https://stackoverflow.com/questions/46098105/is-there-a-way-to-open-and-close-a-stream-easily-at-kotlin
         honorBlock: (suspend SequenceScope<Component>.(RequestScopeContext) -> Unit)? = null
     ) {
-        val requestStart = now
+        val requestedAt = now
 
         @Suppress("NAME_SHADOWING")
         val resourceRequests: List<ResourceRequest> = when(capacityLimitMode) {
@@ -728,10 +746,9 @@ open class Component(
             failed = false
             oneOfRequest = oneOf
 
-            resourceRequests.forEach { (r, quantity, priority) ->
-                val q = quantity
+            resourceRequests.forEach { (resource, quantity, priority) ->
 
-                if(r.preemptive && resourceRequests.size > 1) {
+                if(resource.preemptive && resourceRequests.size > 1) {
                     throw IllegalArgumentException("preemptive resources do not support multiple resource requests")
                 }
 
@@ -740,31 +757,40 @@ open class Component(
                 //                q = -q
                 //            }
 
-                require(q >= 0 || r.depletable) { "quantity <0" }
+                require(quantity >= 0 || resource.depletable) { "quantity <0" }
+
+                val requestContext = RequestContext(random.nextLong(), quantity, priority, now, null)
 
                 //  is same resource is specified several times, just add them up
                 //https://stackoverflow.com/questions/53826903/increase-value-in-mutable-map
                 // todo this may not not be correct for a RelaxedFCFS honor policy or a SQF --> replace entirely with list?
-                requests.merge(r, q, Double::plus)
+                requests.merge(resource, requestContext, RequestContext::merge)
 
-                val reqText =
-                    (calledFrom ?: "") + "Requesting $q from '${r.name}' ${if(priority
-                    !=null) "with priority $priority" else ""} ${if(oneOf) "and oneof=$oneOf" else ""}".trim()
+                resource.requesters.add(this@Component, priority = priority)
 
-                r.requesters.add(this@Component, priority = priority)
-
-                if(trackingPolicy.logInteractionEvents) {
-                    log(InteractionEvent(now, env.curComponent, this@Component, reqText))
+                if(resource.trackingPolicy.logResourceChanges) {
+                    log(
+                        ResourceEvent(
+                            env.now,
+                            requestContext.requestId,
+                            env.curComponent,
+                            this@Component,
+                            resource,
+                            REQUESTED,
+                            quantity,
+                            priority
+                        )
+                    )
                 }
 
-                if(r.preemptive) {
-                    var av = r.availableQuantity
-                    val thisClaimers = r.claimers.q
+                if(resource.preemptive) {
+                    var av = resource.availableQuantity
+                    val thisClaimers = resource.claimers.q
 
                     val bumpCandidates = mutableListOf<Component>()
                     //                val claimComponents = thisClaimers.map { it.c }
                     for(cqe in thisClaimers.toList().reversed()) {
-                        if(av >= q) {
+                        if(av >= quantity) {
                             break
                         }
 
@@ -773,21 +799,26 @@ open class Component(
                             break
                         }
 
-                        av += cqe.component.claims.getOrDefault(r, 0.0)
+                        av += cqe.component.claims[resource]!!.quantity
                         bumpCandidates.add(cqe.component)
                     }
 
                     if(av >= 0) {
                         bumpCandidates.forEach {
-                            it.releaseInternal(r, bumpedBy = this@Component)
-                            logInternal(trackingPolicy.logInteractionEvents, "$it bumped from $r by ${this@Component}")
+                            it.releaseInternal(resource, bumpedBy = this@Component)
+                            logInternal(
+                                trackingPolicy.logInteractionEvents,
+                                "$it bumped from $resource by ${this@Component}"
+                            )
+
                             it.activate()
                         }
                     }
                 }
             }
 
-            requests.forEach { (resource, quantity) ->
+            requests.forEach { (resource, requestContext) ->
+                val (_, quantity, _, _) = requestContext
                 if(quantity < resource.minq)
                     resource.minq = quantity
             }
@@ -804,30 +835,41 @@ open class Component(
 
         if(honorBlock != null) {
             // suspend{ ... }
-            val before = now
-            honorBlock(RequestScopeContext(if(oneOf) claims.toList().last().first else null, requestStart))
+            val honoredAt = now
 
-            val after = now
+            honorBlock(RequestScopeContext(if(oneOf) claims.toList().last().first else null, requestedAt))
+
+            val releasedAt = now
 
             // salabim says: It is possible to check which resource has been claimed with `Component.claimers()`.
+            // note we could alternative also use the request-id to identify the claim
             resourceRequests.filter { it.resource.claimers.contains(this@Component) }.forEach {
                 release(it)
 
                 if(it.resource.trackingPolicy.trackActivities) {
                     val rse =
-                        ResourceActivityEvent(before, after, this@Component, it.resource, description, it.quantity)
+                        ResourceActivityEvent(
+                            requestedAt,
+                            honoredAt,
+                            releasedAt,
+                            this@Component,
+                            it.resource,
+                            description,
+                            it.quantity
+                        )
                     (it.resource.activities as MutableList<ResourceActivityEvent>).add(rse)
                     log(rse)
                 }
-
             }
         }
     }
 
 
     /** Determine if all current requests of this component could be honored. */
-    private fun honorAll(): List<Pair<Resource, Double>>? {
-        for((resource, requestedQuantity) in requests) {
+    private fun honorAll(): List<Pair<Resource, RequestContext>>? {
+        for((resource, requestContext) in requests) {
+            val requestedQuantity = requestContext.quantity
+
             if(requestedQuantity < 0) {
                 require(resource is DepletableResource) {
                     "can not request negative quantity from non-depletable resource"
@@ -841,12 +883,12 @@ open class Component(
     }
 
 
-    private fun honorAny(): List<Pair<Resource, Double>>? {
-        for(request in requests) {
-            val (resource, requestedQuantity) = request
+    private fun honorAny(): List<Pair<Resource, RequestContext>>? {
+        for((resource, requestContext) in requests) {
+            val requestedQuantity = requestContext.quantity
 
             if(resource.canComponentHonorQuantity(this, requestedQuantity)) {
-                return listOf(resource to requestedQuantity)
+                return listOf(resource to requestContext)
             }
 //            if (requestedQuantity > 0) {
 //                if (requestedQuantity <= resource.capacity - resource.claimed + EPS) {
@@ -870,13 +912,15 @@ open class Component(
     internal fun tryRequest(): Boolean {
         if(componentState == INTERRUPTED) return false
 
-        val rHonor: List<Pair<Resource, Double>>? = if(oneOfRequest) honorAny() else honorAll()
+        val rHonor: List<Pair<Resource, RequestContext>>? = if(oneOfRequest) honorAny() else honorAll()
 
         if(rHonor.isNullOrEmpty()) return false
 
-        requests.forEach { (resource, quantity) ->
+        requests.forEach { (resource, requestContext) ->
+
             // proceed just if request was honored claim it
             if(rHonor.any { it.first == resource }) {
+                val quantity = requestContext.quantity
                 resource.claimed += quantity //this will also update the timeline
 
                 log(trackingPolicy.logInteractionEvents) {
@@ -885,12 +929,21 @@ open class Component(
                         quantity < 0 -> PUT
                         else -> TAKE
                     }
-                    ResourceEvent(env.now, env.curComponent, this, resource, type, quantity)
+                    ResourceEvent(
+                        env.now,
+                        requestContext.requestId,
+                        env.curComponent,
+                        this,
+                        resource,
+                        type,
+                        quantity,
+                        requestContext.priority
+                    )
                 }
 
                 if(!resource.depletable) {
                     val thisPrio = resource.requesters.q.firstOrNull { it.component == this }?.priority
-                    claims.merge(resource, quantity, Double::plus)
+                    claims.merge(resource, requestContext.copy(honoredAt = now), RequestContext::merge)
 
                     //also register as claimer in resource if not yet present
                     if(resource.claimers.q.none { it.component == this }) {
@@ -1256,23 +1309,35 @@ open class Component(
     private fun releaseInternal(resource: Resource, q: Double? = null, bumpedBy: Component? = null) {
         require(resource in claims) { "$name not claiming from resource ${resource.name}" }
 
-        val quantity = if(q == null) {
-            claims[resource]!!
-        } else if(q > claims[resource]!!) {
-            claims[resource]!!
+        val requestContext = claims[resource]!!
+
+        val releaseQuantity = if(q == null) {
+            requestContext.quantity
+        } else if(q > requestContext.quantity) {
+            requestContext.quantity
         } else {
             q
         }
 
-        resource.claimed -= quantity
+        resource.claimed -= releaseQuantity
 
-        log(resource.trackingPolicy.logClaimRelease) {
-            ResourceEvent(env.now, env.curComponent, this, resource, RELEASED, quantity)
+        log(resource.trackingPolicy.logResourceChanges) {
+            ResourceEvent(
+                env.now,
+                requestContext.requestId,
+                env.curComponent,
+                this,
+                resource,
+                RELEASED,
+                releaseQuantity,
+                requestContext.priority,
+                bumpedBy = bumpedBy
+            )
         }
 
-        claims[resource] = claims[resource]!! - quantity
+        claims[resource] = with(requestContext) { copy(quantity = this.quantity - releaseQuantity) }
 
-        if(claims[resource]!! < EPS) {
+        if(claims[resource]!!.quantity < EPS) {
             leave(resource.claimers)
             claims.remove(resource)
         }
@@ -1440,7 +1505,7 @@ open class Component(
     }
 
 
-    internal fun requestedQuantity(resource: Resource) = requests[resource]
+    internal fun requestedQuantity(resource: Resource) = requests[resource]?.quantity
 
     /** Captures the current state of a `Component`*/
     @Suppress("unused")
@@ -1451,8 +1516,8 @@ open class Component(
         val status = component.componentState
         val scheduledTime = component.scheduledTime
 
-        val claims = component.claims.map { it.key.name to it.value }.toMap()
-        val requests = component.requests.map { it.key.name to it.value }.toMap()
+        val claims = component.claims.map { it.key.name to it.value.quantity }.toMap()
+        val requests = component.requests.map { it.key.name to it.value.quantity }.toMap()
     }
 
 

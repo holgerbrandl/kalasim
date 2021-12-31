@@ -133,12 +133,12 @@ fun List<ResourceActivityEvent>.display(
     title: String? = null,
     forceTickAxis: Boolean = false,
 ): GGPlot {
-    val useWT = any { it.startWT != null } && !forceTickAxis
+    val useWT = any { it.requestedWT != null } && !forceTickAxis
 
     return plot(y = { resource.name },
         yend = { resource.name },
-        x = { if (useWT) startWT else start },
-        xend = { if (useWT) endWT else end },
+        x = { if (useWT) honoredWT else honored },
+        xend = { if (useWT) releasedWT else released },
         color = { activity ?: "Other" })
         .geomSegment(size = 10.0)
         .yLabel("")

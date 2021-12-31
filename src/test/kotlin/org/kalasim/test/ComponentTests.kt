@@ -83,10 +83,12 @@ class ComponentTests {
         var counter = 0
 
         class MyComponent : Component(process = MyComponent::myProcess) {
-            fun myProcess() =
-                sequence {
+            fun myProcess() = sequence {
                     hold(1)
                     println("hello from $name")
+
+                    isCurrent shouldBe true
+
                     counter++
                 }
         }
@@ -181,12 +183,12 @@ class ComponentTests {
 .00                             tester                Waiting, scheduled for .00                             New state: scheduled
 .00                                                   Hold +1.00, scheduled for 1.00                         New state: scheduled
 1.00                            Resource.1            Created                                                capacity=1
-1.00                            tester                Requesting 1.0 from 'Resource.1'
+1.00                            tester                Requested 1.0 from 'Resource.1'
 1.00                                                  Claimed 1.0 from 'Resource.1'
 1.00                                                  Request honored by Resource.1, scheduled for 1.00      New state: scheduled
 1.00                                                  Hold +1.00, scheduled for 2.00                         New state: scheduled
 2.00                                                  Released 1.0 from 'Resource.1'
-2.00                                                  ResourceActivityEvent(start=1.00, end=2.00, reques...
+2.00                                                  ResourceActivityEvent(requested=1.00, honored=1.00...
 2.00                                                  Ended                                                  New state: data""".trimIndent()
 
 

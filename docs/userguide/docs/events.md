@@ -2,7 +2,28 @@
 
 To analyze state changes in a simulation model, we may want to monitor [component](component.md) creation, the [event queue](basics.md#event-queue), or the [interplay](component.md#process-interaction) between simulation entities. We may  want to trace which process caused an event, or which processes waited for resource. Or a model may require other custom state change events to be monitored. 
 
-`kalasim` triggers a rich set of built-int events, which are gathered automatically for  [interactions](component.md#process-interaction), entity creation, and [resource requests](resource.md). It also allows for custom event types that can be triggered in [process definitions](component.md#process-definition).
+`kalasim` internally triggers a rich set of built-int events
+
+* [Interactions](component.md#process-interaction) via `InteractionEvent`
+* Entity creation via `EntityCreatedEvent` 
+* Resource requests, see [resource events](resource.md#events).
+
+![](event_hierarchy.png)
+
+In addition, it also allows for custom event types that can be triggered with `log()` in [process definitions](component.md#process-definition)
+
+```kotlin
+class MyEvent(time : TickTime) : Event(time)
+
+object : Component() {
+    override fun process() = sequence {
+        //... a great history
+        log(MyEvent(now))
+        //... a promising future
+    }
+}
+```
+
 
 The event log is modelled as a sequence of `org.kalasim.Event`s that can be consumed with one more multiple `org.kalasim.EventListener`s. The classical  publish-subscribe pattern is used here. Consumers can easily route events into such as consoles, files, rest-endpoints, databases, or in-place-analytics.
 
@@ -23,7 +44,7 @@ In this example, we have created custom simulation event type. This approach is 
 
 ## Console Logger
 
-There are a few provided event listeners, most notable the built-int console logger. With console logging being enabled, we get the following output (displayed as table for convenience):
+There are a few provided event listeners, most notable the built-in console logger. With console logging being enabled, we get the following output (displayed as table for convenience):
 
 ```
 time      current component        component                action      info                          
@@ -117,6 +138,6 @@ The transformation step is optional, `List<Event>` can be transformed `asDataFra
 
 When working with jupyter, we can harvest the kernel's built-in rendering capabilities to render events. Note that we need to filter for specific event type to capture all attributes.
 
-![](jupyter_events.png)
+![](jupyter_event_log.png)
 
-For a fully worked out example see 
+For a fully worked out example see one of the [example notebooks](https://github.com/holgerbrandl/kalasim/blob/master/docs/userguide/docs/examples/bridge_game.ipynb) .

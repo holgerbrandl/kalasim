@@ -259,6 +259,35 @@ with an iterator.
 <!--}-->
 <!--```-->
 
+## Events
+
+Resources will log all changes with 2 event types
+
+### Resource Event
+
+Events of type `org.kalasim.ResourceEvent` will indicate changes as they occur. The following fields are included in each event
+
+* `requestId: Long` - A unique id, that allows to trace requests in time
+* `time: TickTime`
+* `curComponent: Component?`
+* `requester: SimulationEntity`
+* `resource: Resource`
+* `type: ResourceEventType` - Either `REQUESTED`, `CLAIMED`, `RELEASED`, `PUT` or `TAKE`.
+* `quantity: Double` 
+
+
+### Resource Activity Event`
+
+Events of type `org.kalasim.ResourceActivityEvent` will be logged at the end of a [scoped request](#request-scope) block. The following fields are included in each event
+
+* `requested: TickTime`
+* `honored: TickTime`
+* `released: TickTime`
+* `requester: Component`
+* `resource: Resource`
+* `activity: String`
+* `claimedQuantity: Double`
+
 ## Activity Log
 
 Resources have a `activities` attribute that provides a history of [scoped requests](#request-scope) as a `List<ResourceActivityEvent>`
