@@ -9,6 +9,7 @@ import org.kalasim.ComponentState.DATA
 import org.kalasim.ComponentState.SCHEDULED
 import org.kalasim.analysis.InteractionEvent
 import org.kalasim.misc.*
+import kotlin.test.assertEquals
 import kotlin.test.fail
 
 
@@ -170,7 +171,7 @@ class ComponentTests {
 
             run(5)
         }
-    }.stdout shouldBe """time      current               receiver              action                                                 info                               
+    }.stdout shouldBeDiff """time      current               receiver              action                                                 info                               
 --------- --------------------- --------------------- ------------------------------------------------------ ----------------------------------
 .00                             main                  Created
 .00                             tester                Created
@@ -470,4 +471,7 @@ class ComponentTests {
         shouldThrow<MyException> { run(10) }
     }
 }
+
+// see https://github.com/kotest/kotest/issues/1084
+private infix fun String.shouldBeDiff(expected: String) = assertEquals(expected, this)
 
