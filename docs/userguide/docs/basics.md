@@ -213,41 +213,64 @@ Examples
 ## Randomness & Distributions
 
 Experimentation in a simulation context relates to large part to controlling randomness. Here, this is achieved by using probabilistic
-[distributions](https://commons.apache.org/proper/commons-math/userguide/distribution.html) which are internally backed by [apache-commons-math](https://commons.apache.org/proper/commons-math/). A simulation always allows deterministic execution while still supporting pseudo-random sampling. When creating a new simulation [environment](#simulation-runtime-environment), the user can provide a random seed which is internally resolved to a random generator to be used in process definitions.
+[distributions](https://commons.apache.org/proper/commons-math/userguide/distribution.html) which are internally backed by [apache-commons-math](https://commons.apache.org/proper/commons-math/). A simulation always allows deterministic execution while still supporting pseudo-random sampling. When creating a new simulation [environment](#running-a-simulation), the user can provide a random seed which used [internally](https://github.com/holgerbrandl/kalasim/blob/9b75303163d96e1c6460798a8030ab5dc8070a51/src/main/kotlin/org/kalasim/Environment.kt#L103-L103) to initialize a random generator. By default kalasim, is using a fixed seed of [`42`](https://en.wikipedia.org/wiki/42_(number)#The_Hitchhiker's_Guide_to_the_Galaxy).
 
 ```kotlin
 createSimulation(randomSeed = 123){
-    val randomGenerator = rg // which is resolved by Environment receiver     
+    val randomGenerator = rg // which is resolved as    
 }
 ```
 
-With random generator, the following [number distributions](https://github.com/holgerbrandl/kalasim/blob/master/src/main/kotlin/org/kalasim/Distributions.kt) are supported out of the box (with common defaults where possible) as extension functions on `Component` and `Environment`:
+With this internal random generator `rg`, several  [probability distributions](https://github.com/holgerbrandl/kalasim/blob/master/src/main/kotlin/org/kalasim/Distributions.kt) are supported to provide controlled randomization. That is, the outcome of a simulation experiment will be the same if the same seed is being used.  
+
+### Continuous Distributions
+
+The following continuous distributions can be used to model randomness in a simulation model
 
 * `uniform(lower=0, upper=1)`
-* `discreteUniform(lower, upper)`
-* `exponential(mean)`
+* `exponential(mean=3)`
 * `normal(mean=0, sd=1)`
+* `triangular(lowerLimit=0, mode=1, upperLimit=4.3)`
 
-Whenever, distributions are needed in method signatures in `kalasim`, the more general interface `org.apache.commons.math3.distribution.RealDistribution` is being used to support a much [wider variety](https://commons.apache.org/proper/commons-math/javadocs/api-3.4/org/apache/commons/math3/distribution/RealDistribution.html) of distributions if needed. So we can also use other implementations as well. For example
-
+Example:
 ```kotlin
-ComponentGenerator(iat=NakagamiDistribution(1,0.3)){ Customer() }
+object : Component(){
+    val waitDist = exponential(3.3) // this is bound to env.rg
+    
+    override fun process() = sequence {
+        hold(waitDist()) 
+    }
+} 
 ```
 
-The API also include some convenience wrappers to provide fixed values for argument of `RealDistribution`. E.g. consider the  time until a request is considered as failed:
+As shown in the example, probability distributions can be sampled with [invoke](https://kotlinlang.org/docs/operator-overloading.html#invoke-operator) `()`.
+
+Also integer distributions are supported
+
+* `discreteUniform(lower, upper)`
+
+All distributions functions provide common parameter defaults where possible, and are defined as extension functions of `org.kalasim.SimContext`. This makes the accessible in [environment definitions](basics.md#simulation-environment), all simulation entities, as well as [process definitions](component.md#process-definition):
+
+
+!!!important
+    All randomization/distribution helpers are accessible  from an `Environment` or `SimulationEntity` context only. That's because kalasim needs the context to associate the correct internal random generator.
+
+
+A user can cap the sampled values with the extension function `RealDistribution.clip()`. E.g. `normal(mean=3).clip(0)` at 0 (or any other value,  allowing zero-inflated distribution models with controlled randomization.
+
+### Constant Random Variables
+
+The API also allow to model [constant random variables](https://en.wikipedia.org/wiki/Degenerate_distribution). E.g. consider the time until a request is considered as failed:
 
 ```kotlin
 val dist =  constant(3)
 ComponentGenerator(iat=dist){ Customer() }
 ```
 
-Here, `3` is converted into a `org.apache.commons.math3.distribution.ConstantRealDistribution`.
+Internally, `3` is converted into a `org.apache.commons.math3.distribution.ConstantRealDistribution`.
 
-Also, `RealDistribution.clip(0)` will cap the sampled values at 0 (or any other value,  allowing zero-inflated distribution models with controlled randomization
 
-!!!important
-    All randomization/distribution helpers are accessible  from an `Environment` or `SimulationEntity` context only. That's because kalasim needs the context to associate the correct internal random generator.
-
+### Enumerations
 
 Apart fom numeric distributions, also distributions over arbitrary types are supported via `enumerated()`. This does not just work with [`enums`](https://kotlinlang.org/docs/enum-classes.html) but with arbitrary types including [data classes](https://kotlinlang.org/docs/data-classes.html).
 
@@ -265,5 +288,13 @@ val biasedFruit = enumerated(Apple to 0.7, Banana to 0.1, Peach to 0.2 )
 biasedFruit()
 ```
             
-Controlled randomization is a key aspect of every process simulation. Make sure to always strive for repeatability by not using randomization outside of what the simulation context provides. 
- 
+Controlled randomization is a key aspect of every process simulation. Make sure to always strive for repeatability by not using randomization outside of what the [simulation context](basics.md#simulation-environment) provides. 
+
+### Custom Distributions
+
+Whenever, distributions are needed in method signatures in `kalasim`, the more general interface `org.apache.commons.math3.distribution.RealDistribution` is being used to support a much [wider variety](https://commons.apache.org/proper/commons-math/javadocs/api-3.4/org/apache/commons/math3/distribution/RealDistribution.html) of distributions if needed. So we can also use other implementations as well. For example
+
+```kotlin
+ComponentGenerator(iat=NakagamiDistribution(1,0.3)){ Customer() }
+```
+

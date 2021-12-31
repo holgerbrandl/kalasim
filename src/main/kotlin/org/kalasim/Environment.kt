@@ -3,7 +3,6 @@ package org.kalasim
 import com.github.holgerbrandl.jsonbuilder.json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import org.apache.commons.math3.random.JDKRandomGenerator
 import org.apache.commons.math3.random.RandomGenerator
 import org.json.JSONObject
@@ -140,8 +139,10 @@ open class Environment(
     @Deprecated(message = "Use property instead. To be removed in v0.9", replaceWith = ReplaceWith("now"))
     fun now() = now
 
-//    val foo  = 3.ticks
-//    val foo  = 3.simtime
+    @Suppress("LeakingThis")
+    // That's a pointless self-recursion, but it allows to simplify support API (tick-transform, distributions, etc.)
+    override val env: Environment = this
+
 
     /** Allows to transform ticks to real world time moements (represented by `java.time.Instant`) */
     override var tickTransform: TickTransform? = null

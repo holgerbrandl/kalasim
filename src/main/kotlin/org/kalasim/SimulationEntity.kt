@@ -3,9 +3,7 @@ package org.kalasim
 import com.github.holgerbrandl.jsonbuilder.json
 import org.json.JSONObject
 import org.kalasim.analysis.InteractionEvent
-import org.kalasim.misc.DependencyContext
-import org.kalasim.misc.Jsonable
-import org.kalasim.misc.printThis
+import org.kalasim.misc.*
 import org.koin.core.Koin
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
@@ -13,7 +11,7 @@ import org.koin.core.qualifier.Qualifier
 
 abstract class SimulationEntity(name: String? = null, val simKoin: Koin = DependencyContext.get()) : SimContext {
 
-    val env = getKoin().get<Environment>()
+    final override val env = getKoin().get<Environment>()
 
     /** The (possibly auto-generated) name of this simulation entity.*/
     val name = name ?: javaClass.defaultName(env.nameCache)

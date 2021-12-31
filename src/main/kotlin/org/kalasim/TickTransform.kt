@@ -110,6 +110,8 @@ internal const val MISSING_TICK_TRAFO_ERROR = "Tick transformation not configure
 
 interface SimContext : KoinComponent {
 
+    val env: Environment
+
     var tickTransform: TickTransform?
 
     /** Transforms a wall `duration` into the corresponding amount of ticks.*/

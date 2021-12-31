@@ -1,9 +1,13 @@
 package org.kalasim.test
 
+import io.kotest.matchers.doubles.*
+import io.kotest.matchers.shouldBe
 import org.apache.commons.math3.distribution.ExponentialDistribution
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.analysis.EntityCreatedEvent
+import org.kalasim.misc.roundAny
+import org.kalasim.monitors.NumericStatisticMonitor
 import kotlin.test.assertEquals
 import kotlin.test.fail
 
@@ -42,6 +46,28 @@ class GeneratorTest {
         cg.addConsumer { fail() }
 
         run(10)
+    }
+
+    @Test
+    fun `it should allow sampling iat from a triangular distribution`() = createTestSimulation(false) {
+        val nsm  = NumericStatisticMonitor()
+
+        var lastCreation :TickTime = now
+        ComponentGenerator(iat = triangular(4,8,10)) {
+            val timeSinceLastArrival = now - lastCreation
+            nsm.addValue(timeSinceLastArrival)
+            it.toString()
+            lastCreation = now
+        }
+
+        run(10000)
+
+        nsm.statistics().min shouldBeGreaterThan 4.0
+        nsm.statistics().max shouldBeLessThan 10.0
+        nsm.values.toList().map{it.roundAny(2)}
+            .groupBy { it }
+            .maxByOrNull { it.value.size }
+            ?.key shouldBe 8.0.plusOrMinus(0.1)
     }
 
     @Test

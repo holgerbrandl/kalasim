@@ -3,9 +3,7 @@ package org.kalasim.examples
 import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
-import kravis.geomLine
-import kravis.geomPoint
-import kravis.plot
+import kravis.*
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.rank.Median
@@ -18,11 +16,10 @@ import org.kalasim.examples.bank.oneclerk.Customer
 import org.kalasim.examples.bank.reneging.CustomerGenerator
 import org.kalasim.misc.median
 import org.kalasim.test.captureOutput
-import org.kalasim.test.createTestSimulation
 import org.koin.core.context.stopKoin
 
 
-private val DescriptiveStatistics.median: Double
+internal val DescriptiveStatistics.median: Double
     get() = Median().evaluate(values)
 
 class SalabimExampleTests {

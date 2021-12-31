@@ -2,6 +2,9 @@
 
 ## v0.8-SNAPSHOT
 
+Not yet released. Developer snapshots are deposited on maven-central starting with v0.7.90+ 
+
+
 Milestone Enhancements
 
 * Added [honor policies](resource.md#request-honor-policies) to allow for more configurable request queue consumption
@@ -10,6 +13,7 @@ Milestone Enhancements
 
 Major Enhancements
 
+* [#34](https://github.com/holgerbrandl/kalasim/issues/34) Added support for [triangular distributions](basics.md#continuous-distributions)
 * [#43](https://github.com/holgerbrandl/kalasim/issues/43) Simplified states to consume [predicates](state.md#predicate-testing) directly in `wait()`
 * [#27](https://github.com/holgerbrandl/kalasim/issues/27) Made resource events more informative and consistent. These event now include a request-id to enable simplified bottleneck analyses  
 * Added `RequestScopeContext` to honor-block of `request` including `requestingSince` time
@@ -26,6 +30,7 @@ Minor enhancements
 * Removed `Resource.release()` because of incomplete and unclear semantics
 
 Documentation
+
 * [#38](https://github.com/holgerbrandl/kalasim/issues/38) Rewritten gas-station example to illustrate [depletable resource](resource.md#depletable-resources) usage
 * Added new datalore example workbook: [Extended Traffic](https://datalore.jetbrains.com/view/notebook/k1y5ufCMLdAWZOu1ztU2fV)
 
