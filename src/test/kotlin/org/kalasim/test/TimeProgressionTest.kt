@@ -2,9 +2,7 @@ package org.kalasim.test
 
 import io.kotest.matchers.shouldNotBe
 import org.junit.Test
-import org.kalasim.Component
-import org.kalasim.Environment
-import org.kalasim.EventLog
+import org.kalasim.*
 
 class TimeProgressionTest {
 

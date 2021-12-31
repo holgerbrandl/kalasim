@@ -1,10 +1,7 @@
 package org.kalasim.examples
 
 import krangl.*
-import kravis.GGPlot
-import kravis.facetWrap
-import kravis.geomStep
-import kravis.plot
+import kravis.*
 import org.kalasim.*
 import org.kalasim.analysis.ResourceEvent
 import org.kalasim.plot.kravis.display

@@ -5,10 +5,7 @@ import kravis.*
 import kravis.device.JupyterDevice
 import org.kalasim.*
 import org.kalasim.analysis.ResourceActivityEvent
-import org.kalasim.monitors.CategoryTimeline
-import org.kalasim.monitors.FrequencyTable
-import org.kalasim.monitors.MetricTimeline
-import org.kalasim.monitors.NumericStatisticMonitor
+import org.kalasim.monitors.*
 import java.awt.GraphicsEnvironment
 
 internal fun canDisplay() = !GraphicsEnvironment.isHeadless() && hasR()

@@ -1,8 +1,6 @@
 package org.kalasim.examples.er
 
-import krangl.count
-import krangl.dataFrameOf
-import krangl.print
+import krangl.*
 import org.kalasim.ComponentGenerator
 import org.kalasim.plot.kravis.display
 

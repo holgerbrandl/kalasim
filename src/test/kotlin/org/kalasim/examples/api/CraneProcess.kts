@@ -1,7 +1,5 @@
 //CraneProcess.kts
-import org.kalasim.Component
-import org.kalasim.ProcessPointer
-import org.kalasim.createSimulation
+import org.kalasim.*
 
 class Crane(
     process: ProcessPointer? = Component::process

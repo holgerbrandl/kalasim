@@ -1,7 +1,5 @@
 //ResourceSelection.kts
-import org.kalasim.Component
-import org.kalasim.Resource
-import org.kalasim.createSimulation
+import org.kalasim.*
 import org.kalasim.misc.repeat
 
 createSimulation {

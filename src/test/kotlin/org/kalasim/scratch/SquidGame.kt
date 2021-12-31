@@ -1,14 +1,9 @@
 //SquidGame.kts
 package org.kalasim.scratch
 
-import kravis.geomBar
-import kravis.geomCol
-import kravis.plot
+import kravis.*
 import org.apache.commons.math3.distribution.LogNormalDistribution
-import org.kalasim.Component
-import org.kalasim.Environment
-import org.kalasim.enumerated
-import org.kalasim.invoke
+import org.kalasim.*
 import java.lang.Double.min
 import kotlin.random.Random
 

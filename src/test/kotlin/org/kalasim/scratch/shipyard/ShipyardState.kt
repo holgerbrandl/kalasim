@@ -1,9 +1,6 @@
 package org.kalasim.scratch.shipyard
 
-import org.kalasim.Component
-import org.kalasim.DepletableResource
-import org.kalasim.State
-import org.kalasim.createSimulation
+import org.kalasim.*
 import org.kalasim.plot.kravis.display
 
 // Wait for a terminal to accumulate enough goods before starting shipment.

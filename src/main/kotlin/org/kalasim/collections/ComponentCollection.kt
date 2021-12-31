@@ -4,9 +4,7 @@ package org.kalasim
 
 import org.kalasim.misc.ComponentCollectionTrackingConfig
 import org.kalasim.misc.DependencyContext
-import org.kalasim.monitors.MetricTimeline
-import org.kalasim.monitors.NumericStatisticMonitor
-import org.kalasim.monitors.printHistogram
+import org.kalasim.monitors.*
 import org.koin.core.Koin
 
 

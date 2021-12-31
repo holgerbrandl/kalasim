@@ -1,9 +1,7 @@
 //DiningPhilosophers.kt
 package org.kalasim.examples
 
-import krangl.asDataFrame
-import krangl.gt
-import krangl.lag
+import krangl.*
 import kravis.geomSegment
 import kravis.plot
 import org.kalasim.*

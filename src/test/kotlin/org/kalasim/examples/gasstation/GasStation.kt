@@ -5,9 +5,9 @@ package org.kalasim.examples.gasstation
 import org.kalasim.*
 import org.kalasim.misc.printThis
 import org.kalasim.monitors.printHistogram
+import org.kalasim.plot.kravis.display
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
-import org.kalasim.plot.kravis.display
 
 /**
  * A car arrives at the gas station for refueling.

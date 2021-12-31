@@ -7,10 +7,7 @@
 ///@file:DependsOn("com.github.holgerbrandl:kalasim:0.6.91")
 //@file:DependsOn("com.github.holgerbrandl:krangl:0.17")
 
-import krangl.asDataFrame
-import krangl.gt
-import krangl.lag
-import krangl.writeCSV
+import krangl.*
 import org.kalasim.*
 import org.kalasim.analysis.ResourceEvent
 import org.kalasim.analysis.ResourceEventType

@@ -1,15 +1,10 @@
 package org.kalasim.test
 
-import jetbrains.letsPlot.geom.geomBoxplot
-import jetbrains.letsPlot.geom.geomDensity
-import jetbrains.letsPlot.geom.geomPoint
+import jetbrains.letsPlot.geom.*
 import jetbrains.letsPlot.ggsize
 import jetbrains.letsPlot.intern.Plot
 import jetbrains.letsPlot.letsPlot
-import krangl.asDataFrame
-import krangl.irisData
-import krangl.print
-import krangl.toMap
+import krangl.*
 import org.kalasim.analysis.InteractionEvent
 import org.kalasim.examples.MM1Queue
 import org.kalasim.plot.letsplot.display

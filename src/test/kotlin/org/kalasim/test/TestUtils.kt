@@ -1,9 +1,7 @@
 package org.kalasim.test
 
 import org.apache.commons.math3.distribution.ConstantRealDistribution
-import org.kalasim.Environment
-import org.kalasim.createSimulation
-import org.kalasim.tickTime
+import org.kalasim.*
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 

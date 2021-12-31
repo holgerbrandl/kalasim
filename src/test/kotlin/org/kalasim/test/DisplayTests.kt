@@ -5,27 +5,18 @@ import junit.framework.Assert
 import kravis.GGPlot
 import kravis.SessionPrefs
 import kravis.render.LocalR
-import org.junit.Assume
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
 import org.junit.rules.TestName
 import org.kalasim.OffsetTransform
 import org.kalasim.examples.MM1Queue
-import org.kalasim.plot.kravis.canDisplay
-import org.kalasim.plot.kravis.display
-import org.kalasim.plot.kravis.displayStateProportions
-import org.kalasim.plot.kravis.displayStateTimeline
-import java.io.File
-import java.io.StringReader
-import java.io.StringWriter
+import org.kalasim.plot.kravis.*
+import java.io.*
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.stream.StreamSource
-import kotlin.test.assertEquals
 
 
 class DisplayTests : AbstractSvgPlotRegression() {

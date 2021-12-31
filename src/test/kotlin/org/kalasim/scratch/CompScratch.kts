@@ -1,8 +1,6 @@
 package org.kalasim.scratch
 
-import org.kalasim.Component
-import org.kalasim.Environment
-import org.kalasim.Resource
+import org.kalasim.*
 
 val env = Environment()
 

@@ -1,7 +1,5 @@
 //TickTrafoExample.kts
-import org.kalasim.OffsetTransform
-import org.kalasim.asWallTime
-import org.kalasim.createSimulation
+import org.kalasim.*
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit

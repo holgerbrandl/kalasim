@@ -1,8 +1,8 @@
 package org.kalasim.examples.er
 
+import org.kalasim.*
 import org.kalasim.examples.er.PatientStatus.*
 import org.kalasim.examples.er.Severity.*
-import org.kalasim.*
 import org.kalasim.monitors.MetricTimeline
 import kotlin.math.pow
 import kotlin.math.sqrt

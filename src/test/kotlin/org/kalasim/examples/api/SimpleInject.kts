@@ -1,7 +1,5 @@
 //SimpleInject.kts
-import org.kalasim.Component
-import org.kalasim.add
-import org.kalasim.configureEnvironment
+import org.kalasim.*
 
 data class Counter(var value: Int)
 

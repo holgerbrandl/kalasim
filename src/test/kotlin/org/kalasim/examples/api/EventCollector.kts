@@ -1,8 +1,7 @@
 //EventCollector.kts
-import org.kalasim.*
-import org.kalasim.analysis.InteractionEvent
-import org.kalasim.analysis.ResourceEvent
-import org.kalasim.analysis.ResourceEventType
+import org.kalasim.analysis.*
+import org.kalasim.createSimulation
+import org.kalasim.eventLog
 
 createSimulation(enableConsoleLogger = true) {
     val tc = eventLog()

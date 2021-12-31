@@ -11,7 +11,6 @@ import org.kalasim.misc.*
 import org.kalasim.monitors.MetricTimelineStats
 import org.koin.core.Koin
 import java.util.*
-import kotlin.Comparator
 
 data class CQElement<C>(val component: C, val enterTime: TickTime, val priority: Priority? = null)
 

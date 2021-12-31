@@ -2,9 +2,7 @@ package org.kalasim.scratch
 
 import org.apache.commons.math3.stat.descriptive.AggregateSummaryStatistics
 import org.kalasim.createSimulation
-import org.kalasim.monitors.CategoryTimeline
-import org.kalasim.monitors.MetricTimeline
-import org.kalasim.monitors.NumericStatisticMonitor
+import org.kalasim.monitors.*
 import org.kalasim.tickTime
 
 // https://www.kalasim.org/examples/

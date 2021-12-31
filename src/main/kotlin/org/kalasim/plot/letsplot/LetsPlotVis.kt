@@ -4,9 +4,7 @@ import jetbrains.letsPlot.Stat
 import jetbrains.letsPlot.facet.facetWrap
 import jetbrains.letsPlot.geom.*
 import jetbrains.letsPlot.intern.Plot
-import jetbrains.letsPlot.label.ggtitle
-import jetbrains.letsPlot.label.xlab
-import jetbrains.letsPlot.label.ylab
+import jetbrains.letsPlot.label.*
 import jetbrains.letsPlot.letsPlot
 import jetbrains.letsPlot.scale.scaleXDateTime
 import krangl.*
