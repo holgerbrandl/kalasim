@@ -27,10 +27,15 @@ object : Component() {
 
 The event log is modelled as a sequence of `org.kalasim.Event`s that can be consumed with one more multiple `org.kalasim.EventListener`s. The classical  publish-subscribe pattern is used here. Consumers can easily route events into such as consoles, files, rest-endpoints, databases, or in-place-analytics.
 
-To get started, we can register new event handlers with `addEventListener(org.kalasim.EventListener)`. Since an `EventListener` is modelled as a [functional interface](https://kotlinlang.org/docs/fun-interfaces.html), the syntax is very concise:
+To get started, we can register new event handlers with `addEventListener(org.kalasim.EventListener)`. Since an `EventListener` is modelled as a [functional interface](https://kotlinlang.org/docs/fun-interfaces.html), the syntax is very concise and optionally supports generics:
+
 ```kotlin
 createSimulation { 
+    // register to all events
     addEventListener{ it: Event -> println(it)}    
+    
+    // register listener only for resource-events
+    addEventListener<ResourceEvent>{ it: ResourceEvent -> println(it)}    
 }
 ```
 
@@ -105,10 +110,21 @@ Sometimes, events can not be consumed in the simulation thread, but must be proc
 In the example, we can think of a channel as a pipe between two coroutines. For details see the great article [_Kotlin: Diving in to Coroutines and Channels_]( 
 https://proandroiddev.com/kotlin-coroutines-channels-csp-android-db441400965f).
 
-
 ## Logging Configuration
 
 Typically, only some types of event logging are required in a given simulation. To optimize simulation performance, the engine allows to suppress selectively per event type and simulation entity. This is configured via [tracking policy factory](advanced.md#continuous-simulation) 
+
+
+## Logging Framework Support
+
+It's very easy to also log kalasim events via another logging library such as [log4j](https://logging.apache.org/log4j), [https://logging.apache.org/log4j/2.x/](https://www.slf4j.org), [kotlin-logging](https://github.com/MicroUtils/kotlin-logging) or the jdk-bundled [util-logger](https://docs.oracle.com/javase/7/docs/api/java/util/logging/Logger.html). This is how it works:
+
+```kotlin
+//{!api/LoggingAdapter.kts!}
+```
+
+
+For an in-depth logging framework support discussion see [#40](https://github.com/holgerbrandl/kalasim/issues/40).
 
 ## Tabular Interface
 
