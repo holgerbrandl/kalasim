@@ -59,7 +59,7 @@ fun MetricTimeline.display(
 
     return data
         .plot(
-            x = { wtTransform(TickTime(first)) },
+            x = { wtTransform(first) },
             y = { second }
         )
         .xLabel("Time")
@@ -100,7 +100,7 @@ fun <T> CategoryTimeline<T>.display(
 
     fun wtTransform(tt: TickTime) = if (useWT) env.asWallTime(tt) else tt
 
-    data class Segment<T>(val value: T, val start: Double, val end: Double)
+    data class Segment<T>(val value: T, val start: TickTime, val end: TickTime)
 
     val segments = stepFun.zipWithNext().map {
         Segment(
@@ -112,9 +112,9 @@ fun <T> CategoryTimeline<T>.display(
 
     // why cant we use "x".asDiscreteVariable here?
     return segments.plot(
-        x = { wtTransform(TickTime(start)) },
+        x = { wtTransform(start) },
         y = { value },
-        xend = { wtTransform(TickTime(end)) },
+        xend = { wtTransform(end) },
         yend = { value }
     )
         .xLabel("Time")
@@ -194,8 +194,8 @@ fun List<Component>.displayStateTimeline(
     return df.plot(
         y = { first.name },
         yend = { first.name },
-        x = { wtTransform(TickTime(second.timestamp)) },
-        xend = { wtTransform(TickTime(second.timestamp + (second.duration ?: 0.0))) },
+        x = { wtTransform(second.timestamp) },
+        xend = { wtTransform(second.timestamp + (second.duration ?: 0.0)) },
         color = { second.value }
     )
         .geomSegment()

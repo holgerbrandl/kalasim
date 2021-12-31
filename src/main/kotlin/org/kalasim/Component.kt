@@ -1715,7 +1715,7 @@ fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {
     return ComponentLifecycleRecord(
         c.name,
         c.creationTime,
-        inDataSince = if(c.isData) c.statusTimeline.statsData().timepoints.last().asTickTime() else null,
+        inDataSince = if(c.isData) c.statusTimeline.statsData().timepoints.last() else null,
         (histogram.get(DATA) ?: 0.0).asTickTime(),
         (histogram[CURRENT] ?: 0.0).asTickTime(),
         (histogram[STANDBY] ?: 0.0).asTickTime(),

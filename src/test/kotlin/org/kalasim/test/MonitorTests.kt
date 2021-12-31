@@ -215,7 +215,7 @@ class MergeTimelineTests {
         println(addedTL.values)
 
         addedTL.values shouldBe listOf(0.0, 23.0, 26.0, 28.0, 15.0)
-        addedTL.timestamps shouldBe listOf(0.0, 5.0, 10.0, 12.0, 14.0)
+        addedTL.timestamps shouldBe listOf(0.0, 5.0, 10.0, 12.0, 14.0).map{ it.tt}
 
         // just make sure that the other ops do not error do not error
         println(mtA + mtB)

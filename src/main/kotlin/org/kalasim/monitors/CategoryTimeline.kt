@@ -9,7 +9,7 @@ import org.koin.core.Koin
 /**
  * Level monitors tally levels along with the current (simulation) time. e.g. the number of parts a machine is working on.
  *
- * @sample org.kalasim.misc.DokkaExamplesKt.freqLevelDemo
+ * @sample org.kalasim.dokka.freqLevelDemo
  */
 class CategoryTimeline<T>(
     val initialValue: T,
@@ -17,7 +17,7 @@ class CategoryTimeline<T>(
     koin: Koin = DependencyContext.get()
 ) : Monitor<T>(name, koin), ValueTimeline<T> {
 
-    private val timestamps = mutableListOf<Double>()
+    private val timestamps = mutableListOf<TickTime>()
     private val values = ifEnabled { mutableListOf<T>() }
 
     init {
@@ -37,7 +37,7 @@ class CategoryTimeline<T>(
     override fun addValue(value: T) {
         if (!enabled) return
 
-        timestamps.add(env.now.value)
+        timestamps.add(env.now)
         values.add(value)
     }
 
@@ -58,13 +58,13 @@ class CategoryTimeline<T>(
 
     private fun xDuration(): DoubleArray =
         timestamps.toMutableList()
-            .apply { add(env.now.value) }
+            .apply { add(env.now) }
             .zipWithNext { first, second -> second - first }
             .toDoubleArray()
 
 
     override fun get(time: Number): T? {
-        require(time.toDouble() >= timestamps.first()) {
+        require(timestamps.first() <= time ) {
             "query time must be greater than timeline start (${timestamps.first()})"
         }
 
@@ -111,7 +111,7 @@ class CategoryTimeline<T>(
 
         val valuesLst = values.toList()
 
-        val timepointsExt = timestamps + env.now.value
+        val timepointsExt = timestamps + env.now
         val durations = timepointsExt.toMutableList().zipWithNext { first, second -> second - first }
 
         return LevelStatsData(valuesLst, timestamps, durations)

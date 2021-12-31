@@ -43,7 +43,7 @@ fun main() {
             val numLeftQueue = theater.numReneged[movie]!!
             val soldOutSince = theater.tickets[movie]!!.occupancyTimeline.stepFun()
                 // find the first time when tickets were sold out
-                .first { it.second == 1.0 }.first.roundAny(2)
+                .first { it.second == 1.0 }.first.value.roundAny(2)
 
             println("Movie ${movie.name} sold out $soldOutSince minutes after ticket counter opening.")
             println("$numLeftQueue walked away after film was sold out.")

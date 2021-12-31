@@ -64,7 +64,7 @@ fun <T> CategoryTimeline<T>.display(
 
     fun wtTransform(tt: TickTime) = if (useWT) env.asWallTime(tt) else tt.value
 
-    data class Segment<T>(val value: T, val start: Double, val end: Double)
+    data class Segment<T>(val value: T, val start: TickTime, val end: TickTime)
 
     val segments = stepFun.zipWithNext().map {
         Segment(

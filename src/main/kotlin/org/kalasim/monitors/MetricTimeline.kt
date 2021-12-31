@@ -11,7 +11,6 @@ import org.kalasim.asCMPairList
 import org.kalasim.misc.*
 import org.koin.core.Koin
 import java.util.*
-import kotlin.math.max
 import kotlin.math.sqrt
 
 /**
@@ -25,7 +24,7 @@ class MetricTimeline(
     koin: Koin = DependencyContext.get()
 ) : Monitor<Number>(name, koin), ValueTimeline<Number> {
 
-    internal val timestamps = mutableListOf<Double>()
+    internal val timestamps = mutableListOf<TickTime>()
     internal val values = ifEnabled { mutableListOf<Double>() }
 
     init {
@@ -36,7 +35,7 @@ class MetricTimeline(
     override fun addValue(value: Number) {
         if (!enabled) return
 
-        timestamps.add(env.now.value)
+        timestamps.add(env.now)
         values.add(value.toDouble())
     }
 
@@ -59,7 +58,7 @@ class MetricTimeline(
     }
 
     override fun get(time: Number): Number {
-        require(time.toDouble() >= timestamps.first()) {
+        require(timestamps.first() <= time) {
             "query time must be greater than timeline start (${timestamps.first()})"
         }
 
@@ -77,16 +76,17 @@ class MetricTimeline(
     override fun statisticsSummary() = (statsData() as LevelStatsData<Number>).statisticalSummary()
 
     fun statsData(excludeZeros: Boolean = false): LevelStatsData<Double> {
+        @Suppress("DuplicatedCode")
         require(values.isNotEmpty()) { "data must not be empty when preparing statistics of $name" }
 
         val valuesLst = values.toList()
 
-        val timepointsExt = timestamps + env.now.value
+        val timepointsExt = timestamps + env.now
         val durations = timepointsExt.toMutableList().zipWithNext { first, second -> second - first }
 
         return if (excludeZeros) {
             val (durFilt, valFilt) = durations.zip(valuesLst).filter { it.second > 0 }.unzip()
-            val (_, timestampsFilt) = timestamps.zip(valuesLst).filter { it.second > 0 }.unzip()
+            val (timestampsFilt,_ ) = timestamps.zip(valuesLst).filter { it.second > 0 }.unzip()
 
             LevelStatsData(valFilt, timestampsFilt, durFilt)
         } else {
@@ -113,6 +113,7 @@ class MetricTimeline(
 
     override fun resetToCurrent() = reset(get(now))
 
+    @Suppress("DuplicatedCode")
     override fun clearHistory(before: TickTime) {
         val startFromIdx = timestamps.withIndex().firstOrNull { before > it.value }?.index ?: return
 
@@ -205,14 +206,14 @@ private fun combineInternal(mt: MetricTimeline, other: MetricTimeline, mode: Ari
     // also see
     // https://www.geeksforgeeks.org/merge-two-sorted-linked-lists/
     // https://stackoverflow.com/questions/1774256/java-code-review-merge-sorted-lists-into-a-single-sorted-list
-    val joinTime = TreeSet<Double>().apply { addAll(mt.timestamps); addAll(other.timestamps); add(mt.now.value) }
+    val joinTime = TreeSet<TickTime>().apply { addAll(mt.timestamps); addAll(other.timestamps); add(mt.now) }
 
-    val minTime = max(mt.timestamps.first(), other.timestamps.first())
+    val minTime = maxOf(mt.timestamps.first(), other.timestamps.first())
 //    val maxTime = Math.min(mt.timestamps.last(), other.timestamps.last())
     val maxTime = mt.now.value
 //    val timeRange = minTime..maxTime
 
-    val merged = MetricTimeline("'${mt.name}' ${mode} '${other.name}'").apply {
+    val merged = MetricTimeline("'${mt.name}' $mode '${other.name}'").apply {
         timestamps.clear()
         values.clear()
     }

@@ -22,7 +22,7 @@ interface ValueTimeline<T> {
 
 
     /** Returns the step function of this monitored value along the time axis. */
-    fun stepFun(): List<Pair<Double, T>>
+    fun stepFun(): List<Pair<TickTime, T>>
 
     /** Resets the timeline to a new initial at the current simulation clock. This will also reenable it as a side-effect. */
     fun reset(initial: T)
@@ -51,11 +51,11 @@ fun <T> LevelStatsData<T>.statisticalSummary(): EnumeratedDistribution<T> {
 
 data class LevelStatsData<T>(
     val values: List<T>,
-    val timepoints: List<Double>,
+    val timepoints: List<TickTime>,
     val durations: List<Double>
 ) {
     /** Returns the step function of time, value pairs*/
-    fun stepFun(): List<Pair<Double, T>> =
+    fun stepFun(): List<Pair<TickTime, T>> =
         (this.timepoints + (timepoints.last() + durations.last())).zip(values.toList() + values.last())
 
     /**
@@ -68,7 +68,7 @@ data class LevelStatsData<T>(
     }
 }
 
-data class LevelStateRecord<T>(val timestamp: Double, val value: T, val duration: Double?)
+data class LevelStateRecord<T>(val timestamp: TickTime, val value: T, val duration: Double?)
 
 
 class IntVarTimeline(initialValue: Int = 0, name: String? = null, koin: Koin = DependencyContext.get()) {

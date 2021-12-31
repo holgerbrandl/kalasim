@@ -4,13 +4,8 @@ import com.github.holgerbrandl.jsonbuilder.json
 import krangl.*
 import org.kalasim.analysis.EntityCreatedEvent
 import org.kalasim.analysis.ResourceActivityEvent
-import org.kalasim.misc.DependencyContext
-import org.kalasim.misc.Jsonable
-import org.kalasim.misc.ResourceTrackingConfig
-import org.kalasim.monitors.MetricTimeline
-import org.kalasim.monitors.copy
-import org.kalasim.monitors.div
-import org.kalasim.monitors.minus
+import org.kalasim.misc.*
+import org.kalasim.monitors.*
 import org.koin.core.Koin
 import java.util.*
 import kotlin.random.Random
@@ -111,7 +106,8 @@ open class DepletableResource(
             // note: SQF looks the same as StrictFCFS, but the queue comparator is different
 //            (quantity < 0 || requesters.q.peek().component == component) && canHonorQuantity(quantity)
             (quantity <= 0 || (requesters.q as PriorityQueue).sortedIterator()
-                .filter { it.component.requests[this]!!.quantity > 0 }.firstOrNull()?.component == component) && canHonorQuantity(
+                .filter { it.component.requests[this]!!.quantity > 0 }
+                .firstOrNull()?.component == component) && canHonorQuantity(
                 quantity
             )
         }
@@ -429,11 +425,15 @@ val Resource.timeline: List<ResourceTimelineSegment>
 
         var statsDF = bindRows(capStats, claimStats, availStats, occStats, requesters, claimers)
         statsDF = statsDF.rename("timestamp" to "start")
-        statsDF = statsDF.addColumn("end") { it["start"] + it["duration"] }
+        statsDF = statsDF.addColumn("end") {
+            DoubleCol(
+                "tt",
+                it["start"].map<TickTime> { it.value } as List<Double>) + it["duration"]
+        }
         statsDF = statsDF.addColumn("resource") { this@timeline }
 
         // convert to tick-time
-        statsDF = statsDF.addColumn("start") { expr -> expr["start"].map<Double> { TickTime(it) } }
+//        statsDF = statsDF.addColumn("start") { expr -> expr["start"].map<Double> { TickTime(it) } }
         statsDF = statsDF.addColumn("end") { expr -> expr["end"].map<Double> { TickTime(it) } }
 
         // optionally add walltimes
