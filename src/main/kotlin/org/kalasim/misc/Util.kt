@@ -4,6 +4,8 @@ import com.google.gson.GsonBuilder
 import kotlinx.coroutines.*
 import org.apache.commons.math3.util.Precision
 import org.json.JSONObject
+import org.kalasim.MetricEvent
+import org.kalasim.TickTime
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
@@ -24,6 +26,9 @@ internal fun Any.printThis() {
 internal fun ImplementMe(): Nothing =
     TODO("Not yet implemented. Please file a ticket under https://github.com/holgerbrandl/kalasim/issues")
 
+fun main() {
+    print(MetricEvent(TickTime(3), 123).toJson())
+}
 
 //@Serializable
 abstract class Jsonable {

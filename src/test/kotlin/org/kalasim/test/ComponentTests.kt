@@ -474,6 +474,4 @@ class ComponentTests {
     }
 }
 
-// see https://github.com/kotest/kotest/issues/1084
-private infix fun String.shouldBeDiff(expected: String) = assertEquals(expected, this)
 

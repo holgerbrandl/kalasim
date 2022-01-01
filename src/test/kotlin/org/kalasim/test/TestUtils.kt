@@ -4,6 +4,7 @@ import org.apache.commons.math3.distribution.ConstantRealDistribution
 import org.kalasim.*
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
+import kotlin.test.assertEquals
 
 
 // this class is simply copied from https://github.com/holgerbrandl/krangl
@@ -77,3 +78,7 @@ fun Environment.inversedIatDist(vararg arrivalTimes: Number) = object : Constant
 
     override fun sample(): Double = values.next()
 }
+
+
+// see https://github.com/kotest/kotest/issues/1084
+infix fun String.shouldBeDiff(expected: String) = assertEquals(expected, this)
