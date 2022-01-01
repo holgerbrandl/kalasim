@@ -245,10 +245,6 @@ object : Component(){
 
 As shown in the example, probability distributions can be sampled with [invoke](https://kotlinlang.org/docs/operator-overloading.html#invoke-operator) `()`.
 
-Also integer distributions are supported
-
-* `discreteUniform(lower, upper)`
-
 All distributions functions provide common parameter defaults where possible, and are defined as extension functions of `org.kalasim.SimContext`. This makes the accessible in [environment definitions](basics.md#simulation-environment), all simulation entities, as well as [process definitions](component.md#process-definition):
 
 
@@ -272,7 +268,12 @@ Internally, `3` is converted into a `org.apache.commons.math3.distribution.Const
 
 ### Enumerations
 
-Apart fom numeric distributions, also distributions over arbitrary types are supported via `enumerated()`. This does not just work with [`enums`](https://kotlinlang.org/docs/enum-classes.html) but with arbitrary types including [data classes](https://kotlinlang.org/docs/data-classes.html).
+Very often when working out simulation models, there is a need to sample with controlled randomization, from discrete populations, such as integer-ranges, IDs, enums or collections. Kalasim supports various integer distributions, uuid-sampling, as well as type-safe enumeration-sampling.
+
+* `discreteUniform(lower, upper)` - Uniformly distributed integers in provided interval
+* `uuid()` - Creates a random-controlled - i.e. deterministic - series of [universally unique IDs](https://en.wikipedia.org/wiki/Universally_unique_identifier) (backed by [`java.util.UUID`](https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html))
+
+Apart fom numeric distributions, also distributions over arbitrary types are supported with `enumerated()`. This does not just work with [`enums`](https://kotlinlang.org/docs/enum-classes.html) but with arbitrary types including [data classes](https://kotlinlang.org/docs/data-classes.html).
 
 ```kotlin
 enum class Fruit{Apple, Banana, Peach}

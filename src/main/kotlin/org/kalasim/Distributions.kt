@@ -2,6 +2,7 @@ package org.kalasim
 
 import org.apache.commons.math3.distribution.*
 import java.lang.Double.min
+import java.util.*
 import kotlin.math.max
 
 /**
@@ -91,3 +92,10 @@ internal typealias   CMPair<K, V> = org.apache.commons.math3.util.Pair<K, V>
 
 internal fun <T, S> List<Pair<T, S>>.asCMPairList(): List<CMPair<T, S>> = map { CMPair(it.first, it.second) }
 internal fun <T, S> Map<T, S>.asCMPairList(): List<CMPair<T, S>> = map { CMPair(it.key, it.value) }
+
+
+//
+// ID Generation
+//
+
+fun SimContext.uuid(): UUID = UUID.nameUUIDFromBytes(env.rg.nextLong().toString().toByteArray())
