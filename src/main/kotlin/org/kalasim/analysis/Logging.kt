@@ -17,7 +17,8 @@ abstract class Event(
 //    constructor(time: TickTime) : this(time.value)
 //    constructor(time: Number) : this(time.toDouble())
 
-    open val logLevel: Level get() = Level.INFO
+    // disabled because was just used in console-logger. It should better use tracking-policy instead
+//    open val logLevel: Level get() = Level.INFO
 
     override fun toString() = toJson().toString()
 

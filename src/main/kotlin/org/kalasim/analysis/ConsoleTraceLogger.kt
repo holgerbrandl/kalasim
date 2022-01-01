@@ -28,7 +28,7 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
 
 
     override fun consume(event: Event) {
-        if(event.logLevel.intValue() < logLevel.intValue()) return
+//        if(event.logLevel.intValue() < logLevel.intValue()) return
 
         if(!hasPrintedHeader) {
             hasPrintedHeader = true
