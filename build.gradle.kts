@@ -23,7 +23,7 @@ dependencies {
 
 
     api("com.github.holgerbrandl:jsonbuilder:0.9")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 
   //  api("io.github.microutils:kotlin-logging:1.12.5")
 //    api("org.slf4j:slf4j-simple:1.7.32")
