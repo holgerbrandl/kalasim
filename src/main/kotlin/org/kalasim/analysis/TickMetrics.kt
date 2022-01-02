@@ -2,7 +2,9 @@
 
 package org.kalasim
 
+import org.json.JSONObject
 import org.kalasim.misc.DependencyContext
+import org.kalasim.misc.buildJsonWithGson
 import org.kalasim.monitors.MetricTimeline
 import org.koin.core.Koin
 import kotlin.math.round
@@ -41,7 +43,9 @@ class TickMetrics(
     }
 }
 
-class MetricEvent(tickTime: TickTime, val tickWallDurationMs: Int) : Event(tickTime)
+class MetricEvent(tickTime: TickTime, val tickWallDurationMs: Int) : Event(tickTime){
+    override fun toJson() = buildJsonWithGson()
+}
 
 // can this be enabled with multiple receivers in kotlin 1.6
 //internal fun SequenceScope<Component>.benchmark(block: SequenceScope<Component>.() -> Any): Long {

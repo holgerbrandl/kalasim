@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import kotlin.test.assertEquals
 
+fun SimulationEntity.printInfo() = println(this)
 
 // this class is simply copied from https://github.com/holgerbrandl/krangl
 

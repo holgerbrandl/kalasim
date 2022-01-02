@@ -24,7 +24,7 @@ class StateTests {
     fun `it should gracefully print an empty state`() {
         createSimulation {
             State("foo").apply {
-                println(info)
+                println(snapshot)
                 println(toString())
                 printHistograms()
             }
@@ -67,7 +67,7 @@ class StateTests {
 
             run(10.0)
 
-            trafficLight.info.waiters.size shouldBe 1
+            trafficLight.snapshot.waiters.size shouldBe 1
 
             // toggle state
             trafficLight.value = "green"
@@ -76,7 +76,7 @@ class StateTests {
 
             trafficLight.printInfo()
 
-            trafficLight.info.waiters.shouldBeEmpty()
+            trafficLight.snapshot.waiters.shouldBeEmpty()
         }
     }
 
@@ -112,7 +112,7 @@ class StateTests {
 
         sim.run(10.0)
 
-        trafficLight.info.waiters.size shouldBe 1
+        trafficLight.snapshot.waiters.size shouldBe 1
 
         // toggle state
         trafficLight.value = "green"
@@ -121,7 +121,7 @@ class StateTests {
 
         trafficLight.printInfo()
 
-        trafficLight.info.waiters.size shouldBe 1
+        trafficLight.snapshot.waiters.size shouldBe 1
 
         car.isWaiting shouldBe true
 
@@ -135,8 +135,8 @@ class StateTests {
         car.isWaiting shouldBe false
         car.isData shouldBe true
 
-        trafficLight.info.waiters.shouldBeEmpty()
-        engine.info.waiters.shouldBeEmpty()
+        trafficLight.snapshot.waiters.shouldBeEmpty()
+        engine.snapshot.waiters.shouldBeEmpty()
     }
 
 
@@ -177,7 +177,7 @@ class StateTests {
 
             run(10.0)
 
-            trafficLight.info.waiters.size shouldBe 1
+            trafficLight.snapshot.waiters.size shouldBe 1
 
             // toggle state
             trafficLight.value = "green"
@@ -186,7 +186,7 @@ class StateTests {
 
             trafficLight.printInfo()
 
-            trafficLight.info.waiters.shouldBeEmpty()
+            trafficLight.snapshot.waiters.shouldBeEmpty()
 
             car.isWaiting shouldBe true
 

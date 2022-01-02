@@ -104,7 +104,7 @@ fun main() {
 //        waitingLine.queueLengthMonitor.display()
 //        waitingLine.lengthOfStayMonitor.display()
 
-        waitingLine.stats.toJson().toString(2).printThis()
+        waitingLine.statistics.toJson().toString(2).printThis()
 
         println("number reneged: $numReneged")
         println("number balked: $numBalked")

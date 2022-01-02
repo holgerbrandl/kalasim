@@ -49,8 +49,8 @@ data class Patient(
             hold(exponential(meanTime).sample())
         }
 
-        while (!patientStatus.value.deceased) {
-            when (severity.value) {
+        while(!patientStatus.value.deceased) {
+            when(severity.value) {
                 NonUrgent -> passivate()
                 LessUrgent -> {
                     holdExponential(8)
@@ -92,11 +92,11 @@ data class Patient(
 class Room(name: String, var setup: State<InjuryType>) : Component(name) {
 
     override fun process() = sequence {
-        while (true) {
+        while(true) {
             val er = get<EmergencyRoom>()
             val patient = er.nurse.nextOne(er, this@Room)
 
-            if (patient == null) {
+            if(patient == null) {
                 cancel(); return@sequence
             }
 
@@ -107,7 +107,7 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
             // check setup state of room
             val injuryType = patient.type
 
-            if (setup.value != injuryType) {
+            if(setup.value != injuryType) {
                 hold(setupTimes[injuryType]!!, description = "preparing room ${this@Room} for $injuryType")
                 setup.value = injuryType
             }
@@ -132,7 +132,7 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
 
                 // was it successful? This depends on the severity of the injury
                 val isDeceased = surgerySuccessProbability[patient.severity.value]!! > env.random.nextDouble()
-                if (isDeceased) {
+                if(isDeceased) {
                     get<EmergencyRoom>().treatedMonitor.inc()
                     patient.patientStatus.value = Released
                 } else {
@@ -140,7 +140,7 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
                     patient.patientStatus.value = DeceasedInSurgery
                 }
 
-                log("surgery of $patient completed ${if (isDeceased) "with" else "without"} success")
+                log("surgery of $patient completed ${if(isDeceased) "with" else "without"} success")
             }
         }
     }
@@ -154,7 +154,9 @@ val Patient.severityWeightedSurgeryTime: Double
         return severityFactor * nonUrgentSurgeryTimes[type]!!
     }
 
-val setupTimes = InjuryType.values().associateWith { Random.nextInt(5, 10).toDouble() / 60.0 }
+val setupTimes = Random(1).run {
+    InjuryType.values().associateWith { nextInt(5, 10).toDouble() / 60.0 }
+}
 
 val nonUrgentSurgeryTimes =
     InjuryType.values().zip(Random(1).run { List(InjuryType.values().size) { nextDouble(0.1, 0.4) } }).toMap()
@@ -179,7 +181,7 @@ class FifoNurse : HeadNurse {
     override fun nextOne(er: EmergencyRoom, room: Room): Patient? {
 
         // simple fifo
-        return if (er.waitingLine.size > 0) er.waitingLine.poll() else null
+        return if(er.waitingLine.size > 0) er.waitingLine.poll() else null
     }
 }
 
@@ -205,7 +207,7 @@ val SetupAvoidanceNoMatterWhatNurse = HeadNurse { er, _ -> // simple fifo
 //    val firstBySeverity = sameTypePatients.sortedWith(bySeverity).firstOrNull()
 
     // if we need to setup we setup to whats most needed in total count
-    if (er.waitingLine.isEmpty()) return@HeadNurse null
+    if(er.waitingLine.isEmpty()) return@HeadNurse null
 
     val maxSeverity = er.waitingLine.groupingBy { it.severity.value }.eachCount().maxByOrNull { it.value }!!
     er.waitingLine.filter { it.severity.value == maxSeverity.key }.sortedWith(bySeverity).firstOrNull()
@@ -228,13 +230,14 @@ class Doctor(name: String, val qualification: List<InjuryType>) : Resource(name)
 class EmergencyRoom(
 //    nurse: HeadNurse = FifoNurse()
     val nurse: HeadNurse = FifoNurse(),
-    disableMetrics: Boolean = true
-) : Environment(true) {
+    enableConsoleLogger: Boolean = true,
+    enableTickMetrics: Boolean = true
+) : Environment(enableConsoleLogger, enableTickMetrics = enableTickMetrics) {
 
     val waitingAreaSize = 300
 
     init {
-        if (disableMetrics) trackingPolicyFactory.disableAll()
+        if(!enableTickMetrics) trackingPolicyFactory.disableAll()
     }
 
     // todo also here having sorted queue is causing almost more problems than solving
@@ -267,7 +270,7 @@ class EmergencyRoom(
     val incomingMonitor = MetricTimeline("incoming patients")
 
     init {
-        if (disableMetrics) {
+        if(!enableTickMetrics) {
             deceasedMonitor.enabled = false
             treatedMonitor.enabled = false
             incomingMonitor.enabled = false
@@ -290,7 +293,7 @@ class EmergencyRoom(
             // todo this is not pretty; How to model time-dependent iat?
             // reduce new patients during the night
             val isDay = (now.value % 24) in 8.0..18.0
-            if ((isDay || random.nextDouble() > 0.9) && waitingLine.size <= waitingAreaSize) {
+            if((isDay || random.nextDouble() > 0.9) && waitingLine.size <= waitingAreaSize) {
                 register(patient)
             } else {
 //                println("skipping patient (out-of-office")

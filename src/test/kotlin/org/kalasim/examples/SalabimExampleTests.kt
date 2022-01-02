@@ -79,7 +79,7 @@ class SalabimExampleTests {
         )
 
         //https://github.com/stleary/JSON-java/issues/573
-        waitingLine.stats.toJson().toString(2) shouldBe expectedStats.toString(2)
+        waitingLine.statistics.toJson().toString(2) shouldBe expectedStats.toString(2)
 //        waitingLine.stats.toJson().similar(expectedStats) shouldBe true
     }
 
@@ -100,7 +100,7 @@ class SalabimExampleTests {
             }.run {
 
                 val losStats =
-                    get<ComponentQueue<Customer>>().stats.lengthOfStayStats
+                    get<ComponentQueue<Customer>>().statistics.lengthOfStayStats
 
 //                get<ComponentQueue<Customer>>().lengthOfStayMonitor.display()
 //                get<ComponentQueue<Customer>>().queueLengthMonitor.display()
@@ -193,7 +193,7 @@ class SalabimExampleTests {
             }"""
         )
 
-        waitingLine.stats.toJson().toString(2) shouldBe expectedStats.toString(2)
+        waitingLine.statistics.toJson().toString(2) shouldBe expectedStats.toString(2)
 
         listOf(1.0).toDoubleArray()
 
@@ -222,10 +222,10 @@ class SalabimExampleTests {
         clerks.apply {
             requesters.size shouldBeLessThan 10
 
-            requesters.stats.lengthStats.mean!! shouldBeLessThan 10.0
+            requesters.statistics.lengthStats.mean!! shouldBeLessThan 10.0
 //            (requesters.stats.lengthStats as DescriptiveStatistics).getPercentile(.9) shouldBeLessThan  10.0
 
-            claimers.stats.lengthOfStayStats.mean shouldBe 30.0.plusOrMinus(0.1)
+            claimers.statistics.lengthOfStayStats.mean shouldBe 30.0.plusOrMinus(0.1)
         }
     }
 

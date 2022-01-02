@@ -5,7 +5,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.apache.commons.math3.random.JDKRandomGenerator
 import org.apache.commons.math3.random.RandomGenerator
-import org.json.JSONObject
 import org.kalasim.ComponentState.*
 import org.kalasim.Defaults.DEFAULT_SEED
 import org.kalasim.Priority.Companion.NORMAL
@@ -95,7 +94,7 @@ open class Environment(
     koin: Koin? = null,
     randomSeed: Int = DEFAULT_SEED,
     startTime: TickTime = TickTime(0.0)
-) : SimContext {
+) : SimContext, WithJson {
 
     private var running: Boolean = false
 
@@ -430,17 +429,15 @@ open class Environment(
         }
     }
 
-    fun toJson(): JSONObject = json {
+    override fun toJson() = json {
         "now" to now
         "queue" to queue.toList().map { it.name }.toTypedArray()
     }
 
-    override fun toString(): String {
-        return toJson().toString(JSON_INDENT)
-    }
-
-    fun log(msg: String) = main.log(msg)
+    // deprecated because nothing should be logged outside a process
+//    fun log(msg: String) = main.log(msg)
 }
+
 
 
 data class QueueElement(

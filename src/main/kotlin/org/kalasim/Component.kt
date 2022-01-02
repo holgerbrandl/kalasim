@@ -692,7 +692,7 @@ open class Component(
         failPriority: Priority = NORMAL,
         capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
         // try to avoid argument by inferring from stacktrace
-        calledFrom: String? = null,
+//        calledFrom: String? = null,
         // see https://stackoverflow.com/questions/46098105/is-there-a-way-to-open-and-close-a-stream-easily-at-kotlin
         honorBlock: (suspend SequenceScope<Component>.(RequestScopeContext) -> Unit)? = null
     ) {
@@ -1518,8 +1518,8 @@ open class Component(
     }
 
 
-    override val info: ComponentInfo
-        get() = ComponentInfo(this)
+      override val snapshot : ComponentSnapshot
+         get() = ComponentSnapshot(this)
 
 
     private suspend fun SequenceScope<Component>.yieldCurrent(builder: () -> Unit = {}) {
@@ -1537,7 +1537,7 @@ open class Component(
 
     /** Captures the current state of a `Component`*/
     @Suppress("unused")
-    open class ComponentInfo(component: Component) : Jsonable() {
+    open class ComponentSnapshot(component: Component) : AutoJson(), EntitySnapshot {
         val name = component.name
         val creationTime: TickTime = component.creationTime
         val now = component.now

@@ -9,7 +9,11 @@ import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 
 
-abstract class SimulationEntity(name: String? = null, val simKoin: Koin = DependencyContext.get()) : SimContext {
+/** A representation/snapshot of an entities current state. */
+interface EntitySnapshot : WithJson
+
+/** Base class of all main simulation entities such as environments, resources, components, states and collections. */
+abstract class SimulationEntity(name: String? = null, val simKoin: Koin = DependencyContext.get()) : SimContext, WithJson {
 
     final override val env = getKoin().get<Environment>()
 
@@ -19,20 +23,20 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
     /** The time when the component was instantiated. */
     val creationTime = env.now
 
-
-    open val info: Jsonable = object : Jsonable() {
-        override fun toJson(): JSONObject {
-            return json { "name" to name }
+    open val snapshot: EntitySnapshot = object : EntitySnapshot{
+        override fun toJson() = json{
+            "name" to name
+            "time" to now
         }
     }
 
+    override fun toJson() = snapshot.toJson()
 
     /** Print info about this resource */
-    fun printInfo() = info.printThis()
+    internal fun printInfo() = println(snapshot.toJson().toIndentString())
 
-    //    override fun toString(): String = "${javaClass.simpleName}($name)"
+        //    override fun toString(): String = "${javaClass.simpleName}($name)"
     override fun toString(): String = name
-
 
     //https://medium.com/koin-developers/ready-for-koin-2-0-2722ab59cac3
     final override fun getKoin(): Koin = simKoin

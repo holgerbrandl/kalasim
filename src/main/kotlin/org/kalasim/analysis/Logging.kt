@@ -5,7 +5,7 @@ package org.kalasim
 import com.github.holgerbrandl.jsonbuilder.json
 import org.json.JSONObject
 import org.kalasim.analysis.EntityCreatedEvent
-import org.kalasim.misc.Jsonable
+import org.kalasim.misc.*
 import java.util.logging.Level
 
 
@@ -20,13 +20,18 @@ abstract class Event(
     // disabled because was just used in console-logger. It should better use tracking-policy instead
 //    open val logLevel: Level get() = Level.INFO
 
-    override fun toString() = toJson().toString()
+    //included for more informative json serialization
+    val eventType: String = this.javaClass.simpleName
 
 
     override fun toJson(): JSONObject = json {
         "time" to time
         "type" to this@Event.javaClass.simpleName
     }
+
+
+    // we intentionally override toStiring again to remove json line-breaks and indents
+    override fun toString() = toJson().toString()
 }
 
 

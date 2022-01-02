@@ -4,6 +4,7 @@ import org.junit.Test
 import org.kalasim.ComponentList
 import org.kalasim.ComponentQueue
 import org.kalasim.misc.printThis
+import org.kalasim.misc.toIndentString
 
 class ComponentListTest {
 
@@ -19,7 +20,7 @@ class ComponentListTest {
         cl.remove("bar")
 
         cl.lengthOfStayStatistics.statistics().printThis()
-        cl.printStats()
+        cl.toString().printThis()
     }
 }
 class ComponentQueueTests {
@@ -39,6 +40,6 @@ class ComponentQueueTests {
 
         }
         cl.lengthOfStayStatistics.statistics().printThis()
-        cl.printStats()
+        cl.statistics.toJson().toIndentString()
     }
 }

@@ -7,6 +7,7 @@ import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 // note: remove @JvmInline because it did not seem ready on the java-interop-side
+// value class ? --> Blocked by https://github.com/holgerbrandl/kalasim/issues/45
 data class TickTime(val value: Double) : Comparable<TickTime> {
     override operator fun compareTo(other: TickTime): Int = value.compareTo(other.value)
     operator fun compareTo(other: Int): Int = value.compareTo(other)

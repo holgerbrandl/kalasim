@@ -2,6 +2,7 @@
 package org.kalasim.examples.bank.oneclerk
 
 import org.kalasim.*
+import org.kalasim.misc.printThis
 import org.kalasim.plot.kravis.canDisplay
 import org.kalasim.plot.kravis.display
 import org.koin.core.component.inject
@@ -62,7 +63,7 @@ fun main() {
 
     val waitingLine: ComponentQueue<Customer> = env.get()
 
-    waitingLine.stats.print()
+    waitingLine.statistics.printThis()
 
     if (canDisplay()) {
         waitingLine.queueLengthTimeline.display()

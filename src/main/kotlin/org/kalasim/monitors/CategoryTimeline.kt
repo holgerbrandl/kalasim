@@ -120,9 +120,6 @@ class CategoryTimeline<T>(
     override fun stepFun() = statsData().stepFun()
 
 
-    override val info: Jsonable
-        get() = ImplementMe()
-
     override fun resetToCurrent() = reset(get(now)!!)
 
     override fun clearHistory(before: TickTime) {

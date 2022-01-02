@@ -1,4 +1,4 @@
-@file:Suppress("PackageDirectoryMismatch")
+@file:Suppress("PackageDirectoryMismatch", "DuplicatedCode")
 
 package org.kalasim
 
@@ -19,7 +19,7 @@ data class CQElement<C>(val component: C, val enterTime: TickTime, val priority:
 //    { it.enterTime }
 //)
 
-class  PriorityFCFSQueueComparator<C>() : Comparator<CQElement<C>> {
+class  PriorityFCFSQueueComparator<C> : Comparator<CQElement<C>> {
     override fun compare(o1: CQElement<C>, o2: CQElement<C>): Int  =
         compareValuesBy(o1, o2, { it.priority?.value?.times(-1) ?: DEFAULT_QUEUE_PRIORITY }, { it.enterTime })
 }
@@ -106,7 +106,8 @@ class ComponentQueue<C>(
 
     fun isNotEmpty() = !isEmpty()
 
-    fun printStats() = stats.print()
+    override fun toString() = snapshot.toJson().toIndentString()
+
 
     /** Update queue position of component after property changes. */
     // TODO add test coverage
@@ -118,15 +119,15 @@ class ComponentQueue<C>(
         q.add(element)
     }
 
-    val stats: QueueStatistics
+    val statistics: QueueStatistics
         get() = QueueStatistics(this)
 
-    override val info: Jsonable
+    override val snapshot
         get() = QueueInfo(this)
 }
 
 
-class QueueInfo(cq: ComponentQueue<*>) : Jsonable() {
+class QueueInfo(cq: ComponentQueue<*>) : AutoJson(), EntitySnapshot {
 
     data class Entry(val component: String, val enterTime: TickTime, val priority: Priority?)
 
@@ -143,12 +144,12 @@ class QueueInfo(cq: ComponentQueue<*>) : Jsonable() {
 }
 
 @Suppress("MemberVisibilityCanBePrivate")
-class QueueStatistics(cq: ComponentQueue<*>) {
+class QueueStatistics(cq: ComponentQueue<*>) : Jsonable() {
 
     val name = cq.name
     val timestamp = cq.env.now
 
-  val lengthStats = cq.sizeTimeline.statistics(false)
+    val lengthStats = cq.sizeTimeline.statistics(false)
     val lengthStatsExclZeros = MetricTimelineStats(cq.sizeTimeline, excludeZeros = true)
 
     val lengthOfStayStats = cq.lengthOfStayStatistics.statistics()
@@ -159,7 +160,7 @@ class QueueStatistics(cq: ComponentQueue<*>) {
 //    val ninetyfivePercentile = Percentile(0.95).setData()evaluate()
 
 
-    fun toJson() = json {
+    override fun toJson() = json {
         "name" to name
         "timestamp" to timestamp.value
         "type" to this@QueueStatistics.javaClass.simpleName //"queue statistics"
@@ -174,9 +175,8 @@ class QueueStatistics(cq: ComponentQueue<*>) {
             "excl_zeros" to lengthStatsExclZeros.toJson()
         }
     }
-
-    fun print() = toJson().toString(JSON_INDENT).printThis()
 }
+
 
 fun StatisticalSummary.toJson(): JSONObject {
     return json {

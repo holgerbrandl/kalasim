@@ -125,14 +125,14 @@ open class State<T>(
         timeline.printHistogram()
     }
 
-    override val info
-        get() = StateInfo(env.now, name, value.toString(), waiters.q.map { it.component.name })
+     override val snapshot
+        get() = StateSnapshot(env.now, name, value.toString(), waiters.q.map { it.component.name })
 }
 
 
 /** Captures the current state of a `State`*/
 //@Serializable
-data class StateInfo(val time: TickTime, val name: String, val value: String, val waiters: List<String>) : Jsonable() {
+data class StateSnapshot(val time: TickTime, val name: String, val value: String, val waiters: List<String>) : AutoJson(), EntitySnapshot {
 //    override fun toString(): String {
 //        return Json.encodeToString(this)
 //    }

@@ -314,7 +314,7 @@ class MergeMonitorStatsTests {
             addValue(3)
         }
 
-        print(fsmA.info)
+        print(fsmA.snapshot)
 
         val mergedDist: FrequencyTable<Int> = listOf(fsmA, fsmB).mergeStats()
 

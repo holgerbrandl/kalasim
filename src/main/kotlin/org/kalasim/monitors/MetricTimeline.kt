@@ -6,7 +6,7 @@ import org.apache.commons.math3.stat.Frequency
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.moment.Variance
-import org.kalasim.TickTime
+import org.kalasim.*
 import org.kalasim.asCMPairList
 import org.kalasim.misc.*
 import org.koin.core.Koin
@@ -99,7 +99,7 @@ class MetricTimeline(
 
     fun statistics(excludeZeros: Boolean = false) = MetricTimelineStats(this, excludeZeros)
 
-    override val info: Jsonable
+     override val snapshot
         get() = statistics(false)
 
     override fun reset(initial: Number) {
@@ -246,7 +246,7 @@ internal fun MetricTimeline.copy(name: String = this.name): MetricTimeline = Met
 // Statistical Summary
 //
 
-class MetricTimelineStats(nlm: MetricTimeline, excludeZeros: Boolean = false) : Jsonable() {
+class MetricTimelineStats(nlm: MetricTimeline, excludeZeros: Boolean = false) : Jsonable(), EntitySnapshot {
     val duration: Double
 
     val mean: Double?
@@ -284,7 +284,7 @@ class MetricTimelineStats(nlm: MetricTimeline, excludeZeros: Boolean = false) : 
     override fun toJson() = json {
         "duration" to duration
         "mean" to mean?.roundAny()
-        "standard_deviation" to standardDeviation?.roundAny()
+        "standard_deviation" to standardDeviation?.roundAny().nanAsNull()
         "min" to min?.roundAny()
         "max" to max?.roundAny()
     }

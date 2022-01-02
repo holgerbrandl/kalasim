@@ -5,11 +5,8 @@ import com.google.gson.GsonBuilder
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import com.squareup.moshi.*
-import org.kalasim.ComponentListStatistics
 import org.kalasim.QueueStatistics
 import org.kalasim.examples.MM1Queue
-import java.util.*
 
 
 fun main() {
@@ -20,7 +17,7 @@ fun main() {
     builder.serializeSpecialFloatingPointValues()
     val gson = builder.create()
 
-    val stats = MM1Queue().apply { run(100) }.server.requesters.stats
+    val stats = MM1Queue().apply { run(100) }.server.requesters.statistics
     val toJson = gson.toJson(stats)
 
     print(toJson)

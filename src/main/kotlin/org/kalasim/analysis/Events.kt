@@ -74,6 +74,16 @@ data class ResourceActivityEvent(
     val requestedWT = resource.env.tickTransform?.tick2wallTime(requested)
     val honoredWT = resource.env.tickTransform?.tick2wallTime(honored)
     val releasedWT = resource.env.tickTransform?.tick2wallTime(released)
+
+    override fun toJson() = json {
+        "requested" to requested
+        "honored" to honored
+        "released" to released
+        "requester" to requester.name
+        "resource" to resource.name
+        "activity" to activity
+        "claimedQuantity" to claimedQuantity
+    }
 }
 
 
@@ -106,7 +116,15 @@ class EntityCreatedEvent(
     val creator: Component?,
     val entity: SimulationEntity,
     val details: String? = null
-) : Event(time)
+) : Event(time) {
+
+    override fun toJson() = json{
+        "time" to time
+        "creator" to creator?.name
+        "entity" to entity.name
+        "details" to details
+    }
+}
 
 class ComponentStateChangeEvent(
     time: TickTime,

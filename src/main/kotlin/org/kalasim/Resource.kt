@@ -350,12 +350,10 @@ open class Resource(
     /** Prints a summary of statistics of a resource. */
     fun printStatistics() = println(statistics.toString())
 
-    override val info
-            : Jsonable
-        get() = ResourceInfo(this)
+    override val snapshot
+        get() = ResourceSnapshot(this)
 
     val statistics
-            : ResourceStatistics
         get() = ResourceStatistics(this)
 
 
@@ -378,6 +376,14 @@ internal fun <E> PriorityQueue<E>.sortedIterator() = sequence {
 //
 
 enum class ResourceMetric { Capacity, Claimed, Requesters, Claimers, Occupancy, Availability }
+data class fo(
+    val duration: Double?,
+    val start: TickTime,
+    val value: Double,
+    val metric: ResourceMetric,
+    val end: TickTime?,
+    val resource: Any
+)
 
 data class ResourceTimelineSegment(
     val resource: Resource,
@@ -446,7 +452,7 @@ val Resource.timeline: List<ResourceTimelineSegment>
     }
 
 @Suppress("unused")
-class ResourceInfo(resource: Resource) : Jsonable() {
+class ResourceSnapshot(resource: Resource) : AutoJson(), EntitySnapshot {
     val name: String = resource.name
     val now = resource.now
     val creationTime = resource.creationTime
@@ -471,8 +477,8 @@ class ResourceStatistics(resource: Resource) : Jsonable() {
     val name = resource.name
     val timestamp = resource.env.now
 
-    val requesters = resource.requesters.stats
-    val claimers = resource.claimers.stats
+    val requesters = resource.requesters.statistics
+    val claimers = resource.claimers.statistics
 
     val capacity = resource.capacityTimeline.statistics(false)
     val availableQuantity = resource.availabilityTimeline.statistics(false)

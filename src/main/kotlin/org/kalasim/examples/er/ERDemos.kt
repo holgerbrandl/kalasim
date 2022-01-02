@@ -7,7 +7,7 @@ import org.kalasim.plot.kravis.display
 object InfiniteER {
     @JvmStatic
     fun main(args: Array<String>) {
-        val er = EmergencyRoom(disableMetrics = true)
+        val er = EmergencyRoom(enableTickMetrics = true)
 
         er.run(100000)
 

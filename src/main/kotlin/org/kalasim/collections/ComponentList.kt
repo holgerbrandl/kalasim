@@ -56,18 +56,18 @@ class ComponentList<C>(
         return removed
     }
 
-    fun printStats() = stats.print()
 
     fun poll(): C? = firstOrNull().also { remove(it) }
 
-    val stats: ComponentListStatistics
+    val statistics: ComponentListStatistics
         get() = ComponentListStatistics(this)
 
-    override val info: Jsonable
-        get() = ComponentListInfo(this)
+     override val snapshot
+        get() = ComponentListSnapshot(this)
 }
 
-class ComponentListInfo<T>(cl: ComponentList<T>) : Jsonable() {
+
+class ComponentListSnapshot<T>(cl: ComponentList<T>) : AutoJson(), EntitySnapshot {
 
     data class Entry(val component: String, val enterTime: TickTime?)
 
@@ -78,7 +78,7 @@ class ComponentListInfo<T>(cl: ComponentList<T>) : Jsonable() {
 
 //todo this duplicates the impl in ComponentQueue
 @Suppress("MemberVisibilityCanBePrivate")
-class ComponentListStatistics(cl: ComponentList<*>) {
+class ComponentListStatistics(cl: ComponentList<*>) : Jsonable(){
 
     val name = cl.name
     val timestamp = cl.env.now
@@ -94,7 +94,7 @@ class ComponentListStatistics(cl: ComponentList<*>) {
 //    val ninetyfivePercentile = Percentile(0.95).setData()evaluate()
 
 
-    fun toJson() = json {
+    override fun toJson() = json {
         "name" to name
         "timestamp" to timestamp.value
         "type" to this@ComponentListStatistics.javaClass.simpleName //"queue statistics"
@@ -109,7 +109,5 @@ class ComponentListStatistics(cl: ComponentList<*>) {
             "excl_zeros" to sizeStatsExclZeros.toJson()
         }
     }
-
-    fun print() = toJson().toString(JSON_INDENT).printThis()
 }
 

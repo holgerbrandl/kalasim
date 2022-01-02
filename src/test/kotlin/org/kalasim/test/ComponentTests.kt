@@ -9,7 +9,6 @@ import org.kalasim.ComponentState.DATA
 import org.kalasim.ComponentState.SCHEDULED
 import org.kalasim.analysis.InteractionEvent
 import org.kalasim.misc.*
-import kotlin.test.assertEquals
 import kotlin.test.fail
 
 
@@ -58,18 +57,18 @@ class ComponentTests {
 
 
     @Test
-    fun `it should capture component state with info`() = createTestSimulation {
-        val info = Component("foo").info
+    fun `it should capture component state with snapshot`() = createTestSimulation {
+        val info = Component("foo").snapshot
         run(10)
 
         info.status shouldBe DATA
         info.scheduledTime shouldBe null
 
-        info.toString() shouldBe """
+        info.toString() shouldBeDiff  """
             {
               "scheduledTime": null,
-              "creationTime": {"value": 0},
-              "now": {"value": 0},
+              "creationTime": 0,
+              "now": 0,
               "name": "foo",
               "claims": {},
               "requests": {},

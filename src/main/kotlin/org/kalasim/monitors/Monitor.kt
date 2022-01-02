@@ -1,5 +1,8 @@
 package org.kalasim.monitors
 
+import com.github.holgerbrandl.jsonbuilder.json
+import org.json.JSONObject
+import org.kalasim.EntitySnapshot
 import org.kalasim.SimulationEntity
 import org.kalasim.misc.DependencyContext
 import org.koin.core.Koin
@@ -16,13 +19,8 @@ abstract class Monitor<T>(
     /** Disable or enable data collection in a timeline. */
     open var enabled: Boolean = true
 
-//    fun disable() {
-//        enabled = false
-//    }
-
-
     fun <T> ifEnabled(query: () -> T): T {
-        if (!enabled) {
+        if(!enabled) {
             throw  IllegalArgumentException("can not query disabled timeline")
         }
 

@@ -79,9 +79,10 @@ class ComponentGenerator<T>(
 //        log(env.now, env.curComponent, this@ComponentGenerator, "till reached")
 //    }
 
-    override val info: ComponentGeneratorInfo<T>
-        get() = ComponentGeneratorInfo(this)
+     override val snapshot: ComponentGeneratorSnapshot<T>
+        get() = ComponentGeneratorSnapshot(this)
 }
 
 
-class ComponentGeneratorInfo<T>(cg: ComponentGenerator<T>) : Component.ComponentInfo(cg)
+// todo add more context details here
+class ComponentGeneratorSnapshot<T>(cg: ComponentGenerator<T>) : Component.ComponentSnapshot(cg)

@@ -9,7 +9,7 @@ import org.koin.core.component.inject
 class CustomerGenerator : Component() {
 
     override fun process() = sequence {
-        while (true) {
+        while(true) {
             Customer(get(), get())
             hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample())
         }
@@ -30,8 +30,8 @@ class Clerk : Component() {
     val workTodo: State<Boolean> by inject()
 
     override fun process() = sequence {
-        while (true) {
-            if (waitingLine.isEmpty())
+        while(true) {
+            if(waitingLine.isEmpty())
                 wait(workTodo, true)
 
             val customer = waitingLine.poll()
@@ -57,7 +57,7 @@ fun main() {
 
     }.run(500.0)
 
-    env.get<ComponentQueue<Customer>>().printStats()
+    println(env.get<ComponentQueue<Customer>>().statistics)
     env.get<State<Boolean>>().printInfo()
 
 //    val waitingLine: ComponentQueue<Customer> = env.get()

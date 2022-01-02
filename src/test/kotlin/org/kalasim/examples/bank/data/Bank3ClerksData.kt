@@ -57,6 +57,6 @@ fun main() {
 
         val waitingLine: ComponentQueue<Customer> = get()
 
-        waitingLine.printStats()
+        println(waitingLine.statistics.toJson())
     }
 }

@@ -3,6 +3,7 @@ package org.kalasim.monitors
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.json.JSONObject
+import org.kalasim.EntitySnapshot
 import org.kalasim.misc.*
 import org.kalasim.toJson
 import org.koin.core.Koin
@@ -94,10 +95,11 @@ class NumericStatisticMonitor(name: String? = null, koin: Koin = DependencyConte
     }
 
 
-    override val info: Jsonable
+     override val snapshot
         get() = statistics(false)
 }
 
-class NumericStatisticMonitorStats(internal val ss: StatisticalSummary) : StatisticalSummary by ss, Jsonable() {
+class NumericStatisticMonitorStats(internal val ss: StatisticalSummary) : StatisticalSummary by ss, Jsonable(),
+    EntitySnapshot {
     override fun toJson(): JSONObject = ss.toJson()
 }

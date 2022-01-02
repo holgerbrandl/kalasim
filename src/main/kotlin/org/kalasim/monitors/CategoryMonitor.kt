@@ -2,6 +2,7 @@ package org.kalasim.monitors
 
 import com.github.holgerbrandl.jsonbuilder.json
 import org.json.JSONObject
+import org.kalasim.EntitySnapshot
 import org.kalasim.misc.*
 import org.koin.core.Koin
 import kotlin.math.roundToInt
@@ -29,7 +30,7 @@ open class CategoryMonitor<T>(
         get() = ifEnabled { field }
 
     override fun addValue(value: T) {
-        if (!enabled) return
+        if(!enabled) return
 
         frequencies.merge(value, 1, Long::plus)
     }
@@ -46,7 +47,7 @@ open class CategoryMonitor<T>(
     val statistics: FrequencyTable<T>
         get() = frequencies.mapValues { it.value.toDouble() }
 
-    override val info: FrequencyStatsSummary<T>
+    override val snapshot
         get() = FrequencyStatsSummary(statistics)
 }
 
@@ -59,10 +60,10 @@ fun <T> CategoryMonitor<T>.printHistogram(values: List<T>? = null, sortByWeight:
     // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
     println("Histogram of: '${name}'")
 //        frequencies.mapValues { it.value.toDouble() }
-    info.counts.printConsole(values = values, sortByWeight = sortByWeight)
+    snapshot.counts.printConsole(values = values, sortByWeight = sortByWeight)
 }
 
-class FrequencyStatsSummary<T>(internal val counts: FrequencyTable<T>) : Jsonable() {
+class FrequencyStatsSummary<T>(internal val counts: FrequencyTable<T>) : Jsonable(), EntitySnapshot {
     override fun toJson(): JSONObject = json {
         counts.forEach { it.key to counts[it.key]!!.toLong() }
     }

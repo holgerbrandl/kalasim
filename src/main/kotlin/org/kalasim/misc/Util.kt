@@ -1,9 +1,7 @@
 package org.kalasim.misc
 
-import com.google.gson.GsonBuilder
 import kotlinx.coroutines.*
 import org.apache.commons.math3.util.Precision
-import org.json.JSONObject
 import org.kalasim.MetricEvent
 import org.kalasim.TickTime
 import java.text.DecimalFormat
@@ -17,41 +15,14 @@ internal var JSON_DF = DecimalFormat("###.00", DecimalFormatSymbols(Locale.ENGLI
 internal var TRACE_DF = JSON_DF
 
 
-internal fun Any.printThis() {
-    println(toString())
-}
-
-
 @Suppress("FunctionName")
 internal fun ImplementMe(): Nothing =
     TODO("Not yet implemented. Please file a ticket under https://github.com/holgerbrandl/kalasim/issues")
 
-fun main() {
-    print(MetricEvent(TickTime(3), 123).toJson())
+
+internal fun Any.printThis() {
+    println(toString())
 }
-
-//@Serializable
-abstract class Jsonable {
-
-    open fun toJson(): JSONObject =
-        JSONObject(GSON.toJson(this))
-
-    override fun toString(): String {
-        return toJson().toString(JSON_INDENT)
-
-        // todo get rid of gson here to simplify dependency tree
-//        return GSON.toJson(this)
-//        return Json.encodeToString(this)
-    }
-}
-
-// https://futurestud.io/tutorials/gson-builder-special-values-of-floats-doubles
-// https://github.com/google/gson/blob/master/UserGuide.md#null-object-support
-internal val GSON by lazy {
-    GsonBuilder().serializeSpecialFloatingPointValues().setPrettyPrinting().serializeNulls().create()
-}
-
-var JSON_INDENT = 2
 
 
 // from https://stackoverflow.com/questions/46895140/how-to-perform-action-for-all-combinations-of-elements-in-lists
