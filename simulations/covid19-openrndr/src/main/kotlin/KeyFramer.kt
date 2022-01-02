@@ -32,9 +32,9 @@ fun main() = application {
             drawer.fill = animation.color
             drawer.circle(animation.position, animation.radius)
 
-//            drawer.fontMap = font
-//            drawer.fill = ColorRGBa.WHITE
-//            drawer.text("OPENRNDR", width / 2.0, height / 2.0)
+            drawer.fontMap = font
+            drawer.fill = ColorRGBa.WHITE
+            drawer.text("OPENRNDR", width / 2.0, height / 2.0)
         }
     }
 }
