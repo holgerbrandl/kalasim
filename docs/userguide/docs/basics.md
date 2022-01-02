@@ -45,9 +45,6 @@ To configure references first, an `Environment` can also be instantiated by conf
 
 In a discrete event simulation a clear distinction is made between real time and simulation time. With *real time* we refer to the wall-clock time. It represents the execution time of the experiment. The *simulation time* is an attribute of the simulator.
 
-!!! tip 
-    The user can define a [transformation](advanced.md#tick-transformation) to map the internal clock to her wall-time clock
-
 As shown in the example from above a simulation is usually started with `sim.run(ticks)`. Here `ticks` is the number of ticks, that is simulation time units. The simulation will progress for `ticks`. By doing so we may stop right in the middle of a [process](component.md#process-interaction).
 
 Alternatively, we can also run until the event queue is empty (or forever depending on the model) by omitting the argument: 
@@ -59,6 +56,16 @@ sim.run(5) // run for some more ticks
 sim.run(until=42.tickTime) // run until internal simulation clock is 23 
 
 sim.run() // run until event queue is empty
+```
+
+The user can define a [tick transformation](advanced.md#tick-transformation) to map the internal clock to her wall-time clock. If a [tick transformation](advanced.md#tick-transformation) is configured, it also allows to express run durations more naturally:
+
+```kotlin
+sim.run(2.hours)
+
+sim.run(1.4.days) // fractionals are suportes as well
+sim.run(until  = Instant.now() + 3.hours) // wall-time plus 3 hours
+sim.run(until  = now + 3.hours) // simulation-time plus 3 hours
 ```
 
 !!! tip

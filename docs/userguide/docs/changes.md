@@ -8,11 +8,35 @@ Not yet released. Developer snapshots are deposited on maven-central starting wi
 Milestone Enhancements
 
 * Added [honor policies](resource.md#request-honor-policies) to allow for more configurable request queue consumption
-* New: [Timeline Arithmetics](monitors.md#monitors-arithmetics). It is now possible to perform stream arithmetics on timeline attributes
+```kotlin
+val r  = Resource(honorPolicy = RequestHonorPolicy.StrictFCFS)
+```
+* Added [Timeline Arithmetics](monitors.md#monitors-arithmetics). It is now possible to perform stream arithmetics on timeline attributes
 * Introduced different [modes](resource.md#capacity-limit-modes) if resource requests exceed resource capacity.
+```kotlin
+val tank  = DepletableResource(capacity=100, initialLevel=60)
+
+put(gasSupply, 50, capacityLimitMode = CapacityLimitMode.CAP)
+```
+* [#23](https://github.com/holgerbrandl/kalasim/issues/23) It is now possible to use `java.time.Instant` and `java.time.Duration` in `Component.hold()` and `Environment.run`. 
+```kotlin
+createSimulation{
+    object: Component{
+        val driver = Resource(2) 
+        override fun process() = sequence {
+            request(driver) {
+                hold(23.minutes)
+            }
+            hold(3.hours)
+        }
+    
+    }
+}.run(2.5.days) // incl. fractional support
+```
 
 Major Enhancements
 
+* Added extensions to express durations more naturally with `2.hours`, `3.minutes` and so on. Note: this is not using [kotlin-duration API](https://blog.jetbrains.com/kotlin/2021/11/kotlin-1-6-0-is-released/) because of currently too limited compatibility with existing java-time APIs
 * [#37](https://github.com/holgerbrandl/kalasim/issues/37) Simplified [process activation](component.md#activate) in process definitions  
 * [#34](https://github.com/holgerbrandl/kalasim/issues/34) Added support for [triangular distributions](basics.md#continuous-distributions)
 * [#43](https://github.com/holgerbrandl/kalasim/issues/43) Simplified states to consume [predicates](state.md#predicate-testing) directly in `wait()`

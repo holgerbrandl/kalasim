@@ -18,6 +18,8 @@ import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
+import java.time.Duration
+import java.time.Instant
 import java.util.*
 
 
@@ -224,7 +226,6 @@ open class Environment(
     private val standBy = mutableListOf<Component>()
     private val pendingStandBy = mutableListOf<Component>()
 
-
 //    fun build(vararg compoennts: Component) = components.forEach { this + it }
 
     // seesm unused. To be deleted in v0.9
@@ -235,11 +236,19 @@ open class Environment(
 
 
     /**
-     * Start execution of the simulation
+     * Start execution of the simulation. See https://www.kalasim.org/basics/#running-a-simulation
      *
-     * If neither `until` nor `ticks` are specified, the main component will be reactivated at
-     * the time there are no more events on the event-list, i.e. possibly not at Double.MAX_VALUE. If you want
-     * to keep a simulation running simply call `run(Double.MAX_VALUE)`.
+     * @param duration Time to run. Requires tick-transform to be confiured.
+     * @param priority If a component has the same time on the event list, the main component is sorted according to
+     * the priority. An event with a higher priority will be scheduled first.
+     */
+    fun run(
+        duration: Duration,
+        priority: Priority = NORMAL
+    ) = run(duration.asTicks(), null, priority)
+
+    /**
+     * Start execution of the simulation. See https://www.kalasim.org/basics/#running-a-simulation
      *
      * @param duration Time to run
      * @param priority If a component has the same time on the event list, the main component is sorted according to
@@ -247,9 +256,20 @@ open class Environment(
      */
     fun run(
         duration: Ticks? = null,
-        priority: Priority = NORMAL,
-        urgent: Boolean = false
-    ) = run(duration?.value, null, priority, urgent)
+        priority: Priority = NORMAL
+    ) = run(duration?.value, null, priority)
+
+    /**
+     * Start execution of the simulation
+     *
+     * @param until Absolute time until the which the simulation should run. Requires tick-transform to be confiured.
+     * @param priority If a component has the same time on the event list, the main component is sorted according to
+     * the priority. An event with a higher priority will be scheduled first.
+     */
+    fun run(
+        until: Instant,
+        priority: Priority = NORMAL
+    ) = run(until=until.asTickTime(), priority = priority)
 
     /**
      * Start execution of the simulation

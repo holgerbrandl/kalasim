@@ -10,6 +10,7 @@ import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
 import kotlin.math.*
 import kotlin.reflect.KFunction1
+import java.time.Duration
 
 
 internal const val EPS = 1E-8
@@ -1195,17 +1196,35 @@ open class Component(
      *
      * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
      *
-     * @param duration Time to hold. Either `duration` or `till` must be specified.
+     * @param duration Time to hold.
      * @param priority If a component has the same time on the event list, this component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
     suspend fun SequenceScope<Component>.hold(
-        duration: Ticks? = null,
+        duration: Duration,
         description: String? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
     ) = yieldCurrent {
-        this@Component.hold(duration?.value, description, null, priority, urgent)
+        this@Component.hold(duration.asTicks(), description, null, priority, urgent)
+    }
+
+    /**
+     * Hold the component.
+     *
+     * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
+     *
+     * @param duration Time to hold.
+     * @param priority If a component has the same time on the event list, this component is sorted according to
+     * the priority. An event with a higher priority will be scheduled first.
+     */
+    suspend fun SequenceScope<Component>.hold(
+        duration: Ticks,
+        description: String? = null,
+        priority: Priority = NORMAL,
+        urgent: Boolean = false
+    ) = yieldCurrent {
+        this@Component.hold(duration.value, description, null, priority, urgent)
     }
 
     /**
@@ -1260,7 +1279,7 @@ open class Component(
 
     fun getThis() = this
 
-    fun callProcess() {
+    internal fun callProcess() {
         require(simProcess != null) { "component '${name}' must have active process to be called" }
         simProcess!!.call()
     }

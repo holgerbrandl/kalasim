@@ -249,6 +249,15 @@ ship2.activate(delay=50)
 
 Hold is the way to make a - usually `current` - component `scheduled`.
 
+```kotlin
+object : Component(){
+    override fun process() = sequence {
+        request(driver) {
+            hold(1.0, description="some action that lasts 1 tick")
+        }
+    }
+}
+```
 
 * If the component is `CURRENT`, it will suspend execution internally, and the component becomes scheduled for the specified time
 * If the component to be held is passive, the component becomes scheduled for the specified time.
@@ -261,6 +270,12 @@ Hold is the way to make a - usually `current` - component `scheduled`.
   terminated, the attribute failed set and the component will become scheduled. It is recommended to
   use the more versatile activate method.
 * If the component is interrupted, the component will be activated at the specified time.
+
+If a [tick transformation](advanced.md#tick-transformation) is configured, it also allows to express run durations more naturally:
+```
+hold(2.hours)
+hold(until= now + 3.hours )
+```
 
 ### passivate
 

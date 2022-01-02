@@ -5,6 +5,7 @@ import org.koin.core.component.KoinComponent
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToLong
 
 // note: remove @JvmInline because it did not seem ready on the java-interop-side
 // value class ? --> Blocked by https://github.com/holgerbrandl/kalasim/issues/45
@@ -32,6 +33,16 @@ data class TickTime(val value: Double) : Comparable<TickTime> {
 value class Ticks(val value: Double) {
     constructor(instant: Number) : this(instant.toDouble())
 }
+
+
+inline val Int.seconds get() : Duration = Duration.ofSeconds(this.toLong())
+inline val Int.minutes get(): Duration = Duration.ofMinutes(this.toLong())
+
+inline val Int.hours: Duration get() = Duration.ofHours(this.toLong())
+inline val Double.hours: Duration get() = Duration.ofSeconds((this * 3600).roundToLong())
+
+inline val Int.days get(): Duration = Duration.ofHours(this.toLong())
+inline val Double.days get(): Duration = Duration.ofSeconds((this * 86400).roundToLong())
 
 
 //val Number.ticks: Ticks
@@ -64,13 +75,29 @@ fun Number.asTickTime() = TickTime(this)
 
 
 // https://stackoverflow.com/questions/32437550/whats-the-difference-between-instant-and-localdatetime
-interface TickTransform {
-    fun tick2wallTime(tickTime: TickTime): Instant
-    fun wall2TickTime(instant: Instant): TickTime
-    fun durationAsTicks(duration: Duration): Double
+open class TickTransform(val tickUnit: TimeUnit) {
+    open fun tick2wallTime(tickTime: TickTime): Instant {
+        throw IllegalArgumentException("Only supported when using OffsetTransform")
+    }
+
+    open fun wall2TickTime(instant: Instant): TickTime {
+        throw IllegalArgumentException("Only supported when using OffsetTransform")
+    }
+
+     fun durationAsTicks(duration: Duration): Double = when(tickUnit) {
+        TimeUnit.NANOSECONDS -> duration.toNanos()
+        TimeUnit.MICROSECONDS -> duration.toNanos() / 1000.0
+        TimeUnit.MILLISECONDS -> duration.toNanos() / 1000000.0
+        // https://stackoverflow.com/questions/42317152/why-does-the-duration-class-not-have-toseconds-method
+        TimeUnit.SECONDS -> duration.toMillis() / 1000.0
+        TimeUnit.MINUTES -> duration.toMillis() / 60000.0
+        //https://stackoverflow.com/questions/42317152/why-does-the-duration-class-not-have-toseconds-method
+        TimeUnit.HOURS -> duration.seconds / 3600.0
+        TimeUnit.DAYS -> duration.toMinutes() / 1440.0
+    }.toDouble()
 }
 
-class OffsetTransform(val offset: Instant = Instant.now(), val tickUnit: TimeUnit = TimeUnit.MINUTES) : TickTransform {
+class OffsetTransform(val offset: Instant = Instant.now(), tickUnit: TimeUnit) : TickTransform(tickUnit) {
     override fun tick2wallTime(tickTime: TickTime): Instant {
         val ttValue = tickTime.value
         val durationSinceOffset = when(tickUnit) {
@@ -93,17 +120,7 @@ class OffsetTransform(val offset: Instant = Instant.now(), val tickUnit: TimeUni
     }
 
     // todo improve precision of transformation
-    override fun durationAsTicks(duration: Duration): Double = when(tickUnit) {
-        TimeUnit.NANOSECONDS -> duration.toNanos()
-        TimeUnit.MICROSECONDS -> duration.toNanos() / 1000.0
-        TimeUnit.MILLISECONDS -> duration.toNanos() / 1000000.0
-        // https://stackoverflow.com/questions/42317152/why-does-the-duration-class-not-have-toseconds-method
-        TimeUnit.SECONDS -> duration.toMillis() / 1000.0
-        TimeUnit.MINUTES -> duration.toMillis() / 60000.0
-        //https://stackoverflow.com/questions/42317152/why-does-the-duration-class-not-have-toseconds-method
-        TimeUnit.HOURS -> duration.seconds / 3600.0
-        TimeUnit.DAYS -> duration.toMinutes() / 1440.0
-    }.toDouble()
+
 }
 
 internal const val MISSING_TICK_TRAFO_ERROR = "Tick transformation not configured."
