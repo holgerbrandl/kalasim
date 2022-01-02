@@ -268,7 +268,7 @@ open class Environment(
         until: TickTime? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
-    ): Environment {
+    ) {
         // also see https://simpy.readthedocs.io/en/latest/topical_guides/environments.html
         if(duration == null && until == null) {
 //            endOnEmptyEventlist = true
@@ -286,8 +286,6 @@ open class Environment(
         while(running) {
             step()
         }
-
-        return (this)
     }
 
     /** Executes the next step of the future event list. */

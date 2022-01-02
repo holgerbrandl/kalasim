@@ -59,7 +59,9 @@ fun main() {
 
     val env = createSimulation(true, dependencies = deps) {
         CustomerGenerator()
-    }.run(50.0)
+    }
+
+    env.run(50.0)
 
     val waitingLine: ComponentQueue<Customer> = env.get()
 

@@ -55,7 +55,9 @@ fun main() {
         repeat(3) { Clerk() }
         CustomerGenerator()
 
-    }.run(500.0)
+    }
+
+    env.run(500.0)
 
     println(env.get<ComponentQueue<Customer>>().statistics)
     env.get<State<Boolean>>().printInfo()

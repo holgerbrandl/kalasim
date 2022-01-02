@@ -32,7 +32,9 @@ class SalabimExampleTests {
             add { ComponentQueue<Customer>("waiting line") }
         }.apply {
             org.kalasim.examples.bank.oneclerk.CustomerGenerator()
-        }.run(50.0)
+        }
+
+        env.run(50.0)
 
         val waitingLine: ComponentQueue<Customer> = env.get()
 
@@ -114,7 +116,7 @@ class SalabimExampleTests {
 
         print(avgQueueMeans)
 
-        if (false) {
+        if(false) {
             avgQueueMeans
                 .plot(x = { it.first }, y = { (it.second.ss as DescriptiveStatistics).median })
                 .geomPoint()
@@ -203,7 +205,7 @@ class SalabimExampleTests {
     @Test
     fun `bank with resource clerks should result in correct statistics`() {
 
-     val env= createSimulation {
+        val env = createSimulation {
             // same logic as in Bank3ClerksResources.kt
             dependency { Resource("clerks", capacity = 3) }
 
@@ -216,7 +218,9 @@ class SalabimExampleTests {
             ) {
                 org.kalasim.examples.bank.resources.Customer(get())
             }
-        }.run(5000)
+        }
+
+        env.run(5000)
 
         val clerks = env.get<Resource>()
         clerks.apply {
