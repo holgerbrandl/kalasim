@@ -116,7 +116,7 @@ plugins {
 
 repositories {
     mavenCentral()
-    if (openrndrUseSnapshot || orxUseSnapshot) {
+    if (openrndrUseSnapshot || orxUseSnapshot || true) {
         mavenLocal()
     }
     maven(url = "https://maven.openrndr.org")
@@ -157,7 +157,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core","1.5.0-RC")
     implementation("io.github.microutils", "kotlin-logging-jvm","2.0.6")
 
-    implementation("com.github.holgerbrandl:kalasim:0.7.91")
+//    implementation("com.github.holgerbrandl:kalasim:0.7.91")
+    implementation("com.github.holgerbrandl:kalasim:0.7.92-SNAPSHOT")
 
 
     when(applicationLogging) {

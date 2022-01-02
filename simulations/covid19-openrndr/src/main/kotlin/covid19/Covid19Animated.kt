@@ -1,13 +1,15 @@
 import covid19.Covid19
 import covid19.PersonStatusEvent
 import org.kalasim.EventLog
-import org.koin.core.component.get
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
+import org.openrndr.color.rgba
+import org.openrndr.extra.noise.Random
 import org.openrndr.math.IntVector2
+import org.openrndr.math.Polar
 import org.openrndr.math.Vector2
 
-
+// Run a simulation and visualize the event-log in retrospect
 fun main() = application {
     configure {
         width = 800
@@ -40,6 +42,7 @@ fun main() = application {
             drawer.stroke = null
 //                drawer.translate(width / 2.0, height / 2.00)
 
+            // Note: It's hard to beat that in terms of inefficiency
             val current = grouped.map { (_, log) -> log.firstOrNull() { it.time > curTime / timeStretch.toDouble() } }
                 .filterNotNull()
 
@@ -52,6 +55,27 @@ fun main() = application {
             drawer.fill = ColorRGBa.WHITE
             drawer.text("NOW: ${curTime.toDouble()/timeStretch}", width -100.0, height -50.0)
         }
+
+//        val zoom = 0.03
+//
+        // lighting effect, adopted from https://openrndr.org/getting-started/#getting-started-guides
+//
+//        drawer.fill = ColorRGBa.WHITE
+//
+//        extend {
+//            drawer.fill = rgba(0.0, 0.0, 0.0, 0.01)
+//            drawer.fill = ColorRGBa.WHITE
+//            var pos = Random.point(drawer.bounds)
+//            repeat(500) {
+//                drawer.point(pos)
+//                pos += Polar(
+//                    180 * if (pos.x < width / 2)
+//                        Random.value(pos * zoom)
+//                    else
+//                        Random.simplex(pos * zoom)
+//                ).cartesian
+//            }
+//        }
     }
 //    }
 }

@@ -2,7 +2,6 @@ package covid19
 
 import org.kalasim.*
 import org.kalasim.monitors.MetricTimeline
-import org.koin.core.component.get
 import java.util.*
 
 
@@ -21,7 +20,7 @@ data class Position(val x: Double, val y: Double) {
 
 
 class Infection(val person: Person) : Component() {
-    val cureProb = normal(12, 2)
+    val convalescenceTime = normal(12, 2).clip(0)
 
     init {
         person.sick = true
@@ -38,7 +37,7 @@ class Infection(val person: Person) : Component() {
 //            }
 //        }.toList()
 
-        hold(cureProb().run { if (this < 0) 0 else this })
+        hold(convalescenceTime().run { if (this < 0) 0 else this })
         person.sick = false
         person.immune = true
         get<MetricTimeline>().dec()

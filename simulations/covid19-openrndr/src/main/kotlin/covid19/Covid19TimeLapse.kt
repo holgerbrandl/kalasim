@@ -1,19 +1,17 @@
 import covid19.Covid19
 import covid19.PersonStatusEvent
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.kalasim.ClockSync
-import org.kalasim.Event
-import org.kalasim.TickTime
-import org.kalasim.tt
+import org.kalasim.misc.DependencyContext
+import org.kalasim.seconds
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.math.IntVector2
 import org.openrndr.math.Vector2
 import java.time.Duration
 
-
+// evolve a sim while running the visualization
 fun main() = application {
     configure {
         width = 800
@@ -22,20 +20,21 @@ fun main() = application {
     }
     program {
 
-
-        // think of it as a  Non Blocking Queue
-        val ordersChannel = Channel<Event>(100)
-
-        var now: TickTime = 0.tt
+//        var now: TickTime = 0.tt
 
         val currentPopulation = mutableMapOf<String, PersonStatusEvent>()
 
+        val covid19 = Covid19()
+
         // Start a log consumer
         GlobalScope.launch {
-            Covid19().apply {
-                ClockSync(tickDuration = Duration.ofDays(1), syncsPerTick = 5)
+            // restore context in thread
+            DependencyContext.setKoin(covid19.getKoin())
 
-                addAsyncEventListener<PersonStatusEvent> {
+            covid19.apply {
+                ClockSync(tickDuration = 1.seconds, syncsPerTick = 10)
+
+                addEventListener<PersonStatusEvent> {
                     now = it.time
                     currentPopulation[it.person] = it
                 }
@@ -66,7 +65,7 @@ fun main() = application {
 
 
             drawer.fill = ColorRGBa.WHITE
-            drawer.text("NOW: ${now}", width - 100.0, height - 50.0)
+            drawer.text("NOW: ${covid19.now}", width - 100.0, height - 50.0)
             drawer.text("Frame: ${counter++}", width - 100.0, height - 70.0)
         }
     }
