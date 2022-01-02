@@ -37,7 +37,8 @@ object DependencyContext {
         return get()
     }
 
-    internal fun setKoin(koin: Koin) {
+    // public to enable restoring
+    fun setKoin(koin: Koin) {
         threadLocalValue.set(koin)
 //        this.koin = koin
     }
