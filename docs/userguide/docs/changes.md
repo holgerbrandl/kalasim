@@ -22,7 +22,6 @@ Major Enhancements
 * [#38](https://github.com/holgerbrandl/kalasim/issues/38) Extended and improved API support for [depletable resources](resource.md#depletable-resources). 
 * Added `ComponentQueue.asSortedList()` to sorted copy of underlying priority queue 
 
-
 Minor enhancements
 
 * Renamed all `info` attributes to `snapshot` to convey intent better

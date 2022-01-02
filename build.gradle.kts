@@ -13,7 +13,7 @@ plugins {
 
 group = "com.github.holgerbrandl"
 //version = "0.7-SNAPSHOT"
-version = "0.7.91-SNAPSHOT"
+version = "0.7.91"
 
 
 repositories {
