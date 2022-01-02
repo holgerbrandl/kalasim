@@ -45,7 +45,7 @@ fun RealDistribution.clip(lower: Number = 0, upper: Number = Double.MAX_VALUE) =
 
 
 class Clipper internal constructor(val dist: RealDistribution, val lower: Double, val upper: Double) {
-    fun invoke(): Double = min(max(dist(), lower), upper)
+    operator fun invoke(): Double = min(max(dist(), lower), upper)
 }
 
 
