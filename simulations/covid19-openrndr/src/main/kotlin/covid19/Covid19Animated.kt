@@ -1,6 +1,6 @@
 import covid19.Covid19
 import covid19.PersonStatusEvent
-import org.kalasim.TraceCollector
+import org.kalasim.EventLog
 import org.koin.core.component.get
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
@@ -21,7 +21,7 @@ fun main() = application {
         }
 
         println("simulation done")
-        val log = covid19.get<TraceCollector>().filterIsInstance<PersonStatusEvent>()
+        val log = covid19.get<EventLog>().filterIsInstance<PersonStatusEvent>()
 
 
         val grouped = log.groupBy { it.person }.mapValues { (_, values) -> values.sortedBy { it.time } }

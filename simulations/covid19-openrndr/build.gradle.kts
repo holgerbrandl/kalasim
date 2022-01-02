@@ -5,7 +5,8 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 /* the name of this project, default is the template version but you are free to change these */
 group = "org.openrndr.template"
-version = "0.3.14"
+//version = "0.4.0-rc.3"
+version = "0.3.18"
 
 val applicationMainClass = "TemplateProgramKt"
 
@@ -14,11 +15,11 @@ val orxFeatures = setOf(
 //  "orx-boofcv",
 //  "orx-camera",
 //  "orx-chataigne",
+//  "orx-color",
     "orx-compositor",
 //  "orx-dnk3",
 //  "orx-easing",
 //  "orx-file-watcher",
-//  "orx-parameters",
 //  "orx-filter-extension",
     "orx-fx",
 //  "orx-glslify",
@@ -29,17 +30,22 @@ val orxFeatures = setOf(
 //  "orx-interval-tree",
 //  "orx-jumpflood",
 //  "orx-kdtree",
+  "orx-keyframer",
+//  "orx-kinect-v1",
+//  "orx-kotlin-parser",
 //  "orx-mesh-generators",
 //  "orx-midi",
 //  "orx-no-clear",
     "orx-noise",
-    "orx-keyframer",
 //  "orx-obj-loader",
     "orx-olive",
 //  "orx-osc",
 //  "orx-palette",
+    "orx-panel",
+//  "orx-parameters",
 //  "orx-poisson-fill",
-//  "orx-rabbit-control,
+//  "orx-rabbit-control",
+//  "orx-realsense2",
 //  "orx-runway",
     "orx-shade-styles",
 //  "orx-shader-phrases",
@@ -47,10 +53,12 @@ val orxFeatures = setOf(
 //  "orx-syphon",
 //  "orx-temporal-blur",
 //  "orx-time-operators",
-//  "orx-kinect-v1",
+//  "orx-timer",
+//  "orx-triangulation",
+//  "orx-video-profiles",
+    null
+).filterNotNull()
 
-    "orx-panel"
-)
 
 /* Which OPENRNDR libraries should be added to this project? */
 val openrndrFeatures = setOf(
@@ -59,10 +67,12 @@ val openrndrFeatures = setOf(
 
 /*  Which version of OPENRNDR and ORX should be used? */
 val openrndrUseSnapshot = false
-val openrndrVersion = if (openrndrUseSnapshot) "0.4.0-SNAPSHOT" else "0.3.44"
+val openrndrVersion = if (openrndrUseSnapshot) "0.4.0-SNAPSHOT" else "0.3.58"
 
 val orxUseSnapshot = false
-val orxVersion = if (orxUseSnapshot) "0.4.0-SNAPSHOT" else "0.3.53"
+val orxVersion = if (orxUseSnapshot) "0.4.0-SNAPSHOT" else "0.3.58"
+
+
 
 //<editor-fold desc="This is code for OPENRNDR, no need to edit this .. most of the times">
 val supportedPlatforms = setOf("windows", "macos", "linux-x64", "linux-arm64")
@@ -95,29 +105,25 @@ enum class Logging {
 /*  What type of logging should this project use? */
 val applicationLogging = Logging.FULL
 
-val kotlinVersion = "1.4.30"
+val kotlinVersion = "1.5.0"
 
 plugins {
     java
-    kotlin("jvm") version("1.4.0")
+    kotlin("jvm") version("1.5.0")
     id("com.github.johnrengelman.shadow") version ("6.1.0")
     id("org.beryx.runtime") version ("1.11.4")
 }
 
 repositories {
     mavenCentral()
-    mavenLocal()
-
     if (openrndrUseSnapshot || orxUseSnapshot) {
         mavenLocal()
     }
-    maven(url = "https://dl.bintray.com/openrndr/openrndr")
-    jcenter()
-
+    maven(url = "https://maven.openrndr.org")
 }
 
 fun DependencyHandler.orx(module: String): Any {
-        return "org.openrndr.extra:$module:$orxVersion"
+    return "org.openrndr.extra:$module:$orxVersion"
 }
 
 fun DependencyHandler.openrndr(module: String): Any {
@@ -148,11 +154,11 @@ dependencies {
     implementation(openrndr("extensions"))
     implementation(openrndr("filter"))
 
-    compile("org.kalasim:kalasim:0.7-SNAPSHOT")
-//    compile("org.kalasim:kalasim:0.6")
+    implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core","1.5.0-RC")
+    implementation("io.github.microutils", "kotlin-logging-jvm","2.0.6")
 
-    implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core","1.3.9")
-    implementation("io.github.microutils", "kotlin-logging","1.12.0")
+    implementation("com.github.holgerbrandl:kalasim:0.7.91")
+
 
     when(applicationLogging) {
         Logging.NONE -> {
@@ -162,7 +168,7 @@ dependencies {
             runtimeOnly("org.slf4j","slf4j-simple","1.7.30")
         }
         Logging.FULL -> {
-            runtimeOnly("org.apache.logging.log4j", "log4j-slf4j-impl", "2.13.3")
+            runtimeOnly("org.apache.logging.log4j", "log4j-slf4j-impl", "2.17.0")
             runtimeOnly("com.fasterxml.jackson.core", "jackson-databind", "2.11.1")
             runtimeOnly("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", "2.11.1")
         }
@@ -177,26 +183,18 @@ dependencies {
         implementation(orx(feature))
     }
 
-    if ("orx-kinect-v1" in orxFeatures) {
-        runtimeOnly(orxNatives("orx-kinect-v1"))
-    }
-
-    if ("orx-olive" in orxFeatures) {
-        implementation("org.jetbrains.kotlin:kotlin-script-runtime:$kotlinVersion")
-    }
-
     implementation(kotlin("stdlib-jdk8"))
     testImplementation("junit", "junit", "4.12")
 }
 
 // --------------------------------------------------------------------------------------------------------------------
-
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-}
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
+//
+//configure<JavaPluginConvention> {
+//    sourceCompatibility = JavaVersion.VERSION_1_8
+//}
+//tasks.withType<KotlinCompile> {
+//    kotlinOptions.jvmTarget = "1.8"
+//}
 
 
 project.setProperty("mainClassName", applicationMainClass)

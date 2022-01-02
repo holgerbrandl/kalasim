@@ -76,7 +76,7 @@ class Person(var position: Position, var sick: Boolean = false, var immune : Boo
     }
 }
 
-class PersonStatusEvent(now:Double, person: Person):Event(now) {
+class PersonStatusEvent(now:TickTime, person: Person):Event(now) {
     val person = person.name
     val position = person.position.copy()
     val sick = person.sick
@@ -114,7 +114,7 @@ class Covid19 : Environment() {
         dependency { PersonTracker(this) }
         dependency { MetricTimeline("sick_monitor") }
 
-        traceCollector()
+        eventLog()
 
         val populationManager = get<PersonTracker>()
 

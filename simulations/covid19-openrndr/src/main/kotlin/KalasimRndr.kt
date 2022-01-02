@@ -1,5 +1,4 @@
 import org.kalasim.*
-import org.koin.core.component.get
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.loadFont
@@ -23,11 +22,11 @@ fun main() = application {
 
 // create simulation with no default logging
         val sim = createSimulation {
-            traceCollector()
+            eventLog()
             ComponentGenerator(iat = 1.asDist()) { Component("Car.${it}") }
         }
 
-        val logs = sim.get<TraceCollector>()
+        val logs = sim.get<EventLog>()
 
         extend {
             drawer.fill = ColorRGBa.PINK

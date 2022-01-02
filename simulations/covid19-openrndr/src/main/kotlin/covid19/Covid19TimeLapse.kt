@@ -2,13 +2,11 @@ import covid19.Covid19
 import covid19.PersonStatusEvent
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.kalasim.ClockSync
 import org.kalasim.Event
+import org.kalasim.TickTime
+import org.kalasim.tt
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.math.IntVector2
@@ -28,23 +26,22 @@ fun main() = application {
         // think of it as a  Non Blocking Queue
         val ordersChannel = Channel<Event>(100)
 
-        var now = -0.0
+        var now: TickTime = 0.tt
 
         val currentPopulation = mutableMapOf<String, PersonStatusEvent>()
-        GlobalScope.launch {
-            ordersChannel.receiveAsFlow().buffer(Channel.UNLIMITED).filterIsInstance<PersonStatusEvent>().collect {
-                now = it.time
-                currentPopulation.put(it.person, it)
-            }
-        }
 
         // Start a log consumer
         GlobalScope.launch {
             Covid19().apply {
-                ClockSync(tickDuration = Duration.ofDays(1), speedUp =200000, syncsPerTick=5)
+                ClockSync(tickDuration = Duration.ofDays(1), syncsPerTick = 5)
 
-                addEventListener { if(it is PersonStatusEvent) ordersChannel.offer(it) }
-                run(null)
+                addAsyncEventListener<PersonStatusEvent> {
+                    now = it.time
+                    currentPopulation[it.person] = it
+                }
+
+                run()
+
                 println("simulation finished prematurely")
             }
         }
@@ -52,7 +49,7 @@ fun main() = application {
 
         val mapScale = Math.min(width, height) / 100
 
-        var counter=0
+        var counter = 0
         extend {
 //                drawer.clear(ColorRGBa.BLACK)
 
