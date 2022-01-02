@@ -92,7 +92,7 @@ class Harvester : Component() {
         }
     }
 
-    fun searching() = sequence {
+    fun searching() : Sequence<Component> = sequence {
         state.value = SCANNING
 
 //        val stepInc = discreteUniform(-3,3)
@@ -122,7 +122,8 @@ class Harvester : Component() {
                 currentDeposit = deposit
 
                 // todo https://github.com/holgerbrandl/kalasim/issues/37
-                yield(activate(process = Harvester::harvesting))
+//                yield(activate(process = Harvester::harvesting))
+                activate(process = Harvester::harvesting)
             }
         }
     }
@@ -133,8 +134,9 @@ class Harvester : Component() {
         // unloading time correlates with load status
         hold(tank.level / 10, "unloading ${tank.level} hydrat units")
         put(get<Base>().refinery withQuantity tank.level)
+
         // empty the tank
-        tank.level = 0.0
+        take(tank, tank.level)
     }
 
     fun harvesting(): Sequence<Component> = sequence {
@@ -146,7 +148,7 @@ class Harvester : Component() {
 
         if(currentDeposit == null) {
             // todo this is not pretty, the user must never yield herself
-            yield(activate(process = Harvester::searching))
+            activate(process = Harvester::searching)
         }
 
         state.value = MINING
@@ -161,7 +163,7 @@ class Harvester : Component() {
         } else {
             require(currentDeposit!!.isDepleted)
             currentDeposit = null
-            yield(activate(process = Harvester::harvesting))
+            activate(process = Harvester::harvesting)
         }
     }
 }

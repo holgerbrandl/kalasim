@@ -26,7 +26,7 @@ createSimulation {
             hold(5, description = "shipping ${batchRL.size} r2l")
 
             // we could also use an infinite while loop instead of activate
-            yield(activate(process = Component::process))
+            activate(process = Component::process)
         }
     }
 

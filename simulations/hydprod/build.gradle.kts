@@ -17,7 +17,7 @@ repositories {
 
 dependencies {
 //    implementation(project ("kalasim"))
-    api("com.github.holgerbrandl:kalasim:0.7.4-SNAPSHOT")
+    api("com.github.holgerbrandl:kalasim:0.7.92-SNAPSHOT")
 
     api("com.github.holgerbrandl:kravis:0.8.1")
 

@@ -52,7 +52,6 @@ class ComponentTests {
         Component("foo", process = Component::process).componentState shouldBe DATA
 
 
-
     }
 
 
@@ -64,7 +63,7 @@ class ComponentTests {
         info.status shouldBe DATA
         info.scheduledTime shouldBe null
 
-        info.toString() shouldBeDiff  """
+        info.toString() shouldBeDiff """
             {
               "scheduledTime": null,
               "creationTime": 0,
@@ -83,13 +82,13 @@ class ComponentTests {
 
         class MyComponent : Component(process = MyComponent::myProcess) {
             fun myProcess() = sequence {
-                    hold(1)
-                    println("hello from $name")
+                hold(1)
+                println("hello from $name")
 
-                    isCurrent shouldBe true
+                isCurrent shouldBe true
 
-                    counter++
-                }
+                counter++
+            }
         }
 
         val c = MyComponent()
@@ -153,6 +152,91 @@ class ComponentTests {
         }
 
         run()
+    }
+
+    @Test
+    fun `it shall not allow self-activation with activate()`() = createTestSimulation {
+        object : Component() {
+
+            override fun process() =sequence {
+                hold(1)
+                activate()
+                fail("it must not get here")
+            }
+
+        }
+
+        shouldThrow<IllegalArgumentException> {
+            run()
+        }
+    }
+
+    @Test
+    fun `it shall activate a sub-proces with activate()`() = createTestSimulation {
+        class MultiProcessor : Component() {
+            var sp1Started = false
+            var sp2Started= false
+
+            override fun process() =sequence {
+                hold(1)
+            }
+
+            fun subProcess1(): Sequence<Component> = sequence {
+                sp1Started=true
+                hold(1)
+                activate(process = MultiProcessor::subProcess2)
+
+                fail("it should never get here")
+            }
+
+            fun subProcess2(): Sequence<Component> = sequence {
+                sp2Started=true
+                hold(1)
+                activate(process = MultiProcessor::subProcess1)
+
+                fail("it should never get here")
+            }
+        }
+
+        val mp = MultiProcessor()
+
+        run()
+
+        now shouldBe 1.tt
+
+        // activate sub-process
+        mp.activate(process = MultiProcessor::subProcess1)
+
+        run(10)
+
+        mp.sp1Started shouldBe true
+        mp.sp2Started shouldBe true
+
+    }
+
+    @Test
+    fun `it shall consume a sub-process inplace`() = createTestSimulation {
+        class MultiProcessor : Component() {
+            var sp1Started = false
+
+            override fun process() =sequence {
+                hold(1)
+                yieldAll(subProcess1())
+                hold(1)
+            }
+
+            fun subProcess1(): Sequence<Component> = sequence {
+                sp1Started=true
+                hold(1)
+            }
+        }
+
+        val mp = MultiProcessor()
+
+        run()
+
+        now shouldBe 3.tt
+        mp.sp1Started shouldBe true
     }
 
 

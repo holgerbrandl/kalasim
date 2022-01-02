@@ -1084,6 +1084,18 @@ open class Component(
     }
 
 
+    suspend fun SequenceScope<Component>.activate(
+        at: TickTime? = null,
+        delay: Number = 0,
+        priority: Priority = NORMAL,
+        urgent: Boolean = false,
+        keepRequest: Boolean = false,
+        keepWait: Boolean = false,
+        process: ProcessPointer? = null
+    ) = yieldCurrent {
+        this@Component.activate(at, delay, priority, urgent, keepRequest, keepWait,process)
+    }
+
     /**
      * Activate component
      *
@@ -1095,7 +1107,7 @@ open class Component(
      * * if None (default), process will not be changed
      * * if the component is a data component, the generator function `process` will be used as the default process.
      */
-    fun activate(
+     fun activate(
         at: TickTime? = null,
         delay: Number = 0,
         priority: Priority = NORMAL,
@@ -1104,7 +1116,6 @@ open class Component(
         keepWait: Boolean = false,
         process: ProcessPointer? = null
 //        process: ProcessPointer? = Component::process
-
     ): Component {
 
         require(componentState != CURRENT || process != null) {
@@ -1614,7 +1625,7 @@ open class Component(
         val queueListener = object : CollectionChangeListener<T>() {
             override fun added(component: T) {
                 if(queue.size >= batchSize) {
-                    activate()
+                    this@Component.activate()
                 }
             }
         }

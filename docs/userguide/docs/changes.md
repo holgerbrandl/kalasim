@@ -13,6 +13,7 @@ Milestone Enhancements
 
 Major Enhancements
 
+* [#37](https://github.com/holgerbrandl/kalasim/issues/37) Simplified [process activation](component.md#activate) in process definitions  
 * [#34](https://github.com/holgerbrandl/kalasim/issues/34) Added support for [triangular distributions](basics.md#continuous-distributions)
 * [#43](https://github.com/holgerbrandl/kalasim/issues/43) Simplified states to consume [predicates](state.md#predicate-testing) directly in `wait()`
 * [#27](https://github.com/holgerbrandl/kalasim/issues/27) Made resource events more informative and consistent. These event now include a request-id to enable simplified bottleneck analyses  

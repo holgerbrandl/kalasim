@@ -186,14 +186,17 @@ The scheme below shows how interaction relate to component state transitions:
 
 ### activate
 
-Activate will schedule execution at the specified time. If no time is specified, execution will be scheduled for the current simulation time. If you do not specify a process, the current process will be scheduled for *continuation*. If a `process` argument is provided, the process will be *started* (or *restarted* if it is equal to the currently active process).
+`activate()` will schedule execution at the specified time. If no time is specified, execution will be scheduled for the current simulation time. If you do not specify a process, the current process will be scheduled for *continuation*. If a `process` argument is provided, the process will be *started* (or *restarted* if it is equal to the currently active process).
 
 ```kotlin
-val car0 = Car(process=null)  // data component
-car0.activate()  // activate @ process if exists, otherwise error
+Car() // default to process=Component::process or Component::repeatedProcess   
+Car(process=Component::none) // no process, which effectivly makes the car DATA     
 
-val car1 = Car(process=null)  // data component
-car1.activate(process=null) //  activate @ wash
+val car = Car(process=Car::driving) // start car in driving mode  
+
+car1.activate(process=Car::refilling) //  stop driving (if still ongoing) and activate refilling process
+
+car0.activate()  // activate defined process if set, otherwise error
 ```
 
 <!--* If the component to be activated is `CURRENT`, always use `yield(activate())`. The effect is that the-->
@@ -211,17 +214,36 @@ car1.activate(process=null) //  activate @ wash
   scheduled.
 * If the component is `INTERRUPTED`, the component will be activated at the specified time.
 
-!!! note
-    It is not possible to `activate` the `CURRENT` component, and `kalasim` will throw an error in this situation. The effect of a "self"-activate would be that the component becomes scheduled, thus this is essentially equivalent to the preferred hold method, so please use `hold` instead. In rare situations processes need to be restarted. If so, use yield for activation and provide the process pointer `yield(activate(process = Component::process))` which will bypass the internal requirement that the activated component must not be `CURRENT`.
+
+!!!important
+    It is not possible to `activate()` the `CURRENT` component without providing a `process` argument. `kalasim` will throw an error in this situation. The effect of a "self"-activate would be that the component becomes scheduled, thus this is essentially equivalent to the preferred hold method, so please use `hold` instead. The error is a safe-guard mechanism to prevent the user from unintentionally rescheduling the current component again. 
 
 
-Although not very common, it is possible to activate a component at a certain time or with a specified delay:
+In situations where the current process need to be restarted, we can use activate `yield(activate(process = Component::process))` which will bypass the internal requirement that the activated component must not be `CURRENT`.
+
+In situations where a user want's to run/consume an another process definition, without loosing the current process state, it is possible to yield all process steps with [`yieldAll()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence-scope/yield-all.html) the subprocess:
+
+```kotlin hl_lines="1000"
+{!api/ConsumeSubProcess.kts!}
+```
+
+Although not very common, it is also possible to activate a component at a certain time or with a specified delay:
 
 ```kotlin
 ship1.activate(at=100)
 ship2.activate(delay=50)
 ```
 
+
+!!!note
+    It is possible to use `activate()` outside of a process definition, e.g. to toggle processes after some time  
+
+    ```kotlin
+    sim.run(10)
+    car.activate(process=Car::repair)
+    sim.run(10)
+    ```
+    However, in most situations this is better modelled within a [process definition](#process-definition).
 
 ### hold
 
