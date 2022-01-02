@@ -3,6 +3,11 @@ plugins {
 //    kotlin("jvm") version "1.5.31"
     `maven-publish`
     signing
+
+//    id("org.jetbrains.kotlin.jupyter.api") version "0.10.0-131-1" // "0.11.0-45"
+    // see https://kotlinlang.slack.com/archives/C4W52CFEZ/p1641056747134600
+    id("org.jetbrains.kotlin.jupyter.api") version "0.11.0-45" // "0.11.0-45"
+
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
 }
 
@@ -58,6 +63,12 @@ dependencies {
 //    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
 //}
 
+
+
+//https://github.com/Kotlin/kotlin-jupyter/blob/master/docs/libraries.md
+tasks.processJupyterApiResources {
+    libraryProducers = listOf("org.kalasim.analysis.NotebookIntegration")
+}
 
 //https://gist.github.com/domnikl/c19c7385927a7bef7217aa036a71d807
 val jar by tasks.getting(Jar::class) {
