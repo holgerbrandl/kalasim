@@ -760,7 +760,7 @@ open class Component(
 
                 require(quantity >= 0 || resource.depletable) { "quantity <0" }
 
-                val requestContext = RequestContext(random.nextLong(), quantity, priority, now, null)
+                val requestContext = RequestContext(random.nextLong().absoluteValue, quantity, priority, now, null)
 
                 //  is same resource is specified several times, just add them up
                 //https://stackoverflow.com/questions/53826903/increase-value-in-mutable-map

@@ -352,11 +352,11 @@ class EnvTests {
             {"current":"ComponentGenerator.1","receiver":"Patient.6","action":"activated, scheduled for .74","details":"New state: scheduled","time":".74"}
             {"current":"ComponentGenerator.1","receiver":"ComponentGenerator.1","action":"hold +.35, scheduled for 1.09","details":"New state: scheduled","time":".74"}
             {"current":"Patient.6","receiver":"Patient.6","action":"Ended","details":"New state: data","time":".74"}
-            {"requester":"room 0","requesters":1,"current":"room 0","amount":1,"resource":"Dr 0","occupancy":0,"claimed":0,"time":".83","type":"REQUESTED","claimers":0,"request_id":-6457245767123267605,"capacity":1}
-            {"requester":"room 0","requesters":1,"current":"room 0","amount":1,"resource":"Dr 1","occupancy":0,"claimed":0,"time":".83","type":"REQUESTED","claimers":0,"request_id":-8473867053398002461,"capacity":1}
-            {"requester":"room 0","requesters":1,"current":"room 0","amount":1,"resource":"Dr 2","occupancy":0,"claimed":0,"time":".83","type":"REQUESTED","claimers":0,"request_id":-3604026565907225053,"capacity":1}
-            {"requester":"room 0","requesters":1,"current":"room 0","amount":1,"resource":"Dr 3","occupancy":0,"claimed":0,"time":".83","type":"REQUESTED","claimers":0,"request_id":-7522904868940355451,"capacity":1}
-            {"requester":"room 0","requesters":1,"current":"room 0","amount":1,"resource":"Dr 0","occupancy":1,"claimed":1,"time":".83","type":"CLAIMED","claimers":0,"request_id":-6457245767123267605,"capacity":1}
+            {"requester":"room 0","requesters":1,"current":"room 0","amount":1,"resource":"Dr 0","occupancy":0,"claimed":0,"time":".83","type":"REQUESTED","claimers":0,"request_id":6457245767123267605,"capacity":1}
+            {"requester":"room 0","requesters":1,"current":"room 0","amount":1,"resource":"Dr 1","occupancy":0,"claimed":0,"time":".83","type":"REQUESTED","claimers":0,"request_id":8473867053398002461,"capacity":1}
+            {"requester":"room 0","requesters":1,"current":"room 0","amount":1,"resource":"Dr 2","occupancy":0,"claimed":0,"time":".83","type":"REQUESTED","claimers":0,"request_id":3604026565907225053,"capacity":1}
+            {"requester":"room 0","requesters":1,"current":"room 0","amount":1,"resource":"Dr 3","occupancy":0,"claimed":0,"time":".83","type":"REQUESTED","claimers":0,"request_id":7522904868940355451,"capacity":1}
+            {"requester":"room 0","requesters":1,"current":"room 0","amount":1,"resource":"Dr 0","occupancy":1,"claimed":1,"time":".83","type":"CLAIMED","claimers":0,"request_id":6457245767123267605,"capacity":1}
             {"current":"room 0","receiver":"room 0","action":"Request honored by Dr 0, scheduled for .83","details":"New state: scheduled","time":".83"}
             {"current":"room 0","receiver":"room 0","action":"hold +.59  Surgery of patient Patient(type=Dislocations, severity=State.9[Urgent], patientStatus=State.10[InSurgery]) in room room 0 by doctor RequestScopeContext(resource=Dr 0, requestingSince=.83), scheduled for 1.42","details":"New state: scheduled","time":".83"}
             """.trimIndent()
