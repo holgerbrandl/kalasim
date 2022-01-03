@@ -96,7 +96,7 @@ Even if real-world processes may run "in parallel", a simulation is processed se
 
 Although, `kalasim` supports double-precision to schedule events, events will inevitably arise that are scheduled for the *same time*. Because of its  single-threaded, deterministic execution model (like most DES frameworks),  `kalasim`  processes events sequentially – one after another. If two events are scheduled at the same time, the one scheduled first will also be the processed first (FIFO).
 
-As pointed out in [Ucar, 2019](https://www.jstatsoft.org/article/view/v090i02), there are many situations where simultaneous events may occur in simulation. To provide a well-defined behavior in such situations, process interaction methods (namely  `wait`, `request`,  `activate` and `reschedule`) support user-define [schedule priorities]. With the parameter `priority`, it is possible to sort a component before or after other components, scheduled for the same time. Events with higher priority are executed first in situations where multiple events are scheduled for the same simulation time.
+As pointed out in [Ucar, 2019](https://www.jstatsoft.org/article/view/v090i02), there are many situations where such simultaneous events may occur in simulation. To provide a well-defined behavior in such situations, process interaction methods (namely  `wait`, `request`,  `activate` and `reschedule`) support user-provided schedule priorities. With the parameter `priority` in these [interaction methods](component.md#process-interaction), it is possible to order components scheduled for the same time in the event-queue. Events with higher priority are executed first in situations where multiple events are scheduled for the same simulation time.
 
 There are different predefined priorities which correspond the following sort-levels
 
@@ -107,8 +107,6 @@ There are different predefined priorities which correspond the following sort-le
 * `CRITICAL` (20)
 
 The user can also create more fine-grained priorities with `Priority(23)`
-
-
 
 <!--The `urgent` parameters only applies to components scheduled with the same time and same `priority`. TBD do we need it?-->
 
@@ -133,8 +131,9 @@ class Car : Component() {
 
     val gasStation by inject<GasStation>()
     
-    // we can also distinguish different resources of the same type with a qualifier
-//    val gasStation2 : GasStation by inject(qualifier = named("gas_station_2"))
+    // we could also distinguish different resources of the same type 
+    // using a qualifier
+//    val gasStation2 : GasStation by inject(qualifier = named("gs_2"))
 
     override fun process() = sequence {
         request(gasStation) {
@@ -150,13 +149,13 @@ createSimulation{
     dependency { TrafficLight() }
     dependency { GasStation() }
 
-    // declare another gas station and specifiy 
+    // declare another gas station and specify 
     dependency(qualifier = named(FUEL_PUMP)) {  }
     
     Car()
 }
 ```
-As shown in the example, the user can simply pull dependencies from the simulation environment using `get<T>()` or `inject<T>()`. This is realized with via [Koin Context Isolation](https://insert-koin.io/docs/reference/koin-core/context-isolation/) provided by a thread-local `DependencyContext`. This  context is a of type `KalasimContext`. It is automatically created when calling `createSimulation` or by instantiating a new simulation `Environment`. This context is kept as a static reference, so the user may omit it when creating simulation entities. Typically, dependency context management is fully transparent to the user.
+As shown in the example, the user can simply pull dependencies from the simulation environment using `get<T>()` or `inject<T>()`. This is realized with via [Koin Context Isolation](https://insert-koin.io/docs/reference/koin-core/context-isolation/) provided by a thread-local `DependencyContext`. This  context is a of type `DependencyContext`. It is automatically created when calling `createSimulation` or by instantiating a new simulation `Environment`. This context is kept as a static reference, so the user may omit it when creating simulation entities. Typically, dependency context management is fully transparent to the user.
 
 
 ```kotlin

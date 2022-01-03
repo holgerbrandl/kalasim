@@ -41,7 +41,7 @@ inline val Int.minutes get(): Duration = Duration.ofMinutes(this.toLong())
 inline val Int.hours: Duration get() = Duration.ofHours(this.toLong())
 inline val Double.hours: Duration get() = Duration.ofSeconds((this * 3600).roundToLong())
 
-inline val Int.days get(): Duration = Duration.ofHours(this.toLong())
+inline val Int.days get(): Duration = Duration.ofDays(this.toLong())
 inline val Double.days get(): Duration = Duration.ofSeconds((this * 86400).roundToLong())
 
 

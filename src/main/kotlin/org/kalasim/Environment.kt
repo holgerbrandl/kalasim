@@ -177,7 +177,7 @@ open class Environment(
         }
 
         _koin = koin ?: run {
-//            KalasimContext.stopKoin()
+//            DependencyContext.stopKoin()
 
             //https://medium.com/koin-developers/ready-for-koin-2-0-2722ab59cac3
 
