@@ -18,7 +18,7 @@ val tank  = DepletableResource(capacity=100, initialLevel=60)
 
 put(gasSupply, 50, capacityLimitMode = CapacityLimitMode.CAP)
 ```
-* [#23](https://github.com/holgerbrandl/kalasim/issues/23) It is now possible to use `java.time.Instant` and `java.time.Duration` in `Component.hold()` and `Environment.run`. 
+* [#23](https://github.com/holgerbrandl/kalasim/issues/23) Added support for duration extensions introduced in kotlin [v1.6](https://blog.jetbrains.com/kotlin/2021/11/kotlin-1-6-0-is-released/) to express durations more naturally with `2.hours`, `3.minutes` and so on. It is now possible to use `java.time.Instant` and `kotlin.time.Duration` in `Component.hold()` and `Environment.run`. 
 ```kotlin
 createSimulation{
     object: Component{
@@ -36,7 +36,6 @@ createSimulation{
 
 Major Enhancements
 
-* Added extensions to express durations more naturally with `2.hours`, `3.minutes` and so on. Note: this is not using [kotlin-duration API](https://blog.jetbrains.com/kotlin/2021/11/kotlin-1-6-0-is-released/) because of currently too limited compatibility with existing java-time APIs
 * [#37](https://github.com/holgerbrandl/kalasim/issues/37) Simplified [process activation](component.md#activate) in process definitions  
 * [#34](https://github.com/holgerbrandl/kalasim/issues/34) Added support for [triangular distributions](basics.md#continuous-distributions)
 * [#43](https://github.com/holgerbrandl/kalasim/issues/43) Simplified states to consume [predicates](state.md#predicate-testing) directly in `wait()`

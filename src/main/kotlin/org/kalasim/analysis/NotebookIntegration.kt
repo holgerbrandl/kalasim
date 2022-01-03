@@ -12,6 +12,12 @@ import org.kalasim.misc.toIndentString
 internal class NotebookIntegration : JupyterIntegration() {
     override fun Builder.onLoaded() {
         import("org.kalasim.*")
+        import(
+            "kotlin.time.Duration.Companion.minutes",
+            "kotlin.time.Duration.Companion.seconds",
+            "kotlin.time.Duration.Companion.hours",
+            "kotlin.time.Duration.Companion.days",
+        )
 
         render<Environment> { it.toJson().toIndentString().printThis() }
         render<QueueInfo> { it.toJson().toIndentString().printThis() }

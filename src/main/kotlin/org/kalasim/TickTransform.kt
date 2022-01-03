@@ -2,10 +2,10 @@ package org.kalasim
 
 import org.kalasim.misc.TRACE_DF
 import org.koin.core.component.KoinComponent
-import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToLong
+import kotlin.time.*
 
 // note: remove @JvmInline because it did not seem ready on the java-interop-side
 // value class ? --> Blocked by https://github.com/holgerbrandl/kalasim/issues/45
@@ -33,16 +33,16 @@ data class TickTime(val value: Double) : Comparable<TickTime> {
 value class Ticks(val value: Double) {
     constructor(instant: Number) : this(instant.toDouble())
 }
-
-
-inline val Int.seconds get() : Duration = Duration.ofSeconds(this.toLong())
-inline val Int.minutes get(): Duration = Duration.ofMinutes(this.toLong())
-
-inline val Int.hours: Duration get() = Duration.ofHours(this.toLong())
-inline val Double.hours: Duration get() = Duration.ofSeconds((this * 3600).roundToLong())
-
-inline val Int.days get(): Duration = Duration.ofDays(this.toLong())
-inline val Double.days get(): Duration = Duration.ofSeconds((this * 86400).roundToLong())
+//
+//
+//inline val Int.seconds get() : Duration = Duration.ofSeconds(this.toLong())
+//inline val Int.minutes get(): Duration = Duration.ofMinutes(this.toLong())
+//
+//inline val Int.hours: Duration get() = Duration.ofHours(this.toLong())
+//inline val Double.hours: Duration get() = Duration.ofSeconds((this * 3600).roundToLong())
+//
+//inline val Int.days get(): Duration = Duration.ofDays(this.toLong())
+//inline val Double.days get(): Duration = Duration.ofSeconds((this * 86400).roundToLong())
 
 
 //val Number.ticks: Ticks
@@ -85,15 +85,15 @@ open class TickTransform(val tickUnit: TimeUnit) {
     }
 
      fun durationAsTicks(duration: Duration): Double = when(tickUnit) {
-        TimeUnit.NANOSECONDS -> duration.toNanos()
-        TimeUnit.MICROSECONDS -> duration.toNanos() / 1000.0
-        TimeUnit.MILLISECONDS -> duration.toNanos() / 1000000.0
+        TimeUnit.NANOSECONDS -> duration.toJavaDuration().toNanos()
+        TimeUnit.MICROSECONDS -> duration.toJavaDuration().toNanos() / 1000.0
+        TimeUnit.MILLISECONDS -> duration.toJavaDuration().toNanos() / 1000000.0
         // https://stackoverflow.com/questions/42317152/why-does-the-duration-class-not-have-toseconds-method
-        TimeUnit.SECONDS -> duration.toMillis() / 1000.0
-        TimeUnit.MINUTES -> duration.toMillis() / 60000.0
+        TimeUnit.SECONDS -> duration.toJavaDuration().toMillis() / 1000.0
+        TimeUnit.MINUTES -> duration.toJavaDuration().toMillis() / 60000.0
         //https://stackoverflow.com/questions/42317152/why-does-the-duration-class-not-have-toseconds-method
-        TimeUnit.HOURS -> duration.seconds / 3600.0
-        TimeUnit.DAYS -> duration.toMinutes() / 1440.0
+        TimeUnit.HOURS -> duration.toJavaDuration().seconds / 3600.0
+        TimeUnit.DAYS -> duration.toJavaDuration().toMinutes() / 1440.0
     }.toDouble()
 }
 
@@ -101,22 +101,22 @@ class OffsetTransform(val offset: Instant = Instant.now(), tickUnit: TimeUnit) :
     override fun tick2wallTime(tickTime: TickTime): Instant {
         val ttValue = tickTime.value
         val durationSinceOffset = when(tickUnit) {
-            TimeUnit.NANOSECONDS -> Duration.ofNanos(ttValue.toLong())
-            TimeUnit.MICROSECONDS -> Duration.ofNanos((ttValue * 1000).toLong())
-            TimeUnit.MILLISECONDS -> Duration.ofNanos((ttValue * 1000000).toLong())
-            TimeUnit.SECONDS -> Duration.ofMillis((ttValue * 1000).toLong())
-            TimeUnit.MINUTES -> Duration.ofMillis((ttValue * 60000).toLong())
-            TimeUnit.HOURS -> Duration.ofSeconds((ttValue * 3600).toLong())
-            TimeUnit.DAYS -> Duration.ofMinutes((ttValue * 1440).toLong())
+            TimeUnit.NANOSECONDS -> java.time.Duration.ofNanos(ttValue.toLong())
+            TimeUnit.MICROSECONDS -> java.time.Duration.ofNanos((ttValue * 1000).toLong())
+            TimeUnit.MILLISECONDS -> java.time.Duration.ofNanos((ttValue * 1000000).toLong())
+            TimeUnit.SECONDS -> java.time.Duration.ofMillis((ttValue * 1000).toLong())
+            TimeUnit.MINUTES -> java.time.Duration.ofMillis((ttValue * 60000).toLong())
+            TimeUnit.HOURS -> java.time.Duration.ofSeconds((ttValue * 3600).toLong())
+            TimeUnit.DAYS -> java.time.Duration.ofMinutes((ttValue * 1440).toLong())
         }
 
         return offset + durationSinceOffset
     }
 
     override fun wall2TickTime(instant: Instant): TickTime {
-        val offsetDuration = Duration.between(offset, instant)
+        val offsetDuration = java.time.Duration.between(offset, instant)
 
-        return TickTime(durationAsTicks(offsetDuration))
+        return TickTime(durationAsTicks(offsetDuration.toKotlinDuration()))
     }
 
     // todo improve precision of transformation

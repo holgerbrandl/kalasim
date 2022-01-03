@@ -2,6 +2,10 @@
 import org.kalasim.*
 import java.time.Instant
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.toJavaDuration
 
 
 createSimulation(true) {
@@ -9,7 +13,7 @@ createSimulation(true) {
     tickTransform = TickTransform(TimeUnit.MINUTES)
 
     object :Component(){
-        override fun process() =sequence<Component> {
+        override fun process() =sequence {
             hold(1.minutes, description = "dressing")
 
             // we can express fractional durations (1.3 hours = 78 minutes)
@@ -30,3 +34,4 @@ createSimulation(true) {
     println(asWallTime(now))
 }
 
+operator fun Instant.plus(duration: kotlin.time.Duration) = this + duration.toJavaDuration()

@@ -10,7 +10,7 @@ import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
 import kotlin.math.*
 import kotlin.reflect.KFunction1
-import java.time.Duration
+import kotlin.time.Duration
 
 
 internal const val EPS = 1E-8

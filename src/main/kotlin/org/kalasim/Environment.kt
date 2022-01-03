@@ -18,7 +18,7 @@ import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
-import java.time.Duration
+import kotlin.time.Duration
 import java.time.Instant
 import java.util.*
 
