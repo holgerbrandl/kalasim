@@ -2,6 +2,7 @@ package org.kalasim.test
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldNotContain
+import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.doubles.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import org.junit.Test
@@ -26,7 +27,7 @@ class DepletableResourceTests {
     fun `it should process an empty take`() = createTestSimulation(true) {
         val dr = DepletableResource(capacity = 10, initialLevel = 0)
 
-        object : Component(){
+        object : Component() {
             override fun process() = sequence {
                 shouldThrow<InvalidRequestQuantity> {
                     take(dr, 0.0)
@@ -143,8 +144,15 @@ class DepletableResourceTests {
 
 
     @Test
+    fun `it should forbid capacities larger than Int_MAX_VALUE`() = createTestSimulation(true) {
+        shouldThrow<IllegalArgumentException> {
+            DepletableResource(capacity = Double.MAX_VALUE, initialLevel = 0)
+        }
+    }
+
+    @Test
     fun `it ensure that capacity=INF has meaningful semantics`() = createTestSimulation(true) {
-        val dp = DepletableResource(capacity = Double.MAX_VALUE, initialLevel = 0)
+        val dp = DepletableResource(capacity = Int.MAX_VALUE, initialLevel = 0)
 
         object : Component() {
             override fun process() = sequence {
@@ -152,10 +160,12 @@ class DepletableResourceTests {
                     put(dp, 10)
                 }
 
-                dp.occupancy shouldBe 0.0.plus(1e-10)
+                dp.occupancy shouldBe 1.0.plusOrMinus(1e-5)
                 dp.level shouldBe 1000
             }
         }
+
+        run()
     }
 
 

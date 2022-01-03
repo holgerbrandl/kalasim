@@ -163,6 +163,8 @@ open class Resource(
 
     var capacity = capacity.toDouble()
         set(newCapacity) {
+            validateCapacityRange(newCapacity)
+
             if(newCapacity < claimed) {
                 throw CapacityLimitException(this, "can not reduce capacity below current claims", now, newCapacity)
             }
@@ -216,6 +218,19 @@ open class Resource(
             : Double
         get() = capacity - claimed
 
+
+
+    // because Double.MAX_VALUE-1< Double.MAX_VALUE  is wrong on the JVM (because of limited precision)
+    // we need to ensure that capacities are in a range where kalasim will function correctly
+    private fun validateCapacityRange(capacity: Number) {
+        require(capacity.toDouble() >=0 &&  capacity.toDouble() <= Int.MAX_VALUE) {
+            "Only capacities in range [0, Int.MAX_VALUE] are supported by kalasim"
+        }
+    }
+
+    init{
+        validateCapacityRange(capacity)
+    }
 
     val capacityTimeline = MetricTimeline("Capacity of ${super.name}", initialValue = capacity, koin = koin)
     val claimedTimeline = MetricTimeline("Claimed quantity of ${this.name}", koin = koin)
