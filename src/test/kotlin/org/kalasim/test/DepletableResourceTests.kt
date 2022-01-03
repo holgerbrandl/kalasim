@@ -66,6 +66,9 @@ class DepletableResourceTests {
                 gasSupply.level shouldBe 30
 
                 // Test cap mode
+                put(gasSupply, 1, capacityLimitMode = CapacityLimitMode.CAP)
+                gasSupply.level shouldBe 31
+
                 put(gasSupply, 1000, capacityLimitMode = CapacityLimitMode.CAP)
                 gasSupply.level shouldBe 100
 

@@ -715,7 +715,8 @@ open class Component(
             CapacityLimitMode.CAP -> resourceRequests.map {
                 with(it) {
                     if(quantity < 0 && resource is DepletableResource) {
-                        copy(quantity = -1 * max(resource.capacity - resource.level, quantity))
+                        copy(quantity = max(resource.level-resource.capacity , quantity))
+//                        copy(quantity = -1 * max(resource.capacity - resource.level, quantity))
                     } else {
                         throw RuntimeException("CAP mode is just supported for put requests")
                     }
