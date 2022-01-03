@@ -5,23 +5,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.kalasim.ClockSync
 import org.kalasim.misc.DependencyContext
-import org.kalasim.seconds
 import org.kalasim.sims.hydprod.HydProd
-import org.kalasim.sims.hydprod.mapCoordinates
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.loadImage
 import org.openrndr.svg.loadSVG
+import java.time.Duration
 
 fun main() = application {
 
     val hydProd = HydProd().apply {
-        ClockSync(tickDuration = 1.seconds, syncsPerTick = 10)
-
-//        addEventListener<PersonStatusEvent> {
-//            now = it.time
-//            currentPopulation[it.person] = it
-//        }
+        ClockSync(tickDuration = Duration.ofMillis(100), syncsPerTick = 10)
     }
 
     // Start simulation model
@@ -42,31 +36,18 @@ fun main() = application {
     }
 
     program {
-//        val image = loadImage("data/images/pm5544.png")
         val image = loadImage("src/main/resources/1024px-Phlegra_Montes_on_Mars_ESA211127.jpg")
 
         val truck = loadSVG("src/main/resources/tractor-svgrepo-com.svg")
         val base = loadSVG("src/main/resources/base.svg")
 
-
-        val xScale = width.toDouble() / hydProd.map.upperRight.mapCoordinates.x
-        val yScale = height.toDouble() / hydProd.map.upperRight.mapCoordinates.y
+        val xScale = width.toDouble() / (hydProd.map.gridDimension.width*10)
+        val yScale = height.toDouble() / (hydProd.map.gridDimension.height*10)
 
         extend {
-//            drawer.drawStyle.colorMatrix = grayscale(1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0) * invert
+            // draw background
 //            drawer.drawStyle.colorMatrix = tint(ColorRGBa.BLUE) * invert
             drawer.image(image, 0.0, 0.0, width.toDouble(), height.toDouble())
-
-            drawer.defaults()
-
-////            drawer.fontMap = font
-//            drawer.drawStyle.colorMatrix = Matrix55.IDENTITY
-//            drawer.fill = ColorRGBa.WHITE
-//            drawer.stroke = ColorRGBa.YELLOW
-//            drawer.translate(200.0, 200.0)
-//            drawer.text("OPENRNDR", width / 2.0, height / 2.0)
-
-//        }
 
             with(drawer) {
 
@@ -85,7 +66,7 @@ fun main() = application {
                 // draw harvesters
                 hydProd.harvesters.forEach {
                     defaults()
-                    translate(it.gridPosition.mapCoordinates.x * xScale, it.gridPosition.mapCoordinates.y * yScale)
+                    translate(it.currentPosition.x * xScale, it.currentPosition.y * yScale)
                     scale(0.3)
                     composition(truck)
                 }
