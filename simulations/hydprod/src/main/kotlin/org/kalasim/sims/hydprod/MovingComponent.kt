@@ -39,6 +39,7 @@ open class MovingComponent(
         estimatedArrival = now + duration
 
         hold(Ticks(duration), description ?:"moving to ${nextTarget}", priority)
+        from = to!!
         to = null
     }
 

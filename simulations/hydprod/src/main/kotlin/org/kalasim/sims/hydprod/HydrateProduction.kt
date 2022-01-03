@@ -79,8 +79,6 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
 
 
     fun searching(): Sequence<Component> = sequence {
-        state.value = SCANNING
-
         val stepInc = discreteUniform(-3, 3)
 
         while(true) {
@@ -95,7 +93,7 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
 
             // now start the scanning process
             currentState = SCANNING
-            hold(0.1.hours, "scanning")
+            hold(1.hours, "scanning")
 
             // did we find a deposit
             map.deposits.find { depost ->
@@ -107,19 +105,26 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
 
                 activate(process = Harvester::harvesting)
             }
+
+            // can base assign a close-by one?
+            if(currentDeposit == null) {
+                currentDeposit = get<Base>().requestAssignment(this@Harvester)
+                if(currentDeposit!=null){
+                    activate(process = Harvester::harvesting)
+                }
+            }
         }
     }
 
 
     private suspend fun SequenceScope<Component>.moveTo(gridPosition: GridPosition, description: String? = null) {
-        state.value = MOVING
+        currentState = MOVING
         move(gridPosition.mapCoordinates, gridUnitsPerHour, description = description)
         this@Harvester.gridPosition = gridPosition
     }
 
     fun unload() = sequence {
         moveTo(base.position)
-
 
         val unloadUnitsPerMinute = 0.5  // speed of unloading
 
@@ -145,8 +150,10 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
             activate(process = Harvester::searching)
         }
 
+        moveTo(currentDeposit!!.gridPosition)
+
         //todo could we avoid the loop by using process interaction here?
-        val miningUnitsPerHour = 2.0
+        val miningUnitsPerHour = 5.0
         while(!currentDeposit!!.isDepleted && !tank.isFull) {
             val quantity = min(miningUnitsPerHour, currentDeposit!!.level)
             take(currentDeposit!!, quantity, failDelay = 0)
@@ -154,10 +161,10 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
                 break
             }
 
-            state.value = MINING
+            currentState = MINING
             hold(1.hours)
 
-            put(tank, quantity)
+            put(tank, quantity, capacityLimitMode = CapacityLimitMode.CAP)
         }
 
         if(tank.isFull) {
@@ -173,7 +180,7 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
 }
 
 class Base : Component() {
-    val position: GridPosition = GridPosition(20, 15)
+    val position: GridPosition = GridPosition(10, 15)
 
     init{
         require(get<DepositMap>().restrictToMap(position) == position){ "base out of map" }
@@ -192,9 +199,9 @@ class Base : Component() {
 
     /** Performs analysis to find a suitable deposit for harvesting for the given harvester. */
     fun requestAssignment(harvester: Harvester): Deposit? {
-        return knownDeposits.filter { !it.isDepleted }.ifEmpty { null }?.sortedBy {
+        return knownDeposits.filter { !it.isDepleted }.ifEmpty { null }?.minByOrNull {
             it.gridPosition.distance(harvester.gridPosition)
-        }?.firstOrNull()
+        }
     }
 
 
@@ -221,7 +228,7 @@ class HydProd : Environment(true) {
     // the initially unknown list of deposits
     val map = dependency { DepositMap() }
     val base = dependency { Base() }
-    val harvesters = List(4) { Harvester(base.position) }
+    val harvesters = List(1) { Harvester(base.position) }
 }
 
 fun main() {
@@ -232,5 +239,5 @@ fun main() {
     println("produced hydrate units: ${prod.base.refinery.level}")
 
     val depletionRatio = prod.map.deposits.map { it.level to it.capacity }.run { sumOf { it.first } / sumOf { it.second } }
-    println("Deposit depletion ${depletionRatio}")
+    println("Deposit depletion ${depletionRatio.roundAny(2)} *")
 }

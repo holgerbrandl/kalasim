@@ -45,7 +45,7 @@ repositories {
 
 dependencies {
 //    implementation(project ("kalasim"))
-    api("com.github.holgerbrandl:kalasim:0.7.92-SNAPSHOT")
+    api("com.github.holgerbrandl:kalasim:0.7.93-SNAPSHOT")
 
     api("com.github.holgerbrandl:kravis:0.8.1")
 
@@ -61,6 +61,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core","1.5.0-RC")
     implementation("io.github.microutils", "kotlin-logging-jvm","2.0.6")
+    implementation(kotlin("script-runtime"))
 
 
     for (feature in orxFeatures) {
