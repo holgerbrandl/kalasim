@@ -3,9 +3,10 @@ package org.kalasim
 import org.kalasim.misc.ComponentTrackingConfig
 import org.kalasim.misc.DependencyContext
 import org.koin.core.Koin
-import java.time.Duration
 import java.time.Instant
 import kotlin.math.roundToLong
+import kotlin.time.Duration
+import kotlin.time.toJavaDuration
 
 /**
  * A component that allows to synchronize wall time to simulation. See the [user manual](https://www.kalasim.org/advanced/#clock-synchronization) for an in-depth overview about clock synchronization.
@@ -34,7 +35,7 @@ class ClockSync(
 
     fun changeTickDuration(tickDuration: Duration) {
         syncConfig = SyncConfiguration(
-            tickMs = tickDuration.toMillis().toDouble(),
+            tickMs = tickDuration.inWholeMilliseconds.toDouble(),
             holdTime = 1.0 / syncsPerTick.toDouble()
         )
     }
@@ -52,14 +53,14 @@ class ClockSync(
 
             //wait until we have caught up with wall clock
             val simTimeSinceStart =
-                Duration.between(simStart, simStart.plusMillis((syncConfig.tickMs * env.now.value).roundToLong()))
-            val wallTimeSinceStart = Duration.between(simStart, Instant.now())
+                java.time.Duration.between(simStart, simStart.plusMillis((syncConfig.tickMs * env.now.value).roundToLong()))
+            val wallTimeSinceStart = java.time.Duration.between(simStart, Instant.now())
 
             val sleepDuration = simTimeSinceStart - wallTimeSinceStart
 
 //            println("sim $simTimeSinceStart wall $wallTimeSinceStart")
 
-            if (maxDelay != null && sleepDuration.abs() > maxDelay) {
+            if (maxDelay != null && sleepDuration.abs() > maxDelay.toJavaDuration()) {
                 throw ClockOverloadException(
                     env.now,
                     "Maximum delay between wall clock and simulation clock exceeded at time ${env.now}. " +
@@ -68,7 +69,7 @@ class ClockSync(
             }
 
             // simulation is too fast if value is larger
-            if (sleepDuration > Duration.ZERO) {
+            if (sleepDuration > Duration.ZERO.toJavaDuration()) {
                 // wait accordingly to let wall clock catch up
                 Thread.sleep(sleepDuration.toMillis())
             }

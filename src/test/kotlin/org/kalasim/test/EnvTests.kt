@@ -17,6 +17,8 @@ import org.koin.core.error.NoBeanDefFoundException
 import org.koin.dsl.koinApplication
 import java.lang.Thread.sleep
 import java.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class EnvTests {
 
@@ -147,7 +149,7 @@ class EnvTests {
         val timeBefore = System.currentTimeMillis()
 
         createSimulation(true) {
-            ClockSync(Duration.ofMillis(500))
+            ClockSync(500.milliseconds)
 
             run(10)
         }
@@ -158,7 +160,7 @@ class EnvTests {
 
     @Test
     fun `it should allow collecting events by type`() = createTestSimulation(true) {
-        ClockSync(Duration.ofMillis(500))
+        ClockSync(500.milliseconds)
 
         val creations = collect<EntityCreatedEvent>()
         val cg = ComponentGenerator(exponential(1), total = 10) { Component() }
@@ -183,7 +185,7 @@ class EnvTests {
                     }
             }
 
-            ClockSync(Duration.ofSeconds(1), maxDelay = Duration.ofSeconds(3))
+            ClockSync(1.seconds, maxDelay = 1.seconds)
 
             shouldThrow<ClockOverloadException> {
                 run(10)

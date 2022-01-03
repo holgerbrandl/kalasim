@@ -1,12 +1,12 @@
 import org.kalasim.ClockSync
 import org.kalasim.createSimulation
-import java.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 val timeBefore = System.currentTimeMillis()
 
 createSimulation(true) {
     // enable real-time clock synchronization w
-    ClockSync(tickDuration = Duration.ofSeconds(1))
+    ClockSync(tickDuration = 1.seconds)
 
     // enable real-time clock synchronization but run in 2x realtime
 //    ClockSync(Duration.ofSeconds(1), speedUp = 2)
