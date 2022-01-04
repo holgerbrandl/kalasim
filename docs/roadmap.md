@@ -10,8 +10,6 @@ complex, performant, dynamic process --> links to all of them
 
 **TODO** better name and documentation for `curComponent`
 
-**TODO** explore kon for better multi-platform abilities
-
 **TODO** consider using processcontext across the api 
 
 ## v0.8
