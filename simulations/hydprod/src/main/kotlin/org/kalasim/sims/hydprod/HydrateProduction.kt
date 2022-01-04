@@ -228,7 +228,7 @@ class HydProd : Environment(true) {
     // the initially unknown list of deposits
     val map = dependency { DepositMap() }
     val base = dependency { Base() }
-    val harvesters = List(1) { Harvester(base.position) }
+    val harvesters = List(4) { Harvester(base.position) }
 }
 
 fun main() {

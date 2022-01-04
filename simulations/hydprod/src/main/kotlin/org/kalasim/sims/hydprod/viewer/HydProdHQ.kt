@@ -10,21 +10,23 @@ import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.loadFont
 import org.openrndr.draw.loadImage
+import org.openrndr.ffmpeg.ScreenRecorder
 import org.openrndr.svg.loadSVG
 import java.time.Duration
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 
 fun main() = application {
 
     val hydProd = HydProd().apply {
-        ClockSync(tickDuration = 1.milliseconds, syncsPerTick = 10)
+        ClockSync(tickDuration = 1.milliseconds, syncsPerTick = 100)
     }
 
     // Start simulation model
     CoroutineScope(Dispatchers.Default).launch {
         DependencyContext.setKoin(hydProd.getKoin())
         println("starting simulation")
-        hydProd.run()
+        hydProd.run(5.days)
         println("finished simulation")
     }
 
@@ -47,6 +49,8 @@ fun main() = application {
 
         val xScale = width.toDouble() / (hydProd.map.gridDimension.width*10)
         val yScale = height.toDouble() / (hydProd.map.gridDimension.height*10)
+
+        extend(ScreenRecorder())
 
         extend {
             // draw background
@@ -92,10 +96,11 @@ fun main() = application {
 
 
                 // draw info
+                defaults()
                 drawer.fill = ColorRGBa.WHITE
                 drawer.fontMap = font
-                drawer.text("NOW: ${hydProd.now}", width - 100.0, height - 50.0)
-                drawer.text("Frame: ${counter++}", width - 100.0, height - 70.0)
+                drawer.text("NOW: ${hydProd.now}", width - 150.0, height - 30.0)
+                drawer.text("Frame: ${counter++}", width - 150.0, height - 50.0)
             }
         }
     }

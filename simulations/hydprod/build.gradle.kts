@@ -25,6 +25,9 @@ val orxFeatures = setOf(
 val openrndrUseSnapshot = false
 val openrndrVersion = if (openrndrUseSnapshot) "0.4.0-SNAPSHOT" else "0.3.58"
 
+val openrndrFeatures = setOf(
+    "video"
+)
 
 fun openrndr(module: String): Any {
     return "org.openrndr:openrndr-$module:$openrndrVersion"
@@ -63,6 +66,10 @@ dependencies {
     implementation("io.github.microutils", "kotlin-logging-jvm","2.0.6")
     implementation(kotlin("script-runtime"))
 
+    if ("video" in openrndrFeatures) {
+        implementation(openrndr("ffmpeg"))
+        runtimeOnly(openrndrNatives("ffmpeg"))
+    }
 
     for (feature in orxFeatures) {
         implementation(orx(feature))
