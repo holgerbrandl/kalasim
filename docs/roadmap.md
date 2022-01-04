@@ -5,16 +5,10 @@ complex, performant, dynamic process --> links to all of them
 
 ## Next steps
 
-honor policy notes
-* relaxedFCFS is expense in java because we can not traverse the sorted list (can not consume sorted queue)
 
 **TODO** unify naming availableQuantity vs claimed
 
-**TODO** clean up all compiler warnings
-
 **TODO** better name and documentation for `curComponent`
-
-**TODO** consider removing Component.requestedQuantity
 
 **TODO** explore kon for better multi-platform abilities
 

@@ -481,7 +481,7 @@ class ResourceSnapshot(resource: Resource) : AutoJson(), EntitySnapshot {
     data class ReqComp(val component: String, val quantity: Double?)
 
     val requestedBy = resource.requesters.q.toList().map {
-        ReqComp(it.component.name, it.component.requestedQuantity(resource))
+        ReqComp(it.component.name, it.component.requests[resource]?.quantity)
     }
 }
 

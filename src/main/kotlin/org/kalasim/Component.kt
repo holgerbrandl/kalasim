@@ -1564,8 +1564,6 @@ open class Component(
     }
 
 
-    internal fun requestedQuantity(resource: Resource) = requests[resource]?.quantity
-
     /** Captures the current state of a `Component`*/
     @Suppress("unused")
     open class ComponentSnapshot(component: Component) : AutoJson(), EntitySnapshot {
