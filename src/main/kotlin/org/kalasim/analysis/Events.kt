@@ -69,7 +69,7 @@ data class ResourceActivityEvent(
     val requester: Component,
     val resource: Resource,
     val activity: String?,
-    val claimedQuantity: Double,
+    val quantity: Double,
 ) : Event(released) {
     val requestedWT = resource.env.tickTransform?.tick2wallTime(requested)
     val honoredWT = resource.env.tickTransform?.tick2wallTime(honored)
@@ -82,7 +82,7 @@ data class ResourceActivityEvent(
         "requester" to requester.name
         "resource" to resource.name
         "activity" to activity
-        "claimedQuantity" to claimedQuantity
+        "quantity" to quantity
     }
 }
 

@@ -49,6 +49,7 @@ Major Enhancements
 Minor enhancements
 
 * Renamed all `info` attributes to `snapshot` to convey intent better
+* Unified naming [resource](resource.md) attributes
 * [#28](https://github.com/holgerbrandl/kalasim/pull/28) Added support API to [sample UUIDs](basics.md#enumerations) with engine-controlled randomization 
 * Added `capacity` to [component collections](collections.md)
 * Reworked [distribution support API](basics.md#randomness--distributions) for better API experience to enable controlled randomization in process models

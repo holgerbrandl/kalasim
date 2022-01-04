@@ -786,7 +786,7 @@ open class Component(
                 }
 
                 if(resource.preemptive) {
-                    var av = resource.availableQuantity
+                    var av = resource.available
                     val thisClaimers = resource.claimers.q
 
                     val bumpCandidates = mutableListOf<Component>()
@@ -1581,7 +1581,7 @@ open class Component(
     suspend fun SequenceScope<Component>.selectResource(
         resources: List<Resource>,
         quantity: Number = 1,
-        policy: ResourceSelectionPolicy = Random
+        policy: ResourceSelectionPolicy = RandomOrder
     ): Resource {
         require(resources.isNotEmpty()) { "Resources listing must not be empty" }
 
@@ -1601,17 +1601,17 @@ open class Component(
                 return resources[curValue]
             }
             FirstAvailable -> {
-                while(resources.all { it.availableQuantity < quantity.toDouble() }) {
+                while(resources.all { it.available < quantity.toDouble() }) {
                     standby()
                 }
 
-                resources.first { it.availableQuantity > quantity.toDouble() }
+                resources.first { it.available > quantity.toDouble() }
             }
-            Random -> {
+            RandomOrder -> {
                 resources[discreteUniform(0, resources.size - 1).sample()]
             }
             RandomAvailable -> {
-                val available = resources.filter { it.availableQuantity >= quantity.toDouble() }
+                val available = resources.filter { it.available >= quantity.toDouble() }
                 require(available.isNotEmpty()) { "Not all resources must be in use to use RANDOM_AVAILABE selection policy" }
 
                 available[discreteUniform(0, available.size - 1).sample()]
@@ -1666,7 +1666,7 @@ internal val SELECT_SCOPE_IDX = mutableMapOf<Int, Int>()
 
 
 enum class ResourceSelectionPolicy {
-    ShortestQueue, FirstAvailable, Random, RandomAvailable, RoundRobin
+    ShortestQueue, FirstAvailable, RandomOrder, RandomAvailable, RoundRobin
 }
 
 

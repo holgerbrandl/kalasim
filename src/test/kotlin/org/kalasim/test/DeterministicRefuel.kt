@@ -75,7 +75,7 @@ object DeterministicRefuel {
                 val litersRequired = FUEL_TANK_SIZE - fuelTankLevel
 
                 // order a new Tank if the fuelpump runs of out fuel
-                if ((fuelPump.availableQuantity - litersRequired) / fuelPump.capacity * 100 < THRESHOLD) {
+                if ((fuelPump.available - litersRequired) / fuelPump.capacity * 100 < THRESHOLD) {
                     log("running out of fuel at $gasStation. Ordering new fuel truck...")
                     TankTruck()
 

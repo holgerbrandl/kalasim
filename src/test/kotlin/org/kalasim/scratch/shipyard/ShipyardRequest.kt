@@ -16,7 +16,7 @@ fun main() {
                 while(true) {
                     hold(1)
                     put(tank, 2)
-                    log("tankLevel is ${tank.availableQuantity}")
+                    log("tankLevel is ${tank.available}")
                 }
             }
         }

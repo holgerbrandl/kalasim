@@ -8,24 +8,43 @@ A resource has always a capacity (which can be zero and even negative). This cap
 
 There are two of types resources:
 
-* [*Regular resources*](#regular-resources), where each claim is associated with a component (the claimer). It is not necessary that the claimed quantities are integer.
+* [*Claimable resources*](#claimable-resources), where each claim is associated with a component (the claimer). It is not necessary that the claimed quantities are integer.
 * [*Depletable resources*](#depletable-resources), where only the claimed quantity is registered. This is most useful for dealing with levels, lengths, etc.
 
 <!-- todo consider to add a dedicated container type instead of anonymous resources https://simpy.readthedocs.io/en/latest/topical_guides/resources.html#containers-->
 
-## Regular Resources
+## Claimable Resources
 
-Regular resources are declared with:
+Claimable resources are declared with:
 
 ```kotlin
 val clerks = Resource("clerks", capacity = 3)
+```
+
+Claimable resources have several attributes to query their status
+
+```kotlin
+clerks.claimed // currently claimed quantity
+clerks.available // currently available quantity
+
+clerks.capacity // current capacity
+
+clerks.occupancy // calculated by claimedQuantity / capacity
+
+clerks.requesters  // components currently requesting it 
+clerks.claimers // components currently claiming it 
+```
+All these attributes are read-only, except for the capacity of the resource, which can be adjusted dynamically
+
+```kotlin
+clerks.capacity  = 3 // set capacity to 3
 ```
 
 Any [component](component.md) can `request` from a resource in its [process method](component.md#process-definition). The user must not use [`request`](component.md#request) outside of a component's process definition.
 
 `request` has the effect that the component will check whether the requested quantity from a resource is available. It is possible to check for multiple availability of a certain quantity from several resources.
 
-Regular resources have a [queue](collections.md#queue) called `requesters` containing all components trying to claim from the resource. In addition, there is a [list](collections.md#list) `claimers` containing all components claiming from the resource. Both queues can not be modified but are very useful for analysis.
+Claimable resources have a [queue](collections.md#queue) called `requesters` containing all components trying to claim from the resource. In addition, there is a [list](collections.md#list) `claimers` containing all components claiming from the resource. Both queues can not be modified but are very useful for analysis.
 
 Notes
 
@@ -143,7 +162,7 @@ request(clerks, quantity = -3) // will throw exception!
 
 When requesting, it may (and will) happen that a resource is currently fully claimed, and the request can not be honored right away. Requests may even queue up, if a resource is under more demand than it can serve. To resolve competing requests in an orderly fashion, kalasim supports different _honor policies_. An honor policy defines the order in which competing requests are honored.
 
-Honor policies are applied to both regular and also [depletable resources](#depletable-resources).
+Honor policies are applied to both [claimable](resource.md#claimable-resources) and also [depletable resources](#depletable-resources).
 
 
 Policy implementations extend `org.kalasim.RequestHonorPolicy`.The following policies are supported:
@@ -152,7 +171,7 @@ Policy implementations extend `org.kalasim.RequestHonorPolicy`.The following pol
 * **Relaxed first come, first serve** (`RelaxedFCFS`): This policy will honor claimable requests first. It will honor small requests even if larger requests are already waiting longer in line. FCFS is used as secondary order scheme in situations where multiple concurrent requests of the same quantity are waiting in line.
 * **Smallest Quantity First** (`SQF`) This policy tries to maximize "customer" throughput. Also this policy will fall back to an FCFS to resolve ambiguities. It will maximize the total number of requests being honored, whereas large requests may need to wait for a long time. For depletable resources, just imagine a resource that is constantly low on supply. When new supply becomes available, the resource could serve as many requesters as possible. Also, for regular resources this concept applies, e.g. in customer support, where customers require one or multiple mechanics, and the company decides to serve the least staffing-intense requests first.
 * **Weighted FCFS** (`WeightedFCSC`): Here the user can supply a weight `α` that is used to compute an ordering based on `α * time_since_insert / quantity`. This will progressively weigh the time since the request against request quantity. The policy will prefer smaller requests, but will ensure that also larger request are finally be honored.
-* **Random Order** (`Random`): This honor policy will honor requests in a random order. Sometimes real world processes lack a structured policy to resolve concurrent demand, so it may help understanding the current situation, before working out a better planning strategy.
+* **Random Order** (`RandomOrder`): This honor policy will honor requests in a random order. Sometimes real world processes lack a structured policy to resolve concurrent demand, so it may help understanding the current situation, before working out a better planning strategy.
 
 As of now, the user can not provide custom `RequestHonorPolicy` implementations. To realize more sophisticated resource request regimes, she must implement their business specific request mechanism separately.
 
@@ -286,7 +305,7 @@ Events of type `org.kalasim.ResourceActivityEvent` will be logged at the end of 
 * `requester: Component`
 * `resource: Resource`
 * `activity: String`
-* `claimedQuantity: Double`
+* `quantity: Double`
 
 ## Activity Log
 
@@ -309,8 +328,10 @@ There's also a [notebook](https://github.com/holgerbrandl/kalasim/blob/master/si
 
 The `timeline` attribute of a resource reports the progression of all its major metrics. The `timeline` provides a changelog of a resource in terms of:
 
-* `capacity` of the resource
 * `claimed` capacity
+* `capacity` of the resource
+* `availability` of the resource
+* `occupancy` of the resource
 * `# requesters` in the queue of the resource at a given time
 * `# claimers` claiming from the resource at a given time
 

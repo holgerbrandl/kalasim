@@ -185,6 +185,7 @@ open class Resource(
 
 
     // https://stackoverflow.com/questions/41214452/why-dont-property-initializers-call-a-custom-setter
+    /**  Currently claimed quantity. This can't be set directly but via request */
     var claimed
             : Double = 0.0
         internal set(x) {
@@ -210,11 +211,13 @@ open class Resource(
         }
 
 
+    // todo when would a capcity less than 0?
     val occupancy
             : Double
         get() = if(capacity < 0) 0.0 else claimed / capacity
 
-    val availableQuantity
+    // note: called _just_ available and availableQuanity because more readible in many situations doctors.available
+    val available
             : Double
         get() = capacity - claimed
 

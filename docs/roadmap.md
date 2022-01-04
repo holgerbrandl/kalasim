@@ -6,8 +6,6 @@ complex, performant, dynamic process --> links to all of them
 ## Next steps
 
 
-**TODO** unify naming availableQuantity vs claimed
-
 **TODO** better name and documentation for `curComponent`
 
 **TODO** consider using processcontext across the api 
@@ -119,3 +117,8 @@ also adjust random generator of kotlin to prevent non-determinism entering simul
 
 **{todo}** port  machine maintenance example from ucar 2019
 ![](.roadmap_images/2bad897b.png)
+
+
+## Misc 
+
+state-machine-like https://github.com/fraktalio/fmodel

@@ -26,7 +26,7 @@ fun main() = application {
     CoroutineScope(Dispatchers.Default).launch {
         DependencyContext.setKoin(hydProd.getKoin())
         println("starting simulation")
-        hydProd.run(5.days)
+        hydProd.run(50.days)
         println("finished simulation")
     }
 
@@ -50,7 +50,7 @@ fun main() = application {
         val xScale = width.toDouble() / (hydProd.map.gridDimension.width*10)
         val yScale = height.toDouble() / (hydProd.map.gridDimension.height*10)
 
-        extend(ScreenRecorder())
+//        extend(ScreenRecorder())
 
         extend {
             // draw background
