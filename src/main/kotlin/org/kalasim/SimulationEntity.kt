@@ -1,7 +1,6 @@
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
-import org.json.JSONObject
 import org.kalasim.analysis.InteractionEvent
 import org.kalasim.misc.*
 import org.koin.core.Koin
@@ -52,7 +51,7 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
 
 
     internal fun logInternal(enabled: Boolean, action: String) = log(enabled) {
-        with(env) { InteractionEvent(now, curComponent, this@SimulationEntity, action) }
+        with(env) { InteractionEvent(now, currentComponent, this@SimulationEntity, action) }
     }
 
     override var tickTransform: TickTransform?
@@ -76,7 +75,7 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
      *
      * @param action Describing the nature if the event
      */
-    fun log(action: String) = env.apply { log(InteractionEvent(now, curComponent, this@SimulationEntity, action)) }
+    fun log(action: String) = env.apply { log(InteractionEvent(now, currentComponent, this@SimulationEntity, action)) }
 
 
     /**

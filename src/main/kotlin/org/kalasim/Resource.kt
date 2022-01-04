@@ -275,7 +275,7 @@ open class Resource(
         log(trackingPolicy.logCreation) {
             EntityCreatedEvent(
                 now,
-                env.curComponent,
+                env.currentComponent,
                 this,
                 "capacity=$capacity " + if(depletable) "anonymous" else ""
             )

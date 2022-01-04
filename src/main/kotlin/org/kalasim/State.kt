@@ -68,7 +68,7 @@ open class State<T>(
         trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
 
         log(trackingPolicy.logCreation) {
-            EntityCreatedEvent(now, env.curComponent, this, "Initial value: $value")
+            EntityCreatedEvent(now, env.currentComponent, this, "Initial value: $value")
         }
     }
 
@@ -89,7 +89,7 @@ open class State<T>(
         log(trackingPolicy.logTriggers) {
             InteractionEvent(
                 env.now,
-                env.curComponent,
+                env.currentComponent,
                 this,
                 "value = $value --> $valueAfter allow $max components",
                 "trigger"

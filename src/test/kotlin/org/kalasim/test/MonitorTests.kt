@@ -71,10 +71,10 @@ class MonitorTests {
     fun `Frequency level stats should be correct`() = createTestSimulation {
         val m = CategoryTimeline(AUDI)
 //        m.addValue(AUDI)
-        now = 2.tt
+        run(until = 2.tt)
 
         m.addValue(VW)
-        now = 8.tt
+        run(until = 8.tt)
 
         m.getPct(AUDI) shouldBe 0.25
 
@@ -86,12 +86,12 @@ class MonitorTests {
     fun `it should correctly calculate numeric level stats`() = createTestSimulation {
         val nlm = MetricTimeline()
 
-        now += 2
+        run(2)
         nlm.addValue(2)
 
-        now += 2
+        run(2)
         nlm.addValue(6)
-        now += 4
+        run(4)
 
 //            expected value (2*0 + 2*2 + 4*6)/8
         nlm.statistics().mean shouldBe 3.5.plusOrMinus(.1)
@@ -107,12 +107,12 @@ class MonitorTests {
         createTestSimulation {
             val nlm = MetricTimeline()
 
-            now += 2
+            run(2)
             nlm.addValue(2)
 
-            now += 2
+            run(2)
             nlm.addValue(6)
-            now += 4
+            run(4)
 
 
             // first we try a get that should fail because it precedes simulation start
@@ -130,12 +130,12 @@ class MonitorTests {
         createTestSimulation {
             val nlm = CategoryTimeline("foo")
 
-            now += 2
+            run(2)
             nlm.addValue("bar")
 
-            now += 2
+            run(2)
             nlm.addValue("kalasim")
-            now += 4
+            run(4)
 
 
             // first we try a get that should fail because it precedes simulation start
@@ -151,12 +151,12 @@ class MonitorTests {
     fun `it should correctly calculate numeric  stats`() = createTestSimulation {
         val nsm = NumericStatisticMonitor()
 
-        now += 2
+        run(2)
         nsm.addValue(2)
 
-        now += 2
+        run(2)
         nsm.addValue(6)
-        now += 4
+        run(4)
 
         nsm.statistics().mean shouldBe 4.0
     }
@@ -195,16 +195,16 @@ class MergeTimelineTests {
         val mtA = MetricTimeline()
         val mtB = MetricTimeline()
 
-        now = 5.tt
+        run(until = 5.tt)
         mtA.addValue(23)
 
-        now = 10.tt
+        run(until = 10.tt)
         mtB.addValue(3)
 
-        now = 12.tt
+        run(until = 12.tt)
         mtB.addValue(5)
 
-        now = 14.tt
+        run(until = 14.tt)
         mtA.addValue(10)
 
         //merge statistics
@@ -215,7 +215,7 @@ class MergeTimelineTests {
         println(addedTL.values)
 
         addedTL.values shouldBe listOf(0.0, 23.0, 26.0, 28.0, 15.0)
-        addedTL.timestamps shouldBe listOf(0.0, 5.0, 10.0, 12.0, 14.0).map{ it.tt}
+        addedTL.timestamps shouldBe listOf(0.0, 5.0, 10.0, 12.0, 14.0).map { it.tt }
 
         // just make sure that the other ops do not error do not error
         println(mtA + mtB)
@@ -234,16 +234,16 @@ class MergeMonitorStatsTests {
         val nlmA = MetricTimeline()
         val nlmB = MetricTimeline()
 
-        now = 5.tt
+        run(until = 5.tt)
         nlmA.addValue(23)
 
-        now = 10.tt
+        run(until = 10.tt)
         nlmB.addValue(3)
 
-        now = 12.tt
+        run(until = 12.tt)
         nlmB.addValue(5)
 
-        now = 14.tt
+        run(until = 14.tt)
         nlmA.addValue(10)
 
         //merge statistics
@@ -262,14 +262,15 @@ class MergeMonitorStatsTests {
         flmA.addValue(1)
         flmB.addValue(2)
 
-        now = 1.tt
+        run(until=1.tt)
         flmB.addValue(4)
 
-        now = 3.tt
+        run(until=3.tt)
         flmA.addValue(1)
 
         //merge statistics
-        now = 5.tt
+        run(until=5.tt)
+
         val mergedStats: EnumeratedDistribution<Int> = listOf(flmA, flmB).mergeStats()
         println(mergedStats)
 

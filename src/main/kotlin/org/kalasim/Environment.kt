@@ -18,9 +18,9 @@ import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
-import kotlin.time.Duration
 import java.time.Instant
 import java.util.*
+import kotlin.time.Duration
 
 
 internal const val MAIN = "main"
@@ -109,11 +109,10 @@ open class Environment(
     // heap for better performance
     private val eventQueue = PriorityQueue<QueueElement>()
 
-    // TODO Fix order or add introspection API https://stackoverflow.com/questions/8129122/how-to-iterate-over-a-priorityqueue
-    /** Unmodifiable view on `eventQueue`. */
+    /** Unmodifiable sorted view of currently scheduled components. */
     val queue: List<Component>
-        get() = eventQueue.map { it.component }
-
+        //        get() = eventQueue.map { it.component }
+        get() = eventQueue.sortedIterator().map { it.component }.toList()
 
     private val eventListeners = listOf<EventListener>().toMutableList()
 
@@ -134,24 +133,25 @@ open class Environment(
 //        })
     }
 
+    /** The current time of the simulation. See https://www.kalasim.org/basics/#running-a-simulation.*/
     var now = startTime
-        internal set // todo since this is just used for testing, we could also maybe simply use run(newTime)
-
-    @Deprecated(message = "Use property instead. To be removed in v0.9", replaceWith = ReplaceWith("now"))
-    fun now() = now
+        private set // no longer needed/wanted --> use run
 
     @Suppress("LeakingThis")
     // That's a pointless self-recursion, but it allows to simplify support API (tick-transform, distributions, etc.)
+    /** Self-pointer. Pointless from a user-perspective, but helpful to build the kalasim APIs more efficiently.*/
     override val env: Environment = this
 
 
-    /** Allows to transform ticks to real world time moements (represented by `java.time.Instant`) */
+    /** Allows to transform ticks to wall time (represented by `java.time.Instant`) */
     override var tickTransform: TickTransform? = null
 
-    var curComponent: Component? = null
+    /** The component of the currently iterated process definition. Read-only, as components enter the queue only
+     * indirectly via scheduling interactions such as for example hold(), request() or wait(). */
+    var currentComponent: Component? = null
         private set
 
-    val main: Component
+    internal val main: Component
 
     @Suppress("PropertyName")
     internal val _koin: Koin
@@ -269,7 +269,7 @@ open class Environment(
     fun run(
         until: Instant,
         priority: Priority = NORMAL
-    ) = run(until=until.asTickTime(), priority = priority)
+    ) = run(until = until.asTickTime(), priority = priority)
 
     /**
      * Start execution of the simulation
@@ -329,7 +329,7 @@ open class Environment(
 
             time to c
         } else {
-            publishEvent(InteractionEvent(now, curComponent, null, null, "run end; no events left"))
+            publishEvent(InteractionEvent(now, currentComponent, null, null, "run end; no events left"))
             val t =
 //                if (endOnEmptyEventlist) {
 //                publishEvent(InteractionEvent(now, curComponent, null, null, "run end; no events left"))
@@ -360,7 +360,7 @@ open class Environment(
         c.componentState = CURRENT
         c.scheduledTime = null
 
-        curComponent = c
+        currentComponent = c
 //        c.log(c, info)
     }
 
@@ -408,6 +408,7 @@ open class Environment(
     }
 
 
+    /** Remove a component from the event-queue. Also, remove it from standing-by list, if currently on stand-by.*/
     fun remove(c: Component) {
         unschedule(c)
 
@@ -440,10 +441,14 @@ open class Environment(
 
         // consistency checks
         if(ASSERT_MODE == AssertMode.FULL) {
-            require(queue.none(Component::isPassive)) { "passive component must not be in event queue" }
+            val scheduledComponents = queue
+
+            require(scheduledComponents.none(Component::isPassive)) { "passive component must not be in event queue" }
 
             // ensure that no scheduled components have the same name
-            require(queue.map { it.name }.distinct().size == queue.size) { "components must not have the same name" }
+            require(scheduledComponents.map { it.name }.distinct().size == scheduledComponents.size) {
+                "components must not have the same name"
+            }
         }
     }
 
@@ -455,7 +460,6 @@ open class Environment(
     // deprecated because nothing should be logged outside a process
 //    fun log(msg: String) = main.log(msg)
 }
-
 
 
 data class QueueElement(

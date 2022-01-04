@@ -1,14 +1,9 @@
 # Development Roadmap
 
-
-complex, performant, dynamic process --> links to all of them
-
 ## Next steps
-
 
 **TODO** better name and documentation for `curComponent`
 
-**TODO** consider using processcontext across the api 
 
 ## v0.8
 
@@ -103,6 +98,10 @@ fix <https://github.com/holgerbrandl/kravis/issues/25>
 ---
 
 also adjust random generator of kotlin to prevent non-determinism entering simulation when user is doing `listOf().random()`
+
+---
+
+**TODO** consider using processcontext across the api
 
 
 ## More Examples

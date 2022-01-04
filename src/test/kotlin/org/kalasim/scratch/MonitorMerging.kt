@@ -3,7 +3,7 @@ package org.kalasim.scratch
 import org.apache.commons.math3.stat.descriptive.AggregateSummaryStatistics
 import org.kalasim.createSimulation
 import org.kalasim.monitors.*
-import org.kalasim.tickTime
+import org.kalasim.tt
 
 // https://www.kalasim.org/examples/
 fun main() {
@@ -11,10 +11,10 @@ fun main() {
         val nlm = MetricTimeline()
         nlm.addValue(23)
 
-        now = 10.tickTime
+        run(until = 10.tt)
 
         nlm.addValue(23)
-        now = 12.tickTime
+        run(until = 12.tt)
 
         // has meaningful semantics
 //        val mergedStats: MetricTimelineStats = listOf(nlm.statistics(),nlm.statistics()).merge()

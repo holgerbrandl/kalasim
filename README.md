@@ -5,10 +5,9 @@ Discrete Event Simulator
 [ ![Download](https://img.shields.io/github/v/release/holgerbrandl/kalasim) ](https://github.com/holgerbrandl/kalasim/releases) [![Build Status](https://github.com/holgerbrandl/kalasim/workflows/build/badge.svg)](https://github.com/holgerbrandl/kalasim/actions?query=workflow%3Abuild) [![slack](https://img.shields.io/badge/slack-kalasim-yellowgreen)](https://kotlinlang.slack.com/messages/kalasim/) [![github-discussions](https://img.shields.io/badge/discuss-kalasim-orange)](https://github.com/holgerbrandl/kalasim/discussions)
 
 
-`kalasim` is a discrete event simulator with type support, dependency injection, modern persistence and logging to enable large-scale, industrial-ready simulations.
+`kalasim` is a discrete event simulator. It provides a statically typed API, dependency injection, modern persistence, structured logging and automation capabilities.
 
-
-`kalasim` is written in [Kotlin](https://kotlinlang.org/), designed on top of [koin](https://github.com/InsertKoinIO/koin) as dependency injection framework, and is using [common-math](https://commons.apache.org/proper/commons-math/) for stats and distributions, modern event tracking and persistence, and [plotly.kt](https://github.com/mipt-npm/plotly.kt), [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) as well as [`kravis`](https://github.com/holgerbrandl/kravis) for visualization.
+kalasim is designed for simulation practitioners, process analysts and industrial engineers, who need to go beyond the limitations of existing simulation tools to model and optimize their business-critical use-cases.
 
 In contrast to many other simulation tools, `kalasim` is neither low-code nor no-code. It is _code-first_ to enable change tracking, scaling, refactoring, CI/CD, unit-tests, and the rest of the gang that makes simulation development fun.
 

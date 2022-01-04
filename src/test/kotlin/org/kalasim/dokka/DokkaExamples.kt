@@ -18,14 +18,16 @@ fun freqLevelDemo() {
 
     val dm = CategoryTimeline("bla")
 
-    repeat(1000) { dm.addValue(dist.sample()); dm.env.now += 1 }
+    repeat(1000) {
+        dm.addValue(dist.sample());
+        dm.env.run(1)
+    }
 
     dm.printHistogram()
 
     // get a value at a specific time
     dm[4.5]
 }
-
 
 
 class DokkaTest {

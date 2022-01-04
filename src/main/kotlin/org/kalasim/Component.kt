@@ -146,7 +146,7 @@ open class Component(
     init {
 //        val dataSuffix = if (process == null && this.name != MAIN) " data" else ""
         log(trackingPolicy.logCreation) {
-            EntityCreatedEvent(now, env.curComponent, this)
+            EntityCreatedEvent(now, env.currentComponent, this)
         }
 
         // the contract for initial auto-scheduling is
@@ -323,7 +323,7 @@ open class Component(
     }
 
     fun stateChangeEvent(details: String? = null) =
-        ComponentStateChangeEvent(now, env.curComponent, this, componentState, details)
+        ComponentStateChangeEvent(now, env.currentComponent, this, componentState, details)
 
     private var interruptedStatus: ComponentState? = null
 
@@ -775,7 +775,7 @@ open class Component(
                         ResourceEvent(
                             env.now,
                             requestContext.requestId,
-                            env.curComponent,
+                            env.currentComponent,
                             this@Component,
                             resource,
                             REQUESTED,
@@ -934,7 +934,7 @@ open class Component(
                     ResourceEvent(
                         env.now,
                         requestContext.requestId,
-                        env.curComponent,
+                        env.currentComponent,
                         this,
                         resource,
                         type,
@@ -1356,7 +1356,7 @@ open class Component(
             ResourceEvent(
                 env.now,
                 requestContext.requestId,
-                env.curComponent,
+                env.currentComponent,
                 this,
                 resource,
                 RELEASED,
