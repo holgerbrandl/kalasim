@@ -11,6 +11,7 @@ import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.loadFont
 import org.openrndr.draw.loadImage
 import org.openrndr.ffmpeg.ScreenRecorder
+import org.openrndr.shape.Circle
 import org.openrndr.svg.loadSVG
 import java.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -85,6 +86,23 @@ fun main() = application {
                     drawer.text("${harvester.tank.level.toInt()}", y=80.0)
                     scale(0.3)
                     composition(truck)
+
+                    // visualize hold-state (except for moving)
+
+                    // if component is on hold
+                    if(harvester.isScheduled){
+
+                    }
+                    drawer.fill = null
+                    drawer.stroke = ColorRGBa.PINK
+                    drawer.strokeWeight = 4.0
+
+                    //todo finish this
+//                    val sub0 = Circle(
+//                        it.gridPosition.mapCoordinates.x * xScale,
+//                        it.gridPosition.mapCoordinates.y * yScale,
+//                        100.0).contour.sub(0.0, 0.5 + 0.50 * sin(seconds))
+//                    drawer.contour(sub0)
                 }
 
                 // draw base

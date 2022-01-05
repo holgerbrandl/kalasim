@@ -3,6 +3,7 @@ package org.kalasim
 import org.kalasim.ComponentState.*
 import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.ResourceSelectionPolicy.*
+import org.kalasim.ScheduledType.*
 import org.kalasim.analysis.*
 import org.kalasim.analysis.ResourceEventType.*
 import org.kalasim.misc.*
@@ -15,18 +16,22 @@ import kotlin.time.Duration
 
 internal const val EPS = 1E-8
 
-//@Deprecated("directly use sequence<Component>{}")
-//typealias ProcContext = SequenceScope<Component>
+internal const val DEFAULT_QUEUE_PRIORITY = 0
 
+
+/** Life-cycle states of a simulation components. See https://www.kalasim.org/component/#lifecycle */
 enum class ComponentState {
     DATA, CURRENT, STANDBY, PASSIVE, INTERRUPTED, SCHEDULED, REQUESTING, WAITING
 }
 
-internal const val DEFAULT_QUEUE_PRIORITY = 0
 
-// note: Salabim Changelog: "The default priority of a requested resource is now inf, which means the lowest possible priority."
+/** Indicate why a component is scheduled for later continuation/execution. */
+enum class ScheduledType {
+    HOLD, REQUEST, WAIT, ACTIVATE
+}
+
+
 /** Describes the priority of a process or request. Higher values will be scheduled earlier or claimed earlier respectively. */
-
 data class Priority(val value: Int) : Comparable<Priority?> {
     companion object {
         val LOWEST = Priority(-20)
@@ -63,12 +68,12 @@ internal data class RequestContext(
 }
 
 
+// todo https://github.com/holgerbrandl/kalasim/issues/47
 /**
  * A kalasim component is used as component (primarily for queueing) or as a component with a process.
  * Usually, a component will be defined as a subclass of Component.
  *
- *
- *  @param name name of the component.  if the name ends with a period (.), auto serializing will be applied  if the name end with a comma, auto serializing starting at 1 will be applied  if omitted, the name will be derived from the class it is defined in (lowercased)
+ *  @param name name of the component.  if the name ends with a period (.), auto-indexing will be applied  if the name end with a comma, auto serializing starting at 1 will be applied  if omitted, the name will be derived from the class it is defined in (lowercase)
  * @param at schedule time
  * @param delay schedule with a delay if omitted, no delay
  * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
@@ -82,7 +87,7 @@ open class Component(
     priority: Priority = NORMAL,
     process: ProcessPointer? = null,
     koin: Koin = DependencyContext.get(),
-    // to be reenabled/reworked as part of https://github.com/holgerbrandl/kalasim/issues/11
+    // to be re-enabled/reworked as part of https://github.com/holgerbrandl/kalasim/issues/11
 //    builder: SequenceScope<Component>.() -> Unit = {   }
 ) : SimulationEntity(name, koin) {
 
@@ -196,7 +201,7 @@ open class Component(
                 at + delay.toDouble()
             }
 
-            reschedule(scheduledTime, priority, false, null, "activated", SCHEDULED)
+            reschedule(scheduledTime, priority, false, null, ACTIVATE)
         }
     }
 
@@ -227,7 +232,7 @@ open class Component(
     }
 
 
-    /** Used to suppress component activation in presenence of a process definition.*/
+    /** Used to suppress component activation in presence of a process definition.*/
     fun none() = sequence<Component> {}
 
     open fun process() = sequence<Component> {
@@ -290,8 +295,6 @@ open class Component(
     val isWaiting: Boolean
         get() = waits.isNotEmpty()
 
-    // TODO v0.4 reenable
-
 
     /** Passivate a component.
      *
@@ -334,9 +337,7 @@ open class Component(
             )
         }
     ) {
-        if(trackingPolicy.logStateChangeEvents){
-            log(builder())
-        }
+        log(trackingPolicy.logStateChangeEvents) { builder() }
     }
 
 
@@ -348,7 +349,7 @@ open class Component(
 
     /** Interrupt the component.
      *
-     * Can not be applied on the curent component. Use `resume()` to resume. */
+     * Can not be applied on the current component. Use `resume()` to resume. */
     fun interrupt() {
         require(componentState != CURRENT) { "Current component can no be interrupted" }
 
@@ -404,24 +405,23 @@ open class Component(
                     val reason = when(componentState) {
                         WAITING -> {
                             if(waits.isNotEmpty()) tryWait()
-                            "waiting"
+                            WAIT
                         }
                         REQUESTING -> {
                             tryRequest()
-                            "requesting"
+                            REQUEST
                         }
                         SCHEDULED -> {
-                            "holding"
+                            HOLD
                         }
-                        else -> "unknown"
+                        else -> TODO("map missing types")//"unknown"
                     }
 
                     reschedule(
                         env.now + remainingDuration!!,
                         priority,
                         urgent = false,
-                        caller = reason,
-                        newStatus = componentState
+                        type = reason,
                     )
 
                 }
@@ -729,7 +729,7 @@ open class Component(
             CapacityLimitMode.CAP -> resourceRequests.map {
                 with(it) {
                     if(quantity < 0 && resource is DepletableResource) {
-                        copy(quantity = max(resource.level-resource.capacity , quantity))
+                        copy(quantity = max(resource.level - resource.capacity, quantity))
 //                        copy(quantity = -1 * max(resource.capacity - resource.level, quantity))
                     } else {
                         throw RuntimeException("CAP mode is just supported for put requests")
@@ -842,10 +842,7 @@ open class Component(
             tryRequest()
 
             if(requests.isNotEmpty()) {
-                reschedule(
-                    scheduledTime!!, priority = failPriority, urgent = urgent,
-                    caller = "requesting", newStatus = REQUESTING
-                )
+                reschedule(scheduledTime!!, priority = failPriority, urgent = urgent, description, REQUEST)
             }
         }
 
@@ -976,7 +973,7 @@ open class Component(
 
         val honorInfo = rHonor.firstOrNull()!!.first.name + (if(rHonor.size > 1) "++" else "")
 
-        reschedule(now, NORMAL, false, null, "Request honored by $honorInfo", SCHEDULED)
+        reschedule(now, NORMAL, false, "Request honored by $honorInfo", ACTIVATE)
 
         // process negative put requests
         rHonor.filter { it.first.depletable }.forEach {
@@ -1005,6 +1002,7 @@ open class Component(
      *
      * @return `true` if this component is in the resource claimers
      */
+    @Suppress("SpellCheckingInspection")
     fun isClaiming(resource: Resource? = null): Boolean {
         @Suppress("IfThenToElvis")
         return if(resource == null) {
@@ -1065,8 +1063,7 @@ open class Component(
         priority: Priority = NORMAL,
         urgent: Boolean = false,
         description: String? = null,
-        caller: String? = null,
-        newStatus: ComponentState,
+        type: ScheduledType
     ) {
         require(scheduledTime >= env.now) { "scheduled time (${scheduledTime}) before now (${env.now})" }
 
@@ -1074,6 +1071,12 @@ open class Component(
             require(this !in env.queue) {
                 "component must not be in queue when rescheduling but must be removed already at this point"
             }
+        }
+
+        val newStatus: ComponentState = when(type) {
+            WAIT -> WAITING
+            REQUEST -> REQUESTING
+            HOLD, ACTIVATE -> SCHEDULED
         }
 
         componentState = newStatus
@@ -1087,13 +1090,17 @@ open class Component(
         }
 
         if(trackingPolicy.logStateChangeEvents) {
-            val extra = ", scheduled for ${formatWithInf(scheduledTime)}"
 
-            val delta = if(this.scheduledTime == env.now || (this.scheduledTime?.value == Double.MAX_VALUE)) "" else {
-                "+" + TRACE_DF.format(scheduledTime - env.now) + " "
+            log(trackingPolicy.logStateChangeEvents) {
+                RescheduledEvent(
+                    now,
+                    env.currentComponent,
+                    this,
+                    description,
+                    scheduledTime,
+                    type
+                )
             }
-
-            logStateChange(("$caller $delta ${description ?: ""}").trim() + extra)
         }
     }
 
@@ -1107,7 +1114,7 @@ open class Component(
         keepWait: Boolean = false,
         process: ProcessPointer? = null
     ) = yieldCurrent {
-        this@Component.activate(at, delay, priority, urgent, keepRequest, keepWait,process)
+        this@Component.activate(at, delay, priority, urgent, keepRequest, keepWait, process)
     }
 
     /**
@@ -1121,7 +1128,7 @@ open class Component(
      * * if None (default), process will not be changed
      * * if the component is a data component, the generator function `process` will be used as the default process.
      */
-     fun activate(
+    fun activate(
         at: TickTime? = null,
         delay: Number = 0,
         priority: Priority = NORMAL,
@@ -1136,7 +1143,7 @@ open class Component(
             // original contract
             "Can not activate the CURRENT component. If needed simply use hold method."
             // technically we could use suspend here , but since activate is used
-            // outside of process definitions we don't want to overcomplete the API for this
+            // outside of process definitions we don't want to over-complete the API for this
             // rare edge case
             // workaround yield(activate(process = Component::process))
         }
@@ -1174,7 +1181,7 @@ open class Component(
             at + delay.toDouble()
         }
 
-        reschedule(scheduledTime, priority, urgent, null, "Activating $extra", SCHEDULED)
+        reschedule(scheduledTime, priority, urgent, "Activating $extra", ACTIVATE)
 
         return this
     }
@@ -1196,13 +1203,6 @@ open class Component(
         }
     }
 
-// TODO v0.4 reenable
-//     fun hold(
-//        duration: Number? = null,
-//        till: Number? = null,
-//        priority: Int = 0,
-//        urgent: Boolean = false
-//    ) {}
 
     /**
      * Hold the component.
@@ -1286,7 +1286,7 @@ open class Component(
 
         val scheduledTime = env.calcScheduleTime(until, duration)
 
-        reschedule(scheduledTime, priority, urgent, description, "hold", SCHEDULED)
+        reschedule(scheduledTime, priority, urgent, description, HOLD)
     }
 
 
@@ -1430,8 +1430,8 @@ open class Component(
      * @sample org.kalasim.dokka.statesHowTo
      *
      * @param state A state variable
-    * @param triggerPriority The queue priority to be used along with a [state change trigger](https://www.kalasim.org/state/#state-change-triggers)
- * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
+     * @param triggerPriority The queue priority to be used along with a [state change trigger](https://www.kalasim.org/state/#state-change-triggers)
+     * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failDelay If the request is not honored before `now + failDelay`,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
      * @param failPriority Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
@@ -1504,13 +1504,7 @@ open class Component(
         tryWait()
 
         if(waits.isNotEmpty()) {
-            reschedule(
-                scheduledTime!!,
-                priority = failPriority,
-                urgent = urgent,
-                caller = "waiting",
-                newStatus = WAITING
-            )
+            reschedule(scheduledTime!!, priority = failPriority, urgent = urgent, type = WAIT)
         }
     }
 
@@ -1543,7 +1537,7 @@ open class Component(
             waits.clear()
             remove()
 
-            reschedule(env.now, NORMAL, false, null, "waiting", SCHEDULED)
+            reschedule(env.now, NORMAL, false, null, WAIT)
         }
 
         return honored
@@ -1561,8 +1555,8 @@ open class Component(
     }
 
 
-      override val snapshot : ComponentSnapshot
-         get() = ComponentSnapshot(this)
+    override val snapshot: ComponentSnapshot
+        get() = ComponentSnapshot(this)
 
 
     private suspend fun SequenceScope<Component>.yieldCurrent(builder: () -> Unit = {}) {
@@ -1624,7 +1618,7 @@ open class Component(
             }
             RandomAvailable -> {
                 val available = resources.filter { it.available >= quantity.toDouble() }
-                require(available.isNotEmpty()) { "Not all resources must be in use to use RANDOM_AVAILABE selection policy" }
+                require(available.isNotEmpty()) { "Not all resources must be in use to use RandomAvailable selection policy" }
 
                 available[discreteUniform(0, available.size - 1).sample()]
             }
@@ -1758,7 +1752,7 @@ data class StateRequest<T>(val state: State<T>, val priority: Priority? = null, 
 
 infix fun <T> State<T>.turns(value: T) = StateRequest(this) { it == value }
 
-private fun formatWithInf(time: TickTime) =
+internal fun formatWithInf(time: TickTime) =
     if(time.value == Double.MAX_VALUE || time.value.isInfinite()) "<inf>" else TRACE_DF.format(time.value)
 
 
@@ -1785,7 +1779,7 @@ fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {
         c.name,
         c.creationTime,
         inDataSince = if(c.isData) c.statusTimeline.statsData().timepoints.last() else null,
-        (histogram.get(DATA) ?: 0.0).asTickTime(),
+        (histogram[DATA] ?: 0.0).asTickTime(),
         (histogram[CURRENT] ?: 0.0).asTickTime(),
         (histogram[STANDBY] ?: 0.0).asTickTime(),
         (histogram[PASSIVE] ?: 0.0).asTickTime(),

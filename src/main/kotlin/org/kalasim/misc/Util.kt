@@ -6,7 +6,9 @@ import org.kalasim.MetricEvent
 import org.kalasim.TickTime
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.time.Instant
 import java.util.*
+import kotlin.time.toJavaDuration
 
 
 internal var JSON_DF = DecimalFormat("###.00", DecimalFormatSymbols(Locale.ENGLISH))

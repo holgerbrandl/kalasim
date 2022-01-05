@@ -295,7 +295,7 @@ open class Environment(
         } else {
             val scheduledTime = calcScheduleTime(until, duration)
 
-            main.reschedule(scheduledTime, priority, urgent, null, "running", SCHEDULED)
+            main.reschedule(scheduledTime, priority, urgent, "running", ScheduledType.HOLD)
         }
 
         // restore dependency context
@@ -329,7 +329,7 @@ open class Environment(
 
             time to c
         } else {
-            publishEvent(InteractionEvent(now, currentComponent, null, null, "run end; no events left"))
+            publishEvent(InteractionEvent(now, currentComponent, null, "run end; no events left"))
             val t =
 //                if (endOnEmptyEventlist) {
 //                publishEvent(InteractionEvent(now, curComponent, null, null, "run end; no events left"))

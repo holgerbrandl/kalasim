@@ -71,9 +71,9 @@ class ComponentQueue<C>(
 
         log(trackingPolicy.trackCollectionStatistics) {
             if(cqe.component is Component) {
-                InteractionEvent(env.now, env.currentComponent, cqe.component as Component, "Left $name", null)
+                InteractionEvent(env.now, env.currentComponent, cqe.component as Component, "Left $name")
             } else {
-                InteractionEvent(env.now, env.currentComponent, null, "${cqe.component} left $name", null)
+                InteractionEvent(env.now, env.currentComponent, null, "${cqe.component} left $name")
             }
         }
 

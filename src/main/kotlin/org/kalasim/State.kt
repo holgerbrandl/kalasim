@@ -91,8 +91,7 @@ open class State<T>(
                 env.now,
                 env.currentComponent,
                 this,
-                "value = $value --> $valueAfter allow $max components",
-                "trigger"
+                "trigger value = $value --> $valueAfter allow $max components",
             )
         }
 

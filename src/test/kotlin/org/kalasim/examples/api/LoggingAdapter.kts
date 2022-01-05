@@ -11,7 +11,7 @@ val LOG: Logger = Logger.getLogger(this::class.java.getName())
 
 // Add a custom event handler to forward events to the used logging library
 er.addEventListener<ResourceEvent> {
-    LOG.info(it.renderAction())
+    LOG.info(it.action?: "")
 }
 
 // Run the sim for 100 ticks

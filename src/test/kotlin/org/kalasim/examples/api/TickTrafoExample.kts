@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.toJavaDuration
 
 
 createSimulation(true) {
@@ -33,5 +32,3 @@ createSimulation(true) {
     println(now)
     println(asWallTime(now))
 }
-
-operator fun Instant.plus(duration: kotlin.time.Duration) = this + duration.toJavaDuration()

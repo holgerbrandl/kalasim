@@ -94,7 +94,7 @@ class QueueTests {
             run(10)
 
             tc.events.filterIsInstance<InteractionEvent>()
-                .filter { it.renderAction() == "Ended" }
+                .filter { it.action == "Ended" }
                 .apply {
                     size shouldBe 2
                     get(0).source?.name shouldBe c1.name

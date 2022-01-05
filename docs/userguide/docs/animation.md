@@ -14,13 +14,19 @@ Process animations can be
 * advanced per simulation event (non synchronized)
 
 ## Elements
+
 Animation is not part of the core API of kalasim, but support is provided by a decorator types (extending their respective base-type) 
 
 ### Animation
+
 * `Component` -> `AnimationComponent`
 * `Resource` -> `AnimationResource`
+* `ComponentQueue` -> `AnimationResource`
+
+**TODO** for queues consider point circles https://guide.openrndr.org/#/04_Drawing_basics/C05_ComplexShapes?id=shapes-and-contours-from-primitives
 
 The animation support API does not bind to a particular rendering engine. However, only https://openrndr.org/ has been explored for process animation with kalasim.
+
 
 
 

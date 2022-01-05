@@ -309,58 +309,58 @@ class EnvTests {
 
             er.run(1)
         }.stdout shouldBeDiff """
-            {"receiver":"main","action":"running +1.00, scheduled for 1.00","details":"New state: scheduled","time":".00"}
-            {"current":"TickMetrics.1","receiver":"TickMetrics.1","action":"hold +1.00, scheduled for 1.00","details":"New state: scheduled","time":".00"}
-            {"current":"room 0","receiver":"room 0","action":"canceled","details":"New state: data","time":".00"}
-            {"current":"room 1","receiver":"room 1","action":"canceled","details":"New state: data","time":".00"}
-            {"current":"room 2","receiver":"room 2","action":"canceled","details":"New state: data","time":".00"}
-            {"current":"room 3","receiver":"room 3","action":"canceled","details":"New state: data","time":".00"}
-            {"current":"ComponentGenerator.1","receiver":"ComponentGenerator.1","action":"hold +.09, scheduled for .09","details":"New state: scheduled","time":".00"}
-            {"creator":"ComponentGenerator.1","details":"Initial value: Urgent","time":".09","entity":"State.1"}
-            {"creator":"ComponentGenerator.1","details":"Initial value: Waiting","time":".09","entity":"State.2"}
-            {"creator":"ComponentGenerator.1","time":".09","entity":"Patient.1"}
-            {"current":"ComponentGenerator.1","receiver":"Patient.1","action":"activated, scheduled for .09","details":"New state: scheduled","time":".09"}
-            {"current":"ComponentGenerator.1","receiver":"ComponentGenerator.1","action":"hold +.16, scheduled for .25","details":"New state: scheduled","time":".09"}
-            {"current":"Patient.1","receiver":"Patient.1","action":"Ended","details":"New state: data","time":".09"}
-            {"creator":"ComponentGenerator.1","details":"Initial value: Resuscitation","time":".25","entity":"State.3"}
-            {"creator":"ComponentGenerator.1","details":"Initial value: Waiting","time":".25","entity":"State.4"}
-            {"creator":"ComponentGenerator.1","time":".25","entity":"Patient.2"}
-            {"current":"ComponentGenerator.1","receiver":"Patient.2","action":"activated, scheduled for .25","details":"New state: scheduled","time":".25"}
-            {"current":"ComponentGenerator.1","receiver":"ComponentGenerator.1","action":"hold +.23, scheduled for .48","details":"New state: scheduled","time":".25"}
-            {"current":"Patient.2","receiver":"Patient.2","action":"Ended","details":"New state: data","time":".25"}
-            {"creator":"ComponentGenerator.1","details":"Initial value: Emergent","time":".48","entity":"State.5"}
-            {"creator":"ComponentGenerator.1","details":"Initial value: Waiting","time":".48","entity":"State.6"}
-            {"creator":"ComponentGenerator.1","time":".48","entity":"Patient.3"}
-            {"current":"ComponentGenerator.1","receiver":"Patient.3","action":"activated, scheduled for .48","details":"New state: scheduled","time":".48"}
-            {"current":"ComponentGenerator.1","receiver":"ComponentGenerator.1","action":"hold +.11, scheduled for .60","details":"New state: scheduled","time":".48"}
-            {"current":"Patient.3","receiver":"Patient.3","action":"Ended","details":"New state: data","time":".48"}
-            {"creator":"ComponentGenerator.1","details":"Initial value: Emergent","time":".60","entity":"State.7"}
-            {"creator":"ComponentGenerator.1","details":"Initial value: Waiting","time":".60","entity":"State.8"}
-            {"creator":"ComponentGenerator.1","time":".60","entity":"Patient.4"}
-            {"current":"ComponentGenerator.1","receiver":"Patient.4","action":"activated, scheduled for .60","details":"New state: scheduled","time":".60"}
-            {"current":"ComponentGenerator.1","receiver":"ComponentGenerator.1","action":"hold +.10, scheduled for .70","details":"New state: scheduled","time":".60"}
-            {"current":"Patient.4","receiver":"Patient.4","action":"Ended","details":"New state: data","time":".60"}
-            {"creator":"ComponentGenerator.1","details":"Initial value: Urgent","time":".70","entity":"State.9"}
-            {"creator":"ComponentGenerator.1","details":"Initial value: Waiting","time":".70","entity":"State.10"}
-            {"creator":"ComponentGenerator.1","time":".70","entity":"Patient.5"}
-            {"current":"ComponentGenerator.1","receiver":"Patient.5","action":"activated, scheduled for .70","details":"New state: scheduled","time":".70"}
-            {"current":"ComponentGenerator.1","receiver":"room 0","action":"Activating process=process, scheduled for .70","details":"New state: scheduled","time":".70"}
-            {"current":"ComponentGenerator.1","receiver":"ComponentGenerator.1","action":"hold +.04, scheduled for .74","details":"New state: scheduled","time":".70"}
-            {"current":"Patient.5","receiver":"Patient.5","action":"Ended","details":"New state: data","time":".70"}
-            {"current":"room 0","receiver":"room 0","action":"hold +.13  preparing room room 0 for Dislocations, scheduled for .83","details":"New state: scheduled","time":".70"}
-            {"creator":"ComponentGenerator.1","details":"Initial value: Resuscitation","time":".74","entity":"State.11"}
-            {"creator":"ComponentGenerator.1","details":"Initial value: Waiting","time":".74","entity":"State.12"}
-            {"creator":"ComponentGenerator.1","time":".74","entity":"Patient.6"}
-            {"current":"ComponentGenerator.1","receiver":"Patient.6","action":"activated, scheduled for .74","details":"New state: scheduled","time":".74"}
-            {"current":"ComponentGenerator.1","receiver":"ComponentGenerator.1","action":"hold +.35, scheduled for 1.09","details":"New state: scheduled","time":".74"}
-            {"current":"Patient.6","receiver":"Patient.6","action":"Ended","details":"New state: data","time":".74"}
-            {"requester":"room 0","requesters":1,"current":"room 0","amount":1,"resource":"Dr 0","occupancy":0,"claimed":0,"time":".83","type":"REQUESTED","claimers":0,"request_id":6457245767123267605,"capacity":1}
-            {"requester":"room 0","requesters":1,"current":"room 0","amount":1,"resource":"Dr 1","occupancy":0,"claimed":0,"time":".83","type":"REQUESTED","claimers":0,"request_id":8473867053398002461,"capacity":1}
-            {"requester":"room 0","requesters":1,"current":"room 0","amount":1,"resource":"Dr 2","occupancy":0,"claimed":0,"time":".83","type":"REQUESTED","claimers":0,"request_id":3604026565907225053,"capacity":1}
-            {"requester":"room 0","requesters":1,"current":"room 0","amount":1,"resource":"Dr 3","occupancy":0,"claimed":0,"time":".83","type":"REQUESTED","claimers":0,"request_id":7522904868940355451,"capacity":1}
-            {"requester":"room 0","requesters":1,"current":"room 0","amount":1,"resource":"Dr 0","occupancy":1,"claimed":1,"time":".83","type":"CLAIMED","claimers":0,"request_id":6457245767123267605,"capacity":1}
-            {"current":"room 0","receiver":"room 0","action":"Request honored by Dr 0, scheduled for .83","details":"New state: scheduled","time":".83"}
-            {"current":"room 0","receiver":"room 0","action":"hold +.59  Surgery of patient Patient(type=Dislocations, severity=State.9[Urgent], patientStatus=State.10[InSurgery]) in room room 0 by doctor RequestScopeContext(resource=Dr 0, requestingSince=.83), scheduled for 1.42","details":"New state: scheduled","time":".83"}
+            {"receiver":"main","details":"running; Hold +1.00, scheduled for 1.00","time":".00","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"TickMetrics.1","receiver":"TickMetrics.1","details":"Hold +1.00, scheduled for 1.00","time":".00","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"room 0","receiver":"room 0","details":"canceled","time":".00","state":"DATA","type":"ComponentStateChangeEvent"}
+            {"current":"room 1","receiver":"room 1","details":"canceled","time":".00","state":"DATA","type":"ComponentStateChangeEvent"}
+            {"current":"room 2","receiver":"room 2","details":"canceled","time":".00","state":"DATA","type":"ComponentStateChangeEvent"}
+            {"current":"room 3","receiver":"room 3","details":"canceled","time":".00","state":"DATA","type":"ComponentStateChangeEvent"}
+            {"current":"ComponentGenerator.1","receiver":"ComponentGenerator.1","details":"Hold +.09, scheduled for .09","time":".00","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"creator":"ComponentGenerator.1","details":"Initial value: Urgent","eventType":"EntityCreatedEvent","time":".09","entity":"State.1"}
+            {"creator":"ComponentGenerator.1","details":"Initial value: Waiting","eventType":"EntityCreatedEvent","time":".09","entity":"State.2"}
+            {"creator":"ComponentGenerator.1","eventType":"EntityCreatedEvent","time":".09","entity":"Patient.1"}
+            {"current":"ComponentGenerator.1","receiver":"Patient.1","details":"Activated, scheduled for .09","time":".09","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"ComponentGenerator.1","receiver":"ComponentGenerator.1","details":"Hold +.16, scheduled for .25","time":".09","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"Patient.1","receiver":"Patient.1","details":"Ended","time":".09","state":"DATA","type":"ComponentStateChangeEvent"}
+            {"creator":"ComponentGenerator.1","details":"Initial value: Resuscitation","eventType":"EntityCreatedEvent","time":".25","entity":"State.3"}
+            {"creator":"ComponentGenerator.1","details":"Initial value: Waiting","eventType":"EntityCreatedEvent","time":".25","entity":"State.4"}
+            {"creator":"ComponentGenerator.1","eventType":"EntityCreatedEvent","time":".25","entity":"Patient.2"}
+            {"current":"ComponentGenerator.1","receiver":"Patient.2","details":"Activated, scheduled for .25","time":".25","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"ComponentGenerator.1","receiver":"ComponentGenerator.1","details":"Hold +.23, scheduled for .48","time":".25","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"Patient.2","receiver":"Patient.2","details":"Ended","time":".25","state":"DATA","type":"ComponentStateChangeEvent"}
+            {"creator":"ComponentGenerator.1","details":"Initial value: Emergent","eventType":"EntityCreatedEvent","time":".48","entity":"State.5"}
+            {"creator":"ComponentGenerator.1","details":"Initial value: Waiting","eventType":"EntityCreatedEvent","time":".48","entity":"State.6"}
+            {"creator":"ComponentGenerator.1","eventType":"EntityCreatedEvent","time":".48","entity":"Patient.3"}
+            {"current":"ComponentGenerator.1","receiver":"Patient.3","details":"Activated, scheduled for .48","time":".48","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"ComponentGenerator.1","receiver":"ComponentGenerator.1","details":"Hold +.11, scheduled for .60","time":".48","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"Patient.3","receiver":"Patient.3","details":"Ended","time":".48","state":"DATA","type":"ComponentStateChangeEvent"}
+            {"creator":"ComponentGenerator.1","details":"Initial value: Emergent","eventType":"EntityCreatedEvent","time":".60","entity":"State.7"}
+            {"creator":"ComponentGenerator.1","details":"Initial value: Waiting","eventType":"EntityCreatedEvent","time":".60","entity":"State.8"}
+            {"creator":"ComponentGenerator.1","eventType":"EntityCreatedEvent","time":".60","entity":"Patient.4"}
+            {"current":"ComponentGenerator.1","receiver":"Patient.4","details":"Activated, scheduled for .60","time":".60","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"ComponentGenerator.1","receiver":"ComponentGenerator.1","details":"Hold +.10, scheduled for .70","time":".60","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"Patient.4","receiver":"Patient.4","details":"Ended","time":".60","state":"DATA","type":"ComponentStateChangeEvent"}
+            {"creator":"ComponentGenerator.1","details":"Initial value: Urgent","eventType":"EntityCreatedEvent","time":".70","entity":"State.9"}
+            {"creator":"ComponentGenerator.1","details":"Initial value: Waiting","eventType":"EntityCreatedEvent","time":".70","entity":"State.10"}
+            {"creator":"ComponentGenerator.1","eventType":"EntityCreatedEvent","time":".70","entity":"Patient.5"}
+            {"current":"ComponentGenerator.1","receiver":"Patient.5","details":"Activated, scheduled for .70","time":".70","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"ComponentGenerator.1","receiver":"room 0","details":"Activating process=process; Activated, scheduled for .70","time":".70","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"ComponentGenerator.1","receiver":"ComponentGenerator.1","details":"Hold +.04, scheduled for .74","time":".70","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"Patient.5","receiver":"Patient.5","details":"Ended","time":".70","state":"DATA","type":"ComponentStateChangeEvent"}
+            {"current":"room 0","receiver":"room 0","details":"preparing room room 0 for Dislocations; Hold +.13, scheduled for .83","time":".70","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"creator":"ComponentGenerator.1","details":"Initial value: Resuscitation","eventType":"EntityCreatedEvent","time":".74","entity":"State.11"}
+            {"creator":"ComponentGenerator.1","details":"Initial value: Waiting","eventType":"EntityCreatedEvent","time":".74","entity":"State.12"}
+            {"creator":"ComponentGenerator.1","eventType":"EntityCreatedEvent","time":".74","entity":"Patient.6"}
+            {"current":"ComponentGenerator.1","receiver":"Patient.6","details":"Activated, scheduled for .74","time":".74","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"ComponentGenerator.1","receiver":"ComponentGenerator.1","details":"Hold +.35, scheduled for 1.09","time":".74","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"Patient.6","receiver":"Patient.6","details":"Ended","time":".74","state":"DATA","type":"ComponentStateChangeEvent"}
+            {"requester":"room 0","requesters":1,"amount":1,"resource":"Dr 0","occupancy":0,"claimed":0,"eventType":"ResourceEvent","type":"REQUESTED","capacity":1,"current":"room 0","time":".83","claimers":0,"request_id":6457245767123267605}
+            {"requester":"room 0","requesters":1,"amount":1,"resource":"Dr 1","occupancy":0,"claimed":0,"eventType":"ResourceEvent","type":"REQUESTED","capacity":1,"current":"room 0","time":".83","claimers":0,"request_id":8473867053398002461}
+            {"requester":"room 0","requesters":1,"amount":1,"resource":"Dr 2","occupancy":0,"claimed":0,"eventType":"ResourceEvent","type":"REQUESTED","capacity":1,"current":"room 0","time":".83","claimers":0,"request_id":3604026565907225053}
+            {"requester":"room 0","requesters":1,"amount":1,"resource":"Dr 3","occupancy":0,"claimed":0,"eventType":"ResourceEvent","type":"REQUESTED","capacity":1,"current":"room 0","time":".83","claimers":0,"request_id":7522904868940355451}
+            {"requester":"room 0","requesters":1,"amount":1,"resource":"Dr 0","occupancy":1,"claimed":1,"eventType":"ResourceEvent","type":"CLAIMED","capacity":1,"current":"room 0","time":".83","claimers":0,"request_id":6457245767123267605}
+            {"current":"room 0","receiver":"room 0","details":"Request honored by Dr 0; Activated, scheduled for .83","time":".83","state":"SCHEDULED","type":"RescheduledEvent"}
+            {"current":"room 0","receiver":"room 0","details":"Surgery of patient Patient(type=Dislocations, severity=State.9[Urgent], patientStatus=State.10[InSurgery]) in room room 0 by doctor RequestScopeContext(resource=Dr 0, requestingSince=.83); Hold +.59, scheduled for 1.42","time":".83","state":"SCHEDULED","type":"RescheduledEvent"}
             """.trimIndent()
     }
 

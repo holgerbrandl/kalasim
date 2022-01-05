@@ -3,8 +3,7 @@ package org.kalasim.analysis
 import com.github.holgerbrandl.jsonbuilder.json
 import org.json.JSONObject
 import org.kalasim.*
-import org.kalasim.misc.roundAny
-import org.kalasim.misc.titlecaseFirstChar
+import org.kalasim.misc.*
 import kotlin.math.absoluteValue
 
 enum class ResourceEventType { REQUESTED, CLAIMED, RELEASED, PUT, TAKE }
@@ -34,21 +33,23 @@ class ResourceEvent(
         if(bumpedBy != null) require(type == ResourceEventType.RELEASED)
     }
 
-    override fun renderAction(): String {
-        val prioInfo = if(priority != null) "with priority $priority" else ""
+    override val action: String
+        get() {
+            val prioInfo = if(priority != null) "with priority $priority" else ""
 
-        //if this is to be disabled later it should include which resources were requested as part of oneOf=false
-//         val honorInfo =  if(oneOf) "and oneof=$oneOf" else ""
+            //if this is to be disabled later it should include which resources were requested as part of oneOf=false
+            // val honorInfo =  if(oneOf) "and oneOf=$oneOf" else ""
 
-        return "${
-            type.toString().lowercase().titlecaseFirstChar()
-        } ${amount.absoluteValue.roundAny(2)} from '${resource.name}' $prioInfo".trim()
-    }
+            return "${
+                type.toString().lowercase().titlecaseFirstChar()
+            } ${amount.absoluteValue.roundAny(2)} from '${resource.name}' $prioInfo".trim()
+        }
 
     override fun toJson() = json {
+        "eventType" to eventType
         "time" to time
         "request_id" to requestId
-        "current" to curComponent?.name
+        "current" to current?.name
         "requester" to requester.name
         "resource" to resource.name
         "type" to type
@@ -76,6 +77,7 @@ data class ResourceActivityEvent(
     val releasedWT = resource.env.tickTransform?.tick2wallTime(released)
 
     override fun toJson() = json {
+        "eventType" to eventType
         "requested" to requested
         "honored" to honored
         "released" to released
@@ -89,25 +91,17 @@ data class ResourceActivityEvent(
 
 open class InteractionEvent(
     time: TickTime,
-    val curComponent: Component? = null,
+    val current: Component? = null,
     val source: SimulationEntity? = null,
-    val action: String? = null,
-    @Deprecated("Will be removed because unclear semantics in comparison to action parameter")
-    val details: String? = null
+    open val action: String? = null,
 ) : Event(time) {
 
-    open fun renderAction() = action ?: ""
-
-    @Suppress("DEPRECATION")
-    fun renderDetails() = details
-
-
     override fun toJson(): JSONObject = json {
+        "eventType" to eventType
         "time" to time
-        "current" to curComponent?.name
+        "current" to current?.name
         "receiver" to source?.name
-        "action" to renderAction()
-        "details" to renderDetails()
+        "action" to (action ?: "")
     }
 }
 
@@ -118,7 +112,8 @@ class EntityCreatedEvent(
     val details: String? = null
 ) : Event(time) {
 
-    override fun toJson() = json{
+    override fun toJson() = json {
+        "eventType" to eventType
         "time" to time
         "creator" to creator?.name
         "entity" to entity.name
@@ -126,10 +121,52 @@ class EntityCreatedEvent(
     }
 }
 
-class ComponentStateChangeEvent(
+/** An event indicating that the state of  component has changed. See https://www.kalasim.org/component/#lifecycle */
+open class ComponentStateChangeEvent(
     time: TickTime,
-    curComponent: Component? = null,
-    simEntity: SimulationEntity,
-    state: ComponentState,
+    current: Component? = null,
+    simEntity: Component,
+    val state: ComponentState,
     details: String? = null
-) : InteractionEvent(time, curComponent, simEntity, details, "New state: " + state.toString().lowercase())
+) : InteractionEvent(time, current, simEntity, details){
+
+    override fun toJson(): JSONObject = json {
+        "time" to time
+        "type" to eventType
+        "current" to current?.name
+        "receiver" to source?.name
+        "details" to (action ?: "")
+        "state" to state
+    }
+}
+
+/** An event indicating that a component process was scheduled for later execution or continuation.
+ * See https://www.kalasim.org/component/#lifecycle
+ */
+class RescheduledEvent(
+    time: TickTime,
+    current: Component? = null,
+    simEntity: Component,
+    val description: String? = null,
+    val scheduledFor: TickTime,
+    val type: ScheduledType
+) : ComponentStateChangeEvent(time, current, simEntity, ComponentState.SCHEDULED) {
+
+    override val action: String
+        get() {
+            val extra = ", scheduled for ${formatWithInf(scheduledFor)}"
+
+            val delta = if(this.scheduledFor == time || (this.scheduledFor.value == Double.MAX_VALUE)) "" else {
+                "+" + TRACE_DF.format(scheduledFor - time) + " "
+            }
+
+            val prettyType = when(type) {
+                ScheduledType.WAIT -> "Waiting"
+                ScheduledType.ACTIVATE -> "Activated"
+                else -> type.toString().lowercase().titlecaseFirstChar()
+            }
+
+            return (if(!description.isNullOrBlank()) ("$description; ") else "") + ("$prettyType $delta").trim() + extra
+        }
+}
+

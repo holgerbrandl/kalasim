@@ -261,14 +261,14 @@ class ComponentTests {
 .00                             main                  Created
 .00                             tester                Created
 .00                                                   Activated, scheduled for .00                           New state: scheduled
-.00                             main                  Running +5.00, scheduled for 5.00                      New state: scheduled
+.00                             main                  Running; Hold +5.00, scheduled for 5.00                New state: scheduled
 .00       tester                State.1               Created                                                Initial value: true
 .00                             tester                Waiting, scheduled for .00                             New state: scheduled
 .00                                                   Hold +1.00, scheduled for 1.00                         New state: scheduled
 1.00                            Resource.1            Created                                                capacity=1
 1.00                            tester                Requested 1.0 from 'Resource.1'
 1.00                                                  Claimed 1.0 from 'Resource.1'
-1.00                                                  Request honored by Resource.1, scheduled for 1.00      New state: scheduled
+1.00                                                  Request honored by Resource.1; Activated, schedule... New state: scheduled
 1.00                                                  Hold +1.00, scheduled for 2.00                         New state: scheduled
 2.00                                                  Released 1.0 from 'Resource.1'
 2.00                                                  ResourceActivityEvent(requested=1.00, honored=1.00...

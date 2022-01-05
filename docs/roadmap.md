@@ -50,6 +50,10 @@ urgency for the patient.
 ---
 ## Later
 
+**TODO** consider removing supported for untyped durations in hold etc. The user could be forced to simply provide a tick-duration when creating any sim, and would used typed durations always! This is likely to remove quite some errors
+
+---
+
 **TODO** automatically render process diagrams 
 * gant-charts over time-->display extension
 

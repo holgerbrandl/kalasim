@@ -169,3 +169,5 @@ fun Environment.asTickTime(instant: Instant) = instant.asTickTime()
 /** Transforms a simulation time (typically `now`) to the corresponding wall time. */
 fun Environment.asWallTime(time: TickTime) = time.asWallTime()
 fun Environment.asWallTimeOrNull(time: TickTime) = time.asWallTime()
+
+operator fun Instant.plus(duration: kotlin.time.Duration): Instant = this + duration.toJavaDuration()
