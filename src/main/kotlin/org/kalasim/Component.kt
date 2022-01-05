@@ -319,11 +319,26 @@ open class Component(
         scheduledTime = null
         componentState = PASSIVE
 
-        if(trackingPolicy.logStateChangeEvents) log(stateChangeEvent())
+        logStateChange()
     }
 
-    fun stateChangeEvent(details: String? = null) =
-        ComponentStateChangeEvent(now, env.currentComponent, this, componentState, details)
+    fun logStateChange(
+        details: String? = null,
+        builder: () -> ComponentStateChangeEvent = {
+            ComponentStateChangeEvent(
+                now,
+                env.currentComponent,
+                this,
+                componentState,
+                details
+            )
+        }
+    ) {
+        if(trackingPolicy.logStateChangeEvents){
+            log(builder())
+        }
+    }
+
 
     private var interruptedStatus: ComponentState? = null
 
@@ -443,8 +458,7 @@ open class Component(
 
         componentState = DATA
 
-        if(trackingPolicy.logStateChangeEvents) log(stateChangeEvent("canceled"))
-
+        logStateChange("canceled")
     }
 
     /**
@@ -468,7 +482,7 @@ open class Component(
 
         componentState = STANDBY
 
-        if(trackingPolicy.logStateChangeEvents) log(stateChangeEvent())
+        logStateChange()
     }
 
 
@@ -1034,9 +1048,7 @@ open class Component(
         scheduledTime = null
         simProcess = null
 
-        if(trackingPolicy.logStateChangeEvents) {
-            log(stateChangeEvent("Ended"))
-        }
+        logStateChange("Ended")
     }
 
     private fun requireNotData() =
@@ -1081,7 +1093,7 @@ open class Component(
                 "+" + TRACE_DF.format(scheduledTime - env.now) + " "
             }
 
-            log(stateChangeEvent(("$caller $delta ${description ?: ""}").trim() + extra))
+            logStateChange(("$caller $delta ${description ?: ""}").trim() + extra)
         }
     }
 
