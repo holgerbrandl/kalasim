@@ -170,7 +170,7 @@ Environment().apply{
 
 In the latter case, the context reference is provided explicitly. This is usually not needed nor recommended.
 
-Instead of sub-classing, we can also use qualifiers to refere to dependencies of the same type
+Instead of sub-classing, we can also use qualifiers to refer to dependencies of the same type
 
 ```kotlin
 class Car : Component() {

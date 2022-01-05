@@ -7,16 +7,6 @@
 
 ## v0.8
 
-**TODO** log output is misleading
-
-```
-10.00     lateConsumer          lateConsumer          Requesting 1.0 from Resource.1 with priority null ...
-10.00                                                 Claimed 1.0 from 'lateConsumer'
-```
-
-**TODO** continue exploring https://openrndr.org/ or https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/chapter01/chapter1.html (which seems more popular and is also very active)
-
-**TODO** https://docs.korge.org/korge/
 
 **TODO** complete and publish hospital example
 * https://www.sciencedirect.com/science/article/pii/S037722172101002X?dgcid=rss_sd_all
@@ -59,6 +49,14 @@ urgency for the patient.
 
 ---
 ## Later
+
+**TODO** automatically render process diagrams 
+* gant-charts over time-->display extension
+
+* dependency who is requesting from whom, with link-weight iniating how often
+
+
+---
 
 **TODO** try to establish better default names by using similar concept as in `dataframe` 
 

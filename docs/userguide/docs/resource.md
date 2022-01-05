@@ -295,7 +295,7 @@ Events of type `org.kalasim.ResourceEvent` will indicate changes as they occur. 
 * `quantity: Double` 
 
 
-### Resource Activity Event`
+### Resource Activity Event
 
 Events of type `org.kalasim.ResourceActivityEvent` will be logged at the end of a [scoped request](#request-scope) block. The following fields are included in each event
 
@@ -366,10 +366,10 @@ Resources have a number of monitors:
 * requesters
     * `queueLength`
     * `lengthOfStay`
-* `claimedQuantity`
-* `availableQuantity`
-* `capacity`
-* `occupancy`  (= claimed quantity / capacity)
+* `claimedTimeline`
+* `availabilityTimeline`
+* `capacityTimeline`
+* `occupancyTimeline`  (= claimed quantity / capacity)
 
 By default, all monitors are enabled.
 
@@ -488,7 +488,7 @@ With `r.printStatistics()` the key statistics of these all monitors are printed.
 
 ```
 
-With `r.printInfo()` a summary of the contents of the queues can be printed. E.g.:
+With `println(r)` a summary of the contents of the queues can be printed. E.g.:
 
 ```json
 {

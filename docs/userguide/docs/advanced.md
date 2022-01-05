@@ -4,7 +4,7 @@ Simulation time is measured in ticks. Usually, a simulation starts at `0` and th
 
 To express duration more naturally, and to enable a more eye-friendly logging and to stay closer to the system under study, `kalasim` supports a built in transformation `tickTransform` to convert from simulation to wall clock. Let's consider the following example
 
-```kotlin hl_lines="9 13 16 21 24"
+```kotlin hl_lines="13 17 20 25 28"
 {!api/TickTrafoExample.kts!}
 ```
 

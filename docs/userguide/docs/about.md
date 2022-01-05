@@ -64,6 +64,7 @@ We have adopted several examples and documentation bits from `SimPy`, and are de
 Visualization
 
 * <https://github.com/holgerbrandl/kravis> which implements a grammar to create a wide range of plots using a standardized set of verbs
+* <https://github.com/JetBrains/lets-plot-kotlin> is an open-source plotting library for statistical data.
 
 
 ## Repo Maintainer
