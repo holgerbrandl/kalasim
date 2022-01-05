@@ -2,6 +2,7 @@ package org.kalasim.test
 
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
+import junit.framework.Assert.fail
 import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
@@ -43,7 +44,7 @@ class StateTests {
 
             fun waitForGreen() = sequence {
                 // just to increase test-coverage we use a predicate here
-                wait(trafficLight, triggerPriority = Priority.IMPORTANT ){ it =="green"}
+                wait(trafficLight, triggerPriority = Priority.IMPORTANT) { it == "green" }
 
                 val stateRequest: StateRequest<String> = StateRequest(trafficLight) { it == "green" }
 //                val (state: State<String>, bar: Int?, predicate: (String) -> Boolean) = stateRequest
@@ -78,6 +79,60 @@ class StateTests {
 
             trafficLight.snapshot.waiters.shouldBeEmpty()
         }
+    }
+
+    private enum class TestColor { RED, GREEN }
+
+    @Test
+    fun `it trigger once and keep the other waiters`() {
+        captureOutput {
+            createTestSimulation(true) {
+                val state = State(TestColor.RED)
+
+                var wasAStarted = false
+
+                object : Component("A") {
+                    override fun process() = sequence {
+                        wasAStarted = true
+                        wait(state, TestColor.GREEN)
+                        fail()
+                    }
+                }
+
+                var wasBHonored = false
+                object : Component("B") {
+                    override fun process() = sequence {
+                        wait(state, TestColor.GREEN, triggerPriority = Priority.IMPORTANT)
+                        wasBHonored = true
+                    }
+                }
+
+                run(1)
+                state.trigger(TestColor.GREEN, max = 1)
+                run(1)
+
+                wasAStarted shouldBe true
+                wasBHonored shouldBe true
+
+            }
+        }.stdout shouldBeDiff """
+            time      current               receiver              action                                                 info                               
+            --------- --------------------- --------------------- ------------------------------------------------------ ----------------------------------
+            .00                             main                  Created
+            .00                             State.1               Created                                                Initial value: RED
+            .00                             A                     Created
+            .00                                                   Activated, scheduled for .00                           New state: scheduled
+            .00                             B                     Created
+            .00                                                   Activated, scheduled for .00                           New state: scheduled
+            .00                             main                  Running; Hold +1.00, scheduled for 1.00                New state: scheduled
+            .00       A                     A                     Waiting, scheduled for <inf>                           New state: scheduled
+            .00       B                     B                     Waiting, scheduled for <inf>                           New state: scheduled
+            1.00      main                                        State changed to 'GREEN'
+            1.00                            B                     Waiting, scheduled for 1.00                            New state: scheduled
+            1.00                                                  State changes to 'RED' with trigger allowing null ...
+            1.00                            main                  Running; Hold +1.00, scheduled for 2.00                New state: scheduled
+            1.00      B                     B                     Ended                                                  New state: data
+        """.trimIndent()
     }
 
     @Test

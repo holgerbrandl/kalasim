@@ -97,7 +97,7 @@ class QueueTests {
                 .filter { it.action == "Ended" }
                 .apply {
                     size shouldBe 2
-                    get(0).source?.name shouldBe c1.name
+                    get(0).component?.name shouldBe c1.name
                 }
         }
 

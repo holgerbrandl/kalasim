@@ -1,7 +1,7 @@
 package org.kalasim
 
 import org.kalasim.analysis.EntityCreatedEvent
-import org.kalasim.analysis.InteractionEvent
+import org.kalasim.analysis.StateChangedEvent
 import org.kalasim.misc.*
 import org.kalasim.monitors.*
 import org.koin.core.Koin
@@ -19,19 +19,31 @@ open class State<T>(
     koin: Koin = DependencyContext.get()
 ) : SimulationEntity(name, koin) {
 
-    private var isTriggerCxt: Boolean = false
+    private var maxTriggerCxt: Int? = null
+    private val isTriggerCxt
+        get()= maxTriggerCxt != null
 
     var value: T = initialValue
         set(value) {
-            if (field == value) return
+            // salabim also logs the set even if the state.value may not change
+            log(trackingPolicy.logTriggers) {
+                StateChangedEvent(
+                    env.now,
+                    this,
+                    value,
+                    current = env.currentComponent,
+                    if(isTriggerCxt) maxTriggerCxt else null,
+                )
+            }
+
+            if(field == value) return
 
             field = value
 
-            // todo ensure that this is called also for the initial value
             timeline.addValue(value)
 
 //            if (Thread.currentThread().getStackTrace()[2].methodName != "trigger") {
-            if (!isTriggerCxt) {
+            if(!isTriggerCxt) {
                 tryWait()
             }
         }
@@ -86,35 +98,27 @@ open class State<T>(
      * @param max Maximum number of components to be honored for the trigger value
      */
     fun trigger(value: T, valueAfter: T = this.value, max: Int = Int.MAX_VALUE) {
-        log(trackingPolicy.logTriggers) {
-            InteractionEvent(
-                env.now,
-                env.currentComponent,
-                this,
-                "trigger value = $value --> $valueAfter allow $max components",
-            )
-        }
-
-        withoutAutoTry {
+        triggerContext(max) {
             this.value = value
         }
+
         tryWait(max)
 
+        // restore to valueAfter
         this.value = valueAfter
-        tryWait()
     }
 
-    fun withoutAutoTry(smthg: () -> Unit) {
-        isTriggerCxt = true
+    private fun triggerContext(max: Int, smthg: () -> Unit) {
+        maxTriggerCxt = max
         smthg()
-        isTriggerCxt = false
+        maxTriggerCxt = null
     }
 
     private fun tryWait(maxHonor: Int = Int.MAX_VALUE) {
         var mx = maxHonor
         waiters.q.map { it.component }.takeWhile {
             // wait max times but consider honor return state of tryWait
-            if (it.tryWait()) mx--
+            if(it.tryWait()) mx--
             mx > 0
         }
     }
@@ -124,14 +128,15 @@ open class State<T>(
         timeline.printHistogram()
     }
 
-     override val snapshot
+    override val snapshot
         get() = StateSnapshot(env.now, name, value.toString(), waiters.q.map { it.component.name })
 }
 
 
 /** Captures the current state of a `State`*/
 //@Serializable
-data class StateSnapshot(val time: TickTime, val name: String, val value: String, val waiters: List<String>) : AutoJson(), EntitySnapshot {
+data class StateSnapshot(val time: TickTime, val name: String, val value: String, val waiters: List<String>) :
+    AutoJson(), EntitySnapshot {
 //    override fun toString(): String {
 //        return Json.encodeToString(this)
 //    }

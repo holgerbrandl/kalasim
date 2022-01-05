@@ -50,19 +50,19 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
             val traceLine: List<String?> = when(this) {
                 is InteractionEvent -> {
                     val ccChanged = current != lastCurrent
-                    val receiverChanged = source != lastReceiver
+                    val receiverChanged = component != lastReceiver
 
                     listOf(
                         TRACE_DF.format(time.value),
                         if(ccChanged) current?.name else null,
-                        if(receiverChanged) source?.name else null,
+                        if(receiverChanged) component?.name else null,
                         //                ((source?.name ?: "") + " " + (renderAction() ?: "")).trim(),
                         (action ?: "").titlecaseFirstChar(),
                         if(event is ComponentStateChangeEvent){ "New state: ${event.state.toString().lowercase()}"} else ""
                     ).apply {
                         // update last element
                         lastCurrent = this@with.current
-                        lastReceiver = this@with.source
+                        lastReceiver = this@with.component
                     }
                 }
                 is EntityCreatedEvent -> {

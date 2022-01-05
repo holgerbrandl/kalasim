@@ -13,7 +13,7 @@ class ResourceEvent(
     time: TickTime,
     val requestId: Long,
     curComponent: Component?,
-    val requester: SimulationEntity,
+    val requester: Component,
     val resource: Resource,
     val type: ResourceEventType,
     val amount: Double,
@@ -92,7 +92,7 @@ data class ResourceActivityEvent(
 open class InteractionEvent(
     time: TickTime,
     val current: Component? = null,
-    val source: SimulationEntity? = null,
+    val component: Component? = null,
     open val action: String? = null,
 ) : Event(time) {
 
@@ -100,8 +100,39 @@ open class InteractionEvent(
         "eventType" to eventType
         "time" to time
         "current" to current?.name
-        "receiver" to source?.name
+        "receiver" to component?.name
         "action" to (action ?: "")
+    }
+}
+
+
+/** Fired when a simulation state is changing its value. https://www.kalasim.org/state/ */
+open class  StateChangedEvent<T>(
+    time: TickTime,
+    val state: State<T> ,
+    val newValue: T,
+    current: Component? = null,
+    val trigger: Int? = null
+): InteractionEvent(time, current, null){
+
+    override val action: String?
+        get() {
+            return if(trigger!=null) {
+                "State changed to '$newValue'"
+            } else {
+                "State changes to '$newValue' with trigger allowing $trigger components"
+            }
+        }
+
+    override fun toJson(): JSONObject = json {
+        "eventType" to eventType
+        "time" to time
+        "current" to current?.name
+        "state" to state.name
+        "newValue" to newValue
+        if(trigger!=null) {
+            "trigger" to (trigger ?: "")
+        }
     }
 }
 
@@ -125,16 +156,16 @@ class EntityCreatedEvent(
 open class ComponentStateChangeEvent(
     time: TickTime,
     current: Component? = null,
-    simEntity: Component,
+    component: Component,
     val state: ComponentState,
     details: String? = null
-) : InteractionEvent(time, current, simEntity, details){
+) : InteractionEvent(time, current, component, details){
 
     override fun toJson(): JSONObject = json {
         "time" to time
         "type" to eventType
         "current" to current?.name
-        "receiver" to source?.name
+        "receiver" to component?.name
         "details" to (action ?: "")
         "state" to state
     }

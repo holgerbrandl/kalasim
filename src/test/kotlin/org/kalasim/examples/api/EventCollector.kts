@@ -6,7 +6,7 @@ import org.kalasim.eventLog
 createSimulation(enableConsoleLogger = true) {
     val tc = eventLog()
 
-    tc.filter { it is InteractionEvent && it.source?.name == "foo" }
+    tc.filter { it is InteractionEvent && it.component?.name == "foo" }
 
     val claims = tc //
         .filterIsInstance<ResourceEvent>()

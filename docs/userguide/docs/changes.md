@@ -48,7 +48,8 @@ Major Enhancements
 
 Minor enhancements
 
-* Introduced more event-type and improved structured logging capabilities
+* [#50](https://github.com/holgerbrandl/kalasim/pull/50) Fixed [`trigger()`](state.md#state-change-triggers)
+* Introduced more event-types and improved [structured logging](events.md) capabilities
 * Renamed all `info` attributes to `snapshot` to convey intent better
 * Unified naming [resource](resource.md) attributes
 * [#28](https://github.com/holgerbrandl/kalasim/pull/28) Added support API to [sample UUIDs](basics.md#enumerations) with engine-controlled randomization 

@@ -340,6 +340,17 @@ open class Component(
         log(trackingPolicy.logStateChangeEvents) { builder() }
     }
 
+    internal fun logInternal(enabled: Boolean, action: String) = log(enabled) {
+        with(env) { InteractionEvent(now, currentComponent, this@Component, action) }
+    }
+
+    /**
+     * Records a state-change event.
+     *
+     * @param action Describing the nature if the event
+     */
+    fun log(action: String) = env.apply { log(InteractionEvent(now, currentComponent, this@Component, action)) }
+
 
     private var interruptedStatus: ComponentState? = null
 

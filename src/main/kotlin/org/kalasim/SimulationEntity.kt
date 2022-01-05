@@ -50,10 +50,6 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
         getKoin().get(qualifier, parameters)
 
 
-    internal fun logInternal(enabled: Boolean, action: String) = log(enabled) {
-        with(env) { InteractionEvent(now, currentComponent, this@SimulationEntity, action) }
-    }
-
     override var tickTransform: TickTransform?
         get() = env.tickTransform
         set(_) {
@@ -70,12 +66,6 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
         get() = env.random
 
 
-    /**
-     * Records a state-change event.
-     *
-     * @param action Describing the nature if the event
-     */
-    fun log(action: String) = env.apply { log(InteractionEvent(now, currentComponent, this@SimulationEntity, action)) }
 
 
     /**

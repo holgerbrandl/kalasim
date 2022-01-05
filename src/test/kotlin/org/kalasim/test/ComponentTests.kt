@@ -535,7 +535,7 @@ class ComponentTests {
 
         run(20)
 
-        (tc[4] as InteractionEvent).source!!.name shouldBe "other"
+        (tc[4] as InteractionEvent).component!!.name shouldBe "other"
     }
 
 

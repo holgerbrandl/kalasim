@@ -8,7 +8,7 @@ To analyze state changes in a simulation model, we may want to monitor [componen
 * Entity creation via `EntityCreatedEvent` 
 * Resource requests, see [resource events](resource.md#events).
 
-![](event_hierarchy.png)
+![](event_hierarchy.png.png)
 
 In addition, it also allows for custom event types that can be triggered with `log()` in [process definitions](component.md#process-definition)
 
