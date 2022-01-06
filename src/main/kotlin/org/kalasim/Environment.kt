@@ -146,6 +146,11 @@ open class Environment(
     /** Allows to transform ticks to wall time (represented by `java.time.Instant`) */
     override var tickTransform: TickTransform? = null
 
+    /** A read-only view on the tick-transform returning it if it is an instance of OffsetTransform and null otherwise */
+    val offsetTransform: OffsetTransform?
+        get() = if(tickTransform is OffsetTransform) (tickTransform as OffsetTransform) else null
+
+
     /** The component of the currently iterated process definition. Read-only, as components enter the queue only
      * indirectly via scheduling interactions such as for example hold(), request() or wait(). */
     var currentComponent: Component? = null

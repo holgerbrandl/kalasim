@@ -3,16 +3,14 @@
 package org.kalasim.sims.hydprod
 
 import org.kalasim.*
+import org.kalasim.animation.AnimationComponent
 import org.kalasim.misc.roundAny
 import org.kalasim.sims.hydprod.HarvesterState.*
 import java.awt.Dimension
 import java.awt.geom.Point2D
 import java.lang.Math.pow
 import java.util.concurrent.TimeUnit
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
-import kotlin.math.sqrt
+import kotlin.math.*
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -20,7 +18,9 @@ import kotlin.time.Duration.Companion.minutes
 
 enum class HarvesterState { STANDBY, MOVING, SCANNING, MINING, UNLOADING, MAINTENANCE, BROKEN }
 
-class Deposit(val gridPosition: GridPosition, size: Int) : DepletableResource(capacity = size)
+class Deposit(val gridPosition: GridPosition, size: Int) : DepletableResource(capacity = size) {
+    val miningShaft = Resource("MineShaft[${this}]", 1)
+}
 
 
 /** A discrete position on the surface */
@@ -58,7 +58,7 @@ class DepositMap(
 
 
 class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.5) :
-    MovingComponent(initialPosition.mapCoordinates, process = Harvester::searching) {
+    AnimationComponent(initialPosition.mapCoordinates, process = Harvester::searching) {
 
     val state = State(STANDBY)
 
@@ -109,7 +109,7 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
             // can base assign a close-by one?
             if(currentDeposit == null) {
                 currentDeposit = get<Base>().requestAssignment(this@Harvester)
-                if(currentDeposit!=null){
+                if(currentDeposit != null) {
                     activate(process = Harvester::harvesting)
                 }
             }
@@ -126,11 +126,11 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
     fun unload() = sequence {
         moveTo(base.position)
 
-        val unloadUnitsPerMinute = 0.5  // speed of unloading
+        val unloadingUnitsPerHours = 8  // speed of unloading
 
         // unloading time correlates with load status
         currentState = UNLOADING
-        hold((tank.level * unloadUnitsPerMinute).roundToInt().minutes, "unloading ${tank.level} hydrat units")
+        hold((tank.level / unloadingUnitsPerHours).roundToInt().hours, "Unloading ${tank.level} hydrate units")
         put(get<Base>().refinery, tank.level)
 
         // empty the tank
@@ -152,20 +152,34 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
 
         moveTo(currentDeposit!!.gridPosition)
 
-        //todo could we avoid the loop by using process interaction here?
+
+
+        // MODEL 1: Mine increments: THis allows for better progress monitoring in the UI, but is overly
+        // complex from a modelling and event perspective
+        //todo could we avoid the loop by using process interaction here? --> yes use mine-shafts see below
         val miningUnitsPerHour = 5.0
-        while(!currentDeposit!!.isDepleted && !tank.isFull) {
-            val quantity = min(miningUnitsPerHour, currentDeposit!!.level)
-            take(currentDeposit!!, quantity, failDelay = 0)
-            if(failed) { // could happen if other harvester tries to mine here as well
-                break
+        request(currentDeposit!!.miningShaft) {
+            while(!currentDeposit!!.isDepleted && !tank.isFull) {
+                val quantity = min(miningUnitsPerHour, currentDeposit!!.level)
+                take(currentDeposit!!, quantity, failDelay = 0)
+                if(failed) { // could happen if other harvester tries to mine here as well
+                    break
+                }
+
+                currentState = MINING
+                hold(1.hours)
+                put(tank, quantity, capacityLimitMode = CapacityLimitMode.CAP)
             }
-
-            currentState = MINING
-            hold(1.hours)
-
-            put(tank, quantity, capacityLimitMode = CapacityLimitMode.CAP)
         }
+
+        //MODEL 1 more concise but lacks the ability to track mining status at the deposits
+//        val quantity = min(tank.capacity - tank.level, currentDeposit!!.level)
+//        request(currentDeposit!!.miningShaft) {
+//            currentState = MINING
+//            hold((miningUnitsPerHour * quantity).hours, "Mining deposit $currentDeposit")
+//            take(currentDeposit!!, quantity, failDelay = 0)
+//            put(tank, quantity, capacityLimitMode = CapacityLimitMode.CAP)
+//        }
 
         if(tank.isFull) {
             activate(process = Harvester::unload)
@@ -182,8 +196,8 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
 class Base : Component() {
     val position: GridPosition = GridPosition(10, 15)
 
-    init{
-        require(get<DepositMap>().restrictToMap(position) == position){ "base out of map" }
+    init {
+        require(get<DepositMap>().restrictToMap(position) == position) { "base out of map" }
     }
 
     val knownDeposits = mutableListOf<Deposit>()
@@ -199,9 +213,12 @@ class Base : Component() {
 
     /** Performs analysis to find a suitable deposit for harvesting for the given harvester. */
     fun requestAssignment(harvester: Harvester): Deposit? {
-        return knownDeposits.filter { !it.isDepleted }.ifEmpty { null }?.minByOrNull {
-            it.gridPosition.distance(harvester.gridPosition)
-        }
+        return knownDeposits
+            .filter { !it.isDepleted }
+            .filter { it.miningShaft.occupancy < 1 }
+            .ifEmpty { null }?.minByOrNull {
+                it.gridPosition.distance(harvester.gridPosition)
+            }
     }
 
 
@@ -211,7 +228,13 @@ class Base : Component() {
 
         if(unexplored) {
             val mapSize = get<DepositMap>().gridDimension
-            println("map coverage increased to ${(scanHistory.size.toDouble() / (mapSize.height * mapSize.width)).roundAny(2)}")
+            println(
+                "map coverage increased to ${
+                    (scanHistory.size.toDouble() / (mapSize.height * mapSize.width)).roundAny(
+                        2
+                    )
+                }"
+            )
 
             scanHistory[searchPosition] = now
         }
@@ -238,6 +261,7 @@ fun main() {
     // analyze production
     println("produced hydrate units: ${prod.base.refinery.level}")
 
-    val depletionRatio = prod.map.deposits.map { it.level to it.capacity }.run { sumOf { it.first } / sumOf { it.second } }
-    println("Deposit depletion ${depletionRatio.roundAny(2)} *")
+    val depletionRatio =
+        prod.map.deposits.map { it.level to it.capacity }.run { sumOf { it.first } / sumOf { it.second } }
+    println("Deposit depletion ${depletionRatio.roundAny(2)}%")
 }

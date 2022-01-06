@@ -1,24 +1,22 @@
-package org.kalasim.sims.hydprod
+package org.kalasim.animation
 
 import org.kalasim.*
+import org.kalasim.analysis.RescheduledEvent
 import java.awt.geom.Point2D
 import kotlin.math.sqrt
 import kotlin.properties.Delegates
 
-
-//TODO Add route support, so that entity moves alon planned route
-
 /** A component that has a position on a planar 2D surface. While being on the move, it allows to query its current
  *  position. This is most useful when visualizing a simulation state.
  */
-open class MovingComponent(
+open class AnimationComponent(
     initialPosition: Point2D,
     name: String? = null,
     process: ProcessPointer? = null,
 ) : Component(name, process = process) {
 
     private var from: Point2D = initialPosition
-    var to: Point2D? = null
+    private var to: Point2D? = null
 
     private var started by Delegates.notNull<TickTime>()
     private var currentSpeed by Delegates.notNull<Double>()
@@ -38,7 +36,7 @@ open class MovingComponent(
         val duration = distance / speed
         estimatedArrival = now + duration
 
-        hold(Ticks(duration), description ?:"moving to ${nextTarget}", priority)
+        hold(Ticks(duration), description ?: "moving to ${nextTarget}", priority)
         from = to!!
         to = null
     }
@@ -99,4 +97,44 @@ open class MovingComponent(
 //            yield(to)
 //        }
 //    }
+
+
+    private var lastHold = mutableMapOf<String, RescheduledEvent>()
+
+    // note: we could potentially also bypass the event-bus and overload log()
+    init {
+        env.addEventListener<RescheduledEvent> { re ->
+            if(re.component != this) return@addEventListener
+
+            holdTracks
+                .filter { (name, matcher) -> matcher(re) }
+                .keys.forEach {
+                    lastHold[it] = re
+                }
+        }
+    }
+
+    val holdTracks = mutableMapOf<String, AnimationHoldMatcher>()
+    fun registerHoldTracker(query: String, eventMatcher: AnimationHoldMatcher) {
+        holdTracks[query] = eventMatcher
+    }
+
+
+    fun isHolding(holdId: String): Boolean {
+        val rescheduledEvent = lastHold[holdId]
+
+        return rescheduledEvent!=null && rescheduledEvent.scheduledFor >= now
+    }
+
+    fun holdProgress(holdId: String) : Double?{
+        val rescheduledEvent = lastHold[holdId]
+        if(rescheduledEvent==null || rescheduledEvent.scheduledFor < now) return null
+
+        require(rescheduledEvent.time <=now)
+
+        // calculate fraction
+        return (now-rescheduledEvent.time)/(rescheduledEvent.scheduledFor-rescheduledEvent.time)
+    }
 }
+
+typealias AnimationHoldMatcher = RescheduledEvent.() -> Boolean

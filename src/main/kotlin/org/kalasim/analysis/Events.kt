@@ -72,9 +72,9 @@ data class ResourceActivityEvent(
     val activity: String?,
     val quantity: Double,
 ) : Event(released) {
-    val requestedWT = resource.env.tickTransform?.tick2wallTime(requested)
-    val honoredWT = resource.env.tickTransform?.tick2wallTime(honored)
-    val releasedWT = resource.env.tickTransform?.tick2wallTime(released)
+    val requestedWT = resource.env.offsetTransform?.tick2wallTime(requested)
+    val honoredWT = resource.env.offsetTransform?.tick2wallTime(honored)
+    val releasedWT = resource.env.offsetTransform?.tick2wallTime(released)
 
     override fun toJson() = json {
         "eventType" to eventType
