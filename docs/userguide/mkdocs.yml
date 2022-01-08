@@ -43,6 +43,7 @@ nav:
     - Events: events.md
     - Monitors: monitors.md
     - Visualization: visualization.md
+    - Animation: animation/animation.md
 
   - Examples:
     - Overview: examples.md
@@ -60,6 +61,7 @@ nav:
     - Office Tower: examples/office_tower.md
     - The Ferryman: examples/ferryman.md
     - Emergyency Room: examples/emergency_room.md
+    - Lunar Mining: animation/lunar_mining.md
 
   - Advanced:
     - advanced.md

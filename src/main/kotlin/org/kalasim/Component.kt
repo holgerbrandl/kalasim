@@ -499,7 +499,7 @@ open class Component(
 
     @Throws(InvalidRequestQuantity::class)
     private fun ensurePositiveQuantity(quantity: Number): Number {
-        if(quantity.toDouble() <= 0) {
+        if(quantity.toDouble() < 0) {
             throw InvalidRequestQuantity("Positive quantity expected but was $quantity.")
         }
         return quantity

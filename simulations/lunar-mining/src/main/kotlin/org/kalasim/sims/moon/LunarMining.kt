@@ -13,9 +13,6 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
-
-//todo get rid of the grid to make the example more simple
-
 enum class HarvesterState { STANDBY, MOVING, SCANNING, MINING, UNLOADING, MAINTENANCE, BROKEN }
 
 class Deposit(val gridPosition: GridPosition, size: Int) : DepletableResource(capacity = size) {
@@ -55,6 +52,9 @@ class DepositMap(
         max(min(gp.x, gridDimension.width), 1),
         max(min(gp.y, gridDimension.height), 1)
     )
+
+    val depletionRatio
+        get() = 1 - deposits.map { it.level to it.capacity }.run { sumOf { it.first } / sumOf { it.second } }.roundAny(2)
 }
 
 
@@ -129,7 +129,7 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
     fun unload() = sequence {
         moveTo(base.position)
 
-        val unloadingUnitsPerHours = 8  // speed of unloading
+        val unloadingUnitsPerHours = 20  // speed of unloading
 
         // unloading time correlates with load status
         currentState = UNLOADING
@@ -159,7 +159,7 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
         // MODEL 1: Mine increments: THis allows for better progress monitoring in the UI, but is overly
         // complex from a modelling and event perspective
         //todo could we avoid the loop by using process interaction here? --> yes use mine-shafts see below
-        val miningUnitsPerHour = 5.0
+        val miningUnitsPerHour = 4.0
         request(currentDeposit!!.miningShaft) {
             while(!currentDeposit!!.isDepleted && !tank.isFull) {
                 val quantity = min(miningUnitsPerHour / 4, currentDeposit!!.level)
@@ -196,7 +196,7 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
 }
 
 class Base : Component() {
-    val position: GridPosition = GridPosition(6, 8)
+    val position: GridPosition = GridPosition(5, 8)
 
     init {
         require(get<DepositMap>().restrictToMap(position) == position) { "base out of map" }
@@ -207,10 +207,18 @@ class Base : Component() {
     // a list of previously scanned positions
     val scanHistory = mutableMapOf<GridPosition, TickTime>()
 
-    val refinery = DepletableResource(capacity = Int.MAX_VALUE, initialLevel = 0)
+    val refinery = DepletableResource(capacity = Int.MAX_VALUE, initialLevel = 100)
 
     fun registerDeposit(deposit: Deposit) {
         knownDeposits.add(deposit)
+    }
+
+    val waterConsumption = exponential(3)
+
+    // water consumption of the base
+    override fun repeatedProcess() = sequence<Component> {
+        hold(1.hours)
+        take(refinery, quantity =  min(refinery.level, waterConsumption()))
     }
 
     /** Performs analysis to find a suitable deposit for harvesting for the given harvester. */
@@ -256,12 +264,11 @@ class HydProd : Environment(true) {
 
 fun main() {
     val prod = HydProd()
+
     prod.run(60.days)
 
-    // analyze production
+    // Analyze production KPIs
     println("Produced water units: ${prod.base.refinery.level}")
-
-    val depletionRatio =
-        prod.map.deposits.map { it.level to it.capacity }.run { sumOf { it.first } / sumOf { it.second } }
-    println("Deposit depletion ${depletionRatio.roundAny(2)}%")
+    println("Deposit depletion ${prod.map.depletionRatio}%")
 }
+

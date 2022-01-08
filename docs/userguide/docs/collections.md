@@ -78,7 +78,8 @@ Statistics
 Collections support a `capacity` and an accompanying `capacityTimeline` to set a maximum capacity. If this capacity is exceeded a `CapacityExceededException` is being thrown. 
 
 A capacity can be reduced (similar to [resources](resource.md)) by setting a new one
-```asciidoc
+
+```kotlin
 val queue = ComponentQueue(capacity=5)
 queue.capacity = 10
 ```

@@ -2,17 +2,21 @@ package org.kalasim.sims.lunarmining.viewer
 
 import kotlinx.coroutines.*
 import org.kalasim.ClockSync
+import org.kalasim.Component
 import org.kalasim.misc.DependencyContext
-import org.kalasim.sims.moon.GridPosition
-import org.kalasim.sims.moon.HydProd
+import org.kalasim.sims.moon.*
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.loadFont
 import org.openrndr.draw.loadImage
+import org.openrndr.ffmpeg.ScreenRecorder
 import org.openrndr.shape.Circle
 import org.openrndr.svg.loadSVG
+import java.lang.Thread.sleep
 import kotlin.math.roundToInt
 import kotlin.random.Random
+import kotlin.system.exitProcess
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 
 fun main() {
@@ -20,7 +24,7 @@ fun main() {
         val UNLOADING_HARVESTER = "Unloading"
 
         val hydProd = HydProd().apply {
-            ClockSync(tickDuration = 10.milliseconds, syncsPerTick = 100)
+            ClockSync(tickDuration = 6.milliseconds, syncsPerTick = 100)
 
             // configure harvesters to track mining events
             harvesters.forEach {
@@ -49,7 +53,7 @@ fun main() {
 
             val gridUnitSize = 10
 
-//        extend(ScreenRecorder())
+            extend(ScreenRecorder())
 
             extend {
                 val scaledXUnit = width.toDouble() / (hydProd.map.gridDimension.width * gridUnitSize)
@@ -65,7 +69,7 @@ fun main() {
                     hydProd.map.deposits.forEach {
                         defaults()
                         val isKnown = hydProd.base.knownDeposits.contains(it)
-                        drawer.fill = ColorRGBa.YELLOW.copy(a = if(isKnown) 0.8 else 0.2)
+                        drawer.fill = ColorRGBa.fromHex("0E86D4").copy(a = if(isKnown) 0.8 else 0.2)
 
                         circle(
                             it.gridPosition.mapCoordinates.x * scaledXUnit,
@@ -124,19 +128,19 @@ fun main() {
                     // draw base
                     defaults()
                     val baseCoordinates = hydProd.base.position.mapCoordinates
-                    translate(baseCoordinates.x * scaledXUnit, (baseCoordinates.y-1) * scaledYUnit )
+                    translate(baseCoordinates.x * scaledXUnit, (baseCoordinates.y - 1) * scaledYUnit)
 
                     scale(0.1)
                     composition(base)
 
                     defaults()
-                    translate((baseCoordinates.x+3) * scaledXUnit, (baseCoordinates.y+18) * scaledYUnit )
+                    translate((baseCoordinates.x + 3) * scaledXUnit, (baseCoordinates.y + 18) * scaledYUnit)
                     drawer.fill = ColorRGBa.BLACK
                     drawer.fontMap = font
-                    if(!hydProd.harvesters.any{it.isHolding(UNLOADING_HARVESTER)}) {
-                        drawer.text( String.format("%06d",hydProd.base.refinery.level.roundToInt()))
-                    }else{
-                        drawer.text( List(6){ Random.nextInt(9) }.joinToString (""))
+                    if(!hydProd.harvesters.any { it.isHolding(UNLOADING_HARVESTER) }) {
+                        drawer.text(String.format("%06d", hydProd.base.refinery.level.roundToInt()))
+                    } else {
+                        drawer.text(List(6) { Random.nextInt(9) }.joinToString(""))
                     }
 
                     // draw info
@@ -152,6 +156,19 @@ fun main() {
         // Start simulation model
         CoroutineScope(Dispatchers.Default).launch {
             DependencyContext.setKoin(hydProd.getKoin())
+
+            // stop the simulation if all deposits are depleted
+            object : Component() {
+                override fun repeatedProcess() = sequence {
+                    hold(1.hours)
+                    if(get<DepositMap>().depletionRatio > 0.6) {
+                        stopSimulation()
+                        exitProcess(0)
+                    }
+                }
+            }
+
+            sleep(3000)
             hydProd.run()
         }
     }

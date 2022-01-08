@@ -8,9 +8,6 @@ Parameters
 * Number of elevators
 * Capacity of each elevator
 
-<!--```kotlin-->
-<!--//{!elevator/Elevator.kt!}-->
-<!--```-->
-See [here](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/examples/elevator/Elevator.kt) for the implementation
+See [here](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/examples/elevator/Elevator.kt) for the implementation.
 
 The implementation is inspired by [salabim's elevator](https://github.com/salabim/salabim/blob/master/sample%20models/Elevator.py) example.
