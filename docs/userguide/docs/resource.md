@@ -92,7 +92,7 @@ The model below illustrates the use of `take` and `put`. See the [Gas Station](e
 
 Examples using depletable resources
 * [Shipyard](https://github.com/holgerbrandl/kalasim/blob/master/src/test/kotlin/org/kalasim/scratch/shipyard/ShipyardRequest.kt)
-* [Hydrate Production](https://github.com/holgerbrandl/kalasim/tree/master/simulations/hydprod) which models deposits as depletable resource
+* [Lunar Mining](https://github.com/holgerbrandl/kalasim/tree/master/simulations/lunar-mining) which models deposits as depletable resource
 * [Gas Station](examples/gas_station.md) where the central fuel storage is modeled as depletable resource
 
 

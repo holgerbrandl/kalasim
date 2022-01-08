@@ -1,26 +1,14 @@
-package org.kalasim.sims.hydprod.viewer.orexp
+package org.kalasim.sims.moon.viewer
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.kalasim.ClockSync
-import org.kalasim.misc.DependencyContext
-import org.kalasim.sims.hydprod.HydProd
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.colorBuffer
 import org.openrndr.draw.loadFont
 import org.openrndr.draw.loadImage
 import org.openrndr.extra.fx.blur.BoxBlur
-import org.openrndr.ffmpeg.ScreenRecorder
-import org.openrndr.shape.Circle
 import org.openrndr.svg.loadSVG
 import java.awt.geom.Point2D
 import java.lang.Math.cos
-import java.lang.Thread.sleep
-import java.time.Duration
-import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.milliseconds
 
 fun main() = application {
 
@@ -30,7 +18,7 @@ fun main() = application {
         width = 1024
         height = 800
         windowResizable = true
-        title = "Hydrate Production"
+        title = "Lunar Water Mining"
     }
 
     program {

@@ -1,8 +1,10 @@
-# Hydrate Production
+# Lunar Mining
 
-Resource agents scan the ground of the ocean for depletable hydrate deposits.
+See [Lunar Mining](../../docs/userguide/docs/animation/lunar_mining.md) in the manual.
 
-## References
+Resource agents scan the ground of the moon for depletable water  deposits.
+
+## Image References
 
 [Surface Background](https://commons.wikimedia.org/wiki/File:Phlegra_Montes_on_Mars_ESA211127.jpg) 
 

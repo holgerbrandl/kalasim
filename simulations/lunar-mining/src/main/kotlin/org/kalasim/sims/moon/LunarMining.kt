@@ -1,11 +1,9 @@
-@file:Suppress("MemberVisibilityCanBePrivate")
-
-package org.kalasim.sims.hydprod
+package org.kalasim.sims.moon
 
 import org.kalasim.*
 import org.kalasim.animation.AnimationComponent
 import org.kalasim.misc.roundAny
-import org.kalasim.sims.hydprod.HarvesterState.*
+import org.kalasim.sims.moon.HarvesterState.*
 import java.awt.Dimension
 import java.awt.geom.Point2D
 import java.lang.Math.pow
@@ -45,8 +43,8 @@ class DepositMap(
     val deposits = run {
         val capacityDist = uniform(1, maxCapacity)
         // sample deposit location but avoid borders of map (for sake of beauty)
-        val x = discreteUniform(1, gridDimension.width-1)
-        val y = discreteUniform(1, gridDimension.height-1)
+        val x = discreteUniform(1, gridDimension.width - 1)
+        val y = discreteUniform(1, gridDimension.height - 1)
 
         List(numDeposits) {
             Deposit(GridPosition(x(), y()), capacityDist.sample().roundToInt())
@@ -54,8 +52,8 @@ class DepositMap(
     }
 
     fun restrictToMap(gp: GridPosition): GridPosition = GridPosition(
-        max(min(gp.x, gridDimension.width), 0),
-        max(min(gp.y, gridDimension.height), 0)
+        max(min(gp.x, gridDimension.width), 1),
+        max(min(gp.y, gridDimension.height), 1)
     )
 }
 
@@ -135,7 +133,7 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
 
         // unloading time correlates with load status
         currentState = UNLOADING
-        hold((tank.level / unloadingUnitsPerHours).roundToInt().hours, "Unloading ${tank.level} hydrate units")
+        hold((tank.level / unloadingUnitsPerHours).roundToInt().hours, "Unloading ${tank.level} water units")
         put(get<Base>().refinery, tank.level)
 
         // empty the tank
@@ -158,14 +156,13 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
         moveTo(currentDeposit!!.gridPosition)
 
 
-
         // MODEL 1: Mine increments: THis allows for better progress monitoring in the UI, but is overly
         // complex from a modelling and event perspective
         //todo could we avoid the loop by using process interaction here? --> yes use mine-shafts see below
         val miningUnitsPerHour = 5.0
         request(currentDeposit!!.miningShaft) {
             while(!currentDeposit!!.isDepleted && !tank.isFull) {
-                val quantity = min(miningUnitsPerHour/4, currentDeposit!!.level)
+                val quantity = min(miningUnitsPerHour / 4, currentDeposit!!.level)
                 take(currentDeposit!!, quantity, failDelay = 0)
                 if(failed) { // could happen if other harvester tries to mine here as well
                     break
@@ -199,7 +196,7 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
 }
 
 class Base : Component() {
-    val position: GridPosition = GridPosition(10, 12)
+    val position: GridPosition = GridPosition(6, 8)
 
     init {
         require(get<DepositMap>().restrictToMap(position) == position) { "base out of map" }
@@ -218,12 +215,13 @@ class Base : Component() {
 
     /** Performs analysis to find a suitable deposit for harvesting for the given harvester. */
     fun requestAssignment(harvester: Harvester): Deposit? {
-        return knownDeposits
+        val candidate = knownDeposits
             .filter { !it.isDepleted }
             .filter { it.miningShaft.occupancy < 1 }
             .ifEmpty { null }?.minByOrNull {
                 it.gridPosition.distance(harvester.gridPosition)
             }
+        return if(candidate != null && candidate.gridPosition.distance(harvester.gridPosition) < 4.0) candidate else null
     }
 
 
@@ -253,7 +251,7 @@ class HydProd : Environment(true) {
     // the initially unknown list of deposits
     val map = dependency { DepositMap() }
     val base = dependency { Base() }
-    val harvesters = List(4) { Harvester(base.position) }
+    val harvesters = List(5) { Harvester(base.position) }
 }
 
 fun main() {
@@ -261,7 +259,7 @@ fun main() {
     prod.run(60.days)
 
     // analyze production
-    println("produced hydrate units: ${prod.base.refinery.level}")
+    println("Produced water units: ${prod.base.refinery.level}")
 
     val depletionRatio =
         prod.map.deposits.map { it.level to it.capacity }.run { sumOf { it.first } / sumOf { it.second } }
