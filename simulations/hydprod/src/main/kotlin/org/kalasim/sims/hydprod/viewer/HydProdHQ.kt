@@ -3,15 +3,14 @@ package org.kalasim.sims.hydprod.viewer
 import kotlinx.coroutines.*
 import org.kalasim.ClockSync
 import org.kalasim.misc.DependencyContext
+import org.kalasim.sims.hydprod.GridPosition
 import org.kalasim.sims.hydprod.HydProd
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.loadFont
 import org.openrndr.draw.loadImage
-import org.openrndr.panel.elements.round
 import org.openrndr.shape.Circle
 import org.openrndr.svg.loadSVG
-import kotlin.math.sin
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -24,10 +23,10 @@ fun main() {
             ClockSync(tickDuration = 10.milliseconds, syncsPerTick = 100)
 
             // configure harvesters to track mining events
-            harvesters.forEach{
+            harvesters.forEach {
 //                it.registerHoldTracker(MINING_PROGRESS){ description?.startsWith("Mining deposit") ?: false}
-                it.registerHoldTracker(UNLOADING_HARVESTER){
-                    description?.run{startsWith("Unloading") && endsWith("hydrate units")} ?: false
+                it.registerHoldTracker(UNLOADING_HARVESTER) {
+                    description?.run { startsWith("Unloading") && endsWith("hydrate units") } ?: false
                 }
             }
         }
@@ -57,8 +56,10 @@ fun main() {
 
             val font = loadFont("file:IBM_Plex_Mono/IBMPlexMono-Bold.ttf", 24.0)
 
-            val xScale = width.toDouble() / (hydProd.map.gridDimension.width*10)
-            val yScale = height.toDouble() / (hydProd.map.gridDimension.height*10)
+            val gridUnitSize = 10
+            val scaledXUnit = width.toDouble() / (hydProd.map.gridDimension.width * gridUnitSize)
+            val scaledYUnit = height.toDouble() / (hydProd.map.gridDimension.height * gridUnitSize)
+
 
 //        extend(ScreenRecorder())
 
@@ -73,58 +74,70 @@ fun main() {
                     hydProd.map.deposits.forEach {
                         defaults()
                         val isKnown = hydProd.base.knownDeposits.contains(it)
-                        drawer.fill = ColorRGBa.YELLOW.copy(a = if(isKnown) 0.8 else 0.2 )
+                        drawer.fill = ColorRGBa.YELLOW.copy(a = if(isKnown) 0.8 else 0.2)
 
 //                    scale(0.3)
                         circle(
-                            it.gridPosition.mapCoordinates.x * xScale,
-                            it.gridPosition.mapCoordinates.y * yScale,
+                            it.gridPosition.mapCoordinates.x * scaledXUnit,
+                            it.gridPosition.mapCoordinates.y * scaledYUnit,
                             it.level / 20.0
                         )
                     }
 
+                    drawer.fill = ColorRGBa.BLACK
+                    drawer.fontMap = font
+
+                    val searchHistory = hydProd.base.scanHistory.keys.toList()
+                    for(i in 0..hydProd.map.gridDimension.width)
+                        for(j in 0..hydProd.map.gridDimension.height)
+                            if(searchHistory.contains(GridPosition(i, j))) {
+                                circle(i * scaledXUnit * gridUnitSize, j * scaledYUnit * gridUnitSize, 3.0)
+//                                text(".", i * scaledXUnit * gridUnitSize, j * scaledYUnit * gridUnitSize)
+                            }
+
+
                     // draw harvesters
-                    hydProd.harvesters.withIndex().forEach {(idx, harvester) ->
+                    hydProd.harvesters.withIndex().forEach { (idx, harvester) ->
                         defaults()
                         val hPos = harvester.currentPosition
 //                    val offset = if(hPos == hydProd.base.position.mapCoordinates) idx*30 else 0
-                        translate(hPos.x * xScale, hPos.y * yScale)
+                        translate((hPos.x - 8) * scaledXUnit, (hPos.y - 8) * scaledYUnit)
 
-                        drawer.fill = ColorRGBa.BLACK
-                        drawer.fontMap = font
-                        drawer.text("${harvester.tank.level.toInt()}", y=80.0)
+//                        drawer.fill = ColorRGBa.BLACK
+//                        drawer.fontMap = font
+//                        drawer.text("${harvester.tank.level.toInt()}", y=80.0)
 //                        drawer.text("${harvester.holdProgress(MINING_PROGRESS)?.round(2)}", y=80.0)
 
+
+                        // draw harvester
                         scale(0.3)
                         composition(truck)
 
-                        // visualize hold-state (except for moving)
-
-                        // if component is on hold
-                        if(harvester.isScheduled){
-
-                        }
+                        // indicate tank status
                         drawer.fill = null
-                        drawer.stroke = ColorRGBa.PINK
-                        drawer.strokeWeight = 8.0
+                        drawer.stroke = ColorRGBa.BLACK
+                        drawer.strokeWeight = 10.0
 
-                        if(harvester.isHolding(UNLOADING_HARVESTER)) {
-                            val sub0 = Circle(
+
+                        val contour = Circle(
 //                                harvester.gridPosition.mapCoordinates.x * xScale,
 //                                harvester.gridPosition.mapCoordinates.y * yScale,
-                                0.0,0.0,
-                                100.0
-                            )
+                            100.0, 110.0,
+                            120.0
+                        )
 //                        .contour.sub(0.0, 0.5 + 0.50 * sin(seconds))
-                                .contour.sub(0.0, (1 - harvester.holdProgress(UNLOADING_HARVESTER)!!))
-                            drawer.contour(sub0)
+                            .contour
+                        if(harvester.isHolding(UNLOADING_HARVESTER)) {
+                            drawer.contour(contour.sub(0.0, (1 - harvester.holdProgress(UNLOADING_HARVESTER)!!)))
+                        } else {
+                            drawer.contour(contour.sub(0.0, 1 - harvester.tank.occupancy))
                         }
                     }
 
                     // draw base
                     defaults()
                     val baseCoordinates = hydProd.base.position.mapCoordinates
-                    translate(baseCoordinates.x * xScale, baseCoordinates.y * yScale-90)
+                    translate(baseCoordinates.x * scaledXUnit, baseCoordinates.y * scaledYUnit - 90)
                     scale(0.1)
                     composition(base)
 

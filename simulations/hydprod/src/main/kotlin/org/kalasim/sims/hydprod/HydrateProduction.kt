@@ -16,6 +16,8 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 
+//todo get rid of the grid to make the example more simple
+
 enum class HarvesterState { STANDBY, MOVING, SCANNING, MINING, UNLOADING, MAINTENANCE, BROKEN }
 
 class Deposit(val gridPosition: GridPosition, size: Int) : DepletableResource(capacity = size) {
@@ -36,14 +38,15 @@ data class GridPosition(val x: Int, val y: Int) {
 class DepositMap(
     numDeposits: Int = 10,
     maxCapacity: Int = 1000,
-    val gridDimension: Dimension = Dimension(30, 30)
+    val gridDimension: Dimension = Dimension(20, 15)
 ) : SimulationEntity() {
 
     // sample deposits
     val deposits = run {
         val capacityDist = uniform(1, maxCapacity)
-        val x = discreteUniform(0, gridDimension.width)
-        val y = discreteUniform(0, gridDimension.height)
+        // sample deposit location but avoid borders of map (for sake of beauty)
+        val x = discreteUniform(1, gridDimension.width-1)
+        val y = discreteUniform(1, gridDimension.height-1)
 
         List(numDeposits) {
             Deposit(GridPosition(x(), y()), capacityDist.sample().roundToInt())
@@ -113,6 +116,8 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
                     activate(process = Harvester::harvesting)
                 }
             }
+
+            base.reportScanCompleted(searchAreaCandiate)
         }
     }
 
@@ -160,14 +165,14 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
         val miningUnitsPerHour = 5.0
         request(currentDeposit!!.miningShaft) {
             while(!currentDeposit!!.isDepleted && !tank.isFull) {
-                val quantity = min(miningUnitsPerHour, currentDeposit!!.level)
+                val quantity = min(miningUnitsPerHour/4, currentDeposit!!.level)
                 take(currentDeposit!!, quantity, failDelay = 0)
                 if(failed) { // could happen if other harvester tries to mine here as well
                     break
                 }
 
                 currentState = MINING
-                hold(1.hours)
+                hold(15.minutes)
                 put(tank, quantity, capacityLimitMode = CapacityLimitMode.CAP)
             }
         }
@@ -194,7 +199,7 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
 }
 
 class Base : Component() {
-    val position: GridPosition = GridPosition(10, 15)
+    val position: GridPosition = GridPosition(10, 12)
 
     init {
         require(get<DepositMap>().restrictToMap(position) == position) { "base out of map" }
@@ -203,7 +208,7 @@ class Base : Component() {
     val knownDeposits = mutableListOf<Deposit>()
 
     // a list of previously scanned positions
-    private val scanHistory = mutableMapOf<GridPosition, TickTime>()
+    val scanHistory = mutableMapOf<GridPosition, TickTime>()
 
     val refinery = DepletableResource(capacity = Int.MAX_VALUE, initialLevel = 0)
 
@@ -224,22 +229,19 @@ class Base : Component() {
 
     /** Reject search position if they have been scanned already*/
     fun approveSearchCoordinates(searchPosition: GridPosition): Boolean {
-        val unexplored = !scanHistory.containsKey(searchPosition)
+        return !scanHistory.containsKey(searchPosition)
+    }
 
-        if(unexplored) {
-            val mapSize = get<DepositMap>().gridDimension
-            println(
-                "map coverage increased to ${
-                    (scanHistory.size.toDouble() / (mapSize.height * mapSize.width)).roundAny(
-                        2
-                    )
-                }"
-            )
-
-            scanHistory[searchPosition] = now
-        }
-
-        return unexplored
+    fun reportScanCompleted(searchPosition: GridPosition) {
+        scanHistory[searchPosition] = now
+        val mapSize = get<DepositMap>().gridDimension
+        println(
+            "map coverage increased to ${
+                (scanHistory.size.toDouble() / (mapSize.height * mapSize.width)).roundAny(
+                    2
+                )
+            }"
+        )
     }
 }
 

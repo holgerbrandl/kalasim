@@ -2,7 +2,9 @@
 
 ## Next steps
 
-**TODO** better name and documentation for `curComponent`
+**TODO** bug `State changes to 'WaitForStart' with trigger allow`
+
+**TODO** ` Furnace.1             Waiting, scheduled for 31.00` for what?
 
 
 ## v0.8
