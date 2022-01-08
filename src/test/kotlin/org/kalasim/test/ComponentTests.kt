@@ -310,7 +310,7 @@ class ComponentTests {
             }
         }
 
-        val tc = eventLog()
+        val tc = enableEventLog()
 
         run(10)
 

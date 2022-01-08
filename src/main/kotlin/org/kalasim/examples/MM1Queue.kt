@@ -12,7 +12,7 @@ class MM1Queue(
 
     val componentGenerator: ComponentGenerator<Customer>
 
-    val traces: EventLog = eventLog()
+    val traces: EventLog = enableEventLog()
 
     class Customer(mu: Double) : Component() {
         val ed = ExponentialDistribution(env.rg, mu)

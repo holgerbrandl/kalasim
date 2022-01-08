@@ -269,7 +269,7 @@ class EnvTests {
 
     @Test
     fun `it should stop a simulation`() = createTestSimulation {
-        val events = eventLog()
+        val events = enableEventLog()
 
         object : Component() {
             override fun process() = sequence {

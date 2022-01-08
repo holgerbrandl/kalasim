@@ -1242,6 +1242,7 @@ open class Component(
      * @param priority If a component has the same time on the event list, this component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
+    // todo: it would be more natural to simply support kotlin.time.Duration here
     suspend fun SequenceScope<Component>.hold(
         duration: Ticks,
         description: String? = null,

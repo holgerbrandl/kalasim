@@ -224,37 +224,41 @@ class Floor(val level: Int, val queue: ComponentQueue<Visitor> = ComponentQueue(
 
 typealias Requests = MutableMap<Pair<Floor, Direction>, TickTime>
 
-fun main() {
 
-    createSimulation(false) {
-        val building = dependency { Building() }
+class Elevator(showLog: Boolean = false): Environment(showLog, ) {
+    val building = dependency { Building() }
 
-        val requests: Requests = mutableMapOf()
-        dependency { requests }
+    val requests: Requests = dependency {  mutableMapOf() }
+//    dependency { requests }
 
+    init {
         VisitorGenerator(0 to 0, 1 to TOP_FLOOR, LOAD_0_n, "vg_0_n")
         VisitorGenerator(1 to TOP_FLOOR, 0 to 0, LOAD_n_0, "vg_n_0")
         VisitorGenerator(1 to TOP_FLOOR, 1 to TOP_FLOOR, LOAD_n_n, "vg_n_n")
-        run(100000)
+    }
+}
+
+fun main() {
+    val eleveator = Elevator()
+
+    eleveator.run(100000)
 
 //         try with single visitor to get started
 //        Visitor(3, 12)
 //        run(2000)
 
-
-        //print summary
-        println("Floor    n         Length Length_of_stay")
-        building.floors.forEach {
-            it.let {
-                println(
-                    "%5d%5d%15.3f%15.3f".format(
-                        it.level,
-                        it.queue.lengthOfStayStatistics.statistics().n,
-                        it.queue.queueLengthTimeline.statistics().mean,
-                        it.queue.lengthOfStayStatistics.statistics().mean
-                    )
+    //print summary
+    println("Floor    n         Length Length_of_stay")
+    eleveator.building.floors.forEach {
+        it.let {
+            println(
+                "%5d%5d%15.3f%15.3f".format(
+                    it.level,
+                    it.queue.lengthOfStayStatistics.statistics().n,
+                    it.queue.queueLengthTimeline.statistics().mean,
+                    it.queue.lengthOfStayStatistics.statistics().mean
                 )
-            }
+            )
         }
     }
 }

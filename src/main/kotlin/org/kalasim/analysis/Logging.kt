@@ -6,7 +6,6 @@ import com.github.holgerbrandl.jsonbuilder.json
 import org.json.JSONObject
 import org.kalasim.analysis.EntityCreatedEvent
 import org.kalasim.misc.*
-import java.util.logging.Level
 
 
 /** The base event of kalasim. Usually this extended to convey more specific information.*/
@@ -41,12 +40,14 @@ fun interface EventListener {
 
 
 /**
- * Collects all events on the kalasim event bus. See [Event Log](https://www.kalasim.org/events/) for details.
+ * Activates a global event-log, which stores all events on the kalasim event bus.
+ *
+ * See [Event Log](https://www.kalasim.org/events/) for details.
  *
  * @sample org.kalasim.dokka.eventsHowTo
  */
 //@Deprecated("Use ", replaceWith = ReplaceWith("collect<Event>()"))
-fun Environment.eventLog(): EventLog {
+fun Environment.enableEventLog(): EventLog {
     val tc = dependency { EventLog() }
     addEventListener(tc)
 

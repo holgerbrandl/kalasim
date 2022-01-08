@@ -43,7 +43,7 @@ fun main() {
                 Philosopher(name, forks[idx], forks[(idx + 1).rem(forks.size)])
             }
 
-            eventLog()
+            enableEventLog()
         }
     }
 

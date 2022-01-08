@@ -36,7 +36,7 @@ class Philosopher(name: String, val leftFork: Fork, val rightFork: Fork) : Compo
 }
 
 val sim = createSimulation(true) {
-    eventLog()
+    enableEventLog()
 
     // create forks and resources
     val names = listOf("Socrates", "Pythagoras", "Plato", "Aristotle")

@@ -13,7 +13,7 @@ fun main() {
         val doctors = Resource("doctors", 2)
         val admin = Resource("admin", 1)
 
-        eventLog()
+        enableEventLog()
 
         class Patient : Component() {
             override fun process() = sequence {

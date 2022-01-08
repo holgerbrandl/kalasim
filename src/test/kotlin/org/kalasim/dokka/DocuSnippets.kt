@@ -83,7 +83,7 @@ fun eventsHowTo() {
         addEventListener { println(it) }
 
         // we could also enable a global event log
-        eventLog()
+        enableEventLog()
 
         object : Component() {
             override fun process() = sequence<Component> {
