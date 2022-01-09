@@ -5,7 +5,6 @@ import org.kalasim.ClockSync
 import org.kalasim.Component
 import org.kalasim.demo.moon.*
 import org.kalasim.misc.DependencyContext
-import org.kalasim.sims.demo.*
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.loadFont
