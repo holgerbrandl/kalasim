@@ -26,8 +26,8 @@ Within its environment, a simulation contains one or multiple [components](compo
 Very often, the user will define custom Environments to streamline simulation API experience.
 
 ```kotlin
-class MySim(val numCustomers:Int = 5) : Environment(){
-    val customers = List(numCustomers){ Customer(it) }
+class MySim(val numCustomers: Int = 5) : Environment() {
+    val customers = List(numCustomers) { Customer(it) }
 }
 
 val sim = MySim(10)
@@ -53,7 +53,7 @@ Alternatively, we can also run until the event queue is empty (or forever depend
 sim.run(23) // run for 23 ticks
 sim.run(5) // run for some more ticks
 
-sim.run(until=42.tickTime) // run until internal simulation clock is 23 
+sim.run(until = 42.tickTime) // run until internal simulation clock is 23 
 
 sim.run() // run until event queue is empty
 ```
@@ -64,8 +64,8 @@ The user can define a [tick transformation](advanced.md#tick-transformation) to 
 sim.run(2.hours)
 
 sim.run(1.4.days) // fractionals are suportes as well
-sim.run(until  = Instant.now() + 3.hours) // wall-time plus 3 hours
-sim.run(until  = now + 3.hours) // simulation-time plus 3 hours
+sim.run(until = Instant.now() + 3.hours) // wall-time plus 3 hours
+sim.run(until = now + 3.hours) // simulation-time plus 3 hours
 ```
 
 !!! tip
@@ -150,7 +150,7 @@ createSimulation{
     dependency { GasStation() }
 
     // declare another gas station and specify 
-    dependency(qualifier = named(FUEL_PUMP)) {  }
+    dependency(qualifier = named(FUEL_PUMP)) {}
     
     Car()
 }
@@ -159,12 +159,12 @@ As shown in the example, the user can simply pull dependencies from the simulati
 
 
 ```kotlin
-Environment().apply{
+Environment().apply {
     // implicit context provisioning (recommended)
     val inUse = State(true)
 
     // explicit context provisioning
-    val inUse2 = State(true, koin=getKoin())
+    val inUse2 = State(true, koin = getKoin())
 }
 ```
 
@@ -187,8 +187,8 @@ class Car : Component() {
 }
 
 createSimulation{
-    dependency(qualifier = named("gas_station_1")) {  GasStation() }
-    dependency(qualifier = named("gas_station_2")) {  GasStation() }
+    dependency(qualifier = named("gas_station_1")) { GasStation() }
+    dependency(qualifier = named("gas_station_2")) { GasStation() }
     
     Car()
 }
@@ -233,14 +233,14 @@ With this internal random generator `rg`, several  [probability distributions](h
 
 The following continuous distributions can be used to model randomness in a simulation model
 
-* `uniform(lower=0, upper=1)`
-* `exponential(mean=3)`
-* `normal(mean=0, sd=1)`
-* `triangular(lowerLimit=0, mode=1, upperLimit=4.3)`
+* `uniform(lower = 0, upper = 1)`
+* `exponential(mean = 3)`
+* `normal(mean = 0, sd = 1)`
+* `triangular(lowerLimit = 0, mode = 1, upperLimit = 4.3)`
 
 Example:
 ```kotlin
-object : Component(){
+object : Component() {
     val waitDist = exponential(3.3) // this is bound to env.rg
     
     override fun process() = sequence {
@@ -266,7 +266,7 @@ The API also allow to model [constant random variables](https://en.wikipedia.org
 
 ```kotlin
 val dist =  constant(3)
-ComponentGenerator(iat=dist){ Customer() }
+ComponentGenerator(iat = dist) { Customer() }
 ```
 
 Internally, `3` is converted into a `org.apache.commons.math3.distribution.ConstantRealDistribution`.
@@ -282,12 +282,12 @@ Very often when working out simulation models, there is a need to sample with co
 Apart fom numeric distributions, also distributions over arbitrary types are supported with `enumerated()`. This does not just work with [`enums`](https://kotlinlang.org/docs/enum-classes.html) but with arbitrary types including [data classes](https://kotlinlang.org/docs/data-classes.html).
 
 ```kotlin
-enum class Fruit{Apple, Banana, Peach}
+enum class Fruit{ Apple, Banana, Peach }
 
 // create a uniform distribution over the fruits
 val fruit = enumerated(values())
 // sample the fruits
-val aFruit : Fruit = fruit()
+val aFruit: Fruit = fruit()
 
 // create a non-uniform distribution over the fruits
 val biasedFruit = enumerated(Apple to 0.7, Banana to 0.1, Peach to 0.2 )
@@ -302,6 +302,6 @@ Controlled randomization is a key aspect of every process simulation. Make sure 
 Whenever, distributions are needed in method signatures in `kalasim`, the more general interface `org.apache.commons.math3.distribution.RealDistribution` is being used to support a much [wider variety](https://commons.apache.org/proper/commons-math/javadocs/api-3.4/org/apache/commons/math3/distribution/RealDistribution.html) of distributions if needed. So we can also use other implementations as well. For example
 
 ```kotlin
-ComponentGenerator(iat=NakagamiDistribution(1,0.3)){ Customer() }
+ComponentGenerator(iat = NakagamiDistribution(1, 0.3)) { Customer() }
 ```
 
