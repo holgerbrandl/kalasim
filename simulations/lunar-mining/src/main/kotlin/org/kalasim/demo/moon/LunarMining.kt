@@ -1,9 +1,9 @@
-package org.kalasim.sims.moon
+package org.kalasim.demo.moon
 
 import org.kalasim.*
 import org.kalasim.animation.AnimationComponent
 import org.kalasim.misc.roundAny
-import org.kalasim.sims.moon.HarvesterState.*
+import org.kalasim.demo.moon.HarvesterState.*
 import java.awt.Dimension
 import java.awt.geom.Point2D
 import java.lang.Math.pow
@@ -54,7 +54,8 @@ class DepositMap(
     )
 
     val depletionRatio
-        get() = 1 - deposits.map { it.level to it.capacity }.run { sumOf { it.first } / sumOf { it.second } }.roundAny(2)
+        get() = 1 - deposits.map { it.level to it.capacity }.run { sumOf { it.first } / sumOf { it.second } }
+            .roundAny(2)
 }
 
 
@@ -158,8 +159,9 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
 
         // MODEL 1: Mine increments: THis allows for better progress monitoring in the UI, but is overly
         // complex from a modelling and event perspective
-        //todo could we avoid the loop by using process interaction here? --> yes use mine-shafts see below
-        val miningUnitsPerHour = 4.0
+        // Could we avoid the loop by using process interaction here? --> yes use mine-shafts see below
+        val miningUnitsPerHour = 15.0
+
         request(currentDeposit!!.miningShaft) {
             while(!currentDeposit!!.isDepleted && !tank.isFull) {
                 val quantity = min(miningUnitsPerHour / 4, currentDeposit!!.level)
@@ -218,7 +220,7 @@ class Base : Component() {
     // water consumption of the base
     override fun repeatedProcess() = sequence<Component> {
         hold(1.hours)
-        take(refinery, quantity =  min(refinery.level, waterConsumption()))
+        take(refinery, quantity = min(refinery.level, waterConsumption()))
     }
 
     /** Performs analysis to find a suitable deposit for harvesting for the given harvester. */
@@ -240,30 +242,36 @@ class Base : Component() {
 
     fun reportScanCompleted(searchPosition: GridPosition) {
         scanHistory[searchPosition] = now
-        val mapSize = get<DepositMap>().gridDimension
-        println(
-            "map coverage increased to ${
-                (scanHistory.size.toDouble() / (mapSize.height * mapSize.width)).roundAny(
-                    2
-                )
-            }"
-        )
+
+//        val mapSize = get<DepositMap>().gridDimension
+//        println(
+//            "map coverage increased to ${
+//                (scanHistory.size.toDouble() / (mapSize.height * mapSize.width)).roundAny(
+//                    2
+//                )
+//            }"
+//        )
     }
 }
 
-class HydProd : Environment(true) {
+class LunarMining(
+    numHarvesters: Int = 5,
+    numDeposits: Int = 10,
+    logEvents: Boolean = true,
+    seed: Int = Defaults.DEFAULT_SEED
+) : Environment(logEvents, randomSeed = seed) {
     init {
         tickTransform = TickTransform(TimeUnit.MINUTES)
     }
 
     // the initially unknown list of deposits
-    val map = dependency { DepositMap() }
+    val map = dependency { DepositMap(numDeposits = numDeposits) }
     val base = dependency { Base() }
-    val harvesters = List(5) { Harvester(base.position) }
+    val harvesters = List(numHarvesters) { Harvester(base.position) }
 }
 
 fun main() {
-    val prod = HydProd()
+    val prod = LunarMining()
 
     prod.run(60.days)
 

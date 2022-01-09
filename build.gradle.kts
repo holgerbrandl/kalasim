@@ -18,7 +18,7 @@ version = "0.7.93-SNAPSHOT"
 
 repositories {
     mavenCentral()
-//    mavenLocal()
+    mavenLocal()
 }
 
 dependencies {
@@ -44,7 +44,7 @@ dependencies {
     // **TODO** move to api to require users to pull it in if needed
     implementation("com.github.holgerbrandl:krangl:0.17.1")
 
-    compileOnly("com.github.holgerbrandl:kravis:0.8.1")
+    compileOnly("com.github.holgerbrandl:kravis:0.8.3")
     testImplementation("com.github.holgerbrandl:kravis:0.8.1")
 
     compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:3.1.0")

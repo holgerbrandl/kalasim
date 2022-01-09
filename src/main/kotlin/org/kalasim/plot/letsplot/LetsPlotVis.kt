@@ -21,8 +21,8 @@ fun MetricTimeline.display(
     forceTickAxis: Boolean = false,
 ): Plot {
     val data = stepFun()
-        .filter { from == null || it.first >= from.value }
-        .filter { to == null || it.first <= to.value }
+        .filter { from == null || it.time >= from }
+        .filter { to == null || it.time <= to }
 
     val useWT = env.tickTransform != null && !forceTickAxis
 
@@ -66,9 +66,9 @@ fun <T> CategoryTimeline<T>.display(
 
     val segments = stepFun.zipWithNext().map {
         Segment(
-            it.first.second,
-            it.first.first,
-            it.second.first
+            it.first.value,
+            it.first.time,
+            it.second.time
         )
     }.asDataFrame()
         .addColumn("start") { expr -> expr["start"].map<Double> { wtTransform(TickTime(it)) } }

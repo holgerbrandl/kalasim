@@ -1,4 +1,4 @@
-package org.kalasim.sims.moon.viewer
+package org.kalasim.demo.moon.viewer
 
 import org.openrndr.*
 import org.openrndr.color.ColorRGBa

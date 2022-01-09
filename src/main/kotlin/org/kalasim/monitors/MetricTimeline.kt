@@ -75,7 +75,7 @@ class MetricTimeline(
     @Suppress("UNCHECKED_CAST")
     override fun statisticsSummary() = (statsData() as LevelStatsData<Number>).statisticalSummary()
 
-    fun statsData(excludeZeros: Boolean = false): LevelStatsData<Double> {
+    fun statsData(excludeZeros: Boolean = false): LevelStatsData<Number> {
         @Suppress("DuplicatedCode")
         require(values.isNotEmpty()) { "data must not be empty when preparing statistics of $name" }
 
@@ -142,7 +142,7 @@ fun MetricTimeline.printHistogram(sortByWeight: Boolean = false, binCount: Int =
             statistics().data.run {
                 durations.zip(values)
                     .groupBy { (_, value) -> value }
-                    .map { kv -> kv.key to kv.value.sumOf { it.first } }
+                    .map { kv -> kv.key.toDouble() to kv.value.sumOf { it.first } }
             }.toMap()
 
         // inherently wrong because does not take into account durations
@@ -157,7 +157,7 @@ fun MetricTimeline.printHistogram(sortByWeight: Boolean = false, binCount: Int =
         val hist: List<Pair<Double, Double>> = statistics().data.run {
             val aggregatedMonitor: List<Pair<Double, Double>> =
                 durations.zip(values).groupBy { (_, value) -> value }
-                    .map { kv -> kv.key to kv.value.sumOf { it.first } }
+                    .map { kv -> kv.key.toDouble() to kv.value.sumOf { it.first } }
 
             aggregatedMonitor
         }
@@ -213,7 +213,7 @@ private fun combineInternal(mt: MetricTimeline, other: MetricTimeline, mode: Ari
     val maxTime = mt.now.value
 //    val timeRange = minTime..maxTime
 
-    val merged = MetricTimeline("'${mt.name}' $mode '${other.name}'").apply {
+    val merged = MetricTimeline("'${mt.name}' $mode '${other.name}'", koin=mt.getKoin()).apply {
         timestamps.clear()
         values.clear()
     }
@@ -234,7 +234,7 @@ private fun combineInternal(mt: MetricTimeline, other: MetricTimeline, mode: Ari
 
 
 // not pretty but allows assigning new names to merged timelines without make SimEntity.name var.
-internal fun MetricTimeline.copy(name: String = this.name): MetricTimeline = MetricTimeline(name).apply {
+internal fun MetricTimeline.copy(name: String = this.name): MetricTimeline = MetricTimeline(name, koin = getKoin()).apply {
     values.clear()
     values.addAll(this@copy.values)
     timestamps.clear()
@@ -262,13 +262,15 @@ class MetricTimelineStats(nlm: MetricTimeline, excludeZeros: Boolean = false) : 
 //    val ninetyninePercentile :Double = TODO()
 
     init {
-        min = data.values.minOrNull()
-        max = data.values.maxOrNull()
+        val doubleValues =  data.values.map{ it.toDouble()}.toDoubleArray()
+
+        min = doubleValues.minOrNull()
+        max = doubleValues.maxOrNull()
 
         if (data.durations.any { it != 0.0 }) {
             val durationsArray = data.durations.toDoubleArray()
-            mean = Mean().evaluate(data.values.toDoubleArray(), durationsArray)
-            standardDeviation = sqrt(Variance().evaluate(data.values.toDoubleArray(), durationsArray))
+            mean = Mean().evaluate(doubleValues, durationsArray)
+            standardDeviation = sqrt(Variance().evaluate(doubleValues, durationsArray))
 //            val median = Median().evaluate(data.values.toDoubleArray(), data.durations) // not supported by commons3
         } else {
             // this happens if all there is in total no duration associated once 0s are removed

@@ -47,8 +47,8 @@ fun MetricTimeline.display(
     forceTickAxis: Boolean = false,
 ): GGPlot {
     val data = stepFun()
-        .filter { from == null || it.first >= from.value }
-        .filter { to == null || it.first <= to.value }
+        .filter { from == null || it.value.toDouble() >= from.value }
+        .filter { to == null || it.value.toDouble() <= to.value }
 
     val useWT = env.tickTransform != null && !forceTickAxis
 
@@ -56,8 +56,8 @@ fun MetricTimeline.display(
 
     return data
         .plot(
-            x = { wtTransform(first) },
-            y = { second }
+            x = { wtTransform(time) },
+            y = { value }
         )
         .xLabel("Time")
         .yLabel("")
@@ -101,9 +101,9 @@ fun <T> CategoryTimeline<T>.display(
 
     val segments = stepFun.zipWithNext().map {
         Segment(
-            it.first.second,
-            it.first.first,
-            it.second.first
+            it.first.value,
+            it.first.time,
+            it.second.time
         )
     }
 

@@ -22,7 +22,7 @@ interface ValueTimeline<T> {
 
 
     /** Returns the step function of this monitored value along the time axis. */
-    fun stepFun(): List<Pair<TickTime, T>>
+    fun stepFun(): List<StepRecord<T>>
 
     /** Resets the timeline to a new initial at the current simulation clock. This will also reenable it as a side-effect. */
     fun reset(initial: T)
@@ -37,6 +37,9 @@ interface ValueTimeline<T> {
     /** Discards all history before the given time. */
     fun clearHistory(before: TickTime)
 }
+
+// replacement for Pair to get better auto-conversion to data-frame
+data class StepRecord<T>(val time: TickTime, val value: T)
 
 
 fun <T> LevelStatsData<T>.statisticalSummary(): EnumeratedDistribution<T> {
@@ -55,8 +58,12 @@ data class LevelStatsData<T>(
     val durations: List<Double>
 ) {
     /** Returns the step function of time, value pairs*/
-    fun stepFun(): List<Pair<TickTime, T>> =
-        (this.timepoints + (timepoints.last() + durations.last())).zip(values.toList() + values.last())
+    fun stepFun(): List<StepRecord<T>> {
+        val tickTimes = this.timepoints + (timepoints.last() + durations.last())
+        val values = values.toList() + values.last()
+
+        return tickTimes.zip(values.asIterable()) { time, value -> StepRecord(time, value) }
+    }
 
     /**
      * @param includeNow If true a last segement with the last state (without known end or duration) will be added
@@ -64,7 +71,7 @@ data class LevelStatsData<T>(
      */
     fun asList(includeNow: Boolean = true): List<LevelStateRecord<T>> {
         val durationsExt = if (includeNow) durations + null else durations
-        return stepFun().zip(durationsExt).map { LevelStateRecord(it.first.first, it.first.second, it.second) }
+        return stepFun().zip(durationsExt).map { LevelStateRecord(it.first.time, it.first.value, it.second) }
     }
 }
 

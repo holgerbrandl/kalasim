@@ -3,8 +3,9 @@ package org.kalasim.sims.lunarmining.viewer
 import kotlinx.coroutines.*
 import org.kalasim.ClockSync
 import org.kalasim.Component
+import org.kalasim.demo.moon.*
 import org.kalasim.misc.DependencyContext
-import org.kalasim.sims.moon.*
+import org.kalasim.sims.demo.*
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.loadFont
@@ -23,7 +24,7 @@ fun main() {
     application {
         val UNLOADING_HARVESTER = "Unloading"
 
-        val hydProd = HydProd().apply {
+        val hydProd = LunarMining().apply {
             ClockSync(tickDuration = 6.milliseconds, syncsPerTick = 100)
 
             // configure harvesters to track mining events
