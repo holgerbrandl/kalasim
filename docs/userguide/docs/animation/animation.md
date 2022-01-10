@@ -45,7 +45,7 @@ By changing the base class of a component from `Component` to `org.kalasim.anima
 * While being on hold, an animation can always request the current position with `c.currentPosition`. Positions are linearly interpolated.
 
 
-The animation support API does not bind to a particular rendering engine. However, only https://openrndr.org/ has been explored for process animation with kalasim.
+The animation support API does not bind to a particular rendering engine. However, until now only https://openrndr.org/ has been explored for process animation with kalasim.
 
 ## Animating Resources
 

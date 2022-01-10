@@ -198,4 +198,4 @@ The model could be extended to model robot health as well
 
 ESPA is relieved. The simulation model showed that sufficient water-supplies can be gathered with 5 mining robots. The astronauts can even take a shower every Sunday from now on.
 
-Using a discrete event simulation model built with `kalasim`, we have animated the process and analyzes statistical properties with just few lines of code.
+Using a discrete event simulation model built with `kalasim`, we have animated the process and have analyzed its statistical properties.
