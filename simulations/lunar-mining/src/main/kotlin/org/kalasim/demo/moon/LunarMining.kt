@@ -218,7 +218,7 @@ class Base : Component(process=Base::consumeWater) {
     val waterConsumption = exponential(3)
 
     // water consumption of the base
-    override fun consumeWater() = sequence {
+    fun consumeWater() = sequence {
         hold(1.hours)
         take(refinery, quantity = min(refinery.level, waterConsumption()))
     }
