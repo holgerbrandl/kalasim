@@ -6,8 +6,9 @@ plugins {
     `maven-publish`
 }
 
-group = "org.kalasim"
-version = "1.0-SNAPSHOT"
+group = "com.github.holgerbrandl"
+//version = "1.0-SNAPSHOT"
+version = "${rootProject.version}"
 
 val orxFeatures = setOf(
     "orx-compositor",
@@ -89,6 +90,8 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
+            artifactId = "kalasim-animation"
+
         }
     }
 }

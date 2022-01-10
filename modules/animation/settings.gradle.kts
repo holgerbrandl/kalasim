@@ -1,3 +1,3 @@
 
-rootProject.name = "kalasim-openrndr"
+rootProject.name = "kalasim-animation"
 

@@ -13,7 +13,7 @@ plugins {
 
 group = "com.github.holgerbrandl"
 //version = "0.7-SNAPSHOT"
-version = "0.7.93"
+version = "0.7.94"
 
 
 repositories {
@@ -30,7 +30,7 @@ dependencies {
     api("com.github.holgerbrandl:jsonbuilder:0.9")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 
-  //  api("io.github.microutils:kotlin-logging:1.12.5")
+    //  api("io.github.microutils:kotlin-logging:1.12.5")
 //    api("org.slf4j:slf4j-simple:1.7.32")
 
     implementation("com.google.code.gson:gson:2.8.9")
@@ -62,7 +62,6 @@ dependencies {
 //tasks.withType<KotlinCompile> {
 //    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
 //}
-
 
 
 //https://github.com/Kotlin/kotlin-jupyter/blob/master/docs/libraries.md
