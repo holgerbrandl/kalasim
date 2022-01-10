@@ -59,13 +59,13 @@ class DepositMap(
 }
 
 
-class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.5) :
+class Harvester(initialPosition: GridPosition, private val gridUnitsPerHour: Double = 0.5) :
     AnimationComponent(initialPosition.mapCoordinates, process = Harvester::searching) {
 
     val state = State(STANDBY)
 
-    val map = get<DepositMap>()
-    val base = get<Base>()
+    private val map = get<DepositMap>()
+    private val base = get<Base>()
 
     val tank = DepletableResource("tank of $this", 100, 0)
 
@@ -197,7 +197,7 @@ class Harvester(initialPosition: GridPosition, val gridUnitsPerHour: Double = 0.
     }
 }
 
-class Base : Component() {
+class Base : Component(process=Base::consumeWater) {
     val position: GridPosition = GridPosition(5, 8)
 
     init {
@@ -218,7 +218,7 @@ class Base : Component() {
     val waterConsumption = exponential(3)
 
     // water consumption of the base
-    override fun repeatedProcess() = sequence<Component> {
+    override fun consumeWater() = sequence {
         hold(1.hours)
         take(refinery, quantity = min(refinery.level, waterConsumption()))
     }

@@ -66,7 +66,7 @@ Both are modelled as [depletable resource](../resource.md#depletable-resources),
 
 Once water unloading is complete, another sub-process of the ice harvester is activated: It's going back into harvesting mode, i.e. the robot is returning to its last mined deposit to continue ice collection.
 
-![](lunar_mining_files/lunar_mining_domain_mondel.png)
+![](lunar_mining_files/lunar_mining_domain_model.png)
 
 
 
@@ -75,7 +75,7 @@ Once water unloading is complete, another sub-process of the ice harvester is ac
 
 The model can be expressed easily in approximately 200 lines of [process definitions](../component.md#process-definition) in [`LunarMining.kt`](https://github.com/holgerbrandl/kalasim/blob/master/simulations/lunar-mining/src/main/kotlin/org/kalasim/demo/moon/LunarMining.kt). Howvever, it was not initially clear, if the intended dynamics were implemented correctly. [Process animation](animation.md) comes to resuce, as it allows to debug of the model vsually.
 
-A process animation was developed as well to better understand the spatio-temporal dynamics of the model. In [LunarMningHQ.kt](https://github.com/holgerbrandl/kalasim/blob/master/simulations/lunar-mining/src/main/kotlin/org/kalasim/demo/moon/LunarMningHQ.kt) the animation of this process is worked out in just about 150 lines of code.
+A process animation was developed as well to better understand the spatio-temporal dynamics of the model. In [LunarMiningHQ.kt](https://github.com/holgerbrandl/kalasim/blob/master/simulations/lunar-mining/src/main/kotlin/org/kalasim/demo/moon/LunarMiningHQ.kt) the animation of this process is worked out in just about 150 lines of code.
 
 
 <div class="video-wrapper">
