@@ -45,13 +45,12 @@ fun unload() = sequence {
     currentState = UNLOADING
     hold((tank.level / unloadingUnitsPerHours).roundToInt().hours,
          "Unloading ${tank.level} water units")
+         
+    // put the water into the refinery of the base
+    put(get<Base>().refinery, tank.level)
  
      // empty the tank
     take(tank, tank.level)
-    
-    // ... and put the water into the refinery of the base
-    put(get<Base>().refinery, tank.level)
-
 
     activate(process = Harvester::harvesting)
 }
@@ -71,9 +70,9 @@ Once water unloading is complete, another sub-process of the ice harvester is ac
 
 ## Process Animation
 
-The model can be expressed easily in approximately 200 lines of [process definitions](../component.md#process-definition) in [`LunarMining.kt`](https://github.com/holgerbrandl/kalasim/blob/master/simulations/lunar-mining/src/main/kotlin/org/kalasim/sims/moon/LunarMining.kt). Howvever, it will not be initially clear, if the intended dynamics are implemented correctly. [Process animation](animation.md) comes to resuce, to allow visually debugging of the model.
+The model can be expressed easily in approximately 200 lines of [process definitions](../component.md#process-definition) in [`LunarMining.kt`](https://github.com/holgerbrandl/kalasim/blob/master/simulations/lunar-mining/src/main/kotlin/org/kalasim/demo/moon/LunarMining.kt). Howvever, it will not be initially clear, if the intended dynamics are implemented correctly. [Process animation](animation.md) comes to resuce, to allow visually debugging of the model.
 
-A process animation was developed as well to understand the spatio-temporal dynamics better. In [LunarMningHQ.kt](https://github.com/holgerbrandl/kalasim/blob/master/simulations/lunar-mining/src/main/kotlin/org/kalasim/sims/moon/LunarMningHQ.kt) the animation of this process is worked out in just about lines of code.
+A process animation was developed as well to understand the spatio-temporal dynamics better. In [LunarMningHQ.kt](https://github.com/holgerbrandl/kalasim/blob/master/simulations/lunar-mining/src/main/kotlin/org/kalasim/demo/moon/LunarMningHQ.kt) the animation of this process is worked out in just about lines of code.
 
 
 <div class="video-wrapper">
