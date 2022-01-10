@@ -163,13 +163,12 @@ With more ice harvesters working around the base, supply of water is ensured. In
 
 
 ```kotlin
-sims
-    .withIndex().map { (idx, sim) ->
-    ("harvesters "+ sim.harvesters.size) to
+sims.map { sim ->
+    (""+sim.harvesters.size) to
             sim.base.refinery.levelTimeline.statistics().min
 }.plot(x={ first}, fill={second==0.0})
     .geomBar()
-    .labs(y="runs where water at base was depleted", fill = "Base Depleted?")
+    .labs(x="# harvesters", y="# simulation runs", fill = "Base Depleted?")
 
 ```
 
@@ -184,7 +183,7 @@ sims
 
 As shown in the figure, it turns out, that with >=5 ice harvestering robots, the risk of water supply depletion at the base station is within an acceptable range.
 
-We have just analyzed a the lunar mining model using controlled randomization, and have performed a basic capacity analysis.
+We have just analyzed a the lunar mining model using controlled randomization, and have performed a basic supply-chain analysis.
 
 
 ## Exercise: Maintenance Module
