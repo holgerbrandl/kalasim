@@ -45,6 +45,14 @@ nav:
     - Visualization: visualization.md
     - Animation: animation/animation.md
 
+  - Articles:
+      - Overview: articles/articles.md
+      - 2022:
+          - Lunar Mining: animation/lunar_mining.md
+      - 2021:
+          - Kalasim v0.7: articles/2021-11-27-kalasim-v07.md
+          - Kalasim v0:6: changes/#v06
+
   - Examples:
     - Overview: examples.md
     - Car: examples/car.md
@@ -65,13 +73,6 @@ nav:
 
   - Advanced:
     - advanced.md
-
-  - Articles:
-      - Overview: articles/articles.md
-      - 2021:
-          - Kalasim v0.7: articles/2021-11-27-kalasim-v07.md
-      - 2021:
-          - Kalasim v0:6: changes/#v06
 
   - About:
     - about.md

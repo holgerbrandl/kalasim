@@ -17,7 +17,7 @@ Process animations can be
 
 OPENRNDR is an open source framework for creative coding, written in Kotlin that simplifies writing real-time interactive software.
 
-![](.animation_images/openrndr_features.md.png)
+![](openrndr_features.png)
 For more details see https://openrndr.org/
 
 Process animation with `kalasim` is using `openrendr` as backend and rendering engine. Animation is not part of the core API of kalasim, but support is provided by a decorator types (extending their respective base-type)

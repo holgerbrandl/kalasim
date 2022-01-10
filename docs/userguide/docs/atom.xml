@@ -29,4 +29,23 @@
         </author>
     </entry>
 
+    <entry>
+        <title>Lunar Mining</title>
+        <link href="https://kalasim.org/animation/lunar_mining/"/>
+<!--        <link rel="alternate" type="text/html" href="http://example.org/2003/12/13/atom03.html"/>-->
+<!--        <link rel="edit" href="http://example.org/2003/12/13/atom03/edit"/>-->
+        <id>urn:uuid:e1858277-d6f3-4345-b53a-d27a12fc9eac</id>
+        <updated>2022-01-10T18:00:00Z</updated>
+        <summary>Mining robots scan the surface of the moon for depletable water deposits.</summary>
+        <content type="xhtml">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Mining robots scan the surface of the moon for depletable water deposits.</p>
+            </div>
+        </content>
+        <author>
+            <name>Holger Brandl</name>
+<!--            <email>johndoe@example.com</email>-->
+        </author>
+    </entry>
+
 </feed>
