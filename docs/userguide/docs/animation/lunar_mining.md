@@ -67,7 +67,6 @@ Both are modelled as [depletable resource](../resource.md#depletable-resources),
 Once water unloading is complete, another sub-process of the ice harvester is activated: It's going back into harvesting mode, i.e. the robot is returning to its last mined deposit to continue ice collection.
 
 
-
 ## Process Animation
 
 The model can be expressed easily in approximately 200 lines of [process definitions](../component.md#process-definition) in [`LunarMining.kt`](https://github.com/holgerbrandl/kalasim/blob/master/simulations/lunar-mining/src/main/kotlin/org/kalasim/demo/moon/LunarMining.kt). Howvever, it will not be initially clear, if the intended dynamics are implemented correctly. [Process animation](animation.md) comes to resuce, to allow visually debugging of the model.
