@@ -23,7 +23,7 @@ fun main() {
     application {
         val UNLOADING_HARVESTER = "Unloading"
 
-        val hydProd = LunarMining().apply {
+        val lumi = LunarMining().apply {
             ClockSync(tickDuration = 6.milliseconds, syncsPerTick = 100)
 
             // configure harvesters to track mining events
@@ -56,8 +56,8 @@ fun main() {
             extend(ScreenRecorder())
 
             extend {
-                val scaledXUnit = width.toDouble() / (hydProd.map.gridDimension.width * gridUnitSize)
-                val scaledYUnit = height.toDouble() / (hydProd.map.gridDimension.height * gridUnitSize)
+                val scaledXUnit = width.toDouble() / (lumi.map.gridDimension.width * gridUnitSize)
+                val scaledYUnit = height.toDouble() / (lumi.map.gridDimension.height * gridUnitSize)
 
 
                 // draw background
@@ -66,9 +66,9 @@ fun main() {
                 with(drawer) {
 
                     // draw deposits
-                    hydProd.map.deposits.forEach {
+                    lumi.map.deposits.forEach {
                         defaults()
-                        val isKnown = hydProd.base.knownDeposits.contains(it)
+                        val isKnown = lumi.base.knownDeposits.contains(it)
                         drawer.fill = ColorRGBa.fromHex("0E86D4").copy(a = if(isKnown) 0.8 else 0.2)
 
                         circle(
@@ -81,19 +81,19 @@ fun main() {
                     drawer.fill = ColorRGBa.BLACK
                     drawer.fontMap = font
 
-                    val searchHistory = hydProd.base.scanHistory.keys.toList()
-                    for(i in 0..hydProd.map.gridDimension.width)
-                        for(j in 0..hydProd.map.gridDimension.height)
+                    val searchHistory = lumi.base.scanHistory.keys.toList()
+                    for(i in 0..lumi.map.gridDimension.width)
+                        for(j in 0..lumi.map.gridDimension.height)
                             if(searchHistory.contains(GridPosition(i, j))) {
                                 circle(i * scaledXUnit * gridUnitSize, j * scaledYUnit * gridUnitSize, 3.0)
                             }
 
 
                     // draw harvesters
-                    val posCounts = hydProd.harvesters.groupingBy { it.currentPosition }.eachCount()
+                    val posCounts = lumi.harvesters.groupingBy { it.currentPosition }.eachCount()
 
                     // draw harvester
-                    hydProd.harvesters.forEach { harvester ->
+                    lumi.harvesters.forEach { harvester ->
                         defaults()
                         val harvesterPosition = harvester.currentPosition
                         translate((harvesterPosition.x - 8) * scaledXUnit, (harvesterPosition.y - 8) * scaledYUnit)
@@ -127,7 +127,7 @@ fun main() {
 
                     // draw base
                     defaults()
-                    val baseCoordinates = hydProd.base.position.mapCoordinates
+                    val baseCoordinates = lumi.base.position.mapCoordinates
                     translate(baseCoordinates.x * scaledXUnit, (baseCoordinates.y - 1) * scaledYUnit)
 
                     scale(0.1)
@@ -137,8 +137,8 @@ fun main() {
                     translate((baseCoordinates.x + 3) * scaledXUnit, (baseCoordinates.y + 18) * scaledYUnit)
                     drawer.fill = ColorRGBa.BLACK
                     drawer.fontMap = font
-                    if(!hydProd.harvesters.any { it.isHolding(UNLOADING_HARVESTER) }) {
-                        drawer.text(String.format("%06d", hydProd.base.refinery.level.roundToInt()))
+                    if(!lumi.harvesters.any { it.isHolding(UNLOADING_HARVESTER) }) {
+                        drawer.text(String.format("%06d", lumi.base.refinery.level.roundToInt()))
                     } else {
                         drawer.text(List(6) { Random.nextInt(9) }.joinToString(""))
                     }
@@ -147,7 +147,7 @@ fun main() {
                     defaults()
                     drawer.fill = ColorRGBa.WHITE
                     drawer.fontMap = font
-                    drawer.text("NOW: ${hydProd.now}", width - 150.0, height - 30.0)
+                    drawer.text("NOW: ${lumi.now}", width - 150.0, height - 30.0)
                     drawer.text("Frame: ${frameCounter++}", width - 150.0, height - 50.0)
                 }
             }
@@ -155,7 +155,7 @@ fun main() {
 
         // Start simulation model
         CoroutineScope(Dispatchers.Default).launch {
-            DependencyContext.setKoin(hydProd.getKoin())
+            DependencyContext.setKoin(lumi.getKoin())
 
             // stop the simulation if all deposits are depleted
             object : Component() {
@@ -169,7 +169,7 @@ fun main() {
             }
 
             sleep(3000)
-            hydProd.run()
+            lumi.run()
         }
     }
 }
