@@ -2,6 +2,7 @@ package org.kalasim.animation
 
 import org.kalasim.*
 import org.kalasim.analysis.RescheduledEvent
+import java.awt.Point
 import java.awt.geom.Point2D
 import kotlin.math.sqrt
 import kotlin.properties.Delegates
@@ -10,12 +11,12 @@ import kotlin.properties.Delegates
  *  position. This is most useful when visualizing a simulation state.
  */
 open class AnimationComponent(
-    initialPosition: Point2D,
+    initialPosition: Point2D? = null,
     name: String? = null,
     process: ProcessPointer? = null,
 ) : Component(name, process = process) {
 
-    private var from: Point2D = initialPosition
+    private var from: Point2D = initialPosition ?: Point(0, 0)
     private var to: Point2D? = null
 
     private var started by Delegates.notNull<TickTime>()
@@ -123,17 +124,17 @@ open class AnimationComponent(
     fun isHolding(holdId: String): Boolean {
         val rescheduledEvent = lastHold[holdId]
 
-        return rescheduledEvent!=null && rescheduledEvent.scheduledFor >= now
+        return rescheduledEvent != null && rescheduledEvent.scheduledFor >= now
     }
 
-    fun holdProgress(holdId: String) : Double?{
+    fun holdProgress(holdId: String): Double? {
         val rescheduledEvent = lastHold[holdId]
-        if(rescheduledEvent==null || rescheduledEvent.scheduledFor < now) return null
+        if(rescheduledEvent == null || rescheduledEvent.scheduledFor < now) return null
 
-        require(rescheduledEvent.time <=now)
+        require(rescheduledEvent.time <= now)
 
         // calculate fraction
-        return (now-rescheduledEvent.time)/(rescheduledEvent.scheduledFor-rescheduledEvent.time)
+        return (now - rescheduledEvent.time) / (rescheduledEvent.scheduledFor - rescheduledEvent.time)
     }
 }
 

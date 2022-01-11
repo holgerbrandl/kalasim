@@ -2,14 +2,16 @@
 package org.kalasim.examples.elevator
 
 import org.kalasim.*
+import org.kalasim.animation.AnimationComponent
 import org.kalasim.examples.elevator.Car.DoorState.CLOSED
 import org.kalasim.examples.elevator.Car.DoorState.OPEN
 import org.kalasim.examples.elevator.Direction.*
 import org.kalasim.misc.repeat
+import java.awt.Point
 
 // Adopted from https://github.com/salabim/salabim/blob/master/sample%20models/Elevator.py
 
-// todo built second version where vistors get angry and walk away
+// todo built second version where visitors get angry and walk away
 // todo use inline class for better typing // inline class Floor(level: Int)
 
 const val MOVE_TIME = 10
@@ -73,13 +75,13 @@ class VisitorGenerator(
 }
 
 
-// todo how to get instance number in superconstructor?
+// todo how to get instance number in super-constructor?
 class Visitor(val from: Int, val to: Int) : Component() {
 
-    val building = get<Building>()
+    val elevator = get<Elevator>()
 
-    val fromFloor = building.floors[from]
-    val toFloor = building.floors[to]
+    val fromFloor = elevator.floors[from]
+    val toFloor = elevator.floors[to]
     val direction = getDirection(from, to)
 
     override fun toString() = "$name($from->$to)" // todo remove
@@ -91,14 +93,15 @@ class Visitor(val from: Int, val to: Int) : Component() {
         // on the same floor for the same direction
         get<Requests>().putIfAbsent(fromFloor to direction, env.now)
 
-        building.cars.firstOrNull { it.isPassive }?.activate()
+        elevator.cars.firstOrNull { it.isPassive }?.activate()
 
         passivate() // wait for it
     }
 }
 
 
-class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) : Component() {
+class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) :
+    AnimationComponent(Point(1,initialFloor.level )) {
     var direction = STILL
     var floor = initialFloor
 
@@ -111,7 +114,7 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) : Component() {
     var door = CLOSED
 
 
-    override fun process() = sequence<Component> {
+    override fun process() = sequence {
         while (true) {
             val requests = get<Requests>()
 
@@ -186,12 +189,14 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) : Component() {
 
             closeDoor()
 
-            val floors = get<Building>().floors
+            val floors = get<Elevator>().floors
 
 
             if (direction != STILL) {
                 val nextFloor = floors[floors.indexOf(floor) + direction.asIncrement()]
                 hold(MOVE_TIME, description = "Moving to ${nextFloor.level}")
+                move(Point(0, nextFloor.level), description = "Moving to ${nextFloor.level}", speed = 1.0)
+
                 floor = nextFloor
             }
         }
@@ -210,9 +215,24 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) : Component() {
     }
 }
 
-class Building {
+class Elevator(showLog: Boolean = false) : Environment(showLog ) {
+    init{
+        dependency { this@Elevator }
+    }
+
     val floors = repeat(1 + TOP_FLOOR) { Floor(it - 1) }
     val cars = repeat(NUM_CARS) { Car(floors.first()) }
+
+
+    val requests: Requests = dependency {  mutableMapOf() }
+//    dependency { requests }
+
+    init {
+
+        VisitorGenerator(0 to 0, 1 to TOP_FLOOR, LOAD_0_n, "vg_0_n")
+        VisitorGenerator(1 to TOP_FLOOR, 0 to 0, LOAD_n_0, "vg_n_0")
+        VisitorGenerator(1 to TOP_FLOOR, 1 to TOP_FLOOR, LOAD_n_n, "vg_n_n")
+    }
 }
 
 
@@ -225,23 +245,10 @@ class Floor(val level: Int, val queue: ComponentQueue<Visitor> = ComponentQueue(
 typealias Requests = MutableMap<Pair<Floor, Direction>, TickTime>
 
 
-class Elevator(showLog: Boolean = false): Environment(showLog, ) {
-    val building = dependency { Building() }
-
-    val requests: Requests = dependency {  mutableMapOf() }
-//    dependency { requests }
-
-    init {
-        VisitorGenerator(0 to 0, 1 to TOP_FLOOR, LOAD_0_n, "vg_0_n")
-        VisitorGenerator(1 to TOP_FLOOR, 0 to 0, LOAD_n_0, "vg_n_0")
-        VisitorGenerator(1 to TOP_FLOOR, 1 to TOP_FLOOR, LOAD_n_n, "vg_n_n")
-    }
-}
-
 fun main() {
-    val eleveator = Elevator()
+    val elevator = Elevator()
 
-    eleveator.run(100000)
+    elevator.run(100000)
 
 //         try with single visitor to get started
 //        Visitor(3, 12)
@@ -249,7 +256,7 @@ fun main() {
 
     //print summary
     println("Floor    n         Length Length_of_stay")
-    eleveator.building.floors.forEach {
+    elevator.floors.forEach {
         it.let {
             println(
                 "%5d%5d%15.3f%15.3f".format(
