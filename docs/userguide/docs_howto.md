@@ -82,7 +82,8 @@ jupyter nbconvert --kernel=kotlin --to markdown  gas_station.ipynb --out  gas_st
 
 cd ${KALASIM_HOME}/docs/userguide/docs/animation
 
-jupyter nbconvert --kernel=kotlin --to markdown  lunar_mining.ipynb --execute --out  lunar_mining.md
+#jupyter nbconvert --kernel=kotlin --to markdown  lunar_mining.ipynb --execute --out  lunar_mining.md
+jupyter nbconvert --kernel=kotlin --to markdown  lunar_mining.ipynb --out  lunar_mining.md
 
 ```
 

@@ -68,6 +68,10 @@ Once water unloading is complete, another sub-process of the ice harvester is ac
 
 ![](lunar_mining_files/lunar_mining_domain_model.png)
 
+<p align="center">
+<i>API surface of the lunar mining simulation model</i>
+</p>
+
 
 
 
@@ -94,7 +98,7 @@ We used different capabilties of the [animation system](animation.md) (based on 
 
 ## Supply Optimization
 
-To explore assess how many ice harvesters are needed to ensure base survival we can play what-if with our model. We do so in a fully reproducible manner right in place here. First we load `kalasim` and import required classes.
+To assess how many ice harvesters are needed to ensure base survival we can play what-if with our model. We do so in a fully reproducible manner right in place here. First we load `kalasim` and import required classes.
 
 
 ```kotlin
@@ -183,7 +187,7 @@ sims.map { sim ->
 
 As shown in the figure, it turns out, that with >=5 ice harvestering robots, the risk of water supply depletion at the base station is within an acceptable range.
 
-We have just analyzed a the lunar mining model using controlled randomization, and have performed a basic capacity analysis.
+We have just analyzed our lunar mining model using controlled randomization, and have performed a basic capacity analysis.
 
 
 ## Exercise: Maintenance Module
