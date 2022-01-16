@@ -1,7 +1,6 @@
 package org.kalasim.test
 
 import io.kotest.assertions.fail
-import junit.framework.Assert
 import kravis.GGPlot
 import kravis.SessionPrefs
 import kravis.render.LocalR
@@ -17,7 +16,8 @@ import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.stream.StreamSource
-
+import kotlin.io.path.*
+import kotlin.io.path.createTempFile
 
 class DisplayTests : AbstractSvgPlotRegression() {
 
@@ -112,7 +112,7 @@ abstract class AbstractSvgPlotRegression {
     protected fun assertExpected(plot: GGPlot, subtest: String? = null) {
         val plotFile = plot.save(createTempFile(suffix = ".svg"))
 
-        Assert.assertTrue(plotFile.exists() && plotFile.length() > 0)
+        Assert.assertTrue(plotFile.exists() && plotFile.fileSize() > 0)
 
         val svgDoc = plotFile.readText().run { prettyFormat(this, 4) }.trim()
         //        val obtained = prettyFormat(svgDoc, 4).trim()
