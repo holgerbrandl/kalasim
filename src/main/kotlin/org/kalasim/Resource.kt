@@ -165,9 +165,10 @@ open class Resource(
         set(newCapacity) {
             validateCapacityRange(newCapacity)
 
-            if(newCapacity < claimed) {
-                throw CapacityLimitException(this, "can not reduce capacity below current claims", now, newCapacity)
-            }
+            // disabled for now because it essentially prevents reducing capacity of a fully claimed resource
+//            if(newCapacity < claimed) {
+//                throw CapacityLimitException(this, "can not reduce capacity below current claims", now, newCapacity)
+//            }
 
             val capacityDiff = newCapacity - field
             field = newCapacity
