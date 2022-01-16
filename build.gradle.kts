@@ -13,7 +13,7 @@ plugins {
 
 group = "com.github.holgerbrandl"
 //version = "0.7-SNAPSHOT"
-version = "0.7.94"
+version = "0.7.95"
 
 
 repositories {
@@ -44,8 +44,8 @@ dependencies {
     // **TODO** move to api to require users to pull it in if needed
     implementation("com.github.holgerbrandl:krangl:0.17.1")
 
-    compileOnly("com.github.holgerbrandl:kravis:0.8.3")
-    testImplementation("com.github.holgerbrandl:kravis:0.8.1")
+    compileOnly("com.github.holgerbrandl:kravis:0.8.5")
+    testImplementation("com.github.holgerbrandl:kravis:0.8.5")
 
     compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:3.1.0")
     testImplementation("org.jetbrains.lets-plot:lets-plot-batik:2.2.0")

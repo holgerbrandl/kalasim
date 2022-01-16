@@ -1,3 +1,5 @@
+package org.kalasim.scratch.callcenter.experiments
+
 import kravis.SessionPrefs
 import kravis.device.SwingPlottingDevice
 import org.kalasim.*
