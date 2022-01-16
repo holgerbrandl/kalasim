@@ -125,3 +125,5 @@ also adjust random generator of kotlin to prevent non-determinism entering simul
 ## Misc 
 
 state-machine-like https://github.com/fraktalio/fmodel
+
+consider using delegate for state variables https://medium.com/mobile-app-development-publication/how-kotlin-by-variable-delegate-helps-me-avoid-anti-pattern-558004000341
