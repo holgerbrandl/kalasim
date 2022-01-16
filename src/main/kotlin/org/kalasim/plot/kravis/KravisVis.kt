@@ -47,8 +47,8 @@ fun MetricTimeline.display(
     forceTickAxis: Boolean = false,
 ): GGPlot {
     val data = stepFun()
-        .filter { from == null || it.value.toDouble() >= from.value }
-        .filter { to == null || it.value.toDouble() <= to.value }
+        .filter { from == null || it.time >= from }
+        .filter { to == null || it.time <= to }
 
     val useWT = env.tickTransform != null && !forceTickAxis
 

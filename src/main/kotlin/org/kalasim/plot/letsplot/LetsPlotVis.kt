@@ -29,9 +29,8 @@ fun MetricTimeline.display(
     fun wtTransform(tt: TickTime) = if (useWT) env.asWallTime(tt) else tt.value
 
     return data.asDataFrame()
-        .addColumn("first") { expr -> expr["first"].map<Double> { wtTransform(TickTime(it)) } }
         .letsPlot() +
-            geomStep { x = "first"; y = "second" } + ggtitle(title)
+            geomStep { x = "time"; y = "value" } + ggtitle(title)
 }
 
 
