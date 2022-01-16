@@ -128,7 +128,7 @@ fun main() {
     }
 
     intSim.run(600)
-
+    intSim.callCenter.requesters.queueLengthTimeline.display("Request queue length with revised handover process").show()
 
     // try again but with more customers
     val highWorkLoadSim = object: CallCenter(arrivalRate = 0.2) {
