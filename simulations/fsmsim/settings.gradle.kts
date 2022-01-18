@@ -1,3 +1,3 @@
 
-rootProject.name = "fsmsim"
+rootProject.name = "state-machine-simulation"
 

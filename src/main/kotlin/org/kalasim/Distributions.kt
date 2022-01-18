@@ -49,7 +49,7 @@ class Clipper internal constructor(val dist: RealDistribution, val lower: Double
 }
 
 
-fun SimContext.uniform(lower: Number = 1, upper: Number = 0) =
+fun SimContext.uniform(lower: Number = 0, upper: Number = 1) =
     UniformRealDistribution(env.rg, lower.toDouble(), upper.toDouble())
 
 
