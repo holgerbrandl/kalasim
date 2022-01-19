@@ -4,12 +4,13 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
+import junit.framework.Assert.fail
 import krangl.cumSum
 import krangl.mean
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.junit.Test
 import org.kalasim.*
-import org.kalasim.analysis.EntityCreatedEvent
+import org.kalasim.analysis.*
 import org.kalasim.examples.er.EmergencyRoom
 import org.kalasim.misc.*
 import org.koin.core.Koin
@@ -57,6 +58,29 @@ class EnvTests {
 //            DependencyContext.get()
 //        }
         // this assertion is no longer valid as `run` sets the context
+    }
+
+    @Test
+    fun `it should run be possible to stop a simulation from an event-handler`() = createTestSimulation {
+        var holdCounter = 0
+
+        object : Component() {
+            override fun repeatedProcess() = sequence {
+                hold(1)
+                holdCounter++
+
+                if (holdCounter > 5) fail("simulation did not stop")
+            }
+        }
+
+        addEventListener<RescheduledEvent> {
+            if (it.time > 3 && it.type == ScheduledType.HOLD) {
+                stopSimulation()
+            }
+        }
+
+        run()
+        holdCounter shouldBe 4
     }
 
     @Test
@@ -122,7 +146,7 @@ class EnvTests {
 
         // add an asynchronous log consumer
         val asyncListener = addAsyncEventListener<EntityCreatedEvent> { event ->
-            if(event.entity.name == "Car.1") {
+            if (event.entity.name == "Car.1") {
                 println("Consumed async!")
                 consumed = true
             }
@@ -178,7 +202,7 @@ class EnvTests {
                 var waitCounter = 1
                 override fun process() =
                     sequence {
-                        while(true) {
+                        while (true) {
                             hold(1)
                             // doe something insanely complex that takes 2seconds
                             sleep(waitCounter++ * 1000L)
@@ -313,7 +337,7 @@ class EnvTests {
             }
 
             er.run(1)
-        }.stdout  shouldBeDiff (testDataDir/"EnvTests_it_should_log_events_as_json.txt").toFile().readText()
+        }.stdout shouldBeDiff (testDataDir / "EnvTests_it_should_log_events_as_json.txt").toFile().readText()
     }
 
 

@@ -243,7 +243,7 @@ open class Environment(
     /**
      * Start execution of the simulation. See https://www.kalasim.org/basics/#running-a-simulation
      *
-     * @param duration Time to run. Requires tick-transform to be confiured.
+     * @param duration Time to run. Requires tick-transform to be configured.
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
@@ -267,7 +267,7 @@ open class Environment(
     /**
      * Start execution of the simulation
      *
-     * @param until Absolute time until the which the simulation should run. Requires tick-transform to be confiured.
+     * @param until Absolute time until the which the simulation should run. Requires tick-transform to be configured.
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
@@ -400,6 +400,15 @@ open class Environment(
         eventListeners.forEach {
             it.consume(event)
         }
+    }
+
+    /**
+     * Stops the simulation after the current event step. This will preserve its queue and process state.
+     *
+     * See https://www.kalasim.org/basics/#running-a-simulation).
+     */
+    fun stopSimulation() {
+        main.activate()
     }
 
 
