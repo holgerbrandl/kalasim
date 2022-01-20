@@ -111,6 +111,8 @@ also adjust random generator of kotlin to prevent non-determinism entering simul
 
 **TODO** consider using processcontext across the api
 
+---
+Explore scalalabe queues https://chronicle.software/open-hft/queue/ & https://dzone.com/articles/java-creating-terabyte-sized-queues-with-low-laten-1
 
 ## More Examples
 
@@ -125,6 +127,7 @@ also adjust random generator of kotlin to prevent non-determinism entering simul
 **{todo}** port  machine maintenance example from ucar 2019
 ![](.roadmap_images/2bad897b.png)
 
+https://www.sciencedirect.com/science/article/abs/pii/S0377221721010894?dgcid=rss_sd_all
 
 ## Misc 
 
