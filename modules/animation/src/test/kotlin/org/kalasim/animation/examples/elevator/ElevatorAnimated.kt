@@ -203,9 +203,8 @@ fun main() {
 
                             writer {
                                 box = visitorRect
-                                text("2")
+                                text(visitor.toFloor.toString())
                             }
-
                         }
                     }
 
