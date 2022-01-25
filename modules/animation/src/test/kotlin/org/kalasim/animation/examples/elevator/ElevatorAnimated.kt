@@ -49,7 +49,7 @@ fun main() {
 
         program {
             val font = loadFont("file:IBM_Plex_Mono/IBMPlexMono-Bold.ttf", 24.0)
-            val fontSmall = loadFont("file:IBM_Plex_Mono/IBMPlexMono-Bold.ttf", 8.0)
+            val fontSmall = loadFont("file:IBM_Plex_Mono/IBMPlexMono-Bold.ttf", 0.7, contentScale =200.0)
 
             // https://github.com/openrndr/openrndr-examples/blob/master/src/main/kotlin/examples/10_OPENRNDR_Extras/C08_Quick_UIs001.kt
             val gui = GUI()
@@ -200,11 +200,12 @@ fun main() {
                             // draw the visitor number
                             fill = ColorRGBa.WHITE
                             fontMap = fontSmall
+                            text(visitor.toFloor.level.toString(), visitorRect.x+0.2, visitorRect.y+visitorRect.height*0.8)
 
-                            writer {
-                                box = visitorRect
-                                text(visitor.toFloor.toString())
-                            }
+//                            writer {
+//                                box = visitorRect
+//                                text(visitor.toFloor.toString())
+//                            }
                         }
                     }
 
