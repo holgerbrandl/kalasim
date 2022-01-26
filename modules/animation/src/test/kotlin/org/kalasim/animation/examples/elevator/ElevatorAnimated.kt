@@ -12,6 +12,8 @@ import org.openrndr.draw.loadFont
 import org.openrndr.extra.gui.GUI
 import org.openrndr.extra.parameters.DoubleParameter
 import org.openrndr.extra.parameters.IntParameter
+import org.openrndr.extras.color.presets.DARK_GREEN
+import org.openrndr.extras.color.presets.LIGHT_BLUE
 import org.openrndr.math.Vector3
 import org.openrndr.math.transforms.buildTransform
 import org.openrndr.math.transforms.project
@@ -55,6 +57,10 @@ fun main() = application {
             var x: Double = 385.0
         }
 
+        gui.onChange { name, value ->
+            println("$name, $value")
+        }
+
         gui.add(settings, "Settings")
 
         extend(gui)
@@ -82,8 +88,12 @@ fun main() = application {
 
 
         fun Drawer.drawVisitor(visitor: Visitor, gridX: Number, gridY: Number) {
-            fill = ColorRGBa.GRAY
-            stroke = ColorRGBa.GRAY
+            fill = when(visitor.direction) {
+                Direction.DOWN -> ColorRGBa.DARK_GREEN
+                Direction.STILL -> ColorRGBa.YELLOW
+                Direction.UP -> ColorRGBa.RED
+            }
+            stroke = fill
 
             val visitorRect = Rectangle(
                 gridX.toDouble() + .1,
@@ -116,10 +126,6 @@ fun main() = application {
                     val boundBox = Rectangle(-8.0, -floor.level.toDouble() - 1, 1.0, 0.9)
                     renderTextInRect(boundBox, floor.level.toString())
 
-                    // todo restore font and stroke along with projection
-                    fontMap = font
-                    stroke = ColorRGBa.WHITE
-
                     // also render num extra-waiting
                     val numWaiting = floor.queue.size
 
@@ -135,21 +141,14 @@ fun main() = application {
                     val floorGround = floor.level.toDouble()
                     strokeWeight = 0.1
                     stroke = ColorRGBa.WHITE
-                    lineSegment(-100.0, -floorGround, -2.0, -floorGround)
-                }
+                    lineSegment(-100.0, -floorGround, -1.0, -floorGround)
 
-                translate(0.0, 0.0)
-
-                // draw queue in front of elevator
-                elevator.floors.forEach { floor ->
+                    // draw queue in front of elevator
                     floor.queue.asSortedList().take(5).withIndex().forEach { (idx, cqe) ->
                         strokeWeight = 0.0
-                        fill = ColorRGBa.GRAY
-//                            rectangle((-idx - 3), -floor.level - 1 + .1, 0.8, 0.8)
-                        drawVisitor(cqe.component, -idx - 3, -floor.level)
+                        drawVisitor(cqe.component, -idx - 2, -floor.level)
                     }
                 }
-
 
                 //visualize requests
                 elevator.requests.keys.toSet().forEach { (floor, direction) ->
@@ -157,7 +156,7 @@ fun main() = application {
 
                     val requestIndicator = when(direction) {
                         Direction.DOWN -> {
-                            fill = ColorRGBa.GREEN
+                            fill = ColorRGBa.DARK_GREEN
                             triangle(true)
                         }
                         Direction.STILL -> {
@@ -180,18 +179,13 @@ fun main() = application {
                 elevator.cars.withIndex().forEach { (shaftIndex, car) ->
                     val shaftWidth = car.capacity + 1
 
-                    fill = ColorRGBa.RED
-                    stroke = ColorRGBa.RED
+                    fill = ColorRGBa.LIGHT_BLUE
+                    stroke = ColorRGBa.LIGHT_BLUE
 
                     val shaftX = shaftIndex.toDouble() * (shaftWidth + 0.5)
                     val shaftY = -car.currentPosition.y
-                    rectangle(
-                        shaftX,
-                        shaftY - 1,
-                        shaftWidth.toDouble(),
-                        1.0
-                    )
 
+                    rectangle(shaftX, shaftY - 1, shaftWidth.toDouble(), 1.0)
 
                     // draw customers on the in the cab
                     car.visitors.components.withIndex().forEach { (idx, visitor) ->
@@ -203,12 +197,12 @@ fun main() = application {
                 fontMap = font
                 fill = ColorRGBa.WHITE
 
-                // draw info
+                // draw time & info
                 defaults()
-                drawer.fill = ColorRGBa.WHITE
-                drawer.fontMap = font
-                drawer.text("NOW: ${elevator.now}", width - 150.0, height - 30.0)
-                drawer.text("Frame: ${frameCounter++}", width - 150.0, height - 50.0)
+                fill = ColorRGBa.WHITE
+                fontMap = font
+                text("NOW: ${elevator.now}", width - 150.0, height - 30.0)
+                text("Frame: ${frameCounter++}", width - 150.0, height - 50.0)
             }
         }
     }

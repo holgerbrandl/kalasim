@@ -11,9 +11,6 @@ import java.awt.Point
 
 // Adopted from https://github.com/salabim/salabim/blob/master/sample%20models/Elevator.py
 
-// todo built second version where visitors get angry and walk away
-// todo use inline class for better typing // inline class Floor(level: Int)
-
 const val MOVE_TIME = 10
 const val DOOR_OPEN_TIME = 3
 const val DOOR_CLOSE_TIME = 3
@@ -107,7 +104,6 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) :
 
     // todo why is this is queue (it does no seem to be used as such; stats?)
     val visitors = ComponentQueue<Visitor>("passengers of $name")
-    //.apply { lengthOfStayMonitor.disable(); queueLengthMonitor.disable() }
 
     enum class DoorState { OPEN, CLOSED }
 
@@ -134,7 +130,6 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) :
                 hold(EXIT_TIME, description = "Passengers exiting")
             }
 
-//            if(direction == STILL) direction  = listOf(UP, DOWN).random() // not deterministic because using kotlin random
             if (direction == STILL) direction = enumerated(UP, DOWN).sample()
 
 
