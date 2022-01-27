@@ -52,9 +52,9 @@ dependencies {
     implementation(project(":"))
 
 //    implementation(project ("kalasim"))
-    api("com.github.holgerbrandl:kalasim:0.7.93-SNAPSHOT")
+//    api("com.github.holgerbrandl:kalasim:0.7.93-SNAPSHOT")
 
-    api("com.github.holgerbrandl:kravis:0.8.1")
+    api("com.github.holgerbrandl:kravis:0.8.5")
 
     runtimeOnly(openrndr("gl3"))
     runtimeOnly(openrndrNatives("gl3"))
