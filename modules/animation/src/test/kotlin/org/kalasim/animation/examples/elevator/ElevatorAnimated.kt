@@ -10,7 +10,7 @@ import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.Drawer
 import org.openrndr.draw.loadFont
 import org.openrndr.extra.gui.GUI
-import org.openrndr.extra.parameters.DoubleParameter
+import org.openrndr.extra.parameters.ActionParameter
 import org.openrndr.extra.parameters.IntParameter
 import org.openrndr.extras.color.presets.DARK_GREEN
 import org.openrndr.extras.color.presets.LIGHT_BLUE
@@ -19,22 +19,14 @@ import org.openrndr.math.transforms.buildTransform
 import org.openrndr.math.transforms.project
 import org.openrndr.shape.*
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 
 fun main() = application {
-    // Setup simulation model
-    val elevator = Elevator().apply {
-        ClockSync(tickDuration = 100.milliseconds, syncsPerTick = 10)
-        tickTransform = TickTransform(TimeUnit.SECONDS)
-
-        CoroutineScope(Dispatchers.Default).launch {
-            DependencyContext.setKoin(getKoin())
-            run()
-        }
-    }
 
     var frameCounter = 0
+    var elevator: Elevator = startSimulation(Elevator(), 50.milliseconds)
 
     configure {
         width = 1024
@@ -50,18 +42,50 @@ fun main() = application {
         val gui = GUI()
 
         val settings = object {
-            @IntParameter("# elevators", 1, 10)
+            @IntParameter("# Floors", 5, 20, order = 0)
+            var topFloors: Int = 15
+
+            @IntParameter("# elevators", 1, 6, order = 10)
             var numElevators: Int = 3
 
-            @DoubleParameter("x", 0.0, 770.0)
-            var x: Double = 385.0
+            @IntParameter("Car Capacity", 1, 8, order = 20)
+            var capacity: Int = 4
+
+            @IntParameter("Load 0->N", 0, 100, order = 30)
+            var load0N: Int = 50
+
+            @IntParameter("Load N->N", 0, 200, order = 40)
+            var loadNN: Int = 100
+
+            @IntParameter("Load N->0", 0, 100, order = 50)
+            var loadN0: Int = 50
         }
 
-        gui.onChange { name, value ->
-            println("$name, $value")
+        val simSettings = object {
+            @IntParameter("Speed", 0, 100)
+            var speed: Int = 50
+
+            @ActionParameter("Restart", order = 1000)
+            fun restartModel() {
+                println("file saved!")
+                elevator.stopSimulation()
+
+                // Setup new simulation model
+                elevator = startSimulation(
+                    with(settings) {
+                        Elevator(false, load0N, loadNN, loadN0, capacity, numElevators, topFloors)
+                    },
+                    ((100 - speed + 1)).milliseconds
+                )
+            }
         }
 
-        gui.add(settings, "Settings")
+//        gui.onChange { name, value ->
+//            println("$name, $value")
+//        }
+
+        gui.add(settings, "Elevator Settings")
+        gui.add(simSettings, "Simulation Settings")
 
         extend(gui)
         gui.visible = false
@@ -123,21 +147,19 @@ fun main() = application {
                     fontMap = font
                     stroke = ColorRGBa.WHITE
 
+                    // show floor number
                     val boundBox = Rectangle(-8.0, -floor.level.toDouble() - 1, 1.0, 0.9)
                     renderTextInRect(boundBox, floor.level.toString())
 
-                    // also render num extra-waiting
+                    // also render waiters counts (if too many)
                     val numWaiting = floor.queue.size
-
                     if(numWaiting > NUM_VISIBLE_WAITERS) {
                         val floorInfo = "+${numWaiting - NUM_VISIBLE_WAITERS}"
-                        val waitingBBox = Rectangle(-6.0, -floor.level.toDouble(), 1.0, 1.0)
+                        val waitingBBox = Rectangle(-NUM_VISIBLE_WAITERS - 3.0, -floor.level.toDouble()-1, 1.0, 1.0)
                         renderTextInRect(waitingBBox, floorInfo)
                     }
-                }
 
-                // draw floors
-                elevator.floors.forEach { floor ->
+                    // render the floor grounds
                     val floorGround = floor.level.toDouble()
                     strokeWeight = 0.1
                     stroke = ColorRGBa.WHITE
@@ -150,8 +172,14 @@ fun main() = application {
                     }
                 }
 
+                // render the ceiling
+                strokeWeight = 0.1
+                stroke = ColorRGBa.WHITE
+                lineSegment(-100.0, -elevator.floors.size.toDouble(), -1.0, -elevator.floors.size.toDouble())
+
                 //visualize requests
-                elevator.requests.keys.toSet().forEach { (floor, direction) ->
+                //todo https://stackoverflow.com/questions/48777744/thread-safe-way-to-copy-a-hashmap
+                mutableSetOf(*elevator.requests.keys.toTypedArray()).forEach { (floor, direction) ->
                     strokeWeight = 0.0
 
                     val requestIndicator = when(direction) {
@@ -204,6 +232,18 @@ fun main() = application {
                 text("NOW: ${elevator.now}", width - 150.0, height - 30.0)
                 text("Frame: ${frameCounter++}", width - 150.0, height - 50.0)
             }
+        }
+    }
+}
+
+fun startSimulation(elevator: Elevator, tickMillis: Duration = 50.milliseconds): Elevator {
+    return elevator.apply {
+        ClockSync(tickDuration = tickMillis, syncsPerTick = 10)
+        tickTransform = TickTransform(TimeUnit.SECONDS)
+
+        CoroutineScope(Dispatchers.Default).launch {
+            DependencyContext.setKoin(getKoin())
+            run()
         }
     }
 }

@@ -17,12 +17,6 @@ const val DOOR_CLOSE_TIME = 3
 const val ENTER_TIME = 3
 const val EXIT_TIME = 3
 
-const val LOAD_0_n = 50
-const val LOAD_n_n = 100
-const val LOAD_n_0 = 100
-const val CAR_CAPACITY = 4
-const val NUM_CARS = 3
-const val TOP_FLOOR = 15
 
 enum class Direction {
     DOWN, STILL, UP;
@@ -97,7 +91,7 @@ class Visitor(val from: Int, val to: Int) : Component() {
 }
 
 
-class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) :
+class Car(initialFloor: Floor, val capacity: Int) :
     AnimationComponent(Point(1,initialFloor.level )) {
     var direction = STILL
     var floor = initialFloor
@@ -189,8 +183,8 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) :
 
             if (direction != STILL) {
                 val nextFloor = floors[floors.indexOf(floor) + direction.asIncrement()]
-                hold(MOVE_TIME, description = "Moving to ${nextFloor.level}")
-                move(Point(0, nextFloor.level), description = "Moving to ${nextFloor.level}", speed = 1.0)
+//                hold(MOVE_TIME, description = "Moving to ${nextFloor.level}")
+                move(Point(0, nextFloor.level), description = "Moving to ${nextFloor.level}", speed = 0.1)
 
                 floor = nextFloor
             }
@@ -210,23 +204,27 @@ class Car(initialFloor: Floor, val capacity: Int = CAR_CAPACITY) :
     }
 }
 
-class Elevator(showLog: Boolean = false) : Environment(showLog ) {
+class Elevator(showLog: Boolean = false,
+               val load0N: Int = 50,
+               val loadNN: Int = 100,
+               val loadN0: Int = 100,
+               val carCapacity: Int = 4,
+               val numCars: Int = 3,
+               val topFloor: Int = 15,
+) : Environment(showLog ) {
     init{
         dependency { this@Elevator }
     }
 
-    val floors = repeat(1 + TOP_FLOOR) { Floor(it - 1) }
-    val cars = repeat(NUM_CARS) { Car(floors.first()) }
-
+    val floors = repeat(1 + topFloor) { Floor(it - 1) }
+    val cars = repeat(numCars) { Car(floors.first(), carCapacity) }
 
     val requests: Requests = dependency {  mutableMapOf() }
-//    dependency { requests }
 
     init {
-
-        VisitorGenerator(0 to 0, 1 to TOP_FLOOR, LOAD_0_n, "vg_0_n")
-        VisitorGenerator(1 to TOP_FLOOR, 0 to 0, LOAD_n_0, "vg_n_0")
-        VisitorGenerator(1 to TOP_FLOOR, 1 to TOP_FLOOR, LOAD_n_n, "vg_n_n")
+        VisitorGenerator(0 to 0, 1 to topFloor, load0N, "vg_0_n")
+        VisitorGenerator(1 to topFloor, 0 to 0, loadN0, "vg_n_0")
+        VisitorGenerator(1 to topFloor, 1 to topFloor, loadNN, "vg_n_n")
     }
 }
 
