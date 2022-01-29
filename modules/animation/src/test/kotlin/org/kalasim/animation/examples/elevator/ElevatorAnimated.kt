@@ -13,6 +13,7 @@ import org.openrndr.extra.parameters.ActionParameter
 import org.openrndr.extra.parameters.IntParameter
 import org.openrndr.extras.color.presets.DARK_GREEN
 import org.openrndr.extras.color.presets.LIGHT_BLUE
+import org.openrndr.ffmpeg.ScreenRecorder
 import org.openrndr.math.Vector3
 import org.openrndr.math.transforms.buildTransform
 import org.openrndr.math.transforms.project
@@ -41,14 +42,16 @@ fun main() = application {
     program {
         val image = loadImage("src/test/resources/Campus_Tower_Frankfurt.jpg")
 
-        val font = loadFont("file:IBM_Plex_Mono/IBMPlexMono-Bold.ttf", 24.0)
+        val font = loadFont("file:src/test/resources/IBM_Plex_Mono/IBMPlexMono-Bold.ttf", 24.0)
+
+//        extend(ScreenRecorder())
 
         // https://github.com/openrndr/openrndr-examples/blob/master/src/main/kotlin/examples/10_OPENRNDR_Extras/C08_Quick_UIs001.kt
         val gui = GUI()
 
         val settings = object {
-            @IntParameter("# Floors", 1, 20, order = 0)
-            var topFloors: Int = 15
+            @IntParameter("# Floors", 2, 20, order = 0)
+            var topFloors: Int = 10
 
             @IntParameter("# elevators", 1, 6, order = 10)
             var numElevators: Int = 3
@@ -56,13 +59,13 @@ fun main() = application {
             @IntParameter("Car Capacity", 1, 8, order = 20)
             var capacity: Int = 4
 
-            @IntParameter("Load 0->N", 0, 100, order = 30)
+            @IntParameter("Load 0->N", 0, 200, order = 30)
             var load0N: Int = 50
 
             @IntParameter("Load N->N", 0, 200, order = 40)
             var loadNN: Int = 100
 
-            @IntParameter("Load N->0", 0, 100, order = 50)
+            @IntParameter("Load N->0", 0, 200, order = 50)
             var loadN0: Int = 50
         }
 
@@ -103,7 +106,6 @@ fun main() = application {
 
         extend(gui)
 
-        //        extend(ScreenRecorder())
 
         fun Drawer.renderTextInRect(rect: Rectangle, someText: String) {
             // draw the visitor number
@@ -185,7 +187,7 @@ fun main() = application {
 
                     // draw queue in front of elevator
                     val visitorsRects = NUM_VISIBLE_WAITERS - if(floor.queue.size > NUM_VISIBLE_WAITERS) 1 else 0
-                    cmeGuard{floor.queue.asSortedList()}.take(visitorsRects).withIndex().forEach { (idx, cqe) ->
+                    cmeGuard { floor.queue.asSortedList() }.take(visitorsRects).withIndex().forEach { (idx, cqe) ->
                         strokeWeight = 0.0
                         drawVisitor(cqe.component, -idx - 2, -floor.level)
                     }

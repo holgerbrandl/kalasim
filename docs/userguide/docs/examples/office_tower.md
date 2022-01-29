@@ -1,6 +1,6 @@
 <!--## Elevators-->
 
-Here, we simulate logistics in an office tower. There are 3 lifts with capacity limited cars. Passengers arrive at different floors with different rates and press buttons indicating the direction of their target floor. The cars have a defined speed, and clearly it takes time to open/close its doors before passengers can enter & leaver.
+Here, we simulate logistics in an office tower. There are 3 lifts with capacity limited cars. Passengers arrive at different floors with different rates and press buttons indicating the direction of their target floor. The cars have a defined speed, and clearly it takes time to open/close its doors before passengers can enter & leave.
 
 Parameters
 
