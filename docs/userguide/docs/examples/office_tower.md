@@ -16,7 +16,7 @@ The implementation is inspired by [salabim's elevator](https://github.com/salabi
 The model was also animated ([source](https://github.com/holgerbrandl/kalasim/blob/master/modules/animation/src/test/kotlin/org/kalasim/animation/examples/elevator/ElevatorAnimated.kt)) to illustrate the power of kalasim's [animation](../animation/animation.md) API.
 
 <div class="video-wrapper">
-  <iframe width="700" height="500" src="https://www.youtube.com/watch?v=KwBeon-rXdw" frameborder="0" allowfullscreen></iframe>
+  <iframe width="700" height="500" src="https://www.youtube.com/embed/KwBeon-rXdw" frameborder="0" allowfullscreen></iframe>
 </div>
 
 
