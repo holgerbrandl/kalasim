@@ -8,6 +8,7 @@ import junit.framework.Assert.fail
 import krangl.cumSum
 import krangl.mean
 import org.apache.commons.math3.distribution.UniformRealDistribution
+import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.analysis.*
@@ -338,6 +339,30 @@ class EnvTests {
 
             er.run(1)
         }.stdout shouldBeDiff (testDataDir / "EnvTests_it_should_log_events_as_json.txt").toFile().readText()
+    }
+
+
+    // https://github.com/holgerbrandl/kalasim/issues/49
+    @Ignore
+    @Test
+    fun `it should enforce typed durations`() {
+
+        Environment(
+//            typedDurationsRequired = true
+        ).apply {
+
+            object : Component() {
+                override fun process() = sequence {
+                    // try holding without duration unit --> should fail!
+                    hold(10, "something is about to happen")
+                    stopSimulation()
+                }
+            }
+
+//            try {
+                run() // try spinning the wheel until it should be stopped
+//            }catch(tde: TypedDurationExpected)
+        }
     }
 
 

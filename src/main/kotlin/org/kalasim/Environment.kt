@@ -95,7 +95,9 @@ open class Environment(
     dependencies: KoinModule? = null,
     koin: Koin? = null,
     randomSeed: Int = DEFAULT_SEED,
-    startTime: TickTime = TickTime(0.0)
+    startTime: TickTime = TickTime(0.0),
+    // see https://github.com/holgerbrandl/kalasim/issues/49
+//    val typedDurationsRequired: Boolean = false
 ) : SimContext, WithJson {
 
     private var running: Boolean = false
