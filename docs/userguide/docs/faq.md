@@ -2,22 +2,9 @@
 
 ## Why rebuilding `salabim`?
 
-Great question! Initial development was driven by curiosity about the `salabim` internals. Also, it lacked (arguably) a modern touch which made some of our use cases more tricky to implement.
+Great question! Initial development was driven by curiosity about the `salabim` internals. Also, it lacked (arguably) a modern API touch which made some of our use cases more tricky to implement.
 
-
-`kalasim` implements the great majority of `salabim` features as documented under https://www.salabim.org/manual/ including
-
-* [Components](https://www.salabim.org/manual/Component.html)
-* [ComponentGenerator](https://www.salabim.org/manual/ComponentGenerator.html)
-* [Queue](https://www.salabim.org/manual/Queue.html)
-* [Distributions](https://www.salabim.org/manual/Distributions.html) (via apache-commons-math)
-* [Monitor](https://www.salabim.org/manual/Monitor.html)
-* [Resource](https://www.salabim.org/manual/Resource.html)
-* [State](https://www.salabim.org/manual/State.html)
-
-Not planned
-
-* [Animation](https://www.salabim.org/manual/Animation.html) - which we believe should live in a separate codebase. Visualization in `kalasim` is detailed out in the [visualization chapter](analysis.md).
+`kalasim` implements all major features of `salabim` as documented under https://www.salabim.org/manual/.
 
 
 ## What (TF) is the meaning of `kalasim`?

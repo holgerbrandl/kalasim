@@ -44,7 +44,7 @@ fun orx(module: String): Any {
 
 repositories {
     mavenCentral()
-    mavenLocal()
+//    mavenLocal()
     maven(url = "https://maven.openrndr.org")
 }
 
@@ -66,7 +66,7 @@ dependencies {
     implementation(openrndr("extensions"))
     implementation(openrndr("filter"))
 
-    implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core","1.5.0-RC")
+//    implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core","1.6.0")
     implementation("io.github.microutils", "kotlin-logging-jvm","2.0.6")
     implementation(kotlin("script-runtime"))
 

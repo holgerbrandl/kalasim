@@ -15,11 +15,10 @@ data class TickTime(val value: Double) : Comparable<TickTime> {
     operator fun compareTo(other: Double): Int = value.compareTo(other)
     operator fun compareTo(other: Number): Int = value.compareTo(other.toDouble())
 
-    operator fun minus(duration: Double): TickTime = TickTime(value - duration)
     operator fun plus(duration: Number): TickTime = TickTime(value + duration.toDouble())
 
     operator fun minus(other: TickTime): Double = value - other.value
-
+    operator fun minus(duration: Double): TickTime = TickTime(value - duration)
 
     constructor(instant: Number) : this(instant.toDouble())
 
@@ -33,20 +32,6 @@ data class TickTime(val value: Double) : Comparable<TickTime> {
 value class Ticks(val value: Double) {
     constructor(instant: Number) : this(instant.toDouble())
 }
-//
-//
-//inline val Int.seconds get() : Duration = Duration.ofSeconds(this.toLong())
-//inline val Int.minutes get(): Duration = Duration.ofMinutes(this.toLong())
-//
-//inline val Int.hours: Duration get() = Duration.ofHours(this.toLong())
-//inline val Double.hours: Duration get() = Duration.ofSeconds((this * 3600).roundToLong())
-//
-//inline val Int.days get(): Duration = Duration.ofDays(this.toLong())
-//inline val Double.days get(): Duration = Duration.ofSeconds((this * 86400).roundToLong())
-
-
-//val Number.ticks: Ticks
-//    get() = Ticks(this)
 
 val Number.tickTime: TickTime
     get() = TickTime(this)
@@ -55,23 +40,6 @@ val Number.tt: TickTime
     get() = TickTime(this)
 
 fun Number.asTickTime() = TickTime(this)
-
-
-//infix fun Number.tt(): TickTime = TickTime(this)
-//
-//fun main() {
-//    val foo = 1.tickTime
-//}
-//
-////    @Suppress("EXPERIMENTAL_FEATURE_WARNING")
-//data class TickTime(val env: Environment, val time: Number){
-//    operator fun plus(duration: Number): TickTime = TickTime(env,this.time.toDouble() + duration.toDouble())
-//    operator fun plus(duration: Duration, env:Environment) =  TickTime(env,this.time.toDouble() + env.asTicks(duration))
-//}
-//
-//
-//private val Number.tickTime
-//    get() = TickTime(this)
 
 
 // https://stackoverflow.com/questions/32437550/whats-the-difference-between-instant-and-localdatetime
@@ -118,9 +86,6 @@ class OffsetTransform(val offset: Instant = Instant.now(), tickUnit: TimeUnit) :
 
         return TickTime(durationAsTicks(offsetDuration.toKotlinDuration()))
     }
-
-    // todo improve precision of transformation
-
 }
 
 internal const val MISSING_TICK_TRAFO_ERROR = "Tick transformation not configured."

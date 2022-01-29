@@ -3,12 +3,12 @@ package org.kalasim.animation.examples.elevator
 import kotlinx.coroutines.*
 import org.kalasim.ClockSync
 import org.kalasim.TickTransform
+import org.kalasim.animation.cmeAvoidingCopy
 import org.kalasim.examples.elevator.*
 import org.kalasim.misc.DependencyContext
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
-import org.openrndr.draw.Drawer
-import org.openrndr.draw.loadFont
+import org.openrndr.draw.*
 import org.openrndr.extra.gui.GUI
 import org.openrndr.extra.parameters.ActionParameter
 import org.openrndr.extra.parameters.IntParameter
@@ -28,21 +28,27 @@ fun main() = application {
     var frameCounter = 0
     var elevator: Elevator = startSimulation(Elevator(), 50.milliseconds)
 
+
+    // see also https://openrndr.slack.com/archives/CBJGUKVSQ/p1641933241043200
+    val sideBarWidth = 200
     configure {
-        width = 1024
+        width = 1024 + sideBarWidth
         height = 800
         windowResizable = true
         title = "Office Tower"
     }
 
+
     program {
+        val image = loadImage("src/test/resources/Campus_Tower_Frankfurt.jpg")
+
         val font = loadFont("file:IBM_Plex_Mono/IBMPlexMono-Bold.ttf", 24.0)
 
         // https://github.com/openrndr/openrndr-examples/blob/master/src/main/kotlin/examples/10_OPENRNDR_Extras/C08_Quick_UIs001.kt
         val gui = GUI()
 
         val settings = object {
-            @IntParameter("# Floors", 5, 20, order = 0)
+            @IntParameter("# Floors", 1, 20, order = 0)
             var topFloors: Int = 15
 
             @IntParameter("# elevators", 1, 6, order = 10)
@@ -62,11 +68,15 @@ fun main() = application {
         }
 
         val simSettings = object {
-            @IntParameter("Speed", 0, 100)
+            @IntParameter("Speed", 0, 100, order = 0)
             var speed: Int = 50
 
-            @ActionParameter("Restart", order = 1000)
+            @ActionParameter("Reset")
             fun restartModel() {
+                resetModel()
+            }
+
+            fun resetModel() {
                 println("file saved!")
                 elevator.stopSimulation()
 
@@ -75,20 +85,25 @@ fun main() = application {
                     with(settings) {
                         Elevator(false, load0N, loadNN, loadN0, capacity, numElevators, topFloors)
                     },
-                    ((100 - speed + 1)).milliseconds
+                    ((100 - speed + 1)/1.5).milliseconds
                 )
             }
         }
 
-//        gui.onChange { name, value ->
-//            println("$name, $value")
-//        }
 
+        gui.onChange { name, value ->
+            println("restarting sim...")
+            simSettings.restartModel()
+        }
+
+        gui.compartmentsCollapsedByDefault = false
         gui.add(settings, "Elevator Settings")
         gui.add(simSettings, "Simulation Settings")
 
+
         extend(gui)
-        gui.visible = false
+
+//        gui.visible = false
 
         //        extend(ScreenRecorder())
 
@@ -130,15 +145,20 @@ fun main() = application {
             renderTextInRect(visitorRect, visitor.toFloor.level.toString())
         }
 
+        val floorWidth = 6
+
         extend {
+            drawer.image(image, sideBarWidth.toDouble(), 0.0, width.toDouble() - sideBarWidth, height.toDouble())
+            drawer.translate(sideBarWidth.toDouble() + 20, 0.0)
+
             val gridUnitScaleX = width / 25.0
             val gridUnitScaleY = height / 25.0
 
-            val NUM_VISIBLE_WAITERS = 4
+            val NUM_VISIBLE_WAITERS = floorWidth - 2
 
             with(drawer) {
                 // establish a grid system
-                translate(gridUnitScaleX * 8, height * 0.9)
+                translate(gridUnitScaleX * floorWidth, height * 0.9)
 
                 scale(gridUnitScaleX, gridUnitScaleY)
 
@@ -148,14 +168,14 @@ fun main() = application {
                     stroke = ColorRGBa.WHITE
 
                     // show floor number
-                    val boundBox = Rectangle(-8.0, -floor.level.toDouble() - 1, 1.0, 0.9)
+                    val boundBox = Rectangle(-floorWidth.toDouble(), -floor.level.toDouble() - 1, 1.0, 0.9)
                     renderTextInRect(boundBox, floor.level.toString())
 
                     // also render waiters counts (if too many)
                     val numWaiting = floor.queue.size
-                    if(numWaiting > NUM_VISIBLE_WAITERS) {
-                        val floorInfo = "+${numWaiting - NUM_VISIBLE_WAITERS}"
-                        val waitingBBox = Rectangle(-NUM_VISIBLE_WAITERS - 3.0, -floor.level.toDouble()-1, 1.0, 1.0)
+                    if(numWaiting > NUM_VISIBLE_WAITERS - 1) {
+                        val floorInfo = "+${(numWaiting - NUM_VISIBLE_WAITERS+1)}"
+                        val waitingBBox = Rectangle(-(floorWidth-1.0), -floor.level.toDouble() - 1, 1.0, 1.0)
                         renderTextInRect(waitingBBox, floorInfo)
                     }
 
@@ -163,10 +183,11 @@ fun main() = application {
                     val floorGround = floor.level.toDouble()
                     strokeWeight = 0.1
                     stroke = ColorRGBa.WHITE
-                    lineSegment(-100.0, -floorGround, -1.0, -floorGround)
+                    lineSegment(-floorWidth.toDouble(), -floorGround, -1.0, -floorGround)
 
                     // draw queue in front of elevator
-                    floor.queue.asSortedList().take(5).withIndex().forEach { (idx, cqe) ->
+                    val visitorsRects = NUM_VISIBLE_WAITERS - if(floor.queue.size > NUM_VISIBLE_WAITERS ) 1 else 0
+                    floor.queue.asSortedList().take(visitorsRects).withIndex().forEach { (idx, cqe) ->
                         strokeWeight = 0.0
                         drawVisitor(cqe.component, -idx - 2, -floor.level)
                     }
@@ -175,11 +196,11 @@ fun main() = application {
                 // render the ceiling
                 strokeWeight = 0.1
                 stroke = ColorRGBa.WHITE
-                lineSegment(-100.0, -elevator.floors.size.toDouble(), -1.0, -elevator.floors.size.toDouble())
+                lineSegment(-floorWidth.toDouble(), -elevator.floors.size.toDouble(), -1.0, -elevator.floors.size.toDouble())
 
                 //visualize requests
                 //todo https://stackoverflow.com/questions/48777744/thread-safe-way-to-copy-a-hashmap
-                mutableSetOf(*elevator.requests.keys.toTypedArray()).forEach { (floor, direction) ->
+                elevator.requests.cmeAvoidingCopy().keys.forEach { (floor, direction) ->
                     strokeWeight = 0.0
 
                     val requestIndicator = when(direction) {
@@ -205,18 +226,18 @@ fun main() = application {
 
                 // draw cars
                 elevator.cars.withIndex().forEach { (shaftIndex, car) ->
-                    val shaftWidth = car.capacity + 1
+                    val shaftWidth = car.capacity
 
                     fill = ColorRGBa.LIGHT_BLUE
                     stroke = ColorRGBa.LIGHT_BLUE
 
-                    val shaftX = shaftIndex.toDouble() * (shaftWidth + 0.5)
+                    val shaftX = shaftIndex.toDouble() * (shaftWidth + 0.2)
                     val shaftY = -car.currentPosition.y
 
                     rectangle(shaftX, shaftY - 1, shaftWidth.toDouble(), 1.0)
 
                     // draw customers on the in the cab
-                    car.visitors.components.withIndex().forEach { (idx, visitor) ->
+                    car.visitors.components.cmeAvoidingCopy().withIndex().forEach { (idx, visitor) ->
                         val shaftVisitorX = shaftX + idx
                         drawVisitor(visitor, shaftVisitorX, shaftY)
                     }
@@ -229,12 +250,13 @@ fun main() = application {
                 defaults()
                 fill = ColorRGBa.WHITE
                 fontMap = font
-                text("NOW: ${elevator.now}", width - 150.0, height - 30.0)
-                text("Frame: ${frameCounter++}", width - 150.0, height - 50.0)
+                text("Time: ${elevator.now}", width - 150.0, height - 10.0)
+                text("Frame: ${frameCounter++}", width - 150.0, height - 30.0)
             }
         }
     }
 }
+
 
 fun startSimulation(elevator: Elevator, tickMillis: Duration = 50.milliseconds): Elevator {
     return elevator.apply {
