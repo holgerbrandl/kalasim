@@ -1,9 +1,8 @@
 package org.kalasim.animation.examples.elevator
 
 import kotlinx.coroutines.*
-import org.kalasim.ClockSync
-import org.kalasim.TickTransform
-import org.kalasim.animation.cmeAvoidingCopy
+import org.kalasim.*
+import org.kalasim.animation.*
 import org.kalasim.examples.elevator.*
 import org.kalasim.misc.DependencyContext
 import org.openrndr.application
@@ -78,14 +77,15 @@ fun main() = application {
 
             fun resetModel() {
                 println("file saved!")
-                elevator.stopSimulation()
+//                elevator.stopSimulation()
+                elevator.get<AsyncAnimationStop>().stop()
 
                 // Setup new simulation model
                 elevator = startSimulation(
                     with(settings) {
                         Elevator(false, load0N, loadNN, loadN0, capacity, numElevators, topFloors)
                     },
-                    ((100 - speed + 1)/1.5).milliseconds
+                    ((100 - speed + 1) / 1.5).milliseconds
                 )
             }
         }
@@ -102,8 +102,6 @@ fun main() = application {
 
 
         extend(gui)
-
-//        gui.visible = false
 
         //        extend(ScreenRecorder())
 
@@ -174,8 +172,8 @@ fun main() = application {
                     // also render waiters counts (if too many)
                     val numWaiting = floor.queue.size
                     if(numWaiting > NUM_VISIBLE_WAITERS - 1) {
-                        val floorInfo = "+${(numWaiting - NUM_VISIBLE_WAITERS+1)}"
-                        val waitingBBox = Rectangle(-(floorWidth-1.0), -floor.level.toDouble() - 1, 1.0, 1.0)
+                        val floorInfo = "+${(numWaiting - NUM_VISIBLE_WAITERS + 1)}"
+                        val waitingBBox = Rectangle(-(floorWidth - 1.0), -floor.level.toDouble() - 1, 1.0, 1.0)
                         renderTextInRect(waitingBBox, floorInfo)
                     }
 
@@ -186,8 +184,8 @@ fun main() = application {
                     lineSegment(-floorWidth.toDouble(), -floorGround, -1.0, -floorGround)
 
                     // draw queue in front of elevator
-                    val visitorsRects = NUM_VISIBLE_WAITERS - if(floor.queue.size > NUM_VISIBLE_WAITERS ) 1 else 0
-                    floor.queue.asSortedList().take(visitorsRects).withIndex().forEach { (idx, cqe) ->
+                    val visitorsRects = NUM_VISIBLE_WAITERS - if(floor.queue.size > NUM_VISIBLE_WAITERS) 1 else 0
+                    cmeGuard{floor.queue.asSortedList()}.take(visitorsRects).withIndex().forEach { (idx, cqe) ->
                         strokeWeight = 0.0
                         drawVisitor(cqe.component, -idx - 2, -floor.level)
                     }
@@ -196,11 +194,16 @@ fun main() = application {
                 // render the ceiling
                 strokeWeight = 0.1
                 stroke = ColorRGBa.WHITE
-                lineSegment(-floorWidth.toDouble(), -elevator.floors.size.toDouble(), -1.0, -elevator.floors.size.toDouble())
+                lineSegment(
+                    -floorWidth.toDouble(),
+                    -elevator.floors.size.toDouble(),
+                    -1.0,
+                    -elevator.floors.size.toDouble()
+                )
 
                 //visualize requests
                 //todo https://stackoverflow.com/questions/48777744/thread-safe-way-to-copy-a-hashmap
-                elevator.requests.cmeAvoidingCopy().keys.forEach { (floor, direction) ->
+                elevator.requests.asyncCopy().keys.forEach { (floor, direction) ->
                     strokeWeight = 0.0
 
                     val requestIndicator = when(direction) {
@@ -237,7 +240,7 @@ fun main() = application {
                     rectangle(shaftX, shaftY - 1, shaftWidth.toDouble(), 1.0)
 
                     // draw customers on the in the cab
-                    car.visitors.components.cmeAvoidingCopy().withIndex().forEach { (idx, visitor) ->
+                    car.visitors.components.asyncCopy().withIndex().forEach { (idx, visitor) ->
                         val shaftVisitorX = shaftX + idx
                         drawVisitor(visitor, shaftVisitorX, shaftY)
                     }
@@ -262,6 +265,8 @@ fun startSimulation(elevator: Elevator, tickMillis: Duration = 50.milliseconds):
     return elevator.apply {
         ClockSync(tickDuration = tickMillis, syncsPerTick = 10)
         tickTransform = TickTransform(TimeUnit.SECONDS)
+
+        dependency { AsyncAnimationStop() }
 
         CoroutineScope(Dispatchers.Default).launch {
             DependencyContext.setKoin(getKoin())

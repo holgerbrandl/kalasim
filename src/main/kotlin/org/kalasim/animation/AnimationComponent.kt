@@ -51,11 +51,13 @@ open class AnimationComponent(
 
     val currentPosition: Point2D
         get() {
-            return if(to != null) {
+            val currentTo = to // used for better thread safety
+
+            return if(currentTo != null) {
                 val percentDone = (now - started) / (estimatedArrival - started)
 
-                val xDist = to!!.x - from.x
-                val yDist = to!!.y - from.y
+                val xDist = currentTo.x - from.x
+                val yDist = currentTo.y - from.y
 
                 Point2D.Double(
 //                    from.x*(1-percentDone) + to!!.x*percentDone,
