@@ -61,6 +61,8 @@ Documentation
 
 * [#38](https://github.com/holgerbrandl/kalasim/issues/38) Rewritten gas-station example to illustrate [depletable resource](resource.md#depletable-resources) usage
 * Added new datalore example workbook: [Extended Traffic](https://datalore.jetbrains.com/view/notebook/k1y5ufCMLdAWZOu1ztU2fV)
+* Reworked [The Office Tower](examples/office_tower.md) to include better model description and animation
+* New: [Lunar Mining](animation/lunar_mining.md) model to illustrate new animation toolbox of kalasim  
 
 
 ## v0.7 

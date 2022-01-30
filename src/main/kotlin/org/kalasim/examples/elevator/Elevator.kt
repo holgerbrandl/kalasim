@@ -9,7 +9,7 @@ import org.kalasim.examples.elevator.Direction.*
 import org.kalasim.misc.repeat
 import java.awt.Point
 
-// Adopted from https://github.com/salabim/salabim/blob/master/sample%20models/Elevator.py
+// For example documentation see https://www.kalasim.org/examples/office_tower/
 
 const val MOVE_TIME = 10
 const val DOOR_OPEN_TIME = 3
@@ -205,12 +205,12 @@ class Car(initialFloor: Floor, val capacity: Int) :
 }
 
 class Elevator(showLog: Boolean = false,
-               val load0N: Int = 50,
-               val loadNN: Int = 100,
-               val loadN0: Int = 100,
-               val carCapacity: Int = 4,
-               val numCars: Int = 3,
-               val topFloor: Int = 15,
+               load0N: Int = 50,
+               loadNN: Int = 100,
+               loadN0: Int = 100,
+               carCapacity: Int = 4,
+               numCars: Int = 3,
+               topFloor: Int = 15,
 ) : Environment(showLog ) {
     init{
         dependency { this@Elevator }
