@@ -222,7 +222,7 @@ open class Environment(
 
     private val _tm: TickMetrics? = if(enableTickMetrics) TickMetrics(koin = koin) else null
 
-    val tickMetrics: MetricTimeline
+    val tickMetrics: MetricTimeline<Int>
         get() {
             require(_tm != null) { "Use enableTickMetrics=true to enable tick metrics" }
             return _tm.timeline

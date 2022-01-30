@@ -3,7 +3,7 @@ package org.kalasim.examples.er
 import org.kalasim.*
 import org.kalasim.examples.er.PatientStatus.*
 import org.kalasim.examples.er.Severity.*
-import org.kalasim.monitors.MetricTimeline
+import org.kalasim.monitors.IntTimeline
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
@@ -265,9 +265,9 @@ class EmergencyRoom(
     val rooms = List(4) { Room("room $it", State(InjuryType.values().random(random), name = "Setup of room $it")) }
 
     // Add additional metrics
-    val deceasedMonitor = MetricTimeline("deceased patients")
-    val treatedMonitor = MetricTimeline("treated patients")
-    val incomingMonitor = MetricTimeline("incoming patients")
+    val deceasedMonitor = IntTimeline("deceased patients")
+    val treatedMonitor = IntTimeline("treated patients")
+    val incomingMonitor = IntTimeline("incoming patients")
 
     init {
         if(!enableTickMetrics) {

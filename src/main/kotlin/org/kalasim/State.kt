@@ -55,7 +55,7 @@ open class State<T>(
 //    val waiters = PriorityQueue<Component>()
 
     /** Tracks the queue length level along time. */
-    val queueLength: MetricTimeline
+    val queueLength: MetricTimeline<Int>
         get() = waiters.sizeTimeline
 
     /** Tracks the length of stay in the queue over time*/

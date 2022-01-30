@@ -3,8 +3,7 @@ package org.kalasim.test
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
 import org.kalasim.misc.printThis
-import org.kalasim.monitors.MetricTimeline
-import org.kalasim.monitors.printHistogram
+import org.kalasim.monitors.*
 import org.kalasim.plot.kravis.display
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -80,15 +79,15 @@ object DeterministicRefuel {
                     TankTruck()
 
                     // track number of trucks
-                    get<MetricTimeline>(named(TRUCKS_ORDERED)).inc()
-                    get<MetricTimeline>(named(TRUCKS_EN_ROUTE)).addValue(
+                    get<IntTimeline>(named(TRUCKS_ORDERED)).inc()
+                    get<IntTimeline>(named(TRUCKS_EN_ROUTE)).addValue(
                         env.queue.count { it is TankTruck }
                     )
                 }
 
                 request(fuelPump withQuantity litersRequired)
                 hold(litersRequired / REFUELING_SPEED)
-                get<MetricTimeline>(named(CAR_LEAVING)).inc()
+                get<IntTimeline>(named(CAR_LEAVING)).inc()
 //                get<MetricTimeline>(named(TRUCKS_EN_ROUTE)).inc()
             }
         }
@@ -100,9 +99,9 @@ object DeterministicRefuel {
             single { GasStation() }
 
             single(qualifier = named(FUEL_PUMP)) { DepletableResource(FUEL_PUMP, GAS_STATION_SIZE) }
-            single(qualifier = named(CAR_LEAVING)) { MetricTimeline(CAR_LEAVING) }
-            single(qualifier = named(TRUCKS_EN_ROUTE)) { MetricTimeline(TRUCKS_EN_ROUTE) }
-            single(qualifier = named(TRUCKS_ORDERED)) { MetricTimeline(TRUCKS_ORDERED) }
+            single(qualifier = named(CAR_LEAVING)) { IntTimeline(CAR_LEAVING) }
+            single(qualifier = named(TRUCKS_EN_ROUTE)) { IntTimeline(TRUCKS_EN_ROUTE) }
+            single(qualifier = named(TRUCKS_ORDERED)) { IntTimeline(TRUCKS_ORDERED) }
         }.apply {
 
             ComponentGenerator(iat = T_INTER) { Car(get()) }
@@ -127,9 +126,9 @@ object DeterministicRefuel {
 
             get<GasStation>().claimedTimeline.display()
             fuelPump.claimedTimeline.display()
-            get<MetricTimeline>(named(CAR_LEAVING)).display()
-            get<MetricTimeline>(named(TRUCKS_EN_ROUTE)).display()
-            get<MetricTimeline>(named(TRUCKS_ORDERED)).display()
+            get<IntTimeline>(named(CAR_LEAVING)).display()
+            get<IntTimeline>(named(TRUCKS_EN_ROUTE)).display()
+            get<IntTimeline>(named(TRUCKS_ORDERED)).display()
         }
     }
 }

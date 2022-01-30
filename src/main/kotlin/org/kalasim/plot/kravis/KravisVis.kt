@@ -40,7 +40,7 @@ private fun GGPlot.showOptional(): GGPlot = also {
 
 var USE_KRAVIS_VIEWER = false
 
-fun MetricTimeline.display(
+fun  <V:Number> MetricTimeline<V>.display(
     title: String = name,
     from: TickTime? = null,
     to: TickTime? = null,

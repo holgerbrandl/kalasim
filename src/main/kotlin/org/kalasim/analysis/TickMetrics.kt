@@ -20,7 +20,7 @@ class TickMetrics(
     koin: Koin? = null
 ) : Component(koin = koin ?: DependencyContext.get()) {
 
-    val timeline = MetricTimeline(name)
+    val timeline = MetricTimeline(name, 0)
 
     override fun process() = sequence {
 //        hold(ceil(now.value))

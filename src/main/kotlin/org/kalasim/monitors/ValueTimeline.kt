@@ -77,30 +77,30 @@ data class LevelStatsData<T>(
 
 data class LevelStateRecord<T>(val timestamp: TickTime, val value: T, val duration: Double?)
 
+//
+//class IntVarTimeline(initialValue: Int = 0, name: String? = null, koin: Koin = DependencyContext.get()) {
+//    var value: Int = initialValue
+//        set(value) {
+//            field = value
+//            timeline.addValue(value)
+//        }
+//
+//    val timeline by lazy { MetricTimeline<Int>(name, koin = koin) }
+//
+//    override fun toString(): String = value.toString()
+//}
 
-class IntVarTimeline(initialValue: Int = 0, name: String? = null, koin: Koin = DependencyContext.get()) {
-    var value: Int = initialValue
-        set(value) {
-            field = value
-            timeline.addValue(value)
-        }
-
-    val timeline by lazy { MetricTimeline(name, koin = koin) }
-
-    override fun toString(): String = value.toString()
-}
-
-class GenericVarTimeline<T>(initialValue: T, name: String? = null, koin: Koin = DependencyContext.get()) {
-    var value: T = initialValue
-        set(value) {
-            field = value
-            timeline.addValue(value)
-        }
-
-    val timeline by lazy { CategoryTimeline<T>(initialValue, name, koin = koin) }
-
-    override fun toString(): String = value.toString()
-}
+//class GenericVarTimeline<T>(initialValue: T, name: String? = null, koin: Koin = DependencyContext.get()) {
+//    var value: T = initialValue
+//        set(value) {
+//            field = value
+//            timeline.addValue(value)
+//        }
+//
+//    val timeline by lazy { CategoryTimeline<T>(initialValue, name, koin = koin) }
+//
+//    override fun toString(): String = value.toString()
+//}
 
 
 // without wrapping type

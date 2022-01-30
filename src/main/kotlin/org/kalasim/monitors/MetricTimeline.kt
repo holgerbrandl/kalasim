@@ -7,7 +7,6 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.moment.Variance
 import org.kalasim.*
-import org.kalasim.asCMPairList
 import org.kalasim.misc.*
 import org.koin.core.Koin
 import java.util.*
@@ -18,46 +17,29 @@ import kotlin.math.sqrt
  *
  * @param initialValue initial value for a level timeline. It is important to set the value correctly. Default: 0
  */
-class MetricTimeline(
+open class MetricTimeline<V : Number>(
     name: String? = null,
-    private val initialValue: Number = 0,
+    internal val initialValue: V,
     koin: Koin = DependencyContext.get()
-) : Monitor<Number>(name, koin), ValueTimeline<Number> {
+) : Monitor<V>(name, koin), ValueTimeline<V> {
 
     internal val timestamps = mutableListOf<TickTime>()
-    internal val values = ifEnabled { mutableListOf<Double>() }
+    internal val values = ifEnabled { mutableListOf<V>() }
 
     init {
         addValue(initialValue)
     }
 
 
-    override fun addValue(value: Number) {
-        if (!enabled) return
+    override fun addValue(value: V) {
+        if(!enabled) return
 
         timestamps.add(env.now)
-        values.add(value.toDouble())
+        values.add(value)
     }
 
 
-    /** Increment the current value by 1 and add it as value. Autostart with 0 if there is no prior value. */
-    operator fun inc(): MetricTimeline {
-//        val roundToInt = (values.lastOrNull() ?: 0.0).roundToInt()
-        val roundToInt = values.last()
-        addValue((roundToInt + 1))
-
-        return this
-    }
-
-    operator fun dec(): MetricTimeline {
-//        val roundToInt = (values.lastOrNull() ?: 0.0).roundToInt()
-        val roundToInt = values.last()
-        addValue((roundToInt - 1))
-
-        return this
-    }
-
-    override fun get(time: Number): Number {
+    override fun get(time: Number): V {
         require(timestamps.first() <= time) {
             "query time must be greater than timeline start (${timestamps.first()})"
         }
@@ -67,15 +49,15 @@ class MetricTimeline(
 
     operator fun get(time: TickTime) = get(time.value)
 
-    override fun total(value: Number): Double = statsData().run {
+    override fun total(value: V): Double = statsData().run {
         // https://youtrack.jetbrains.com/issue/KT-43776
         values.zip(durations).filter { it.first == value }.sumOf { it.second }
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun statisticsSummary() = (statsData() as LevelStatsData<Number>).statisticalSummary()
+    override fun statisticsSummary() = statsData().statisticalSummary()
 
-    fun statsData(excludeZeros: Boolean = false): LevelStatsData<Number> {
+    fun statsData(excludeZeros: Boolean = false): LevelStatsData<V> {
         @Suppress("DuplicatedCode")
         require(values.isNotEmpty()) { "data must not be empty when preparing statistics of $name" }
 
@@ -84,9 +66,9 @@ class MetricTimeline(
         val timepointsExt = timestamps + env.now
         val durations = timepointsExt.toMutableList().zipWithNext { first, second -> second - first }
 
-        return if (excludeZeros) {
-            val (durFilt, valFilt) = durations.zip(valuesLst).filter { it.second > 0 }.unzip()
-            val (timestampsFilt,_ ) = timestamps.zip(valuesLst).filter { it.second > 0 }.unzip()
+        return if(excludeZeros) {
+            val (durFilt, valFilt) = durations.zip(valuesLst).filter { it.second.toDouble() > 0 }.unzip()
+            val (timestampsFilt, _) = timestamps.zip(valuesLst).filter { it.second.toDouble() > 0 }.unzip()
 
             LevelStatsData(valFilt, timestampsFilt, durFilt)
         } else {
@@ -99,10 +81,10 @@ class MetricTimeline(
 
     fun statistics(excludeZeros: Boolean = false) = MetricTimelineStats(this, excludeZeros)
 
-     override val snapshot
+    override val snapshot
         get() = statistics(false)
 
-    override fun reset(initial: Number) {
+    override fun reset(initial: V) {
         require(enabled) { "resetting a disabled timeline is unlikely to have meaningful semantics" }
 
         values.clear()
@@ -117,7 +99,7 @@ class MetricTimeline(
     override fun clearHistory(before: TickTime) {
         val startFromIdx = timestamps.withIndex().firstOrNull { before > it.value }?.index ?: return
 
-        for (i in 0 until startFromIdx) {
+        for(i in 0 until startFromIdx) {
             val newTime = timestamps.subList(0, startFromIdx)
             val newValues = values.subList(0, startFromIdx)
 
@@ -125,18 +107,27 @@ class MetricTimeline(
             values.apply { clear(); addAll(newValues) }
         }
     }
+
+    fun asDoubleTimeline() = MetricTimeline(name, initialValue.toDouble(), koin = getKoin()).apply {
+        timestamps.apply { clear(); addAll(this@MetricTimeline.timestamps) }
+        values.apply { clear(); addAll(this@MetricTimeline.values.map { it.toDouble() }) }
+    }
 }
 
-fun MetricTimeline.printHistogram(sortByWeight: Boolean = false, binCount: Int = NUM_HIST_BINS, valueBins: Boolean = false) {
+fun <V : Number> MetricTimeline<V>.printHistogram(
+    sortByWeight: Boolean = false,
+    binCount: Int = NUM_HIST_BINS,
+    valueBins: Boolean = false
+) {
     println("Summary of: '${name}'")
     statistics().toJson().printThis()
 
     println("Histogram of: '${name}'")
 
-    if (valueBins) {
+    if(valueBins) {
         val freq = Frequency()
 
-        values.forEach { freq.addValue(it) }
+        values.forEach { freq.addValue(it as Comparable<*>) }
 
         val colData: Map<Double, Double> =
             statistics().data.run {
@@ -180,7 +171,7 @@ fun MetricTimeline.printHistogram(sortByWeight: Boolean = false, binCount: Int =
 internal enum class ArithmeticOp {
     Plus, Minus, Times, Div;
 
-    override fun toString() = when (this) {
+    override fun toString() = when(this) {
         Plus -> "+"
         Minus -> "-"
         Times -> "*"
@@ -188,21 +179,35 @@ internal enum class ArithmeticOp {
     }
 }
 
-operator fun MetricTimeline.plus(other: MetricTimeline) = combineInternal(this, other, ArithmeticOp.Plus)
-operator fun MetricTimeline.minus(other: MetricTimeline) = combineInternal(this, other, ArithmeticOp.Minus)
-operator fun MetricTimeline.times(other: MetricTimeline) = combineInternal(this, other, ArithmeticOp.Times)
-operator fun MetricTimeline.div(other: MetricTimeline) = combineInternal(this, other, ArithmeticOp.Div)
+operator fun <V : Number> MetricTimeline<V>.plus(other: MetricTimeline<V>) =
+    combineInternal(this, other, ArithmeticOp.Plus)
 
-operator fun MetricTimeline.div(factor: Number): MetricTimeline {
-    val constMT = MetricTimeline("Constant $factor", initialValue = factor).apply {
+operator fun <V : Number> MetricTimeline<V>.minus(other: MetricTimeline<V>) =
+    combineInternal(this, other, ArithmeticOp.Minus)
+
+operator fun <V : Number> MetricTimeline<V>.times(other: MetricTimeline<V>) =
+    combineInternal(this, other, ArithmeticOp.Times)
+
+operator fun <V : Number> MetricTimeline<V>.div(other: MetricTimeline<V>) =
+    combineInternal(this, other, ArithmeticOp.Div)
+
+operator fun <V : Number> MetricTimeline<V>.div(factor: Double): MetricTimeline<Double> {
+    val constMT = MetricTimeline("Constant $factor", initialValue = factor.toDouble()).apply {
         timestamps.apply { clear(); add(timestamps.first()) }
     }
-    return combineInternal(this, constMT, ArithmeticOp.Div)
+    return combineInternal(this.asDoubleTimeline(), constMT, ArithmeticOp.Div)
 }
 
-fun List<MetricTimeline>.mean() = reduce { acc, mt -> acc + mt } / size
+fun <V : Number> List<MetricTimeline<V>>.mean(): MetricTimeline<Double> {
+    val reduce = map { it.asDoubleTimeline() }.reduce { acc, mt -> acc + mt }
+    return reduce / size.toDouble()
+}
 
-private fun combineInternal(mt: MetricTimeline, other: MetricTimeline, mode: ArithmeticOp): MetricTimeline {
+private fun <V : Number> combineInternal(
+    mt: MetricTimeline<V>,
+    other: MetricTimeline<V>,
+    mode: ArithmeticOp
+): MetricTimeline<Double> {
     // also see
     // https://www.geeksforgeeks.org/merge-two-sorted-linked-lists/
     // https://stackoverflow.com/questions/1774256/java-code-review-merge-sorted-lists-into-a-single-sorted-list
@@ -213,14 +218,18 @@ private fun combineInternal(mt: MetricTimeline, other: MetricTimeline, mode: Ari
     val maxTime = mt.now.value
 //    val timeRange = minTime..maxTime
 
-    val merged = MetricTimeline("'${mt.name}' $mode '${other.name}'", koin=mt.getKoin()).apply {
+    val merged = MetricTimeline(
+        "'${mt.name}' $mode '${other.name}'",
+        koin = mt.getKoin(),
+        initialValue = 0.0
+    ).apply {
         timestamps.clear()
         values.clear()
     }
 
     joinTime.dropWhile { it < minTime }.takeWhile { it <= maxTime }.forEach { time ->
         merged.timestamps.add(time)
-        val value = when (mode) {
+        val value = when(mode) {
             ArithmeticOp.Plus -> mt[time].toDouble() + other[time].toDouble()
             ArithmeticOp.Minus -> mt[time].toDouble() - other[time].toDouble()
             ArithmeticOp.Times -> mt[time].toDouble() * other[time].toDouble()
@@ -234,19 +243,21 @@ private fun combineInternal(mt: MetricTimeline, other: MetricTimeline, mode: Ari
 
 
 // not pretty but allows assigning new names to merged timelines without make SimEntity.name var.
-internal fun MetricTimeline.copy(name: String = this.name): MetricTimeline = MetricTimeline(name, koin = getKoin()).apply {
-    values.clear()
-    values.addAll(this@copy.values)
-    timestamps.clear()
-    timestamps.addAll(this@copy.timestamps)
-}
+internal fun <V : Number> MetricTimeline<V>.copy(name: String = this.name): MetricTimeline<V> =
+    MetricTimeline<V>(name, initialValue = initialValue, koin = getKoin()).apply {
+        values.clear()
+        values.addAll(this@copy.values)
+        timestamps.clear()
+        timestamps.addAll(this@copy.timestamps)
+    }
 
 
 //
 // Statistical Summary
 //
 
-class MetricTimelineStats(nlm: MetricTimeline, excludeZeros: Boolean = false) : Jsonable(), EntitySnapshot {
+class MetricTimelineStats<V : Number>(nlm: MetricTimeline<V>, excludeZeros: Boolean = false) : Jsonable(),
+    EntitySnapshot {
     val duration: Double
 
     val mean: Double?
@@ -262,12 +273,12 @@ class MetricTimelineStats(nlm: MetricTimeline, excludeZeros: Boolean = false) : 
 //    val ninetyninePercentile :Double = TODO()
 
     init {
-        val doubleValues =  data.values.map{ it.toDouble()}.toDoubleArray()
+        val doubleValues = data.values.map { it.toDouble() }.toDoubleArray()
 
         min = doubleValues.minOrNull()
         max = doubleValues.maxOrNull()
 
-        if (data.durations.any { it != 0.0 }) {
+        if(data.durations.any { it != 0.0 }) {
             val durationsArray = data.durations.toDoubleArray()
             mean = Mean().evaluate(doubleValues, durationsArray)
             standardDeviation = sqrt(Variance().evaluate(doubleValues, durationsArray))

@@ -14,7 +14,7 @@ import org.kalasim.monitors.*
 import org.kalasim.plot.kravis.clistTimeline
 
 
-fun MetricTimeline.display(
+fun  <V:Number> MetricTimeline<V>.display(
     title: String = name,
     from: TickTime? = null,
     to: TickTime? = null,

@@ -84,7 +84,7 @@ class MonitorTests {
 
     @Test
     fun `it should correctly calculate numeric level stats`() = createTestSimulation {
-        val nlm = MetricTimeline()
+        val nlm = IntTimeline()
 
         run(2)
         nlm.addValue(2)
@@ -105,7 +105,7 @@ class MonitorTests {
     @Test
     fun `MetricTimeline should allow to retrieve a value for now but not before recording start`() =
         createTestSimulation {
-            val nlm = MetricTimeline()
+            val nlm = IntTimeline()
 
             run(2)
             nlm.addValue(2)
@@ -192,8 +192,8 @@ class MergeTimelineTests {
 
     @Test
     fun `it should metric timelines`() = createTestSimulation {
-        val mtA = MetricTimeline()
-        val mtB = MetricTimeline()
+        val mtA = IntTimeline()
+        val mtB = IntTimeline()
 
         run(until = 5.tt)
         mtA.addValue(23)
@@ -231,8 +231,8 @@ class MergeMonitorStatsTests {
 
     @Test
     fun `it should merge NLM stats`() = createTestSimulation {
-        val nlmA = MetricTimeline()
-        val nlmB = MetricTimeline()
+        val nlmA = IntTimeline()
+        val nlmB = IntTimeline()
 
         run(until = 5.tt)
         nlmA.addValue(23)
@@ -247,7 +247,7 @@ class MergeMonitorStatsTests {
         nlmA.addValue(10)
 
         //merge statistics
-        val mergedStats: EnumeratedDistribution<Number> = listOf(nlmA, nlmB).mergeStats()
+        val mergedStats: EnumeratedDistribution<Int> = listOf(nlmA, nlmB).mergeStats()
         println(mergedStats)
 
         // TODO tadd actual assert

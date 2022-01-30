@@ -56,6 +56,7 @@ Minor enhancements
 * Added `capacity` to [component collections](collections.md)
 * Reworked [distribution support API](basics.md#randomness--distributions) for better API experience to enable controlled randomization in process models
 * Removed `Resource.release()` because of incomplete and unclear semantics
+* [#53](https://github.com/holgerbrandl/kalasim/issues/53) Generified [`MetricsTimeline`](analysis.md#monitors)
 
 Documentation
 

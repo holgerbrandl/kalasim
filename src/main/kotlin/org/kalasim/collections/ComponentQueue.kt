@@ -56,7 +56,7 @@ class ComponentQueue<C>(
 
         changeListeners.forEach { it.added(component) }
 
-        sizeTimeline.addValue(q.size.toDouble())
+        sizeTimeline.addValue(q.size)
 
         return added
     }
@@ -97,7 +97,7 @@ class ComponentQueue<C>(
         val (_, enterTime) = cqe
 
         lengthOfStayStatistics.addValue((env.now - enterTime))
-        sizeTimeline.addValue(q.size.toDouble())
+        sizeTimeline.addValue(q.size)
     }
 
     fun contains(c: C): Boolean = q.any { it.component == c }

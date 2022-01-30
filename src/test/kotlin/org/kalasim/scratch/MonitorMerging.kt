@@ -8,7 +8,7 @@ import org.kalasim.tt
 // https://www.kalasim.org/examples/
 fun main() {
     createSimulation {
-        val nlm = MetricTimeline()
+        val nlm = MetricTimeline(initialValue = 0)
         nlm.addValue(23)
 
         run(until = 10.tt)

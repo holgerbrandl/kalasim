@@ -45,7 +45,7 @@ abstract class ComponentCollection<C>(
 
 
     //    val ass = AggregateSummaryStatistics()
-    val sizeTimeline = MetricTimeline("Size of ${this.name}", koin = koin)
+    val sizeTimeline = MetricTimeline<Int>("Size of ${this.name}", 0, koin = koin)
     val lengthOfStayStatistics = NumericStatisticMonitor("Length of stay in ${this.name}", koin = koin)
     val capacityTimeline = MetricTimeline("Capacity of ${this.name}", initialValue = capacity, koin = koin)
 

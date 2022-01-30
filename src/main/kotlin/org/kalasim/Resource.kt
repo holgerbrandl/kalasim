@@ -236,8 +236,8 @@ open class Resource(
         validateCapacityRange(capacity)
     }
 
-    val capacityTimeline = MetricTimeline("Capacity of ${super.name}", initialValue = capacity, koin = koin)
-    val claimedTimeline = MetricTimeline("Claimed quantity of ${this.name}", koin = koin)
+    val capacityTimeline = MetricTimeline("Capacity of ${super.name}", initialValue = capacity.toDouble(), koin = koin)
+    val claimedTimeline = MetricTimeline("Claimed quantity of ${this.name}", koin = koin, initialValue = 0.0)
 
     //    val availabilityTimeline =
 //            MetricTimeline("Available quantity of ${this.name}", initialValue = availableQuantity, koin = koin)
@@ -444,9 +444,9 @@ val Resource.timeline: List<ResourceTimelineSegment>
             .addColumn("Metric") { ResourceMetric.Availability }
 
         val requesters = requesters.sizeTimeline.statsData().asList().asDataFrame()
-            .addColumn("Metric") { ResourceMetric.Requesters }
+            .addColumn("Metric") { ResourceMetric.Requesters }.addColumn("value"){ it["value"].toDoubles()}
         val claimers = claimers.sizeTimeline.statsData().asList().asDataFrame()
-            .addColumn("Metric") { ResourceMetric.Claimers }
+            .addColumn("Metric") { ResourceMetric.Claimers }.addColumn("value"){ it["value"].toDoubles()}
 
         var statsDF = bindRows(capStats, claimStats, availStats, occStats, requesters, claimers)
         statsDF = statsDF.rename("timestamp" to "start")
