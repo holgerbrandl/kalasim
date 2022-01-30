@@ -2,7 +2,7 @@
 
 In this logistics model, we simulate an office tower. There are N lifts with capacity limited cars. Passengers arrive at different floors with different rates and press buttons indicating the direction of their target floor. The cars have a defined speed, and clearly it takes time to open/close its doors before passengers can enter & leave.
 
-![](office_tower_snapshot.png){: .center}
+![](office_tower_snapshot.jpg){: .center}
 
 Parameters
 
