@@ -1,13 +1,13 @@
-package org.kalasim.animation
+package org.kalasim.examples.er
 
 import kotlinx.coroutines.*
 import org.kalasim.*
+import org.kalasim.animation.AnimationComponent
 import org.kalasim.misc.DependencyContext
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.loadFont
 import org.openrndr.draw.loadImage
-import org.openrndr.ffmpeg.ScreenRecorder
 import org.openrndr.svg.loadSVG
 import java.awt.geom.Point2D
 import java.lang.Thread.sleep
@@ -39,16 +39,16 @@ fun main() {
 
         program {
             // load resources such as images
-            val image = loadImage("src/main/resources/1024px-Phlegra_Montes_on_Mars_ESA211127.jpg")
-            val truck = loadSVG("src/main/resources/tractor-svgrepo-com.svg")
-            val font = loadFont("file:IBM_Plex_Mono/IBMPlexMono-Bold.ttf", 24.0)
+//            val image = loadImage("src/main/resources/1024px-Phlegra_Montes_on_Mars_ESA211127.jpg")
+//            val truck = loadSVG("src/main/resources/tractor-svgrepo-com.svg")
+//            val font = loadFont("file:IBM_Plex_Mono/IBMPlexMono-Bold.ttf", 24.0)
 
             // optionally enable video recording
 //            extend(ScreenRecorder())
 
             extend {
                 // draw background
-                drawer.image(image, 0.0, 0.0, width.toDouble(), height.toDouble())
+//                drawer.image(image, 0.0, 0.0, width.toDouble(), height.toDouble())
 
                 // visualize simulation entities
                 with(drawer) {
@@ -60,7 +60,7 @@ fun main() {
                 // draw info & statistics
                 drawer.defaults()
                 drawer.fill = ColorRGBa.WHITE
-                drawer.fontMap = font
+//                drawer.fontMap = font
                 drawer.text("NOW: ${sim.now}", width - 150.0, height - 30.0)
                 drawer.text("Frame: ${frameCounter++}", width - 150.0, height - 50.0)
             }

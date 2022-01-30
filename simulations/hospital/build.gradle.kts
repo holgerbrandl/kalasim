@@ -2,11 +2,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 plugins {
-    kotlin("jvm") version "1.5.21"
+    kotlin("jvm") version "1.6.10"
     `maven-publish`
 }
 
-group = "org.kalasim.examples"
+group = "org.kalasim.examples.er"
 version = "1.0-SNAPSHOT"
 
 
@@ -16,22 +16,12 @@ repositories {
 }
 
 dependencies {
-
-    api("com.github.holgerbrandl:kalasim:0.7.3")
-    api("com.github.holgerbrandl:kravis:0.8.1")
+    api("com.github.holgerbrandl:kalasim-animation:0.7.97-SNAPSHOT")
+    api("com.github.holgerbrandl:kravis:0.8.5")
 
     testImplementation(kotlin("test"))
 }
 
 tasks.test {
     useJUnit()
-}
-
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-        }
-    }
 }

@@ -12,8 +12,8 @@ plugins {
 }
 
 group = "com.github.holgerbrandl"
-//version = "0.7-SNAPSHOT"
-version = "0.7.96"
+version = "0.7.97-SNAPSHOT"
+//version = "0.7.96"
 
 
 repositories {
