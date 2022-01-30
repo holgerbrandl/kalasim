@@ -48,6 +48,7 @@ Major Enhancements
 
 Minor enhancements
 
+* [#47](https://github.com/holgerbrandl/kalasim/issues/47) Added entity [auto-indexing](component.md) to allow for more descriptive names
 * [#50](https://github.com/holgerbrandl/kalasim/pull/50) Fixed [`trigger()`](state.md#state-change-triggers)
 * Introduced more event-types and improved [structured logging](events.md) capabilities
 * Renamed all `info` attributes to `snapshot` to convey intent better

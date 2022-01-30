@@ -18,7 +18,7 @@ val component = Component()
 Components will interact with each other through a well-defined vocabulary of [process interaction](#process-interaction) methods.
 
 !!!info
-    By default, Components will be named automatically, using the pattern `[Class Name].[Instance Number]` unless a custom name is provided via the `name` parameter in `Component(name="Foo")`.
+    By default, Components will be named automatically, using the pattern `[Class Name].[Instance Number]` unless a custom name is provided via the `name` parameter in `Component(name="Foo")`. Kalasim also supports _auto-indexing_ if a provided component name ends with a dash `-`, dot `.` or underscore `_`. E.g. A first `Component("Foo-")` will be named `Foo-1`, a second one `Foo-2` and so on.
 
 ## Process Definition
 

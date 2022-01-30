@@ -1,7 +1,6 @@
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
-import org.kalasim.analysis.InteractionEvent
 import org.kalasim.misc.*
 import org.koin.core.Koin
 import org.koin.core.parameter.ParametersDefinition
@@ -12,18 +11,24 @@ import org.koin.core.qualifier.Qualifier
 interface EntitySnapshot : WithJson
 
 /** Base class of all main simulation entities such as environments, resources, components, states and collections. */
-abstract class SimulationEntity(name: String? = null, val simKoin: Koin = DependencyContext.get()) : SimContext, WithJson {
+abstract class SimulationEntity(name: String? = null, val simKoin: Koin = DependencyContext.get()) : SimContext,
+    WithJson {
 
     final override val env = getKoin().get<Environment>()
 
     /** The (possibly auto-generated) name of this simulation entity.*/
-    val name = name ?: javaClass.defaultName(env.nameCache)
+    val name = name?.run {
+        if(endsWithCDU()) defaultName(env.nameCache) else this
+    } ?: javaClass.defaultName(env.nameCache)
+
+    /** return true if name ends with dot, dash or underscore. Used for auto-index pattern detection.*/
+    private fun String.endsWithCDU(): Boolean = endsWith('.') || endsWith('-') || endsWith('_')
 
     /** The time when the component was instantiated. */
     val creationTime = env.now
 
-    open val snapshot: EntitySnapshot = object : EntitySnapshot{
-        override fun toJson() = json{
+    open val snapshot: EntitySnapshot = object : EntitySnapshot {
+        override fun toJson() = json {
             "name" to name
             "time" to now
         }
@@ -34,7 +39,7 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
     /** Print info about this resource */
     internal fun printInfo() = println(snapshot.toJson().toIndentString())
 
-        //    override fun toString(): String = "${javaClass.simpleName}($name)"
+    //    override fun toString(): String = "${javaClass.simpleName}($name)"
     override fun toString(): String = name
 
     //https://medium.com/koin-developers/ready-for-koin-2-0-2722ab59cac3
@@ -66,8 +71,6 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
         get() = env.random
 
 
-
-
     /**
      * Records a state-change event.
      *
@@ -81,7 +84,7 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
 
 
     internal fun log(enabled: Boolean, builder: () -> Event) {
-        if (enabled) {
+        if(enabled) {
             log(builder())
         }
     }
@@ -98,6 +101,9 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
 
 internal fun Class<*>.defaultName(nameCache: MutableMap<String, Int>) =
     simpleName.ifEmpty { "Component" } + "." + getComponentCounter(simpleName, nameCache)
+
+private fun String.defaultName(nameCache: MutableMap<String, Int>) =
+    this + getComponentCounter(this.removeRange(length-1 until length), nameCache)
 
 private fun getComponentCounter(className: String, nameCache: MutableMap<String, Int>) =
     nameCache.merge(className, 1, Int::plus)

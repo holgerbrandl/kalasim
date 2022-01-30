@@ -27,6 +27,21 @@ class ComponentTests {
         c.name shouldBe "Component.1"
     }
 
+    @Test
+    fun `it should  auto-indexing if the name ends with a comma or dot`() = createTestSimulation {
+        val c1 = object : Component("Foo") {}
+        val c2 = object : Component("Bar.") {}
+        val c3 = object : Component("Bar.") {}
+        val c4 = object : Component("Bla-") {}
+        val c5 = object : Component("Bla-") {}
+
+        c1.name shouldBe "Foo"
+        c2.name shouldBe "Bar.1"
+        c3.name shouldBe "Bar.2"
+        c4.name shouldBe "Bla-1"
+        c5.name shouldBe "Bla-2"
+    }
+
 
     @Test
     fun `it should not create components outside of an environment`() {

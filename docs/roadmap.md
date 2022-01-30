@@ -129,6 +129,10 @@ Explore scalalabe queues https://chronicle.software/open-hft/queue/ & https://dz
 
 https://www.sciencedirect.com/science/article/abs/pii/S0377221721010894?dgcid=rss_sd_all
 
+
+optimize operations with simple grid search
+https://www.supplychaindataanalytics.com/open-pit-mine-simulation-for-better-planning/
+
 ## Misc 
 
 state-machine-like https://github.com/fraktalio/fmodel
