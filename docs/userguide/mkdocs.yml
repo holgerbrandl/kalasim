@@ -43,7 +43,7 @@ nav:
     - Events: events.md
     - Monitors: monitors.md
     - Visualization: visualization.md
-    - Animation: animation/animation.md
+    - Animation: animation.md
 
   - Articles:
       - Overview: articles/articles.md
