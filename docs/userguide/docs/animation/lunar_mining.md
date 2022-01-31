@@ -77,7 +77,7 @@ Once water unloading is complete, another sub-process of the ice harvester is ac
 
 ## Process Animation
 
-The model can be expressed easily in approximately 200 lines of [process definitions](../component.md#process-definition) in [`LunarMining.kt`](https://github.com/holgerbrandl/kalasim/blob/master/simulations/lunar-mining/src/main/kotlin/org/kalasim/demo/moon/LunarMining.kt). Howvever, it was not initially clear, if the intended dynamics were implemented correctly. [Process animation](animation.md) comes to resuce, as it allows to debug of the model vsually.
+The model can be expressed easily in approximately 200 lines of [process definitions](../component.md#process-definition) in [`LunarMining.kt`](https://github.com/holgerbrandl/kalasim/blob/master/simulations/lunar-mining/src/main/kotlin/org/kalasim/demo/moon/LunarMining.kt). Howvever, it was not initially clear, if the intended dynamics were implemented correctly. [Process animation](../animation.md) comes to resuce, as it allows to debug of the model vsually.
 
 A process animation was developed as well to better understand the spatio-temporal dynamics of the model. In [LunarMiningHQ.kt](https://github.com/holgerbrandl/kalasim/blob/master/simulations/lunar-mining/src/main/kotlin/org/kalasim/demo/moon/LunarMiningHQ.kt) the animation of this process is worked out in just about 150 lines of code.
 
@@ -86,7 +86,7 @@ A process animation was developed as well to better understand the spatio-tempor
   <iframe width="700" height="500" src="https://www.youtube.com/embed/r2igemRWk7s" frameborder="0" allowfullscreen></iframe>
 </div>
 
-We used different capabilties of the [animation system](animation.md) (based on [OPENRNDR](https://openrndr.org/))
+We used different capabilties of the [animation system](../animation.md) (based on [OPENRNDR](https://openrndr.org/))
 
 * Image background to draw a map of the moon
 * Dynamic shape contour to indicate loading status of the harvesters

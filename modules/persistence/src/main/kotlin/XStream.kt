@@ -1,8 +1,5 @@
 package org.kalasim.examples.hospital
 
-import EmergencyRoom
-import Patient
-import SetupAvoidanceNurse
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.io.Output
 import com.thoughtworks.xstream.XStream

@@ -32,7 +32,7 @@ The simulation [environment](../basics.md#simulation-environment) is modelled in
 
 ## Process Animation
 
-The model was also animated ([source](https://github.com/holgerbrandl/kalasim/blob/master/modules/animation/src/test/kotlin/org/kalasim/animation/examples/elevator/ElevatorAnimated.kt)) to illustrate the power of kalasim's [animation](../animation/animation.md) API.
+The model was also animated ([source](https://github.com/holgerbrandl/kalasim/blob/master/modules/animation/src/test/kotlin/org/kalasim/animation/examples/elevator/ElevatorAnimated.kt)) to illustrate the power of kalasim's [animation](../animation.md) API.
 
 <div class="video-wrapper">
   <iframe width="700" height="500" src="https://www.youtube.com/embed/KwBeon-rXdw" frameborder="0" allowfullscreen></iframe>

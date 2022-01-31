@@ -1,8 +1,5 @@
 package org.kalasim.examples.hospital
 
-import EmergencyRoom
-import Patient
-import SetupAvoidanceNurse
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.io.Output
 import krangl.DataFrameRow
@@ -11,9 +8,10 @@ import krangl.dataFrameOf
 import krangl.print
 import org.kalasim.*
 import org.kalasim.examples.MM1Queue
+import org.kalasim.examples.er.EmergencyRoom
+import org.kalasim.examples.er.Patient
 import org.kalasim.plot.letsplot.display
 import org.koin.core.Koin
-import org.koin.core.component.get
 import org.koin.core.logger.EmptyLogger
 import java.io.ByteArrayOutputStream
 import java.io.FileOutputStream
@@ -51,16 +49,16 @@ public fun EmergencyRoom.testSim() = apply {
     deceasedMonitor.display("Deceased Patients")
 
     get<EmergencyRoom>().apply {
-        rooms[0].setup.valueMonitor.display().show()
-        rooms[1].setup.valueMonitor.display().show()
+        rooms[0].setup.timeline.display().show()
+        rooms[1].setup.timeline.display().show()
 
-        rooms[1].statusMonitor.display().show()
+        rooms[1].statusTimeline.display().show()
     }
 
-    waitingLine.queueLengthMonitor.display().show()
-    waitingLine.lengthOfStayMonitor.display().show()
+    waitingLine.sizeTimeline.display().show()
+//    waitingLine.timlengthOfStayMonitor.display().show()
 
-    val arrivals = get<ComponentGenerator<Patient>>().arrivals
+    val arrivals = get<ComponentGenerator<Patient>>().history
 //        arrivals.asDataFrame().print()
 
 
