@@ -34,7 +34,7 @@ main differences
 
 
 
-## github actions
+## Github Actions
 
 revert remote tags that prevent pushing because of
 > error: dst refspec refs/heads/master matches more than one
@@ -45,21 +45,29 @@ https://github.com/actions/create-release/issues/13
 git push origin :refs/tags/refs/heads/master
 ```
 
-## coroutines
+## Coroutines Concepts
+
 
 <https://medium.com/livefront/suspending-lambdas-in-kotlin-7319d2d7092a>
 > `(suspend () -> T)`
 
 
-<https://stackoverflow.com/questions/40161956/kotlin-sequence-concatenation>
-
-
----
-
 <https://medium.com/mobile-app-development-publication/kotlin-flow-buffer-is-like-a-fashion-adoption-31630a9cdb00>
 ![](.dev_notes_images/flowmodes.png)
 
-## Priortiy Queue
+## Coroutine Serialization
+
+Main Thread https://github.com/Kotlin/kotlinx.coroutines/issues/76
+
+Older reference https://discuss.kotlinlang.org/t/kotlin-serialization/2063/14
+> Serialization of coroutines is a larger problem that is not directly related to an actual serialization format. Current implementation of coroutines is serializable with both Java Serialization (they implement java.io.Serializable) as well as with 3rd party Java libraries (I’ve tested it with Kryo and it works).
+
+
+---
+comparator persistence https://youtrack.jetbrains.com/issue/KT-23398
+
+
+## Priority Queue
 
 https://newbedev.com/how-to-iterate-over-a-priorityqueue
 
@@ -77,7 +85,7 @@ Arrays.sort(theActualArray, pq.comparer())
 Arrays.sort(pq.toArray())
 ```
 
-## misc
+## Misc
 
 publish the central
 
