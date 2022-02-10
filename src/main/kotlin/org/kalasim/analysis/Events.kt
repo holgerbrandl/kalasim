@@ -131,7 +131,7 @@ open class  StateChangedEvent<T>(
         "state" to state.name
         "newValue" to newValue
         if(trigger!=null) {
-            "trigger" to (trigger ?: "")
+            "trigger" to trigger
         }
     }
 }

@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "com.github.holgerbrandl"
-version = "0.7.97"
+version = "0.7.98-SNAPSHOT"
 //version = "0.7.96"
 
 
@@ -42,7 +42,7 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:5.0.3")
 
     // **TODO** move to api to require users to pull it in if needed
-    implementation("com.github.holgerbrandl:krangl:0.17.1")
+    implementation("com.github.holgerbrandl:krangl:0.17.2")
 
     compileOnly("com.github.holgerbrandl:kravis:0.8.5")
     testImplementation("com.github.holgerbrandl:kravis:0.8.5")

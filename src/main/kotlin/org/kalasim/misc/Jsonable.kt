@@ -42,7 +42,7 @@ open class AutoJson() : Jsonable() {
 var ser: JsonSerializer<TickTime> =
     JsonSerializer<TickTime> { src: TickTime?, _: Type?, _: JsonSerializationContext? ->
 //        if(src == null) null else JsonPrimitive(JSON_DF.format(  src.value)) as JsonElement
-        if(src == null) null else JsonPrimitive(src.value.roundAny(2)) as JsonElement
+        if(src == null) null else JsonPrimitive(src.value.roundAny(2))
     }
 
 internal class TickTimeGsonAdapter : TypeAdapter<TickTime>() {

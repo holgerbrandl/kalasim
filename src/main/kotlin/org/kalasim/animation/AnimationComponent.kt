@@ -110,7 +110,7 @@ open class AnimationComponent(
             if(re.component != this) return@addEventListener
 
             holdTracks
-                .filter { (name, matcher) -> matcher(re) }
+                .filter { (_, matcher) -> matcher(re) }
                 .keys.forEach {
                     lastHold[it] = re
                 }
