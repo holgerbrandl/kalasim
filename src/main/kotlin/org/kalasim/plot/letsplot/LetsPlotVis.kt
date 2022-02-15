@@ -29,8 +29,13 @@ fun  <V:Number> MetricTimeline<V>.display(
     fun wtTransform(tt: TickTime) = if (useWT) env.asWallTime(tt) else tt.value
 
     return data.asDataFrame()
+        .convertTick2Double("time")
         .letsPlot() +
             geomStep { x = "time"; y = "value" } + ggtitle(title)
+}
+
+private fun DataFrame.convertTick2Double(colName: String): DataFrame {
+    return addColumn(colName){ it[colName].map<TickTime>{ it.value}}
 }
 
 
@@ -70,8 +75,10 @@ fun <T> CategoryTimeline<T>.display(
             it.second.time
         )
     }.asDataFrame()
-        .addColumn("start") { expr -> expr["start"].map<Double> { wtTransform(TickTime(it)) } }
-        .addColumn("end") { expr -> expr["end"].map<Double> { wtTransform(TickTime(it)) } }
+        .convertTick2Double("start")
+        .convertTick2Double("end")
+//        .addColumn("start") { expr -> expr["start"].map<Double> { wtTransform(TickTime(it)) } }
+//        .addColumn("end") { expr -> expr["end"].map<Double> { wtTransform(TickTime(it)) } }
         .addColumn("value") { expr -> expr["value"].map<ComponentState> { it.toString() } }
 
 
@@ -100,15 +107,17 @@ fun List<ResourceActivityEvent>.display(
     val plotData = asDataFrame()
         .unfold<Resource>("resource", listOf("name"))
         .addColumn("activity") { expr -> expr["activity"].toStrings().map { it ?: "Other" } }
-        .addColumn("start") { expr -> expr["start"].map<TickTime> { it.value } }
-        .addColumn("end") { expr -> expr["end"].map<TickTime> { it.value } }
+        .convertTick2Double("requested")
+        .convertTick2Double("released")
+//        .addColumn("start") { expr -> expr["start"].map<TickTime> { it.value } }
+//        .addColumn("end") { expr -> expr["end"].map<TickTime> { it.value } }
 
     return plotData.letsPlot() +
             geomSegment(size = 10) {
                 y = "name"
                 yend = "name"
-                x = if (useWT) "startWT" else "start"
-                xend = if (useWT) "endWT" else "end"
+                x = if (useWT) "startWT" else "requested"
+                xend = if (useWT) "endWT" else "released"
                 color = "activity"
 
             } +
@@ -132,7 +141,8 @@ fun List<ResourceTimelineSegment>.display(
 
 
     return filter { it.metric !in exclude }.asDataFrame()
-        .addColumn("start") { expr -> expr["start"].map<TickTime> { it.value } }
+//        .addColumn("start") { expr -> expr["start"].map<TickTime> { it.value } }
+        .convertTick2Double("start")
         .letsPlot() +
             geomStep {
 
@@ -171,8 +181,10 @@ fun List<Component>.displayStateTimeline(
         .asDataFrame()
         .unfold<Component>("first", listOf("name"))
         .unfold<LevelStateRecord<ComponentState>>("second", listOf("timestamp", "duration", "value"))
-        .addColumn("start") { expr -> expr["timestamp"].map<Double> { wtTransform(TickTime(it)) } }
-        .addColumn("end") { expr -> (expr["timestamp"] + expr["timestamp"]).map<Double> { wtTransform(TickTime(it)) } }
+//        .addColumn("start") { expr -> expr["timestamp"].map<Double> { wtTransform(TickTime(it)) } }
+//        .addColumn("end") { expr -> (expr["timestamp"] + expr["timestamp"]).map<Double> { wtTransform(TickTime(it)) } }
+        .convertTick2Double("start")
+        .convertTick2Double("end")
         .addColumn("value") { expr -> expr["value"].map<ComponentState> { it.toString() } }
 
 
