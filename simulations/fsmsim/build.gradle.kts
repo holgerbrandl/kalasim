@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.5.20"
+    kotlin("jvm") version "1.6.10"
 }
 
 group = "org.kalasim.examples"
@@ -16,10 +16,10 @@ dependencies {
     testImplementation(kotlin("test"))
     implementation("io.jumpco.open:kfsm-jvm:1.4.31")
 //    implementation "com.github.holgerbrandl:kalasim:0.6.8"
-    implementation("com.github.holgerbrandl:kalasim:0.7-SNAPSHOT")
+    implementation("com.github.holgerbrandl:kalasim:0.7.97")
 
 
-    implementation("com.github.holgerbrandl:kravis:0.8.1")
+    implementation("com.github.holgerbrandl:kravis:0.8.5")
 }
 
 tasks.test {

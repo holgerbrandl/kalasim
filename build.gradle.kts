@@ -42,7 +42,7 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:5.0.3")
 
     // **TODO** move to api to require users to pull it in if needed
-    implementation("com.github.holgerbrandl:krangl:0.17.2")
+    implementation("com.github.holgerbrandl:krangl:0.17.3")
 
     compileOnly("com.github.holgerbrandl:kravis:0.8.5")
     testImplementation("com.github.holgerbrandl:kravis:0.8.5")

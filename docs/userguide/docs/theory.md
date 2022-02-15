@@ -23,7 +23,7 @@ As described by [Ucar, 2019](https://www.jstatsoft.org/article/view/v090i02), th
 <!-- see Ucar, 2019 page 2-->
 There are several main DES paradigms. In *activity-oriented*  DES the simulation clock advances in fixed time increments and all simulation entities are scanned and possibly reevaluated. Clearly, simulation performance degrades quickly with smaller increments and increasingly complex models.
 
-In *event-oriented* DES is built around a list of scheduled events ordered by future execution time. During simulation, the these events are processed seqeuentially to update the state of the model.
+In *event-oriented* DES is built around a list of scheduled events ordered by future execution time. During simulation, the these events are processed sequentially to update the state of the model.
 
 Finally, *process-oriented* DES refines the event-oriented approach by defining a vocabulary of interactions to describe the interplay between simulation entities. This vocabulary is used by the modeler to define the component life-cycle processes of each simulation entity.
 
