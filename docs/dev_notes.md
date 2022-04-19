@@ -47,6 +47,12 @@ git push origin :refs/tags/refs/heads/master
 
 ## Coroutines Concepts
 
+From https://youtrack.jetbrains.com/issue/KT-48678#focus=Comments-27-6015585.0-0
+
+> how local variables (including function arguments) are dealt with. For every suspend function and lambda the compiler generates a so-called continuation class, which is used as a storage of local variables' values. Before every suspension point (suspend call), the variables are saved in the continuation object during the process called spillling. After the suspension point the variables are restored (unspilled). This is necessary, since a coroutine can be resumed on a different thread and there will be no variables there.
+
+---
+
 
 <https://medium.com/livefront/suspending-lambdas-in-kotlin-7319d2d7092a>
 > `(suspend () -> T)`
