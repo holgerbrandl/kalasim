@@ -67,6 +67,10 @@ Visualization
 * <https://github.com/JetBrains/lets-plot-kotlin> is an open-source plotting library for statistical data.
 
 
+Inspirations
+
+* [atomic-agents](https://gjmcn.github.io/atomic-agents/index.html) - Spatial Agent-based Modeling in JavaScript
+
 ## Repo Maintainer
 
 [Holger Brandl](https://linkedin.com/in/holgerbrandl/) holds a Ph.D. degree in machine learning and has developed new concepts in the field of computational linguistics. More recently he has co-authored [publications](https://orcid.org/0000-0003-1911-8570) in high-ranking journals such as Nature and Science.
