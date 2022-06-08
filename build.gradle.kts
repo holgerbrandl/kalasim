@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.6.10"
+    kotlin("jvm") version "1.6.21"
 //    kotlin("jvm") version "1.5.31"
     `maven-publish`
     signing
