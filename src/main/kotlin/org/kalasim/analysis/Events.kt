@@ -118,9 +118,9 @@ open class  StateChangedEvent<T>(
     override val action: String?
         get() {
             return if(trigger!=null) {
-                "State changed to '$newValue'"
-            } else {
                 "State changes to '$newValue' with trigger allowing $trigger components"
+            } else {
+                "State changed to '$newValue'"
             }
         }
 
