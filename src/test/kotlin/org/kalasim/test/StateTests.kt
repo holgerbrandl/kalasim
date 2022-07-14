@@ -127,9 +127,9 @@ class StateTests {
             .00                             main                  Running; Hold +1.00, scheduled for 1.00                New state: scheduled
             .00       A                     A                     Waiting, scheduled for <inf>                           New state: scheduled
             .00       B                     B                     Waiting, scheduled for <inf>                           New state: scheduled
-            1.00      main                                        State changed to 'GREEN'
+            1.00      main                                        State changes to 'GREEN' with trigger allowing 1 c...
             1.00                            B                     Waiting, scheduled for 1.00                            New state: scheduled
-            1.00                                                  State changes to 'RED' with trigger allowing null ...
+            1.00                                                  State changed to 'RED'
             1.00                            main                  Running; Hold +1.00, scheduled for 2.00                New state: scheduled
             1.00      B                     B                     Ended                                                  New state: data
         """.trimIndent()

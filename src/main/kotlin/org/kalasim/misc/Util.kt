@@ -98,9 +98,3 @@ fun Double.roundAny(n: Int = 3) = Precision.round(this, n)
  */
 fun String.titlecaseFirstChar() = replaceFirstChar(Char::titlecase)
 
-
-
-// Duration utilities
-fun Collection<Duration>.sum() : Duration = sumOf { it }
-
-fun <T> Iterable<T>.sumOf(selector: (T) -> Duration) = map{ selector(it)}.sum()
