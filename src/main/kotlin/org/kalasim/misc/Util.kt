@@ -8,7 +8,7 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.time.Instant
 import java.util.*
-import kotlin.time.toJavaDuration
+import kotlin.time.*
 
 
 internal var JSON_DF = DecimalFormat("###.00", DecimalFormatSymbols(Locale.ENGLISH))
@@ -97,3 +97,10 @@ fun Double.roundAny(n: Int = 3) = Precision.round(this, n)
  * From https://stackoverflow.com/questions/67843986/is-there-a-shorter-replacement-for-kotlins-deprecated-string-capitalize-funct
  */
 fun String.titlecaseFirstChar() = replaceFirstChar(Char::titlecase)
+
+
+
+// Duration utilities
+fun Collection<Duration>.sum() : Duration = sumOf { it }
+
+fun <T> Iterable<T>.sumOf(selector: (T) -> Duration) = map{ selector(it)}.sum()
