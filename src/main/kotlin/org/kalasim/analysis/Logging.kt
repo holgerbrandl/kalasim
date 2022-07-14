@@ -5,7 +5,7 @@ package org.kalasim
 import com.github.holgerbrandl.jsonbuilder.json
 import org.json.JSONObject
 import org.kalasim.analysis.EntityCreatedEvent
-import org.kalasim.misc.*
+import org.kalasim.misc.Jsonable
 
 
 /** The base event of kalasim. Usually this extended to convey more specific information.*/
@@ -73,12 +73,13 @@ class EventLog(val events: MutableList<Event> = mutableListOf()) : EventListener
  * See [Event Log](https://www.kalasim.org/events/) for details.
  *
  * @sample org.kalasim.dokka.eventsHowTo
+ * @param filter Optional filter lambda to further filter the events when populating the list
  */
-inline fun <reified E : Event> Environment.collect(): List<E> {
+inline fun <reified E : Event> Environment.collect(crossinline filter: E.() -> Boolean = { true }): List<E> {
     val traces: MutableList<E> = mutableListOf()
 
     addEventListener {
-        if(it is E) traces.add(it)
+        if(it is E && filter(it)) traces.add(it)
     }
 
     return traces
