@@ -1,9 +1,9 @@
 package org.kalasim.test
 
-import jetbrains.letsPlot.geom.*
-import jetbrains.letsPlot.ggsize
-import jetbrains.letsPlot.intern.Plot
-import jetbrains.letsPlot.letsPlot
+import org.jetbrains.letsPlot.geom.*
+import org.jetbrains.letsPlot.ggsize
+import org.jetbrains.letsPlot.intern.Plot
+import org.jetbrains.letsPlot.letsPlot
 import krangl.*
 import org.kalasim.analysis.InteractionEvent
 import org.kalasim.examples.MM1Queue

@@ -26,7 +26,7 @@ val orxFeatures = setOf(
 ).filterNotNull()
 
 val openrndrUseSnapshot = false
-val openrndrVersion = if (openrndrUseSnapshot) "0.4.0-SNAPSHOT" else "0.3.58"
+val openrndrVersion = if (openrndrUseSnapshot) "0.5.1-SNAPSHOT" else "0.4.1"
 
 val openrndrFeatures = setOf(
     "video"

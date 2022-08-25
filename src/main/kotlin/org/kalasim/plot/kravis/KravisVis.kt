@@ -1,8 +1,8 @@
 package org.kalasim.plot.kravis
 
-import jetbrains.letsPlot.label.ggtitle
 import kravis.*
 import kravis.device.JupyterDevice
+import org.jetbrains.letsPlot.label.ggtitle
 import org.kalasim.*
 import org.kalasim.analysis.ResourceActivityEvent
 import org.kalasim.monitors.*

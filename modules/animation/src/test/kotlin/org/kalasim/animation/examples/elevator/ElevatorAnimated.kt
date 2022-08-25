@@ -11,8 +11,6 @@ import org.openrndr.draw.*
 import org.openrndr.extra.gui.GUI
 import org.openrndr.extra.parameters.ActionParameter
 import org.openrndr.extra.parameters.IntParameter
-import org.openrndr.extras.color.presets.DARK_GREEN
-import org.openrndr.extras.color.presets.LIGHT_BLUE
 import org.openrndr.ffmpeg.ScreenRecorder
 import org.openrndr.math.Vector3
 import org.openrndr.math.transforms.buildTransform
@@ -128,7 +126,7 @@ fun main() = application {
 
         fun Drawer.drawVisitor(visitor: Visitor, gridX: Number, gridY: Number) {
             fill = when(visitor.direction) {
-                Direction.DOWN -> ColorRGBa.DARK_GREEN
+                Direction.DOWN -> ColorRGBa.GREEN
                 Direction.STILL -> ColorRGBa.YELLOW
                 Direction.UP -> ColorRGBa.RED
             }
@@ -210,7 +208,7 @@ fun main() = application {
 
                     val requestIndicator = when(direction) {
                         Direction.DOWN -> {
-                            fill = ColorRGBa.DARK_GREEN
+                            fill = ColorRGBa.GREEN
                             triangle(true)
                         }
                         Direction.STILL -> {
@@ -233,8 +231,8 @@ fun main() = application {
                 elevator.cars.withIndex().forEach { (shaftIndex, car) ->
                     val shaftWidth = car.capacity
 
-                    fill = ColorRGBa.LIGHT_BLUE
-                    stroke = ColorRGBa.LIGHT_BLUE
+                    fill = ColorRGBa.BLUE
+                    stroke = ColorRGBa.BLUE
 
                     val shaftX = shaftIndex.toDouble() * (shaftWidth + 0.2)
                     val shaftY = -car.currentPosition.y

@@ -1,19 +1,19 @@
 plugins {
-    kotlin("jvm") version "1.6.21"
+    kotlin("jvm") version "1.7.10"
 //    kotlin("jvm") version "1.5.31"
     `maven-publish`
     signing
 
 //    id("org.jetbrains.kotlin.jupyter.api") version "0.10.0-131-1" // "0.11.0-45"
     // see https://kotlinlang.slack.com/archives/C4W52CFEZ/p1641056747134600
-    id("org.jetbrains.kotlin.jupyter.api") version "0.11.0-45" // "0.11.0-45"
+    id("org.jetbrains.kotlin.jupyter.api") version "0.11.0-87" // "0.11.0-45"
 
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
 }
 
 group = "com.github.holgerbrandl"
-version = "0.7.99"
-//version = "0.7.96"
+//version = "0.7.99"
+version = "0.8-SNAPSHOT"
 
 
 repositories {
@@ -26,33 +26,32 @@ dependencies {
     api("io.insert-koin:koin-core:3.1.4")
     implementation(kotlin("reflect"))
 
-
     api("com.github.holgerbrandl:jsonbuilder:0.9")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 
     //  api("io.github.microutils:kotlin-logging:1.12.5")
 //    api("org.slf4j:slf4j-simple:1.7.32")
 
-    implementation("com.google.code.gson:gson:2.8.9")
+    implementation("com.google.code.gson:gson:2.9.0")
 
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
 
     testImplementation(kotlin("test-junit"))
-    testImplementation("io.kotest:kotest-assertions-core:5.0.3")
+    testImplementation("io.kotest:kotest-assertions-core:5.4.2")
 
     // **TODO** move to api to require users to pull it in if needed
-    implementation("com.github.holgerbrandl:krangl:0.17.3")
+    implementation("com.github.holgerbrandl:krangl:0.18.2")
 
     compileOnly("com.github.holgerbrandl:kravis:0.8.5")
     testImplementation("com.github.holgerbrandl:kravis:0.8.5")
 
-    compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:3.1.0")
-    testImplementation("org.jetbrains.lets-plot:lets-plot-batik:2.2.0")
+    compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.0.0")
+    testImplementation("org.jetbrains.lets-plot:lets-plot-batik:2.4.0")
     //    testImplementation("org.jetbrains.lets-plot:lets-plot-jfx:1.5.4")
 
     //experimental dependencies  use for experimentation
-    testImplementation("com.thoughtworks.xstream:xstream:1.4.18")
+    testImplementation("com.thoughtworks.xstream:xstream:1.4.19")
 
     //https://youtrack.jetbrains.com/issue/KT-44197
 

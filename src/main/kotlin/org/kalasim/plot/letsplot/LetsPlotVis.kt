@@ -1,12 +1,12 @@
 package org.kalasim.plot.letsplot
 
-import jetbrains.letsPlot.Stat
-import jetbrains.letsPlot.facet.facetWrap
-import jetbrains.letsPlot.geom.*
-import jetbrains.letsPlot.intern.Plot
-import jetbrains.letsPlot.label.*
-import jetbrains.letsPlot.letsPlot
-import jetbrains.letsPlot.scale.scaleXDateTime
+import org.jetbrains.letsPlot.Stat
+import org.jetbrains.letsPlot.facet.facetWrap
+import org.jetbrains.letsPlot.geom.*
+import org.jetbrains.letsPlot.intern.Plot
+import org.jetbrains.letsPlot.label.*
+import org.jetbrains.letsPlot.letsPlot
+import org.jetbrains.letsPlot.scale.scaleXDateTime
 import krangl.*
 import org.kalasim.*
 import org.kalasim.analysis.ResourceActivityEvent
