@@ -6,7 +6,7 @@ plugins {
 
 //    id("org.jetbrains.kotlin.jupyter.api") version "0.10.0-131-1" // "0.11.0-45"
     // see https://kotlinlang.slack.com/archives/C4W52CFEZ/p1641056747134600
-    id("org.jetbrains.kotlin.jupyter.api") version "0.11.0-87" // "0.11.0-45"
+    id("org.jetbrains.kotlin.jupyter.api") version "0.11.0-157" // "0.11.0-45"
 
     id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
 }
