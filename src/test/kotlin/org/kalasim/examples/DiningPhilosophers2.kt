@@ -1,9 +1,9 @@
 //DiningPhilosophers.kt
 package org.kalasim.examples
 
-import krangl.*
 import kravis.geomSegment
 import kravis.plot
+import org.jetbrains.kotlinx.dataframe.api.*
 import org.kalasim.*
 import org.kalasim.analysis.ResourceEvent
 import org.kalasim.analysis.ResourceEventType
@@ -60,15 +60,16 @@ fun main() {
     }
 
     // transform data into shape suiteable for interval plotting
+
     val requestsDf = requests.asDataFrame()
         .groupBy("requester")
-        .sortedBy("requester", "timestamp")
-        .addColumn("end_time") { it["timestamp"].lag() }
-        .addColumn("state") { rowNumber.map { if (it.rem(2) == 0) "hungry" else "eating" } }
-        .filter { it["quantity"] gt 0 }
-        .ungroup()
+        .sortBy("timestamp")
+        .add("end_time") { prev()?.get("timestamp") as TickTime }
+        .add("state") { if(index().rem(2) == 0) "hungry" else "eating" }
+        .filter { "quantity"<Int>() > 0 }
+        .concat()
 
     // visualize with kravis
-    requestsDf.plot(x = "timestamp", xend = "end_time", y = "requester", yend = "requester", color = "state")
+    requestsDf.asKranglDF().plot(x = "timestamp", xend = "end_time", y = "requester", yend = "requester", color = "state")
         .geomSegment(size = 15.0).show()
 }

@@ -150,4 +150,4 @@ fun Environment.asTickTime(instant: Instant) = instant.asTickTime()
 fun Environment.asWallTime(time: TickTime) = time.asWallTime()
 //fun Environment.asWallTimeOrNull(time: TickTime) = time.asWallTime()
 
-operator fun Instant.plus(duration: Duration): Instant = this + duration
+operator fun Instant.plus(duration: Duration): Instant = this.plus(duration.toJavaDuration())

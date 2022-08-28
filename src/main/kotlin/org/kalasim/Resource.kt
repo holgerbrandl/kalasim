@@ -1,11 +1,12 @@
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
-import krangl.*
+import org.jetbrains.kotlinx.dataframe.api.*
 import org.kalasim.analysis.EntityCreatedEvent
 import org.kalasim.analysis.ResourceActivityEvent
 import org.kalasim.misc.*
 import org.kalasim.monitors.*
+import org.kalasim.monitors.copy
 import org.koin.core.Koin
 import java.util.*
 import kotlin.random.Random
@@ -435,39 +436,39 @@ data class ResourceTimelineSegment(
 val Resource.timeline: List<ResourceTimelineSegment>
     get() {
         val capStats = capacityTimeline.statsData().asList().asDataFrame()
-            .addColumn("Metric") { ResourceMetric.Capacity }
+            .add("metric") { ResourceMetric.Capacity }
         val claimStats = claimedTimeline.statsData().asList().asDataFrame()
-            .addColumn("Metric") { ResourceMetric.Claimed }
+            .add("metric") { ResourceMetric.Claimed }
         val occStats = occupancyTimeline.statsData().asList().asDataFrame()
-            .addColumn("Metric") { ResourceMetric.Occupancy }
+            .add("metric") { ResourceMetric.Occupancy }
         val availStats = occupancyTimeline.statsData().asList().asDataFrame()
-            .addColumn("Metric") { ResourceMetric.Availability }
+            .add("metric") { ResourceMetric.Availability }
 
         val requesters = requesters.sizeTimeline.statsData().asList().asDataFrame()
-            .addColumn("Metric") { ResourceMetric.Requesters }.addColumn("value"){ it["value"].toDoubles()}
-        val claimers = claimers.sizeTimeline.statsData().asList().asDataFrame()
-            .addColumn("Metric") { ResourceMetric.Claimers }.addColumn("value"){ it["value"].toDoubles()}
+            .add("metric") { ResourceMetric.Requesters }.convert("value").to<Double>()
 
-        var statsDF = bindRows(capStats, claimStats, availStats, occStats, requesters, claimers)
+        val claimers = claimers.sizeTimeline.statsData().asList().asDataFrame()
+            .add("metric") { ResourceMetric.Claimers }
+            .convert("value").to<Double>()
+
+        var statsDF = listOf(capStats, claimStats, availStats, occStats, requesters, claimers).concat()
         statsDF = statsDF.rename("timestamp" to "start")
-        statsDF = statsDF.addColumn("end") {
-            DoubleCol(
-                "tt",
-                it["start"].map<TickTime> { it.value } as List<Double>) + it["duration"]
+        statsDF = statsDF.add("end") {
+            "start"<TickTime>().value + ("duration"() ?: 0.0)
         }
-        statsDF = statsDF.addColumn("resource") { this@timeline }
+        statsDF = statsDF.add("resource") { this@timeline }
 
         // convert to tick-time
-//        statsDF = statsDF.addColumn("start") { expr -> expr["start"].map<Double> { TickTime(it) } }
-        statsDF = statsDF.addColumn("end") { expr -> expr["end"].map<Double> { TickTime(it) } }
+//        statsDF = statsDF.add("start") { expr -> expr["start"].map<Double> { TickTime(it) } }
+        statsDF = statsDF.convert("end").with { TickTime(it as Double) }
 
         // optionally add walltimes
 //        if (env.tickTransform != null) {
-//            statsDF = statsDF.addColumn("start_wt") { it["start"].map<TickTime> { env.asWallTime(it) } }
-//            statsDF = statsDF.addColumn("end_wt") { it["end"].map<TickTime> { env.asWallTime(it) } }
+//            statsDF = statsDF.add("start_wt") { it["start"].map<TickTime> { env.asWallTime(it) } }
+//            statsDF = statsDF.add("end_wt") { it["end"].map<TickTime> { env.asWallTime(it) } }
 //        }
 
-        return statsDF.rowsAs<ResourceTimelineSegment>().toList()
+        return statsDF.toListOf<ResourceTimelineSegment>()
     }
 
 @Suppress("unused")

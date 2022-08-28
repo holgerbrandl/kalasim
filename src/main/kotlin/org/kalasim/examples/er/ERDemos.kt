@@ -1,6 +1,6 @@
 package org.kalasim.examples.er
 
-import krangl.*
+import org.jetbrains.kotlinx.dataframe.api.*
 import org.kalasim.ComponentGenerator
 import org.kalasim.plot.kravis.display
 
@@ -43,15 +43,13 @@ object SimpleER {
 //        history.asDataFrame().print()
 
 
-            val df = arrivals.map {
-                mapOf(
-                    "type" to it.type.toString(),
-                    "status" to it.patientStatus.value.toString(),
-                    "severity" to it.severity.value.toString()
-                )
-            }.let { dataFrameOf(it) }
+            val df = dataFrameOf(columnOf(arrivals).named("patient"))
+                .add("type"){ "patient"<Patient>().type.toString()}
+                .add("status"){ "patient"<Patient>().patientStatus.toString()}
+                .add("severity"){ "patient"<Patient>().severity.toString()}
 
-            df.count("status").print()
+            df.groupBy("status").count().print()
+            df.rowsCount()
 
             // visualize room setup as gant chart
         }

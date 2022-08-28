@@ -45,7 +45,7 @@ fun orx(module: String): Any {
 
 repositories {
     mavenCentral()
-//    mavenLocal()
+    mavenLocal()
     maven(url = "https://maven.openrndr.org")
 }
 

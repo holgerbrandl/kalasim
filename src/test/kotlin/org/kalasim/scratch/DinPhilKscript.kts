@@ -7,7 +7,8 @@
 ///@file:DependsOn("com.github.holgerbrandl:kalasim:0.6.91")
 //@file:DependsOn("com.github.holgerbrandl:krangl:0.17")
 
-import krangl.*
+import org.jetbrains.kotlinx.dataframe.api.*
+import org.jetbrains.kotlinx.dataframe.io.writeCSV
 import org.kalasim.*
 import org.kalasim.analysis.ResourceEvent
 import org.kalasim.analysis.ResourceEventType
@@ -58,14 +59,14 @@ val requests = tc.filterIsInstance<ResourceEvent>().map {
     RequestRecord(it.requester.name, it.time, it.resource.name, amountDirected)
 }
 
-// transform data into shape suiteable for interval plotting
+// transform data into shape suitable for interval plotting
 val requestsDf = requests.asDataFrame()
     .groupBy("requester")
-    .sortedBy("requester", "timestamp")
-    .addColumn("end_time") { it["timestamp"].lag() }
-    .addColumn("state") { rowNumber.map { if (it.rem(2) == 0) "hungry" else "eating" } }
-    .filter { it["quantity"] gt 0 }
-    .ungroup()
+    .sortBy("timestamp")
+    .add("end_time") { prev()?.get("timestamp") as TickTime }
+    .add("state") { if(index().rem(2) == 0) "hungry" else "eating" }
+    .filter { "quantity"<Int>() > 0 }
+    .concat()
 
 println("writing sim-csv")
 requestsDf.writeCSV(File("dining.csv"))

@@ -1,5 +1,8 @@
 package org.kalasim.plot.letsplot
 
+import kravis.GGPlot
+import org.jetbrains.kotlinx.dataframe.DataFrame
+import org.jetbrains.kotlinx.dataframe.api.*
 import org.jetbrains.letsPlot.Stat
 import org.jetbrains.letsPlot.facet.facetWrap
 import org.jetbrains.letsPlot.geom.*
@@ -7,11 +10,11 @@ import org.jetbrains.letsPlot.intern.Plot
 import org.jetbrains.letsPlot.label.*
 import org.jetbrains.letsPlot.letsPlot
 import org.jetbrains.letsPlot.scale.scaleXDateTime
-import krangl.*
 import org.kalasim.*
 import org.kalasim.analysis.ResourceActivityEvent
 import org.kalasim.monitors.*
 import org.kalasim.plot.kravis.clistTimeline
+import org.kalasim.plot.kravis.display
 
 
 fun  <V:Number> MetricTimeline<V>.display(
@@ -34,8 +37,8 @@ fun  <V:Number> MetricTimeline<V>.display(
             geomStep { x = "time"; y = "value" } + ggtitle(title)
 }
 
-private fun DataFrame.convertTick2Double(colName: String): DataFrame {
-    return addColumn(colName){ it[colName].map<TickTime>{ it.value}}
+private fun DataFrame<*>.convertTick2Double(colName: String): DataFrame<*> {
+    return add(colName){ colName<TickTime>().value}
 }
 
 
@@ -79,7 +82,7 @@ fun <T> CategoryTimeline<T>.display(
         .convertTick2Double("end")
 //        .addColumn("start") { expr -> expr["start"].map<Double> { wtTransform(TickTime(it)) } }
 //        .addColumn("end") { expr -> expr["end"].map<Double> { wtTransform(TickTime(it)) } }
-        .addColumn("value") { expr -> expr["value"].map<ComponentState> { it.toString() } }
+        .add("value") {  "value"<ComponentState?>()?.toString() }
 
 
     // why cant we use "x".asDiscreteVariable here?
@@ -106,7 +109,7 @@ fun List<ResourceActivityEvent>.display(
 
     val plotData = asDataFrame()
         .unfold<Resource>("resource", listOf("name"))
-        .addColumn("activity") { expr -> expr["activity"].toStrings().map { it ?: "Other" } }
+        .add("activity") { "activity"() ?: "Other" }
         .convertTick2Double("requested")
         .convertTick2Double("released")
 //        .addColumn("start") { expr -> expr["start"].map<TickTime> { it.value } }
@@ -164,7 +167,7 @@ fun List<ResourceTimelineSegment>.display(
 fun Component.display(
     title: String = statusTimeline.name,
     forceTickAxis: Boolean = false,
-): Plot = statusTimeline.display(title = title, forceTickAxis = forceTickAxis)
+): GGPlot = statusTimeline.display(title = title, forceTickAxis = forceTickAxis)
 
 
 fun List<Component>.displayStateTimeline(
@@ -185,7 +188,7 @@ fun List<Component>.displayStateTimeline(
 //        .addColumn("end") { expr -> (expr["timestamp"] + expr["timestamp"]).map<Double> { wtTransform(TickTime(it)) } }
         .convertTick2Double("start")
         .convertTick2Double("end")
-        .addColumn("value") { expr -> expr["value"].map<ComponentState> { it.toString() } }
+        .add("value") { "value"<ComponentState?>()?.toString() }
 
 
     return df.letsPlot() + geomSegment {
