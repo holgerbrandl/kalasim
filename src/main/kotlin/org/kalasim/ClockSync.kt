@@ -6,6 +6,7 @@ import org.koin.core.Koin
 import java.time.Instant
 import kotlin.math.roundToLong
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.toJavaDuration
 
 /**
@@ -32,6 +33,9 @@ class ClockSync(
     }
 
     private lateinit var syncConfig: SyncConfiguration
+
+    val tickDuration: Duration
+        get() = syncConfig.tickMs.milliseconds
 
     fun changeTickDuration(tickDuration: Duration) {
         syncConfig = SyncConfiguration(
