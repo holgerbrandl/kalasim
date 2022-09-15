@@ -1,10 +1,8 @@
 plugins {
     kotlin("jvm") version "1.7.10"
-//    kotlin("jvm") version "1.5.31"
     `maven-publish`
     signing
 
-//    id("org.jetbrains.kotlin.jupyter.api") version "0.10.0-131-1" // "0.11.0-45"
     // see https://kotlinlang.slack.com/archives/C4W52CFEZ/p1641056747134600
     id("org.jetbrains.kotlin.jupyter.api") version "0.11.0-157" // "0.11.0-45"
 
@@ -12,8 +10,8 @@ plugins {
 }
 
 group = "com.github.holgerbrandl"
-//version = "0.7.99"
-version = "0.8-SNAPSHOT"
+version = "0.7.100"
+//version = "0.8-SNAPSHOT"
 
 
 repositories {
