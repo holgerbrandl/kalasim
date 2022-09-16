@@ -3,10 +3,13 @@ package org.kalasim
 import org.kalasim.misc.ComponentTrackingConfig
 import org.kalasim.misc.DependencyContext
 import org.koin.core.Koin
+import java.time.Duration.between
+import java.time.Duration.ofMillis
 import java.time.Instant
+import kotlin.math.abs
 import kotlin.math.roundToLong
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.days
 import kotlin.time.toJavaDuration
 
 /**
@@ -28,41 +31,41 @@ class ClockSync(
         trackingPolicy = ComponentTrackingConfig(logCreation = false, logStateChangeEvents = false)
         // disable trace monitoring for clock control
 //        env.traceFilters.add { it is InteractionEvent && it.curComponent is ClockSync }
-
-        changeTickDuration(tickDuration)
     }
 
-    private lateinit var syncConfig: SyncConfiguration
+    var tickDuration: Duration = tickDuration
+        set(value) {
+            field = value
 
-    val tickDuration: Duration
-        get() = syncConfig.tickMs.milliseconds
+            syncStartWT = null
+            syncStartTicks = null
+        }
 
-    fun changeTickDuration(tickDuration: Duration) {
-        syncConfig = SyncConfiguration(
-            tickMs = tickDuration.inWholeMilliseconds.toDouble(),
-            holdTime = 1.0 / syncsPerTick.toDouble()
-        )
-    }
 
-    //https://stackoverflow.com/questions/32437550/whats-the-difference-between-instant-and-localdatetime
-    internal data class SyncConfiguration(val tickMs: Double, val holdTime: Double) {
-        val simStart: Instant by lazy { Instant.now() }
-    }
+    private val holdTime = 1.0 / syncsPerTick.toDouble()
 
+    private var syncStartWT: Instant? = null
+    private var syncStartTicks: TickTime? = null
 
     override fun process() = sequence {
 
         while (true) {
-            val simStart = syncConfig.simStart
-
             //wait until we have caught up with wall clock
-            val simTimeSinceStart =
-                java.time.Duration.between(simStart, simStart.plusMillis((syncConfig.tickMs * env.now.value).roundToLong()))
-            val wallTimeSinceStart = java.time.Duration.between(simStart, Instant.now())
+            val tickDurationMs = tickDuration.inWholeMilliseconds.toDouble()
 
-            val sleepDuration = simTimeSinceStart - wallTimeSinceStart
+            // set the start time if not yet done (happens only after changing tickDuration
+            syncStartTicks = syncStartTicks ?: env.now
+            syncStartWT = syncStartWT ?: Instant.now()
 
-//            println("sim $simTimeSinceStart wall $wallTimeSinceStart")
+
+            val simTimeSinceSyncStart = ofMillis(((env.now - syncStartTicks!!) * tickDurationMs).roundToLong())
+            val wallTimeSinceSyncStart = between(syncStartWT, Instant.now())
+
+            val sleepDuration = simTimeSinceSyncStart - wallTimeSinceSyncStart
+
+//            if (abs(sleepDuration.toMillis()) > 5000L) {
+//                println("sim $simTimeSinceSyncStart wall $wallTimeSinceSyncStart; Resync by sleep for ${sleepDuration}ms")
+//            }
 
             if (maxDelay != null && sleepDuration.abs() > maxDelay.toJavaDuration()) {
                 throw ClockOverloadException(
@@ -79,7 +82,7 @@ class ClockSync(
             }
 
             // wait until the next sync event is due
-            hold(syncConfig.holdTime)
+            hold(holdTime)
         }
     }
 }
