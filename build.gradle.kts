@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "com.github.holgerbrandl"
-version = "0.7.101"
+version = "0.7.102"
 //version = "0.8-SNAPSHOT"
 
 
@@ -39,8 +39,8 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:5.0.3")
 
     // **TODO** move to api to require users to pull it in if needed
-    implementation("com.github.holgerbrandl:krangl:0.18.2") // must needed for kravis
-    implementation("com.github.holgerbrandl:kdfutils:1.0-SNAPSHOT")
+    implementation("com.github.holgerbrandl:krangl:0.18.4") // must needed for kravis
+    implementation("com.github.holgerbrandl:kdfutils:1.0")
 
     compileOnly("com.github.holgerbrandl:kravis:0.8.5")
     testImplementation("com.github.holgerbrandl:kravis:0.8.5")
