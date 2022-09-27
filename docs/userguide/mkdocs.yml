@@ -48,6 +48,7 @@ nav:
   - Articles:
       - Overview: articles/articles.md
       - 2022:
+          - Kalasim v0.8: articles/2021-09-27-kalasim-v08.md
           - Lunar Mining: animation/lunar_mining.md
       - 2021:
           - Kalasim v0.7: articles/2021-11-27-kalasim-v07.md
