@@ -4,6 +4,7 @@ import org.kalasim.*
 import org.kalasim.examples.er.PatientStatus.*
 import org.kalasim.examples.er.Severity.*
 import org.kalasim.monitors.IntTimeline
+import java.util.concurrent.TimeUnit
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
@@ -237,6 +238,8 @@ class EmergencyRoom(
     val waitingAreaSize = 300
 
     init {
+        tickTransform = TickTransform(tickUnit = TimeUnit.HOURS)
+
         if(!enableTickMetrics) trackingPolicyFactory.disableAll()
     }
 
@@ -286,7 +289,7 @@ class EmergencyRoom(
         val cg = ComponentGenerator(
             iat = exponential(0.2),
 //            total = 800,
-            keepHistory = false
+            keepHistory = true
         ) {
             val patient = Patient(typeDist.sample(), State(sevDist.sample()), State(Waiting))
 

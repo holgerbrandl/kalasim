@@ -6,7 +6,7 @@ plugins {
     // see https://kotlinlang.slack.com/archives/C4W52CFEZ/p1641056747134600
     id("org.jetbrains.kotlin.jupyter.api") version "0.11.0-157" // "0.11.0-45"
 
-    id("io.github.gradle-nexus.publish-plugin") version "1.0.0"
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }
 
 group = "com.github.holgerbrandl"
@@ -21,11 +21,11 @@ repositories {
 
 dependencies {
     api("org.apache.commons:commons-math3:3.6.1")
-    api("io.insert-koin:koin-core:3.1.4")
+    api("io.insert-koin:koin-core:3.2.1")
     implementation(kotlin("reflect"))
 
     api("com.github.holgerbrandl:jsonbuilder:0.9")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
     //  api("io.github.microutils:kotlin-logging:1.12.5")
 //    api("org.slf4j:slf4j-simple:1.7.32")
@@ -36,13 +36,13 @@ dependencies {
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
 
     testImplementation(kotlin("test-junit"))
-    testImplementation("io.kotest:kotest-assertions-core:5.0.3")
+    testImplementation("io.kotest:kotest-assertions-core:5.4.2")
 
     // **TODO** move to api to require users to pull it in if needed
     implementation("com.github.holgerbrandl:krangl:0.18.4") // must needed for kravis
     implementation("com.github.holgerbrandl:kdfutils:1.0")
 
-    compileOnly("com.github.holgerbrandl:kravis:0.8.5")
+    compileOnly("com.github.holgerbrandl:kravis:0.8.6")
     testImplementation("com.github.holgerbrandl:kravis:0.8.5")
 
     compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.0.0")

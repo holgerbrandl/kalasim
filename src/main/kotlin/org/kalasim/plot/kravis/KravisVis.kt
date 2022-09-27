@@ -50,7 +50,7 @@ fun  <V:Number> MetricTimeline<V>.display(
         .filter { from == null || it.time >= from }
         .filter { to == null || it.time <= to }
 
-    val useWT = env.tickTransform != null && !forceTickAxis
+    val useWT = env.tickTransform is OffsetTransform && !forceTickAxis
 
     fun wtTransform(tt: TickTime) = if (useWT) env.asWallTime(tt) else tt
 
@@ -93,7 +93,7 @@ fun <T> CategoryTimeline<T>.display(
     val nlmStatsData = statsData()
     val stepFun = nlmStatsData.stepFun()
 
-    val useWT = env.tickTransform != null && !forceTickAxis
+    val useWT = env.tickTransform is OffsetTransform && !forceTickAxis
 
     fun wtTransform(tt: TickTime) = if (useWT) env.asWallTime(tt) else tt
 
