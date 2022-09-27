@@ -1,18 +1,21 @@
 # Kalasim Release History
 
-## v0.8-SNAPSHOT
+## v0.9 (Not yet released)
 
-Not yet released. Developer snapshots are deposited on maven-central starting with v0.7.90+ 
+Developer snapshots are deposited on maven-central starting with v0.8.90+
 
+## v0.8
+
+Released [announced](articles/2021-09-27-kalasim-v08.md) at 2022-09-27
 
 Milestone Enhancements
 
-* Added [honor policies](resource.md#request-honor-policies) to allow for more configurable request queue consumption
+* Implemented [honor policies](resource.md#request-honor-policies) allowing for more configurable request queue consumption
 ```kotlin
 val r  = Resource(honorPolicy = RequestHonorPolicy.StrictFCFS)
 ```
 * Added [Timeline Arithmetics](monitors.md#monitors-arithmetics). It is now possible to perform stream arithmetics on timeline attributes
-* Introduced different [modes](resource.md#capacity-limit-modes) if resource requests exceed resource capacity.
+* Introduced different [capacity modes](resource.md#capacity-limit-modes) if resource requests exceed resource capacity.
 ```kotlin
 val tank  = DepletableResource(capacity=100, initialLevel=60)
 
@@ -45,6 +48,7 @@ Major Enhancements
 * Reduced memory requirements of [resource](resource.md) monitoring by 50% by inferring `occupancy` and `availability` using [Timeline Arithmetics](monitors.md#monitors-arithmetics)
 * [#38](https://github.com/holgerbrandl/kalasim/issues/38) Extended and improved API support for [depletable resources](resource.md#depletable-resources). 
 * Added `ComponentQueue.asSortedList()` to sorted copy of underlying priority queue 
+* Ported data-frame-support from [krangl](https://github.com/holgerbrandl/krangl) to the more modern [kotlin-dataframe](https://github.com/Kotlin/dataframe).
 
 Minor enhancements
 

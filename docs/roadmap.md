@@ -2,28 +2,14 @@
 
 ## Next steps
 
-**TODO** bug `State changes to 'WaitForStart' with trigger allow`
-
-**TODO** ` Furnace.1             Waiting, scheduled for 31.00` for what?
-
-
 ## v0.8
-
-
-**TODO** complete and publish hospital example
-* https://www.sciencedirect.com/science/article/pii/S037722172101002X?dgcid=rss_sd_all
-
-**TODO** add display option to discard zero-duration intervals for simplified vis
-
-better work out https://www.kalasim.org/setup/ for novice users (e.g. use koans/or datalore share)
-
-simple optimizing example
-
-https://groups.google.com/g/salabim/c/iK6o7umeXKc/m/l3t59WbKBgAJ?utm_medium=email&utm_source=footer
 
 ---
 
-**{todo}** finish elevator example with visualization
+
+
+## v0.9
+
 
 ---
 **TODO** pathfinding example
@@ -33,26 +19,34 @@ https://github.com/citiususc/hipster
 https://www.baeldung.com/java-a-star-pathfinding
 
 ---
-visualization
 
-https://medium.com/@benjaminmbrown/real-time-data-visualization-with-d3-crossfilter-and-websockets-in-python-tutorial-dba5255e7f0e
-* ktor backend for serving https://www.youtube.com/watch?v=wXpEKouOV3E&t=1926s&ab_channel=KotlinbyJetBrains
-
+**TODO** add display option to discard zero-duration intervals for simplified vis
 
 ---
 
-**TODO** add planning example from classical scheduling theory
-parallel machines --> solve with or tools or optaplanner
 
-> Other relevant applications arise in the context of health-care, where, for example, patients have to be assigned to surgery rooms that must be
-equipped by considering the type (i.e., the family) of surgery to
-be performed. In such cases, the weight usually models a level of
-urgency for the patient.
+**TODO** complete and publish hospital example
+* https://www.sciencedirect.com/science/article/pii/S037722172101002X?dgcid=rss_sd_all
+
+
+Add tickUnit to constructor of Environment and remove setter
 
 ---
 ## Later
 
+
+better work out https://www.kalasim.org/setup/ for novice users (e.g. use koans/or datalore share)
+
+simple optimizing example
+
 better api for time distrubtions: `normal(tbfDays.days.asTicks(), 2.days.asTicks()) ` should alllow to sample `kotlin.time.Duration` directly
+
+---
+
+visualization
+
+https://medium.com/@benjaminmbrown/real-time-data-visualization-with-d3-crossfilter-and-websockets-in-python-tutorial-dba5255e7f0e
+* ktor backend for serving https://www.youtube.com/watch?v=wXpEKouOV3E&t=1926s&ab_channel=KotlinbyJetBrains
 
 --
 
