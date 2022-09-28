@@ -1,4 +1,4 @@
-The beauty of discrete event simulation is its very limited vocabulary which still allow expressing complex system dynamics. In essence, `kalasim` relies on just a handful of elements to model real-world processes.
+The beauty of discrete event simulation is its very limited vocabulary which still allows expressing complex system dynamics. In essence, `kalasim` relies on just a handful of elements to model real-world processes.
 
 * [Components](component.md)
 * [Resources](resource.md)

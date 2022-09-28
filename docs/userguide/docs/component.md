@@ -1,15 +1,14 @@
 # Component
 
-Components are the key elements of a simulation. By means of [process definition](#process-definition) of the business process in study, components allow modeling the interplay with other simulation components as well as its timing.
+Components are the key elements of a simulation. By providing a [process definition](#process-definition) of the business process in study, components allow modeling the interplay with other simulation components as well as its timing.
 
-Components can be either  in `DATA` or an `ACTIVE` [lifecycle](#lifecycle) state. An `ACTIVE`  component has one or more [process definitions](#process-definition) of which one was activated at some point in time. 
+Components can be in different [lifecycle](#lifecycle) state. An `ACTIVE`  component has one or more [process definitions](#process-definition) of which one was activated at some point earlier in time. 
 
+If a component has an associated process definition, we can schedule it for execution using  [`activate()`](#activate). This will also change its state to become active `ACTIVE`, 
 
-With [`activate()`](#activate) we can change a `DATA` component to `ACTIVE`, if it has an associated process definition.
+An `ACTIVE` component can become `DATA` either with a [`cancel()`](#cancel) or by reaching the end of its [process definition](#process-definition).
 
-An `ACTIVE` component can become `DATA` either with a [`cancel()`](#cancel) or by reaching the end of a [definition](#process-definition).
-
-It is very easy to create a `DATA` components
+It is very easy to create a `DATA` components which can be useful to model more passive elements in a model (such as production material).
 
 ```kotlin
 val component = Component()
@@ -22,20 +21,18 @@ Components will interact with each other through a well-defined vocabulary of [p
 
 ## Process Definition
 
-
-Although it is possible to create a component directly with `val x = Component()`, this
-makes it very hard to make that component into an active component, because there's no process method. So, nearly always we define our simulation entities by extending `Component` and by providing a _process definition_ which details out the component's life cycle:
+Although it is possible to create a component directly with `val x = Component()`, this does not encode any simulation mechanics a there is process definition defining how the `x` will interact with the simulation environment. So, nearly always we define our simulation entities by extending `Component` and by providing a _process definition_ which details out the component's life cycle:
 
 !!!important
     The process definition of a component defines its dynamics and interplay with other simulation entities. Writing down the process definition is the **key** modelling task when using `kalasim`.
 
-If there is no process definition, a component will always be a [data](#lifecycle) component.
+If there is no process definition, a component will stay passive. Techncially, it is refrerred to as a [`DATA`](#lifecycle) component.
 
 There are 3 supported methods to provide a process definition.
 
 ### 1. Extend `process`
 
-Let's start with the most common method. In order to make an *active*  component it is necessary to extend `Component` to provide (at least) one sequence generator method, normally called `process`:
+Let's start with the most common method. In order to define an `ACTIVE`  component it is necessary to extend `org.kalasim.Component` to provide (at least) one sequence generator method, normally called `process`:
 
 ```kotlin
 class Car: Component(){
@@ -49,11 +46,9 @@ class Car: Component(){
 }
 ```
 
-If we then say `val car = Car()`, a component is created, and it activated from process. This process is nearly always, but not necessarily a *generator method*  (i.e. it has at least one `yield` statement).
+If we then later say `val car = Car()`, a component is created, and it is scheduled for execution within kalasim's [event loop](basics.md#event-queue). The `process` method is nearly always, but not necessarily a *generator method*  (i.e. it has at least one `yield` statement), so it contains suspension points where execution can be stalled. 
 
-The result is that car is put on the future [event list](basics.md#event-queue) (for time `now`) and when it's its turn, the component becomes `CURRENT`.
-
-It is also possible to set a time at which the component (car) becomes active, like `val car = Car(at=10)`. This requires an additional constructor argument to be passed on to `Component` as in `class Car(at:Number): Component(delay=at)`.
+It is also possible to set a time at which the component (`car`) becomes active, like `val car = Car(delay=10)`. This requires an additional constructor argument to be passed on to `Component` as in `class Car(delay:Number): Component(delay=delay)`.
 
 
 Creation and activation are by default combined when creating a new `Component` instance:
@@ -64,14 +59,19 @@ val car2 = Car()
 val car3 = Car()
 ```
 
-This causes three cars to be created and to be [activated](component.md#activate), that is _scheduled_ for execution in the simulation's [event queue](basics.md#event-queue).
+This causes three cars to be created and to be [activated](component.md#activate), so these instances are _scheduled_ for execution in the simulation's [event queue](basics.md#event-queue).
+
+
+!!!info
+In some situations, automatic activation of the process definition may not be needed or desired. If so, even in presence of a `process` or `repeatedProcess` method, you can disable the automatic activation (i.e. make it a data component), by specifying `Component(process = Component::none)`.
+
 
 Normally, any process definition will contain at least one [`yield`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence-scope/yield.html) statement. By doing so, the component can hand-back control to the simulation engine at defined points when a component needs to wait. Typically, the user must not use `yield` directly, but rather the provided [process interaction](#process-interaction) methods.
 
 
 ### 2. Extend `repeatedProcess`
 
-A very common pattern in process definition, iteratively executed processes. This could be modelled with 
+Another very common pattern when writing down process definitions, iteratively executed processes. This could be modelled directly as described above using [`process`](#1-extend-process). But as shown in the following example, this lacks somewhat lacks conciseness: 
 
 ```kotlin
 class Machine : Component(){
@@ -84,7 +84,7 @@ class Machine : Component(){
 }
 ```
 
-This can be expressed more elegantly with `repeatedProcess`:
+Luckily, this can be expressed more elegantly with `repeatedProcess`:
 
 ```kotlin
 class Machine : Component(){
@@ -95,13 +95,9 @@ class Machine : Component(){
 }
 ```
 
-!!!info
-    Finally, if there is a `process` or `repeatedProcess` method, you can disable the automatic activation (i.e. make it a data component), by specifying `Component(process = Component::none)`.
-
 ### 3. Process Reference
 
 A component may be initialized to start at another process definition method. This is achieved by passing a reference to this method which must be part of the component's class definition, like `val car = Car(process = Car::wash)`.
-
 
 It is also possible to prepare multiple process definition, which may become active later by means of an `activate()` statement:
 
@@ -114,7 +110,7 @@ Effectively, creation and start of `crane1` and `crane2` is the same.
 
 ## Lifecycle
 
-A component is always in one of the following states modelled by `org.kalasim.ComponentState`:
+A simulation component is always in one of the following states modelled by `org.kalasim.ComponentState`:
 
 * `CURRENT` - The component's process is currently being executed by the [event queue](basics.md#event-queue)
 * `SCHEDULED` - The component is [scheduled](basics.md#event-queue) for future execution
@@ -126,13 +122,16 @@ A component is always in one of the following states modelled by `org.kalasim.Co
 * `DATA` - The component is non of the _active_ states above. Components without a `process` definition are always in this state.
 
 
-A component's status is automatically tracked in the status level monitor `component.statusMonitor`. Thus, it possible to check how long a component has been in a particuar state with
+A component's status is managed via the property `component.componentState`, and is automatically tracked with a [level monitor](monitors.md#level-monitor) named `component.statusTimeline`.
+
+
+
+The `statusMonitor` can be consumed in different ways. It possible to check how long a component has been in a particular state with
 
 ```kotlin
 val passiveDuration = component.statusMonitor[ComponentState.PASSIVE]
 ```
-
-It is possible to print a histogram with all the statuses a component has been in with
+Also, it is possible to print a histogram with all the statuses a component has been in with
 
 ```kotlin
 component.statusMonitor.printHistogram()
