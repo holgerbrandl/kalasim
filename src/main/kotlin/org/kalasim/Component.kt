@@ -1243,6 +1243,7 @@ open class Component(
      * the priority. An event with a higher priority will be scheduled first.
      */
     // todo: it would be more natural to simply support kotlin.time.Duration here
+    @Deprecated("Use Duration instead of Ticks")
     suspend fun SequenceScope<Component>.hold(
         duration: Ticks,
         description: String? = null,
@@ -1262,6 +1263,7 @@ open class Component(
      * @param priority If a component has the same time on the event list, this component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
+    @Deprecated("Use Duration instead of Number")
     suspend fun SequenceScope<Component>.hold(
         duration: Number? = null,
         description: String? = null,
