@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.7.10"
+    kotlin("jvm") version "1.7.20"
     `maven-publish`
     signing
 
@@ -10,8 +10,8 @@ plugins {
 }
 
 group = "com.github.holgerbrandl"
-version = "0.8"
-//version = "0.8-SNAPSHOT"
+//version = "0.8"
+version = "0.9-SNAPSHOT"
 
 
 repositories {
