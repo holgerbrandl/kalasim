@@ -84,7 +84,7 @@ object XStreamPQ {
         val envXML = xstream.toXML(q)
 
         xstream.addPermission(AnyTypePermission.ANY) // to prevent https://stackoverflow.com/questions/30812293/com-thoughtworks-xstream-security-forbiddenclassexception
-        val qRestored: PriorityQueue<String> = xstream.fromXML(envXML) as PriorityQueue<String>
+        @Suppress("UNCHECKED_CAST") val qRestored: PriorityQueue<String> = xstream.fromXML(envXML) as PriorityQueue<String>
 
         qRestored.add("bar")
 
@@ -114,7 +114,7 @@ object XStreamPQ2 {
 
         xstream.addPermission(AnyTypePermission.ANY) // to prevent https://stackoverflow.com/questions/30812293/com-thoughtworks-xstream-security-forbiddenclassexception
 
-        val qRestored: PriorityQueue<String> = xstream.fromXML(envXML) as PriorityQueue<String>
+        @Suppress("UNCHECKED_CAST") val qRestored: PriorityQueue<String> = xstream.fromXML(envXML) as PriorityQueue<String>
 
 
         qRestored.add("bar")
