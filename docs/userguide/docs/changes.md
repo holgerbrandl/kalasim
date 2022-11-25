@@ -6,7 +6,7 @@ Developer snapshots are deposited on maven-central starting with v0.8.90+
 
 ## v0.8
 
-Released [announced](articles/2021-09-27-kalasim-v08.md) at 2022-09-27
+Released [announced](articles/2022-09-27-kalasim-v08.md) at 2022-09-27
 
 Milestone Enhancements
 
