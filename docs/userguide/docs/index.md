@@ -14,7 +14,9 @@ In contrast to many other simulation tools, `kalasim` is neither low-code nor no
 
 ---
 
-TIP: Meet our team at the [Winter Simulation Conference 2022](https://meetings.informs.org/wordpress/wsc2022/) in Singapore! We will be there joining the simulation community for great week of discussion, processing modelling & analytics. Read the full [announcement](articles/2022-11-25-kalasim-at-wsc22.md).
+!!! tip "Meet kalasim at the WSC22" 
+    Meet our team at the [Winter Simulation Conference 2022](https://meetings.informs.org/wordpress/wsc2022/) in Singapore! We will be there joining the simulation community for great week of discussion, processing modelling & analytics. Read the full [announcement](articles/2022-11-25-kalasim-at-wsc22.md).
+
 
 ---
 
