@@ -12,6 +12,13 @@ In contrast to many other simulation tools, `kalasim` is neither low-code nor no
 `kalasim` is written in [Kotlin](https://kotlinlang.org/), is designed around suspendable [coroutines](https://kotlinlang.org/docs/reference/coroutines-overview.html) for process definitions, runs on the [JVM](https://github.com/openjdk/jdk) for performance and scale, is built with [koin](https://github.com/InsertKoinIO/koin) as dependency wiring framework, and is using [common-math](https://commons.apache.org/proper/commons-math/) for stats and distributions. See [acknowledgements](about.md#acknowledgements) for further references. `kalasim` is agnostic regarding a visualization frontend, but we provide bindings/examples using [plotly.kt](https://github.com/mipt-npm/plotly.kt), [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) as well as [kravis](https://github.com/holgerbrandl/kravis).
 
 
+---
+
+TIP: Meet our team at the [Winter Simulation Conference 2022](https://meetings.informs.org/wordpress/wsc2022/) in Singapore! We will be there joining the simulation community for great week of discussion, processing modelling & analytics. Read the full [announcement](articles/2022-11-25-kalasim-at-wsc22.md).
+
+---
+
+
 ## Core Features
 
 `kalasim` is a generic [process-oriented](theory.md) discrete event simulation (DES) engine.

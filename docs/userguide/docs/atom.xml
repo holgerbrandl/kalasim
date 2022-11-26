@@ -63,4 +63,21 @@
             <name>Holger Brandl</name>
         </author>
     </entry>
+
+
+    <entry>
+        <title>Kalasim v0.8 Released</title>
+        <link href="https://kalasim.org/articles/2022-11-25-kalasim-at-wsc22/"/>
+        <id>urn:uuid:de5c363f-6b76-4d87-8c11-5fbde63a8140</id>
+        <updated>2022-11-25T18:00:00Z</updated>
+        <summary>Meet the team at WSC22!</summary>
+        <content type="xhtml">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>We will be at WSC22 in Singapore (December 11-14, 2022), presenting simulation and promoting open-source tooling for simulation professionals.</p>
+            </div>
+        </content>
+        <author>
+            <name>Holger Brandl</name>
+        </author>
+    </entry>
 </feed>
