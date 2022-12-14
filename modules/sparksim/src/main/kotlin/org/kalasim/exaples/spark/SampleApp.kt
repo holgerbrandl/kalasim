@@ -13,39 +13,23 @@ import kotlin.time.Duration.Companion.seconds
 fun main() {
     val logFile = "D:\\projects\\scheduling\\kalasim\\modules\\sparksim\\README.md" // Change to your Spark Home path
 
-
     //    SparkSession
 //        .builder()
 //        .config(SparkConf())
 //        .master("local[2]")
 //        .appName("Simple Application").orCreate
 
-    val conf: SparkConf = SparkConf().setAppName("Java Spark").setMaster("local[*]")
+//    val conf: SparkConf = SparkConf().setAppName("Java Spark").setMaster("local[*]")
 
     val sparkSession = SparkSession.builder()
-//        .master("spark://hobvm2204:7077")
+        .master("spark://hobvm2204:7077")
 //        .master("spark://192.168.217.128:7077")
-        .config(conf)
+//        .config(conf)
         .appName("spark session example")
 
-    withSpark(sparkSession) {
-        spark.catalog()
-    }
-
-    data class SimConfig(val run:Int)
-    withSpark(sparkSession) {
-        val arg = List(10) { SimConfig(it) }
-        val dd = arg.toDS().map{ it->
-//            Math.random()
-            org.kalasim.Environment().apply {
-                tickTransform = TickTransform(TimeUnit.DAYS)
-                run(1.seconds)
-            }.currentComponent?.componentState?.name
-        }
-
-        dd.show()
-
-    }
+//    withSpark(sparkSession) {
+//        spark.catalog()
+//    }
 
     withSpark(sparkSession){
         spark.read().textFile(logFile).withCached {
