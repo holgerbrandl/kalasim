@@ -89,6 +89,7 @@ internal class MainComponent(koin: Koin) : Component(MAIN, koin = koin) {
     override fun process() = sequence<Component> {}
 }
 
+/** An environment hosts all elements of a simulation, maintains the event loop, and provides randomization support. For details see  https://www.kalasim.org/basics/#simulation-environment */
 open class Environment(
     enableConsoleLogger: Boolean = false,
     enableTickMetrics: Boolean = false,
@@ -104,6 +105,7 @@ open class Environment(
 
     val rg: RandomGenerator = JDKRandomGenerator(randomSeed)
     val random: kotlin.random.Random = kotlin.random.Random(randomSeed.toLong())
+
 
     internal val nameCache = mutableMapOf<String, Int>()
 

@@ -1,7 +1,6 @@
 package org.kalasim
 
 import org.kalasim.misc.TRACE_DF
-import org.koin.core.component.KoinComponent
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import kotlin.time.*
@@ -105,37 +104,6 @@ class OffsetTransform(val offset: Instant = Instant.now(), tickUnit: TimeUnit) :
 
 internal const val MISSING_TICK_TRAFO_ERROR = "Tick transformation not configured."
 
-
-interface SimContext : KoinComponent {
-
-    val env: Environment
-
-    var tickTransform: TickTransform?
-
-    /** Transforms a wall `duration` into the corresponding amount of ticks.*/
-    fun Duration.asTicks(): Double {
-        require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
-        return tickTransform!!.durationAsTicks(this)
-    }
-
-    val Duration.ticks: Double
-        get() = asTicks()
-
-    // Scoped extensions
-    fun Instant.asTickTime(): TickTime {
-        require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
-        return tickTransform!!.wall2TickTime(this)
-    }
-
-    operator fun TickTime.plus(duration: Duration): TickTime = TickTime(value + duration.asTicks())
-    operator fun TickTime.minus(duration: Duration): TickTime = TickTime(value - duration.asTicks())
-
-    /** Transforms a simulation time (typically `now`) to the corresponding wall time. */
-    fun TickTime.asWallTime(): Instant {
-        require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
-        return tickTransform!!.tick2wallTime(this)
-    }
-}
 
 // also provide transforms via direct environment extensions for use outside of simulation context. *?
 

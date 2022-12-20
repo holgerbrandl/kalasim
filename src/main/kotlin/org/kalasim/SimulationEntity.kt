@@ -5,6 +5,7 @@ import org.kalasim.misc.*
 import org.koin.core.Koin
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
+import kotlin.random.Random
 
 
 /** A representation/snapshot of an entities current state. */
@@ -107,3 +108,4 @@ private fun String.defaultName(nameCache: MutableMap<String, Int>) =
 
 private fun getComponentCounter(className: String, nameCache: MutableMap<String, Int>) =
     nameCache.merge(className, 1, Int::plus)
+

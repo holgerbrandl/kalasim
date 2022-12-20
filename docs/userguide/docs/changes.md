@@ -4,6 +4,10 @@
 
 Developer snapshots are deposited on maven-central starting with v0.8.90+
 
+Minor 
+
+* Overwrite `shuffled()` and `random()` as extensions on `Collection<T>` in simulation entities to enable better control over randomization by default
+
 ## v0.8
 
 Released [announced](articles/2022-09-27-kalasim-v08.md) at 2022-09-27
