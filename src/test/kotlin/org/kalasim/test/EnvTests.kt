@@ -1,6 +1,7 @@
 package org.kalasim.test
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
@@ -12,11 +13,13 @@ import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.analysis.*
+import org.kalasim.examples.bank.data.*
 import org.kalasim.examples.er.EmergencyRoom
 import org.kalasim.misc.*
 import org.koin.core.Koin
 import org.koin.core.error.NoBeanDefFoundException
 import org.koin.dsl.koinApplication
+import org.koin.dsl.module
 import java.io.File
 import java.lang.Thread.sleep
 import kotlin.io.path.div
@@ -448,5 +451,52 @@ class EnvTests {
               "timestamp": 10
             }
         """.trimIndent()
+    }
+}
+
+class CustomKoinModuleTests{
+
+
+
+    @Test
+    // https://kotlinlang.slack.com/archives/C67HDJZ2N/p1671535899858929
+    fun `avoid updating koin until 3_2_1 regression is fixed`() {
+        data class Tester(val created :Long=System.nanoTime() )
+
+        val myModule=  module(createdAtStart = true) {
+            single(createdAtStart = true){
+                Tester()
+            }
+        }
+
+        val koinApplication = koinApplication {}
+        val koin = koinApplication.koin
+        koin.loadModules(modules = listOf(myModule))
+
+        val now = System.nanoTime()
+
+        sleep(10)
+        now shouldBeGreaterThan koin.get<Tester>().created
+    }
+
+    @Test
+    fun `it should create components on simulation start`(){
+        val deps = declareDependencies {
+            // register components needed for dependency injection
+            add {
+                println("foo")
+                ComponentQueue<Customer>("waitingline") }
+            add { CustomerGenerator(get()) }
+            add { (1..3).map { Clerk() } }
+        }
+
+        createSimulation(dependencies = deps) {
+            run(50000.0)
+
+            val waitingLine: ComponentQueue<Customer> = get()
+            waitingLine.creationTime.value.toInt() shouldBe 0
+
+            println(waitingLine.statistics.toJson())
+        }
     }
 }
