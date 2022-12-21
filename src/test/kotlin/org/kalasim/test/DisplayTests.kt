@@ -57,7 +57,7 @@ class DisplayTests : AbstractSvgPlotRegression() {
 
 
         val customerTimeline =
-            mm1.componentGenerator.history.first().statusTimeline
+            mm1.componentGenerator.history.first().stateTimeline
 
         customerTimeline.display("Arrival State Timeline")
             .apply { assertExpected(this, "arrival_state") }
@@ -90,7 +90,7 @@ class DisplayTests : AbstractSvgPlotRegression() {
             .apply { assertExpected(this, "claimed") }
 
         val customerTimeline =
-            mm1.componentGenerator.history.first().statusTimeline
+            mm1.componentGenerator.history.first().stateTimeline
 
         customerTimeline.display("Arrival State Timeline", forceTickAxis = true)
             .apply { assertExpected(this, "arrival_state_forced") }

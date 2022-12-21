@@ -319,10 +319,10 @@ class ResourceTests {
             run(10)
 
             // how long was the component in passive state
-            customer.statusTimeline.printHistogram()
+            customer.stateTimeline.printHistogram()
 //                println(customer.statusTimeline[ComponentState.PASSIVE])
 
-            customer.statusTimeline.total(ComponentState.PASSIVE) shouldBe 8.0
+            customer.stateTimeline.total(ComponentState.PASSIVE) shouldBe 8.0
         }
     }
 

@@ -6,9 +6,10 @@ import com.github.holgerbrandl.jsonbuilder.json
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.json.JSONObject
-import org.kalasim.analysis.InteractionEvent
+import org.kalasim.analysis.*
+import org.kalasim.analysis.snapshot.MetricTimelineSnapshot
+import org.kalasim.analysis.snapshot.QueueSnapshot
 import org.kalasim.misc.*
-import org.kalasim.monitors.MetricTimelineStats
 import org.koin.core.Koin
 import java.util.*
 
@@ -119,38 +120,23 @@ class ComponentQueue<C>(
         q.add(element)
     }
 
-    val statistics: QueueStatistics
-        get() = QueueStatistics(this)
+    val statistics: QueueStatisticsSnapshot
+        get() = QueueStatisticsSnapshot(this)
 
     override val snapshot
-        get() = QueueInfo(this)
+        get() = QueueSnapshot(this)
 }
 
 
-class QueueInfo(cq: ComponentQueue<*>) : AutoJson(), EntitySnapshot {
-
-    data class Entry(val component: String, val enterTime: TickTime, val priority: Priority?)
-
-    val name = cq.name
-    val timestamp = cq.env.now
-    val queue = cq.q.map { Entry(it.component.toString(), it.enterTime, it.priority) }.toList()
-
-    // salabim example
-//    Queue 0x2522b637580
-//    name=waitingline
-//    component(s):
-//    customer.4995        enter_time 49978.472 priority=0
-//    customer.4996        enter_time 49991.298 priority=0
-}
 
 @Suppress("MemberVisibilityCanBePrivate")
-class QueueStatistics(cq: ComponentQueue<*>) : Jsonable() {
+class QueueStatisticsSnapshot(cq: ComponentQueue<*>) : Jsonable() {
 
     val name = cq.name
     val timestamp = cq.env.now
 
     val lengthStats = cq.sizeTimeline.statistics(false)
-    val lengthStatsExclZeros = MetricTimelineStats(cq.sizeTimeline, excludeZeros = true)
+    val lengthStatsExclZeros = MetricTimelineSnapshot(cq.sizeTimeline, excludeZeros = true)
 
     val lengthOfStayStats = cq.lengthOfStayStatistics.statistics()
     val lengthOfStayStatsExclZeros = cq.lengthOfStayStatistics.statistics(excludeZeros = true)
@@ -163,7 +149,7 @@ class QueueStatistics(cq: ComponentQueue<*>) : Jsonable() {
     override fun toJson() = json {
         "name" to name
         "timestamp" to timestamp.value
-        "type" to this@QueueStatistics.javaClass.simpleName //"queue statistics"
+        "type" to this@QueueStatisticsSnapshot.javaClass.simpleName //"queue statistics"
 
         "length_of_stay" to {
             "all" to lengthOfStayStats.toJson()

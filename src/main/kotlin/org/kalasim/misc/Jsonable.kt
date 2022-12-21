@@ -29,7 +29,7 @@ internal fun Any.buildJsonWithGson() = JSONObject(GSON.toJson(this))
 
 
 /** Automatic json serialization with GSON. This works just if the entity to be serialized is using basic types only.*/
-open class AutoJson() : Jsonable() {
+open class AutoJson : Jsonable() {
     override fun toJson(): JSONObject {
         return buildJsonWithGson()
     }

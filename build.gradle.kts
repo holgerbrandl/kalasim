@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     api("org.apache.commons:commons-math3:3.6.1")
-    api("io.insert-koin:koin-core:3.2.2")
+    api("io.insert-koin:koin-core:3.1.2")
     implementation(kotlin("reflect"))
 
     api("com.github.holgerbrandl:jsonbuilder:0.9")

@@ -1,6 +1,7 @@
 package org.kalasim
 
 import org.apache.commons.math3.distribution.RealDistribution
+import org.kalasim.analysis.snapshot.ComponentGeneratorSnapshot
 import org.kalasim.misc.DependencyContext
 import org.koin.core.Koin
 
@@ -82,7 +83,3 @@ class ComponentGenerator<T>(
      override val snapshot: ComponentGeneratorSnapshot<T>
         get() = ComponentGeneratorSnapshot(this)
 }
-
-
-// todo add more context details here
-class ComponentGeneratorSnapshot<T>(cg: ComponentGenerator<T>) : Component.ComponentSnapshot(cg)

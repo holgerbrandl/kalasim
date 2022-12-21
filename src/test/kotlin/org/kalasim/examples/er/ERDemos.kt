@@ -1,10 +1,8 @@
 package org.kalasim.examples.er
 
 import kravis.geomBar
-import kravis.nshelper.plot
 import kravis.plot
 import org.jetbrains.kotlinx.dataframe.api.*
-import org.jetbrains.letsPlot.geom.geomBar
 import org.kalasim.ComponentGenerator
 import org.kalasim.plot.kravis.display
 
@@ -37,7 +35,7 @@ object SimpleER {
                 rooms[0].setup.timeline.display().show()
                 rooms[1].setup.timeline.display().show()
 
-                rooms[1].statusTimeline.display().show()
+                rooms[1].stateTimeline.display().show()
             }
 
             waitingLine.sizeTimeline.display().show()

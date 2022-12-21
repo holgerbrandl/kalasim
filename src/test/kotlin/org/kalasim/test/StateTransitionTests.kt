@@ -64,7 +64,7 @@ class StateTransitionTests {
             run(10.0)
         }
 
-        c!!.statusTimeline.printHistogram()
+        c!!.stateTimeline.printHistogram()
     }
 
 
@@ -111,12 +111,12 @@ class StateTransitionTests {
                 // note this is a compiler test only. the example is not meaningful
                 run(1000)
 
-                comp.statusTimeline.statsData().values shouldBe listOf(
+                comp.stateTimeline.statsData().values shouldBe listOf(
                     DATA, SCHEDULED, CURRENT, SCHEDULED, CURRENT, SCHEDULED, CURRENT, SCHEDULED,
                     CURRENT, SCHEDULED, CURRENT, DATA
                 )
 
-                other.statusTimeline.statsData().values shouldBe listOf(
+                other.stateTimeline.statsData().values shouldBe listOf(
                     DATA, SCHEDULED, CURRENT, SCHEDULED, PASSIVE, SCHEDULED, CURRENT, SCHEDULED, DATA,
                     SCHEDULED, SCHEDULED, CURRENT, SCHEDULED, CURRENT, SCHEDULED, CURRENT, DATA
                 )

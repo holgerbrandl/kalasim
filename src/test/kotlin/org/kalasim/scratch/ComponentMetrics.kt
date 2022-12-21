@@ -14,7 +14,7 @@ fun main() {
         object : Component("refillController") {
             override fun process() =
                 sequence {
-                    while (true) {
+                    while(true) {
                         hold(uniform(0, 10)())
                         refilPermitted.value = true
                         hold(uniform(0, 10)())
@@ -47,7 +47,7 @@ fun main() {
         pStats.asDataFrame().printThis()
 
 
-        cg.history.first().statusTimeline.summed().printConsole()
-        cg.history.first().statusTimeline.summed().display()
+        cg.history.first().stateTimeline.summed().printConsole()
+        cg.history.first().stateTimeline.summed().display()
     }
 }

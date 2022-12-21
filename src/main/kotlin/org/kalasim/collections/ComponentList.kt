@@ -3,8 +3,9 @@
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
+import org.kalasim.analysis.snapshot.ComponentListSnapshot
+import org.kalasim.analysis.snapshot.MetricTimelineSnapshot
 import org.kalasim.misc.*
-import org.kalasim.monitors.MetricTimelineStats
 import org.koin.core.Koin
 import java.util.*
 
@@ -67,14 +68,6 @@ class ComponentList<C>(
 }
 
 
-class ComponentListSnapshot<T>(cl: ComponentList<T>) : AutoJson(), EntitySnapshot {
-
-    data class Entry(val component: String, val enterTime: TickTime?)
-
-    val name = cl.name
-    val timestamp = cl.env.now
-    val queue = cl.map { Entry(it.toString(), cl.stayTracker[it]) }.toList()
-}
 
 //todo this duplicates the impl in ComponentQueue
 @Suppress("MemberVisibilityCanBePrivate")
@@ -84,7 +77,7 @@ class ComponentListStatistics(cl: ComponentList<*>) : Jsonable(){
     val timestamp = cl.env.now
 
     val sizeStats = cl.sizeTimeline.statistics(false)
-    val sizeStatsExclZeros = MetricTimelineStats(cl.sizeTimeline, excludeZeros = true)
+    val sizeStatsExclZeros = MetricTimelineSnapshot(cl.sizeTimeline, excludeZeros = true)
 
     val lengthOfStayStats = cl.lengthOfStayStatistics.statistics()
     val lengthOfStayStatsExclZeros = cl.lengthOfStayStatistics.statistics(excludeZeros = true)

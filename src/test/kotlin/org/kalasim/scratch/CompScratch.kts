@@ -34,8 +34,8 @@ env.run(1)
 
 c.componentState
 
-c.statusTimeline.printHistogram()
+c.stateTimeline.printHistogram()
 
 
-c.statusTimeline[1.0]
+c.stateTimeline[1.0]
 

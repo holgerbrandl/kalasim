@@ -456,8 +456,6 @@ class EnvTests {
 
 class CustomKoinModuleTests{
 
-
-
     @Test
     // https://kotlinlang.slack.com/archives/C67HDJZ2N/p1671535899858929
     fun `avoid updating koin until 3_2_1 regression is fixed`() {

@@ -2,8 +2,8 @@ package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
 import org.jetbrains.kotlinx.dataframe.api.*
-import org.kalasim.analysis.EntityCreatedEvent
-import org.kalasim.analysis.ResourceActivityEvent
+import org.kalasim.analysis.*
+import org.kalasim.analysis.snapshot.ResourceSnapshot
 import org.kalasim.misc.*
 import org.kalasim.monitors.*
 import org.kalasim.monitors.copy
@@ -470,26 +470,6 @@ val Resource.timeline: List<ResourceTimelineSegment>
 
         return statsDF.toListOf<ResourceTimelineSegment>()
     }
-
-@Suppress("unused")
-class ResourceSnapshot(resource: Resource) : AutoJson(), EntitySnapshot {
-    val name: String = resource.name
-    val now = resource.now
-    val creationTime = resource.creationTime
-
-    val claimedQuantity = resource.claimed
-    val capacity = resource.capacity
-
-    // use a dedicated type here to see null prios in json
-    val claimedBy = resource.claimers.q.toList().map { it.component.name to it.priority }
-
-    data class ReqComp(val component: String, val quantity: Double?)
-
-    val requestedBy = resource.requesters.q.toList().map {
-        ReqComp(it.component.name, it.component.requests[resource]?.quantity)
-    }
-}
-
 
 @Suppress("MemberVisibilityCanBePrivate")
 class ResourceStatistics(resource: Resource) : Jsonable() {

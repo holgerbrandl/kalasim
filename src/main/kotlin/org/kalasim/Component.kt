@@ -6,6 +6,7 @@ import org.kalasim.ResourceSelectionPolicy.*
 import org.kalasim.ScheduledType.*
 import org.kalasim.analysis.*
 import org.kalasim.analysis.ResourceEventType.*
+import org.kalasim.analysis.snapshot.ComponentSnapshot
 import org.kalasim.misc.*
 import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
@@ -121,17 +122,26 @@ open class Component(
 //        this.javaClass.getMethod("process").getDeclaringClass();
 //    }
 
-    //    var status: ComponentState = if(this.javaClass.getMethod("process").getDeclaringClass().simpleName == "Component") DATA else SCHEDULED
+    fun interface ComponentStateChangeListener {
+        fun stateChanged(component: Component)
+    }
+
+    internal val stateChangeListeners = mutableListOf<ComponentStateChangeListener>()
+
+    /** Current lifecycle state of the component. See https://www.kalasim.org/component/#lifecycle for details. */
     var componentState: ComponentState = DATA
         internal set(value) {
             field = value
 
-            statusTimeline.addValue(value)
+            stateTimeline.addValue(value)
+
+            stateChangeListeners.forEach { it.stateChanged(this) }
 //            if (trackingPolicy.logStateChangeEvents) log(stateChangeEvent())
         }
+//        get() = csState.value
 
-    val statusTimeline = CategoryTimeline(componentState, "status of ${this.name}", koin)
 
+    val stateTimeline = CategoryTimeline(componentState, "status of ${this.name}", koin)
 
     // define how logging is executed in this component
     var trackingPolicy: ComponentTrackingConfig = ComponentTrackingConfig()
@@ -139,7 +149,7 @@ open class Component(
             field = newPolicy
 
             with(newPolicy) {
-                statusTimeline.enabled = trackComponentState
+                stateTimeline.enabled = trackComponentState
             }
         }
 
@@ -407,24 +417,29 @@ open class Component(
                 PASSIVE -> {
                     logInternal(trackingPolicy.logInteractionEvents, "passivate")
                 }
+
                 STANDBY -> {
                     scheduledTime = env.now
                     env.addStandBy(this)
                     logInternal(trackingPolicy.logInteractionEvents, "standby")
                 }
+
                 in listOf(SCHEDULED, WAITING, REQUESTING) -> {
                     val reason = when(componentState) {
                         WAITING -> {
                             if(waits.isNotEmpty()) tryWait()
                             WAIT
                         }
+
                         REQUESTING -> {
                             tryRequest()
                             REQUEST
                         }
+
                         SCHEDULED -> {
                             HOLD
                         }
+
                         else -> TODO("map missing types")//"unknown"
                     }
 
@@ -436,6 +451,7 @@ open class Component(
                     )
 
                 }
+
                 else -> error("Unexpected interrupt status $componentState is $name")
             }
         }
@@ -1263,7 +1279,7 @@ open class Component(
      * @param priority If a component has the same time on the event list, this component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
-    @Deprecated("Use Duration instead of Number")
+//    @Deprecated("Use Duration instead of Number")
     suspend fun SequenceScope<Component>.hold(
         duration: Number? = null,
         description: String? = null,
@@ -1584,20 +1600,6 @@ open class Component(
     }
 
 
-    /** Captures the current state of a `Component`*/
-    @Suppress("unused")
-    open class ComponentSnapshot(component: Component) : AutoJson(), EntitySnapshot {
-        val name = component.name
-        val creationTime: TickTime = component.creationTime
-        val now = component.now
-        val status = component.componentState
-        val scheduledTime = component.scheduledTime
-
-        val claims = component.claims.map { it.key.name to it.value.quantity }.toMap()
-        val requests = component.requests.map { it.key.name to it.value.quantity }.toMap()
-    }
-
-
     suspend fun SequenceScope<Component>.selectResource(
         resources: List<Resource>,
         quantity: Number = 1,
@@ -1609,6 +1611,7 @@ open class Component(
             ShortestQueue -> {
                 resources.minByOrNull { it.requesters.size }!!
             }
+
             RoundRobin -> {
                 // note could also be achieved with listOf<Resource>().repeat().iterator()
                 val mapKey = listOf(this.hashCode(), resources.map { it.name }.hashCode()).hashCode()
@@ -1620,6 +1623,7 @@ open class Component(
 
                 return resources[curValue]
             }
+
             FirstAvailable -> {
                 while(resources.all { it.available < quantity.toDouble() }) {
                     standby()
@@ -1627,9 +1631,11 @@ open class Component(
 
                 resources.first { it.available > quantity.toDouble() }
             }
+
             RandomOrder -> {
                 resources[discreteUniform(0, resources.size - 1).sample()]
             }
+
             RandomAvailable -> {
                 val available = resources.filter { it.available >= quantity.toDouble() }
                 require(available.isNotEmpty()) { "Not all resources must be in use to use RandomAvailable selection policy" }
@@ -1682,8 +1688,22 @@ open class Component(
     }
 }
 
+
 internal val SELECT_SCOPE_IDX = mutableMapOf<Int, Int>()
 
+
+/** Create a state component to lifecycle monitoring using a https://www.kalasim.org/state/. */
+class LifecycleState(val component: Component) : State<ComponentState>(component.componentState) {
+    init {
+        changeListeners.add { value = component.componentState }
+    }
+}
+
+/** Create a state component to lifecycle monitoring using a https://www.kalasim.org/state/. */
+fun Component.componentState() = LifecycleState(this)
+//fun Component.componentState() = State(componentState).apply {
+//    stateChangeListeners.add{ value = componentState }
+//}
 
 enum class ResourceSelectionPolicy {
     ShortestQueue, FirstAvailable, RandomOrder, RandomAvailable, RoundRobin
@@ -1787,12 +1807,12 @@ data class ComponentLifecycleRecord(
 fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {
     val c = this
 
-    val histogram: Map<ComponentState, Double> = c.statusTimeline.summed()
+    val histogram: Map<ComponentState, Double> = c.stateTimeline.summed()
 
     return ComponentLifecycleRecord(
         c.name,
         c.creationTime,
-        inDataSince = if(c.isData) c.statusTimeline.statsData().timepoints.last() else null,
+        inDataSince = if(c.isData) c.stateTimeline.statsData().timepoints.last() else null,
         (histogram[DATA] ?: 0.0).asTickTime(),
         (histogram[CURRENT] ?: 0.0).asTickTime(),
         (histogram[STANDBY] ?: 0.0).asTickTime(),

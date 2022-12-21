@@ -70,6 +70,6 @@ createSimulation(true) {
     run(10)
 
     // Assess the state of the simulation entities
-    cg.filterIsInstance<Car>().first().statusTimeline.printHistogram()
+    cg.filterIsInstance<Car>().first().stateTimeline.printHistogram()
     get<GasStation>().printStatistics()
 }

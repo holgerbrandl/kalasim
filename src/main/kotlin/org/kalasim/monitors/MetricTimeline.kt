@@ -1,16 +1,13 @@
 package org.kalasim.monitors
 
-import com.github.holgerbrandl.jsonbuilder.json
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.apache.commons.math3.stat.Frequency
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
-import org.apache.commons.math3.stat.descriptive.moment.Mean
-import org.apache.commons.math3.stat.descriptive.moment.Variance
 import org.kalasim.*
+import org.kalasim.analysis.snapshot.MetricTimelineSnapshot
 import org.kalasim.misc.*
 import org.koin.core.Koin
 import java.util.*
-import kotlin.math.sqrt
 
 /**
  * Allows to track a numeric quantity over time.
@@ -79,7 +76,7 @@ open class MetricTimeline<V : Number>(
     /** Returns the step function of this monitored value along the time axis. */
     override fun stepFun() = statsData().stepFun()
 
-    fun statistics(excludeZeros: Boolean = false) = MetricTimelineStats(this, excludeZeros)
+    fun statistics(excludeZeros: Boolean = false) = MetricTimelineSnapshot(this, excludeZeros)
 
     override val snapshot
         get() = statistics(false)
@@ -250,55 +247,3 @@ internal fun <V : Number> MetricTimeline<V>.copy(name: String = this.name): Metr
         timestamps.clear()
         timestamps.addAll(this@copy.timestamps)
     }
-
-
-//
-// Statistical Summary
-//
-
-class MetricTimelineStats<V : Number>(nlm: MetricTimeline<V>, excludeZeros: Boolean = false) : Jsonable(),
-    EntitySnapshot {
-    val duration: Double
-
-    val mean: Double?
-    val standardDeviation: Double?
-
-    val min: Double?
-    val max: Double?
-
-    internal val data = nlm.statsData(excludeZeros)
-
-//    val median :Double = TODO()
-//    val ninetyfivePercentile :Double = TODO()
-//    val ninetyninePercentile :Double = TODO()
-
-    init {
-        val doubleValues = data.values.map { it.toDouble() }.toDoubleArray()
-
-        min = doubleValues.minOrNull()
-        max = doubleValues.maxOrNull()
-
-        if(data.durations.any { it != 0.0 }) {
-            val durationsArray = data.durations.toDoubleArray()
-            mean = Mean().evaluate(doubleValues, durationsArray)
-            standardDeviation = sqrt(Variance().evaluate(doubleValues, durationsArray))
-//            val median = Median().evaluate(data.values.toDoubleArray(), data.durations) // not supported by commons3
-        } else {
-            // this happens if all there is in total no duration associated once 0s are removed
-            mean = null
-            standardDeviation = null
-        }
-        // weights not supported
-        // mean = Median().evaluate(data.values.toDoubleArray(), data.timepoints.toDoubleArray())
-
-        duration = data.durations.sum()
-    }
-
-    override fun toJson() = json {
-        "duration" to duration
-        "mean" to mean?.roundAny()
-        "standard_deviation" to standardDeviation?.roundAny().nanAsNull()
-        "min" to min?.roundAny()
-        "max" to max?.roundAny()
-    }
-}

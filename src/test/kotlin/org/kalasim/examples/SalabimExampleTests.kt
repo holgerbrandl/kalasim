@@ -75,7 +75,7 @@ class SalabimExampleTests {
                   "ninetyfive_pct_quantile": 4.083
                 }
               },
-              "type": "QueueStatistics",
+              "type": "QueueStatisticsSnapshot",
               "timestamp": 50
             }"""
         )
@@ -190,7 +190,7 @@ class SalabimExampleTests {
                   "ninetyfive_pct_quantile": 22.567
                 }
               },
-              "type": "QueueStatistics",
+              "type": "QueueStatisticsSnapshot",
               "timestamp": 2000
             }"""
         )

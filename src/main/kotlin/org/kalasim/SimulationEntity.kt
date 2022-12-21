@@ -1,15 +1,12 @@
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
+import org.kalasim.analysis.snapshot.EntitySnapshot
 import org.kalasim.misc.*
 import org.koin.core.Koin
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
-import kotlin.random.Random
 
-
-/** A representation/snapshot of an entities current state. */
-interface EntitySnapshot : WithJson
 
 /** Base class of all main simulation entities such as environments, resources, components, states and collections. */
 abstract class SimulationEntity(name: String? = null, val simKoin: Koin = DependencyContext.get()) : SimContext,

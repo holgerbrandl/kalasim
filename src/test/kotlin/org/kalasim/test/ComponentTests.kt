@@ -401,7 +401,7 @@ class ComponentTests {
         component.activate(delay = 1)
         run(2)
 
-        component.statusTimeline.printHistogram()
+        component.stateTimeline.printHistogram()
     }
 
     @Test

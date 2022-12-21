@@ -1,8 +1,6 @@
 package org.kalasim.monitors
 
-import com.github.holgerbrandl.jsonbuilder.json
-import org.json.JSONObject
-import org.kalasim.EntitySnapshot
+import org.kalasim.analysis.snapshot.FrequencyTableSnapshot
 import org.kalasim.misc.*
 import org.koin.core.Koin
 import kotlin.math.roundToInt
@@ -48,7 +46,7 @@ open class CategoryMonitor<T>(
         get() = frequencies.mapValues { it.value.toDouble() }
 
     override val snapshot
-        get() = FrequencyStatsSummary(statistics)
+        get() = FrequencyTableSnapshot(statistics)
 }
 
 fun <T> CategoryMonitor<T>.printHistogram(values: List<T>? = null, sortByWeight: Boolean = false) {
@@ -63,11 +61,6 @@ fun <T> CategoryMonitor<T>.printHistogram(values: List<T>? = null, sortByWeight:
     snapshot.counts.printConsole(values = values, sortByWeight = sortByWeight)
 }
 
-class FrequencyStatsSummary<T>(internal val counts: FrequencyTable<T>) : Jsonable(), EntitySnapshot {
-    override fun toJson(): JSONObject = json {
-        counts.forEach { it.key to counts[it.key]!!.toLong() }
-    }
-}
 
 
 typealias FrequencyTable<T> = Map<T, Double>

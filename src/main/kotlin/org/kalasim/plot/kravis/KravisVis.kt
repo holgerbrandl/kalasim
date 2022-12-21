@@ -172,9 +172,9 @@ fun List<ResourceTimelineSegment>.display(
 //
 
 fun Component.display(
-    title: String = statusTimeline.name,
+    title: String = stateTimeline.name,
     forceTickAxis: Boolean = false,
-): GGPlot = statusTimeline.display(title = title, forceTickAxis = forceTickAxis)
+): GGPlot = stateTimeline.display(title = title, forceTickAxis = forceTickAxis)
 
 
 fun List<Component>.displayStateTimeline(
@@ -245,7 +245,7 @@ fun List<Component>.displayStateProportions(
 //}
 
 internal fun List<Component>.clistTimeline() = flatMap { eqn ->
-    eqn.statusTimeline
+    eqn.stateTimeline
         .statsData().asList().map { eqn to it }
 }
 

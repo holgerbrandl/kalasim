@@ -1,8 +1,5 @@
 package org.kalasim.monitors
 
-import com.github.holgerbrandl.jsonbuilder.json
-import org.json.JSONObject
-import org.kalasim.EntitySnapshot
 import org.kalasim.SimulationEntity
 import org.kalasim.misc.DependencyContext
 import org.koin.core.Koin
@@ -31,14 +28,14 @@ abstract class Monitor<T>(
 
 interface ValueMonitor<T> {
 
-    /** Resets the timeline. This will also reenable it as a side-effect. */
+    /** Resets the timeline. This will also re-enable it as a side-effect. */
     fun reset()
 
     fun addValue(value: T)
 }
 
 
-internal val NUM_HIST_BINS = 10
+internal const val NUM_HIST_BINS = 10
 
 
 //internal data class NLMStatsData(val values: List<Double>, val timepoints: List<Double>, val durations: DoubleArray) {
