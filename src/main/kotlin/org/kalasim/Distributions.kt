@@ -1,9 +1,14 @@
 package org.kalasim
 
 import org.apache.commons.math3.distribution.*
+import org.kalasim.misc.ImplementMe
 import java.lang.Double.min
 import java.util.*
 import kotlin.math.max
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 /**
  * Distribution support API with controlled randomization via `env.rg`
@@ -51,6 +56,40 @@ class Clipper internal constructor(val dist: RealDistribution, val lower: Double
 
 fun SimContext.uniform(lower: Number = 0, upper: Number = 1) =
     UniformRealDistribution(env.rg, lower.toDouble(), upper.toDouble())
+
+
+//
+// date utils for distributions
+
+data class RealDurationDistribution(val unit: DurationUnit, val dist: RealDistribution){
+    operator fun invoke() = sample()
+    fun sample() = when(unit){
+        DurationUnit.SECONDS -> dist().seconds
+        DurationUnit.MINUTES -> dist().minutes
+        DurationUnit.DAYS -> dist().days
+        else -> ImplementMe()
+    }
+}
+
+val RealDistribution.seconds get() = RealDurationDistribution(DurationUnit.SECONDS, this)
+val RealDistribution.minutes get() = RealDurationDistribution(DurationUnit.MINUTES, this)
+val RealDistribution.days get() = RealDurationDistribution(DurationUnit.DAYS, this)
+
+
+
+data class IntegerDurationDistribution(val unit: DurationUnit, val dist: IntegerDistribution){
+    fun invoke() = sample()
+    fun sample() = when(unit){
+        DurationUnit.SECONDS -> dist().seconds
+        DurationUnit.MINUTES -> dist().minutes
+        DurationUnit.DAYS -> dist().days
+        else -> ImplementMe()
+    }
+}
+
+val IntegerDistribution.seconds get() = IntegerDurationDistribution(DurationUnit.SECONDS, this)
+val IntegerDistribution.minutes get() = IntegerDurationDistribution(DurationUnit.MINUTES, this)
+val IntegerDistribution.days get() = IntegerDurationDistribution(DurationUnit.DAYS, this)
 
 
 //
