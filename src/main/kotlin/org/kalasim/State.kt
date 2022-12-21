@@ -1,7 +1,7 @@
 package org.kalasim
 
-import org.kalasim.analysis.EntityCreatedEvent
-import org.kalasim.analysis.StateChangedEvent
+import org.kalasim.analysis.*
+import org.kalasim.analysis.snapshot.StateSnapshot
 import org.kalasim.misc.*
 import org.kalasim.monitors.*
 import org.koin.core.Koin
@@ -21,7 +21,7 @@ open class State<T>(
 
     private var maxTriggerCxt: Int? = null
     private val isTriggerCxt
-        get()= maxTriggerCxt != null
+        get() = maxTriggerCxt != null
 
     var value: T = initialValue
         set(value) {
@@ -39,6 +39,8 @@ open class State<T>(
             if(field == value) return
 
             field = value
+
+            changeListeners.forEach{ it.stateChanged(this)}
 
             timeline.addValue(value)
 
@@ -128,16 +130,15 @@ open class State<T>(
         timeline.printHistogram()
     }
 
+    internal val changeListeners = mutableListOf<StateChangeListener<T>>()
+
+    fun interface StateChangeListener<T> {
+        fun stateChanged(state: State<T>)
+    }
+
+    /** Register a change listener. Will be invoked on every value change of the state. */
+    fun onChange(function: StateChangeListener<T>) = changeListeners.add(function)
+
     override val snapshot
         get() = StateSnapshot(env.now, name, value.toString(), waiters.q.map { it.component.name })
-}
-
-
-/** Captures the current state of a `State`*/
-//@Serializable
-data class StateSnapshot(val time: TickTime, val name: String, val value: String, val waiters: List<String>) :
-    AutoJson(), EntitySnapshot {
-//    override fun toString(): String {
-//        return Json.encodeToString(this)
-//    }
 }
