@@ -5,7 +5,7 @@ import io.kotest.matchers.shouldNotBe
 import org.junit.Test
 import org.kalasim.*
 import java.time.Instant
-import java.util.concurrent.TimeUnit
+import kotlin.time.DurationUnit
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -18,7 +18,7 @@ class TimeTrafoTests {
     fun `it should preserve precision when transforming ticks to wall time`() = createTestSimulation {
         val baseTime = Instant.parse("2021-01-24T12:00:00.00Z")
 
-        tickTransform = OffsetTransform(baseTime, TimeUnit.MINUTES)
+        tickTransform = OffsetTransform(baseTime, DurationUnit.MINUTES)
 
         asWallTime(15.tt) shouldNotBe asWallTime(15.32.tt)
 
@@ -32,7 +32,7 @@ class TimeTrafoTests {
     fun `it should correctly project simulation times with offset-trafo`() = createTestSimulation(true) {
         val baseTime = Instant.parse("2021-01-24T12:00:00.00Z")
 
-        tickTransform = OffsetTransform(baseTime, TimeUnit.MINUTES)
+        tickTransform = OffsetTransform(baseTime, DurationUnit.MINUTES)
 
         object : Component() {
             override fun process() = sequence {

@@ -4,7 +4,7 @@ import org.kalasim.OffsetTransform
 import org.kalasim.examples.MM1Queue
 import org.kalasim.plot.letsplot.display
 import java.time.Instant
-import java.util.concurrent.TimeUnit
+import kotlin.time.DurationUnit
 
 fun main() {
     val mm1 = MM1Queue()
@@ -12,7 +12,7 @@ fun main() {
     // redo but with set tick-transform
     mm1.tickTransform = OffsetTransform(
         offset = Instant.parse("2021-01-01T00:00:00.00Z"),
-        tickUnit = TimeUnit.MINUTES
+        tickUnit = DurationUnit.MINUTES
     )
 
     mm1.run(50)

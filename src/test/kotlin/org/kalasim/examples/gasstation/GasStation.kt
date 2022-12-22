@@ -29,7 +29,7 @@ val SIM_TIME = 20000.0  // Simulation time in seconds
 
 // todo review status of https://youtrack.jetbrains.com/issue/KT-50586
 
-private val FUEL_TANK = "fuel_pump"
+private const val FUEL_TANK = "fuel_pump"
 
 /** Arrives at the gas station after a certain delay and refuels it.*/
 class TankTruck : Component() {
@@ -78,7 +78,7 @@ class Car(
 }
 
 
-class GasStation : Environment(true) {
+class GasStation : Environment(enableConsoleLogger = true) {
     val tank = dependency(qualifier = named(FUEL_TANK)) { DepletableResource(FUEL_TANK, GAS_STATION_SIZE) }
 
     val fuelPumps = dependency { Resource(capacity = 2) }

@@ -1259,6 +1259,7 @@ open class Component(
      * the priority. An event with a higher priority will be scheduled first.
      */
     // todo: it would be more natural to simply support kotlin.time.Duration here
+    @OptIn
     @Deprecated("Use Duration instead of Ticks")
     suspend fun SequenceScope<Component>.hold(
         duration: Ticks,

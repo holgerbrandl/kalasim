@@ -152,7 +152,7 @@ val batchLR: List<Customer> = batch(queue, 4, timeout = 10)
 * Added option to [configure](advanced.md#tick-transformation) a tick to wall time transformer 
 ```kotlin
 createSimulation {
-    tickTransform = OffsetTransform(Instant.now(), TimeUnit.MINUTES)
+    tickTransform = OffsetTransform(Instant.now(), DurationUnit.MINUTES)
 
     run(Duration.ofMinutes(90).asTicks())
     println(asWallTime(now))

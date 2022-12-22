@@ -6,7 +6,7 @@ import org.kalasim.*
 class MM1Queue(
     lambda: Double = 1.5,
     mu: Double = 2.0
-) : Environment(false) {
+) : Environment() {
 
     val server: Resource
 

@@ -211,7 +211,7 @@ class Elevator(showLog: Boolean = false,
                carCapacity: Int = 4,
                numCars: Int = 3,
                topFloor: Int = 15,
-) : Environment(showLog ) {
+) : Environment(enableConsoleLogger = showLog ) {
     init{
         dependency { this@Elevator }
     }

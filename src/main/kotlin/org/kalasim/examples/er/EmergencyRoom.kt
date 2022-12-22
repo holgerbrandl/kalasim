@@ -4,7 +4,7 @@ import org.kalasim.*
 import org.kalasim.examples.er.PatientStatus.*
 import org.kalasim.examples.er.Severity.*
 import org.kalasim.monitors.IntTimeline
-import java.util.concurrent.TimeUnit
+import kotlin.time.DurationUnit
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
@@ -233,12 +233,12 @@ class EmergencyRoom(
     val nurse: HeadNurse = FifoNurse(),
     enableConsoleLogger: Boolean = true,
     enableTickMetrics: Boolean = true
-) : Environment(enableConsoleLogger, enableTickMetrics = enableTickMetrics) {
+) : Environment(enableConsoleLogger=enableConsoleLogger, enableTickMetrics = enableTickMetrics) {
 
     val waitingAreaSize = 300
 
     init {
-        tickTransform = TickTransform(tickUnit = TimeUnit.HOURS)
+        tickTransform = TickTransform(tickUnit = DurationUnit.HOURS)
 
         if(!enableTickMetrics) trackingPolicyFactory.disableAll()
     }

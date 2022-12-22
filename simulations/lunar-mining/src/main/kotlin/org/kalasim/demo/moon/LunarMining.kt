@@ -7,7 +7,7 @@ import org.kalasim.demo.moon.HarvesterState.*
 import java.awt.Dimension
 import java.awt.geom.Point2D
 import java.lang.Math.pow
-import java.util.concurrent.TimeUnit
+import kotlin.time.DurationUnit
 import kotlin.math.*
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -261,7 +261,7 @@ class LunarMining(
     seed: Int = Defaults.DEFAULT_SEED
 ) : Environment(logEvents, randomSeed = seed) {
     init {
-        tickTransform = TickTransform(TimeUnit.MINUTES)
+        tickTransform = TickTransform(DurationUnit.MINUTES)
     }
 
     // the initially unknown list of deposits

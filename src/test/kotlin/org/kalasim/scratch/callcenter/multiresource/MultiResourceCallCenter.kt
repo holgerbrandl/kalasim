@@ -59,7 +59,7 @@ open class ShiftManager : Component() {
 }
 
 
-class MultiResourceCallCenter(arrivalRate: Double = 0.3, logEvents: Boolean = true) : Environment(logEvents) {
+class MultiResourceCallCenter(arrivalRate: Double = 0.3, logEvents: Boolean = true) : Environment(enableConsoleLogger = logEvents) {
 
     val shiftManager = dependency { ShiftManager() }
 

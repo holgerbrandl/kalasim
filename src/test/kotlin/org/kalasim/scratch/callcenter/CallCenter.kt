@@ -90,7 +90,7 @@ class InterruptingShiftManager: ShiftManager() {
 }
 
 
-abstract class CallCenter(val arrivalRate: Double = 0.3, logEvents: Boolean = true) : Environment(logEvents) {
+abstract class CallCenter(val arrivalRate: Double = 0.3, logEvents: Boolean = true) : Environment(enableConsoleLogger=logEvents) {
     // not defined at this point
     abstract val shiftManager : ShiftManager
 

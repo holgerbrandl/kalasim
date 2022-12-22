@@ -55,6 +55,7 @@ dependencies {
     //https://youtrack.jetbrains.com/issue/KT-44197
 
     testImplementation(kotlin("script-runtime"))
+//    implementation(kotlin("script-runtime"))
 }
 
 //tasks.withType<KotlinCompile> {

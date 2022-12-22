@@ -9,6 +9,7 @@ import org.kalasim.Environment
 import org.kalasim.TickTransform
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 
 fun main() {

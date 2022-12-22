@@ -2,7 +2,7 @@ package org.kalasim
 
 import org.kalasim.misc.TRACE_DF
 import java.time.Instant
-import java.util.concurrent.TimeUnit
+import kotlin.time.DurationUnit
 import kotlin.time.*
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -48,7 +48,7 @@ fun Number.asTickTime() = TickTime(this)
 
 
 // https://stackoverflow.com/questions/32437550/whats-the-difference-between-instant-and-localdatetime
-open class TickTransform(val tickUnit: TimeUnit) {
+open class TickTransform(val tickUnit: DurationUnit) {
     open fun ticks2Duration(ticks: Double) = ticks2Duration(Ticks(ticks))
 
     open fun ticks2Duration(ticks: Ticks): Duration {
@@ -64,30 +64,30 @@ open class TickTransform(val tickUnit: TimeUnit) {
     }
 
     fun durationAsTicks(duration: Duration): Double = when(tickUnit) {
-        TimeUnit.NANOSECONDS -> duration.toDouble(DurationUnit.NANOSECONDS)
-        TimeUnit.MICROSECONDS -> duration.toDouble(DurationUnit.MICROSECONDS)
-        TimeUnit.MILLISECONDS -> duration.toDouble(DurationUnit.MILLISECONDS)
+        DurationUnit.NANOSECONDS -> duration.toDouble(DurationUnit.NANOSECONDS)
+        DurationUnit.MICROSECONDS -> duration.toDouble(DurationUnit.MICROSECONDS)
+        DurationUnit.MILLISECONDS -> duration.toDouble(DurationUnit.MILLISECONDS)
         // https://stackoverflow.com/questions/42317152/why-does-the-duration-class-not-have-toseconds-method
-        TimeUnit.SECONDS -> duration.toDouble(DurationUnit.MILLISECONDS)
-        TimeUnit.MINUTES -> duration.toDouble(DurationUnit.MINUTES)
+        DurationUnit.SECONDS -> duration.toDouble(DurationUnit.MILLISECONDS)
+        DurationUnit.MINUTES -> duration.toDouble(DurationUnit.MINUTES)
         //https://stackoverflow.com/questions/42317152/why-does-the-duration-class-not-have-toseconds-method
-        TimeUnit.HOURS -> duration.toDouble(DurationUnit.HOURS)
-        TimeUnit.DAYS -> duration.toDouble(DurationUnit.DAYS)
+        DurationUnit.HOURS -> duration.toDouble(DurationUnit.HOURS)
+        DurationUnit.DAYS -> duration.toDouble(DurationUnit.DAYS)
     }.toDouble()
 }
 
-class OffsetTransform(val offset: Instant = Instant.now(), tickUnit: TimeUnit) : TickTransform(tickUnit) {
+class OffsetTransform(val offset: Instant = Instant.now(), tickUnit: DurationUnit) : TickTransform(tickUnit) {
     override fun ticks2Duration(ticks: Ticks): Duration {
         val ttValue = ticks.value
 
         return when(tickUnit) {
-            TimeUnit.NANOSECONDS -> ttValue.nanoseconds
-            TimeUnit.MICROSECONDS -> ttValue.microseconds
-            TimeUnit.MILLISECONDS -> ttValue.milliseconds
-            TimeUnit.SECONDS -> ttValue.seconds
-            TimeUnit.MINUTES -> ttValue.minutes
-            TimeUnit.HOURS -> ttValue.hours
-            TimeUnit.DAYS -> ttValue.days
+            DurationUnit.NANOSECONDS -> ttValue.nanoseconds
+            DurationUnit.MICROSECONDS -> ttValue.microseconds
+            DurationUnit.MILLISECONDS -> ttValue.milliseconds
+            DurationUnit.SECONDS -> ttValue.seconds
+            DurationUnit.MINUTES -> ttValue.minutes
+            DurationUnit.HOURS -> ttValue.hours
+            DurationUnit.DAYS -> ttValue.days
         }
     }
 

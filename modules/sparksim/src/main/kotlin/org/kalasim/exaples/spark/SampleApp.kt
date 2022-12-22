@@ -6,7 +6,7 @@ import org.jetbrains.kotlinx.spark.api.*
 
 import org.jetbrains.kotlinx.spark.api.tuples.*
 import org.kalasim.TickTransform
-import java.util.concurrent.TimeUnit
+import kotlin.time.DurationUnit
 import kotlin.time.Duration.Companion.seconds
 
 

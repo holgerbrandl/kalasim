@@ -16,7 +16,7 @@ import org.openrndr.math.Vector3
 import org.openrndr.math.transforms.buildTransform
 import org.openrndr.math.transforms.project
 import org.openrndr.shape.*
-import java.util.concurrent.TimeUnit
+import kotlin.time.DurationUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -264,7 +264,7 @@ fun main() = application {
 fun startSimulation(elevator: Elevator, tickMillis: Duration = 50.milliseconds): Elevator {
     return elevator.apply {
         ClockSync(tickDuration = tickMillis, syncsPerTick = 10)
-        tickTransform = TickTransform(TimeUnit.SECONDS)
+        tickTransform = TickTransform(DurationUnit.SECONDS)
 
         dependency { AsyncAnimationStop() }
 

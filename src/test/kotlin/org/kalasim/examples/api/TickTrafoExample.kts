@@ -1,15 +1,15 @@
 //TickTrafoExample.kts
 import org.kalasim.*
 import java.time.Instant
-import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.DurationUnit
 
 
 createSimulation(true) {
-//    tickTransform = OffsetTransform(Instant.now(), TimeUnit.MINUTES)
-    tickTransform = TickTransform(TimeUnit.MINUTES)
+//    tickTransform = OffsetTransform(Instant.now(), DurationUnit.MINUTES)
+    tickTransform = TickTransform(DurationUnit.MINUTES)
 
     object :Component(){
         override fun process() =sequence {

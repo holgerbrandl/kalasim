@@ -20,7 +20,6 @@ import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 import java.time.Instant
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -95,7 +94,7 @@ internal class MainComponent(koin: Koin) : Component(MAIN, koin = koin) {
 
 /** An environment hosts all elements of a simulation, maintains the event loop, and provides randomization support. For details see  https://www.kalasim.org/basics/#simulation-environment */
 open class Environment(
-//    durationUnit: DurationUnit = DurationUnit.MINUTES,
+    durationUnit: DurationUnit? = null, //= DurationUnit.MINUTES,
     enableConsoleLogger: Boolean = false,
     enableTickMetrics: Boolean = false,
     dependencies: KoinModule? = null,
@@ -153,7 +152,7 @@ open class Environment(
 
 
     /** Allows to transform ticks to wall time (represented by `java.time.Instant`) */
-    override var tickTransform: TickTransform? = null// = TickTransform(TimeUnit.MINUTES)
+    override var tickTransform: TickTransform? = durationUnit?.let { TickTransform(durationUnit) }
 
     /** A read-only view on the tick-transform returning it if it is an instance of OffsetTransform and null otherwise */
     val offsetTransform: OffsetTransform?

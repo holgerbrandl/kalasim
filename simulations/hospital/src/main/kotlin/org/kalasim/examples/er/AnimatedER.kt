@@ -11,7 +11,7 @@ import org.openrndr.draw.loadImage
 import org.openrndr.svg.loadSVG
 import java.awt.geom.Point2D
 import java.lang.Thread.sleep
-import java.util.concurrent.TimeUnit
+import kotlin.time.DurationUnit
 import kotlin.time.Duration.Companion.milliseconds
 
 fun main() {
@@ -20,7 +20,7 @@ fun main() {
         val sim = object : Environment() {
             init {
                 ClockSync(tickDuration = 10.milliseconds, syncsPerTick = 100)
-                tickTransform = TickTransform(TimeUnit.SECONDS)
+                tickTransform = TickTransform(DurationUnit.SECONDS)
             }
 
             // instantiate components (not fully worked out here)
