@@ -16,9 +16,7 @@ class TimeTrafoTests {
 
     @Test
     fun `it should preserve precision when transforming ticks to wall time`() = createTestSimulation {
-        val baseTime = Instant.parse("2021-01-24T12:00:00.00Z")
-
-        tickTransform = OffsetTransform(baseTime, DurationUnit.MINUTES)
+        startDate = Instant.parse("2021-01-24T12:00:00.00Z")
 
         asWallTime(15.tt) shouldNotBe asWallTime(15.32.tt)
 
@@ -30,9 +28,7 @@ class TimeTrafoTests {
 
     @Test
     fun `it should correctly project simulation times with offset-trafo`() = createTestSimulation(true) {
-        val baseTime = Instant.parse("2021-01-24T12:00:00.00Z")
-
-        tickTransform = OffsetTransform(baseTime, DurationUnit.MINUTES)
+        startDate = Instant.parse("2021-01-24T12:00:00.00Z")
 
         object : Component() {
             override fun process() = sequence {

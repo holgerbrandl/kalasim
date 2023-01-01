@@ -3,6 +3,7 @@ package org.kalasim
 import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.analysis.snapshot.ComponentGeneratorSnapshot
 import org.kalasim.misc.DependencyContext
+import org.kalasim.misc.NumericDuration
 import org.koin.core.Koin
 
 /**
@@ -51,6 +52,7 @@ class ComponentGenerator<T>(
     var numGenerated = 0
         private set
 
+    @OptIn(NumericDuration::class)
     fun doIat(): Sequence<Component> = sequence {
 
         val iatSeq = sequence { if (forceStart) yield(0.0); while (true) yield(iat()) }.iterator()

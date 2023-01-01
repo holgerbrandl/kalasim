@@ -1,4 +1,4 @@
-@file:Suppress("unused") // seem a dokka bug
+@file:Suppress("unused", "OPT_IN_USAGE") // seem a dokka bug
 
 package org.kalasim.dokka
 

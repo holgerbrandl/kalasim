@@ -6,6 +6,7 @@ import java.awt.Point
 import java.awt.geom.Point2D
 import kotlin.math.sqrt
 import kotlin.properties.Delegates
+import kotlin.time.toDuration
 
 /** A component that has a position on a planar 2D surface. While being on the move, it allows to query its current
  *  position. This is most useful when visualizing a simulation state.
@@ -34,10 +35,10 @@ open class AnimationComponent(
         currentSpeed = speed
 
         val distance = distance()
-        val duration = distance / speed
+        val duration = (distance / speed).toDuration()
         estimatedArrival = now + duration
 
-        hold(Ticks(duration), description ?: "moving to ${nextTarget}", priority)
+        hold(duration, description ?: "moving to ${nextTarget}", priority = priority)
         from = to!!
         to = null
     }

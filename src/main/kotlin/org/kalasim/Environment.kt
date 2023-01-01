@@ -20,9 +20,9 @@ import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 import java.time.Instant
 import java.util.*
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
-
+import kotlin.time.*
+import kotlin.time.Duration.Companion.days
+import kotlin.time.DurationUnit.*
 
 internal const val MAIN = "main"
 
@@ -35,10 +35,8 @@ typealias KoinModule = org.koin.core.module.Module
 
 // https://github.com/InsertKoinIO/koin/issues/801
 fun configureEnvironment(
-    enableConsoleLogger: Boolean = false,
-    builder: KoinModule.() -> Unit
-): Environment =
-    declareDependencies(builder).createSimulation(enableConsoleLogger) {}
+    enableConsoleLogger: Boolean = false, builder: KoinModule.() -> Unit
+): Environment = declareDependencies(builder).createSimulation(enableConsoleLogger) {}
 
 
 fun declareDependencies(
@@ -48,11 +46,17 @@ fun declareDependencies(
 
 fun KoinModule.createSimulation(
     enableConsoleLogger: Boolean = false,
+    /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
+    durationUnit: DurationUnit = MINUTES,
+    /** The absolute time at tick-time 0. Defaults to `null`.*/
+    startDate: Instant? = null,
     enableTickMetrics: Boolean = false,
     useCustomKoin: Boolean = false,
     randomSeed: Int = DEFAULT_SEED,
     builder: Environment.() -> Unit
 ): Environment = createSimulation(
+    durationUnit = durationUnit,
+    startDate = startDate,
     enableConsoleLogger = enableConsoleLogger,
     enableTickMetrics = enableTickMetrics,
     dependencies = this,
@@ -63,19 +67,24 @@ fun KoinModule.createSimulation(
 
 fun createSimulation(
     enableConsoleLogger: Boolean = false,
+    /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
+    durationUnit: DurationUnit = MINUTES,
+    /** The absolute time at tick-time 0. Defaults to `null`.*/
+    startDate: Instant? = null,
     enableTickMetrics: Boolean = false,
     dependencies: KoinModule? = null,
     useCustomKoin: Boolean = false,
     randomSeed: Int = DEFAULT_SEED,
     builder: Environment.() -> Unit
-): Environment =
-    Environment(
-        enableConsoleLogger = enableConsoleLogger,
-        enableTickMetrics = enableTickMetrics,
-        dependencies = dependencies,
-        randomSeed = randomSeed,
-        koin = if(useCustomKoin) koinApplication { }.koin else null
-    ).apply(builder)
+): Environment = Environment(
+    durationUnit = durationUnit,
+    startDate = startDate,
+    enableConsoleLogger = enableConsoleLogger,
+    enableTickMetrics = enableTickMetrics,
+    dependencies = dependencies,
+    randomSeed = randomSeed,
+    koin = if(useCustomKoin) koinApplication { }.koin else null
+).apply(builder)
 
 
 //fun Environment.createSimulation(builder: Environment.() -> Unit) {
@@ -91,16 +100,24 @@ internal class MainComponent(koin: Koin) : Component(MAIN, koin = koin) {
     override fun process() = sequence<Component> {}
 }
 
+fun main() {
+    val environment = Environment(DAYS)
+
+    environment.run(4.days)
+}
 
 /** An environment hosts all elements of a simulation, maintains the event loop, and provides randomization support. For details see  https://www.kalasim.org/basics/#simulation-environment */
 open class Environment(
-    durationUnit: DurationUnit? = null, //= DurationUnit.MINUTES,
+    /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
+    val durationUnit: DurationUnit = MINUTES,
+    /** The absolute time at tick-time 0. Defaults to `null`.*/
+    var startDate: Instant? = null,
     enableConsoleLogger: Boolean = false,
     enableTickMetrics: Boolean = false,
     dependencies: KoinModule? = null,
     koin: Koin? = null,
     randomSeed: Int = DEFAULT_SEED,
-    startTime: TickTime = TickTime(0.0),
+    tickTimeOffset: TickTime = TickTime(0.0),
     // see https://github.com/holgerbrandl/kalasim/issues/49
 //    val typedDurationsRequired: Boolean = false
 ) : SimContext, WithJson {
@@ -126,9 +143,10 @@ open class Environment(
 
 
     val trackingPolicyFactory = TrackingPolicyFactory()
-//    val traceFilters = mutableListOf<EventFilter>()
 
-    init {
+//    val traceFilters = mutableListOf<EventFilter>()
+//
+//    init {
 //        traceFilters.add(EventFilter {
 //            if(it !is InteractionEvent) return@EventFilter true
 //
@@ -139,10 +157,10 @@ open class Environment(
 //                    || action.contains("removed from requesters")
 //                    || action.contains("removed from claimers"))
 //        })
-    }
+//    }
 
     /** The current time of the simulation. See https://www.kalasim.org/basics/#running-a-simulation.*/
-    var now = startTime
+    var now = tickTimeOffset
         private set // no longer needed/wanted --> use run
 
     @Suppress("LeakingThis")
@@ -152,11 +170,11 @@ open class Environment(
 
 
     /** Allows to transform ticks to wall time (represented by `java.time.Instant`) */
-    override var tickTransform: TickTransform? = durationUnit?.let { TickTransform(durationUnit) }
+    override var tickTransform: TickTransform = TickTransform(durationUnit)
 
-    /** A read-only view on the tick-transform returning it if it is an instance of OffsetTransform and null otherwise */
-    val offsetTransform: OffsetTransform?
-        get() = if(tickTransform is OffsetTransform) (tickTransform as OffsetTransform) else null
+    //    var startDate: Instant? = null
+    var offsetTransform: OffsetTransform? = null
+//        get() = if(tickTransform is OffsetTransform) (tickTransform as OffsetTransform) else null
 
 
     /** The component of the currently iterated process definition. Read-only, as components enter the queue only
@@ -174,10 +192,8 @@ open class Environment(
     //redeclare to simplify imports
     /** Resolves a dependency in the simulation. Dependencies can be disambiguated by using a qualifier.*/
     inline fun <reified T : Any> get(
-        qualifier: Qualifier? = null,
-        noinline parameters: ParametersDefinition? = null
-    ): T =
-        getKoin().get(qualifier, parameters)
+        qualifier: Qualifier? = null, noinline parameters: ParametersDefinition? = null
+    ): T = getKoin().get(qualifier, parameters)
 
 
     init {
@@ -259,22 +275,22 @@ open class Environment(
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
+    @OptIn(NumericDuration::class)
     fun run(
-        duration: Duration,
-        priority: Priority = NORMAL
-    ) = run(duration.asTicks(), null, priority)
+        duration: Duration? = null, priority: Priority = NORMAL
+    ) = run(duration?.asTicks(), null, priority)
 
-    /**
-     * Start execution of the simulation. See https://www.kalasim.org/basics/#running-a-simulation
-     *
-     * @param duration Time to run
-     * @param priority If a component has the same time on the event list, the main component is sorted according to
-     * the priority. An event with a higher priority will be scheduled first.
-     */
-    fun run(
-        duration: Ticks? = null,
-        priority: Priority = NORMAL
-    ) = run(duration?.value, null, priority)
+//    /**
+//     * Start execution of the simulation. See https://www.kalasim.org/basics/#running-a-simulation
+//     *
+//     * @param duration Time to run
+//     * @param priority If a component has the same time on the event list, the main component is sorted according to
+//     * the priority. An event with a higher priority will be scheduled first.
+//     */
+//    fun run(
+//        duration: Ticks? = null,
+//        priority: Priority = NORMAL
+//    ) = run(duration?.value, null, priority)
 
     /**
      * Start execution of the simulation
@@ -283,9 +299,9 @@ open class Environment(
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
+    @OptIn(NumericDuration::class)
     fun run(
-        until: Instant,
-        priority: Priority = NORMAL
+        until: Instant, priority: Priority = NORMAL
     ) = run(until = until.asTickTime(), priority = priority)
 
     /**
@@ -300,11 +316,9 @@ open class Environment(
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
+    @NumericDuration
     fun run(
-        duration: Number? = null,
-        until: TickTime? = null,
-        priority: Priority = NORMAL,
-        urgent: Boolean = false
+        duration: Number? = null, until: TickTime? = null, priority: Priority = NORMAL, urgent: Boolean = false
     ) {
         // also see https://simpy.readthedocs.io/en/latest/topical_guides/environments.html
         if(duration == null && until == null) {
@@ -388,8 +402,7 @@ open class Environment(
 
 
     inline fun <reified T : Event> addAsyncEventListener(
-        scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
-        crossinline block: (T) -> Unit
+        scope: CoroutineScope = CoroutineScope(Dispatchers.Default), crossinline block: (T) -> Unit
     ) = AsyncEventListener(scope).also { listener ->
         listener.start(block)
         addEventListener(listener)
@@ -483,19 +496,28 @@ open class Environment(
         "queue" to queue.toList().map { it.name }.toTypedArray()
     }
 
+    fun hasAbsoluteTime() = startDate != null
+
+
+    fun tick2wallTime(tickTime: TickTime): Instant {
+        return startDate!! + tickTransform.ticks2Duration(tickTime.value)
+    }
+
+    fun wall2TickTime(instant: Instant): TickTime {
+        val offsetDuration = java.time.Duration.between(startDate, instant).toKotlinDuration()
+
+        return TickTime(tickTransform.durationAsTicks(offsetDuration))
+    }
+
+
     // deprecated because nothing should be logged outside a process
 //    fun log(msg: String) = main.log(msg)
 }
 
 
 data class QueueElement(
-    val component: Component,
-    val time: TickTime,
-    val priority: Priority,
-    val queueCounter: Int,
-    val urgent: Boolean
-) :
-    Comparable<QueueElement> {
+    val component: Component, val time: TickTime, val priority: Priority, val queueCounter: Int, val urgent: Boolean
+) : Comparable<QueueElement> {
     //TODO clarify if we need/want to also support urgent
 
     override fun compareTo(other: QueueElement): Int =
@@ -510,7 +532,7 @@ data class QueueElement(
 }
 
 
-fun Environment.calcScheduleTime(until: TickTime?, duration: Number?): TickTime {
+internal fun Environment.calcScheduleTime(until: TickTime?, duration: Number?): TickTime {
     return (until?.value to duration?.toDouble()).let { (till, duration) ->
         if(till == null) {
             require(duration != null) { "neither duration nor till specified" }
@@ -524,8 +546,7 @@ fun Environment.calcScheduleTime(until: TickTime?, duration: Number?): TickTime 
 
 
 inline fun <reified T> KoinModule.add(
-    qualifier: Qualifier? = null,
-    noinline definition: Definition<T>
+    qualifier: Qualifier? = null, noinline definition: Definition<T>
 ) {
     single(qualifier = qualifier, createdAtStart = true, definition = definition)
 
@@ -533,11 +554,9 @@ inline fun <reified T> KoinModule.add(
 
 inline fun <reified T> Environment.dependency(qualifier: Qualifier? = null, builder: Environment.() -> T): T {
     val something = builder(this)
-    getKoin().loadModules(listOf(
-        module(createdAtStart = true) {
-            add(qualifier) { something }
-        }
-    ))
+    getKoin().loadModules(listOf(module(createdAtStart = true) {
+        add(qualifier) { something }
+    }))
 
     return something
 }

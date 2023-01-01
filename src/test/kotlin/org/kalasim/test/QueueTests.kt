@@ -9,6 +9,7 @@ import org.kalasim.Priority.Companion.IMPORTANT
 import org.kalasim.analysis.InteractionEvent
 import kotlin.math.roundToInt
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.minutes
 
 class QueueTests {
 
@@ -166,13 +167,13 @@ class QueueTests {
             val waitingLine = ComponentQueue<Passenger>()
 
             override fun process() = sequence {
-                val batchComplete = batch(waitingLine, 4, timeout = 10)
+                val batchComplete = batch(waitingLine, 4, timeout = 10.minutes)
                 batchComplete.size shouldBe 4
                 env.now shouldBe 8.tt
 
                 hold(until = TickTime(20))
 
-                val batchPartial = batch(waitingLine, 4, timeout = 10)
+                val batchPartial = batch(waitingLine, 4, timeout = 10.minutes)
                 batchPartial.size shouldBe 2
                 env.now shouldBe 30.tt
             }

@@ -63,6 +63,8 @@ class ResourceEvent(
 
 }
 
+internal fun Environment.asWtOptional(tickTime: TickTime) = if(hasAbsoluteTime()) asWallTime(tickTime) else null
+
 data class ResourceActivityEvent(
     val requested: TickTime,
     val honored: TickTime,
@@ -72,9 +74,9 @@ data class ResourceActivityEvent(
     val activity: String?,
     val quantity: Double,
 ) : Event(released) {
-    val requestedWT = resource.env.offsetTransform?.tick2wallTime(requested)
-    val honoredWT = resource.env.offsetTransform?.tick2wallTime(honored)
-    val releasedWT = resource.env.offsetTransform?.tick2wallTime(released)
+    val requestedWT = resource.env.asWtOptional(requested)
+    val honoredWT = resource.env.asWtOptional(honored)
+    val releasedWT = resource.env.asWtOptional(released)
 
     override fun toJson() = json {
         "eventType" to eventType

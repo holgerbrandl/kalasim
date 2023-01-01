@@ -15,6 +15,7 @@ import org.kalasim.Priority.Companion.LOWEST
 import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.ResourceSelectionPolicy.*
 import java.time.Instant
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 
 class ResourceTests {
@@ -454,7 +455,7 @@ class ResourceTests {
         timeline.size shouldBe 28
 
         // now set the tick-transform and check if the timeline includes walltime
-        tickTransform = OffsetTransform(offset = Instant.parse("2021-01-01T00:00:00.00Z"), tickUnit = DurationUnit.MINUTES)
+        startDate =Instant.parse("2021-01-01T00:00:00.00Z")
         val timelineWT = r1.timeline
         timelineWT.first().startWT shouldNotBe null
     }
@@ -474,19 +475,19 @@ class ResourceTests {
 
                     //now try again but since both resources are busy/depleted it should fail
                     // irrespective of the delay or time
-                    request(r, failDelay = 0)
+                    request(r, failDelay = 0.minutes)
                     failed shouldBe true
-                    request(dr, failDelay = 0)
-                    failed shouldBe true
-
-                    request(r, failDelay = 1)
-                    failed shouldBe true
-                    request(dr, failDelay = 1)
+                    request(dr, failDelay = 0.minutes)
                     failed shouldBe true
 
-                    request(r, failAt = now + 1)
+                    request(r, failDelay = 1.minutes)
                     failed shouldBe true
-                    request(dr, failAt = now + 1)
+                    request(dr, failDelay = 1.minutes)
+                    failed shouldBe true
+
+                    request(r, failAt = now + 1.minutes)
+                    failed shouldBe true
+                    request(dr, failAt = now + 1.minutes)
                     failed shouldBe true
                 }
             }

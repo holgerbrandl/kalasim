@@ -1,7 +1,10 @@
+@file:OptIn(NumericDuration::class)
+
 package org.kalasim.examples
 
 import org.apache.commons.math3.distribution.ExponentialDistribution
 import org.kalasim.*
+import org.kalasim.misc.NumericDuration
 
 class MM1Queue(
     lambda: Double = 1.5,
@@ -19,7 +22,7 @@ class MM1Queue(
 
         override fun process() = sequence {
             request(get<Resource>()) {
-                hold(ed.sample())
+                hold(ed())
             }
         }
     }

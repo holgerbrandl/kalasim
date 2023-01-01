@@ -6,6 +6,7 @@ import org.kalasim.misc.*
 import org.koin.core.Koin
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
+import kotlin.time.Duration
 
 
 /** Base class of all main simulation entities such as environments, resources, components, states and collections. */
@@ -53,7 +54,7 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
         getKoin().get(qualifier, parameters)
 
 
-    override var tickTransform: TickTransform?
+    override var tickTransform: TickTransform
         get() = env.tickTransform
         set(_) {
             throw RuntimeException("Tick transformation must be set via the environment")
@@ -86,6 +87,8 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
             log(builder())
         }
     }
+
+    fun Number.toDuration() : Duration = env.tickTransform.ticks2Duration(this.toDouble())
 }
 
 

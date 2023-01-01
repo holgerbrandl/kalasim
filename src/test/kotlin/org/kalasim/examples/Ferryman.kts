@@ -4,6 +4,7 @@ package org.kalasim.examples
 import org.kalasim.*
 import org.kalasim.monitors.NumericStatisticMonitor
 import org.kalasim.plot.kravis.display
+import kotlin.time.Duration.Companion.minutes
 
 createSimulation {
 
@@ -17,13 +18,13 @@ createSimulation {
         val r2lMonitor = NumericStatisticMonitor()
 
         override fun process() = sequence {
-            val batchLR: List<Passenger> = batch(left2Right, 4, timeout = 10)
+            val batchLR: List<Passenger> = batch(left2Right, 4, timeout = 10.minutes)
             l2rMonitor.addValue(batchLR.size)
-            hold(5, description = "shipping ${batchLR.size} l2r")
+            hold(5.minutes, description = "shipping ${batchLR.size} l2r")
 
-            val batchRL: List<Passenger> = batch(right2Left, 4, timeout = 10)
+            val batchRL: List<Passenger> = batch(right2Left, 4, timeout = 10.minutes)
             r2lMonitor.addValue(batchRL.size)
-            hold(5, description = "shipping ${batchRL.size} r2l")
+            hold(5.minutes, description = "shipping ${batchRL.size} r2l")
 
             // we could also use an infinite while loop instead of activate
             activate(process = Component::process)
@@ -36,7 +37,7 @@ createSimulation {
     ComponentGenerator(uniform(0, 12)) { Passenger() }
         .addConsumer { fm.right2Left.add(it) }
 
-    run(10000)
+    run(10000.minutes)
 
     fm.l2rMonitor.display("Passengers left->right")
     fm.r2lMonitor.display("Passengers right->left")

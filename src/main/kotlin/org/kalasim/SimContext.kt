@@ -12,12 +12,12 @@ interface SimContext : KoinComponent {
     /** The environment of this simulation model. */
     val env: Environment
 
-    var tickTransform: TickTransform?
+    var tickTransform: TickTransform
 
     /** Transforms a wall `duration` into the corresponding amount of ticks.*/
     fun Duration.asTicks(): Double {
-        require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
-        return tickTransform!!.durationAsTicks(this)
+//        require(env.startDate != null) { MISSING_TICK_TRAFO_ERROR }
+        return env.tickTransform.durationAsTicks(this)
     }
 
     val Duration.ticks: Double
@@ -25,8 +25,8 @@ interface SimContext : KoinComponent {
 
     // Scoped extensions
     fun Instant.asTickTime(): TickTime {
-        require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
-        return tickTransform!!.wall2TickTime(this)
+        require(env.startDate != null) { MISSING_TICK_TRAFO_ERROR }
+        return env.wall2TickTime(this)
     }
 
     operator fun TickTime.plus(duration: Duration): TickTime = TickTime(value + duration.asTicks())
@@ -34,8 +34,8 @@ interface SimContext : KoinComponent {
 
     /** Transforms a simulation time (typically `now`) to the corresponding wall time. */
     fun TickTime.asWallTime(): Instant {
-        require(tickTransform != null) { MISSING_TICK_TRAFO_ERROR }
-        return tickTransform!!.tick2wallTime(this)
+        require(env.startDate != null) { MISSING_TICK_TRAFO_ERROR }
+        return env.tick2wallTime(this)
     }
 
 

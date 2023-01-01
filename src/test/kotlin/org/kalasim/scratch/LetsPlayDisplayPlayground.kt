@@ -1,19 +1,19 @@
 package org.kalasim.test
 
-import org.kalasim.OffsetTransform
 import org.kalasim.examples.MM1Queue
+import org.kalasim.misc.NumericDuration
 import org.kalasim.plot.letsplot.display
-import java.time.Instant
-import kotlin.time.DurationUnit
 
+@OptIn(NumericDuration::class)
 fun main() {
     val mm1 = MM1Queue()
 
     // redo but with set tick-transform
-    mm1.tickTransform = OffsetTransform(
-        offset = Instant.parse("2021-01-01T00:00:00.00Z"),
-        tickUnit = DurationUnit.MINUTES
-    )
+//    mm1.startDate = Instant.parse("2021-01-01T00:00:00.00Z")
+//    mm1.offsetTransform = OffsetTransform(
+//        offset = Instant.parse("2021-01-01T00:00:00.00Z"),
+//        tickUnit = DurationUnit.MINUTES
+//    )
 
     mm1.run(50)
 

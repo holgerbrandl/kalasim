@@ -428,8 +428,10 @@ data class ResourceTimelineSegment(
 //
 //    }
 
-    val startWT = resource.env.offsetTransform?.tick2wallTime(start)
-    val endWT = end?.let { resource.env.offsetTransform?.tick2wallTime(it) }
+    val startWT = resource.env.asWtOptional(start)
+
+    @Suppress("unused")
+    val endWT = end?.let { resource.env.asWtOptional(it) }
 }
 
 

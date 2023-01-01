@@ -23,8 +23,10 @@ import org.koin.dsl.module
 import java.io.File
 import java.lang.Thread.sleep
 import kotlin.io.path.div
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 class EnvTests {
 
@@ -241,6 +243,15 @@ class EnvTests {
 
             cc.size shouldBe 1
         }
+    }
+
+    @Test
+    fun `it should allow to use custom duration units`(){
+        val environment = Environment(DurationUnit.DAYS)
+
+        environment.run(4.days)
+
+        environment.now shouldBe TickTime(4)
     }
 
     @Test

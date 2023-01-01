@@ -51,9 +51,16 @@ fun Number.asTickTime() = TickTime(this)
 open class TickTransform(val tickUnit: DurationUnit) {
     open fun ticks2Duration(ticks: Double) = ticks2Duration(Ticks(ticks))
 
-    open fun ticks2Duration(ticks: Ticks): Duration {
-        throw IllegalArgumentException("Only supported when using OffsetTransform")
+    open fun ticks2Duration(ticks: Ticks): Duration = when(tickUnit){
+        DurationUnit.NANOSECONDS -> ticks.value.nanoseconds
+        DurationUnit.MICROSECONDS -> ticks.value.microseconds
+        DurationUnit.MILLISECONDS -> ticks.value.milliseconds
+        DurationUnit.SECONDS -> ticks.value.seconds
+        DurationUnit.MINUTES -> ticks.value.minutes
+        DurationUnit.HOURS -> ticks.value.hours
+        DurationUnit.DAYS -> ticks.value.days
     }
+
 
     open fun tick2wallTime(tickTime: TickTime): Instant {
         throw IllegalArgumentException("Only supported when using OffsetTransform")
@@ -73,33 +80,12 @@ open class TickTransform(val tickUnit: DurationUnit) {
         //https://stackoverflow.com/questions/42317152/why-does-the-duration-class-not-have-toseconds-method
         DurationUnit.HOURS -> duration.toDouble(DurationUnit.HOURS)
         DurationUnit.DAYS -> duration.toDouble(DurationUnit.DAYS)
-    }.toDouble()
+    }
 }
 
-class OffsetTransform(val offset: Instant = Instant.now(), tickUnit: DurationUnit) : TickTransform(tickUnit) {
-    override fun ticks2Duration(ticks: Ticks): Duration {
-        val ttValue = ticks.value
+class OffsetTransform(val offset: Instant = Instant.now(), val tt: TickTransform) {
 
-        return when(tickUnit) {
-            DurationUnit.NANOSECONDS -> ttValue.nanoseconds
-            DurationUnit.MICROSECONDS -> ttValue.microseconds
-            DurationUnit.MILLISECONDS -> ttValue.milliseconds
-            DurationUnit.SECONDS -> ttValue.seconds
-            DurationUnit.MINUTES -> ttValue.minutes
-            DurationUnit.HOURS -> ttValue.hours
-            DurationUnit.DAYS -> ttValue.days
-        }
-    }
 
-    override fun tick2wallTime(tickTime: TickTime): Instant {
-        return offset + ticks2Duration(tickTime.value)
-    }
-
-    override fun wall2TickTime(instant: Instant): TickTime {
-        val offsetDuration = java.time.Duration.between(offset, instant).toKotlinDuration()
-
-        return TickTime(durationAsTicks(offsetDuration))
-    }
 }
 
 internal const val MISSING_TICK_TRAFO_ERROR = "Tick transformation not configured."
@@ -109,6 +95,9 @@ internal const val MISSING_TICK_TRAFO_ERROR = "Tick transformation not configure
 
 /** Transforms a simulation time (typically `now`) to the corresponding wall time. */
 fun Environment.asTicks(duration: Duration): Double = duration.asTicks()
+fun Environment.asDuration(duration: Number?): Duration? = duration?.let{
+    tickTransform.ticks2Duration(duration.toDouble())
+}
 
 /** Transforms an wall `Instant` to simulation time.*/
 fun Environment.asTickTime(instant: Instant) = instant.asTickTime()

@@ -1,6 +1,7 @@
 package org.kalasim.test
 
 import io.kotest.assertions.fail
+import junit.framework.TestCase.assertEquals
 import kravis.GGPlot
 import kravis.SessionPrefs
 import kravis.render.LocalR
@@ -8,6 +9,7 @@ import org.junit.*
 import org.junit.rules.TestName
 import org.kalasim.OffsetTransform
 import org.kalasim.examples.MM1Queue
+import org.kalasim.misc.NumericDuration
 import org.kalasim.plot.kravis.*
 import java.io.*
 import java.time.Instant
@@ -63,16 +65,14 @@ class DisplayTests : AbstractSvgPlotRegression() {
 
     }
 
+    @OptIn(NumericDuration::class)
     @Test
     fun `is should display the mm1 server utilization with walltime`() {
 
         val mm1 = MM1Queue()
 
         // redo but with set tick-transform
-        mm1.tickTransform = OffsetTransform(
-            offset = Instant.parse("2021-01-01T00:00:00.00Z"),
-            tickUnit = DurationUnit.MINUTES
-        )
+        mm1.startDate = Instant.parse("2021-01-01T00:00:00.00Z")
 
         mm1.run(50)
 
@@ -109,6 +109,7 @@ abstract class AbstractSvgPlotRegression {
     abstract val testDataDir: File
 
     protected fun assertExpected(plot: GGPlot, subtest: String? = null) {
+//        if(true) return
         val plotFile = plot.save(createTempFile(suffix = ".svg"))
 
         Assert.assertTrue(plotFile.exists() && plotFile.fileSize() > 0)

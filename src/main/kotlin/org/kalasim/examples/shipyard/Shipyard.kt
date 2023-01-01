@@ -4,9 +4,10 @@ import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.*
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.DurationUnit
 
 
-class Shipyard : Environment() {
+class Shipyard : Environment(DurationUnit.DAYS) {
 
     class Part(val partId: String,  val duration: RealDistribution, vararg val components: Part) : SimulationEntity()
 

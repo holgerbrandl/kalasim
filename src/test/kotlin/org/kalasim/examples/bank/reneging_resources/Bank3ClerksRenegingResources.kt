@@ -4,6 +4,7 @@ package org.kalasim.examples.bank.reneging_resources
 
 import org.kalasim.*
 import org.kalasim.monitors.printHistogram
+import kotlin.time.Duration.Companion.minutes
 
 
 //var numBalked = LevelMonitoredInt(0)
@@ -20,13 +21,13 @@ class Customer(val clerks: Resource) : Component() {
             cancel()
         }
 
-        request(clerks, failDelay = 50)
+        request(clerks, failDelay = 50.minutes)
 
         if (failed) {
             numReneged++
             log("reneged")
         } else {
-            hold(30)
+            hold(30.minutes)
             release(clerks)
         }
     }
@@ -41,7 +42,7 @@ fun main() {
             Customer(get())
         }
 
-        run(50000.0)
+        run(50000.minutes)
 
         val clerks = get<Resource>()
 

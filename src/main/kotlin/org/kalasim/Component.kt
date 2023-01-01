@@ -13,6 +13,7 @@ import org.koin.core.Koin
 import kotlin.math.*
 import kotlin.reflect.KFunction1
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 
 internal const val EPS = 1E-8
@@ -84,14 +85,13 @@ internal data class RequestContext(
 open class Component(
     name: String? = null,
     at: TickTime? = null,
-    delay: Number = 0,
+    delay: Duration? = null,
     priority: Priority = NORMAL,
     process: ProcessPointer? = null,
     koin: Koin = DependencyContext.get(),
     // to be re-enabled/reworked as part of https://github.com/holgerbrandl/kalasim/issues/11
 //    builder: SequenceScope<Component>.() -> Unit = {   }
 ) : SimulationEntity(name, koin) {
-
 
     private var oneOfRequest: Boolean = false
 
@@ -196,19 +196,21 @@ open class Component(
 
         //  what's the point of scheduling it at `at`  without a process definition?
         //  --> main is one major reason, we need the engine to progress the time until a given point
-        if(at != null || delay.toDouble() > 0.0) {
+        if(at != null || delay != null) {
             require(simProcess != null) {
                 "component '${name}' must have process definition to be scheduled"
             }
         }
 
+        val tickDelay = delay?.asTicks() ?: 0
+
 //        if (at != null || (process != null && (process.name != "process" || overriddenProcess))) {
         @Suppress("LeakingThis")
         if(simProcess != null && this !is MainComponent) {
             val scheduledTime = if(at == null) {
-                env.now + delay.toDouble()
+                env.now + tickDelay
             } else {
-                at + delay.toDouble()
+                at + tickDelay
             }
 
             reschedule(scheduledTime, priority, false, null, ACTIVATE)
@@ -540,7 +542,7 @@ open class Component(
         quantity: Number = DEFAULT_REQUEST_QUANTITY,
         priority: Priority? = null,
         failAt: TickTime? = null,
-        failDelay: Number? = null,
+        failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
     ): Unit = request(
         resource withQuantity ensurePositiveQuantity(quantity) andPriority priority,
@@ -585,7 +587,7 @@ open class Component(
         priority: Priority? = null,
         description: String? = null,
         failAt: TickTime? = null,
-        failDelay: Number? = null,
+        failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
         capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
     ) = put(
@@ -614,7 +616,7 @@ open class Component(
         vararg resourceRequests: ResourceRequest,
         description: String? = null,
         failAt: TickTime? = null,
-        failDelay: Number? = null,
+        failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
         capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
     ) = request(
@@ -653,7 +655,7 @@ open class Component(
         priority: Priority? = null,
         oneOf: Boolean = false,
         failAt: TickTime? = null,
-        failDelay: Number? = null,
+        failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
         capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
         honorBlock: (suspend SequenceScope<Component>.(RequestScopeContext) -> Unit)? = null
@@ -693,7 +695,7 @@ open class Component(
         priority: Priority? = null,
         oneOf: Boolean = false,
         failAt: TickTime? = null,
-        failDelay: Number? = null,
+        failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
         capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
         honorBlock: (suspend SequenceScope<Component>.(RequestScopeContext) -> Unit)? = null
@@ -730,7 +732,7 @@ open class Component(
         oneOf: Boolean = false,
         urgent: Boolean = false,
         failAt: TickTime? = null,
-        failDelay: Number? = null,
+        failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
         capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
         // try to avoid argument by inferring from stacktrace
@@ -782,7 +784,7 @@ open class Component(
 
             scheduledTime = when {
                 failAt != null -> failAt
-                failDelay != null -> env.now + failDelay.toDouble()
+                failDelay != null -> env.now + failDelay.asTicks()
                 else -> TickTime(Double.MAX_VALUE)
             }
 
@@ -1240,6 +1242,7 @@ open class Component(
      * @param priority If a component has the same time on the event list, this component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
+    @OptIn(NumericDuration::class)
     suspend fun SequenceScope<Component>.hold(
         duration: Duration,
         description: String? = null,
@@ -1259,16 +1262,15 @@ open class Component(
      * the priority. An event with a higher priority will be scheduled first.
      */
     // todo: it would be more natural to simply support kotlin.time.Duration here
-    @OptIn
-    @Deprecated("Use Duration instead of Ticks")
-    suspend fun SequenceScope<Component>.hold(
-        duration: Ticks,
-        description: String? = null,
-        priority: Priority = NORMAL,
-        urgent: Boolean = false
-    ) = yieldCurrent {
-        this@Component.hold(duration.value, description, null, priority, urgent)
-    }
+//    @Deprecated("Use Duration instead of Ticks")
+//    suspend fun SequenceScope<Component>.hold(
+//        duration: Ticks,
+//        description: String? = null,
+//        priority: Priority = NORMAL,
+//        urgent: Boolean = false
+//    ) = yieldCurrent {
+//        this@Component.hold(duration.value, description, null, priority, urgent)
+//    }
 
     /**
      * Hold the component.
@@ -1281,6 +1283,7 @@ open class Component(
      * the priority. An event with a higher priority will be scheduled first.
      */
 //    @Deprecated("Use Duration instead of Number")
+    @NumericDuration
     suspend fun SequenceScope<Component>.hold(
         duration: Number? = null,
         description: String? = null,
@@ -1301,6 +1304,7 @@ open class Component(
      * @param priority If a component has the same time on the event list, this component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
+    @NumericDuration
     fun hold(
         duration: Number? = null,
         description: String? = null,
@@ -1444,7 +1448,7 @@ open class Component(
         waitFor: T,
         triggerPriority: Priority = NORMAL,
         failAt: TickTime? = null,
-        failDelay: Number? = null,
+        failDelay: Duration? = null,
         failPriority: Priority = NORMAL
     ) = wait(
         StateRequest(state, priority = triggerPriority) { state.value == waitFor },
@@ -1472,7 +1476,7 @@ open class Component(
         state: State<T>,
         triggerPriority: Priority = NORMAL,
         failAt: TickTime? = null,
-        failDelay: Number? = null,
+        failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
         predicate: (T) -> Boolean
     ) = wait(
@@ -1501,7 +1505,7 @@ open class Component(
         vararg stateRequests: StateRequest<*>,
         urgent: Boolean = false,
         failAt: TickTime? = null,
-        failDelay: Number? = null,
+        failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
         all: Boolean = false
     ) = yieldCurrent {
@@ -1519,7 +1523,7 @@ open class Component(
 
         scheduledTime = when {
             failAt != null -> failAt
-            failDelay != null -> env.now + failDelay.toDouble()
+            failDelay != null -> env.now + failDelay.asTicks()
             else -> TickTime(Double.MAX_VALUE)
         }
 
@@ -1661,7 +1665,7 @@ open class Component(
     suspend fun <T : SimulationEntity> SequenceScope<Component>.batch(
         queue: ComponentQueue<T>,
         batchSize: Int,
-        timeout: Number? = null
+        timeout: Duration? = null
     ): List<T> {
         // Note: Adopted from simmer::batch (Ucar2019, p14)
 
@@ -1716,7 +1720,6 @@ enum class ResourceSelectionPolicy {
 //
 
 typealias ProcessPointer = KFunction1<*, Sequence<Component>>
-//typealias GenProcess = KFunction1<*, Sequence<Component>>
 
 
 interface SimProcess {

@@ -4,6 +4,9 @@
 
 Developer snapshots are deposited on maven-central starting with v0.8.90+
 
+Major
+* Changed API to always favor `kotlin.time.Duration` to express durations. Previously untyped `Numbers` were used that often led to confusion in larger simulations models. Evey simulation environment has now a `DurationUnit` such as seconds, hours, etc.  (defaulting to minutes if not specified). To indicate this breaking change to the user in her IDE, new [opt-in](https://kotlinlang.org/docs/opt-in-requirements.html) annotations were introduced
+
 Minor 
 
 * Overwrite `shuffled()` and `random()` as extensions on `Collection<T>` in simulation entities to enable better control over randomization by default

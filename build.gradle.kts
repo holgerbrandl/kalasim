@@ -1,5 +1,7 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-    kotlin("jvm") version "1.7.21"
+    kotlin("jvm") version "1.8.0"
     `maven-publish`
     signing
 
@@ -21,10 +23,11 @@ repositories {
 
 dependencies {
     api("org.apache.commons:commons-math3:3.6.1")
+    // note updated postponed because of regression errors
     api("io.insert-koin:koin-core:3.1.2")
     implementation(kotlin("reflect"))
 
-    api("com.github.holgerbrandl:jsonbuilder:0.9")
+    api("com.github.holgerbrandl:jsonbuilder:0.10")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
     //  api("io.github.microutils:kotlin-logging:1.12.5")
@@ -58,9 +61,20 @@ dependencies {
 //    implementation(kotlin("script-runtime"))
 }
 
-//tasks.withType<KotlinCompile> {
-//    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+// see https://youtrack.jetbrains.com/issue/KT-52735
+val compileKotlin: KotlinCompile by tasks
+
+
+compileKotlin.kotlinOptions.freeCompilerArgs += "-Xallow-any-scripts-in-source-roots"
+
+
+// to set bytecode version to 11 we need to do 2 things (note: this requires the usage projects to do the same)
+//compileKotlin.kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+//
+//kotlin { // Extension to make an easy setup
+//    jvmToolchain(11) // Target version of generated JVM bytecode
 //}
+
 
 
 //https://github.com/Kotlin/kotlin-jupyter/blob/master/docs/libraries.md
