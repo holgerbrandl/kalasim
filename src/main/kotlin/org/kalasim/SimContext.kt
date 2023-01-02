@@ -39,6 +39,12 @@ interface SimContext : KoinComponent {
     }
 
 
+    fun Number.toDuration() : Duration = env.tickTransform.ticks2Duration(this.toDouble())
+
+
+    // would be nice but makes it harder to use TickTime outside of env
+//    operator fun TickTime.minus(other: TickTime): Duration = (value - other.value).toDuration()
+
     /**
      * Returns a random element from this collection.
      *
@@ -46,6 +52,16 @@ interface SimContext : KoinComponent {
      * provide better control over randomization of simulation experiments.
      */
     fun <T> Collection<T>.random(): T {
+        return random(env.random)
+    }
+
+    /**
+     * Returns a random element from this collection.
+     *
+     * Note: this method intentionally overwrites the same-signature method of the kotlin standard library to
+     * provide better control over randomization of simulation experiments.
+     */
+    fun <T> Array<T>.random(): T {
         return random(env.random)
     }
 

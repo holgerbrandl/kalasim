@@ -108,6 +108,7 @@ fun SimContext.discreteUniform(lower: Int, upper: Int) = UniformIntegerDistribut
 //
 
 operator fun <E> EnumeratedDistribution<E>.invoke(): E = sample()
+operator fun <E> EnumeratedDistribution<E>.get(key: E): Double = pmf.first { it.key == key }.value
 
 
 // since it's common that users want to create an integer distribution from a range, we highlight the incorrect API usage

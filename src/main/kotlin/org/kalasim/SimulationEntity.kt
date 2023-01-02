@@ -87,8 +87,6 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
             log(builder())
         }
     }
-
-    fun Number.toDuration() : Duration = env.tickTransform.ticks2Duration(this.toDouble())
 }
 
 
