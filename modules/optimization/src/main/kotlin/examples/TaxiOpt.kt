@@ -1,4 +1,0 @@
-package examples
-
-class TaxiOpt {
-}

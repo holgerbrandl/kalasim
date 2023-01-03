@@ -15,12 +15,15 @@ dependencies {
     api("com.github.holgerbrandl:kalasim:0.9-SNAPSHOT")
     api("org.optaplanner:optaplanner-core:8.32.0.Final")
 //    implementation("org.optaplanner:optaplanner-benchmark:8.19.0.Final")
+    api("ch.qos.logback:logback-classic:1.4.5")
+
+    implementation("com.google.code.gson:gson:2.10")
 
     api("org.jetbrains.kotlinx:dataframe-excel:0.8.1")
 
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
 }
 
 tasks.getByName<Test>("test") {

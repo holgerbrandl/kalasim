@@ -1,9 +1,9 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package examples;
+package org.kalasim.examples.taxiinc;
 
 import com.github.holgerbrandl.jsonbuilder.json
-import examples.TaxiStatus.*
+import org.kalasim.examples.taxiinc.TaxiStatus.*
 import org.jetbrains.kotlinx.dataframe.math.mean
 import org.kalasim.*
 import org.kalasim.misc.mergeStats
@@ -12,7 +12,6 @@ import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.toDuration
 
 
 @Suppress("SpellCheckingInspection")
@@ -57,8 +56,8 @@ class Taxi : Component() {
         } else {
             // collect all passengers
             job.passengers.forEach { request ->
-                if(request.departure != position) {
-                    driveTo(request.departure)
+                if(request.from != position) {
+                    driveTo(request.from)
                 }
 
                 // optionally wait for passengers if too earl
@@ -73,8 +72,8 @@ class Taxi : Component() {
 
             // drive them to their locations
             job.passengers.forEach { request ->
-                if(request.destination != position) {
-                    driveTo(request.departure)
+                if(request.to != position) {
+                    driveTo(request.from)
                     release(cabinCapacity, quantity = request.numPassengers)
                     log(OrderChangeEvent(request, OrderStatus.Completed, now))
                 }
@@ -101,8 +100,8 @@ class TaxiDriveEvent(val cabinLoad: Int, val distance: Double, ts: TickTime) : E
 
 
 data class Order(
-    val departure: Quarter,
-    val destination: Quarter,
+    val from: Quarter,
+    val to: Quarter,
     val plannedStart: TickTime,
     val numPassengers: Int = 1,
 ) : Component() {
@@ -110,6 +109,8 @@ data class Order(
         hold(until = plannedStart)
         log(OrderChangeEvent(this@Order, OrderStatus.Waiting, now))
     }
+
+    val tripDistance = Quarter.distance(from, to)
 }
 
 enum class OrderStatus { Created, Dispatched, Waiting, Pickup, Completed }
@@ -126,7 +127,7 @@ interface Dispatcher {
     fun jobCompleted(job: Job)
 }
 
-class FifoDispatcher(val fleet: List<Taxi>) : Component(), Dispatcher {
+open class FifoDispatcher(val fleet: List<Taxi>) : Component(), Dispatcher {
 
     override fun process() = sequence {
         val nextOrder = orders.minByOrNull { it.plannedStart }
@@ -174,7 +175,7 @@ fun main() {
 
         val delay = uniform(0, 60).minutes
 
-        ComponentGenerator(uniform(0, 3)) {
+        ComponentGenerator(uniform(0, 10)) {
             val departure = Quarter.values().random()
             val destination = Quarter.values().asList().minusElement(departure).random()
 
@@ -195,18 +196,33 @@ fun main() {
 
 
         val avgDispatchQueueLength = dispatcher.orders.sizeTimeline.statistics().mean
+        dispatcher.orders.sizeTimeline.statistics().printJson()
+//        dispatcher.orders.sizeTimeline.printHistogram()
+
+        val avgDistance = orderTx.map { it.order }.toSet().map { it.tripDistance }.mean()
+
+        val avgDriveTime = orderTx
+        .filter { listOf(OrderStatus.Pickup, OrderStatus.Completed).contains(it.status) }
+        .groupBy { it.order }
+        .filter { it.value.size == 2 }
+        .map { (_, tx) -> (tx.last().time - tx.first().time) }.mean().toDuration()
+
+
 
         val avgWaitTime4Pickup = orderTx
             .filter { listOf(OrderStatus.Waiting, OrderStatus.Pickup).contains(it.status) }
-            .groupBy { it.order}
-            .filter{ it.value.size==2}
-            .map{ (_, tx)-> (tx.first().time - tx.last().time)}.mean().toDuration()
+            .groupBy { it.order }
+            .filter { it.value.size == 2 }
+            .map { (_, tx) -> (tx.last().time - tx.first().time) }.mean().toDuration()
 
-        val metrics = json{
+        val metrics = json {
             "idleprop" to idleProportion
             "dailyProfit" to dailyProfit
             "numJobs" to orderTx.distinctBy { it.order }.count()
             "avgQueueLength" to avgDispatchQueueLength
+            "avgWaitTime4Pickup" to avgWaitTime4Pickup
+            "averageDistance" to avgDistance
+            "avgDriveTime" to avgDriveTime
         }
 
         println("sim completed: $metrics")

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="appender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d [%t] %-5p %m%n</pattern>
+        </encoder>
+    </appender>
+    <!--
+        warn: Log suspicious circumstances.
+        info: Log every phase and the solver itself.
+        debug: Log every step of every phase.
+        trace: Log every move of every step of every phase.
+        warn|info|debug|trace
+    -->
+    <logger name="org.optaplanner" level="info"/>
+
+    <root level="info">
+        <appender-ref ref="appender"/>
+    </root>
+
+</configuration>
