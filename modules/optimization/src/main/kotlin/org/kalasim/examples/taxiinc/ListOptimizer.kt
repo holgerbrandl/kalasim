@@ -1,7 +1,8 @@
 @file:Suppress("ConvertSecondaryConstructorToPrimary", "unused", "MemberVisibilityCanBePrivate")
 
-package org.kalasim.examples.taxiinc
+package org.kalasim.examples.taxiinc.opt1
 
+import org.kalasim.examples.taxiinc.*
 import org.optaplanner.core.api.domain.entity.PlanningEntity
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty
 import org.optaplanner.core.api.domain.solution.PlanningScore
@@ -26,7 +27,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 
-class CleverDispatcher(fleet: List<Taxi>) : FifoDispatcher(fleet) {
+class CleverDispatcher : FifoDispatcher() {
 
     var currentSchedule: TaxiSchedule? = null
 

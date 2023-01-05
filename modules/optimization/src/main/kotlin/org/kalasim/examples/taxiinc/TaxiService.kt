@@ -3,12 +3,14 @@
 package org.kalasim.examples.taxiinc;
 
 import com.github.holgerbrandl.jsonbuilder.json
-import org.kalasim.examples.taxiinc.TaxiStatus.*
 import org.jetbrains.kotlinx.dataframe.math.mean
 import org.kalasim.*
+import org.kalasim.examples.taxiinc.TaxiStatus.*
+import org.kalasim.examples.taxiinc.opt2.CleverDispatcher
 import org.kalasim.misc.mergeStats
 import java.awt.Point
 import kotlin.math.absoluteValue
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -31,7 +33,7 @@ enum class Quarter {
 
 enum class TaxiStatus { Idle, Driving, WaitingForPickup }
 
-class Taxi : Component() {
+class Taxi(val speedKmh: Double = 40.0) : Component() {
     val status = State(Idle)
 
     val cabinCapacity = Resource(capacity = 4)
@@ -44,7 +46,6 @@ class Taxi : Component() {
             _position.value = value
         }
 
-
     override fun repeatedProcess() = sequence {
         val dispatcher = get<Dispatcher>()
 
@@ -54,8 +55,16 @@ class Taxi : Component() {
             status.value = Idle
             passivate()
         } else {
+            // predict job completion
+            val totalRoute =
+                (listOf(job.orders.last().from) + job.orders.map { it.to }).zipWithNext().sumOf { (from, to) ->
+                    Quarter.distance(from, to)
+                }
+            estArrivalTime = listOf(job.orders.last().plannedStart, now).max() + computeDriveDuration(totalRoute.toDouble())
+            finalJobDestination = job.orders.last().to
+
             // collect all passengers
-            job.passengers.forEach { request ->
+            job.orders.forEach { request ->
                 if(request.from != position) {
                     driveTo(request.from)
                 }
@@ -70,8 +79,9 @@ class Taxi : Component() {
                 request(cabinCapacity, quantity = request.numPassengers)
             }
 
+
             // drive them to their locations
-            job.passengers.forEach { request ->
+            job.orders.forEach { request ->
                 if(request.to != position) {
                     driveTo(request.from)
                     release(cabinCapacity, quantity = request.numPassengers)
@@ -79,20 +89,29 @@ class Taxi : Component() {
                 }
             }
 
-            dispatcher.jobCompleted(job)
+//            finalJobDestination = null
+            estArrivalTime = null
         }
+
+
     }
 
+    var estArrivalTime: TickTime? = null
+    var finalJobDestination: Quarter? = null
 
     private suspend fun SequenceScope<Component>.driveTo(destination: Quarter) {
         val distanceKm = Quarter.distance(position, destination).toDouble()
 
-        val speedKmh = 40.0 // meters per minute
+        val hours = computeDriveDuration(distanceKm)
+
         status.value = Driving
-        hold((distanceKm / speedKmh).hours)
+        hold(hours)
+        position = destination
 
         log(TaxiDriveEvent(cabinCapacity.claimed.toInt(), distanceKm, now))
     }
+
+    private fun computeDriveDuration(distanceKm: Double): Duration = (distanceKm / speedKmh).hours
 }
 
 
@@ -118,30 +137,34 @@ enum class OrderStatus { Created, Dispatched, Waiting, Pickup, Completed }
 class OrderChangeEvent(val order: Order, val status: OrderStatus, timestamp: TickTime) : Event(timestamp)
 
 
-data class Job(val passengers: List<Order>)
+data class Job(val orders: List<Order>) {
+    val plannedStart = orders.minOf { it.plannedStart }
+}
 
 interface Dispatcher {
     val orders: ComponentList<Order>
     fun bookTaxi(order: Order)
     fun getJob(taxi: Taxi): Job?
-    fun jobCompleted(job: Job)
 }
 
-open class FifoDispatcher(val fleet: List<Taxi>) : Component(), Dispatcher {
+open class FifoDispatcher : Component(), Dispatcher {
+
+    val fleet = get<List<Taxi>>()
 
     override fun process() = sequence {
-        val nextOrder = orders.minByOrNull { it.plannedStart }
+        val next = orders.minByOrNull { it.plannedStart }
+        val nextJob = next?.let { Job(listOf(it)) }
 
-        if(nextOrder != null) {
-            val timeUntilPickup = (now - nextOrder.plannedStart).toDuration()
+        if(nextJob != null) {
+            val timeUntilPickup = (now - nextJob.plannedStart).toDuration()
 
             val prePickup = 10.minutes
 
-            if(timeUntilPickup <= prePickup) {
-                fleet.firstOrNull { it.isPassive }?.activate()
-            } else {
+            if(timeUntilPickup >= prePickup) {
                 hold(timeUntilPickup - prePickup)
             }
+
+            fleet.firstOrNull { it.isPassive }?.activate()
         }
     }
 
@@ -161,31 +184,31 @@ open class FifoDispatcher(val fleet: List<Taxi>) : Component(), Dispatcher {
             Job(listOf(order))
         } else null
     }
-
-    override fun jobCompleted(job: Job) {
-//        println("job_completed")
-    }
 }
 
-fun main() {
-    createSimulation {
-        val taxis = List(10) { Taxi() }
+class TaxiInc(dispatcherClass: Class<out Dispatcher>) : Environment() {
+    val taxis = dependency { List(10) { Taxi() } }
 
-        val dispatcher = dependency<Dispatcher> { FifoDispatcher(taxis) }
+    //    val dispatcher = dependency<Dispatcher> { FifoDispatcher(taxis) }
+    val dispatcher = dependency<Dispatcher> { dispatcherClass.getDeclaredConstructor().newInstance() }
 
-        val delay = uniform(0, 60).minutes
+    val delay = uniform(0, 60).minutes
 
+    init {
         ComponentGenerator(uniform(0, 10)) {
             val departure = Quarter.values().random()
             val destination = Quarter.values().asList().minusElement(departure).random()
 
             Order(departure, destination, env.now + delay()).apply { dispatcher.bookTaxi(this) }
         }
+    }
+
+    fun computeMetrics(duration: Duration = 10.days): Any {
 
         val drives = collect<TaxiDriveEvent>()
         val orderTx = collect<OrderChangeEvent>()
 
-        run(10.days)
+        run(duration)
 
         // compute central metrics: avg idle time & avg profit
         val idleProportion = taxis.map { it.status.timeline }.mergeStats()[Idle]
@@ -201,21 +224,16 @@ fun main() {
 
         val avgDistance = orderTx.map { it.order }.toSet().map { it.tripDistance }.mean()
 
-        val avgDriveTime = orderTx
-        .filter { listOf(OrderStatus.Pickup, OrderStatus.Completed).contains(it.status) }
-        .groupBy { it.order }
-        .filter { it.value.size == 2 }
-        .map { (_, tx) -> (tx.last().time - tx.first().time) }.mean().toDuration()
+        val avgDriveTime = orderTx.filter { listOf(OrderStatus.Pickup, OrderStatus.Completed).contains(it.status) }
+            .groupBy { it.order }.filter { it.value.size == 2 }.map { (_, tx) -> (tx.last().time - tx.first().time) }
+            .mean().toDuration()
 
 
+        val avgWaitTime4Pickup =
+            orderTx.filter { listOf(OrderStatus.Waiting, OrderStatus.Pickup).contains(it.status) }.groupBy { it.order }
+                .filter { it.value.size == 2 }.map { (_, tx) -> (tx.last().time - tx.first().time) }.mean().toDuration()
 
-        val avgWaitTime4Pickup = orderTx
-            .filter { listOf(OrderStatus.Waiting, OrderStatus.Pickup).contains(it.status) }
-            .groupBy { it.order }
-            .filter { it.value.size == 2 }
-            .map { (_, tx) -> (tx.last().time - tx.first().time) }.mean().toDuration()
-
-        val metrics = json {
+        return json {
             "idleprop" to idleProportion
             "dailyProfit" to dailyProfit
             "numJobs" to orderTx.distinctBy { it.order }.count()
@@ -225,8 +243,25 @@ fun main() {
             "avgDriveTime" to avgDriveTime
         }
 
-        println("sim completed: $metrics")
+//        return object {
+//            val idleprop = idleProportion
+//            val dailyProfit = dailyProfit
+//            val numJobs = orderTx.distinctBy { it.order }.count()
+//            val avgQueueLength = avgDispatchQueueLength
+//            val avgWaitTime4Pickup = avgWaitTime4Pickup
+//            val averageDistance = avgDistance
+//            val avgDriveTime = avgDriveTime
+//        }
     }
+
+}
+
+fun main() {
+//    val computeMetrics = TaxiInc(FifoDispatcher::class.java).computeMetrics()
+    val computeMetrics = TaxiInc(CleverDispatcher::class.java).computeMetrics()
+
+    val newInstance = FifoDispatcher::class.java.getDeclaredConstructor().newInstance()
+    println(computeMetrics)
 }
 
 
