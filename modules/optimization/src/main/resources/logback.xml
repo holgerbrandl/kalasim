@@ -13,7 +13,7 @@
         trace: Log every move of every step of every phase.
         warn|info|debug|trace
     -->
-    <logger name="org.optaplanner" level="info"/>
+    <logger name="org.optaplanner" level="debug"/>
 
     <root level="info">
         <appender-ref ref="appender"/>
