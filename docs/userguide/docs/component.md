@@ -404,7 +404,8 @@ So remember if the method contains a `yield` statement (technically speaking iss
 
 ## Component Generator
 
-Since creation/generation of components is a very common element of most simulations, there is a dedicated utility called `ComponentGenerator` to do so
+The creation of components is a key function of most simulations. To facilitate component creation, a `ComponentGenerator` can be used to create components according to a given inter arrival time (or distribution).
+
 
 ```kotlin
 ComponentGenerator(iat = exponential(lambda, rg)) {
@@ -412,14 +413,32 @@ ComponentGenerator(iat = exponential(lambda, rg)) {
 }
 ```
 
-It requires 2 main parameters
-1. a builder pattern
-2. an inter-arrival distribution
+The following arguments are supported when setting up a component generator
 
-See [here](https://github.com/holgerbrandl/kalasim/blob/master/src/main/kotlin/org/kalasim/ComponentGenerator.kt#L20) for a complete listing of supported arguments.
+1.  Inter arrival duration `iat` or distribution between history/generations.
+2. A builder named `builder` of type `Environment.(counter: Int) -> T` allows to specify how the objects of type `T` are generated. Thereby, `counter` can be used to name the objects accordingly.
+
+There are also additional arguments available to support more custom/advanced use-cases: 
+
+* `startAt` - time where the generator starts its operation. If omitted, `now` is used.
+* `forceStart` - If `false` (default), the first component will be generated at `time = startAt + iat()`. If `true`, the first component will be generated at `startAt`.
+* `until` - time up to which components should be generated. If omitted, no end.
+* `total` - (maximum) number of components to be generated.
+* `name` - Name of the component.  If the name ends with a period (.), auto serializing will be applied. 
+* `priority` - If a component has the same time on the event list, this component is scheduled according to the priority. An event with a higher priority will be scheduled first.
+* `keepHistory` - If `true`, i will store a reference of all generated components which can be queried with `history`.
+* `koin` - The dependency resolution context to be used to resolve the `org.kalasim.Environment`
+
+Note, that the entities being created are not required to extend `org.kalasim.Component`, but can be in fact arbitrary types. 
 
 
-Examples
+Usage:
+
+```kotlin
+//{!api/ComponentGeneratorExamples.kts!}
+```
+
+More examples
 
 * [Car Wash](examples/car_wash.md)
 * [Gas Station](examples/gas_station.md)

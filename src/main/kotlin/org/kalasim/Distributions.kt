@@ -5,7 +5,9 @@ import org.kalasim.misc.ImplementMe
 import java.lang.Double.min
 import java.util.*
 import kotlin.math.max
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -29,11 +31,28 @@ fun Number.asDist() = ConstantRealDistribution(this.toDouble())
 
 fun constant(value: Number) = ConstantRealDistribution(value.toDouble())
 
+fun constant(value: Duration) = RealDurationDistribution(
+    DurationUnit.SECONDS,
+    ConstantRealDistribution(value.toDouble(DurationUnit.SECONDS))
+)
 
-/** A controlled randomization wrapper around https://commons.apache.org/proper/commons-math/javadocs/api-3.6/org/apache/commons/math3/distribution/ExponentialDistribution.html */
+
+/**
+ * See https://www.kalasim.org/basics/#randomness-distributions
+ *
+ * A controlled randomization wrapper around https://commons.apache.org/proper/commons-math/javadocs/api-3.6/org/apache/commons/math3/distribution/ExponentialDistribution.html */
 fun SimContext.exponential(mean: Number) = ExponentialDistribution(env.rg, mean.toDouble())
 
-/** A controlled randomization wrapper around https://commons.apache.org/proper/commons-math/javadocs/api-3.6/org/apache/commons/math3/distribution/NormalDistribution.html */
+/**
+ * See https://www.kalasim.org/basics/#randomness-distributions
+ *
+ * A controlled randomization wrapper around https://commons.apache.org/proper/commons-math/javadocs/api-3.6/org/apache/commons/math3/distribution/ExponentialDistribution.html */
+fun SimContext.exponential(mean: Duration) = ExponentialDistribution(env.rg, mean.inWholeSeconds.toDouble()).seconds
+
+/**
+ * See https://www.kalasim.org/basics/#randomness-distributions
+ *
+ * A controlled randomization wrapper around https://commons.apache.org/proper/commons-math/javadocs/api-3.6/org/apache/commons/math3/distribution/NormalDistribution.html */
 fun SimContext.normal(mean: Number = 0, sd: Number = 1) = NormalDistribution(env.rg, mean.toDouble(), sd.toDouble())
 
 
@@ -58,6 +77,11 @@ fun SimContext.uniform(lower: Number = 0, upper: Number = 1) =
     UniformRealDistribution(env.rg, lower.toDouble(), upper.toDouble())
 
 
+
+fun SimContext.uniform(lower: Duration, upper: Duration) =
+    UniformRealDistribution(env.rg, lower.inWholeSeconds.toDouble(), upper.inWholeSeconds.toDouble()).seconds
+
+
 //
 // date utils for distributions
 
@@ -66,6 +90,7 @@ data class RealDurationDistribution(val unit: DurationUnit, val dist: RealDistri
     fun sample() = when(unit){
         DurationUnit.SECONDS -> dist().seconds
         DurationUnit.MINUTES -> dist().minutes
+        DurationUnit.HOURS -> dist().hours
         DurationUnit.DAYS -> dist().days
         else -> ImplementMe()
     }
@@ -73,8 +98,8 @@ data class RealDurationDistribution(val unit: DurationUnit, val dist: RealDistri
 
 val RealDistribution.seconds get() = RealDurationDistribution(DurationUnit.SECONDS, this)
 val RealDistribution.minutes get() = RealDurationDistribution(DurationUnit.MINUTES, this)
+val RealDistribution.hours get() = RealDurationDistribution(DurationUnit.HOURS, this)
 val RealDistribution.days get() = RealDurationDistribution(DurationUnit.DAYS, this)
-
 
 
 data class IntegerDurationDistribution(val unit: DurationUnit, val dist: IntegerDistribution){
@@ -112,11 +137,11 @@ operator fun <E> EnumeratedDistribution<E>.get(key: E): Double = pmf.first { it.
 
 
 // since it's common that users want to create an integer distribution from a range, we highlight the incorrect API usage
-@Deprecated(
-    "To sample from an integer range, use discreteUniform instead for better efficiency",
-    replaceWith = ReplaceWith("discreteUniform(range.first, range.laste)")
-)
-fun Environment.enumerated(range: IntRange) = enumerated(*(range.toList().toTypedArray()))
+//@Deprecated(
+//    "To sample from an integer range, use discreteUniform instead for better efficiency",
+//    replaceWith = ReplaceWith("discreteUniform(range.first, range.laste)")
+//)
+//fun Environment.enumerated(range: IntRange): EnumeratedDistribution<Int> = enumerated(*(range.toList().toTypedArray()))
 
 @JvmName("enumeratedArray")
 fun <T> SimContext.enumerated(elements: Array<T>): EnumeratedDistribution<T> = enumerated(*elements)
