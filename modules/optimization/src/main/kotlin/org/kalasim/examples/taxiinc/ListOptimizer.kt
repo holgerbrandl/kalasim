@@ -4,6 +4,7 @@ package org.kalasim.examples.taxiinc.opt1
 
 import org.kalasim.examples.taxiinc.*
 import org.optaplanner.core.api.domain.entity.PlanningEntity
+import org.optaplanner.core.api.domain.lookup.PlanningId
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty
 import org.optaplanner.core.api.domain.solution.PlanningScore
 import org.optaplanner.core.api.domain.solution.PlanningSolution

@@ -258,6 +258,18 @@ class ConstraintsProvider : ConstraintProvider {
             }
             .asConstraint("same-dest")
 
+    private fun minimizeTotalDriveDistance(constraintFactory: ConstraintFactory) =
+        constraintFactory.forEach(Order::class.java)
+            .groupBy(Order::taxi, toSet())
+            .penalize(HardMediumSoftScore.ONE_SOFT){ taxi, orders ->
+                // note: there is no inherent order in the route so we can not compute the
+                //       driven route length --> need to use VRP
+                1
+
+            }
+            .asConstraint("minimize-distance")
+
+
 //    private fun preferSimilarRoutes(constraintFactory: ConstraintFactory): Constraint =
 //        constraintFactory.forEach(Order::class.java)
 //            .groupBy(Order::taxi, toList())
