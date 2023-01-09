@@ -14,7 +14,8 @@ dependencies {
 
     api("com.github.holgerbrandl:kalasim:0.9-SNAPSHOT")
     api("org.optaplanner:optaplanner-core:8.32.0.Final")
-//    implementation("org.optaplanner:optaplanner-benchmark:8.19.0.Final")
+    api("org.optaplanner:optaplanner-benchmark:8.32.0.Final")
+
     api("ch.qos.logback:logback-classic:1.4.5")
 
     implementation("com.google.code.gson:gson:2.10")
