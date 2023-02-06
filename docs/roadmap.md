@@ -127,6 +127,12 @@ https://www.sciencedirect.com/science/article/abs/pii/S0377221721010894?dgcid=rs
 optimize operations with simple grid search
 https://www.supplychaindataanalytics.com/open-pit-mine-simulation-for-better-planning/
 
+## state machine support
+
+e.g. https://nsk90.github.io/kstatemachine/#arguments
+
+Any? arguments for better composability
+
 ## Misc 
 
 state-machine-like https://github.com/fraktalio/fmodel

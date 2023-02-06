@@ -12,6 +12,7 @@ import kotlin.math.*
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 enum class HarvesterState { STANDBY, MOVING, SCANNING, MINING, UNLOADING, MAINTENANCE, BROKEN }
 
@@ -165,7 +166,7 @@ class Harvester(initialPosition: GridPosition, private val gridUnitsPerHour: Dou
         request(currentDeposit!!.miningShaft) {
             while(!currentDeposit!!.isDepleted && !tank.isFull) {
                 val quantity = min(miningUnitsPerHour / 4, currentDeposit!!.level)
-                take(currentDeposit!!, quantity, failDelay = 0)
+                take(currentDeposit!!, quantity, failDelay = 0.seconds)
                 if(failed) { // could happen if other harvester tries to mine here as well
                     break
                 }
@@ -259,10 +260,10 @@ class LunarMining(
     numDeposits: Int = 10,
     logEvents: Boolean = true,
     seed: Int = Defaults.DEFAULT_SEED
-) : Environment(logEvents, randomSeed = seed) {
-    init {
-        tickTransform = TickTransform(DurationUnit.MINUTES)
-    }
+) : Environment(enableConsoleLogger = logEvents, randomSeed = seed) {
+//    init {
+//        tickTransform = TickTransform(DurationUnit.MINUTES)
+//    }
 
     // the initially unknown list of deposits
     val map = dependency { DepositMap(numDeposits = numDeposits) }

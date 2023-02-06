@@ -15,6 +15,7 @@ import org.optaplanner.core.config.solver.termination.TerminationConfig
 import java.io.File
 
 
+
 fun main() {
     val config = PlannerBenchmarkConfig().apply {
         benchmarkDirectory = File("benchmark_results").apply {
@@ -22,6 +23,7 @@ fun main() {
         }
         inheritedSolverBenchmarkConfig = SolverBenchmarkConfig().apply {
             solverConfig = SolverConfig()
+                .withMoveThreadCount("")
                 .withSolutionClass(TaxiSchedule::class.java)
                 .withEntityClasses(Order::class.java)
                 .withConstraintProviderClass(ConstraintsProvider::class.java)

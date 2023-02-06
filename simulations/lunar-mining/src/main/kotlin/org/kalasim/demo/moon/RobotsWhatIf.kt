@@ -1,6 +1,6 @@
 package org.kalasim.demo.moon
 
-import kravis.*
+//import kravis.*
 import kotlin.time.Duration.Companion.hours
 
 fun main() {
@@ -14,9 +14,9 @@ fun main() {
 
     // visualize timeline
 
-    sims.withIndex().map { (idx, sim) ->
-        sim.harvesters.size to sim.base.refinery.levelTimeline.statistics().min
-    }.plot(x={ first}, y={second}).geomBoxplot()
+//    sims.withIndex().map { (idx, sim) ->
+//        sim.harvesters.size to sim.base.refinery.levelTimeline.statistics().min
+//    }.plot(x={ first}, y={second}).geomBoxplot()
 
 //    val waterSupply = sims.withIndex().map { (idx, sim) ->
 //        sim.base.refinery.levelTimeline//.statistics()

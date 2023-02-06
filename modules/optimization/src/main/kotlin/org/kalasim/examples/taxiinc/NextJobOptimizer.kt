@@ -5,7 +5,10 @@ package org.kalasim.examples.taxiinc.opt2
 import org.jetbrains.kotlinx.dataframe.math.mean
 import org.jetbrains.kotlinx.dataframe.math.median
 import org.kalasim.TickTime
-import org.kalasim.examples.taxiinc.*
+import org.kalasim.examples.taxiinc.FifoDispatcher
+import org.kalasim.examples.taxiinc.GSON
+import org.kalasim.examples.taxiinc.Job
+import org.kalasim.examples.taxiinc.Quarter
 import org.optaplanner.core.api.domain.entity.PlanningEntity
 import org.optaplanner.core.api.domain.lookup.PlanningId
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty
@@ -15,6 +18,7 @@ import org.optaplanner.core.api.domain.solution.ProblemFactCollectionProperty
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider
 import org.optaplanner.core.api.domain.variable.AbstractVariableListener
 import org.optaplanner.core.api.domain.variable.PlanningVariable
+import org.optaplanner.core.api.score.ScoreManager
 import org.optaplanner.core.api.score.buildin.hardmediumsoft.HardMediumSoftScore
 import org.optaplanner.core.api.score.director.ScoreDirector
 import org.optaplanner.core.api.score.stream.Constraint
@@ -126,11 +130,11 @@ fun configureSolver(): SolverFactory<TaxiSchedule> = SolverFactory.create(
         .withConstraintProviderClass(ConstraintsProvider::class.java)
         .withEnvironmentMode(EnvironmentMode.FAST_ASSERT)
         .withTerminationConfig(TerminationConfig().apply {
-//            withSecondsSpentLimit(10)
-//            withBestScoreFeasible(true)
+            //            withSecondsSpentLimit(10)
+            //            withBestScoreFeasible(true)
             withUnimprovedSecondsSpentLimit(10)
-//    withStepCountLimit(config.solvingStepLimit)
-//    withUnimprovedStepCountLimit(config.scheduleUnimprovedStepLimit)
+            //    withStepCountLimit(config.solvingStepLimit)
+            //    withUnimprovedStepCountLimit(config.scheduleUnimprovedStepLimit)
         })
         .withMoveThreadCount(SolverConfig.MOVE_THREAD_COUNT_AUTO)
 )
@@ -261,7 +265,7 @@ class ConstraintsProvider : ConstraintProvider {
     private fun minimizeTotalDriveDistance(constraintFactory: ConstraintFactory) =
         constraintFactory.forEach(Order::class.java)
             .groupBy(Order::taxi, toSet())
-            .penalize(HardMediumSoftScore.ONE_SOFT){ taxi, orders ->
+            .penalize(HardMediumSoftScore.ONE_SOFT) { taxi, orders ->
                 // note: there is no inherent order in the route so we can not compute the
                 //       driven route length --> need to use VRP
                 1
@@ -342,7 +346,8 @@ fun createSchedule(numOrder: Int = 100, numTaxis: Int = 10): TaxiSchedule {
 }
 
 fun main() {
-    val solver = configureSolver().buildSolver()
+    val solverFactory = configureSolver()
+    val solver = solverFactory.buildSolver()
     val solved = solver.solve(createSchedule(numOrder = 1))
 
     println(solved)
@@ -353,4 +358,11 @@ fun main() {
     println(solved.orders.filter { it.taxi != null }
         .groupBy { it.taxi }
         .map { (taxi, orders) -> taxi!!.taxiId to orders.joinToString { it.orderId } })
+
+
+    val explainScore = ScoreManager.create(solverFactory)
+        .explainScore(solved)
+
+    println(explainScore.getSummary())
+    println(ScoreManager.create(solverFactory).getSummary(solved))
 }

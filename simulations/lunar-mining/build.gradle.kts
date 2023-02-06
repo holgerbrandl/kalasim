@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 plugins {
-    kotlin("jvm")  version "1.6.10"
+    kotlin("jvm")  version "1.7.20"
     `maven-publish`
 }
 
@@ -22,8 +22,9 @@ val orxFeatures = setOf(
     null
 ).filterNotNull()
 
-val openrndrUseSnapshot = false
-val openrndrVersion = if (openrndrUseSnapshot) "0.4.0-SNAPSHOT" else "0.3.58"
+val openrndrVersion = "0.4.1"
+//val openrndrVersion = "0.4.2-RC"
+//val openrndrVersion = "0.3.58"
 
 val openrndrFeatures = setOf(
     "video"
@@ -48,10 +49,10 @@ repositories {
 
 dependencies {
 //    implementation(project ("kalasim"))
-    api("com.github.holgerbrandl:kalasim:0.7.93-SNAPSHOT")
+    api("com.github.holgerbrandl:kalasim:0.9-SNAPSHOT")
 
-    api("com.github.holgerbrandl:kravis:0.8.3")
-    api("com.github.holgerbrandl:krangl:0.17.2")
+//    api("com.github.holgerbrandl:kravis:0.8.3")
+//    api("com.github.holgerbrandl:krangl:0.17.2")
 
     runtimeOnly(openrndr("gl3"))
     runtimeOnly(openrndrNatives("gl3"))
