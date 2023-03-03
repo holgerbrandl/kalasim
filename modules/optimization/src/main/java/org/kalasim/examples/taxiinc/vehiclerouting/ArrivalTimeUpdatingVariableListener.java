@@ -1,11 +1,11 @@
-package org.kalasim.examples.taxiinc.vehiclerouting.domain.timewindowed.solver;
+package org.kalasim.examples.taxiinc.vehiclerouting;
 
-import org.optaplanner.core.api.domain.variable.VariableListener;
-import org.optaplanner.core.api.score.director.ScoreDirector;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.Customer;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.VehicleRoutingSolution;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.timewindowed.TimeWindowedCustomer;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.timewindowed.TimeWindowedDepot;
+import org.optaplanner.core.api.domain.variable.VariableListener;
+import org.optaplanner.core.api.score.director.ScoreDirector;
 
 import java.util.*;
 

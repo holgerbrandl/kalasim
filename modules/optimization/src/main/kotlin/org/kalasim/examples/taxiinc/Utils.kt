@@ -1,6 +1,7 @@
 package org.kalasim.examples.taxiinc
 
 import com.google.gson.GsonBuilder
+import org.json.JSONObject
 
 
 internal val GSON by lazy {
@@ -12,3 +13,5 @@ internal val GSON by lazy {
 //        .registerTypeAdapter(TickTime::class.java, ser)
         .serializeNulls().create()
 }
+
+internal fun Any.buildJsonWithGson() = JSONObject(GSON.toJson(this))

@@ -1,11 +1,11 @@
 package org.kalasim.examples.taxiinc.vehiclerouting.domain;
 
+import org.kalasim.examples.taxiinc.vehiclerouting.domain.solver.DepotAngleCustomerDifficultyWeightFactory;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
 import org.optaplanner.core.api.domain.variable.NextElementShadowVariable;
 import org.optaplanner.core.api.domain.variable.PreviousElementShadowVariable;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.Location;
-import org.kalasim.examples.taxiinc.vehiclerouting.domain.solver.DepotAngleCustomerDifficultyWeightFactory;
 
 @PlanningEntity(difficultyWeightFactoryClass = DepotAngleCustomerDifficultyWeightFactory.class)
 public class Customer extends AbstractPersistable {

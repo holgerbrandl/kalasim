@@ -36,12 +36,39 @@ fun main() {
         distanceType = DistanceType.AIR_DISTANCE
         distanceUnitOfMeasurement = "km"
 
-        locationList = List(10) { AirLocation(it.toLong(), r.nextDouble(10.0), r.nextDouble(10.0)) }
-        depotList = listOf(Depot(1L, AirLocation(1L, 0.0, 0.0)))
+        locationList = List(10) {
+            AirLocation(
+                it.toLong(),
+                r.nextDouble(10.0),
+                r.nextDouble(10.0)
+            )
+        }
+        depotList = listOf(
+            Depot(
+                1L,
+                AirLocation(
+                    1L,
+                    0.0,
+                    0.0
+                )
+            )
+        )
 
-        vehicleList = List(3) { Vehicle(it.toLong(), 4, depotList.first()) }
+        vehicleList = List(3) {
+            Vehicle(
+                it.toLong(),
+                4,
+                depotList.first()
+            )
+        }
 
-        customerList = List(10) { Customer(it.toLong(), locationList.random(r), r.nextInt(2)) }
+        customerList = List(10) {
+            Customer(
+                it.toLong(),
+                locationList.random(r),
+                r.nextInt(2)
+            )
+        }
     }
 
     val solution = solver.solve(problem)

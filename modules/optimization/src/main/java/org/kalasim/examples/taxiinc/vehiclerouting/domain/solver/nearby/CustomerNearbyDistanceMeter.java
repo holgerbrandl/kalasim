@@ -1,7 +1,7 @@
 package org.kalasim.examples.taxiinc.vehiclerouting.domain.solver.nearby;
 
-import org.optaplanner.core.impl.heuristic.selector.common.nearby.NearbyDistanceMeter;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.Location;
+import org.optaplanner.core.impl.heuristic.selector.common.nearby.NearbyDistanceMeter;
 
 public class CustomerNearbyDistanceMeter implements NearbyDistanceMeter<Location, Location> {
 

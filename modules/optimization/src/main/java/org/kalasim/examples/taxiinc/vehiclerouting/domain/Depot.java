@@ -1,7 +1,6 @@
 package org.kalasim.examples.taxiinc.vehiclerouting.domain;
 
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.Location;
-import org.kalasim.examples.taxiinc.vehiclerouting.domain.timewindowed.TimeWindowedDepot;
 
 public class Depot extends AbstractPersistable {
 

@@ -1,4 +1,4 @@
-package org.kalasim.examples.taxiinc.vehiclerouting.optional.score;
+package org.kalasim.examples.taxiinc.vehiclerouting.score;
 
 import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 import org.optaplanner.core.api.score.calculator.EasyScoreCalculator;

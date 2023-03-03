@@ -1,8 +1,8 @@
 package org.kalasim.examples.taxiinc.vehiclerouting.domain.location.segmented;
 
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.DistanceType;
-import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.Location;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.RoadLocation;
+import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.Location;
 
 import java.util.*;
 

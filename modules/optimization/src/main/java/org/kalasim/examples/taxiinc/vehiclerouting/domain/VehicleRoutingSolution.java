@@ -1,12 +1,12 @@
 package org.kalasim.examples.taxiinc.vehiclerouting.domain;
 
+import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.DistanceType;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
 import org.optaplanner.core.api.domain.solution.PlanningScore;
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
 import org.optaplanner.core.api.domain.solution.ProblemFactCollectionProperty;
 import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
-import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.DistanceType;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.Location;
 
 import java.text.NumberFormat;

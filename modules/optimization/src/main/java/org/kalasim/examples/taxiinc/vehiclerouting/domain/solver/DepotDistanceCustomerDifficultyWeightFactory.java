@@ -1,9 +1,9 @@
 package org.kalasim.examples.taxiinc.vehiclerouting.domain.solver;
 
-import org.optaplanner.core.impl.heuristic.selector.common.decorator.SelectionSorterWeightFactory;
-import org.kalasim.examples.taxiinc.vehiclerouting.domain.Customer;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.Depot;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.VehicleRoutingSolution;
+import org.optaplanner.core.impl.heuristic.selector.common.decorator.SelectionSorterWeightFactory;
+import org.kalasim.examples.taxiinc.vehiclerouting.domain.Customer;
 
 import java.util.*;
 
