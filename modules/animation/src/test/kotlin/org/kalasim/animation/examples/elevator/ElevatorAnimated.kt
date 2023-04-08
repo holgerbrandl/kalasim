@@ -264,7 +264,6 @@ fun main() = application {
 fun startSimulation(elevator: Elevator, tickMillis: Duration = 50.milliseconds): Elevator {
     return elevator.apply {
         ClockSync(tickDuration = tickMillis, syncsPerTick = 10)
-        tickTransform = TickTransform(DurationUnit.SECONDS)
 
         dependency { AsyncAnimationStop() }
 

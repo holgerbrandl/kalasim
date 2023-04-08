@@ -98,3 +98,8 @@ fun Double.roundAny(n: Int = 3) = Precision.round(this, n)
  */
 fun String.titlecaseFirstChar() = replaceFirstChar(Char::titlecase)
 
+typealias   CommonMathPair<K, V> = org.apache.commons.math3.util.Pair<K, V>
+
+fun <T, S> List<Pair<T, S>>.asCMPairList(): List<CommonMathPair<T, S>> = map { CommonMathPair(it.first, it.second) }
+
+fun <T, S> Map<T, S>.asCMPairList(): List<CommonMathPair<T, S>> = map { CommonMathPair(it.key, it.value) }

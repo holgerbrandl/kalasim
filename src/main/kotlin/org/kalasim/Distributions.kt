@@ -2,6 +2,7 @@ package org.kalasim
 
 import org.apache.commons.math3.distribution.*
 import org.kalasim.misc.ImplementMe
+import org.kalasim.misc.asCMPairList
 import java.lang.Double.min
 import java.util.*
 import kotlin.math.max
@@ -148,15 +149,6 @@ fun <T> SimContext.enumerated(elements: Array<T>): EnumeratedDistribution<T> = e
 fun <T> SimContext.enumerated(vararg elements: T) = enumerated((elements.map { it to 1.0 / elements.size }).toMap())
 fun <T> SimContext.enumerated(elements: Map<T, Double>) =
     EnumeratedDistribution(env.rg, elements.toList().asCMPairList())
-
-//
-// Util
-//
-
-internal typealias   CMPair<K, V> = org.apache.commons.math3.util.Pair<K, V>
-
-internal fun <T, S> List<Pair<T, S>>.asCMPairList(): List<CMPair<T, S>> = map { CMPair(it.first, it.second) }
-internal fun <T, S> Map<T, S>.asCMPairList(): List<CMPair<T, S>> = map { CMPair(it.key, it.value) }
 
 
 //

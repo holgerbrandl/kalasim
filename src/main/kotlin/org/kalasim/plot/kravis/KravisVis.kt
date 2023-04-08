@@ -52,7 +52,7 @@ fun  <V:Number> MetricTimeline<V>.display(
 
     val useWT = env.startTime != null && !forceTickAxis
 
-    fun wtTransform(tt: TickTime) = if (useWT) env.asWallTime(tt) else tt
+    fun wtTransform(tt: TickTime) = if (useWT) env.toWallTime(tt) else tt
 
     return data
         .plot(
@@ -95,7 +95,7 @@ fun <T> CategoryTimeline<T>.display(
 
     val useWT = env.startTime != null && !forceTickAxis
 
-    fun wtTransform(tt: TickTime) = if (useWT) env.asWallTime(tt) else tt
+    fun wtTransform(tt: TickTime) = if (useWT) env.toWallTime(tt) else tt
 
     data class Segment<T>(val value: T, val start: TickTime, val end: TickTime)
 
@@ -186,7 +186,7 @@ fun List<Component>.displayStateTimeline(
     val df = clistTimeline()
 
     val useWT = first().env.startTime != null && !forceTickAxis
-    fun wtTransform(tt: TickTime) = if (useWT) first().env.asWallTime(tt) else tt
+    fun wtTransform(tt: TickTime) = if (useWT) first().env.toWallTime(tt) else tt
 
     return df.plot(
         y = { first.name },

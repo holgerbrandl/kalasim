@@ -1,6 +1,5 @@
 //TickTrafoExample.kts
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import org.kalasim.*
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -30,5 +29,5 @@ createSimulation(true, durationUnit = DurationUnit.MINUTES) {
     run(1.days)
 
     println(now)
-    println(asWallTime(now))
+    println(toWallTime(now))
 }

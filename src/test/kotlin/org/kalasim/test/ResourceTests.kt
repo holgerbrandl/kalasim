@@ -15,8 +15,8 @@ import org.kalasim.Priority.Companion.LOWEST
 import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.ResourceSelectionPolicy.*
 import kotlinx.datetime.Instant
+import org.kalasim.misc.asCMPairList
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.DurationUnit
 
 class ResourceTests {
 

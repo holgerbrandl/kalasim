@@ -63,7 +63,7 @@ class ResourceEvent(
 
 }
 
-internal fun Environment.asWtOptional(tickTime: TickTime) = if(hasAbsoluteTime()) asWallTime(tickTime) else null
+internal fun Environment.asWtOptional(tickTime: TickTime) = if(hasAbsoluteTime()) toWallTime(tickTime) else null
 
 data class ResourceActivityEvent(
     val requested: TickTime,

@@ -38,8 +38,7 @@ dependencies {
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-
+    api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.8.20")
     testImplementation("io.kotest:kotest-assertions-core:5.5.5")

@@ -31,7 +31,7 @@ interface SimContext : KoinComponent {
     operator fun TickTime.minus(duration: Duration): TickTime = TickTime(value - duration.asTicks())
 
     /** Transforms a simulation time (typically `now`) to the corresponding wall time. */
-    fun TickTime.asWallTime(): Instant {
+    fun TickTime.toWallTime(): Instant {
         require(env.startDate != null) { MISSING_TICK_TRAFO_ERROR }
         return env.tick2wallTime(this)
     }

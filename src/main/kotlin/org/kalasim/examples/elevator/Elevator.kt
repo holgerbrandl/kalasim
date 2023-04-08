@@ -11,6 +11,7 @@ import org.kalasim.examples.elevator.Direction.*
 import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.repeat
 import java.awt.Point
+import kotlin.time.DurationUnit
 
 // For example documentation see https://www.kalasim.org/examples/office_tower/
 
@@ -214,7 +215,7 @@ class Elevator(showLog: Boolean = false,
                carCapacity: Int = 4,
                numCars: Int = 3,
                topFloor: Int = 15,
-) : Environment(enableConsoleLogger = showLog ) {
+) : Environment(enableConsoleLogger = showLog, durationUnit = DurationUnit.SECONDS ) {
     init{
         dependency { this@Elevator }
     }

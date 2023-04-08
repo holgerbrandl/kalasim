@@ -169,7 +169,7 @@ open class Environment(
     override val env: Environment = this
 
 
-    /** Allows to transform ticks to wall time (represented by `java.time.Instant`) */
+    /** Allows to transform ticks to wall time (represented by `kotlinx.datetime.Instant`) */
     internal var tickTransform: TickTransform = TickTransform(durationUnit)
 
     //    var startDate: Instant? = null
