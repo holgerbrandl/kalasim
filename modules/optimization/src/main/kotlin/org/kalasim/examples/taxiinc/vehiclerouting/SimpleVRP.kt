@@ -1,5 +1,6 @@
 package org.kalasim.examples.taxiinc.vehiclerouting
 
+import org.jetbrains.kotlinx.dataframe.api.toDataFrame
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.Customer
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.Depot
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.Vehicle
@@ -74,4 +75,5 @@ fun main() {
     val solution = solver.solve(problem)
 
     println(solution)
+    solution.vehicleList.toDataFrame()
 }

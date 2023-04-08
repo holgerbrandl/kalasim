@@ -1,11 +1,14 @@
 package org.kalasim.examples.taxiinc.vehiclerouting.domain;
 
+import org.kalasim.examples.taxiinc.vehiclerouting.ArrivalTimeUpdatingVariableListener;
+import org.kalasim.examples.taxiinc.vehiclerouting.SimpleVRPVariableListener;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.solver.DepotAngleCustomerDifficultyWeightFactory;
 import org.optaplanner.core.api.domain.entity.PlanningEntity;
 import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
 import org.optaplanner.core.api.domain.variable.NextElementShadowVariable;
 import org.optaplanner.core.api.domain.variable.PreviousElementShadowVariable;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.Location;
+import org.optaplanner.core.api.domain.variable.ShadowVariable;
 
 @PlanningEntity(difficultyWeightFactoryClass = DepotAngleCustomerDifficultyWeightFactory.class)
 public class Customer extends AbstractPersistable {
@@ -65,6 +68,9 @@ public class Customer extends AbstractPersistable {
     public Customer getNextCustomer() {
         return nextCustomer;
     }
+
+    @ShadowVariable(variableListenerClass = SimpleVRPVariableListener.class, sourceVariableName = "vehicle")
+    public Integer routePostion;
 
     public void setNextCustomer(Customer nextCustomer) {
         this.nextCustomer = nextCustomer;
