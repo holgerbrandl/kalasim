@@ -77,7 +77,7 @@ fun main() {
     val waitingLine: ComponentQueue<Customer> = env.get()
     val workToDo: State<Boolean> = env.get()
 
-    env.run(until = 50000.asTickTime())
+    env.run(until = 50000.toTickTime())
 
     // with kravis
 //        waitingLine.queueLengthMonitor.display()

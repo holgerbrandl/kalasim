@@ -4,6 +4,7 @@ package org.kalasim.examples
 import krangl.*
 import kravis.geomSegment
 import kravis.plot
+import org.jetbrains.kotlinx.dataframe.api.*
 import org.kalasim.*
 import org.kalasim.analysis.ResourceEvent
 import org.kalasim.analysis.ResourceEventType
@@ -54,16 +55,22 @@ fun main() {
         RequestRecord(it.requester.name, it.time, it.resource.name, amountDirected)
     }
 
-    // transform data into shape suiteable for interval plotting
-    val requestsDf = requests.asDataFrame()
+    // transform data into shape suitable for interval plotting
+    val requestsDf = requests.toDataFrame()
+
         .groupBy("requester")
-        .sortedBy("requester", "timestamp")
-        .addColumn("end_time") { it["timestamp"].lag() }
-        .addColumn("state") { rowNumber.map { if (it.rem(2) == 0) "hungry" else "eating" } }
-        .filter { it["quantity"] gt 0 }
-        .ungroup()
+        .sortBy("requester", "timestamp")
+        // TODO how to express lag here?
+//        .add("end_time") {   it["timestamp"].lag() }
+        .add("end_time") {   next()?.get("timestamp") }
+        .add("state") { if (index().rem(2) == 0) "hungry" else "eating" }
+        .filter { "quantity"<Int>() > 0 }
+//        .ungroup()
 
     // visualize with kravis
-    requestsDf.plot(x = "timestamp", xend = "end_time", y = "requester", yend = "requester", color = "state")
-        .geomSegment(size = 15.0)
+    // todo bring back once kravis has been fully ported
+//    requestsDf
+//        .toKranglDF()
+//        .plot(x = "timestamp", xend = "end_time", y = "requester", yend = "requester", color = "state")
+//        .geomSegment(size = 15.0)
 }

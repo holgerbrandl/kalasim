@@ -21,7 +21,7 @@ fun main() {
 //    val waterSupply = sims.withIndex().map { (idx, sim) ->
 //        sim.base.refinery.levelTimeline//.statistics()
 //            .stepFun()
-//            .asDataFrame()
+//            .toDataFrame()
 //            .addColumn("num_harvesters") { sim.harvesters.size }
 //            .addColumn("run") { idx }
 //    }.bindRows()

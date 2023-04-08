@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.stereotype.Component
 import java.io.File
-import java.time.Duration
+import kotlin.time.Duration
 import javax.annotation.PostConstruct
 
 

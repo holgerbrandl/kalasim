@@ -1,6 +1,7 @@
 //DiningPhilosophers.kt
 package org.kalasim.examples
 
+import com.github.holgerbrandl.kdfutils.toKranglDF
 import kravis.geomSegment
 import kravis.plot
 import org.jetbrains.kotlinx.dataframe.api.*
@@ -61,7 +62,7 @@ fun main() {
 
     // transform data into shape suiteable for interval plotting
 
-    val requestsDf = requests.asDataFrame()
+    val requestsDf = requests.toDataFrame()
         .groupBy("requester")
         .sortBy("timestamp")
         .add("end_time") { prev()?.get("timestamp") as TickTime }
@@ -70,6 +71,6 @@ fun main() {
         .concat()
 
     // visualize with kravis
-    requestsDf.asKranglDF().plot(x = "timestamp", xend = "end_time", y = "requester", yend = "requester", color = "state")
+    requestsDf.plot(x = "timestamp", xend = "end_time", y = "requester", yend = "requester", color = "state")
         .geomSegment(size = 15.0).show()
 }

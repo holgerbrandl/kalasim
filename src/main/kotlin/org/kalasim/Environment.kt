@@ -18,7 +18,7 @@ import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
-import java.time.Instant
+import kotlinx.datetime.Instant
 import java.util.*
 import kotlin.time.*
 import kotlin.time.Duration.Companion.days
@@ -170,10 +170,10 @@ open class Environment(
 
 
     /** Allows to transform ticks to wall time (represented by `java.time.Instant`) */
-    override var tickTransform: TickTransform = TickTransform(durationUnit)
+    internal var tickTransform: TickTransform = TickTransform(durationUnit)
 
     //    var startDate: Instant? = null
-    var offsetTransform: OffsetTransform? = null
+    var startTime: Instant? = null
 //        get() = if(tickTransform is OffsetTransform) (tickTransform as OffsetTransform) else null
 
 
@@ -238,8 +238,6 @@ open class Environment(
         }
 
 //        curComponent = main
-
-
     }
 
     fun enableConsoleLogger() {
@@ -275,10 +273,10 @@ open class Environment(
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
-    @OptIn(NumericDuration::class)
+    @OptIn(AmbiguousDuration::class)
     fun run(
-        duration: Duration? = null, priority: Priority = NORMAL
-    ) = run(duration?.asTicks(), null, priority)
+        duration: Duration? = null, until:Instant? = null, priority: Priority = NORMAL
+    ) = run(duration?.asTicks(), until?.toTickTime(), priority)
 
 //    /**
 //     * Start execution of the simulation. See https://www.kalasim.org/basics/#running-a-simulation
@@ -299,10 +297,10 @@ open class Environment(
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
-    @OptIn(NumericDuration::class)
+    @OptIn(AmbiguousDuration::class)
     fun run(
         until: Instant, priority: Priority = NORMAL
-    ) = run(until = until.asTickTime(), priority = priority)
+    ) = run(until = until.toTickTime(), priority = priority)
 
     /**
      * Start execution of the simulation
@@ -316,7 +314,7 @@ open class Environment(
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
-    @NumericDuration
+    @AmbiguousDuration
     fun run(
         duration: Number? = null, until: TickTime? = null, priority: Priority = NORMAL, urgent: Boolean = false
     ) {
@@ -504,7 +502,7 @@ open class Environment(
     }
 
     fun wall2TickTime(instant: Instant): TickTime {
-        val offsetDuration = java.time.Duration.between(startDate, instant).toKotlinDuration()
+        val offsetDuration = instant - startDate!!
 
         return TickTime(tickTransform.durationAsTicks(offsetDuration))
     }

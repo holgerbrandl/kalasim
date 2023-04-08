@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.8.0"
+    kotlin("jvm") version "1.8.20"
     `maven-publish`
     signing
 
@@ -12,8 +12,8 @@ plugins {
 }
 
 group = "com.github.holgerbrandl"
-version = "0.8.100"
-//version = "0.9-SNAPSHOT"
+//version = "0.8.100"
+version = "0.9-SNAPSHOT"
 
 
 repositories {
@@ -25,7 +25,7 @@ dependencies {
     api("org.apache.commons:commons-math3:3.6.1")
     // note updated postponed because of regression errors
     api("io.insert-koin:koin-core:3.1.2")
-    implementation(kotlin("reflect"))
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.20")
 
     api("com.github.holgerbrandl:jsonbuilder:0.10")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
@@ -33,27 +33,31 @@ dependencies {
     //  api("io.github.microutils:kotlin-logging:1.12.5")
 //    api("org.slf4j:slf4j-simple:1.7.32")
 
-    implementation("com.google.code.gson:gson:2.10")
+    implementation("com.google.code.gson:gson:2.10.1")
 
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
 
-    testImplementation(kotlin("test-junit"))
-    testImplementation("io.kotest:kotest-assertions-core:5.5.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+
+
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.8.20")
+    testImplementation("io.kotest:kotest-assertions-core:5.5.5")
 
     // **TODO** move to api to require users to pull it in if needed
     implementation("com.github.holgerbrandl:krangl:0.18.4") // must needed for kravis
-    implementation("com.github.holgerbrandl:kdfutils:1.0")
+    implementation("com.github.holgerbrandl:kdfutils:1.2-SNAPSHOT")
+    testImplementation("com.github.holgerbrandl:kdfutils:1.2-SNAPSHOT")
 
-    compileOnly("com.github.holgerbrandl:kravis:0.8.6")
-    testImplementation("com.github.holgerbrandl:kravis:0.8.6")
+    compileOnly("com.github.holgerbrandl:kravis:0.9.95")
+    testImplementation("com.github.holgerbrandl:kravis:0.9.95")
 
-    compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.1.0")
-    testImplementation("org.jetbrains.lets-plot:lets-plot-batik:2.5.1")
+    compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.3.0")
+    testImplementation("org.jetbrains.lets-plot:lets-plot-batik:3.1.0")
     //    testImplementation("org.jetbrains.lets-plot:lets-plot-jfx:1.5.4")
 
     //experimental dependencies  use for experimentation
-    testImplementation("com.thoughtworks.xstream:xstream:1.4.19")
+    testImplementation("com.thoughtworks.xstream:xstream:1.4.20")
 
     //https://youtrack.jetbrains.com/issue/KT-44197
 

@@ -13,7 +13,6 @@ import org.koin.core.Koin
 import kotlin.math.*
 import kotlin.reflect.KFunction1
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 
 
 internal const val EPS = 1E-8
@@ -1242,7 +1241,7 @@ open class Component(
      * @param priority If a component has the same time on the event list, this component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
-    @OptIn(NumericDuration::class)
+    @OptIn(AmbiguousDuration::class)
     suspend fun SequenceScope<Component>.hold(
         duration: Duration,
         description: String? = null,
@@ -1283,7 +1282,7 @@ open class Component(
      * the priority. An event with a higher priority will be scheduled first.
      */
 //    @Deprecated("Use Duration instead of Number")
-    @NumericDuration
+    @AmbiguousDuration
     suspend fun SequenceScope<Component>.hold(
         duration: Number? = null,
         description: String? = null,
@@ -1304,7 +1303,7 @@ open class Component(
      * @param priority If a component has the same time on the event list, this component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
-    @NumericDuration
+    @AmbiguousDuration
     fun hold(
         duration: Number? = null,
         description: String? = null,
@@ -1817,14 +1816,14 @@ fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {
         c.name,
         c.creationTime,
         inDataSince = if(c.isData) c.stateTimeline.statsData().timepoints.last() else null,
-        (histogram[DATA] ?: 0.0).asTickTime(),
-        (histogram[CURRENT] ?: 0.0).asTickTime(),
-        (histogram[STANDBY] ?: 0.0).asTickTime(),
-        (histogram[PASSIVE] ?: 0.0).asTickTime(),
-        (histogram[INTERRUPTED] ?: 0.0).asTickTime(),
-        (histogram[SCHEDULED] ?: 0.0).asTickTime(),
-        (histogram[REQUESTING] ?: 0.0).asTickTime(),
-        (histogram[WAITING] ?: 0.0).asTickTime(),
+        (histogram[DATA] ?: 0.0).toTickTime(),
+        (histogram[CURRENT] ?: 0.0).toTickTime(),
+        (histogram[STANDBY] ?: 0.0).toTickTime(),
+        (histogram[PASSIVE] ?: 0.0).toTickTime(),
+        (histogram[INTERRUPTED] ?: 0.0).toTickTime(),
+        (histogram[SCHEDULED] ?: 0.0).toTickTime(),
+        (histogram[REQUESTING] ?: 0.0).toTickTime(),
+        (histogram[WAITING] ?: 0.0).toTickTime(),
     )
 }
 

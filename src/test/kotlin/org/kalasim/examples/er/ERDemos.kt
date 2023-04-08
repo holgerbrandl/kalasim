@@ -1,5 +1,6 @@
 package org.kalasim.examples.er
 
+import com.github.holgerbrandl.kdfutils.toKranglDF
 import kravis.geomBar
 import kravis.plot
 import org.jetbrains.kotlinx.dataframe.api.*
@@ -42,7 +43,7 @@ object SimpleER {
             waitingLine.lengthOfStayStatistics.display().show()
 
             val arrivals = get<ComponentGenerator<Patient>>().history
-//        history.asDataFrame().print()
+//        history.toDataFrame().print()
 
 
             val df = dataFrameOf(columnOf(*arrivals.toTypedArray()).named("patient"))
@@ -55,7 +56,7 @@ object SimpleER {
 
            // https://github.com/JetBrains/lets-plot-kotlin/issues/82
 //            (df.letsPlot{ x = "status" } + geomBar ()).show()
-            df.asKranglDF().plot(x="status").geomBar().show()
+            df.plot(x="status").geomBar().show()
             Thread.sleep(101000)
 
             // visualize room setup as gant chart

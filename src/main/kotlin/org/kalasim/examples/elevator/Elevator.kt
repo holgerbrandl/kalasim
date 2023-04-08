@@ -1,5 +1,5 @@
 //Elevator.kt
-@file:OptIn(NumericDuration::class)
+@file:OptIn(AmbiguousDuration::class)
 
 package org.kalasim.examples.elevator
 
@@ -8,7 +8,7 @@ import org.kalasim.animation.AnimationComponent
 import org.kalasim.examples.elevator.Car.DoorState.CLOSED
 import org.kalasim.examples.elevator.Car.DoorState.OPEN
 import org.kalasim.examples.elevator.Direction.*
-import org.kalasim.misc.NumericDuration
+import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.repeat
 import java.awt.Point
 

@@ -5,6 +5,8 @@ import org.jetbrains.letsPlot.ggsize
 import org.jetbrains.letsPlot.intern.Plot
 import org.jetbrains.letsPlot.letsPlot
 import krangl.*
+import org.jetbrains.kotlinx.dataframe.api.print
+import org.jetbrains.kotlinx.dataframe.api.toDataFrame
 import org.kalasim.analysis.InteractionEvent
 import org.kalasim.examples.MM1Queue
 import org.kalasim.plot.letsplot.display
@@ -17,7 +19,7 @@ fun main() {
         server.requesters.lengthOfStayStatistics.display().show()
     }
 
-    mm1Queue.traces.filterIsInstance<InteractionEvent>().asDataFrame().print()
+    mm1Queue.traces.filterIsInstance<InteractionEvent>().toDataFrame().print()
 }
 
 

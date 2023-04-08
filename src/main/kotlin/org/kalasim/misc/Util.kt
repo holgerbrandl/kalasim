@@ -6,7 +6,7 @@ import org.kalasim.MetricEvent
 import org.kalasim.TickTime
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
-import java.time.Instant
+import kotlinx.datetime.Instant
 import java.util.*
 import kotlin.time.*
 

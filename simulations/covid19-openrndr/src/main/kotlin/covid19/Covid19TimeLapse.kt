@@ -9,7 +9,7 @@ import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.math.IntVector2
 import org.openrndr.math.Vector2
-import java.time.Duration
+import kotlin.time.Duration
 
 // evolve a sim while running the visualization
 fun main() = application {

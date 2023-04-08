@@ -1,7 +1,8 @@
 package org.kalasim
 
+import kotlinx.datetime.Clock
 import org.kalasim.misc.TRACE_DF
-import java.time.Instant
+import kotlinx.datetime.Instant
 import kotlin.time.DurationUnit
 import kotlin.time.*
 import kotlin.time.Duration.Companion.days
@@ -44,11 +45,11 @@ val Number.tickTime: TickTime
 val Number.tt: TickTime
     get() = TickTime(this)
 
-fun Number.asTickTime() = TickTime(this)
+fun Number.toTickTime() = TickTime(this)
 
 
 // https://stackoverflow.com/questions/32437550/whats-the-difference-between-instant-and-localdatetime
-open class TickTransform(val tickUnit: DurationUnit) {
+internal open class TickTransform(val tickUnit: DurationUnit) {
     open fun ticks2Duration(ticks: Double) = ticks2Duration(Ticks(ticks))
 
     open fun ticks2Duration(ticks: Ticks): Duration = when(tickUnit){
@@ -83,10 +84,7 @@ open class TickTransform(val tickUnit: DurationUnit) {
     }
 }
 
-class OffsetTransform(val offset: Instant = Instant.now(), val tt: TickTransform) {
-
-
-}
+class OffsetTransform(val offset: Instant = Clock.System.now())
 
 internal const val MISSING_TICK_TRAFO_ERROR = "Tick transformation not configured."
 
@@ -100,11 +98,11 @@ fun Environment.asDuration(duration: Number?): Duration? = duration?.let{
 }
 
 /** Transforms an wall `Instant` to simulation time.*/
-fun Environment.asTickTime(instant: Instant) = instant.asTickTime()
+fun Environment.toTickTime(instant: Instant) = instant.toTickTime()
 
 
 /** Transforms a simulation time (typically `now`) to the corresponding wall time. */
 fun Environment.asWallTime(time: TickTime) = time.asWallTime()
 //fun Environment.asWallTimeOrNull(time: TickTime) = time.asWallTime()
 
-operator fun Instant.plus(duration: Duration): Instant = this.plus(duration.toJavaDuration())
+//operator fun Instant.plus(duration: Duration): Instant = this.plus(duration.toJavaDuration())

@@ -1,7 +1,10 @@
 package org.kalasim.examples
 
+import com.github.holgerbrandl.kdfutils.toKotlinDF
+import com.github.holgerbrandl.kdfutils.toKranglDF
 import krangl.*
 import kravis.*
+import org.jetbrains.kotlinx.dataframe.api.*
 import org.kalasim.*
 import org.kalasim.analysis.ResourceEvent
 import org.kalasim.plot.kravis.display
@@ -50,7 +53,7 @@ fun main() {
     val requests: List<ResourceEvent> = tc.filterIsInstance<ResourceEvent>()
     println(requests.first())
 
-    val requestDF = requests.asDataFrame()
+    val requestDF = requests.toDataFrame()
     requestDF.print()
 
 
@@ -86,24 +89,27 @@ fun List<ResourceEvent>.displayTimeline(
 //        y = ResourceEvent::occupancy
 //    ).xLabel("time").yLabel("").geomStep()
 
-    var df = data.asDataFrame()
+    var df = data.toDataFrame()
 //        .remove("type", "requester", "occupancy", "amount")
         .select("time", "resource", "capacity", "claimed", "requesters")
+        .toKranglDF()
+
         .gather("statistic", "value", { listOf("capacity", "claimed", "requesters") })
 //        .sortedBy("resource", "time")
 
     // calculate smooth aggregate
-    df = df.groupBy("resource", "value")
+    val smoothed = df.groupBy("resource", "value")
         .addColumn("mean") { (it["value"] * (it["time"].lead() - it["time"])).cumSum() / it["time"] }.ungroup()
+        .toKotlinDF()
 
 
     // TODO replicate end of each resource until end of simulation
 
-    df.head(20).print()
+//    smoothed.head(20).print()
     // complement step fun until now
 
 
-    return df.plot(x = "time", y = if (avg) "mean" else "value", color = "statistic")
+    return smoothed.plot(x = "time", y = if (avg) "mean" else "value", color = "statistic")
         .xLabel("time").yLabel("").geomStep(alpha = 0.6).facetWrap("resource")
 }
 

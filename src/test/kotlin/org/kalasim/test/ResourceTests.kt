@@ -14,7 +14,7 @@ import org.kalasim.Priority.Companion.LOW
 import org.kalasim.Priority.Companion.LOWEST
 import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.ResourceSelectionPolicy.*
-import java.time.Instant
+import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 

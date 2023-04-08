@@ -1,16 +1,16 @@
 package org.kalasim.test
 
 import org.kalasim.examples.MM1Queue
-import org.kalasim.misc.NumericDuration
+import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.plot.letsplot.display
 
-@OptIn(NumericDuration::class)
+@OptIn(AmbiguousDuration::class)
 fun main() {
     val mm1 = MM1Queue()
 
     // redo but with set tick-transform
 //    mm1.startDate = Instant.parse("2021-01-01T00:00:00.00Z")
-//    mm1.offsetTransform = OffsetTransform(
+//    mm1.startTime = OffsetTransform(
 //        offset = Instant.parse("2021-01-01T00:00:00.00Z"),
 //        tickUnit = DurationUnit.MINUTES
 //    )

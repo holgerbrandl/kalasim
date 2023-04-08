@@ -54,7 +54,7 @@ fun main() {
 //            it.occupancyTimeline.stepFun().map { sf -> Triple(it.name, sf.first, sf.second) }
 //        }
 //
-//        plotData.asDataFrame().plot(x = "second", y = "third")
+//        plotData.toDataFrame().plot(x = "second", y = "third")
 //            .geomStep().facetWrap("first").title("Theater Occupancy")
 //            .xLabel("Time (min)").yLabel("Occupancy")
     }

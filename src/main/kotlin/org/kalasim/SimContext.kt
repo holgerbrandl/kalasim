@@ -1,7 +1,7 @@
 package org.kalasim
 
 import org.koin.core.component.KoinComponent
-import java.time.Instant
+import kotlinx.datetime.Instant
 import kotlin.time.Duration
 
 /**
@@ -11,8 +11,6 @@ interface SimContext : KoinComponent {
 
     /** The environment of this simulation model. */
     val env: Environment
-
-    var tickTransform: TickTransform
 
     /** Transforms a wall `duration` into the corresponding amount of ticks.*/
     fun Duration.asTicks(): Double {
@@ -24,7 +22,7 @@ interface SimContext : KoinComponent {
         get() = asTicks()
 
     // Scoped extensions
-    fun Instant.asTickTime(): TickTime {
+    fun Instant.toTickTime(): TickTime {
         require(env.startDate != null) { MISSING_TICK_TRAFO_ERROR }
         return env.wall2TickTime(this)
     }

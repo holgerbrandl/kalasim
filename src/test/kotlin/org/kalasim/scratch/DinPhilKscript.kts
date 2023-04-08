@@ -60,7 +60,7 @@ val requests = tc.filterIsInstance<ResourceEvent>().map {
 }
 
 // transform data into shape suitable for interval plotting
-val requestsDf = requests.asDataFrame()
+val requestsDf = requests.toDataFrame()
     .groupBy("requester")
     .sortBy("timestamp")
     .add("end_time") { prev()?.get("timestamp") as TickTime }

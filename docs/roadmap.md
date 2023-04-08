@@ -2,14 +2,10 @@
 
 ## Next steps
 
-## v0.8
-
----
-
-
 
 ## v0.9
 
+**TODO** remove all direct imports of krangl api
 
 ---
 **TODO** pathfinding example

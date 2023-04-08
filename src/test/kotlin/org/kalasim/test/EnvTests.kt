@@ -6,6 +6,7 @@ import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import junit.framework.Assert.fail
+import kotlinx.datetime.Instant
 import krangl.cumSum
 import krangl.mean
 import org.apache.commons.math3.distribution.UniformRealDistribution
@@ -238,7 +239,7 @@ class EnvTests {
                     }
             }
 
-            run(until = null)
+            run(until = null as Instant?)
             now shouldBe 10.tt
 
             cc.size shouldBe 1
@@ -387,16 +388,13 @@ class EnvTests {
 
         er.doctors.first().snapshot.toJson().toIndentString() shouldBeDiff """
             {
-              "requestedBy": [],
-              "claimedQuantity": 1,
-              "creationTime": 0,
-              "now": 10,
-              "name": "Dr 0",
-              "claimedBy": [{
-                "first": "room 2",
-                "second": null
-              }],
-              "capacity": 1
+                "requestedBy": [],
+                "claimedQuantity": 0,
+                "creationTime": 0,
+                "now": 10,
+                "name": "Dr 0",
+                "claimedBy": [],
+                "capacity": 1
             }
         """.trimIndent()
 

@@ -13,7 +13,7 @@ import org.openrndr.ffmpeg.ScreenRecorder
 import org.openrndr.shape.Circle
 import org.openrndr.svg.loadSVG
 import java.lang.Thread.sleep
-import java.time.Instant
+import kotlinx.datetime.Instant
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.system.exitProcess

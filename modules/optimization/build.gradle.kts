@@ -13,8 +13,8 @@ repositories {
 dependencies {
 
     api("com.github.holgerbrandl:kalasim:0.9-SNAPSHOT")
-    api("org.optaplanner:optaplanner-core:8.34.0.Final")
-    api("org.optaplanner:optaplanner-benchmark:8.34.0.Final")
+    api("org.optaplanner:optaplanner-core:8.36.0.Final")
+    api("org.optaplanner:optaplanner-benchmark:8.36.0.Final")
 
     api("ch.qos.logback:logback-classic:1.4.5")
 

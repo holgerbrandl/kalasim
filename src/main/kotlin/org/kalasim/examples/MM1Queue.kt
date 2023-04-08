@@ -1,10 +1,10 @@
-@file:OptIn(NumericDuration::class)
+@file:OptIn(AmbiguousDuration::class)
 
 package org.kalasim.examples
 
 import org.apache.commons.math3.distribution.ExponentialDistribution
 import org.kalasim.*
-import org.kalasim.misc.NumericDuration
+import org.kalasim.misc.AmbiguousDuration
 
 class MM1Queue(
     lambda: Double = 1.5,

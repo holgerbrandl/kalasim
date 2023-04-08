@@ -4,6 +4,9 @@ import kotlinx.coroutines.*
 import krangl.*
 import kravis.geomTile
 import kravis.plot
+import org.jetbrains.kotlinx.dataframe.api.rename
+import org.jetbrains.kotlinx.dataframe.api.toDataFrame
+import org.jetbrains.kotlinx.dataframe.api.util.unfold
 import org.kalasim.*
 import org.kalasim.misc.cartesianProduct
 import org.kalasim.misc.roundAny
@@ -93,8 +96,8 @@ object WhatIf {
         atms.map {
             it to it.get<Resource>().statistics.requesters.lengthStats.mean!!.roundAny(2)
         }.toList()
-            .asDataFrame()
-            .unfold<AtmQueue>("first", listOf("rho", "lambda"))
+            .toDataFrame()
+            .unfold("first", listOf("rho", "lambda"))
             .rename("second" to "mean_queue_length")
     }
 }

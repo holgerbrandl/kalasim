@@ -3,7 +3,7 @@ package org.kalasim
 import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.analysis.snapshot.ComponentGeneratorSnapshot
 import org.kalasim.misc.DependencyContext
-import org.kalasim.misc.NumericDuration
+import org.kalasim.misc.AmbiguousDuration
 import org.koin.core.Koin
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -32,7 +32,7 @@ class ComponentGenerator<T>(
      *
      * For supported arguments see https://www.kalasim.org/component/#component-generator
      */
-    @NumericDuration
+    @AmbiguousDuration
     constructor(
         iat: RealDistribution,
         startAt: TickTime? = null,

@@ -4,10 +4,10 @@ import org.kalasim.*
 import org.kalasim.examples.er.PatientStatus.*
 import org.kalasim.examples.er.Severity.*
 import org.kalasim.monitors.IntTimeline
-import kotlin.time.DurationUnit
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.random.Random
+import kotlin.time.DurationUnit
 
 enum class InjuryType {
     AnimalBites, Bruises, Burns, Dislocations, Fractures, SprainsAndStrains, Cuts, Scratches
@@ -57,14 +57,17 @@ data class Patient(
                     holdExponential(8)
                     updatePatient(Urgent)
                 }
+
                 Urgent -> {
                     holdExponential(4)
                     updatePatient(Emergent)
                 }
+
                 Emergent -> {
                     holdExponential(2)
                     updatePatient(Resuscitation)
                 }
+
                 Resuscitation -> {
                     holdExponential(1)
 
@@ -233,13 +236,15 @@ class EmergencyRoom(
     val nurse: HeadNurse = FifoNurse(),
     enableConsoleLogger: Boolean = true,
     enableTickMetrics: Boolean = true
-) : Environment(enableConsoleLogger=enableConsoleLogger, enableTickMetrics = enableTickMetrics) {
+) : Environment(
+    enableConsoleLogger = enableConsoleLogger,
+    enableTickMetrics = enableTickMetrics,
+    durationUnit = DurationUnit.HOURS
+) {
 
     val waitingAreaSize = 300
 
     init {
-        tickTransform = TickTransform(tickUnit = DurationUnit.HOURS)
-
         if(!enableTickMetrics) trackingPolicyFactory.disableAll()
     }
 

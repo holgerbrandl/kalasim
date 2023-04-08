@@ -11,7 +11,7 @@ fun main() {
 
         override fun process() = sequence {
             request(driver) {
-                hold(1.0)
+                hold(1.0, description = "driving")
 
                 wait(trafficLight, "green")
             }

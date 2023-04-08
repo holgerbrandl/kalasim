@@ -3,6 +3,7 @@ package org.kalasim.plot.letsplot
 import kravis.GGPlot
 import org.jetbrains.kotlinx.dataframe.DataFrame
 import org.jetbrains.kotlinx.dataframe.api.*
+import org.jetbrains.kotlinx.dataframe.api.util.unfold
 import org.jetbrains.letsPlot.Stat
 import org.jetbrains.letsPlot.facet.facetWrap
 import org.jetbrains.letsPlot.geom.*
@@ -31,7 +32,7 @@ fun  <V:Number> MetricTimeline<V>.display(
 
     fun wtTransform(tt: TickTime) = if (useWT) env.asWallTime(tt) else tt.value
 
-    return data.asDataFrame()
+    return data.toDataFrame()
         .convertTick2Double("time")
         .letsPlot() +
             geomStep { x = "time"; y = "value" } + ggtitle(title)
@@ -49,7 +50,7 @@ fun NumericStatisticMonitor.display(title: String = name): Plot {
 }
 
 fun <T> FrequencyTable<T>.display(title: String? = null): Plot {
-    var plot = toList().asDataFrame().letsPlot() +
+    var plot = toList().toDataFrame().letsPlot() +
             geomBar(stat = Stat.identity) { x = "first"; y = "second" }
 
     if (title != null) plot += ggtitle(title)
@@ -77,7 +78,7 @@ fun <T> CategoryTimeline<T>.display(
             it.first.time,
             it.second.time
         )
-    }.asDataFrame()
+    }.toDataFrame()
         .convertTick2Double("start")
         .convertTick2Double("end")
 //        .addColumn("start") { expr -> expr["start"].map<Double> { wtTransform(TickTime(it)) } }
@@ -107,8 +108,9 @@ fun List<ResourceActivityEvent>.display(
 ): Plot {
     val useWT = any { it.requestedWT != null } && !forceTickAxis
 
-    val plotData = asDataFrame()
-        .unfold<Resource>("resource", listOf("name"))
+    val plotData = toDataFrame()
+        //<Resource>
+        .unfold("resource", listOf("name"))
         .add("activity") { "activity"() ?: "Other" }
         .convertTick2Double("requested")
         .convertTick2Double("released")
@@ -143,7 +145,7 @@ fun List<ResourceTimelineSegment>.display(
     val useWT = any { it.startWT != null } && !forceTickAxis
 
 
-    return filter { it.metric !in exclude }.asDataFrame()
+    return filter { it.metric !in exclude }.toDataFrame()
 //        .addColumn("start") { expr -> expr["start"].map<TickTime> { it.value } }
         .convertTick2Double("start")
         .letsPlot() +
@@ -177,13 +179,15 @@ fun List<Component>.displayStateTimeline(
 ): Plot {
 //    val df = csTimelineDF(componentName)
 
-    val useWT = first().tickTransform != null && !forceTickAxis
+    val useWT = first().env.startTime != null && !forceTickAxis
     fun wtTransform(tt: TickTime) = if (useWT) first().env.asWallTime(tt) else tt.value
 
     val df = clistTimeline()
-        .asDataFrame()
-        .unfold<Component>("first", listOf("name"))
-        .unfold<LevelStateRecord<ComponentState>>("second", listOf("timestamp", "duration", "value"))
+        .toDataFrame()
+        //<Component>
+        .unfold("first", listOf("name"))
+        //<LevelStateRecord<ComponentState>>
+        .unfold("second", listOf("timestamp", "duration", "value"))
 //        .addColumn("start") { expr -> expr["timestamp"].map<Double> { wtTransform(TickTime(it)) } }
 //        .addColumn("end") { expr -> (expr["timestamp"] + expr["timestamp"]).map<Double> { wtTransform(TickTime(it)) } }
         .convertTick2Double("start")
@@ -207,9 +211,11 @@ fun List<Component>.displayStateProportions(
     title: String? = null,
 ): Plot {
     val df = clistTimeline()
-        .asDataFrame()
-        .unfold<Component>("first", listOf("name"))
-        .unfold<LevelStateRecord<ComponentState>>("second", listOf("timestamp", "duration", "value"))
+        .toDataFrame()
+        //<Component>
+        .unfold("first", listOf("name"))
+        //<LevelStateRecord<ComponentState>>
+        .unfold("second", listOf("timestamp", "duration", "value"))
 
     return df.letsPlot() + geomBar {
         y = "name"

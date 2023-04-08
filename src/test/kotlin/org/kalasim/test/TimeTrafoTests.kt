@@ -4,8 +4,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.junit.Test
 import org.kalasim.*
-import java.time.Instant
-import kotlin.time.DurationUnit
+import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -44,7 +43,7 @@ class TimeTrafoTests {
 
                 hold(asTicks(90.minutes))
 
-                asTickTime(now.asWallTime()) shouldBe now
+                toTickTime(now.asWallTime()) shouldBe now
 
                 log(TimeTrafoTestEvent(now))
             }

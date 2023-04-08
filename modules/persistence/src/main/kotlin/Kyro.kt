@@ -59,7 +59,7 @@ public fun EmergencyRoom.testSim() = apply {
 //    waitingLine.timlengthOfStayMonitor.display().show()
 
     val arrivals = get<ComponentGenerator<Patient>>().history
-//        arrivals.asDataFrame().print()
+//        arrivals.toDataFrame().print()
 
 
     val df = arrivals.map {

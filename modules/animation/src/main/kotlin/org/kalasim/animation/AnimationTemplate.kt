@@ -17,10 +17,9 @@ import kotlin.time.Duration.Companion.milliseconds
 fun main() {
     application {
         // setup simulation model
-        val sim = object : Environment() {
+        val sim = object : Environment(durationUnit = DurationUnit.SECONDS) {
             init {
                 ClockSync(tickDuration = 10.milliseconds, syncsPerTick = 100)
-                tickTransform = TickTransform(DurationUnit.SECONDS)
             }
 
             // instantiate components (not fully worked out here)

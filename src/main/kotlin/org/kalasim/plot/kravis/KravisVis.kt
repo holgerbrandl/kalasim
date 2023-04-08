@@ -50,7 +50,7 @@ fun  <V:Number> MetricTimeline<V>.display(
         .filter { from == null || it.time >= from }
         .filter { to == null || it.time <= to }
 
-    val useWT = env.offsetTransform != null && !forceTickAxis
+    val useWT = env.startTime != null && !forceTickAxis
 
     fun wtTransform(tt: TickTime) = if (useWT) env.asWallTime(tt) else tt
 
@@ -93,7 +93,7 @@ fun <T> CategoryTimeline<T>.display(
     val nlmStatsData = statsData()
     val stepFun = nlmStatsData.stepFun()
 
-    val useWT = env.offsetTransform != null && !forceTickAxis
+    val useWT = env.startTime != null && !forceTickAxis
 
     fun wtTransform(tt: TickTime) = if (useWT) env.asWallTime(tt) else tt
 
@@ -185,7 +185,7 @@ fun List<Component>.displayStateTimeline(
 //    val df = csTimelineDF(componentName)
     val df = clistTimeline()
 
-    val useWT = first().env.offsetTransform != null && !forceTickAxis
+    val useWT = first().env.startTime != null && !forceTickAxis
     fun wtTransform(tt: TickTime) = if (useWT) first().env.asWallTime(tt) else tt
 
     return df.plot(
@@ -204,7 +204,7 @@ fun List<Component>.displayStateTimeline(
 //private fun List<Component>.csTimelineDF(componentName: String) = map { eqn ->
 //    eqn.statusTimeline
 //        .statsData().asList()
-//        .asDataFrame().addColumn(componentName) { eqn }
+//        .toDataFrame().addColumn(componentName) { eqn }
 //}.bindRows().rename("value" to "state")
 
 
@@ -229,7 +229,7 @@ fun List<Component>.displayStateProportions(
 //): GGPlot {
 //    val df = clistTimeline()
 //
-//    val dfUnfold = df.asDataFrame().unfold<LevelStateRecord<ComponentState>>("second").rename("first" to "component")
+//    val dfUnfold = df.toDataFrame().unfold<LevelStateRecord<ComponentState>>("second").rename("first" to "component")
 //
 //    val durationSummary = dfUnfold
 //        .groupBy("state", "component")

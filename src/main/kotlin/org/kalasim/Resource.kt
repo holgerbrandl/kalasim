@@ -437,19 +437,19 @@ data class ResourceTimelineSegment(
 
 val Resource.timeline: List<ResourceTimelineSegment>
     get() {
-        val capStats = capacityTimeline.statsData().asList().asDataFrame()
+        val capStats = capacityTimeline.statsData().asList().toDataFrame()
             .add("metric") { ResourceMetric.Capacity }
-        val claimStats = claimedTimeline.statsData().asList().asDataFrame()
+        val claimStats = claimedTimeline.statsData().asList().toDataFrame()
             .add("metric") { ResourceMetric.Claimed }
-        val occStats = occupancyTimeline.statsData().asList().asDataFrame()
+        val occStats = occupancyTimeline.statsData().asList().toDataFrame()
             .add("metric") { ResourceMetric.Occupancy }
-        val availStats = occupancyTimeline.statsData().asList().asDataFrame()
+        val availStats = occupancyTimeline.statsData().asList().toDataFrame()
             .add("metric") { ResourceMetric.Availability }
 
-        val requesters = requesters.sizeTimeline.statsData().asList().asDataFrame()
+        val requesters = requesters.sizeTimeline.statsData().asList().toDataFrame()
             .add("metric") { ResourceMetric.Requesters }.convert("value").to<Double>()
 
-        val claimers = claimers.sizeTimeline.statsData().asList().asDataFrame()
+        val claimers = claimers.sizeTimeline.statsData().asList().toDataFrame()
             .add("metric") { ResourceMetric.Claimers }
             .convert("value").to<Double>()
 

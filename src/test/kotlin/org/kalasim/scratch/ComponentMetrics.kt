@@ -1,8 +1,8 @@
 package org.kalasim.scratch
 
-import krangl.asDataFrame
+import org.jetbrains.kotlinx.dataframe.api.print
+import org.jetbrains.kotlinx.dataframe.api.toDataFrame
 import org.kalasim.*
-import org.kalasim.misc.printThis
 import org.kalasim.monitors.printConsole
 import org.kalasim.plot.kravis.display
 
@@ -44,7 +44,7 @@ fun main() {
         val pStats: List<ComponentLifecycleRecord> = cg.history.map { it.toLifeCycleRecord() }
 
         // convert to krangl data-frame
-        pStats.asDataFrame().printThis()
+        pStats.toDataFrame().print()
 
 
         cg.history.first().stateTimeline.summed().printConsole()

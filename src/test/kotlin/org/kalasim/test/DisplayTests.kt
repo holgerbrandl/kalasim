@@ -1,24 +1,21 @@
 package org.kalasim.test
 
 import io.kotest.assertions.fail
-import junit.framework.TestCase.assertEquals
+import kotlinx.datetime.Instant
 import kravis.GGPlot
 import kravis.SessionPrefs
 import kravis.render.LocalR
 import org.junit.*
 import org.junit.rules.TestName
-import org.kalasim.OffsetTransform
 import org.kalasim.examples.MM1Queue
-import org.kalasim.misc.NumericDuration
+import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.plot.kravis.*
 import java.io.*
-import java.time.Instant
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.stream.StreamSource
 import kotlin.io.path.*
-import kotlin.time.DurationUnit
 
 class DisplayTests : AbstractSvgPlotRegression() {
 
@@ -41,6 +38,8 @@ class DisplayTests : AbstractSvgPlotRegression() {
 
         mm1.run(50)
 //        mm1.customers
+
+//        USE_KRAVIS_VIEWER = true
 
         mm1.server.activities.display("MM1 Server Utilization")
             .apply { assertExpected(this, "activities") }
@@ -65,7 +64,7 @@ class DisplayTests : AbstractSvgPlotRegression() {
 
     }
 
-    @OptIn(NumericDuration::class)
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `is should display the mm1 server utilization with walltime`() {
 
