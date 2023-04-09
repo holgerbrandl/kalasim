@@ -1,6 +1,9 @@
 .idea
 !.idea/codeStyles
 .gradle
+gradle
 build
 out
 *gpg
+.ipynb_checkpoints
+*.iml
