@@ -14,7 +14,7 @@ As shown in the example there are 2 flavors
 
 This example will run for 2h in total which is transformed to 2x60 ticks, and will report a transform wall time of `now` plus 120 minutes. It also illustrates the 3 supported provided transformations:
 
-* `asWallTime(tickTime)` - Transforms a simulation time (typically `now`) to the corresponding wall time.
+* `toWallTime(tickTime)` - Transforms a simulation time (typically `now`) to the corresponding wall time.
 * `asTickDuration(duration)` - Transforms a wall `duration` into the corresponding amount of ticks.
 * `asTickTime(instant)` - Transforms an wall `Instant` to simulation time.
  

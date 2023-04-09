@@ -159,7 +159,7 @@ createSimulation {
     tickTransform = OffsetTransform(Instant.now(), DurationUnit.MINUTES)
 
     run(Duration.ofMinutes(90).asTicks())
-    println(asWallTime(now))
+    println(toWallTime(now))
 }
 ```
 
