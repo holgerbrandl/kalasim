@@ -12,8 +12,8 @@ plugins {
 }
 
 group = "com.github.holgerbrandl"
-//version = "0.8.100"
-version = "0.9-SNAPSHOT"
+version = "0.8.101"
+//version = "0.9-SNAPSHOT"
 
 
 repositories {
@@ -45,8 +45,8 @@ dependencies {
 
     // **TODO** move to api to require users to pull it in if needed
     implementation("com.github.holgerbrandl:krangl:0.18.4") // must needed for kravis
-    implementation("com.github.holgerbrandl:kdfutils:1.2-SNAPSHOT")
-    testImplementation("com.github.holgerbrandl:kdfutils:1.2-SNAPSHOT")
+    implementation("com.github.holgerbrandl:kdfutils:1.2")
+    testImplementation("com.github.holgerbrandl:kdfutils:1.2")
 
     compileOnly("com.github.holgerbrandl:kravis:0.9.95")
     testImplementation("com.github.holgerbrandl:kravis:0.9.95")

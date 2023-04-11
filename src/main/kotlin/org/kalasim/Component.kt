@@ -1,5 +1,7 @@
 package org.kalasim
 
+import kotlinx.datetime.Instant
+import mu.KotlinLogging
 import org.kalasim.ComponentState.*
 import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.ResourceSelectionPolicy.*
@@ -91,6 +93,8 @@ open class Component(
     // to be re-enabled/reworked as part of https://github.com/holgerbrandl/kalasim/issues/11
 //    builder: SequenceScope<Component>.() -> Unit = {   }
 ) : SimulationEntity(name, koin) {
+
+    val logger = KotlinLogging.logger {}
 
     private var oneOfRequest: Boolean = false
 
@@ -1245,10 +1249,11 @@ open class Component(
     suspend fun SequenceScope<Component>.hold(
         duration: Duration,
         description: String? = null,
+        until: Instant? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
     ) = yieldCurrent {
-        this@Component.hold(duration.asTicks(), description, null, priority, urgent)
+        this@Component.hold(duration.asTicks(), description, until?.toTickTime(), priority, urgent)
     }
 
     /**

@@ -50,7 +50,7 @@ fun  <V:Number> MetricTimeline<V>.display(
         .filter { from == null || it.time >= from }
         .filter { to == null || it.time <= to }
 
-    val useWT = env.startTime != null && !forceTickAxis
+    val useWT = env.startDate != null && !forceTickAxis
 
     fun wtTransform(tt: TickTime) = if (useWT) env.toWallTime(tt) else tt
 
@@ -93,7 +93,7 @@ fun <T> CategoryTimeline<T>.display(
     val nlmStatsData = statsData()
     val stepFun = nlmStatsData.stepFun()
 
-    val useWT = env.startTime != null && !forceTickAxis
+    val useWT = env.startDate != null && !forceTickAxis
 
     fun wtTransform(tt: TickTime) = if (useWT) env.toWallTime(tt) else tt
 
@@ -185,7 +185,7 @@ fun List<Component>.displayStateTimeline(
 //    val df = csTimelineDF(componentName)
     val df = clistTimeline()
 
-    val useWT = first().env.startTime != null && !forceTickAxis
+    val useWT = first().env.startDate != null && !forceTickAxis
     fun wtTransform(tt: TickTime) = if (useWT) first().env.toWallTime(tt) else tt
 
     return df.plot(
@@ -205,7 +205,7 @@ fun List<Component>.displayStateTimeline(
 //    eqn.statusTimeline
 //        .statsData().asList()
 //        .toDataFrame().addColumn(componentName) { eqn }
-//}.bindRows().rename("value" to "state")
+//}.concat().rename("value" to "state")
 
 
 fun List<Component>.displayStateProportions(

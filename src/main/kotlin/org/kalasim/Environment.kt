@@ -172,10 +172,6 @@ open class Environment(
     /** Allows to transform ticks to wall time (represented by `kotlinx.datetime.Instant`) */
     internal var tickTransform: TickTransform = TickTransform(durationUnit)
 
-    //    var startDate: Instant? = null
-    var startTime: Instant? = null
-//        get() = if(tickTransform is OffsetTransform) (tickTransform as OffsetTransform) else null
-
 
     /** The component of the currently iterated process definition. Read-only, as components enter the queue only
      * indirectly via scheduling interactions such as for example hold(), request() or wait(). */

@@ -110,7 +110,7 @@ fun List<ResourceActivityEvent>.display(
 
     val plotData = toDataFrame()
         //<Resource>
-        .unfold("resource", listOf("name"))
+        .unfold<Resource>("resource", listOf("name"))
         .add("activity") { "activity"() ?: "Other" }
         .convertTick2Double("requested")
         .convertTick2Double("released")
@@ -179,15 +179,15 @@ fun List<Component>.displayStateTimeline(
 ): Plot {
 //    val df = csTimelineDF(componentName)
 
-    val useWT = first().env.startTime != null && !forceTickAxis
+    val useWT = first().env.startDate != null && !forceTickAxis
     fun wtTransform(tt: TickTime) = if (useWT) first().env.toWallTime(tt) else tt.value
 
     val df = clistTimeline()
         .toDataFrame()
         //<Component>
-        .unfold("first", listOf("name"))
+        .unfold<Component>("first", listOf("name"))
         //<LevelStateRecord<ComponentState>>
-        .unfold("second", listOf("timestamp", "duration", "value"))
+        .unfold<LevelStateRecord<ComponentState>>("second", listOf("timestamp", "duration", "value"))
 //        .addColumn("start") { expr -> expr["timestamp"].map<Double> { wtTransform(TickTime(it)) } }
 //        .addColumn("end") { expr -> (expr["timestamp"] + expr["timestamp"]).map<Double> { wtTransform(TickTime(it)) } }
         .convertTick2Double("start")
@@ -212,10 +212,8 @@ fun List<Component>.displayStateProportions(
 ): Plot {
     val df = clistTimeline()
         .toDataFrame()
-        //<Component>
-        .unfold("first", listOf("name"))
-        //<LevelStateRecord<ComponentState>>
-        .unfold("second", listOf("timestamp", "duration", "value"))
+        .unfold<Component>("first", listOf("name"))
+        .unfold<LevelStateRecord<ComponentState>>("second", listOf("timestamp", "duration", "value"))
 
     return df.letsPlot() + geomBar {
         y = "name"

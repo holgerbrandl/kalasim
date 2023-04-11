@@ -1,10 +1,19 @@
+@file:Suppress("PackageDirectoryMismatch")
+
 package org.kalasim.misc.time
 
+import org.jetbrains.kotlinx.dataframe.math.mean
+import org.jetbrains.kotlinx.dataframe.math.median
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 
 // Duration utilities
-fun Collection<Duration>.sum() : Duration = sumOf { it }
-
+fun Iterable<Duration>.sum() : Duration = sumOf { it }
 fun <T> Iterable<T>.sumOf(selector: (T) -> Duration) = map{ selector(it)}.sum()
-//fun <T> Iterable<Duration>.sum() = reduce{d1, d2 -> d1+d2}
+
+fun Iterable<Duration>.mean() : Duration = meanOf { it }
+fun <T> Iterable<T>.meanOf(selector: (T) -> Duration) = map{ selector(it).inWholeMilliseconds}.mean().milliseconds
+
+fun Iterable<Duration>.median() : Duration = meanOf { it }
+fun <T> Iterable<T>.medianOf(selector: (T) -> Duration) = map{ selector(it).inWholeMilliseconds}.median().milliseconds

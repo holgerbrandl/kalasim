@@ -97,7 +97,7 @@ object WhatIf {
             it to it.get<Resource>().statistics.requesters.lengthStats.mean!!.roundAny(2)
         }.toList()
             .toDataFrame()
-            .unfold("first", listOf("rho", "lambda"))
+            .unfold<AtmQueue>("first", listOf("rho", "lambda"))
             .rename("second" to "mean_queue_length")
     }
 }

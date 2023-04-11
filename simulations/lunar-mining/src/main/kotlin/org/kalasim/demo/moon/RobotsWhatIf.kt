@@ -24,7 +24,7 @@ fun main() {
 //            .toDataFrame()
 //            .addColumn("num_harvesters") { sim.harvesters.size }
 //            .addColumn("run") { idx }
-//    }.bindRows()
+//    }.concat()
 //
 //    // todo bring back group for correct vis
 //    waterSupply
