@@ -10,6 +10,7 @@ import org.kalasim.examples.elevator.Car.DoorState.OPEN
 import org.kalasim.examples.elevator.Direction.*
 import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.repeat
+import org.kalasim.plot.kravis.display
 import java.awt.Point
 import kotlin.time.DurationUnit
 
@@ -265,4 +266,6 @@ fun main() {
             )
         }
     }
+
+//    elevator.floors[0].queue.queueLengthTimeline.display("queue length on ground floor")
 }
