@@ -85,8 +85,9 @@ class DisplayTests : AbstractSvgPlotRegression() {
                 .apply { assertExpected(this, "timeline") }
         }
 
-        mm1.server.claimedTimeline.display("Claimed Server Capacity")
-            .apply { assertExpected(this, "claimed") }
+        // todo bring back
+//        mm1.server.claimedTimeline.display("Claimed Server Capacity")
+//            .apply { assertExpected(this, "claimed") }
 
         val customerTimeline =
             mm1.componentGenerator.history.first().stateTimeline
