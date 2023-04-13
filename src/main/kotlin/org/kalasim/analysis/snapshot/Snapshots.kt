@@ -151,7 +151,7 @@ class MetricTimelineSnapshot<V : Number>(nlm: MetricTimeline<V>, excludeZeros: B
     }
 
     override fun toJson() = json {
-        "duration" to duration
+        "duration" to duration.roundAny()
         "mean" to mean?.roundAny()
         "standard_deviation" to standardDeviation?.roundAny().nanAsNull()
         "min" to min?.roundAny()

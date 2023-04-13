@@ -14,11 +14,11 @@ In contrast to many other simulation tools, `kalasim` is neither low-code nor no
 
 ---
 
-!!! tip "Meet kalasim at the WSC22" 
-    Meet our team at the [Winter Simulation Conference 2022](https://meetings.informs.org/wordpress/wsc2022/) in Singapore! We will be there joining the simulation community for great week of discussion, processing modelling & analytics. Read the full [announcement](articles/2022-11-25-kalasim-at-wsc22.md).
-
+!!! tip "Meet kalasim at KotlinConf" 
+    Meet our team at the [KotlinConf](https://kotlinconf.com/speakers/384596a7-b0ab-4484-8f1b-98d0dcae22b0) in Amsterdam! We will be there together with other technology leads from cloud, mobile & data-science for a great week of discussion and knowledge sharing. Our talk  about "Make more money by modeling and optimizing your business processes with Kotlin" will be available as stream after the conference in case you can't make it.  
 
 ---
+
 
 
 ## Core Features

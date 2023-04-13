@@ -13,7 +13,8 @@ import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
-import org.kalasim.analysis.*
+import org.kalasim.analysis.EntityCreatedEvent
+import org.kalasim.analysis.RescheduledEvent
 import org.kalasim.examples.bank.data.*
 import org.kalasim.examples.er.EmergencyRoom
 import org.kalasim.misc.*
@@ -26,6 +27,7 @@ import java.lang.Thread.sleep
 import kotlin.io.path.div
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
@@ -76,12 +78,12 @@ class EnvTests {
                 hold(1)
                 holdCounter++
 
-                if (holdCounter > 5) fail("simulation did not stop")
+                if(holdCounter > 5) fail("simulation did not stop")
             }
         }
 
         addEventListener<RescheduledEvent> {
-            if (it.time > 3 && it.type == ScheduledType.HOLD) {
+            if(it.time > 3 && it.type == ScheduledType.HOLD) {
                 stopSimulation()
             }
         }
@@ -153,7 +155,7 @@ class EnvTests {
 
         // add an asynchronous log consumer
         val asyncListener = addAsyncEventListener<EntityCreatedEvent> { event ->
-            if (event.entity.name == "Car.1") {
+            if(event.entity.name == "Car.1") {
                 println("Consumed async!")
                 consumed = true
             }
@@ -207,17 +209,15 @@ class EnvTests {
         createSimulation(true) {
             object : Component() {
                 var waitCounter = 1
-                override fun process() =
-                    sequence {
-                        while (true) {
-                            hold(1)
-                            // doe something insanely complex that takes 2seconds
-                            sleep(waitCounter++ * 1000L)
-                        }
-                    }
+
+                override fun repeatedProcess() = sequence {
+                    hold(1)
+                    // doe something insanely complex that takes 2seconds
+                    sleep(waitCounter++ * 1000L)
+                }
             }
 
-            ClockSync(1.seconds, maxDelay = 1.seconds)
+            ClockSync(1.minutes, maxDelay = 1.seconds)
 
             shouldThrow<ClockOverloadException> {
                 run(10)
@@ -247,7 +247,7 @@ class EnvTests {
     }
 
     @Test
-    fun `it should allow to use custom duration units`(){
+    fun `it should allow to use custom duration units`() {
         val environment = Environment(DurationUnit.DAYS)
 
         environment.run(4.days)
@@ -375,7 +375,7 @@ class EnvTests {
             }
 
 //            try {
-                run() // try spinning the wheel until it should be stopped
+            run() // try spinning the wheel until it should be stopped
 //            }catch(tde: TypedDurationExpected)
         }
     }
@@ -388,13 +388,16 @@ class EnvTests {
 
         er.doctors.first().snapshot.toJson().toIndentString() shouldBeDiff """
             {
-                "requestedBy": [],
-                "claimedQuantity": 0,
-                "creationTime": 0,
-                "now": 10,
-                "name": "Dr 0",
-                "claimedBy": [],
-                "capacity": 1
+              "requestedBy": [],
+              "claimedQuantity": 1,
+              "creationTime": 0,
+              "now": 10,
+              "name": "Dr 0",
+              "claimedBy": [{
+                "first": "room 2",
+                "second": null
+              }],
+              "capacity": 1
             }
         """.trimIndent()
 
@@ -431,7 +434,7 @@ class EnvTests {
                   "standard_deviation": 0.375
                 },
                 "excl_zeros": {
-                  "duration": 0.4761825391449257,
+                  "duration": 0.476,
                   "min": 1,
                   "max": 2,
                   "mean": 1.595
@@ -463,15 +466,15 @@ class EnvTests {
     }
 }
 
-class CustomKoinModuleTests{
+class CustomKoinModuleTests {
 
     @Test
     // https://kotlinlang.slack.com/archives/C67HDJZ2N/p1671535899858929
     fun `avoid updating koin until 3_2_1 regression is fixed`() {
-        data class Tester(val created :Long=System.nanoTime() )
+        data class Tester(val created: Long = System.nanoTime())
 
-        val myModule=  module(createdAtStart = true) {
-            single(createdAtStart = true){
+        val myModule = module(createdAtStart = true) {
+            single(createdAtStart = true) {
                 Tester()
             }
         }
@@ -487,12 +490,13 @@ class CustomKoinModuleTests{
     }
 
     @Test
-    fun `it should create components on simulation start`(){
+    fun `it should create components on simulation start`() {
         val deps = declareDependencies {
             // register components needed for dependency injection
             add {
                 println("foo")
-                ComponentQueue<Customer>("waitingline") }
+                ComponentQueue<Customer>("waitingline")
+            }
             add { CustomerGenerator(get()) }
             add { (1..3).map { Clerk() } }
         }

@@ -49,7 +49,7 @@ class SalabimExampleTests {
                   "standard_deviation": 0.327
                 },
                 "excl_zeros": {
-                  "duration": 5.965374252531483,
+                  "duration": 5.965,
                   "min": 1,
                   "max": 1,
                   "mean": 1,
@@ -164,7 +164,7 @@ class SalabimExampleTests {
                   "standard_deviation": 0.72
                 },
                 "excl_zeros": {
-                  "duration": 831.6386310335986,
+                  "duration": 831.639,
                   "min": 1,
                   "max": 3,
                   "mean": 1.316,

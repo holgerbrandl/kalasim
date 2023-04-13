@@ -86,7 +86,7 @@ fun main() = application {
                     with(settings) {
                         Elevator(false, load0N, loadNN, loadN0, capacity, numElevators, topFloors)
                     },
-                    ((100 - speed + 1) / 1.5).milliseconds
+                    tickMillis = ((100 - speed + 1) / 1.5).milliseconds
                 )
             }
         }

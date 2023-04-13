@@ -4,7 +4,6 @@ package org.kalasim.examples.taxiinc.opt1
 
 import org.kalasim.examples.taxiinc.*
 import org.optaplanner.core.api.domain.entity.PlanningEntity
-import org.optaplanner.core.api.domain.lookup.PlanningId
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty
 import org.optaplanner.core.api.domain.solution.PlanningScore
 import org.optaplanner.core.api.domain.solution.PlanningSolution
@@ -53,7 +52,7 @@ fun configureSolver(): SolverFactory<TaxiSchedule> =
     SolverFactory.create(SolverConfig()
         .withMoveThreadCount("10")
         .withSolutionClass(TaxiSchedule::class.java)
-        .withEntityClasses(OptJob::class.java)
+        .withEntityClasses(TransportJob::class.java)
         .withConstraintProviderClass(ConstraintsProvider::class.java)
         .withEnvironmentMode(EnvironmentMode.FULL_ASSERT)
         .withTerminationConfig(TerminationConfig().apply {
@@ -94,24 +93,19 @@ class TaxiSchedule {
 
     @ProblemFactCollectionProperty
     @ValueRangeProvider(id = "orders")
-    lateinit var orders: List<OptOrder>
-
-//    @ProblemFactCollectionProperty
-//    @ValueRangeProvider(id = "fleet")
-//    lateinit var taxi: List<OptTaxi>
-
+    lateinit var orders: List<TaxiRequest>
 
     @PlanningEntityCollectionProperty
-    lateinit var jobs: List<OptJob>
-
+    lateinit var jobs: List<TransportJob>
 
     @PlanningScore
     val score: HardMediumSoftScore? = null
 
+
     /** Needed by optaplaner */
     constructor()
 
-    constructor(orders: List<OptOrder>, taxiJobs: List<OptJob>) {
+    constructor(orders: List<TaxiRequest>, taxiJobs: List<TransportJob>) {
         this.orders = orders
         this.jobs = taxiJobs
     }
@@ -130,21 +124,19 @@ class TaxiSchedule {
 
 
 @PlanningEntity
-class OptJob {
+class TransportJob {
 
     @PlanningListVariable(valueRangeProviderRefs = ["orders"])
-    lateinit var orders: List<OptOrder>
-//    @PlanningVariable(valueRangeProviderRefs = ["orders"])
-//    lateinit var order: OptOrder
+    lateinit var orders: List<TaxiRequest>
 
-    //    @PlanningVariable(valueRangeProviderRefs = ["fleet"])
     lateinit var taxiId: String
+
     var capacity by Delegates.notNull<Int>()
     var readyIn: Duration = 0.minutes
 
     constructor()
 
-    constructor(orders: List<OptOrder>, taxiId: String, capacity: Int, readyIn: Duration) {
+    constructor(orders: List<TaxiRequest>, taxiId: String, capacity: Int, readyIn: Duration) {
         this.orders = orders
         this.taxiId = taxiId
         this.capacity = capacity
@@ -157,7 +149,7 @@ class OptJob {
 //    val cabinCapacity: Int
 }
 
-class OptOrder {
+class TaxiRequest {
 
     val from: Quarter
     val to: Quarter
@@ -183,46 +175,42 @@ class OptOrder {
     }
 }
 
-class CabinCapacityListener : AbstractVariableListener<TaxiSchedule, OptJob> {
-    override fun beforeEntityAdded(scoreDirector: ScoreDirector<TaxiSchedule>?, entity: OptJob?) {
+class CabinCapacityListener : AbstractVariableListener<TaxiSchedule, TransportJob> {
+    override fun beforeEntityAdded(scoreDirector: ScoreDirector<TaxiSchedule>?, entity: TransportJob?) {
 
     }
 
-    override fun afterEntityAdded(scoreDirector: ScoreDirector<TaxiSchedule>?, entity: OptJob?) {
+    override fun afterEntityAdded(scoreDirector: ScoreDirector<TaxiSchedule>?, entity: TransportJob?) {
         println("updating something")
     }
 
-    override fun beforeEntityRemoved(scoreDirector: ScoreDirector<TaxiSchedule>?, entity: OptJob?) {
+    override fun beforeEntityRemoved(scoreDirector: ScoreDirector<TaxiSchedule>?, entity: TransportJob?) {
     }
 
-    override fun afterEntityRemoved(scoreDirector: ScoreDirector<TaxiSchedule>?, entity: OptJob?) {
+    override fun afterEntityRemoved(scoreDirector: ScoreDirector<TaxiSchedule>?, entity: TransportJob?) {
     }
 }
 
 class ConstraintsProvider : ConstraintProvider {
+
     override fun defineConstraints(constraintFactory: ConstraintFactory): Array<Constraint> {
         return arrayOf(ensureCabinCapacity(constraintFactory))
     }
 
     private fun ensureCabinCapacity(constraintFactory: ConstraintFactory): Constraint {
-        return constraintFactory.forEach(OptJob::class.java)
+        return constraintFactory.forEach(TransportJob::class.java)
             .filter { job -> job.orders.sumOf { it.passengers } > job.capacity }
-            .penalize(
-                HardMediumSoftScore.ONE_HARD,
-//                ToIntFunction { it->
-//                    cartesianProduct(it.orders, it.orders).map{ Quarter.distance(it.first, it.second.)}
-//                }
+            .penalize(HardMediumSoftScore.ONE_HARD,
             )
             .asConstraint("cabin-capacity")
     }
-
 }
 
 fun createSchedule(numOrder: Int = 10, numTaxis: Int = 3): TaxiSchedule {
     val rand = Random(42)
 
     val orders = List(numOrder) {
-        OptOrder(
+        TaxiRequest(
             "order$it",
             Quarter.values().random(rand),
             Quarter.values().random(rand),
@@ -231,7 +219,7 @@ fun createSchedule(numOrder: Int = 10, numTaxis: Int = 3): TaxiSchedule {
         )
     }
 
-    val jobs = List(numTaxis) { OptJob(listOf(), "taxi$it", 4, rand.nextInt(15).minutes) }
+    val jobs = List(numTaxis) { TransportJob(listOf(), "taxi$it", 4, rand.nextInt(15).minutes) }
 
     return TaxiSchedule(orders, jobs)
 }
@@ -239,9 +227,6 @@ fun createSchedule(numOrder: Int = 10, numTaxis: Int = 3): TaxiSchedule {
 fun main() {
     val solver = configureSolver().buildSolver()
     val solved = solver.solve(createSchedule())
-
-    println(solved)
-
 
     println(GSON.toJson(solved))
 }

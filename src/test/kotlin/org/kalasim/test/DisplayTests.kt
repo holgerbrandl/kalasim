@@ -6,6 +6,7 @@ import kravis.GGPlot
 import kravis.SessionPrefs
 import kravis.render.LocalR
 import org.junit.*
+import org.junit.Assert.assertEquals
 import org.junit.rules.TestName
 import org.kalasim.examples.MM1Queue
 import org.kalasim.misc.AmbiguousDuration
@@ -129,7 +130,7 @@ abstract class AbstractSvgPlotRegression {
         val expected = file.readText().trim() //.run { prettyFormat(this, 4) }
 
         // note assertEquals would be cleaner but since its printing the complete diff, it's polluting the travis logs
-//                assertEquals(expected, svgDoc)
+                assertEquals(expected, svgDoc)
         val failMsg = "svg mismatch got:\n${svgDoc.lines().take(30).joinToString("\n")}"
         Assert.assertTrue(failMsg, expected.equals(svgDoc))
 
