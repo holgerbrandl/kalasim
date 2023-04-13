@@ -22,9 +22,9 @@ val orxFeatures = setOf(
     null
 ).filterNotNull()
 
-val openrndrVersion = "0.4.1"
+//val openrndrVersion = "0.4.2"
 //val openrndrVersion = "0.4.2-RC"
-//val openrndrVersion = "0.3.58"
+val openrndrVersion = "0.3.58"
 
 val openrndrFeatures = setOf(
     "video"

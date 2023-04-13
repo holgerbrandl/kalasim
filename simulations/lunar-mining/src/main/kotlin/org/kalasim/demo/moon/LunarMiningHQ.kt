@@ -1,6 +1,7 @@
 package org.kalasim.sims.lunarmining.viewer
 
 import kotlinx.coroutines.*
+import kotlinx.datetime.Clock
 import org.kalasim.ClockSync
 import org.kalasim.Component
 import org.kalasim.demo.moon.*
@@ -19,6 +20,7 @@ import kotlin.random.Random
 import kotlin.system.exitProcess
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
 fun main() {
     application {
@@ -70,7 +72,11 @@ fun main() {
                     lumi.map.deposits.forEach {
                         defaults()
                         val isKnown = lumi.base.knownDeposits.contains(it)
-                        drawer.fill = ColorRGBa.fromHex("0E86D4").copy(alpha = if(isKnown) 0.8 else 0.2)
+                        // openrender 4.x
+//                        drawer.fill = ColorRGBa.fromHex("0E86D4").copy(alpha = if(isKnown) 0.8 else 0.2)
+
+                        // openrender 3.x
+                        drawer.fill = ColorRGBa.fromHex("0E86D4").copy(a = if(isKnown) 0.8 else 0.2)
 
                         circle(
                             it.gridPosition.mapCoordinates.x * scaledXUnit,
@@ -78,7 +84,7 @@ fun main() {
                             it.level / 20.0
                         )
                     }
-                    val foo = Instant.now() + 3.minutes
+//                    val foo = Clock.System.now() + 3.minutes
 
                     drawer.fill = ColorRGBa.BLACK
                     drawer.fontMap = font
@@ -108,7 +114,7 @@ fun main() {
                         }
 
                         // draw the svg
-//                        scale(0.3)
+                        scale(0.3)
                         composition(truck)
 
                         // draw loading status
