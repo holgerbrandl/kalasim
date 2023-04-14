@@ -1,5 +1,9 @@
 //Cars.kts
 import org.kalasim.*
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
+
+
 
 class Driver : Resource()
 class TrafficLight : State<String>("red")
@@ -11,7 +15,7 @@ class Car : Component() {
 
     override fun process() = sequence {
         request(driver) {
-            hold(1.0, description = "driving")
+            hold(30.minutes, description = "driving")
 
             wait(trafficLight, "green")
         }
@@ -23,4 +27,5 @@ createSimulation(enableConsoleLogger = true) {
     dependency { Driver() }
 
     Car()
-}.run(5.0)
+}.run(5.hours)
+
