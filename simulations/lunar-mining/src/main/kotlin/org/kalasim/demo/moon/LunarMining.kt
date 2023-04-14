@@ -20,7 +20,6 @@ class Deposit(val gridPosition: GridPosition, size: Int) : DepletableResource(ca
     val miningShaft = Resource("MineShaft[${this}]", 1)
 }
 
-
 /** A discrete position on the surface */
 data class GridPosition(val x: Int, val y: Int) {
     val mapCoordinates: Point2D
@@ -29,7 +28,6 @@ data class GridPosition(val x: Int, val y: Int) {
     fun distance(other: GridPosition) =
         sqrt(pow((x - other.x).toDouble(), 2.0) - pow((y - other.y).toDouble(), 2.0))
 }
-
 
 class DepositMap(
     numDeposits: Int = 10,
@@ -145,8 +143,6 @@ class Harvester(initialPosition: GridPosition, private val gridUnitsPerHour: Dou
     }
 
     fun harvesting(): Sequence<Component> = sequence {
-//        require(currentDeposit != null) { "deposit must be set when harvesting" }
-
         if(currentDeposit == null) {
             currentDeposit = get<Base>().requestAssignment(this@Harvester)
         }
@@ -158,7 +154,7 @@ class Harvester(initialPosition: GridPosition, private val gridUnitsPerHour: Dou
         moveTo(currentDeposit!!.gridPosition)
 
 
-        // MODEL 1: Mine increments: THis allows for better progress monitoring in the UI, but is overly
+        // MODEL 1: Mine increments: This allows for better progress monitoring in the UI, but is overly
         // complex from a modelling and event perspective
         // Could we avoid the loop by using process interaction here? --> yes use mine-shafts see below
         val miningUnitsPerHour = 15.0
@@ -176,15 +172,6 @@ class Harvester(initialPosition: GridPosition, private val gridUnitsPerHour: Dou
                 put(tank, quantity, capacityLimitMode = CapacityLimitMode.CAP)
             }
         }
-
-        //MODEL 1 more concise but lacks the ability to track mining status at the deposits
-//        val quantity = min(tank.capacity - tank.level, currentDeposit!!.level)
-//        request(currentDeposit!!.miningShaft) {
-//            currentState = MINING
-//            hold((miningUnitsPerHour * quantity).hours, "Mining deposit $currentDeposit")
-//            take(currentDeposit!!, quantity, failDelay = 0)
-//            put(tank, quantity, capacityLimitMode = CapacityLimitMode.CAP)
-//        }
 
         if(tank.isFull) {
             activate(process = Harvester::unload)
@@ -220,8 +207,10 @@ class Base : Component(process=Base::consumeWater) {
 
     // water consumption of the base
     fun consumeWater() = sequence {
-        hold(1.hours)
-        take(refinery, quantity = min(refinery.level, waterConsumption()))
+        while(true) {
+            hold(1.hours)
+            take(refinery, quantity = min(refinery.level, waterConsumption()))
+        }
     }
 
     /** Performs analysis to find a suitable deposit for harvesting for the given harvester. */
@@ -243,15 +232,6 @@ class Base : Component(process=Base::consumeWater) {
 
     fun reportScanCompleted(searchPosition: GridPosition) {
         scanHistory[searchPosition] = now
-
-//        val mapSize = get<DepositMap>().gridDimension
-//        println(
-//            "map coverage increased to ${
-//                (scanHistory.size.toDouble() / (mapSize.height * mapSize.width)).roundAny(
-//                    2
-//                )
-//            }"
-//        )
     }
 }
 
@@ -261,10 +241,6 @@ class LunarMining(
     logEvents: Boolean = true,
     seed: Int = Defaults.DEFAULT_SEED
 ) : Environment(enableConsoleLogger = logEvents, randomSeed = seed) {
-//    init {
-//        tickTransform = TickTransform(DurationUnit.MINUTES)
-//    }
-
     // the initially unknown list of deposits
     val map = dependency { DepositMap(numDeposits = numDeposits) }
     val base = dependency { Base() }

@@ -142,7 +142,7 @@ fun main() {
                     composition(base)
 
                     defaults()
-                    translate((baseCoordinates.x + 3) * scaledXUnit, (baseCoordinates.y + 18) * scaledYUnit)
+                    translate((baseCoordinates.x + 3) * scaledXUnit, (baseCoordinates.y + 22) * scaledYUnit)
                     drawer.fill = ColorRGBa.BLACK
                     drawer.fontMap = font
                     if(!lumi.harvesters.any { it.isHolding(UNLOADING_HARVESTER) }) {

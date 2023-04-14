@@ -1,12 +1,15 @@
 # Kalasim Release History
 
-## v0.9 (Not yet released)
+## v0.9 
 
-Developer snapshots are deposited on maven-central starting with v0.8.90+
+Released at 2023-04-13
 
 Major
-* Changed API to always favor `kotlin.time.Duration` to express durations. Previously untyped `Numbers` were used that often led to confusion in larger simulations models. Evey simulation environment has now a `DurationUnit` such as seconds, hours, etc.  (defaulting to minutes if not specified). To indicate this breaking change to the user in her IDE, new [opt-in](https://kotlinlang.org/docs/opt-in-requirements.html) annotations were introduced
+
+* Changed API to always favor `kotlin.time.Duration` to express durations. Previously untyped `Numbers` were used that often led to confusion in larger simulations models. Evey simulation environment has now a `DurationUnit` such as seconds, hours, etc.  (defaulting to minutes if not specified). 
+* New [opt-in](https://kotlinlang.org/docs/opt-in-requirements.html) annotations were introduced to prevent use of untyped duration arguments in interaction functions such as ``
 * Migrated use of `Instant` to `kotlinx.datetime.Instant` for better API consistency
+* New sampling functions to sample durations directly: `val uni = uniform(5.minutes, 2.hours); uni() // results in Duration`
 
 Minor 
 

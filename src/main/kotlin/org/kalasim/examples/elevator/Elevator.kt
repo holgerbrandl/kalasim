@@ -1,6 +1,4 @@
 //Elevator.kt
-@file:OptIn(AmbiguousDuration::class)
-
 package org.kalasim.examples.elevator
 
 import org.kalasim.*
@@ -12,6 +10,7 @@ import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.repeat
 import org.kalasim.plot.kravis.display
 import java.awt.Point
+import kotlin.time.Duration.Companion.days
 import kotlin.time.DurationUnit
 
 // For example documentation see https://www.kalasim.org/examples/office_tower/
@@ -246,26 +245,7 @@ typealias Requests = MutableMap<Pair<Floor, Direction>, TickTime>
 fun main() {
     val elevator = Elevator()
 
-    elevator.run(100000)
+    elevator.run(2.days)
 
-//         try with single visitor to get started
-//        Visitor(3, 12)
-//        run(2000)
-
-    //print summary
-    println("Floor    n         Length Length_of_stay")
-    elevator.floors.forEach {
-        it.let {
-            println(
-                "%5d%5d%15.3f%15.3f".format(
-                    it.level,
-                    it.queue.lengthOfStayStatistics.statistics().n,
-                    it.queue.queueLengthTimeline.statistics().mean,
-                    it.queue.lengthOfStayStatistics.statistics().mean
-                )
-            )
-        }
-    }
-
-//    elevator.floors[0].queue.queueLengthTimeline.display("queue length on ground floor")
+    println(elevator.cars[0].visitors.statistics.lengthOfStayStats)
 }
