@@ -10,7 +10,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 // Duration utilities
 fun Iterable<Duration>.sum() : Duration = sumOf { it }
-fun <T> Iterable<T>.sumOf(selector: (T) -> Duration) = map{ selector(it)}.sum()
+fun <T> Iterable<T>.sumOf(selector: (T) -> Duration) = map{ selector(it).inWholeMilliseconds }.sum().milliseconds
 
 fun Iterable<Duration>.mean() : Duration = meanOf { it }
 fun <T> Iterable<T>.meanOf(selector: (T) -> Duration) = map{ selector(it).inWholeMilliseconds}.mean().milliseconds
