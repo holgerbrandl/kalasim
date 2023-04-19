@@ -17,6 +17,24 @@ theme:
 #  hljs_languages:
 #    - kotlin
 #  navigation_depth: 3
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      media: "(prefers-color-scheme: light)"
+#      primary: 'deep purple'
+      accent: 'pink'
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      media: "(prefers-color-scheme: dark)"
+#      primary: 'deep purple'
+      accent: 'pink'
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
   features:
     - navigation.expand
     - navigation.instant
