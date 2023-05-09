@@ -2,3 +2,4 @@ IBM_Plex_Mono
 out
 build
 .gradle
+*.mp4
