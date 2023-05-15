@@ -15,7 +15,7 @@ In contrast to many other simulation tools, `kalasim` is neither low-code nor no
 ---
 
 !!! tip "Meet kalasim at KotlinConf" 
-    We presented at [KotlinConf 2023](https://kotlinconf.com/speakers/384596a7-b0ab-4484-8f1b-98d0dcae22b0) in Amsterdam! We were there together with other technology leads from cloud, mobile & data-science for a great week of discussion and knowledge sharing. Our talk  about "Make more money by modeling and optimizing your business processes with Kotlin" was well perceived and a lot of fun. Enjoy:
+    We presented at [KotlinConf 2023](https://kotlinconf.com/talks/389146/) in Amsterdam! We were there together with other technology leads from cloud, mobile & data-science for a great week of discussion and knowledge sharing. Our talk  about "Make more money by modeling and optimizing your business processes with Kotlin" was well perceived and a lot of fun. Enjoy:
 
 
 <div class="video-wrapper">
