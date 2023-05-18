@@ -218,25 +218,48 @@ Examples
 
 ## Randomness & Distributions
 
-Experimentation in a simulation context relates to large part to controlling randomness. Here, this is achieved by using probabilistic
-[distributions](https://commons.apache.org/proper/commons-math/userguide/distribution.html) which are internally backed by [apache-commons-math](https://commons.apache.org/proper/commons-math/). A simulation always allows deterministic execution while still supporting pseudo-random sampling. When creating a new simulation [environment](#running-a-simulation), the user can provide a random seed which used [internally](https://github.com/holgerbrandl/kalasim/blob/9b75303163d96e1c6460798a8030ab5dc8070a51/src/main/kotlin/org/kalasim/Environment.kt#L103-L103) to initialize a random generator. By default kalasim, is using a fixed seed of [`42`](https://en.wikipedia.org/wiki/42_(number)#The_Hitchhiker's_Guide_to_the_Galaxy).
+Experimentation in a simulation context relates to large part to controlling randomness. With `kalasim`, this is achieved by using probabilistic
+[distributions](https://commons.apache.org/proper/commons-math/userguide/distribution.html) which are internally backed by [apache-commons-math](https://commons.apache.org/proper/commons-math/). A simulation always allows deterministic execution while still supporting pseudo-random sampling. When creating a new simulation [environment](#running-a-simulation), the user can provide a random seed which used [internally](https://github.com/holgerbrandl/kalasim/blob/9b75303163d96e1c6460798a8030ab5dc8070a51/src/main/kotlin/org/kalasim/Environment.kt#L103-L103) to initialize a random generator. By default kalasim, is using a fixed seed of [`42`](https://en.wikipedia.org/wiki/42_(number)#The_Hitchhiker's_Guide_to_the_Galaxy). Setting a seed is in particular useful when running a simulation repetitively (possibly with [parallelization](examples/atm_queue.md)).
 
 ```kotlin
 createSimulation(randomSeed = 123){
-    val randomGenerator = rg // which is resolved as    
+    // internally kalasim will create a random generator
+    //val r = Random(randomSeed)
+    
+    // this random generator is used automatically when
+    // creating distributions
+    val normDist = normal(2)   
 }
 ```
 
-With this internal random generator `rg`, several  [probability distributions](https://github.com/holgerbrandl/kalasim/blob/master/src/main/kotlin/org/kalasim/Distributions.kt) are supported to provide controlled randomization. That is, the outcome of a simulation experiment will be the same if the same seed is being used.  
+With this internal random generator `r`, a wide range of  [probability distributions](https://github.com/holgerbrandl/kalasim/blob/master/src/main/kotlin/org/kalasim/Distributions.kt) are supported to provide controlled randomization. That is, the outcome of a simulation experiment will be the same if the same seed is being used.  
+
+
+!!!important
+All randomization/distribution helpers are accessible  from an `Environment` or `SimulationEntity` context only. That's because kalasim needs the context to associate the random generator of the simulation (which is also bound to the current [thread](#dependency-injection)).
+
+
+Controlled randomization is a **key** aspect of every process simulation. Make sure to always strive for reproducibility by not using randomization outside the [simulation context](basics.md#simulation-environment).
+
 
 ### Continuous Distributions
+
+#### Numeric Distributions 
 
 The following continuous distributions can be used to model randomness in a simulation model
 
 * `uniform(lower = 0, upper = 1)`
 * `exponential(mean = 3)`
-* `normal(mean = 0, sd = 1)`
-* `triangular(lowerLimit = 0, mode = 1, upperLimit = 4.3)`
+* `normal(mean = 0, sd = 1, rectify=false)`
+* `triangular(lowerLimit = 0, mode = 1, upperLimit = 2)`
+* `constant(value)`
+
+All distributions functions provide common parameter defaults where possible, and are defined as extension functions of `org.kalasim.SimContext`. This makes the accessible in [environment definitions](basics.md#simulation-environment), all simulation entities, as well as [process definitions](component.md#process-definition).
+
+The normal distribution can be  [rectified](https://en.wikipedia.org/wiki/Rectified_Gaussian_distribution), effectively capping sampled values at 0  (example `normal(3.days, rectify=true)`). This allows for  zero-inflated distribution models under controlled randomization.
+
+
+
 
 Example:
 ```kotlin
@@ -251,26 +274,37 @@ object : Component() {
 
 As shown in the example, probability distributions can be sampled with [invoke](https://kotlinlang.org/docs/operator-overloading.html#invoke-operator) `()`.
 
-All distributions functions provide common parameter defaults where possible, and are defined as extension functions of `org.kalasim.SimContext`. This makes the accessible in [environment definitions](basics.md#simulation-environment), all simulation entities, as well as [process definitions](component.md#process-definition):
 
+#### Constant Random Variables
 
-!!!important
-    All randomization/distribution helpers are accessible  from an `Environment` or `SimulationEntity` context only. That's because kalasim needs the context to associate the correct internal random generator.
-
-
-A user can cap the sampled values with the extension function `RealDistribution.clip()`. E.g. `normal(mean=3).clip(0)` at 0 (or any other value,  allowing zero-inflated distribution models with controlled randomization.
-
-### Constant Random Variables
-
-The API also allow to model [constant random variables](https://en.wikipedia.org/wiki/Degenerate_distribution). E.g. consider the time until a request is considered as failed:
+The API also allow to model [constant random variables](https://en.wikipedia.org/wiki/Degenerate_distribution) using `const(<some-value>)`. These are internally resolved as `org.apache.commons.math3.distribution.ConstantRealDistribution`. E.g. consider the time until a request is considered as failed:
 
 ```kotlin
 val dist =  constant(3)
+// create a component generator with a fixed inter-arrival-time
 ComponentGenerator(iat = dist) { Customer() }
 ```
 
-Internally, `3` is converted into a `org.apache.commons.math3.distribution.ConstantRealDistribution`.
+#### Duration Distributions
 
+Typically randomization in a discrete event simulation is realized by stochastic sampling of time durations. To provide a type-safe API for this very common usecase, all continuous distributions are also modeled to sample `kotlin.time.Duration` in addtion `Double`. Examples:
+
+```kotlin
+// Create a uniform distribution between 3 days and 4 days and a bit  
+val timeUntilArrival = uniform(lower = 3.days, upper = 4.days + 2.hours)
+
+// We can sample distributions by using invoke, that is () 
+val someTime : Duration= timeUntilArrival() 
+
+// Other distributions that support the same style
+exponential(mean = 3.minutes)
+
+normal(mean = 10.days, sd = 1.hours, rectify=true)
+
+triangular(lowerLimit = 0.days, mode = 2.weeks, upperLimit = 3.years)
+
+constant(42.days)
+```
 
 ### Enumerations
 
@@ -294,9 +328,7 @@ val biasedFruit = enumerated(Apple to 0.7, Banana to 0.1, Peach to 0.2 )
 // sample the distribution
 biasedFruit()
 ```
-            
-Controlled randomization is a key aspect of every process simulation. Make sure to always strive for repeatability by not using randomization outside of what the [simulation context](basics.md#simulation-environment) provides. 
-
+   
 ### Custom Distributions
 
 Whenever, distributions are needed in method signatures in `kalasim`, the more general interface `org.apache.commons.math3.distribution.RealDistribution` is being used to support a much [wider variety](https://commons.apache.org/proper/commons-math/javadocs/api-3.4/org/apache/commons/math3/distribution/RealDistribution.html) of distributions if needed. So we can also use other implementations as well. For example

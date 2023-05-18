@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.seconds
  * For supported arguments see https://www.kalasim.org/component/#component-generator
  */
 class ComponentGenerator<T>(
-    val iat: RealDurationDistribution,
+    val iat: DurationDistribution,
     startAt: TickTime? = null,
     val forceStart: Boolean = false,
     var until: TickTime = TickTime(Double.MAX_VALUE),
@@ -45,7 +45,7 @@ class ComponentGenerator<T>(
         koin: Koin = DependencyContext.get(),
         builder: Environment.(counter: Int) -> T
     ) : this(
-        RealDurationDistribution(koin.get<Environment>().durationUnit, iat),
+        DurationDistribution(koin.get<Environment>().durationUnit, iat),
         startAt,
         forceStart,
         until,

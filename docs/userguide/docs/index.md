@@ -19,7 +19,7 @@ In contrast to many other simulation tools, `kalasim` is neither low-code nor no
 
 
 <div class="video-wrapper">
-  <iframe width="750" height="500" src="https://www.youtube.com/embed/5IgNaAB5Xkg?start=14423" frameborder="0" allowfullscreen></iframe>
+  <iframe width="750" height="500" src="https://www.youtube.com/embed/1pqVCOZp9Ko" frameborder="0" allowfullscreen></iframe>
 </div>
 
 [//]: # (https://www.youtube.com/watch?v=lo1BhmF5DVU)

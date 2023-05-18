@@ -1,6 +1,7 @@
 package org.kalasim
 
 import org.apache.commons.math3.distribution.*
+import org.apache.commons.math3.random.RandomGenerator
 import org.kalasim.misc.ImplementMe
 import org.kalasim.misc.asCMPairList
 import java.lang.Double.min
@@ -18,8 +19,6 @@ import kotlin.time.DurationUnit
  */
 
 
-
-
 //
 // Continuous Distributions
 //
@@ -27,66 +26,128 @@ import kotlin.time.DurationUnit
 operator fun RealDistribution.invoke(): Double = sample()
 
 
-@Deprecated("Use fixed instead", ReplaceWith("constant(this)"))
-fun Number.asDist() = ConstantRealDistribution(this.toDouble())
+//@Deprecated("Use fixed instead", ReplaceWith("constant(this)"))
+//fun Number.asDist() = ConstantRealDistribution(this.toDouble())
 
+/**
+ * Constant distribution with built-in support for controlled-randomization.
+ *
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
 fun constant(value: Number) = ConstantRealDistribution(value.toDouble())
 
-fun constant(value: Duration) = RealDurationDistribution(
+/**
+ * Constant distribution with built-in support for controlled-randomization.
+ *
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
+fun constant(value: Duration) = DurationDistribution(
     DurationUnit.SECONDS,
     ConstantRealDistribution(value.toDouble(DurationUnit.SECONDS))
 )
 
 
 /**
- * See https://www.kalasim.org/basics/#randomness-distributions
+ * Exponential distribution with built-in support for controlled-randomization.
  *
- * A controlled randomization wrapper around https://commons.apache.org/proper/commons-math/javadocs/api-3.6/org/apache/commons/math3/distribution/ExponentialDistribution.html */
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
 fun SimContext.exponential(mean: Number) = ExponentialDistribution(env.rg, mean.toDouble())
 
 /**
- * See https://www.kalasim.org/basics/#randomness-distributions
+ * Exponential distribution with built-in support for controlled-randomization.
  *
- * A controlled randomization wrapper around https://commons.apache.org/proper/commons-math/javadocs/api-3.6/org/apache/commons/math3/distribution/ExponentialDistribution.html */
-fun SimContext.exponential(mean: Duration) = ExponentialDistribution(env.rg, mean.inWholeSeconds.toDouble()).seconds
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
+fun SimContext.exponential(mean: Duration) = ExponentialDistribution(env.rg, mean.doubleSeconds).seconds
 
 /**
- * See https://www.kalasim.org/basics/#randomness-distributions
+ * Normal distribution with built-in support for controlled-randomization.
  *
- * A controlled randomization wrapper around https://commons.apache.org/proper/commons-math/javadocs/api-3.6/org/apache/commons/math3/distribution/NormalDistribution.html */
-fun SimContext.normal(mean: Number = 0, sd: Number = 1) = NormalDistribution(env.rg, mean.toDouble(), sd.toDouble())
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
+fun SimContext.normal(mean: Number = 0, sd: Number = 1, rectify: Boolean = false): NormalDistribution = if(rectify){
+    NormalDistribution(env.rg, mean.toDouble(), sd.toDouble())
+}else{
+    RectifiedNormalDistribution(env.rg, mean.toDouble(), sd.toDouble())
+}
+
+/**
+ * Normal distribution with built-in support for controlled-randomization.
+ *
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
+fun SimContext.normal(mean: Duration, sd: Duration, rectify: Boolean = false): DurationDistribution = if(rectify){
+    NormalDistribution(env.rg, mean.doubleSeconds, sd.doubleSeconds)
+}else{
+    RectifiedNormalDistribution(env.rg, mean.doubleSeconds, sd.doubleSeconds)
+}.seconds
 
 
-/** Triangular distribution, see https://en.wikipedia.org/wiki/Triangular_distribution. A controlled randomization wrapper around https://commons.apache.org/proper/commons-math/javadocs/api-3.6/org/apache/commons/math3/distribution/TriangularDistribution.html */
-fun SimContext.triangular(lowerLimit: Number, mode: Number, upperLimit: Number) =
+private class RectifiedNormalDistribution(rng: RandomGenerator, mean:Double, sd:Double): NormalDistribution(rng, mean, sd){
+    override fun probability(x0: Double, x1: Double): Double {
+        return super.probability(x0, x1).let { if(it<0) 0.0 else it }
+    }
+}
+
+
+/**
+ * Triangular distribution, see https://en.wikipedia.org/wiki/Triangular_distribution, with built-in support for controlled-randomization.
+ *
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
+fun SimContext.triangular(lowerLimit: Number, mode: Number, upperLimit: Number): TriangularDistribution =
     TriangularDistribution(env.rg, lowerLimit.toDouble(), mode.toDouble(), upperLimit.toDouble())
 
+
+/**
+ * Triangular distribution, see https://en.wikipedia.org/wiki/Triangular_distribution, with built-in support for controlled-randomization.
+ *
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
+fun SimContext.triangular(lowerLimit: Duration, mode: Duration, upperLimit: Duration): DurationDistribution =
+    TriangularDistribution(env.rg, lowerLimit.doubleSeconds, mode.doubleSeconds, upperLimit.doubleSeconds).seconds
+
+internal val Duration.doubleSeconds
+    get() = inWholeSeconds.toDouble()
 
 
 /** Clip the values of the distribution to the provided interval. */
 // we could also adopt kotlin stdlib conventions and use coerceIn, coerceAtLeast and coerceAtMost
+@Deprecated("Use rectify argument when creating normal distribution with normal(mean,sd, rectify=true)")
 fun RealDistribution.clip(lower: Number = 0, upper: Number = Double.MAX_VALUE) =
     Clipper(this, lower.toDouble(), upper.toDouble())
 
 
+@Deprecated("substituted with rectify argument in normal()")
 class Clipper internal constructor(val dist: RealDistribution, val lower: Double, val upper: Double) {
     operator fun invoke(): Double = min(max(dist(), lower), upper)
 }
 
 
+/**
+ * Uniform distribution with built-in support for controlled-randomization.
+ *
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
 fun SimContext.uniform(lower: Number = 0, upper: Number = 1) =
     UniformRealDistribution(env.rg, lower.toDouble(), upper.toDouble())
 
 
 
+/**
+ * Uniform distribution with built-in support for controlled-randomization.
+ *
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
 fun SimContext.uniform(lower: Duration, upper: Duration) =
-    UniformRealDistribution(env.rg, lower.inWholeSeconds.toDouble(), upper.inWholeSeconds.toDouble()).seconds
+    UniformRealDistribution(env.rg, lower.doubleSeconds, upper.doubleSeconds).seconds
 
 
 //
 // date utils for distributions
 
-data class RealDurationDistribution(val unit: DurationUnit, val dist: RealDistribution){
+data class DurationDistribution(val unit: DurationUnit, val dist: RealDistribution){
     operator fun invoke() = sample()
     fun sample() = when(unit){
         DurationUnit.SECONDS -> dist().seconds
@@ -97,10 +158,10 @@ data class RealDurationDistribution(val unit: DurationUnit, val dist: RealDistri
     }
 }
 
-val RealDistribution.seconds get() = RealDurationDistribution(DurationUnit.SECONDS, this)
-val RealDistribution.minutes get() = RealDurationDistribution(DurationUnit.MINUTES, this)
-val RealDistribution.hours get() = RealDurationDistribution(DurationUnit.HOURS, this)
-val RealDistribution.days get() = RealDurationDistribution(DurationUnit.DAYS, this)
+val RealDistribution.seconds get() = DurationDistribution(DurationUnit.SECONDS, this)
+val RealDistribution.minutes get() = DurationDistribution(DurationUnit.MINUTES, this)
+val RealDistribution.hours get() = DurationDistribution(DurationUnit.HOURS, this)
+val RealDistribution.days get() = DurationDistribution(DurationUnit.DAYS, this)
 
 
 data class IntegerDurationDistribution(val unit: DurationUnit, val dist: IntegerDistribution){
@@ -137,22 +198,37 @@ operator fun <E> EnumeratedDistribution<E>.invoke(): E = sample()
 operator fun <E> EnumeratedDistribution<E>.get(key: E): Double = pmf.first { it.key == key }.value
 
 
-// since it's common that users want to create an integer distribution from a range, we highlight the incorrect API usage
-//@Deprecated(
-//    "To sample from an integer range, use discreteUniform instead for better efficiency",
-//    replaceWith = ReplaceWith("discreteUniform(range.first, range.laste)")
-//)
-//fun Environment.enumerated(range: IntRange): EnumeratedDistribution<Int> = enumerated(*(range.toList().toTypedArray()))
-
 @JvmName("enumeratedArray")
+/**
+ * Discrete uniform distribution over an array of `elements` with built-in support for controlled-randomization.
+ *
+ * For additional details see https://www.kalasim.org/basics/#enumerations.
+ */
 fun <T> SimContext.enumerated(elements: Array<T>): EnumeratedDistribution<T> = enumerated(*elements)
+
+/**
+ * Discrete uniform distribution over an array of `elements` with built-in support for controlled-randomization.
+ *
+ * For additional details see https://www.kalasim.org/basics/#enumerations.
+ */
 fun <T> SimContext.enumerated(vararg elements: T) = enumerated((elements.map { it to 1.0 / elements.size }).toMap())
-fun <T> SimContext.enumerated(elements: Map<T, Double>) =
+/**
+ * Discrete  distribution over an array of `elements` with defined weights. Weights are internally normalized to 1
+ * Has built-in support for controlled-randomization.
+ *
+ * For additional details see https://www.kalasim.org/basics/#enumerations.
+ */fun <T> SimContext.enumerated(elements: Map<T, Double>) =
     EnumeratedDistribution(env.rg, elements.toList().asCMPairList())
 
 
 //
 // ID Generation
 //
+
+/**
+ * Sample UUIDs with built-in support for controlled-randomization.
+ *
+ * For additional details see https://www.kalasim.org/basics/#enumerations
+ */
 
 fun SimContext.uuid(): UUID = UUID.nameUUIDFromBytes(env.rg.nextLong().toString().toByteArray())

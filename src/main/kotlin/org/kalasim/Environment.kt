@@ -124,7 +124,7 @@ open class Environment(
 
     private var running: Boolean = false
 
-    val rg: RandomGenerator = JDKRandomGenerator(randomSeed)
+    internal val rg: RandomGenerator = JDKRandomGenerator(randomSeed)
     val random: kotlin.random.Random = kotlin.random.Random(randomSeed.toLong())
 
 
