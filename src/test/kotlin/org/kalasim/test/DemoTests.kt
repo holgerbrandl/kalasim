@@ -7,19 +7,25 @@ import org.jetbrains.letsPlot.letsPlot
 import krangl.*
 import org.jetbrains.kotlinx.dataframe.api.print
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
+import org.kalasim.EventLog
 import org.kalasim.analysis.InteractionEvent
+import org.kalasim.enableEventLog
 import org.kalasim.examples.MM1Queue
+import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.plot.letsplot.display
 
 
+@OptIn(AmbiguousDuration::class)
 fun main() {
     val mm1Queue = MM1Queue().apply {
+        enableEventLog()
+
         run(100)
         server.claimedTimeline.display().show()
         server.requesters.lengthOfStayStatistics.display().show()
     }
 
-    mm1Queue.traces.filterIsInstance<InteractionEvent>().toDataFrame().print()
+    mm1Queue.get< EventLog>().filterIsInstance<InteractionEvent>().toDataFrame().print()
 }
 
 

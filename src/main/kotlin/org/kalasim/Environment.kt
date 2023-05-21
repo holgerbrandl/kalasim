@@ -112,7 +112,9 @@ open class Environment(
     val durationUnit: DurationUnit = MINUTES,
     /** The absolute time at tick-time 0. Defaults to `null`.*/
     var startDate: Instant? = null,
+    /** If enabled, it will render a tabular view of recorded  interaction and resource events. */
     enableConsoleLogger: Boolean = false,
+    /** Measure the compute time per tick as function of time. For details see  https://www.kalasim.org/advanced/#operational-control */
     enableTickMetrics: Boolean = false,
     dependencies: KoinModule? = null,
     koin: Koin? = null,

@@ -66,9 +66,9 @@ fun SimContext.exponential(mean: Duration) = ExponentialDistribution(env.rg, mea
  *
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
-fun SimContext.normal(mean: Number = 0, sd: Number = 1, rectify: Boolean = false): NormalDistribution = if(rectify){
+fun SimContext.normal(mean: Number = 0, sd: Number = 1, rectify: Boolean = false): NormalDistribution = if(rectify) {
     NormalDistribution(env.rg, mean.toDouble(), sd.toDouble())
-}else{
+} else {
     RectifiedNormalDistribution(env.rg, mean.toDouble(), sd.toDouble())
 }
 
@@ -77,16 +77,17 @@ fun SimContext.normal(mean: Number = 0, sd: Number = 1, rectify: Boolean = false
  *
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
-fun SimContext.normal(mean: Duration, sd: Duration, rectify: Boolean = false): DurationDistribution = if(rectify){
+fun SimContext.normal(mean: Duration, sd: Duration, rectify: Boolean = false): DurationDistribution = if(rectify) {
     NormalDistribution(env.rg, mean.doubleSeconds, sd.doubleSeconds)
-}else{
+} else {
     RectifiedNormalDistribution(env.rg, mean.doubleSeconds, sd.doubleSeconds)
 }.seconds
 
 
-private class RectifiedNormalDistribution(rng: RandomGenerator, mean:Double, sd:Double): NormalDistribution(rng, mean, sd){
+private class RectifiedNormalDistribution(rng: RandomGenerator, mean: Double, sd: Double) :
+    NormalDistribution(rng, mean, sd) {
     override fun probability(x0: Double, x1: Double): Double {
-        return super.probability(x0, x1).let { if(it<0) 0.0 else it }
+        return super.probability(x0, x1).let { if(it < 0) 0.0 else it }
     }
 }
 
@@ -128,15 +129,19 @@ class Clipper internal constructor(val dist: RealDistribution, val lower: Double
 /**
  * Uniform distribution with built-in support for controlled-randomization.
  *
+ * @param lower Lower bound of this distribution (inclusive).
+ * @param upper Upper bound of this distribution (exclusive).
+ *
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
 fun SimContext.uniform(lower: Number = 0, upper: Number = 1) =
     UniformRealDistribution(env.rg, lower.toDouble(), upper.toDouble())
 
 
-
 /**
  * Uniform distribution with built-in support for controlled-randomization.
+ *
+ * Internally the duration range is resolved to seconds for the sampling process. The upper limit is exclusive.
  *
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
@@ -147,9 +152,9 @@ fun SimContext.uniform(lower: Duration, upper: Duration) =
 //
 // date utils for distributions
 
-data class DurationDistribution(val unit: DurationUnit, val dist: RealDistribution){
+data class DurationDistribution(val unit: DurationUnit, val dist: RealDistribution) {
     operator fun invoke() = sample()
-    fun sample() = when(unit){
+    fun sample() = when(unit) {
         DurationUnit.SECONDS -> dist().seconds
         DurationUnit.MINUTES -> dist().minutes
         DurationUnit.HOURS -> dist().hours
@@ -164,9 +169,9 @@ val RealDistribution.hours get() = DurationDistribution(DurationUnit.HOURS, this
 val RealDistribution.days get() = DurationDistribution(DurationUnit.DAYS, this)
 
 
-data class IntegerDurationDistribution(val unit: DurationUnit, val dist: IntegerDistribution){
+data class IntegerDurationDistribution(val unit: DurationUnit, val dist: IntegerDistribution) {
     fun invoke() = sample()
-    fun sample() = when(unit){
+    fun sample() = when(unit) {
         DurationUnit.SECONDS -> dist().seconds
         DurationUnit.MINUTES -> dist().minutes
         DurationUnit.DAYS -> dist().days
@@ -186,8 +191,25 @@ val IntegerDistribution.days get() = IntegerDurationDistribution(DurationUnit.DA
 operator fun IntegerDistribution.invoke(): Int = sample()
 
 
+/**
+ * Uniform discrete distribution with built-in support for controlled-randomization.
+ *
+ * @param range which is consumed including the end into a distribution.
+ *
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
 fun SimContext.discreteUniform(range: IntRange) = discreteUniform(range.first, range.last)
+
+/**
+ * Uniform discrete distribution with built-in support for controlled-randomization.
+ *
+ * @param lower Lower bound of this distribution (inclusive).
+ * @param upper Upper bound of this distribution (exclusive).
+ *
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
 fun SimContext.discreteUniform(lower: Int, upper: Int) = UniformIntegerDistribution(env.rg, lower, upper)
+
 
 
 //
@@ -198,12 +220,12 @@ operator fun <E> EnumeratedDistribution<E>.invoke(): E = sample()
 operator fun <E> EnumeratedDistribution<E>.get(key: E): Double = pmf.first { it.key == key }.value
 
 
-@JvmName("enumeratedArray")
 /**
  * Discrete uniform distribution over an array of `elements` with built-in support for controlled-randomization.
  *
  * For additional details see https://www.kalasim.org/basics/#enumerations.
  */
+@JvmName("enumeratedArray")
 fun <T> SimContext.enumerated(elements: Array<T>): EnumeratedDistribution<T> = enumerated(*elements)
 
 /**
@@ -212,12 +234,14 @@ fun <T> SimContext.enumerated(elements: Array<T>): EnumeratedDistribution<T> = e
  * For additional details see https://www.kalasim.org/basics/#enumerations.
  */
 fun <T> SimContext.enumerated(vararg elements: T) = enumerated((elements.map { it to 1.0 / elements.size }).toMap())
+
 /**
  * Discrete  distribution over an array of `elements` with defined weights. Weights are internally normalized to 1
  * Has built-in support for controlled-randomization.
  *
  * For additional details see https://www.kalasim.org/basics/#enumerations.
- */fun <T> SimContext.enumerated(elements: Map<T, Double>) =
+ */
+fun <T> SimContext.enumerated(elements: Map<T, Double>) =
     EnumeratedDistribution(env.rg, elements.toList().asCMPairList())
 
 

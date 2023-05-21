@@ -4,6 +4,8 @@ package org.kalasim.examples
 
 import org.kalasim.*
 import org.kalasim.misc.AmbiguousDuration
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * An implementation of an MM1 queue, see https://en.wikipedia.org/wiki/M/M/1_queue, which
@@ -49,7 +51,7 @@ open class MMcQueue(
 
         println(
             "rho is ${rho}. With ρ = λ/(c*μ) >=1 the system would be unstable, " +
-                    "because there are more history then the server can serve."
+                    "because there are more customers then the server can serve."
         )
 
         server = dependency { Resource("server", c) }
@@ -67,5 +69,7 @@ fun main() {
         run(200)
 
         println("Average occupancy is ${server.occupancy}")
+
+        println(SimpleDateFormat("yyyyMMdd'T'HHmmss").format(Date()))
     }
 }

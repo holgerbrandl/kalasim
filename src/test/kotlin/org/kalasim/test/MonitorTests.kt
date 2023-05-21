@@ -66,6 +66,22 @@ class MonitorTests {
                 """.trimIndent()
     }
 
+    @Test
+    fun `it should disallow querying from a disabled monitor`() = createTestSimulation {
+        val m = CategoryTimeline(AUDI)
+        m.disable()
+
+        shouldThrow<IllegalArgumentException> {
+            m[now]
+        }
+
+        val it = IntTimeline()
+        it.disable()
+
+        shouldThrow<IllegalArgumentException> {
+            it[now]
+        }
+    }
 
     @Test
     fun `Frequency level stats should be correct`() = createTestSimulation {
@@ -262,14 +278,14 @@ class MergeMonitorStatsTests {
         flmA.addValue(1)
         flmB.addValue(2)
 
-        run(until=1.tt)
+        run(until = 1.tt)
         flmB.addValue(4)
 
-        run(until=3.tt)
+        run(until = 3.tt)
         flmA.addValue(1)
 
         //merge statistics
-        run(until=5.tt)
+        run(until = 5.tt)
 
         val mergedStats: EnumeratedDistribution<Int> = listOf(flmA, flmB).mergeStats()
         println(mergedStats)
