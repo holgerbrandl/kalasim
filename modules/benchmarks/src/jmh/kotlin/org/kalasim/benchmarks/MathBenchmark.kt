@@ -1,6 +1,7 @@
 package org.kalasim.benchmarks
 
 import org.openjdk.jmh.annotations.*
+import kotlin.random.Random
 
 @State(Scope.Benchmark)
 @Fork(1)
@@ -15,6 +16,9 @@ open class MathBenchmark {
     }
 
     @Benchmark
-    fun sqrtBenchmark(): Double = Math.sqrt(value)
+    fun sqrtBenchmark() {
+        Math.sqrt(value)
+        Thread.sleep(Random.nextInt(100).toLong())
+    }
 
 }

@@ -1,3 +1,4 @@
+import java.io.BufferedReader
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -27,10 +28,21 @@ dependencies {
 //    jmh(project(":"))
 }
 
-fun getDate(): String {
-    return Date().toString()//.format("yyyyMMdd_HHmm")
-}
 
+val commitHash = Runtime
+    .getRuntime()
+    .exec("git rev-parse --short HEAD")
+    .let { process ->
+        process.waitFor()
+        val output = process.inputStream.use {
+            it.bufferedReader().use(BufferedReader::readText)
+        }
+        process.destroy()
+        output.trim()
+    }
+
+val timestamp: String = SimpleDateFormat("yyyyMMdd'T'HHmmSS").format(Date())
+//fun getDate(): String = Date().toString()//.format("yyyyMMdd_HHmm")
 
 jmh {
     // Configure the JMH task here
@@ -53,7 +65,7 @@ jmh {
 //    resultFormat = "csv"
 //    resultFormat = 'csv'
     resultsFile.set(File("perf_logs/benchmarks.json"))
-    resultsFile.set(File("perf_logs/jmh_results_${timestamp()}.csv"))
+    resultsFile.set(File("perf_logs/jmh_results_${timestamp}_${commitHash}.csv"))
 //    resultsFile = file('perf_logs/jmh_results_' + getDate()+ '.csv')
 
     // for list of available profilers see http://java-performance.info/introduction-jmh-profilers/
@@ -62,7 +74,3 @@ jmh {
 }
 
 
-fun timestamp() {
-    val sdf = SimpleDateFormat("yyyyMMddTHHmmSS")
-    sdf.format(Date())
-}

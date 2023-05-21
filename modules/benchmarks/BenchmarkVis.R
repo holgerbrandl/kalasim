@@ -8,14 +8,19 @@ pacman::p_load_gh("holgerbrandl/datautils")
 
 
 ex ="perf_logs/jmh_results_20230522T202200.csv"
-basename(ex) %>% {str_split_fixed(., fixed("_"), 3)[,3]} %>% trim_ext(".csv") %>% parse_date_time( "%Y%b%dT%H%M%S")
+basename(ex) %>% {str_split_fixed(., fixed("_"), 3)[,3]} %>% trim_ext(".csv")
+
+
+# https://stackoverflow.com/questions/23089895/how-to-remove-time-field-string-from-a-date-as-character-variable
+parse_timestamp = function(x)
+str_replace(x, "T", " ") |> parse_date_time("%Y%m%d %H%M%S")
 
 # perfData = "perf_logs/benchmarks.csv" %>%
 perfData = list.files("perf_logs", "jmh_results_*", full = T) %>%
   map(~{
     read_csv(.x,show_col_types = FALSE) %>%
       mutate(
-        run = parse_date_time(str_split_fixed(.x, fixed("_"), 3)[,3], "%Y%b%dT%H%M%S")
+        run = basename(.x) %>% {str_split_fixed(., fixed("_"), 3)[,3]} %>% trim_ext(".csv") %>% parse_timestamp
       )
   }) %>%
   bind_rows %>%
