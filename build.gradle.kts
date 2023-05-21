@@ -61,6 +61,9 @@ dependencies {
 
     //https://youtrack.jetbrains.com/issue/KT-44197
 
+    // internalized name part because 5mb
+//    implementation ("io.github.serpro69:kotlin-faker:1.14.0")
+
     testImplementation(kotlin("script-runtime"))
 //    implementation(kotlin("script-runtime"))
 }

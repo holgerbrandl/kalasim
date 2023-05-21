@@ -6,26 +6,15 @@ import kravis.plot
 import org.jetbrains.kotlinx.dataframe.api.*
 import org.kalasim.ComponentGenerator
 import org.kalasim.plot.kravis.display
+import kotlin.time.Duration.Companion.days
 
-object InfiniteER {
-    @JvmStatic
-    fun main(args: Array<String>) {
-        val er = EmergencyRoom(enableTickMetrics = true)
-
-        er.run(100000)
-
-        // memory analysis
-        println()
-    }
-}
 
 object SimpleER {
     @JvmStatic
     fun main(args: Array<String>) {
-        EmergencyRoom(RefittingAvoidanceNurse).apply {
+        EmergencyRoom(nurse = RefittingAvoidanceNurse).apply {
 
-            // run for a week
-            run(24 * 14)
+            run(7.days)
 
             // analysis
             incomingMonitor.display("Incoming Patients")

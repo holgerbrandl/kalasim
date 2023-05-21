@@ -45,6 +45,8 @@ internal fun createTestSimulation(enableConsoleLogger: Boolean = true, builder: 
     createSimulation(enableConsoleLogger, builder = builder)
 }
 
+internal fun <S : Environment> testModel(sim: S, smthg: S.() -> Unit): Unit = smthg(sim)
+
 
 //relates to https://github.com/holgerbrandl/kalasim/issues/11
 //internal fun testComponent(enableConsoleLogger: Boolean = true, block:  suspend SequenceScope<Component>.() -> Unit) = createTestSimulation {

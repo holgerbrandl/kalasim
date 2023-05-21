@@ -26,6 +26,7 @@ import java.io.File
 import java.lang.Thread.sleep
 import kotlin.io.path.div
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -343,16 +344,16 @@ class EnvTests {
     @Test
     fun `it should log events as json`() {
         captureOutput {
-            val er = EmergencyRoom(enableConsoleLogger = false)
+            val er = EmergencyRoom()
+            er.trackingPolicyFactory.enableAll()
 
-//            er.apply { tickMetrics }
 
             er.addEventListener {
 //                println(GSON.toJson(it))
                 println(it.toJson())
             }
 
-            er.run(1)
+            er.run(1.hours)
         }.stdout shouldBeDiff (testDataDir / "EnvTests_it_should_log_events_as_json.txt").toFile().readText()
     }
 
@@ -382,86 +383,76 @@ class EnvTests {
 
 
     @Test
-    fun `it should persist snapshots as json`() {
-        val er = EmergencyRoom(enableConsoleLogger = false)
-        er.run(10)
+    fun `it should persist snapshots as json`() = testModel(EmergencyRoom()) {
+        // does not work because some timelines are enabled upon creation
+//        trackingPolicyFactory.enableAll()
+        waitingLine.sizeTimeline.enabled = true
 
-        er.doctors.first().snapshot.toJson().toIndentString() shouldBeDiff """
+        run(10.days)
+
+        doctors.first().snapshot.toJson().toIndentString() shouldBeDiff """
             {
               "requestedBy": [],
               "claimedQuantity": 1,
               "creationTime": 0,
-              "now": 10,
-              "name": "Dr 0",
+              "now": 240,
+              "name": "Dr. Howe",
               "claimedBy": [{
-                "first": "room 2",
+                "first": "room 1",
                 "second": null
               }],
               "capacity": 1
             }
         """.trimIndent()
 
-        er.waitingLine.first().snapshot.toJson().toIndentString() shouldBeDiff """
-            {
-              "scheduledTime": null,
-              "creationTime": 9.71,
-              "now": 10,
-              "name": "Patient.58",
-              "claims": {},
-              "requests": {},
-              "status": "DATA"
-            }
+        waitingLine.first().snapshot.toJson().toIndentString() shouldBeDiff """
+        {
+          "scheduledTime": null,
+          "creationTime": 105.38,
+          "now": 240,
+          "name": "546 Carmen Johnson",
+          "claims": {},
+          "requests": {},
+          "status": "DATA"
+        }
         """.trimIndent()
 
-        er.waitingLine.sizeTimeline.snapshot.toJson().toIndentString() shouldBeDiff """
-            {
-              "duration": 10,
+        waitingLine.sizeTimeline.snapshot.toJson().toIndentString() shouldBeDiff """
+        {
+          "duration": 240,
+          "min": 0,
+          "max": 301,
+          "mean": 129.546,
+          "standard_deviation": 110.56
+        }
+        """.trimIndent()
+
+        waitingLine.statistics.toJson().toIndentString() shouldBeDiff """
+        {
+          "size": {
+            "all": {
+              "duration": 240,
               "min": 0,
-              "max": 2,
-              "mean": 0.076,
-              "standard_deviation": 0.375
+              "max": 301,
+              "mean": 129.546,
+              "standard_deviation": 110.56
+            },
+            "excl_zeros": {
+              "duration": 217.799,
+              "min": 1,
+              "max": 301,
+              "mean": 142.751,
+              "standard_deviation": 107.617
             }
-        """.trimIndent()
-
-        er.waitingLine.statistics.toJson().toIndentString() shouldBeDiff """
-            {
-              "size": {
-                "all": {
-                  "duration": 10,
-                  "min": 0,
-                  "max": 2,
-                  "mean": 0.076,
-                  "standard_deviation": 0.375
-                },
-                "excl_zeros": {
-                  "duration": 0.476,
-                  "min": 1,
-                  "max": 2,
-                  "mean": 1.595
-                }
-              },
-              "name": "ER Waiting Area Queue",
-              "length_of_stay": {
-                "all": {
-                  "entries": 16,
-                  "median": 0.079,
-                  "mean": 0.029,
-                  "ninety_pct_quantile": 0.142,
-                  "standard_deviation": 0.079,
-                  "ninetyfive_pct_quantile": 0.31
-                },
-                "excl_zeros": {
-                  "entries": 4,
-                  "median": 0.131,
-                  "mean": 0.117,
-                  "ninety_pct_quantile": 0.31,
-                  "standard_deviation": 0.131,
-                  "ninetyfive_pct_quantile": 0.31
-                }
-              },
-              "type": "ComponentListStatistics",
-              "timestamp": 10
-            }
+          },
+          "name": "ER Waiting Area Queue",
+          "length_of_stay": {
+            "all": {"entries": 0},
+            "excl_zeros": {"entries": 0}
+          },
+          "type": "ComponentListStatistics",
+          "timestamp": 240
+        }
         """.trimIndent()
     }
 }
