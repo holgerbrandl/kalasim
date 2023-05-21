@@ -1,11 +1,11 @@
 package org.kalasim.benchmarks
 
 import org.kalasim.examples.MMcQueue
+import org.kalasim.misc.AmbiguousDuration
 import org.openjdk.jmh.annotations.*
-import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
-import kotlin.time.Duration.Companion.seconds
 
+@OptIn(AmbiguousDuration::class)
 @State(Scope.Benchmark)
 @OutputTimeUnit(TimeUnit.SECONDS)
 @BenchmarkMode(Mode.AverageTime)
@@ -14,10 +14,17 @@ import kotlin.time.Duration.Companion.seconds
 @Measurement(iterations = 5)
 open class MMcBenchmark {
 
-//    val tsvFile = File("src/jmh/resources/nycflights.tsv.gz")
+    //    val tsvFile = File("src/jmh/resources/nycflights.tsv.gz")
+    @State(Scope.Benchmark)
+    open class ExecutionPlan {
+
+        @Param("2", "3", "4")
+        var c: Int = 0
+    }
+
 
     @Benchmark
-    fun measureMM10() {
-        MMcQueue(c = 10, mu= 4, lambda = 1).run(1000)
+    fun measureMM10(plan: ExecutionPlan) {
+        MMcQueue(c = plan.c, mu = 4, lambda = 12).run(1000)
     }
 }

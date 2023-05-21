@@ -63,10 +63,10 @@ open class MMcQueue(
 }
 
 fun main() {
-    MMcQueue(c = 10, mu= 4, lambda = 1).apply {
-        addEventListener { println(it) }
+    MMcQueue(c = 3, mu= 4, lambda = 12).apply {
+//        addEventListener { println(it) }
 
-        run(200)
+        run(1000)
 
         println("Average occupancy is ${server.occupancy}")
 
