@@ -14,7 +14,7 @@ class IntTimeline(
     operator fun inc(): IntTimeline {
 //        val roundToInt = (values.lastOrNull() ?: 0.0).roundToInt()
         val roundToInt = values.last()
-        addValue((roundToInt + 1))
+        addValue(roundToInt + 1)
 
         return this
     }

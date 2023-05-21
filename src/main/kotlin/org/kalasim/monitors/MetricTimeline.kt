@@ -37,6 +37,11 @@ open class MetricTimeline<V : Number>(
 
 
     override fun get(time: Number): V {
+        require(enabled){
+            "timeline '$name' is disabled. Make sure to enable it locally,  or globally using a matching tracking-policy." +
+                    " For details see https://www.kalasim.org/advanced/#continuous-simulation"
+
+        }
         require(timestamps.first() <= time) {
             "query time must be greater than timeline start (${timestamps.first()})"
         }

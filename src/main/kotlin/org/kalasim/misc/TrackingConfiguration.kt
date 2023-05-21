@@ -93,10 +93,17 @@ class TrackingPolicyFactory {
 
     @Suppress("BooleanLiteralArgument")
     fun disableAll() {
-        defaultComponentConfig = ComponentTrackingConfig(false, false, false, false)
-        defaultResourceConfig = ResourceTrackingConfig(false, false, false, false, false)
-        defaultStateConfig = StateTrackingConfig(false, false, false, false)
-        defaultCollectionConfig = ComponentCollectionTrackingConfig(false)
+        defaultComponentConfig = ComponentTrackingConfig.NONE
+        defaultResourceConfig = ResourceTrackingConfig.NONE
+        defaultStateConfig = StateTrackingConfig.NONE
+        defaultCollectionConfig = ComponentCollectionTrackingConfig.NONE
+    }
+
+    fun enableAll(){
+        defaultComponentConfig = ComponentTrackingConfig()
+        defaultResourceConfig = ResourceTrackingConfig()
+        defaultStateConfig = StateTrackingConfig()
+        defaultCollectionConfig = ComponentCollectionTrackingConfig()
     }
 
     fun register(customPolicy: TrackingConfig, filter: EntityFilter) {
