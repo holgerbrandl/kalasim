@@ -41,7 +41,7 @@ val commitHash = Runtime
         output.trim()
     }
 
-val timestamp: String = SimpleDateFormat("yyyyMMdd'T'HHmmSS").format(Date())
+val timestamp: String = SimpleDateFormat("yyyyMMdd'T'HHmmss").format(Date())
 //fun getDate(): String = Date().toString()//.format("yyyyMMdd_HHmm")
 
 jmh {
