@@ -7,11 +7,11 @@ import java.util.concurrent.TimeUnit
 
 @OptIn(AmbiguousDuration::class)
 @State(Scope.Benchmark)
-@OutputTimeUnit(TimeUnit.SECONDS)
-@BenchmarkMode(Mode.AverageTime)
 @Fork(value = 1)
 @Warmup(iterations = 2)
 @Measurement(iterations = 5)
+@OutputTimeUnit(TimeUnit.SECONDS)
+@BenchmarkMode(Mode.AverageTime)
 open class MMcBenchmark {
 
     //    val tsvFile = File("src/jmh/resources/nycflights.tsv.gz")

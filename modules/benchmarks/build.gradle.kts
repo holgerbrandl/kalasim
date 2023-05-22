@@ -65,7 +65,7 @@ jmh {
 //    resultFormat = "csv"
 //    resultFormat = 'csv'
     resultsFile.set(File("perf_logs/benchmarks.json"))
-    resultsFile.set(File("perf_logs/jmh_results_${timestamp}_${commitHash}.csv"))
+    resultsFile.set(File("perf_logs/results_${timestamp}_${commitHash}.csv"))
 //    resultsFile = file('perf_logs/jmh_results_' + getDate()+ '.csv')
 
     // for list of available profilers see http://java-performance.info/introduction-jmh-profilers/

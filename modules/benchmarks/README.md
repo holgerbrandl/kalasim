@@ -35,6 +35,10 @@ cd benchmarks
 java -jar build/libs/benchmarks-jmh.jar -wi 2 -i 2 -f 1 -tu ms -bm avgt CompressedTsvBenchmarks
 ```
 
+## References
+
+https://howtodoinjava.com/java/library/jmh-java-microbenchmark-harness/
+
 ## How to automate benchmarking as part of the release process?
 
 Idea: use https://github.com/gradle/gradle-build-action to run the benchmark and then add the result file back to the repo via https://github.com/orgs/community/discussions/25234
