@@ -1,0 +1,47 @@
+package org.kalasim.benchmarks
+
+import com.systema.risuite.simulation.BaseFactory
+import com.systema.risuite.simulation.fullFabMesXls
+import org.openjdk.jmh.annotations.*
+import java.io.File
+import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.days
+
+
+@State(Scope.Benchmark)
+//@Fork(4)
+@Warmup(iterations = 2)
+@Measurement(iterations = 5)
+@OutputTimeUnit(TimeUnit.SECONDS)
+@BenchmarkMode(Mode.AverageTime)
+open class FabBench {
+
+    @State(Scope.Benchmark)
+    open class ExecutionPlan {
+
+//        @Param("10", "20","30")
+//        var numFloors =
+
+        lateinit var fab: BaseFactory
+
+        @Setup(Level.Invocation)
+        fun setUp() {
+                File("small_factory.xlsx")
+            fab = BaseFactory(
+                masterExcel = fullFabMesXls,
+                enableConsoleLogger = false
+            )
+        }
+    }
+
+
+    @Benchmark
+    fun measureFabWithAssert(plan: ExecutionPlan) {
+        plan.fab.run(30.days)
+    }
+
+//    @Benchmark
+//    fun measureFabWithOutAssert(plan: ExecutionPlan) {
+//        plan.fab.run(30.days)
+//    }
+}

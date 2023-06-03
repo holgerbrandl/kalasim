@@ -23,8 +23,9 @@ dependencies {
     jmh("org.apache.commons:commons-lang3:3.12.0")
     jmh("org.slf4j:slf4j-simple:1.6.1")
 
-//    api("com.github.holgerbrandl:kalasim:0.9.2-SNAPSHOT")
     jmh("com.github.holgerbrandl:kalasim:0.9.2-SNAPSHOT")
+
+//    jmh ("com.systema.risuite:fsm-simulator:2.4.1")
 //    jmh(project(":"))
 }
 
@@ -71,6 +72,7 @@ jmh {
     // for list of available profilers see http://java-performance.info/introduction-jmh-profilers/
 //    profilers = Arrays.asList("")
 //}
+//    zip64 = true
 }
 
 

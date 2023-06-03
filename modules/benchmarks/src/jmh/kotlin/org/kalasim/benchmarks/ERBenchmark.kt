@@ -3,7 +3,6 @@ package org.kalasim.benchmarks
 import org.kalasim.examples.er.EmergencyRoom
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
-import kotlin.random.Random
 import kotlin.time.Duration.Companion.days
 
 @State(Scope.Benchmark)
