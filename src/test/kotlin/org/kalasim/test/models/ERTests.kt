@@ -11,6 +11,7 @@ class ERTests {
     @Test
     fun `it should save some patients deterministically`() = testModel(EmergencyRoom()){
         waitingLine.sizeTimeline.enabled = true
+        waitingLine.sizeTimeline.printSummary()
 
         run(2.days)
 

@@ -64,7 +64,7 @@ class StateTests {
 
             val trafficLight = get<State<String>>()
 
-            trafficLight.printInfo()
+            trafficLight.printSummary()
 
             run(10.0)
 
@@ -75,7 +75,7 @@ class StateTests {
 
             run(10.0)
 
-            trafficLight.printInfo()
+            trafficLight.printSummary()
 
             trafficLight.snapshot.waiters.shouldBeEmpty()
         }
@@ -163,7 +163,7 @@ class StateTests {
         val trafficLight = sim.get<TrafficLight>()
         val engine = sim.get<Engine>()
 
-        trafficLight.printInfo()
+        trafficLight.printSummary()
 
         sim.run(10.0)
 
@@ -174,7 +174,7 @@ class StateTests {
 
         sim.run(10.0)
 
-        trafficLight.printInfo()
+        trafficLight.printSummary()
 
         trafficLight.snapshot.waiters.size shouldBe 1
 
@@ -183,7 +183,7 @@ class StateTests {
         // now honor the engine
         engine.value = true
 
-        car.printInfo()
+        car.printSummary()
 
         sim.run(10.0)
 
@@ -228,7 +228,7 @@ class StateTests {
             val trafficLight = get<State<String>>()
             val engine = get<State<Boolean>>()
 
-            trafficLight.printInfo()
+            trafficLight.printSummary()
 
             run(10.0)
 
@@ -239,7 +239,7 @@ class StateTests {
 
             run(10.0)
 
-            trafficLight.printInfo()
+            trafficLight.printSummary()
 
             trafficLight.snapshot.waiters.shouldBeEmpty()
 
@@ -248,7 +248,7 @@ class StateTests {
             // now honor the engine
             engine.value = true
 
-            car.printInfo()
+            car.printSummary()
             car.isWaiting shouldBe false
             car.isData shouldBe true
         }

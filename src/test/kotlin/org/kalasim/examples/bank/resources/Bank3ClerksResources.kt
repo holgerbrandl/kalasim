@@ -26,7 +26,7 @@ fun main() {
     env.run(3000)
 
     env.get<Resource>().apply {
-        printInfo()
+        printSummary()
 
         if (canDisplay()) {
             claimedTimeline.display()

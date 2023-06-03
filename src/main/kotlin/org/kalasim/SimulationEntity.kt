@@ -6,7 +6,6 @@ import org.kalasim.misc.*
 import org.koin.core.Koin
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
-import kotlin.time.Duration
 
 
 /** Base class of all main simulation entities such as environments, resources, components, states and collections. */
@@ -36,7 +35,7 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
     override fun toJson() = snapshot.toJson()
 
     /** Print info about this resource */
-    internal fun printInfo() = println(snapshot.toJson().toIndentString())
+    fun printSummary() = println(snapshot.toJson().toIndentString())
 
     //    override fun toString(): String = "${javaClass.simpleName}($name)"
     override fun toString(): String = name

@@ -60,7 +60,7 @@ fun main() {
     env.run(500.0)
 
     println(env.get<ComponentQueue<Customer>>().statistics)
-    env.get<State<Boolean>>().printInfo()
+    env.get<State<Boolean>>().printSummary()
 
 //    val waitingLine: ComponentQueue<Customer> = env.get()
 //    waitingLine.stats.print()

@@ -42,7 +42,7 @@ fun main() {
     env.run(500.0)
 
     env.get<ComponentQueue<Customer>>().apply {
-        printInfo()
+        printSummary()
         println(statistics)
         lengthOfStayStatistics.display()
     }

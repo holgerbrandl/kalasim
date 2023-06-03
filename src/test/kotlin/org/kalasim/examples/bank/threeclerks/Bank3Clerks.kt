@@ -74,6 +74,6 @@ fun main() {
         }
 
 //        waitingLine.stats.toJson().toString(2).printThis()
-        waitingLine.printInfo()
+        waitingLine.printSummary()
     }
 }
