@@ -71,11 +71,11 @@ There are multiple ways to improve the performance of a simulation.
 3. Set the correct `AssertMode`: The assertion mode determines which internal consistency checks are being performed.  The mode can be set to `Full` (Slowest), `Light` (default) or `Off` (Fastest). Depending on simulation logic and complexity, this will improve performance by ~20%.
 
 
-To further fine-tune and optimize simulation performance and to reveal bottlenecks, a JVM profiler (such as [yourkit](https://www.yourkit.com/)) can be used. Both call-counts and spent-time analysis have been proven useful here. 
+To further fine-tune and optimize simulation performance and to reveal bottlenecks, a JVM profiler (such as [yourkit](https://www.yourkit.com/) or the built-in profiler of [Intellij IDEA Ultimate](https://www.jetbrains.com/idea/)) can be used. Both call-counts and spent-time analysis have been proven useful here. 
 
 ## Continuous Simulation
 
-For some use-cases, simulations may for a very long tick and wall time. To prevent internal metrics gathering from consuming all available memory, it needs to be disabled or at least configured carefully. This can be achieved, but either disabling [timelines and monitors](monitors.md) manually on a per-entity basis, or by setting a sensible default strategy using the `Environment.trackingPolicyFactory`
+For some use-cases, simulations may run for a very long simulation and wall time. To prevent internal metrics gathering from consuming all available memory, it needs to be disabled or at least configured carefully. This can be achieved, but either disabling [timelines and monitors](monitors.md) manually on a per-entity basis, or by setting a sensible default strategy using the `Environment.trackingPolicyFactory`
 
 For each entity type a corresponding tracking-policy `TrackingConfig` can be provisioned along with an entity matcher to narrow down its scope. A _tracking-policy_ allows to change 
 

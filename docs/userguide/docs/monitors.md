@@ -1,15 +1,12 @@
 # Monitors
 
-Monitors are a way to collect data from the simulation. They are automatically collected for [resources](resource.md), [components](component.md), [states](state.md) and [collections](collections.md). On top of that the user can define her own monitors.
+Monitors are a built-in mechanism of `kalasim` to collect data from a simulation. Monitors collect metrics automatically for [resources](resource.md), [components](component.md), [states](state.md) and [collections](collections.md). On top of that the user can define her own monitors.
 
-Monitors can be used to get statistics and as a feed for graphical tools.
-
-There are two types of monitors:
+Monitors allow to capture  and visualize the dynamics of a simulation model. There are two types of monitors:
 
 * **Level monitors** are useful to collect data about a variable that keeps its value over a certain length
   of time, such as the length of a queue or the color of a traffic light.
-* **Non-level monitors** are useful to collect data about  that occur just once. Examples, are the length of stay in a queue, or
-  the number of processing steps of a part.
+* **Value monitors** are useful to collect distributional statistics without a time-dimension. Examples, are the length of stay in a queue, or the number of processing steps of a part.
 
 For both types, the time is always collected, along with the value.
 
@@ -37,7 +34,7 @@ m.reset(initialValue)   // reenable level monitoring
 
 Continuation of a temporarily disabled monitor is currently not supported.
 
-## Non level monitors
+## Value Monitors
 
 Non-level monitors collects values which do not reflect a level, e.g. the processing time of a part.
 
@@ -50,9 +47,9 @@ There are  2 implementations to support categorical and numerical attributes
 Besides, it is possible to get all collected values as list with `m.statistics().values`.
 
 
-Calling `m.reset()` will clear all tallied values.
+Calling `m.reset()` will clear all collected values.
 
-## Level monitor
+## Level Monitors
 
 Level monitors tally levels along with the current (simulation) time. E.g. the number of parts a machine is working on.
 
@@ -66,17 +63,19 @@ Level monitors allow to query the value at a specific time
 ```kotlin
 val nlm = MetricTimeline()
 // ... collecting some data ...
-nlm[4]  // will print the value at time 4
+nlm[4]  // will query the value at time 4
+
+nlm[now] // will query the current value 
 ```
 
-In addition to standard statistics, level monitor support the following statistics
+In addition to standard statistics, level monitors support the following statistics
 
-* duration
+* `duration`
 
 For all statistics, it is possible to exclude zero entries, e.g. `m.statistics(excludeZeros=true).mean` returns the mean, excluding zero entries.
 
 
-**{todo}** implement off tallying
+[//]: # (**{todo}** implement off tallying)
 <!--When monitoring is disabled, an off value (see table above) will be tallied. All statistics will ignore the periods from this-->
 <!--off to a non-off value. This also holds for the `xduration()` method, but NOT for xt() and tx(). Thus,-->
 <!--the x-arrays of `xduration()` are not necessarily the same as the x-arrays in xt() and tx(). This is-->
