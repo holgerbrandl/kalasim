@@ -16,7 +16,7 @@ abstract class Event(
 //    constructor(time: TickTime) : this(time.value)
 //    constructor(time: Number) : this(time.toDouble())
 
-    // disabled because was just used in console-logger. It should better use tracking-policy instead
+    // disabled because was just used in component-logger. It should better use tracking-policy instead
 //    open val logLevel: Level get() = Level.INFO
 
     //included for more informative json serialization

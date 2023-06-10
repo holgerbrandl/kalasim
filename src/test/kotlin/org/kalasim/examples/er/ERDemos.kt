@@ -9,6 +9,16 @@ import org.kalasim.plot.kravis.display
 import kotlin.time.Duration.Companion.days
 
 
+object MinimalisticER {
+    @JvmStatic
+    fun main(args: Array<String>) {
+        EmergencyRoom(numPhysicians = 30, numRooms = 10,).apply {
+
+            run(365.days)
+        }
+    }
+}
+
 object SimpleER {
     @JvmStatic
     fun main(args: Array<String>) {

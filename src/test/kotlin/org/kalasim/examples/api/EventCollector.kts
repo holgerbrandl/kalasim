@@ -3,7 +3,7 @@ import org.kalasim.analysis.*
 import org.kalasim.createSimulation
 import org.kalasim.enableEventLog
 
-createSimulation(enableConsoleLogger = true) {
+createSimulation(enableComponentLogger = true) {
     val tc = enableEventLog()
 
     tc.filter { it is InteractionEvent && it.component?.name == "foo" }

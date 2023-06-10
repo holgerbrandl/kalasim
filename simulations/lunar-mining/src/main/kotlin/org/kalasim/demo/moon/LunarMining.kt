@@ -240,7 +240,7 @@ class LunarMining(
     numDeposits: Int = 10,
     logEvents: Boolean = true,
     seed: Int = Defaults.DEFAULT_SEED
-) : Environment(enableConsoleLogger = logEvents, randomSeed = seed) {
+) : Environment(enableComponentLogger = logEvents, randomSeed = seed) {
     // the initially unknown list of deposits
     val map = dependency { DepositMap(numDeposits = numDeposits) }
     val base = dependency { Base() }

@@ -47,9 +47,9 @@ Event listener implementations typically do not want to consume all events but f
 
 In this example, we have created custom simulation event type. This approach is very common: By using custom event types when building process models with `kalasim` state changes can be consumed very selectively in analysis and visualization. 
 
-## Console Logger
+## Component Logger
 
-There are a few provided event listeners, most notable the built-in console logger. With console logging being enabled, we get the following output (displayed as table for convenience):
+There are a few provided event listeners, most notable the built-in component logger. With component logging being enabled, kalasim will print a tabular listing of component state changes. Example:
 
 ```
 time      current component        component                action      info                          
@@ -67,7 +67,7 @@ time      current component        component                action      info
 Process finished with exit code 0
 ```
 
-Console logging is not active by default as it would considerably slow down larger simulations, and but must be enabled when creating a simulation with `createSimulation(enableConsoleLogger = true)`
+Console logging is not active by default as it would considerably slow down larger simulations, and but must be [enabled](basics.md#configuring-a-simulation) when creating a simulation.
 
 !!!note 
     The user can change the width of individual columns with `ConsoleTraceLogger.setColumnWidth()`

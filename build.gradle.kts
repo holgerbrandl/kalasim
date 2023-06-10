@@ -74,6 +74,9 @@ val compileKotlin: KotlinCompile by tasks
 
 compileKotlin.kotlinOptions.freeCompilerArgs += "-Xallow-any-scripts-in-source-roots"
 
+//todo remove for release
+compileKotlin.kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
+
 
 // to set bytecode version to 11 we need to do 2 things (note: this requires the usage projects to do the same)
 //compileKotlin.kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()

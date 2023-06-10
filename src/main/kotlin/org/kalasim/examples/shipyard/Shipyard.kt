@@ -80,7 +80,7 @@ class Car : Component() {
 
 fun main() {
     Shipyard().apply {
-        enableConsoleLogger()
+        enableComponentLogger()
 
         run(3.minutes)
     }

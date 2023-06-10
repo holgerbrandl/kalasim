@@ -41,15 +41,15 @@ internal fun captureOutput(expr: () -> Any): CapturedOutput {
 //internal fun String.trimAndReline() = trimIndent().replace("\n", System.getProperty("line.separator"))
 
 
-internal fun createTestSimulation(enableConsoleLogger: Boolean = true, builder: Environment.() -> Unit) {
-    createSimulation(enableConsoleLogger, builder = builder)
+internal fun createTestSimulation(enableComponentLogger: Boolean = true, builder: Environment.() -> Unit) {
+    createSimulation(enableComponentLogger, builder = builder)
 }
 
 internal fun <S : Environment> testModel(sim: S, smthg: S.() -> Unit): Unit = smthg(sim)
 
 
 //relates to https://github.com/holgerbrandl/kalasim/issues/11
-//internal fun testComponent(enableConsoleLogger: Boolean = true, block:  suspend SequenceScope<Component>.() -> Unit) = createTestSimulation {
+//internal fun testComponent(enableComponentLogger: Boolean = true, block:  suspend SequenceScope<Component>.() -> Unit) = createTestSimulation {
 //
 //    object : Component() {
 //        override fun process() = sequence {

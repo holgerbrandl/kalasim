@@ -29,7 +29,7 @@ open class FabBench {
                 File("small_factory.xlsx")
             fab = BaseFactory(
                 masterExcel = fullFabMesXls,
-                enableConsoleLogger = false
+                enableComponentLogger = false
             )
         }
     }

@@ -18,7 +18,7 @@ fun main() {
         }
     }
 
-    createSimulation(enableConsoleLogger = true) {
+    createSimulation(enableComponentLogger = true) {
         dependency { TrafficLight() }
         dependency { Driver() }
 

@@ -78,7 +78,7 @@ class Car(
 }
 
 
-class GasStation : Environment(enableConsoleLogger = true) {
+class GasStation : Environment(enableComponentLogger = true) {
     val tank = dependency(qualifier = named(FUEL_TANK)) { DepletableResource(FUEL_TANK, GAS_STATION_SIZE) }
 
     val fuelPumps = dependency { Resource(capacity = 2) }

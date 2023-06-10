@@ -41,7 +41,7 @@ suspends execution control and *comes back* after 1 time unit (referred to as _t
 
 The main body of every `kalasim` model usually starts with:
 ```
-createSimulation(enableConsoleLogger = true){
+createSimulation{
 ...
 }
 ```
