@@ -30,13 +30,14 @@ class Clerk : Component() {
 
 fun main() {
     val env = declareDependencies {
-        add { ComponentQueue<Customer>("waitingline") }
+        dependency { ComponentQueue<Customer>("waitingline") }
 
-    }.createSimulation(true) {
+    }.createSimulation {
+        enableComponentLogger()
+
         repeat(3) { Clerk() }
 
         ComponentGenerator(uniform(5, 15)) { Customer(get()) }
-
     }
 
     env.run(500.0)

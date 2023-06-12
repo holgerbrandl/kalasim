@@ -7,7 +7,8 @@ import org.kalasim.plot.kravis.display
 //
 // In contrast to ShipyardState.kt, we here do ot rely on a state for interation, but use built-in request capabilities and a depletable resource to wait until enough cargo has accumulated.
 fun main() {
-    createSimulation(true) {
+    createSimulation {
+        enableComponentLogger()
 
         val terminal = object : Component("terminal") {
             val tank = DepletableResource(capacity = 100, initialLevel = 10)

@@ -141,7 +141,8 @@ class ComponentTests {
 
 
     @Test
-    fun `it should allow for an empty generator process`() = createTestSimulation(true) {
+    fun `it should allow for an empty generator process`() = createTestSimulation {
+
         val c = Component()
 //        object : Component(){}
 
@@ -258,7 +259,7 @@ class ComponentTests {
     @Test
     fun `it should log to the console`() = captureOutput {
 
-        createTestSimulation(true) {
+        createTestSimulation {
             object : Component("tester") {
                 override fun process() = sequence {
                     wait(State(true), true)
@@ -273,7 +274,6 @@ class ComponentTests {
         }
     }.stdout shouldBeDiff """time      current               receiver              action                                                 info                               
 --------- --------------------- --------------------- ------------------------------------------------------ ----------------------------------
-.00                             main                  Created
 .00                             tester                Created
 .00                                                   Activated, scheduled for .00                           New state: scheduled
 .00                             main                  Running; Hold +5.00, scheduled for 5.00                New state: scheduled
@@ -526,7 +526,8 @@ class ComponentTests {
     }
 
     @Test
-    fun `it should  hold on someones elses behalf`() = createTestSimulation(true) {
+    fun `it should  hold on someones elses behalf`() = createTestSimulation {
+
         val c = object : Component("other") {
             override fun process() =
                 sequence {
@@ -555,7 +556,8 @@ class ComponentTests {
 
 
     @Test
-    fun `it should throw user exceptions`() = createTestSimulation(true) {
+    fun `it should throw user exceptions`() = createTestSimulation {
+
         class MyException(msg: String) : IllegalArgumentException(msg)
 
         object : Component("other") {

@@ -44,7 +44,9 @@ class Car(val trafficLight: TrafficLight) : Component() {
     }
 }
 
-createSimulation(true) {
+createSimulation {
+    enableComponentLogger()
+
     // Add a traffic light so that we can refer to it via koin get<T>()
     dependency { TrafficLight() }
 

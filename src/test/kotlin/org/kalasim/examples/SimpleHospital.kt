@@ -10,8 +10,10 @@ import org.kalasim.analysis.ResourceEvent
 import org.kalasim.plot.kravis.display
 
 fun main() {
-    val sim = createSimulation(true) {
-        // actually it would be more efficient to simply model a single Doctor with a capacity of 2
+    val sim = createSimulation {
+        enableComponentLogger()
+
+        // Actually, it would be more efficient to simply model a single Doctor with a capacity of 2
         val nurses = Resource("nurses", 1)
         val doctors = Resource("doctors", 2)
         val admin = Resource("admin", 1)

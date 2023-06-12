@@ -78,13 +78,13 @@ class Clerk : Component() {
 
 
 fun main() {
-    val env = configureEnvironment(true) {
-        // register components needed for dependency injection
-        add { ComponentQueue<Customer>("waitingline") }
-        add { (0..2).map { Clerk() } }
-    }
+    val env = createSimulation  {
+        enableComponentLogger()
 
-    env.apply {
+        // register components needed for dependency injection
+        dependency { ComponentQueue<Customer>("waitingline") }
+        dependency { (0..2).map { Clerk() } }
+
         // register other components to  be present when starting the simulation
         CustomerGenerator()
 

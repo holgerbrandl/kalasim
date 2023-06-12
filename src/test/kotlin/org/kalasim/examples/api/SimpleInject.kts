@@ -10,6 +10,6 @@ class Something(val counter: Counter) : Component() {
     }
 }
 configureEnvironment {
-    add { Counter(0) }
-    add { Something(get()) }
+    dependency { Counter(0) }
+    dependency { Something(get()) }
 }.run(10)

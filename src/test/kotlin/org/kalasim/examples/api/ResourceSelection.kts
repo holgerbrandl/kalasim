@@ -2,7 +2,9 @@
 import org.kalasim.*
 import org.kalasim.ResourceSelectionPolicy.ShortestQueue
 
-createSimulation(false) {
+createSimulation {
+    enableComponentLogger()
+
     val doctors = List(3) { Resource() }
 
     class Patient : Component() {

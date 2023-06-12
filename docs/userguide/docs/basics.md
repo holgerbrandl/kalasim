@@ -14,7 +14,10 @@ All entities in a simulation are governed by an environment context. Every simul
 The environment context of a kalasim simulation is an instance of  `org.kalasim.Environment`, which can be created using simple instantiation or via a builder called `createSimulation`
 
 ```kotlin
-val env : Environment = createSimulation(enableConsoleLogger = true){
+val env : Environment = createSimulation(){
+    // enable logging of built-in simulation metrics
+    enableComponentLogger()
+    
     // Create simulation entities in here 
     Car()
     Resource("Car Wash")
@@ -121,6 +124,12 @@ So the key points to recall are
 * Simulation events are processed one after another, even if they are scheduled for the same time
 * Race-conditions between events can be avoided by setting a `priority`
 
+
+## Configuring a Simulation
+
+To minimze initial complexity when creating an environment, some options can be enabled within the scope of an environment
+* `enableTickMetrics()` - See [tick metrics](advanced.md#operational-control)
+* `enableComponentLogger()` - Enable the [component logger](events.md#component-logger) to track component status
 
 ## Dependency Injection
 

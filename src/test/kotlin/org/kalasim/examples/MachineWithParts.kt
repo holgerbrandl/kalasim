@@ -37,7 +37,9 @@ class Machine : Component() {
 }
 
 fun main() {
-    createSimulation(true) {
+    createSimulation {
+        enableComponentLogger()
+
         dependency { Resource() }
         repeat(2) { Machine() }
 

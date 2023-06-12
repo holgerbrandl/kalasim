@@ -1,5 +1,16 @@
 # Kalasim Release History
 
+## v0.10
+
+Not yet released
+
+Breaking changes
+* tick metrics and component-logger are now [configured](basics.md#configuring-a-simulation) and not enabled via constructor parameter any longer (to minimize constructor complexity)
+* 
+
+Improvments
+* More robust [dependency injection](basics.md#dependency-injection) with 
+
 ## v0.9 
 
 Released at 2023-04-13

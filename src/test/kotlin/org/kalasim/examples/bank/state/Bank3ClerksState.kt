@@ -46,10 +46,12 @@ class Clerk : Component() {
 fun main() {
     val env = declareDependencies {
         // register components needed for dependency injection
-        add { ComponentQueue<Customer>("waitingline") }
-        add { State(false, "worktodo") }
+        dependency { ComponentQueue<Customer>("waitingline") }
+        dependency { State(false, "worktodo") }
 
-    }.createSimulation(true) {
+    }.createSimulation {
+        enableComponentLogger()
+
         // register other components to  be present
         // when starting the simulation
         repeat(3) { Clerk() }

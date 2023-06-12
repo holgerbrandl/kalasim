@@ -27,9 +27,10 @@ fun main() {
     }
 
 
-    val env = declareDependencies {
-        add { Resource("carwash", NUM_MACHINES) }
-    }.createSimulation(true, randomSeed = RANDOM_SEED) {
+    val env = createSimulation( randomSeed = RANDOM_SEED) {
+        dependency { Resource("carwash", NUM_MACHINES) }
+
+        enableComponentLogger()
 
         //Create 4 initial cars
         repeat(3) { Car() }

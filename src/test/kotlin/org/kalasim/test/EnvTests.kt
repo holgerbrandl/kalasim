@@ -15,7 +15,9 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.analysis.EntityCreatedEvent
 import org.kalasim.analysis.RescheduledEvent
-import org.kalasim.examples.bank.data.*
+import org.kalasim.examples.bank.data.Clerk
+import org.kalasim.examples.bank.data.Customer
+import org.kalasim.examples.bank.data.CustomerGenerator
 import org.kalasim.examples.er.EmergencyRoom
 import org.kalasim.misc.*
 import org.koin.core.Koin
@@ -183,7 +185,9 @@ class EnvTests {
     fun `it should allow to synchronize clock time`() {
         val timeBefore = System.currentTimeMillis()
 
-        createSimulation(true) {
+        createSimulation {
+            enableComponentLogger()
+
             ClockSync(500.milliseconds)
 
             run(10)
@@ -194,7 +198,7 @@ class EnvTests {
 
 
     @Test
-    fun `it should allow collecting events by type`() = createTestSimulation(true) {
+    fun `it should allow collecting events by type`() = createTestSimulation {
         ClockSync(500.milliseconds)
 
         val creations = collect<EntityCreatedEvent>()
@@ -205,9 +209,42 @@ class EnvTests {
         creations.size shouldBe (cg.total + 1) // +1 because of main
     }
 
+    @Suppress("DEPRECATION")
+    @Test
+    fun `it still support configuring dependencies before creating the simulation`() {
+        class Car : Component() {
+            override fun process() = sequence {
+                hold(10.minutes)
+            }
+        }
+
+        val env = createSimulation {
+            dependency { Car() }
+
+            run(5.minutes)
+
+            get<Car>().isScheduled shouldBe true
+        }
+    }
+
+    @Test
+    fun `it still should fail when last element in createSimulation is a dependency as this will fail internally otherwise`() {
+        shouldThrow<IllegalArgumentException> {
+            val sim = createSimulation {
+                dependency("foo") {  1 }
+                dependency("bar") {  2 }
+            }
+
+            sim.get<String>("foo")
+            sim.run(1.days)
+        }
+    }
+
     @Test
     fun `it should fail with exception if simulation is too slow `() {
-        createSimulation(true) {
+        createSimulation {
+            enableComponentLogger()
+
             object : Component() {
                 var waitCounter = 1
 
@@ -484,12 +521,12 @@ class CustomKoinModuleTests {
     fun `it should create components on simulation start`() {
         val deps = declareDependencies {
             // register components needed for dependency injection
-            add {
+            dependency {
                 println("foo")
                 ComponentQueue<Customer>("waitingline")
             }
-            add { CustomerGenerator(get()) }
-            add { (1..3).map { Clerk() } }
+            dependency { CustomerGenerator(get()) }
+            dependency { (1..3).map { Clerk() } }
         }
 
         createSimulation(dependencies = deps) {

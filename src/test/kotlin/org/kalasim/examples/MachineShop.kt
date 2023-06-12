@@ -64,7 +64,8 @@ fun main() {
     }
 
 
-    createSimulation(true, randomSeed = RANDOM_SEED) {
+    createSimulation(randomSeed = RANDOM_SEED) {
+        enableComponentLogger()
 
         val repairMan = Resource("mechanic", preemptive = true)
 

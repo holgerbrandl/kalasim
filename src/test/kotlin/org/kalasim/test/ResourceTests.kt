@@ -60,7 +60,7 @@ class ResourceTests {
     }
 
     @Test
-    fun `it should release resourced when terminating`() = createTestSimulation(true) {
+    fun `it should release resourced when terminating`() = createTestSimulation {
 
         // see bank office docs: By design resources that were claimed are automatically
         // released when a process terminates
@@ -82,7 +82,7 @@ class ResourceTests {
     }
 
     @Test
-    fun `preemptive resources should bump components depending on priority`() = createTestSimulation(true) {
+    fun `preemptive resources should bump components depending on priority`() = createTestSimulation {
 
         // see bank office docs: By design resources that were claimed are automatically
         // released when a process terminates
@@ -156,7 +156,7 @@ class ResourceTests {
     }
 
     @Test
-    fun `null prio requests should not bump each other`() = createTestSimulation(true) {
+    fun `null prio requests should not bump each other`() = createTestSimulation {
         val r = Resource(preemptive = true)
 
         class BumpComponent : Component() {
@@ -178,7 +178,7 @@ class ResourceTests {
     }
 
     @Test
-    fun `it should not bump regular non-preemptive resources`() = createTestSimulation(true) {
+    fun `it should not bump regular non-preemptive resources`() = createTestSimulation {
         val r = Resource()
 
         class BumpComponent : Component() {
@@ -239,7 +239,7 @@ class ResourceTests {
 
 
     @Test
-    fun `it should respect request priorities when mixing request sizes`() = createTestSimulation(true) {
+    fun `it should respect request priorities when mixing request sizes`() = createTestSimulation {
 
         val resource = Resource(capacity = 2)
 
@@ -330,7 +330,9 @@ class ResourceTests {
     @Test
     fun `it should auto-release resources in builder`() {
 
-        createSimulation(true) {
+        createSimulation {
+            enableComponentLogger()
+
             val r = Resource()
 
             object : Component() {
@@ -464,7 +466,9 @@ class ResourceTests {
     @Test
     fun `it should correctly set failed after timeout`() {
 
-        createSimulation(true) {
+        createSimulation {
+            enableComponentLogger()
+
             val r = Resource(capacity = 1)
             val dr = Resource(capacity = 1)
 
@@ -536,7 +540,7 @@ class ResourceTests {
 
 class ResourceSelectionTests {
     @Test
-    fun `it should allow to select with FIRST_AVAILBLE`() = createTestSimulation(true) {
+    fun `it should allow to select with FIRST_AVAILBLE`() = createTestSimulation {
         val resources = List(3) { Resource().apply { capacity = 0.0 } }
 
         object : Component() {
@@ -552,7 +556,7 @@ class ResourceSelectionTests {
     }
 
     @Test
-    fun `it should allow to select with ShortestQueue`() = createTestSimulation(true) {
+    fun `it should allow to select with ShortestQueue`() = createTestSimulation {
         val resources = List(3) { Resource() }
 
         class ResourceConsumer(val resource: Resource) : Component() {
@@ -578,7 +582,7 @@ class ResourceSelectionTests {
     }
 
     @Test
-    fun `it should allow to select with RoundRobin`() = createTestSimulation(true) {
+    fun `it should allow to select with RoundRobin`() = createTestSimulation {
         val resources = List(3) { Resource() }
 
         val c = object : Component() {

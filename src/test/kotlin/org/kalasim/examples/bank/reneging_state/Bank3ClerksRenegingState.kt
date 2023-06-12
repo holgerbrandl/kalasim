@@ -61,14 +61,16 @@ class Clerk(val workToDo: State<Boolean>) : Component() {
 
 
 fun main() {
-    val env = configureEnvironment(true) {
+    val env = createSimulation {
+        enableComponentLogger()
+
         // register components needed for dependency injection
-        add { ComponentQueue<Customer>("waitingline") }
-        add { State(false, "worktodo") }
-        add { (0..2).map { Clerk(get()) } }
+        dependency { ComponentQueue<Customer>("waitingline") }
+        dependency { State(false, "worktodo") }
+        dependency { (0..2).map { Clerk(get()) } }
     }
 
-    // register other components to  be present when starting the simulation
+    // register other components to be present when starting the simulation
     ComponentGenerator(iat = UniformRealDistribution(env.rg, 5.0, 15.0)) {
         val customer = Customer(get(), get())
         customer

@@ -72,7 +72,7 @@ class StateTransitionTests {
 
         @Test
         fun `it should passivate, cancel, hold and activate on behalf of another component`() =
-            createTestSimulation(true) {
+            createTestSimulation {
 
                 val r = Resource()
                 val s = State("foo")

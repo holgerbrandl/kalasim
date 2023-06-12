@@ -19,6 +19,7 @@ import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 import kotlinx.datetime.Instant
+import org.koin.core.qualifier.named
 import java.util.*
 import kotlin.time.*
 import kotlin.time.Duration.Companion.days
@@ -28,37 +29,31 @@ internal const val MAIN = "main"
 
 typealias KoinModule = org.koin.core.module.Module
 
-//internal class EnvBuildContext : KoinModule() {
-//    var enableConsoleLogger: Boolean = true
-//}
-// --> not possible because Module is not open
-
 // https://github.com/InsertKoinIO/koin/issues/801
+@Deprecated("Use createSimulation() instead", ReplaceWith("declareDependencies(builder).createSimulation {}"))
 fun configureEnvironment(
-    enableConsoleLogger: Boolean = false, builder: KoinModule.() -> Unit
-): Environment = declareDependencies(builder).createSimulation(enableConsoleLogger) {}
+    enableComponentLogger: Boolean = false, builder: KoinModule.() -> Unit
+): Environment = declareDependencies(builder).createSimulation {}
 
 
+@Suppress("DeprecatedCallableAddReplaceWith")
+@Deprecated("Use createSimulation() instead")
 fun declareDependencies(
     builder: KoinModule.() -> Unit
 ): KoinModule = module(createdAtStart = true) { builder() }
 
 
 fun KoinModule.createSimulation(
-    enableConsoleLogger: Boolean = false,
     /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
     durationUnit: DurationUnit = MINUTES,
     /** The absolute time at tick-time 0. Defaults to `null`.*/
     startDate: Instant? = null,
-    enableTickMetrics: Boolean = false,
     useCustomKoin: Boolean = false,
     randomSeed: Int = DEFAULT_SEED,
     builder: Environment.() -> Unit
 ): Environment = createSimulation(
     durationUnit = durationUnit,
     startDate = startDate,
-    enableConsoleLogger = enableConsoleLogger,
-    enableTickMetrics = enableTickMetrics,
     dependencies = this,
     useCustomKoin = useCustomKoin,
     randomSeed = randomSeed,
@@ -66,12 +61,10 @@ fun KoinModule.createSimulation(
 )
 
 fun createSimulation(
-    enableConsoleLogger: Boolean = false,
     /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
     durationUnit: DurationUnit = MINUTES,
     /** The absolute time at tick-time 0. Defaults to `null`.*/
     startDate: Instant? = null,
-    enableTickMetrics: Boolean = false,
     dependencies: KoinModule? = null,
     useCustomKoin: Boolean = false,
     randomSeed: Int = DEFAULT_SEED,
@@ -79,8 +72,6 @@ fun createSimulation(
 ): Environment = Environment(
     durationUnit = durationUnit,
     startDate = startDate,
-    enableConsoleLogger = enableConsoleLogger,
-    enableTickMetrics = enableTickMetrics,
     dependencies = dependencies,
     randomSeed = randomSeed,
     koin = if(useCustomKoin) koinApplication { }.koin else null
@@ -113,7 +104,7 @@ open class Environment(
     /** The absolute time at tick-time 0. Defaults to `null`.*/
     var startDate: Instant? = null,
     /** If enabled, it will render a tabular view of recorded  interaction and resource events. */
-    enableConsoleLogger: Boolean = false,
+    enableComponentLogger: Boolean = false,
     /** Measure the compute time per tick as function of time. For details see  https://www.kalasim.org/advanced/#operational-control */
     enableTickMetrics: Boolean = false,
     dependencies: KoinModule? = null,
@@ -141,7 +132,7 @@ open class Environment(
         //        get() = eventQueue.map { it.component }
         get() = eventQueue.sortedIterator().map { it.component }.toList()
 
-    private val eventListeners = listOf<EventListener>().toMutableList()
+    internal val eventListeners = listOf<EventListener>().toMutableList()
 
 
     val trackingPolicyFactory = TrackingPolicyFactory()
@@ -193,14 +184,19 @@ open class Environment(
         qualifier: Qualifier? = null, noinline parameters: ParametersDefinition? = null
     ): T = getKoin().get(qualifier, parameters)
 
+    /** Resolves a dependency in the simulation. Dependencies can be disambiguated by using a qualifier.*/
+    inline fun <reified T : Any> get(
+        qualifier: String , noinline parameters: ParametersDefinition? = null
+    ): T = getKoin().get(named(qualifier), parameters)
+
 
     init {
 
         // start console logger
 
 //        addTraceListener { print(it) }
-        if(enableConsoleLogger) {
-            enableConsoleLogger()
+        if(enableComponentLogger) {
+            enableComponentLogger()
         }
 
         _koin = koin ?: run {
@@ -238,16 +234,20 @@ open class Environment(
 //        curComponent = main
     }
 
-    fun enableConsoleLogger() {
-        addEventListener(ConsoleTraceLogger())
-    }
 
-    private val _tm: TickMetrics? = if(enableTickMetrics) TickMetrics(koin = koin) else null
+    fun enableTickMetrics(){
+        require(queue.none{ it is TickMetrics}){
+            "The tick-metrics monitor is already registered"
+        }
+
+        TickMetrics(koin = getKoin())
+    }
 
     val tickMetrics: MetricTimeline<Int>
         get() {
-            require(_tm != null) { "Use enableTickMetrics=true to enable tick metrics" }
-            return _tm.timeline
+            val tm = queue.filterIsInstance<TickMetrics>().firstOrNull()
+            require(tm != null) { "Use enableTickMetrics=true to enable tick metrics" }
+            return tm.timeline
         }
 
 //    private var endOnEmptyEventlist = false
@@ -528,6 +528,15 @@ data class QueueElement(
 }
 
 
+fun Environment.enableComponentLogger() {
+    require(eventListeners.none{ it is ConsoleTraceLogger}){
+        "The component-logger is already registered"
+    }
+
+    addEventListener(ConsoleTraceLogger())
+}
+
+
 internal fun Environment.calcScheduleTime(until: TickTime?, duration: Number?): TickTime {
     return (until?.value to duration?.toDouble()).let { (till, duration) ->
         if(till == null) {
@@ -541,19 +550,28 @@ internal fun Environment.calcScheduleTime(until: TickTime?, duration: Number?): 
 }
 
 
-inline fun <reified T> KoinModule.add(
+/** Register dependency in simulation context. For details see https://www.kalasim.org/basics/#dependency-injection */
+inline fun <reified T> KoinModule.dependency(
     qualifier: Qualifier? = null, noinline definition: Definition<T>
 ) {
     single(qualifier = qualifier, createdAtStart = true, definition = definition)
-
 }
 
+
+/** Register dependency in simulation context. For details see https://www.kalasim.org/basics/#dependency-injection */
+inline fun <reified T> Environment.dependency(qualifier: String, builder: Environment.() -> T) = dependency(named(qualifier), builder)
+
+/** Register dependency in simulation context. For details see https://www.kalasim.org/basics/#dependency-injection */
 inline fun <reified T> Environment.dependency(qualifier: Qualifier? = null, builder: Environment.() -> T): T {
     val something = builder(this)
+
     getKoin().loadModules(listOf(module(createdAtStart = true) {
-        add(qualifier) { something }
+        dependency(qualifier) { something }
     }))
 
+    require(something  !is Unit){
+        "dependency must not be last element in createSimulation{} as this is causing type inference to fail internally. Add println() or any other terminal statement to work around this problem."
+    }
     return something
 }
 

@@ -54,11 +54,10 @@ class StateTests {
             }
         }
 
-        val sim = configureEnvironment(true) {
-            single { State("red") }
-        }
+        val sim = createSimulation {
+            enableComponentLogger()
+            dependency { State("red") }
 
-        sim.apply {
             val car = Car()
             car.activate()
 
@@ -86,7 +85,7 @@ class StateTests {
     @Test
     fun `it trigger once and keep the other waiters`() {
         captureOutput {
-            createTestSimulation(true) {
+            createTestSimulation {
                 val state = State(TestColor.RED)
 
                 var wasAStarted = false
@@ -118,7 +117,6 @@ class StateTests {
         }.stdout shouldBeDiff """
             time      current               receiver              action                                                 info                               
             --------- --------------------- --------------------- ------------------------------------------------------ ----------------------------------
-            .00                             main                  Created
             .00                             State.1               Created                                                Initial value: RED
             .00                             A                     Created
             .00                                                   Activated, scheduled for .00                           New state: scheduled
@@ -153,45 +151,44 @@ class StateTests {
             }
         }
 
-        val sim = configureEnvironment(true) {
-            single { TrafficLight() }
-            single { Engine() }
+        createSimulation {
+            enableComponentLogger()
+
+            val trafficLight = dependency { TrafficLight() }
+            val engine = dependency { Engine() }
+
+            val car = Car()
+
+            trafficLight.printSummary()
+
+            run(10.0)
+
+            trafficLight.snapshot.waiters.size shouldBe 1
+
+            // toggle state
+            trafficLight.value = "green"
+
+            run(10.0)
+
+            trafficLight.printSummary()
+
+            trafficLight.snapshot.waiters.size shouldBe 1
+
+            car.isWaiting shouldBe true
+
+            // now honor the engine
+            engine.value = true
+
+            car.printSummary()
+
+            run(10.0)
+
+            car.isWaiting shouldBe false
+            car.isData shouldBe true
+
+            trafficLight.snapshot.waiters.shouldBeEmpty()
+            engine.snapshot.waiters.shouldBeEmpty()
         }
-
-        val car = Car()
-
-        val trafficLight = sim.get<TrafficLight>()
-        val engine = sim.get<Engine>()
-
-        trafficLight.printSummary()
-
-        sim.run(10.0)
-
-        trafficLight.snapshot.waiters.size shouldBe 1
-
-        // toggle state
-        trafficLight.value = "green"
-
-        sim.run(10.0)
-
-        trafficLight.printSummary()
-
-        trafficLight.snapshot.waiters.size shouldBe 1
-
-        car.isWaiting shouldBe true
-
-        // now honor the engine
-        engine.value = true
-
-        car.printSummary()
-
-        sim.run(10.0)
-
-        car.isWaiting shouldBe false
-        car.isData shouldBe true
-
-        trafficLight.snapshot.waiters.shouldBeEmpty()
-        engine.snapshot.waiters.shouldBeEmpty()
     }
 
 
@@ -215,14 +212,13 @@ class StateTests {
             }
         }
 
-        val sim = configureEnvironment(true) {
+        createSimulation  {
+            enableComponentLogger()
 //            single(TypeQualifier(String::class)) { State("red") }
 //            single(TypeQualifier(Boolean::class)) { State(false) }
-            single { State("red") }
-            single { State(false) }
-        }
+            dependency { State("red") }
+            dependency { State(false) }
 
-        sim.apply {
             val car = Car()
 
             val trafficLight = get<State<String>>()

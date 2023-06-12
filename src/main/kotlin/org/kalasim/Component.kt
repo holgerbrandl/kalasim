@@ -47,6 +47,16 @@ data class Priority(val value: Int) : Comparable<Priority?> {
     override fun compareTo(other: Priority?): Int = compareValuesBy(this, other ?: NORMAL) { value }
 }
 
+//class SimSequence(val component: Component) : Sequence<Component> {
+//    override fun iterator(): Iterator<Component> {
+//        return super.iterator()
+//    }
+//}
+//
+//public inline fun <T> Component.simSequence(crossinline iterator: () -> Iterator<T>): Sequence<T> = object : SimSequence<T> {
+//    override fun iterator(): Iterator<T> = iterator()
+//}
+
 
 // TODO reassess if we should use these type-aliases
 //typealias ProcessDefinition = SequenceScope<Component>
@@ -1294,8 +1304,13 @@ open class Component(
         until: TickTime? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
-    ) = yieldCurrent {
-        this@Component.hold(duration, description, until, priority, urgent)
+    ) {
+//        val component = getThis()
+//        val other = this
+//        println(component)
+        yieldCurrent {
+            this@Component.hold(duration, description, until, priority, urgent)
+        }
     }
 
     /**
@@ -1600,6 +1615,15 @@ open class Component(
 
     private suspend fun SequenceScope<Component>.yieldCurrent(builder: () -> Unit = {}) {
         val initialStatus = componentState
+
+        require(initialStatus == CURRENT) {
+            """Component context violated. Kalasim has detected an invalid call of 
+               an outer scope function. This can happen if a sub-process defined 
+               within a component class is calling methods of the parent scope. 
+               Unfortunately, this can't be resolved at compile time.
+           """.trimIndent()
+        }
+
 
         builder()
 

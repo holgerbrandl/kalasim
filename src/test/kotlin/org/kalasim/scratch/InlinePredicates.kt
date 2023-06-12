@@ -2,6 +2,7 @@ package org.kalasim.scratch
 
 import org.kalasim.Component
 import org.kalasim.createSimulation
+import org.kalasim.enableComponentLogger
 
 // Objective:
 // dream to just say something like
@@ -9,10 +10,10 @@ import org.kalasim.createSimulation
 
 
 fun main() {
-    createSimulation(true) {
+    createSimulation {
+        enableComponentLogger()
 
         val waiter = object : Component() {
-
             var isBusy = true
 
             override fun process() =

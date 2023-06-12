@@ -11,12 +11,10 @@ import org.openrndr.draw.*
 import org.openrndr.extra.gui.GUI
 import org.openrndr.extra.parameters.ActionParameter
 import org.openrndr.extra.parameters.IntParameter
-import org.openrndr.ffmpeg.ScreenRecorder
 import org.openrndr.math.Vector3
 import org.openrndr.math.transforms.buildTransform
 import org.openrndr.math.transforms.project
 import org.openrndr.shape.*
-import kotlin.time.DurationUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 

@@ -1,9 +1,12 @@
 //EventCollector.kts
 import org.kalasim.analysis.*
 import org.kalasim.createSimulation
+import org.kalasim.enableComponentLogger
 import org.kalasim.enableEventLog
 
-createSimulation(enableComponentLogger = true) {
+createSimulation {
+    enableComponentLogger()
+
     val tc = enableEventLog()
 
     tc.filter { it is InteractionEvent && it.component?.name == "foo" }

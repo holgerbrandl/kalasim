@@ -5,6 +5,8 @@ import org.kalasim.misc.TRACE_DF
 import org.kalasim.misc.titlecaseFirstChar
 import java.util.logging.Level
 
+
+
 class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
 
     enum class EventsTableColumn { Time, Current, Receiver, Action, Info }

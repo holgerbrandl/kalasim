@@ -1,6 +1,8 @@
 import org.kalasim.*
 
-createSimulation(true) {
+createSimulation {
+    enableComponentLogger()
+
     object : Component() {
 
         override fun process() =sequence {

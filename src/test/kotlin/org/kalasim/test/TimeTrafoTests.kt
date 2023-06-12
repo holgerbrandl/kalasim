@@ -26,7 +26,7 @@ class TimeTrafoTests {
     }
 
     @Test
-    fun `it should correctly project simulation times with offset-trafo`() = createTestSimulation(true) {
+    fun `it should correctly project simulation times with offset-trafo`() = createTestSimulation {
         startDate = Instant.parse("2021-01-24T12:00:00.00Z")
 
         object : Component() {

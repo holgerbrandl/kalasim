@@ -92,19 +92,18 @@ object DeterministicRefuel {
             }
         }
 
-        configureEnvironment(true) {
+        createSimulation {
+            dependency { GasStation() }
 
-//            single(qualifier = named("gas_station")) { Resource("gas_station", 2) }
+            // declare dependencies
+            dependency(qualifier = named(FUEL_PUMP)) { DepletableResource(FUEL_PUMP, GAS_STATION_SIZE) }
+            dependency(qualifier = named(CAR_LEAVING)) { IntTimeline(CAR_LEAVING) }
+            dependency(qualifier = named(TRUCKS_EN_ROUTE)) { IntTimeline(TRUCKS_EN_ROUTE) }
+            dependency(qualifier = named(TRUCKS_ORDERED)) { IntTimeline(TRUCKS_ORDERED) }
 
-            single { GasStation() }
-
-            single(qualifier = named(FUEL_PUMP)) { DepletableResource(FUEL_PUMP, GAS_STATION_SIZE) }
-            single(qualifier = named(CAR_LEAVING)) { IntTimeline(CAR_LEAVING) }
-            single(qualifier = named(TRUCKS_EN_ROUTE)) { IntTimeline(TRUCKS_EN_ROUTE) }
-            single(qualifier = named(TRUCKS_ORDERED)) { IntTimeline(TRUCKS_ORDERED) }
-        }.apply {
-
+            // setup stochastic car arrival process
             ComponentGenerator(iat = T_INTER) { Car(get()) }
+
 
             run(SIM_TIME)
 

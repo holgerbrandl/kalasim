@@ -36,7 +36,8 @@ class Philosopher(name: String, val leftFork: Fork, val rightFork: Fork) : Compo
     }
 }
 
-val sim = createSimulation(true) {
+val sim = createSimulation {
+    enableComponentLogger()
     enableEventLog()
 
     // create forks and resources

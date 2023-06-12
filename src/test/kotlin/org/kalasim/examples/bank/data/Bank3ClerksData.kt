@@ -47,9 +47,9 @@ class Clerk : Component() {
 fun main() {
     val deps = declareDependencies {
         // register components needed for dependency injection
-        add { ComponentQueue<Customer>("waitingline") }
-        add { CustomerGenerator(get()) }
-        add { (1..3).map { Clerk() } }
+        dependency { ComponentQueue<Customer>("waitingline") }
+        dependency { CustomerGenerator(get()) }
+        dependency { (1..3).map { Clerk() } }
     }
 
     createSimulation(dependencies = deps) {

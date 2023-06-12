@@ -14,7 +14,7 @@ import org.kalasim.*
 class DepletableResourceTests {
 
     @Test
-    fun `it should realize depletable resource semantics`() = createTestSimulation(true) {
+    fun `it should realize depletable resource semantics`() = createTestSimulation { 
         DepletableResource(capacity = 100, initialLevel = 0).apply {
             isFull shouldBe false
             isDepleted shouldBe true
@@ -24,7 +24,7 @@ class DepletableResourceTests {
     }
 
     @Test
-    fun `it should process an empty take`() = createTestSimulation(true) {
+    fun `it should process an empty take`() = createTestSimulation {
         val dr = DepletableResource(capacity = 10, initialLevel = 0)
 
         object : Component() {
@@ -40,8 +40,7 @@ class DepletableResourceTests {
     }
 
     @Test
-    fun `it should allow to consume and refill a depletable resource`() = createTestSimulation(true) {
-
+    fun `it should allow to consume and refill a depletable resource`() = createTestSimulation {
         // add new gas continuously
         object : Component() {
             override fun process() = sequence {
@@ -102,7 +101,7 @@ class DepletableResourceTests {
 
 
     @Test
-    fun `it allow filling and emptying from 0 to capacity limit`() = createTestSimulation(true) {
+    fun `it allow filling and emptying from 0 to capacity limit`() = createTestSimulation {
         val gasSupply = DepletableResource(capacity = 100, initialLevel = 0)
 
         gasSupply.isFull shouldBe false
@@ -147,14 +146,14 @@ class DepletableResourceTests {
 
 
     @Test
-    fun `it should forbid capacities larger than Int_MAX_VALUE`() = createTestSimulation(true) {
+    fun `it should forbid capacities larger than Int_MAX_VALUE`() = createTestSimulation {
         shouldThrow<IllegalArgumentException> {
             DepletableResource(capacity = Double.MAX_VALUE, initialLevel = 0)
         }
     }
 
     @Test
-    fun `it ensure that capacity=INF has meaningful semantics`() = createTestSimulation(true) {
+    fun `it ensure that capacity=INF has meaningful semantics`() = createTestSimulation {
         val dp = DepletableResource(capacity = Int.MAX_VALUE, initialLevel = 0)
 
         object : Component() {
@@ -174,7 +173,7 @@ class DepletableResourceTests {
 
     @Test
     fun `it should ensure that a level increase is stalled until capacity becomes available`() =
-        createTestSimulation(true) {
+        createTestSimulation {
             val dp = DepletableResource(capacity = 100, initialLevel = 0)
 
             dp.level shouldBe 0
@@ -197,7 +196,7 @@ class DepletableResourceTests {
 
 
     @Test
-    fun `it should respect queue priorities when consuming resource`() = createTestSimulation(true) {
+    fun `it should respect queue priorities when consuming resource`() = createTestSimulation {
         val dp = DepletableResource(capacity = 100, initialLevel = 0)
 
         dp.level shouldBe 0
@@ -228,7 +227,7 @@ class DepletableResourceTests {
 
 
     @Test
-    fun `it should respect queue priorities when restoring resource`() = createTestSimulation(true) {
+    fun `it should respect queue priorities when restoring resource`() = createTestSimulation {
         val resource = DepletableResource(capacity = 10, initialLevel = 7)
 
         var normalPutHonored = false

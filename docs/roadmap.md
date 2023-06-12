@@ -28,6 +28,12 @@ https://www.baeldung.com/java-a-star-pathfinding
 Add tickUnit to constructor of Environment and remove setter
 
 ---
+better landing page
+
+https://github.com/squidfunk/mkdocs-material/issues/1996
+https://sdk.up42.com/
+
+
 ## Later
 
 

@@ -2,7 +2,8 @@ import org.kalasim.Component
 import org.kalasim.createSimulation
 import org.kalasim.plot.letsplot.display
 
-createSimulation(enableTickMetrics = true) {
+createSimulation() {
+    enableTickMetrics()
 
     object : Component() {
         override fun process() = sequence {

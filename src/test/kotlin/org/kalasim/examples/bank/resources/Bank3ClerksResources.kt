@@ -17,9 +17,9 @@ class Customer(private val clerks: Resource) : Component() {
 
 
 fun main() {
-    val env = configureEnvironment {
-        add { Resource("clerks", capacity = 3) }
-    }.apply {
+    val env = createSimulation {
+        dependency { Resource("clerks", capacity = 3) }
+        
         ComponentGenerator(iat = uniform(5.0, 15.0)) { Customer(get()) }
     }
 

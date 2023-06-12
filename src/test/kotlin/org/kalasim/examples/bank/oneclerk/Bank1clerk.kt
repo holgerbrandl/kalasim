@@ -53,11 +53,13 @@ class CustomerGenerator : Component() {
 
 fun main() {
     val deps = declareDependencies {
-        add { Clerk() }
-        add { ComponentQueue<Customer>("waiting line") }
+        dependency { Clerk() }
+        dependency { ComponentQueue<Customer>("waiting line") }
     }
 
-    val env = createSimulation(true, dependencies = deps) {
+    val env = createSimulation(dependencies = deps) {
+        enableComponentLogger()
+
         CustomerGenerator()
     }
 

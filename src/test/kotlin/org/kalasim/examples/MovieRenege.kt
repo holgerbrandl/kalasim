@@ -12,7 +12,8 @@ fun main() {
 
     val MOVIES = listOf("Julia Unchained", "Kill Process", "Pulp Implementation").map { Movie(it) }
 
-    createSimulation(true, randomSeed = RANDOM_SEED) {
+    createSimulation( randomSeed = RANDOM_SEED) {
+        enableComponentLogger()
 
         // note: it's not really needed to model the theater (because it has no process), but we follow the julia model here
         val theater = object {

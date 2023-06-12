@@ -247,20 +247,19 @@ class EmergencyRoom(
     val numRooms: Int = 4,
     /** The execution planning policy of the ER. */
     val nurse: HeadNurse = FifoNurse(),
-    enableConsoleLogger: Boolean = false,
+    enableComponentLogger: Boolean = false,
     enableTickMetrics: Boolean = false,
 ) : Environment(
-    enableConsoleLogger = enableConsoleLogger,
+    enableComponentLogger = enableComponentLogger,
     enableTickMetrics = enableTickMetrics,
     durationUnit = DurationUnit.HOURS
 ) {
 
-    val waitingAreaSize = 300
-
     // todo this should be opt-in anyway https://github.com/holgerbrandl/kalasim/issues/66
-    init {
+    init{
         trackingPolicyFactory.disableAll()
     }
+    val waitingAreaSize = 300
 
     // todo also here having sorted queue is causing almost more problems than solving
 //    val waitingLine = ComponentQueue(comparator = compareBy <Patient>{ it.severity.value }, name = "ER Waiting Area")

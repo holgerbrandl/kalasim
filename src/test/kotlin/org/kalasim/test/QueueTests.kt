@@ -21,11 +21,12 @@ class QueueTests {
             ComponentQueue<Foo>()
         }
 
-        val env = configureEnvironment(true) {
-            add { waitingLine }
-        }
+        val env = createSimulation {
+            enableComponentLogger()
+            dependency { waitingLine }
 
-        env.addEventListener(EventLog())
+            enableEventLog()
+        }
 
         waitingLine.add(Foo())
         waitingLine.add(Foo())
@@ -73,7 +74,9 @@ class QueueTests {
 
         // also see https://simpy.readthedocs.io/en/latest/topical_guides/time_and_scheduling.html
 
-        createSimulation(true) {
+        createSimulation {
+            enableComponentLogger()
+
 //            class TestComponent(name:String, at: Number): Component(name){
 //                override fun process(): Sequence<Component> = super.process()
 //            }
@@ -103,7 +106,9 @@ class QueueTests {
         }
 
         // redo but with priority
-        createSimulation(true) {
+        createSimulation {
+            enableComponentLogger()
+
             // to make sure that the component methods are auto-scheduled we need to overrride them
 //            class TestComponent(name:String, at: Number, priority: Priority = NORMAL): Component(name, priority = priority){
 //                override fun process(): Sequence<Component> = super.process()

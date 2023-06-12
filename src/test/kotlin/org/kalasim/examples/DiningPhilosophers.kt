@@ -32,7 +32,9 @@ fun main() {
         }
     }
 
-    val sim = createSimulation(true) {
+    val sim = createSimulation {
+        enableComponentLogger()
+
         val ec = collect<Event>()
 
         // create forks and resources

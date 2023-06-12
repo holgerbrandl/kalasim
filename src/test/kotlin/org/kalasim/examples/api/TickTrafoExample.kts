@@ -8,7 +8,8 @@ import kotlin.time.DurationUnit
 
 
 // note MINUTES is also kalasim's default
-createSimulation(true, durationUnit = DurationUnit.MINUTES) {
+createSimulation(durationUnit = DurationUnit.MINUTES) {
+    enableComponentLogger()
 
     object :Component(){
         override fun process() =sequence {

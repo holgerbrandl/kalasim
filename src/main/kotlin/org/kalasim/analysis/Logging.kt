@@ -39,6 +39,8 @@ fun interface EventListener {
 }
 
 
+
+
 /**
  * Activates a global event-log, which stores all events on the kalasim event bus.
  *
@@ -53,6 +55,7 @@ fun Environment.enableEventLog(): EventLog {
 
     return tc
 }
+
 
 /** A list of all events that were created in a simulation run.  See [Event Log](https://www.kalasim.org/events/) for details. */
 class EventLog(val events: MutableList<Event> = mutableListOf()) : EventListener,

@@ -12,7 +12,8 @@ import kotlin.math.round
 
 /** Allows introspection of time-complexity of the underlying computations. The user may want to use the built-in env.tickMetrics timeline to analyze how much time is spent per time unit (aka tick).
  *
- * https://www.kalasim.org/advanced/#operational-control */
+ * https://www.kalasim.org/advanced/#operational-control
+ */
 class TickMetrics(
     val sampleTicks: Double = 1.0,
     /** Enable recording of tick metrics via a `timeline` attribute of this object. */
@@ -23,6 +24,12 @@ class TickMetrics(
 ) : Component(koin = koin ?: DependencyContext.get()) {
 
     val timeline = MetricTimeline(name, 0)
+
+    init{
+        require( env.queue.count{ it is TickMetrics} ==1){
+            "tick metrics must be enabled just once"
+        }
+    }
 
     override fun process() = sequence {
 //        hold(ceil(now.value))

@@ -27,10 +27,10 @@ class SalabimExampleTests {
 
     @Test
     fun `Bank_1_clerk should result in correct waiting line statistics`() {
-        val env = configureEnvironment {
-            add { Clerk() }
-            add { ComponentQueue<Customer>("waiting line") }
-        }.apply {
+        val env = createSimulation {
+            dependency { Clerk() }
+            dependency { ComponentQueue<Customer>("waiting line") }
+
             org.kalasim.examples.bank.oneclerk.CustomerGenerator()
         }
 
@@ -94,8 +94,8 @@ class SalabimExampleTests {
 //        val avgQueueMeans = listOf(200).map { 1000.0 * it }.map { runtime ->
 //        val avgQueueMeans = listOf(100000).map { runtime ->
             runtime to declareDependencies {
-                add { Clerk() }
-                add { ComponentQueue<Customer>("waiting line") }
+                dependency { Clerk() }
+                dependency { ComponentQueue<Customer>("waiting line") }
             }.createSimulation {
                 org.kalasim.examples.bank.oneclerk.CustomerGenerator()
                 run(runtime)
@@ -132,9 +132,9 @@ class SalabimExampleTests {
     fun `Bank3clerks_reneging should work as expected`() {
         val env = declareDependencies {
             // register components needed for dependency injection
-            add { ComponentQueue<org.kalasim.examples.bank.reneging.Customer>("waitingline") }
-            add { State(false, "worktodo") }
-            add { (0..2).map { org.kalasim.examples.bank.reneging.Clerk() } }
+            dependency { ComponentQueue<org.kalasim.examples.bank.reneging.Customer>("waitingline") }
+            dependency { State(false, "worktodo") }
+            dependency { (0..2).map { org.kalasim.examples.bank.reneging.Clerk() } }
         }.createSimulation {
 
             // register other components to  be present when starting the simulation

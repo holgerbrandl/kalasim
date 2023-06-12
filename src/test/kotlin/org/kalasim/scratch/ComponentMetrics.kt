@@ -7,7 +7,9 @@ import org.kalasim.monitors.printConsole
 import org.kalasim.plot.kravis.display
 
 fun main() {
-    createSimulation(true) {
+    createSimulation {
+        enableComponentLogger()
+
         val fuelPump = Resource("tank", capacity = 3)
         val refilPermitted = State(false)
 

@@ -1,10 +1,13 @@
 import org.kalasim.ClockSync
 import org.kalasim.createSimulation
+import org.kalasim.enableComponentLogger
 import kotlin.time.Duration.Companion.seconds
 
 val timeBefore = System.currentTimeMillis()
 
-createSimulation(true) {
+createSimulation {
+    enableComponentLogger()
+
     // enable real-time clock synchronization
     ClockSync(tickDuration = 1.seconds)
 

@@ -54,7 +54,7 @@ It may happen that a simulation is too complex to run at a defined clock. In suc
 
 ## Operational Control
 
-Even if `kalasim` tries to provide a simplistic, efficient, declarative approach to define a simulation, it may come along with computational demands simulation. To allow introspection into time-complexity of the underlying computations, the user may want to use the built-in `env.tickMetrics` [monitor](monitors.md) to analyze how much time is spent per time unit (aka *tick*). This monitor is not enabled by default and needs to be enabled when the environment is created by passing `enableTickMetrics=true`
+Even if `kalasim` tries to provide a simplistic, efficient, declarative approach to define a simulation, it may come along with computational demands simulation. To allow introspection into time-complexity of the underlying computations, the user may want to enable the built-in `env.tickMetrics` [monitor](monitors.md) to analyze how much time is spent per time unit (aka *tick*). This monitor can be enabled by calling `enableTickMetrics()` when [configuring](basics.md#configuring-a-simulation) the simulation.
 
 ```kotlin hl_lines="5"
 {!api/TickMetricsExample.kts!}

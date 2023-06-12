@@ -22,7 +22,9 @@ class Car : Component() {
     }
 }
 
-createSimulation(enableComponentLogger = true) {
+createSimulation {
+    enableComponentLogger()
+
     dependency { TrafficLight() }
     dependency { Driver() }
 

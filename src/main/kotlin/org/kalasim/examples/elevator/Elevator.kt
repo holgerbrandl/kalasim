@@ -6,9 +6,7 @@ import org.kalasim.animation.AnimationComponent
 import org.kalasim.examples.elevator.Car.DoorState.CLOSED
 import org.kalasim.examples.elevator.Car.DoorState.OPEN
 import org.kalasim.examples.elevator.Direction.*
-import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.repeat
-import org.kalasim.plot.kravis.display
 import java.awt.Point
 import kotlin.time.Duration.Companion.days
 import kotlin.time.DurationUnit

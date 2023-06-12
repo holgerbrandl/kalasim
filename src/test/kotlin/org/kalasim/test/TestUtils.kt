@@ -42,7 +42,10 @@ internal fun captureOutput(expr: () -> Any): CapturedOutput {
 
 
 internal fun createTestSimulation(enableComponentLogger: Boolean = true, builder: Environment.() -> Unit) {
-    createSimulation(enableComponentLogger, builder = builder)
+    createSimulation{
+        if(enableComponentLogger) enableComponentLogger()
+        builder()
+    }
 }
 
 internal fun <S : Environment> testModel(sim: S, smthg: S.() -> Unit): Unit = smthg(sim)
