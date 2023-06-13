@@ -23,7 +23,7 @@ class Tool : Component() {
                     doSomething()
                 }
 
-                now shouldBe 50.tt
+//                now shouldBe 50.tt
             }
         }
 

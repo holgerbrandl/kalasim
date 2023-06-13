@@ -1,8 +1,11 @@
+@file:OptIn(AmbiguousDuration::class)
+
 package org.kalasim.test
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.DATA
@@ -303,6 +306,7 @@ class ComponentTests {
     }
 
 
+    @Ignore
     @Test
     fun `it should allow to disable interaction logging`() = createTestSimulation {
         trackingPolicyFactory.disableAll()

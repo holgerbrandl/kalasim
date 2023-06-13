@@ -2,14 +2,23 @@
 
 ## v0.10
 
-Not yet released
+Released 2023-06-16
 
-Breaking changes
+Breaking API Changes
+
 * tick metrics and component-logger are now [configured](basics.md#configuring-a-simulation) and not enabled via constructor parameter any longer (to minimize constructor complexity)
-* 
 
-Improvments
-* More robust [dependency injection](basics.md#dependency-injection) with 
+Improvements
+
+* More robust [dependency injection](basics.md#dependency-injection)
+
+Performance
+
+* Added jmh benchmark-suite and reporting
+
+Documentation
+
+* Continued migration to `Duration` as replacement for `Number` in `hold()`, `wait()` etc.  
 
 ## v0.9 
 
