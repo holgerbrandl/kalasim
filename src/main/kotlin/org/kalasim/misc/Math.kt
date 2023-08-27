@@ -5,7 +5,7 @@ import org.apache.commons.math3.stat.descriptive.*
 import org.apache.commons.math3.stat.descriptive.rank.Median
 import org.kalasim.monitors.ValueTimeline
 
-internal fun Collection<Double>.median() = Median().evaluate(toDoubleArray())
+fun Collection<Double>.median() = Median().evaluate(toDoubleArray())
 
 
 // copied from krangl

@@ -22,7 +22,7 @@ internal fun ImplementMe(): Nothing =
     TODO("Not yet implemented. Please file a ticket under https://github.com/holgerbrandl/kalasim/issues")
 
 
-internal fun Any.printThis() {
+fun Any.printThis() {
     println(toString())
 }
 
