@@ -7,10 +7,31 @@ import org.json.JSONObject
 import org.kalasim.analysis.EntityCreatedEvent
 import org.kalasim.misc.Jsonable
 
+fun main() {
+    val name = getNameClassValueCache(Event::class.java)
+    print("name is $name")
+}
+
+fun getNameClassValueCache(clazz: Class<*>): String {
+    val default = ClassName.DEFAULT
+    return default.get(clazz)
+}
+
+
+internal class ClassName : ClassValue<String>() {
+    override fun computeValue(clazz: Class<*>): String {
+        val name = clazz.getName()
+        return name.substring(name.lastIndexOf('.') + 1)
+    }
+
+    companion object {
+        val DEFAULT: ClassValue<String> = ClassName()
+    }
+}
 
 /** The base event of kalasim. Usually this extended to convey more specific information.*/
 abstract class Event(
-    val time: TickTime
+    val time: TickTime,
 ) : Jsonable() {
 
 //    constructor(time: TickTime) : this(time.value)
@@ -20,12 +41,13 @@ abstract class Event(
 //    open val logLevel: Level get() = Level.INFO
 
     //included for more informative json serialization
-    val eventType: String = this.javaClass.simpleName
+    // todo this could be even lazy
+    val eventType: String = getNameClassValueCache(this.javaClass)
 
 
     override fun toJson(): JSONObject = json {
         "time" to time
-        "type" to this@Event.javaClass.simpleName
+        "type" to eventType
     }
 
 
