@@ -1719,6 +1719,11 @@ open class Component(
 
         return batch
     }
+
+
+    suspend fun SequenceScope<Component>.join(components: List<Component>)  = sequence<Component> {
+        wait(*components.map { it.componentState() turns PASSIVE }.toTypedArray())
+    }
 }
 
 

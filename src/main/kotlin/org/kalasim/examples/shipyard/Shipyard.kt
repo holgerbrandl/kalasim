@@ -1,18 +1,51 @@
 package org.kalasim.examples.shipyard
 
+import mu.KotlinLogging
 import org.kalasim.*
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 
+class Part(val partId: String, val makeTime: DurationDistribution, vararg val components: Part) : SimulationEntity(partId)
 
-class Shipyard : Environment(DurationUnit.DAYS) {
+class PartAssembly(val part: Part) : Component() {
+    val completed =  State(false)
 
-    class Part(val partId: String, val makeTime: DurationDistribution, vararg val components: Part) : SimulationEntity()
+    val orgTime = normal(10, 3).minutes
 
-    // utilty to model rectified normal distribution wiht a fifth of the mean as sd
-//    fun norm5(mean: Duration)= normal(mean, mean/5, true)
+    override fun process() = sequence {
+        hold(orgTime())
+
+        // branch part production
+        val partAssemblies = part.components.map { PartAssembly(it) }
+
+        // 1) join parts manually
+        val assemblyStates = partAssemblies.map { it.componentState() }
+        wait(*assemblyStates.map { it turns ComponentState.PASSIVE }.toTypedArray())
+//            wait(*assemblyStates.map {  it turns true }.toTypedArray())
+
+        // 2) make parts with utility method to join sub-processes
+        join(partAssemblies)
+
+        // 3) use dedicated state variable in each process
+        wait(*partAssemblies.map {  it.completed turns true }.toTypedArray())
+
+
+        // assembly them
+        hold(part.makeTime())
+
+        logger.info{ "completed assembly of part ${this}" }
+
+        completed.value = true
+
+        // indicate completion
+        log(Shipyard.PartCompleted(now, part))
+    }
+}
+
+// todo get rid of time attribute
+class PartCompleted(time: TickTime, val part: Part) : Event(time)
+
+fun exampleBOM(){
 
     val rumpf = Part("rumpf",  normal(1.days, 0.2.days, true))
     val deck = Part("deck", normal(2.days, 0.2.days, true))
@@ -29,41 +62,19 @@ class Shipyard : Environment(DurationUnit.DAYS) {
         Part("ship3", normal(2.days, 3.days), rumpf, bridge, deck)
     )
 
-    // todo get rid of time attribute
-    class PartCompleted(time: TickTime, val part: Part) : Event(time)
+    return products
+}
 
+class Shipyard(val bom: List<Any>  = exampleBOM(), iat: DurationDistribution = normal(24, 2).days) : Environment(DurationUnit.DAYS) {
 
-    class PartAssembly(val part: Part) : Component() {
-//        val completed =  State(false)
+    val logger = KotlinLogging.logger {}
 
-        val orgTime = normal(10, 3).minutes
-
-        override fun process() = sequence {
-            hold(orgTime())
-
-            // branch part production
-            val assemblyStates = part.components.map { component ->
-                PartAssembly(component).componentState()
-//                PartAssembly(component).completed
-            }
-
-            // join parts
-            wait(*assemblyStates.map { it turns ComponentState.PASSIVE }.toTypedArray())
-//            wait(*assemblyStates.map {  it turns true }.toTypedArray())
-
-            // assembly them
-            hold(part.makeTime())
-
-//            completed.value = true
-
-            // indicate completion
-            log(PartCompleted(now, part))
-        }
-    }
+    // utility to model rectified normal distribution with a fifth of the mean as sd
+//    fun norm5(mean: Duration)= normal(mean, mean/5, true)
 
     init {
-        ComponentGenerator(normal(23, 2)) {
-            products.random()
+        ComponentGenerator(iat.hours) {
+            bom.random()
         }.addConsumer {
             PartAssembly(it).componentState().onChange{
                 println("state changed ${it.value}")
@@ -71,6 +82,11 @@ class Shipyard : Environment(DurationUnit.DAYS) {
         }
     }
 }
+
+fun main() {
+    Shipyard()
+}
+
 
 class Car : Component() {
     override fun repeatedProcess() = sequence<Component> {
@@ -82,6 +98,6 @@ fun main() {
     Shipyard().apply {
         enableComponentLogger()
 
-        run(3.minutes)
+        run(3.weeks)
     }
 }

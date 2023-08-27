@@ -1,5 +1,13 @@
 # Kalasim Release History
 
+## v0.11
+
+Major improvments 
+* significantly improved library performance
+* Added `Int.Weeks` extension
+* Introduced supendable `join(components: List<Component>)` to wait for other components to become `DATA`  
+
+
 ## v0.10
 
 Released 2023-06-16
