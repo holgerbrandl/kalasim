@@ -106,3 +106,5 @@ fun Environment.toWallTime(time: TickTime) = time.toWallTime()
 //fun Environment.toWallTimeOrNull(time: TickTime) = time.toWallTime()
 
 //operator fun Instant.plus(duration: Duration): Instant = this.plus(duration.toJavaDuration())
+
+public inline val Int.weeks get() = times(7).toDuration(DurationUnit.DAYS)
