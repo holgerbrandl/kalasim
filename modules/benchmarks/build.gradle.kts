@@ -3,7 +3,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 plugins {
-    kotlin("jvm") version "1.8.20"
+    kotlin("jvm") version "1.9.10"
     id("java")
     id("me.champeau.jmh") version "0.7.1"
 //    id("io.morethan.jmhreport") version "0.9.0"

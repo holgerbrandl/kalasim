@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.8.20"
+    kotlin("jvm") version "1.8.10"
 }
 
 group = "org.kalasim.examples"
@@ -12,7 +12,8 @@ repositories {
 
 dependencies {
 
-    api("com.github.holgerbrandl:kalasim:0.9-SNAPSHOT")
+//    api("com.github.holgerbrandl:kalasim:0.9-SNAPSHOT")
+    api("com.github.holgerbrandl:kalasim:0.10")
     api("org.optaplanner:optaplanner-core:8.36.0.Final")
     api("org.optaplanner:optaplanner-benchmark:8.36.0.Final")
 

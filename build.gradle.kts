@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.8.20"
+    kotlin("jvm") version "1.9.10"
     `maven-publish`
     signing
 
@@ -26,8 +26,9 @@ dependencies {
     api("org.apache.commons:commons-math3:3.6.1")
     // note updated postponed because of regression errors
     api("io.insert-koin:koin-core:3.1.2")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.20")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.10")
 
+    api("org.json:json:20230227") // because version 20220924 is reported as vulerable
     api("com.github.holgerbrandl:jsonbuilder:0.10")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
@@ -41,7 +42,7 @@ dependencies {
 
     api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.8.20")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.10")
     testImplementation("io.kotest:kotest-assertions-core:5.5.5")
 
     // **TODO** move to api to require users to pull it in if needed

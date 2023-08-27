@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 plugins {
-    kotlin("jvm")  version "1.8.20"
+    kotlin("jvm")  version "1.9.10"
     `maven-publish`
 }
 
@@ -49,7 +49,7 @@ repositories {
 
 dependencies {
 //    implementation(project ("kalasim"))
-    api("com.github.holgerbrandl:kalasim:0.9-SNAPSHOT")
+    api("com.github.holgerbrandl:kalasim:0.10")
 
 //    api("com.github.holgerbrandl:kravis:0.8.3")
 //    api("com.github.holgerbrandl:krangl:0.17.2")

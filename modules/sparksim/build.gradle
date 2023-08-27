@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.7.21'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.0'
     id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
 
@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     // Kotlin stdlib
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.7.21'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.0'
 
     // Kotlin Spark API
     implementation 'org.jetbrains.kotlinx.spark:kotlin-spark-api_3.3.1_2.12:1.2.2'  // Apache Spark
