@@ -106,7 +106,7 @@ class EnvTests {
 
 //            Resource()
             // Should we auto-declare when being in apply mode? --> No because how to deal with customerS!
-            _koin.declare(Resource())
+            getKoin().declare(Resource())
 
             State(false)
             ComponentQueue<Component>()
@@ -120,7 +120,7 @@ class EnvTests {
             Component()
 
 //            Resource()
-            _koin.declare(Resource())
+            getKoin().declare(Resource())
 
             State(false)
 
@@ -144,8 +144,8 @@ class EnvTests {
             env2.get<LateArriver>()
         }
 
-        println(env1._koin)
-        println(env2._koin)
+        println(env1.getKoin())
+        println(env2.getKoin())
     }
 
 

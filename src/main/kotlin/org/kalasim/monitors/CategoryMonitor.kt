@@ -66,7 +66,7 @@ fun <T> CategoryMonitor<T>.printHistogram(values: List<T>? = null, sortByWeight:
 typealias FrequencyTable<T> = Map<T, Double>
 
 
-internal fun <T> FrequencyTable<T>.printConsole(
+fun <T> FrequencyTable<T>.printConsole(
     colWidth: Double = 40.0,
     sortByWeight: Boolean = false,
     values: List<T>? = null

@@ -3,7 +3,7 @@ package org.kalasim.misc
 import org.koin.core.Koin
 import org.koin.dsl.koinApplication
 
-internal class MissingDependencyContextException : Exception(
+class MissingDependencyContextException : Exception(
     "Simulation environment context is missing. Such a context is required to properly instantiate simulation entities. " +
             "See https://www.kalasim.org/basics/#simulation-environment"
 )

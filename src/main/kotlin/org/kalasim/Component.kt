@@ -65,7 +65,7 @@ data class Priority(val value: Int) : Comparable<Priority?> {
 //private typealias ProcessDefinition = Sequence<Component>
 
 
-internal data class RequestContext(
+data class RequestContext(
     val requestId: Long,
     val quantity: Double,
     val priority: Priority?,

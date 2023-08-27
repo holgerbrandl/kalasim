@@ -7,6 +7,9 @@ import org.kalasim.monitors.ValueTimeline
 
 fun Collection<Double>.median() = Median().evaluate(toDoubleArray())
 
+val DescriptiveStatistics.median: Double
+    get() = Median().evaluate(values)
+
 
 // copied from krangl
 fun <T : Number> List<T>.cumSum(): Iterable<Double> =

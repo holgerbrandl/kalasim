@@ -15,6 +15,7 @@ import org.kalasim.Priority.Companion.LOWEST
 import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.ResourceSelectionPolicy.*
 import kotlinx.datetime.Instant
+import org.kalasim.misc.TestUtil
 import org.kalasim.misc.asCMPairList
 import kotlin.time.Duration.Companion.minutes
 
@@ -130,7 +131,7 @@ class ResourceTests {
         resource.claimers.size shouldBe 1
         lpTool.isRequesting shouldBe false
         lpTool.isData shouldBe true
-        lpTool.requests.shouldBeEmpty()
+        TestUtil.requests(lpTool).shouldBeEmpty()
 
         run(5)
 
@@ -506,7 +507,7 @@ class ResourceTests {
             dr.claimers.isEmpty() shouldBe true
             dr.requesters.isEmpty() shouldBe true
 
-            c.requests.shouldBeEmpty()
+            TestUtil.requests(c).shouldBeEmpty()
             c.componentState shouldBe ComponentState.DATA
         }
     }

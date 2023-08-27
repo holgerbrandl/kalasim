@@ -19,9 +19,6 @@ import org.kalasim.test.captureOutput
 import org.koin.core.context.stopKoin
 
 
-internal val DescriptiveStatistics.median: Double
-    get() = Median().evaluate(values)
-
 class SalabimExampleTests {
 
 
@@ -118,14 +115,14 @@ class SalabimExampleTests {
 
         if(false) {
             avgQueueMeans
-                .plot(x = { it.first }, y = { (it.second.ss as DescriptiveStatistics).median })
+                .plot(x = { it.first }, y = { it.second.median })
                 .geomPoint()
                 .geomLine()
                 .show()
             Thread.sleep(100000)
         }
 
-        avgQueueMeans.map { (it.second.ss as DescriptiveStatistics).median }.median() shouldBe 27.0.plusOrMinus(1.0)
+        avgQueueMeans.map { it.second.median }.median() shouldBe 27.0.plusOrMinus(1.0)
     }
 
     @Test

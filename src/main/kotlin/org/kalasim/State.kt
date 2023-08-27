@@ -116,14 +116,26 @@ open class State<T>(
         maxTriggerCxt = null
     }
 
+//    private fun tryWait(maxHonor: Int = Int.MAX_VALUE) {
+//        var mx = maxHonor
+//        waiters.q.map { it.component }.takeWhile {
+//            // wait max times but consider honor return state of tryWait
+//            if(it.tryWait()) mx--
+//            mx > 0
+//        }
+//    }
     private fun tryWait(maxHonor: Int = Int.MAX_VALUE) {
-        var mx = maxHonor
-        waiters.q.map { it.component }.takeWhile {
-            // wait max times but consider honor return state of tryWait
-            if(it.tryWait()) mx--
-            mx > 0
+        var remainingHonor = maxHonor
+        val iterator = waiters.q.iterator()
+
+        while (remainingHonor > 0 && iterator.hasNext()) {
+            val waiter = iterator.next().component
+            if (waiter.tryWait()) {
+                remainingHonor--
+            }
         }
     }
+
 
     fun printHistograms() {
         waiters.printHistogram()

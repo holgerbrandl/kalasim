@@ -8,7 +8,7 @@ import org.kalasim.analysis.ResourceActivityEvent
 import org.kalasim.monitors.*
 import java.awt.GraphicsEnvironment
 
-internal fun canDisplay() = !GraphicsEnvironment.isHeadless() && hasR()
+fun canDisplay() = !GraphicsEnvironment.isHeadless() && hasR()
 
 fun hasR(): Boolean {
    try {

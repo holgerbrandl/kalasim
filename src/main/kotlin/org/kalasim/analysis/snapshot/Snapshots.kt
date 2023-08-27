@@ -1,6 +1,7 @@
 package org.kalasim.analysis.snapshot
 
 import com.github.holgerbrandl.jsonbuilder.json
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.moment.Variance
@@ -104,6 +105,9 @@ class FrequencyTableSnapshot<T>(internal val counts: FrequencyTable<T>) : Jsonab
 class StatisticalSummarySnapshot(internal val ss: StatisticalSummary) : StatisticalSummary by ss, Jsonable(),
     EntitySnapshot {
     override fun toJson(): JSONObject = ss.toJson()
+
+    val median : Double
+        get() = (ss as DescriptiveStatistics).median
 }
 
 

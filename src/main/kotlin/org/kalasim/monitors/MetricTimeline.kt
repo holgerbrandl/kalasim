@@ -20,8 +20,8 @@ open class MetricTimeline<V : Number>(
     koin: Koin = DependencyContext.get()
 ) : Monitor<V>(name, koin), ValueTimeline<V> {
 
-    internal val timestamps = mutableListOf<TickTime>()
-    internal val values = ifEnabled { mutableListOf<V>() }
+     val timestamps = mutableListOf<TickTime>()
+     val values = ifEnabled { mutableListOf<V>() }
 
     init {
         addValue(initialValue)

@@ -5,6 +5,7 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.*
 import org.kalasim.analysis.EntityCreatedEvent
+import org.kalasim.misc.AmbiguousDuration
 import kotlin.test.assertEquals
 
 
@@ -21,7 +22,7 @@ class StateTransitionTests {
 
             object : Component() {
                 override fun process() = sequence {
-                    while (true) {
+                    while(true) {
                         TestCar()
                         hold(1.0)
                     }
@@ -55,15 +56,19 @@ class StateTransitionTests {
         }.run(1.0)
     }
 
+    @OptIn(AmbiguousDuration::class)
     @Test
-    fun `it should correctly keep track of the state`() {
-        var c: Component? = null
-        createSimulation { c = Component() }.apply {
-            run(10.0)
-            c!!.componentState = WAITING
-            run(10.0)
+    fun `it should correctly keep track of the state`() = createTestSimulation {
+        val someState = State(false)
+
+        val c = object : Component() {
+            override fun process() = sequence<Component> {
+                hold(10)
+                wait(someState) { true }
+            }
         }
 
+        run(20.0)
         c!!.stateTimeline.printHistogram()
     }
 
