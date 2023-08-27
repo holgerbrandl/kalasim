@@ -3,9 +3,11 @@ package org.kalasim
 import com.github.holgerbrandl.jsonbuilder.json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.datetime.Instant
 import org.apache.commons.math3.random.JDKRandomGenerator
 import org.apache.commons.math3.random.RandomGenerator
-import org.kalasim.ComponentState.*
+import org.kalasim.ComponentState.CURRENT
+import org.kalasim.ComponentState.STANDBY
 import org.kalasim.Defaults.DEFAULT_SEED
 import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.analysis.ConsoleTraceLogger
@@ -16,14 +18,15 @@ import org.koin.core.Koin
 import org.koin.core.definition.Definition
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
+import org.koin.core.qualifier.named
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
-import kotlinx.datetime.Instant
-import org.koin.core.qualifier.named
 import java.util.*
-import kotlin.time.*
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
-import kotlin.time.DurationUnit.*
+import kotlin.time.DurationUnit
+import kotlin.time.DurationUnit.DAYS
+import kotlin.time.DurationUnit.MINUTES
 
 internal const val MAIN = "main"
 
@@ -32,14 +35,14 @@ typealias KoinModule = org.koin.core.module.Module
 // https://github.com/InsertKoinIO/koin/issues/801
 @Deprecated("Use createSimulation() instead", ReplaceWith("declareDependencies(builder).createSimulation {}"))
 fun configureEnvironment(
-    enableComponentLogger: Boolean = false, builder: KoinModule.() -> Unit
+    enableComponentLogger: Boolean = false, builder: KoinModule.() -> Unit,
 ): Environment = declareDependencies(builder).createSimulation {}
 
 
 @Suppress("DeprecatedCallableAddReplaceWith")
 @Deprecated("Use createSimulation() instead")
 fun declareDependencies(
-    builder: KoinModule.() -> Unit
+    builder: KoinModule.() -> Unit,
 ): KoinModule = module(createdAtStart = true) { builder() }
 
 
@@ -50,7 +53,7 @@ fun KoinModule.createSimulation(
     startDate: Instant? = null,
     useCustomKoin: Boolean = false,
     randomSeed: Int = DEFAULT_SEED,
-    builder: Environment.() -> Unit
+    builder: Environment.() -> Unit,
 ): Environment = createSimulation(
     durationUnit = durationUnit,
     startDate = startDate,
@@ -68,7 +71,7 @@ fun createSimulation(
     dependencies: KoinModule? = null,
     useCustomKoin: Boolean = false,
     randomSeed: Int = DEFAULT_SEED,
-    builder: Environment.() -> Unit
+    builder: Environment.() -> Unit,
 ): Environment = Environment(
     durationUnit = durationUnit,
     startDate = startDate,
@@ -130,9 +133,12 @@ open class Environment(
     /** Unmodifiable sorted view of currently scheduled components. */
     val queue: List<Component>
         //        get() = eventQueue.map { it.component }
-        get() = eventQueue.sortedIterator().map { it.component }.toList()
+        get() = eventQueue.sortedIterator()
+            .map { it.component }
+            .toList()
 
-    internal val eventListeners = listOf<EventListener>().toMutableList()
+    // intenionally immutable to avoid checkForCodmodificatio when iterating it (suggested by chat-gpt)
+    internal var eventListeners: List<EventListener> = emptyList()
 
 
     val trackingPolicyFactory = TrackingPolicyFactory()
@@ -181,12 +187,12 @@ open class Environment(
     //redeclare to simplify imports
     /** Resolves a dependency in the simulation. Dependencies can be disambiguated by using a qualifier.*/
     inline fun <reified T : Any> get(
-        qualifier: Qualifier? = null, noinline parameters: ParametersDefinition? = null
+        qualifier: Qualifier? = null, noinline parameters: ParametersDefinition? = null,
     ): T = getKoin().get(qualifier, parameters)
 
     /** Resolves a dependency in the simulation. Dependencies can be disambiguated by using a qualifier.*/
     inline fun <reified T : Any> get(
-        qualifier: String , noinline parameters: ParametersDefinition? = null
+        qualifier: String, noinline parameters: ParametersDefinition? = null,
     ): T = getKoin().get(named(qualifier), parameters)
 
 
@@ -235,8 +241,8 @@ open class Environment(
     }
 
 
-    fun enableTickMetrics(){
-        require(queue.none{ it is TickMetrics}){
+    fun enableTickMetrics() {
+        require(queue.none { it is TickMetrics }) {
             "The tick-metrics monitor is already registered"
         }
 
@@ -245,7 +251,8 @@ open class Environment(
 
     val tickMetrics: MetricTimeline<Int>
         get() {
-            val tm = queue.filterIsInstance<TickMetrics>().firstOrNull()
+            val tm = queue.filterIsInstance<TickMetrics>()
+                .firstOrNull()
             require(tm != null) { "Use enableTickMetrics=true to enable tick metrics" }
             return tm.timeline
         }
@@ -273,7 +280,7 @@ open class Environment(
      */
     @OptIn(AmbiguousDuration::class)
     fun run(
-        duration: Duration? = null, until:Instant? = null, priority: Priority = NORMAL
+        duration: Duration? = null, until: Instant? = null, priority: Priority = NORMAL,
     ) = run(duration?.asTicks(), until?.toTickTime(), priority)
 
 //    /**
@@ -297,7 +304,7 @@ open class Environment(
      */
     @OptIn(AmbiguousDuration::class)
     fun run(
-        until: Instant, priority: Priority = NORMAL
+        until: Instant, priority: Priority = NORMAL,
     ) = run(until = until.toTickTime(), priority = priority)
 
     /**
@@ -314,7 +321,7 @@ open class Environment(
      */
     @AmbiguousDuration
     fun run(
-        duration: Number? = null, until: TickTime? = null, priority: Priority = NORMAL, urgent: Boolean = false
+        duration: Number? = null, until: TickTime? = null, priority: Priority = NORMAL, urgent: Boolean = false,
     ) {
         // also see https://simpy.readthedocs.io/en/latest/topical_guides/environments.html
         if(duration == null && until == null) {
@@ -340,11 +347,12 @@ open class Environment(
 
         pendingStandBy.removeIf { it.componentState != STANDBY }
 
-        pendingStandBy.removeFirstOrNull()?.let {
-            setCurrent(it) // , "standby" --> removed field in  v0.8
-            it.callProcess()
-            return
-        }
+        pendingStandBy.removeFirstOrNull()
+            ?.let {
+                setCurrent(it) // , "standby" --> removed field in  v0.8
+                it.callProcess()
+                return
+            }
 
         // move previously standby to pending-standby
         pendingStandBy += standBy
@@ -411,10 +419,16 @@ open class Environment(
         block(it)
     }
 
-    fun addEventListener(listener: EventListener) = eventListeners.add(listener)
+    fun addEventListener(listener: EventListener) {
+//        eventListeners.add(listener)
+        eventListeners += listener
+    }
 
     @Suppress("unused")
-    fun removeEventListener(tr: EventListener) = eventListeners.remove(tr)
+    fun removeEventListener(eventListener: EventListener) {
+//        = eventListeners.remove(tr)
+        eventListeners -= eventListener
+    }
 
 
     internal fun publishEvent(event: Event) {
@@ -481,7 +495,8 @@ open class Environment(
             require(scheduledComponents.none(Component::isPassive)) { "passive component must not be in event queue" }
 
             // ensure that no scheduled components have the same name
-            require(scheduledComponents.map { it.name }.distinct().size == scheduledComponents.size) {
+            require(scheduledComponents.map { it.name }
+                .distinct().size == scheduledComponents.size) {
                 "components must not have the same name"
             }
         }
@@ -489,7 +504,9 @@ open class Environment(
 
     override fun toJson() = json {
         "now" to now
-        "queue" to queue.toList().map { it.name }.toTypedArray()
+        "queue" to queue.toList()
+            .map { it.name }
+            .toTypedArray()
     }
 
     fun hasAbsoluteTime() = startDate != null
@@ -529,7 +546,7 @@ data class QueueElement(
 
 
 fun Environment.enableComponentLogger() {
-    require(eventListeners.none{ it is ConsoleTraceLogger}){
+    require(eventListeners.none { it is ConsoleTraceLogger }) {
         "The component-logger is already registered"
     }
 
@@ -546,7 +563,8 @@ internal fun Environment.calcScheduleTime(until: TickTime?, duration: Number?): 
             require(duration == null) { "both duration and till specified" }
             till
         }
-    }.let { TickTime(it) }
+    }
+        .let { TickTime(it) }
 }
 
 
@@ -559,7 +577,8 @@ inline fun <reified T> KoinModule.dependency(
 
 
 /** Register dependency in simulation context. For details see https://www.kalasim.org/basics/#dependency-injection */
-inline fun <reified T> Environment.dependency(qualifier: String, builder: Environment.() -> T) = dependency(named(qualifier), builder)
+inline fun <reified T> Environment.dependency(qualifier: String, builder: Environment.() -> T) =
+    dependency(named(qualifier), builder)
 
 /** Register dependency in simulation context. For details see https://www.kalasim.org/basics/#dependency-injection */
 inline fun <reified T> Environment.dependency(qualifier: Qualifier? = null, builder: Environment.() -> T): T {
@@ -569,9 +588,10 @@ inline fun <reified T> Environment.dependency(qualifier: Qualifier? = null, buil
         dependency(qualifier) { something }
     }))
 
-    require(something  !is Unit){
+    require(something !is Unit) {
         "dependency must not be last element in createSimulation{} as this is causing type inference to fail internally. Add println() or any other terminal statement to work around this problem."
     }
+
     return something
 }
 
