@@ -41,8 +41,9 @@ abstract class Event(
 //    open val logLevel: Level get() = Level.INFO
 
     //included for more informative json serialization
-    // todo this could be even lazy
-    val eventType: String = getNameClassValueCache(this.javaClass)
+    // todo this could be even lazy val
+//    fun eventType(): String = getNameClassValueCache(this.javaClass)
+    val eventType: String by lazy{ getNameClassValueCache(this.javaClass)}
 
 
     override fun toJson(): JSONObject = json {
