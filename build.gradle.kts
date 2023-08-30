@@ -13,8 +13,8 @@ plugins {
 
 group = "com.github.holgerbrandl"
 //version = "0.8.101"
-//version = "0.9.1"
-version = "0.11-SNAPSHOT"
+version = "0.11"
+//version = "0.11-SNAPSHOT"
 
 
 repositories {
@@ -76,7 +76,7 @@ val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions.freeCompilerArgs += "-Xallow-any-scripts-in-source-roots"
 
 //todo remove for release
-compileKotlin.kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
+//compileKotlin.kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
 
 
 // to set bytecode version to 11 we need to do 2 things (note: this requires the usage projects to do the same)

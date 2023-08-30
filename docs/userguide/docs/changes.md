@@ -2,10 +2,14 @@
 
 ## v0.11
 
-Major improvments 
+Major improvements 
+
 * significantly improved library performance
 * Added `Int.Weeks` extension
-* Introduced supendable `join(components: List<Component>)` to wait for other components to become `DATA`  
+* Introduced suspendable `join(components: List<Component>)` to wait for other components to become `DATA`  
+
+Documentation & Examples
+* New Example Shipyard - Multipart assembly
 
 
 ## v0.10
