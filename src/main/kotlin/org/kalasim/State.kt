@@ -1,9 +1,13 @@
 package org.kalasim
 
-import org.kalasim.analysis.*
+import org.kalasim.analysis.EntityCreatedEvent
+import org.kalasim.analysis.StateChangedEvent
 import org.kalasim.analysis.snapshot.StateSnapshot
-import org.kalasim.misc.*
-import org.kalasim.monitors.*
+import org.kalasim.misc.DependencyContext
+import org.kalasim.misc.StateTrackingConfig
+import org.kalasim.monitors.CategoryTimeline
+import org.kalasim.monitors.MetricTimeline
+import org.kalasim.monitors.NumericStatisticMonitor
 import org.koin.core.Koin
 
 /**
@@ -16,7 +20,7 @@ import org.koin.core.Koin
 open class State<T>(
     initialValue: T,
     name: String? = null,
-    koin: Koin = DependencyContext.get()
+    koin: Koin = DependencyContext.get(),
 ) : SimulationEntity(name, koin) {
 
     private var maxTriggerCxt: Int? = null
@@ -40,7 +44,7 @@ open class State<T>(
 
             field = value
 
-            changeListeners.forEach{ it.stateChanged(this)}
+            changeListeners.forEach { it.stateChanged(this) }
 
             timeline.addValue(value)
 
@@ -116,7 +120,7 @@ open class State<T>(
         maxTriggerCxt = null
     }
 
-//    private fun tryWait(maxHonor: Int = Int.MAX_VALUE) {
+    //    private fun tryWait(maxHonor: Int = Int.MAX_VALUE) {
 //        var mx = maxHonor
 //        waiters.q.map { it.component }.takeWhile {
 //            // wait max times but consider honor return state of tryWait
@@ -124,13 +128,28 @@ open class State<T>(
 //            mx > 0
 //        }
 //    }
+    // throws concurrent modification exception
+//    private fun tryWait(maxHonor: Int = Int.MAX_VALUE) {
+//        var remainingHonor = maxHonor
+//        val iterator = waiters.q.iterator()
+//
+//        while (remainingHonor > 0 && iterator.hasNext()) {
+//            val waiter = iterator.next().component
+//            if (waiter.tryWait()) {
+//                remainingHonor--
+//            }
+//        }
+//    }
     private fun tryWait(maxHonor: Int = Int.MAX_VALUE) {
+        val copyOfQ = ArrayList(waiters.q) // Make a copy of the collection
         var remainingHonor = maxHonor
-        val iterator = waiters.q.iterator()
 
-        while (remainingHonor > 0 && iterator.hasNext()) {
-            val waiter = iterator.next().component
-            if (waiter.tryWait()) {
+        for(waiter in copyOfQ) {
+            val component = waiter.component
+            if(remainingHonor <= 0) {
+                break
+            }
+            if(component.tryWait()) {
                 remainingHonor--
             }
         }
