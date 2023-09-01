@@ -1,6 +1,7 @@
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
+import kotlinx.datetime.Instant
 import org.kalasim.analysis.snapshot.EntitySnapshot
 import org.kalasim.misc.*
 import org.koin.core.Koin
@@ -64,7 +65,7 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
         get() = env.now
 //        private set
 
-    val nowWT =
+    val nowWT : Instant
         get() = now.toWallTime()
 
 
