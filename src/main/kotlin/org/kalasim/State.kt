@@ -29,6 +29,12 @@ open class State<T>(
 
     var value: T = initialValue
         set(value) {
+
+
+            if(field == value) return
+
+            field = value
+
             // salabim also logs the set even if the state.value may not change
             log(trackingPolicy.logTriggers) {
                 StateChangedEvent(
@@ -39,10 +45,6 @@ open class State<T>(
                     if(isTriggerCxt) maxTriggerCxt else null,
                 )
             }
-
-            if(field == value) return
-
-            field = value
 
             changeListeners.forEach { it.stateChanged(this) }
 

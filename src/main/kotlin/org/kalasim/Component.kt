@@ -1257,13 +1257,13 @@ open class Component(
      */
     @OptIn(AmbiguousDuration::class)
     suspend fun SequenceScope<Component>.hold(
-        duration: Duration,
+        duration: Duration? = null,
         description: String? = null,
         until: Instant? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
     ) = yieldCurrent {
-        this@Component.hold(duration.asTicks(), description, until?.toTickTime(), priority, urgent)
+        this@Component.hold(duration?.asTicks(), description, until?.toTickTime(), priority, urgent)
     }
 
     /**

@@ -7,6 +7,7 @@ import org.kalasim.*
 import org.kalasim.ComponentState.DATA
 import org.kalasim.Priority.Companion.IMPORTANT
 import org.kalasim.analysis.InteractionEvent
+import org.kalasim.misc.AmbiguousDuration
 import kotlin.math.roundToInt
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.minutes
@@ -163,6 +164,7 @@ class QueueTests {
         generated.map { it.creationTime.value.roundToInt() } shouldBe arrivalsTimes
     }
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should form batches`() = createTestSimulation {
         // see ferryman.md

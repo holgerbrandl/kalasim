@@ -19,7 +19,7 @@ createSimulation(durationUnit = DurationUnit.MINUTES) {
             hold(1.3.hours, description = "walking")
 
             // we can also hold until a specific time
-            hold(until= now + 3.hours )
+            hold(until= nowWT + 3.hours )
         }
     }
 

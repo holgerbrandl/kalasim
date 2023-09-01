@@ -162,6 +162,10 @@ open class Environment(
     var now = tickTimeOffset
         private set // no longer needed/wanted --> use run
 
+    val nowWT: Instant
+        get() = now.toWallTime()
+
+
     @Suppress("LeakingThis")
     // That's a pointless self-recursion, but it allows to simplify support API (tick-transform, distributions, etc.)
     /** Self-pointer. Pointless from a user-perspective, but helpful to build the kalasim APIs more efficiently.*/

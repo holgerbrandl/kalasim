@@ -64,6 +64,7 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
         get() = env.now
 //        private set
 
+    val nowWT = now.toWallTime()
 
     val random
         get() = env.random
