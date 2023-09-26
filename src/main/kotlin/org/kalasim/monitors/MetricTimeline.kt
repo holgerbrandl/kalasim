@@ -200,10 +200,11 @@ operator fun <V : Number> MetricTimeline<V>.div(factor: Double): MetricTimeline<
     return combineInternal(this.asDoubleTimeline(), constMT, ArithmeticOp.Div)
 }
 
-fun <V : Number> List<MetricTimeline<V>>.mean(): MetricTimeline<Double> {
-    val reduce = map { it.asDoubleTimeline() }.reduce { acc, mt -> acc + mt }
-    return reduce / size.toDouble()
-}
+fun <V : Number> List<MetricTimeline<V>>.sum(): MetricTimeline<Double> =
+    map { it.asDoubleTimeline() }.reduce { acc, mt -> acc + mt }
+
+fun <V : Number> List<MetricTimeline<V>>.mean(): MetricTimeline<Double> = sum() / size.toDouble()
+
 
 private fun <V : Number> combineInternal(
     mt: MetricTimeline<V>,
