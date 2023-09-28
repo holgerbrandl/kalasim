@@ -42,6 +42,8 @@ dependencies {
 
     api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
+    api("io.github.oshai:kotlin-logging-jvm:5.1.0")
+
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.10")
     testImplementation("io.kotest:kotest-assertions-core:5.5.5")
 

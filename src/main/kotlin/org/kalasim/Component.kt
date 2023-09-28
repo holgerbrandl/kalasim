@@ -1,7 +1,7 @@
 package org.kalasim
 
 import kotlinx.datetime.Instant
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.kalasim.ComponentState.*
 import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.ResourceSelectionPolicy.*

@@ -1,6 +1,6 @@
 package org.kalasim.examples.shipyard
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.kalasim.*
 import kotlin.time.Duration.Companion.days
 import kotlin.time.DurationUnit
