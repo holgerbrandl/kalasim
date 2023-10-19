@@ -15,8 +15,8 @@ import org.kalasim.Priority.Companion.LOWEST
 import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.ResourceSelectionPolicy.*
 import kotlinx.datetime.Instant
-import org.kalasim.misc.TestUtil
-import org.kalasim.misc.asCMPairList
+import org.kalasim.misc.*
+import kotlin.repeat
 import kotlin.time.Duration.Companion.minutes
 
 class ResourceTests {
@@ -409,6 +409,7 @@ class ResourceTests {
         run(1)
     }
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should track request scoped activities`() = createTestSimulation {
         val r1 = Resource(capacity = 4)
@@ -455,7 +456,7 @@ class ResourceTests {
 
         // We should make sure that only actual changes are tracked (e.g. not same capacity value twice
         timeline.filter { it.metric == ResourceMetric.Capacity }.size shouldBe 2
-        timeline.size shouldBe 28
+        timeline.size shouldBe 26
 
         // now set the tick-transform and check if the timeline includes walltime
         startDate =Instant.parse("2021-01-01T00:00:00.00Z")

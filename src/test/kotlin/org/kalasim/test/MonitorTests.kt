@@ -6,12 +6,14 @@ import io.kotest.matchers.shouldBe
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.apache.commons.math3.stat.descriptive.StatisticalSummaryValues
 import org.junit.Test
+import org.kalasim.misc.*
 import org.kalasim.misc.merge
 import org.kalasim.misc.mergeStats
 import org.kalasim.monitors.*
 import org.kalasim.test.MonitorTests.Car.*
 import org.kalasim.tt
 
+@OptIn(AmbiguousDuration::class)
 class MonitorTests {
 
     private enum class Car {
@@ -204,10 +206,11 @@ class MonitorTests {
 
 
 /* Test the monitors can be merged. */
+@OptIn(org.kalasim.misc.AmbiguousDuration::class)
 class MergeTimelineTests {
 
     @Test
-    fun `it should metric timelines`() = createTestSimulation {
+    fun `it should support algebra of metric timelines`() = createTestSimulation {
         val mtA = IntTimeline()
         val mtB = IntTimeline()
 
@@ -220,11 +223,21 @@ class MergeTimelineTests {
         run(until = 12.tt)
         mtB.addValue(5)
 
+        val mtC = IntTimeline(initialValue = 5)
+
+
         run(until = 14.tt)
         mtA.addValue(10)
+        mtC.addValue(12)
+
+        //  test scalar operations
+        (mtA / 2.0).apply {
+            get(0) shouldBe 0.0
+            get(6) shouldBe 11.5
+            get(16) shouldBe 5
+        }
 
         //merge statistics
-
         val addedTL = mtA + mtB
 
         println(addedTL.timestamps)
@@ -233,11 +246,22 @@ class MergeTimelineTests {
         addedTL.values shouldBe listOf(0.0, 23.0, 26.0, 28.0, 15.0)
         addedTL.timestamps shouldBe listOf(0.0, 5.0, 10.0, 12.0, 14.0).map { it.tt }
 
-        // just make sure that the other ops do not error do not error
+        //  make sure that the other ops do not error do not error
         println(mtA + mtB)
         println(mtA - mtB)
         println(mtA * mtB)
+        (mtA * mtB)[11] shouldBe 69
         println(mtA / mtB)
+
+        listOf(mtA, mtB).sum()[11] shouldBe 26.0
+        listOf(mtA, mtB).mean()[11] shouldBe 13.0
+
+
+        // also validate that when merging with c the later init is accounted for
+        val mtAC = (mtA+mtC)
+        mtAC[13] shouldBe (mtA[13]+mtC[13])
+        mtAC[100] shouldBe 22
+        shouldThrow<IllegalArgumentException>{mtAC[10]}
     }
 }
 

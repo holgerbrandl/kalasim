@@ -194,8 +194,9 @@ operator fun <V : Number> MetricTimeline<V>.div(other: MetricTimeline<V>) =
     combineInternal(this, other, ArithmeticOp.Div)
 
 operator fun <V : Number> MetricTimeline<V>.div(factor: Double): MetricTimeline<Double> {
-    val constMT = MetricTimeline("Constant $factor", initialValue = factor.toDouble()).apply {
-        timestamps.apply { clear(); add(timestamps.first()) }
+    val constMT = MetricTimeline("Constant $factor", initialValue = factor)
+    .apply {
+        timestamps.apply { clear(); add(this@div.timestamps.first()) }
     }
     return combineInternal(this.asDoubleTimeline(), constMT, ArithmeticOp.Div)
 }
@@ -218,7 +219,7 @@ private fun <V : Number> combineInternal(
 
     val minTime = maxOf(mt.timestamps.first(), other.timestamps.first())
 //    val maxTime = Math.min(mt.timestamps.last(), other.timestamps.last())
-    val maxTime = mt.now.value
+    val maxTime = maxOf(mt.timestamps.last(), other.timestamps.last())
 //    val timeRange = minTime..maxTime
 
     val merged = MetricTimeline(
@@ -230,14 +231,18 @@ private fun <V : Number> combineInternal(
         values.clear()
     }
 
-    joinTime.dropWhile { it < minTime }.takeWhile { it <= maxTime }.forEach { time ->
-        merged.timestamps.add(time)
-        val value = when(mode) {
-            ArithmeticOp.Plus -> mt[time].toDouble() + other[time].toDouble()
-            ArithmeticOp.Minus -> mt[time].toDouble() - other[time].toDouble()
-            ArithmeticOp.Times -> mt[time].toDouble() * other[time].toDouble()
-            ArithmeticOp.Div -> mt[time].toDouble() / other[time].toDouble()
-        }
+    joinTime
+        .dropWhile { it < minTime }
+        .takeWhile { it <= maxTime }
+        .forEach { time ->
+            merged.timestamps.add(time)
+            val value = when(mode) {
+                ArithmeticOp.Plus -> mt[time].toDouble() + other[time].toDouble()
+                ArithmeticOp.Minus -> mt[time].toDouble() - other[time].toDouble()
+                ArithmeticOp.Times -> mt[time].toDouble() * other[time].toDouble()
+                ArithmeticOp.Div -> mt[time].toDouble() / other[time].toDouble()
+          }
+
         merged.values.add(value)
     }
 
