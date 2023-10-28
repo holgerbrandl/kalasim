@@ -48,7 +48,7 @@ fun declareDependencies(
 
 fun KoinModule.createSimulation(
     /** The start time of the simulation model. Defaults to 1970-01-01T00:00:00Z following the convention of kotlin.time.Instant.*/
-    startDate: SimTime = TickTime.fromEpochMilliseconds(0),
+    startDate: SimTime = SimTime.fromEpochMilliseconds(0),
     useCustomKoin: Boolean = false,
     /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
     durationUnit: DurationUnit = MINUTES,
@@ -65,7 +65,7 @@ fun KoinModule.createSimulation(
 
 fun createSimulation(
     /** The start time of the simulation model. Defaults to 1970-01-01T00:00:00Z following the convention of kotlin.time.Instant.*/
-    startDate: SimTime = TickTime.fromEpochMilliseconds(0),
+    startDate: SimTime = SimTime.fromEpochMilliseconds(0),
     dependencies: KoinModule? = null,
     useCustomKoin: Boolean = false,
     /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
@@ -103,7 +103,7 @@ fun main() {
 /** An environment hosts all elements of a simulation, maintains the event loop, and provides randomization support. For details see  https://www.kalasim.org/basics/#simulation-environment */
 open class Environment(
     /** The start time of the simulation model. Defaults to 1970-01-01T00:00:00Z following the convention of kotlin.time.Instant.*/
-    val startDate: SimTime = TickTime.fromEpochMilliseconds(0),
+    val startDate: SimTime = SimTime.fromEpochMilliseconds(0),
     /** If enabled, it will render a tabular view of recorded  interaction and resource events. */
     enableComponentLogger: Boolean = false,
 

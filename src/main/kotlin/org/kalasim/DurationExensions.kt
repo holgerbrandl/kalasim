@@ -38,3 +38,6 @@ val  Duration.inMinutes: Double
 internal val Duration.inSeconds
     get() = toDouble(DurationUnit.SECONDS)
 
+
+
+public inline val Int.weeks get() = times(7).toDuration(DurationUnit.DAYS)
