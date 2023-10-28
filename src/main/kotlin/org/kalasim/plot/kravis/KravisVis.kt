@@ -2,7 +2,6 @@ package org.kalasim.plot.kravis
 
 import kravis.*
 import kravis.device.JupyterDevice
-import kravis.device.SwingPlottingDevice
 import org.jetbrains.letsPlot.label.ggtitle
 import org.kalasim.*
 import org.kalasim.analysis.ResourceActivityEvent
@@ -44,8 +43,8 @@ var USE_KRAVIS_VIEWER = false
 
 fun <V : Number> MetricTimeline<V>.display(
     title: String = name,
-    from: TickTimeOld,
-    to: TickTimeOld,
+    from: TickTime,
+    to: TickTime,
     forceTickAxis: Boolean = false,
 ): GGPlot {
     return display(title, env.toWallTime(from), env.toWallTime(to), forceTickAxis)
@@ -53,8 +52,8 @@ fun <V : Number> MetricTimeline<V>.display(
 
 fun <V : Number> MetricTimeline<V>.display(
     title: String = name,
-    from: TickTime? = null,
-    to: TickTime? = null,
+    from: SimTime? = null,
+    to: SimTime? = null,
     forceTickAxis: Boolean = false,
 ): GGPlot {
     val data = stepFun()
@@ -100,7 +99,7 @@ fun <T> CategoryTimeline<T>.display(
     val nlmStatsData = statsData()
     val stepFun = nlmStatsData.stepFun()
 
-    data class Segment<T>(val value: T, val start: TickTime, val end: TickTime)
+    data class Segment<T>(val value: T, val start: SimTime, val end: SimTime)
 
     val segments = stepFun.zipWithNext().map {
         Segment(

@@ -15,9 +15,9 @@ import kotlin.time.Duration.Companion.seconds
  */
 class ComponentGenerator<T>(
     val iat: DurationDistribution,
-    startAt: TickTime? = null,
+    startAt: SimTime? = null,
     val forceStart: Boolean = false,
-    var until: TickTime = TickTime(Double.MAX_VALUE),
+    var until: SimTime = SimTime(Double.MAX_VALUE),
     val total: Int = Int.MAX_VALUE,
     name: String? = null,
     priority: Priority = Priority.NORMAL,
@@ -35,9 +35,9 @@ class ComponentGenerator<T>(
     @AmbiguousDuration
     constructor(
         iat: RealDistribution,
-        startAt: TickTime? = null,
+        startAt: SimTime? = null,
         forceStart: Boolean = false,
-        until: TickTime = TickTime(Double.MAX_VALUE),
+        until: SimTime = SimTime(Double.MAX_VALUE),
         total: Int = Int.MAX_VALUE,
         name: String? = null,
         priority: Priority = Priority.NORMAL,
@@ -64,9 +64,9 @@ class ComponentGenerator<T>(
      */
     constructor(
         iat: Duration,
-        startAt: TickTime? = null,
+        startAt: SimTime? = null,
         forceStart: Boolean = false,
-        until: TickTime = TickTime(Double.MAX_VALUE),
+        until: SimTime = SimTime(Double.MAX_VALUE),
         total: Int = Int.MAX_VALUE,
         name: String? = null,
         priority: Priority = Priority.NORMAL,

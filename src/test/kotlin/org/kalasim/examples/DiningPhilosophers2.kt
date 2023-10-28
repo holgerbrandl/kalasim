@@ -53,7 +53,7 @@ fun main() {
     sim.run(50)
 
     // Analysis (gather monitoring data (as in simmer:get_mon_arrivals)
-    data class RequestRecord(val requester: String, val timestamp: TickTime, val resource: String, val quantity: Double)
+    data class RequestRecord(val requester: String, val timestamp: SimTime, val resource: String, val quantity: Double)
 
     val tc = sim.get<EventLog>()
     val requests = tc.filterIsInstance<ResourceEvent>().map {
@@ -66,7 +66,7 @@ fun main() {
     val requestsDf = requests.toDataFrame()
         .groupBy("requester")
         .sortBy("timestamp")
-        .add("end_time") { prev()?.get("timestamp") as TickTime }
+        .add("end_time") { prev()?.get("timestamp") as SimTime }
         .add("state") { if(index().rem(2) == 0) "hungry" else "eating" }
         .filter { "quantity"<Int>() > 0 }
         .concat()

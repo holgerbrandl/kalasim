@@ -31,7 +31,7 @@ internal class ClassName : ClassValue<String>() {
 
 /** The base event of kalasim. Usually this extended to convey more specific information.*/
 abstract class Event(
-    val time: TickTime,
+    val time: SimTime,
 ) : Jsonable() {
 
 //    constructor(time: TickTime) : this(time.value)

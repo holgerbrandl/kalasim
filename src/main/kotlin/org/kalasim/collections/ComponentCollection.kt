@@ -11,7 +11,7 @@ import org.koin.core.Koin
 class CapacityLimitException(
     val source: SimulationEntity,
     msg: String,
-    val timestamp: TickTime,
+    val timestamp: SimTime,
     val capacity: Number
 ) : Exception(msg)
 

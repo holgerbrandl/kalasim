@@ -33,33 +33,14 @@ import kotlin.time.Duration.Companion.seconds
 //}
 
 
-typealias TickTime = Instant
+typealias SimTime = Instant
 
 @Deprecated("use is disencouraged because it has an implicit reference to tick-duration of environment")
-fun TickTime(offset: Number) = Instant.fromEpochMilliseconds(offset.toLong())
+fun SimTime(offset: Number) = SimTime.fromEpochMilliseconds(offset.toLong())
 
 @Deprecated("use kotlinx.datetime.Instant equivalent instead")
 @JvmInline
-value class TickTimeOld(val value: Double)
-
-
-//data class TickTime(val value: Double) : Comparable<TickTime> {
-//    override operator fun compareTo(other: TickTime): Int = value.compareTo(other.value)
-//    operator fun compareTo(other: Int): Int = value.compareTo(other)
-//    operator fun compareTo(other: Double): Int = value.compareTo(other)
-//    operator fun compareTo(other: Number): Int = value.compareTo(other.toDouble())
-//
-//    operator fun plus(duration: Number): TickTime = TickTime(value + duration.toDouble())
-//
-//    operator fun minus(other: TickTime): Double = value - other.value
-//    operator fun minus(duration: Double): TickTime = TickTime(value - duration)
-//
-//    constructor(instant: Number) : this(instant.toDouble())
-//
-//    override fun toString(): String {
-//        return if(value.isInfinite()) "INF" else TRACE_DF.format(value)
-//    }
-//}
+value class TickTime(val value: Double)
 
 
 /* A simple type wrapper around a duration in sim time coordinates. Not used in core API of kalasim. */
@@ -68,13 +49,13 @@ value class Ticks(val value: Double) {
     constructor(instant: Number) : this(instant.toDouble())
 }
 
-val Number.tickTime: TickTime
-    get() = TickTime(this)
+val Number.simTime: SimTime
+    get() = SimTime(this)
 
-val Number.tt: TickTimeOld
-    get() = TickTimeOld(this.toDouble())
+val Number.tt: TickTime
+    get() = TickTime(this.toDouble())
 
-fun Number.toTickTime() = TickTime(this)
+fun Number.toTickTime() = SimTime(this)
 
 
 // https://stackoverflow.com/questions/32437550/whats-the-difference-between-instant-and-localdatetime
@@ -90,15 +71,6 @@ internal open class TickTransform(val tickUnit: DurationUnit) {
         DurationUnit.HOURS -> ticks.value.hours
         DurationUnit.DAYS -> ticks.value.days
     }
-
-
-//    open fun tick2wallTime(tickTime: TickTime): Instant {
-//        throw IllegalArgumentException("Only supported when using OffsetTransform")
-//    }
-
-//    open fun wall2TickTime(instant: Instant): TickTime {
-//        throw IllegalArgumentException("Only supported when using OffsetTransform")
-//    }
 
     fun durationAsTicks(duration: Duration): Double = when(tickUnit) {
         DurationUnit.NANOSECONDS -> duration.toDouble(DurationUnit.NANOSECONDS)
@@ -124,7 +96,7 @@ internal const val MISSING_TICK_TRAFO_ERROR = "Tick transformation not configure
 fun Environment.asTicks(duration: Duration): Double = duration.asTicks()
 
 @AmbiguousDuration
-fun Environment.asSimTime(someWhen: Number): TickTime = startDate + asDuration(someWhen)
+fun Environment.asSimTime(someWhen: Number): SimTime = startDate + asDuration(someWhen)
 
 @AmbiguousDuration
 fun Environment.asDuration(duration: Number): Duration = duration.let {
@@ -132,11 +104,11 @@ fun Environment.asDuration(duration: Number): Duration = duration.let {
 }
 
 /** Transforms an wall `Instant` to simulation time.*/
-fun Environment.toTickTime(instant: TickTime) = instant.toTickTime()
+fun Environment.toTickTime(instant: SimTime) = instant.toTickTime()
 
 
 /** Transforms a simulation time (typically `now`) to the corresponding wall time. */
-fun Environment.toWallTime(time: TickTimeOld) = time.toWallTime()
+fun Environment.toWallTime(time: TickTime) = time.toWallTime()
 //fun Environment.toWallTimeOrNull(time: TickTime) = time.toWallTime()
 
 //operator fun Instant.plus(duration: Duration): Instant = this.plus(duration.toJavaDuration())

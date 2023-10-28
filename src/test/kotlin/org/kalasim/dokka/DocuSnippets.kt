@@ -76,7 +76,7 @@ fun resourceHowTo() {
 
 
 fun eventsHowTo() {
-    class MyEvent(val msg: String, time: TickTime) : Event(time)
+    class MyEvent(val msg: String, time: SimTime) : Event(time)
 
     // create simulation with no default logging
     val sim = createSimulation {

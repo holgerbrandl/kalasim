@@ -1,6 +1,6 @@
 package org.kalasim.monitors
 
-import org.kalasim.TickTime
+import org.kalasim.SimTime
 import org.kalasim.misc.*
 import org.kalasim.misc.time.sum
 import org.kalasim.toTickTime
@@ -19,7 +19,7 @@ class CategoryTimeline<T>(
     koin: Koin = DependencyContext.get()
 ) : Monitor<T>(name, koin), ValueTimeline<T> {
 
-    private val timestamps = mutableListOf<TickTime>()
+    private val timestamps = mutableListOf<SimTime>()
     private val values = ifEnabled { mutableListOf<T>() }
 
     init {
@@ -69,7 +69,7 @@ class CategoryTimeline<T>(
     @AmbiguousDuration
     override fun get(time: Number): T?  = get(time.toTickTime())
 
-    override fun get(time: TickTime): T? {
+    override fun get(time: SimTime): T? {
         require(enabled){
             "timeline '$name' is disabled. Make sure to enable it locally,  or globally using a matching tracking-policy." +
                     " For details see https://www.kalasim.org/advanced/#continuous-simulation"
@@ -136,7 +136,7 @@ class CategoryTimeline<T>(
 
     override fun resetToCurrent() = reset(get(now)!!)
 
-    override fun clearHistory(before: TickTime) {
+    override fun clearHistory(before: SimTime) {
         val startFromIdx = timestamps.withIndex().firstOrNull { before > it.value }?.index ?: return
 
         for (i in 0 until startFromIdx) {

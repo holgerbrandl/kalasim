@@ -1,28 +1,3 @@
-## Tick Transformation
-
-Simulation time is measured in ticks. Usually, a simulation starts at `0` and then progresses through actions such as hold or wait or component generation.
-
-To express duration more naturally, and to enable a more eye-friendly logging and to stay closer to the system under study, `kalasim` supports a built in transformation `tickTransform` to convert from simulation to wall clock. Let's consider the following example
-
-```kotlin hl_lines="12 16 19 24 27"
-{!api/TickTrafoExample.kts!}
-```
-
-As shown in the example there are 2 flavors
-1. `TickTransform` takes a temporal unit as argument
-2. `OffsetTransform` takes a temporal offset (expressed as `java.time.Instant`) in additional to a temporal unit. By doing so, the simulation can not just map ticks to durations, but also tick-times to wall-time.
-
-This example will run for 2h in total which is transformed to 2x60 ticks, and will report a transform wall time of `now` plus 120 minutes. It also illustrates the 3 supported provided transformations:
-
-* `toWallTime(tickTime)` - Transforms a simulation time (typically `now`) to the corresponding wall time.
-* `asTickDuration(duration)` - Transforms a wall `duration` into the corresponding amount of ticks.
-* `asTickTime(instant)` - Transforms an wall `Instant` to simulation time.
- 
-Please note that setting this transformation does not impact the actual simulation, which is always carried out in ticks. It can be configured independently from the [clock synchronization](#clock-synchronization) described above.
-
-There is one provided implementation `OffsetTransform` that can be instantiated with  a start time offset the unit of a tick. The user can also implement own transformation by implementing the [functional interface](https://kotlinlang.org/docs/reference/fun-interfaces.html) `TickTransform`.
-
-
 ## Clock Synchronization
 
 In simulation a clear distinction is made between real time and simulation time. With *real time* we refer to the wall-clock time. It represents the execution time of the experiment. The *simulation time* is an attribute of the simulator.

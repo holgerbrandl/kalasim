@@ -287,7 +287,7 @@ Resources will log all changes with 2 event types
 Events of type `org.kalasim.ResourceEvent` will indicate changes as they occur. The following fields are included in each event
 
 * `requestId: Long` - A unique id, that allows to trace requests in time
-* `time: TickTime`
+* `time: SimTime`
 * `curComponent: Component?`
 * `requester: SimulationEntity`
 * `resource: Resource`
@@ -299,9 +299,9 @@ Events of type `org.kalasim.ResourceEvent` will indicate changes as they occur. 
 
 Events of type `org.kalasim.ResourceActivityEvent` will be logged at the end of a [scoped request](#request-scope) block. The following fields are included in each event
 
-* `requested: TickTime`
-* `honored: TickTime`
-* `released: TickTime`
+* `requested: SimTime`
+* `honored: SimTime`
+* `released: SimTime`
 * `requester: Component`
 * `resource: Resource`
 * `activity: String`

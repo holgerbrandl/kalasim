@@ -39,7 +39,7 @@ class ComponentGeneratorSnapshot<T>(cg: ComponentGenerator<T>) : ComponentSnapsh
 
 /** Captures the current state of a `State`*/
 //@Serializable
-data class StateSnapshot(val time: TickTime, val name: String, val value: String, val waiters: List<String>) :
+data class StateSnapshot(val time: SimTime, val name: String, val value: String, val waiters: List<String>) :
     AutoJson(), EntitySnapshot {
 //    override fun toString(): String {
 //        return Json.encodeToString(this)
@@ -69,7 +69,7 @@ class ResourceSnapshot(resource: Resource) : AutoJson(), EntitySnapshot {
 
 class ComponentListSnapshot<T>(cl: ComponentList<T>) : AutoJson(), EntitySnapshot {
 
-    data class Entry(val component: String, val enterTime: TickTime?)
+    data class Entry(val component: String, val enterTime: SimTime?)
 
     val name = cl.name
     val timestamp = cl.env.now
@@ -79,7 +79,7 @@ class ComponentListSnapshot<T>(cl: ComponentList<T>) : AutoJson(), EntitySnapsho
 
 class QueueSnapshot(cq: ComponentQueue<*>) : AutoJson(), EntitySnapshot {
 
-    data class Entry(val component: String, val enterTime: TickTime, val priority: Priority?)
+    data class Entry(val component: String, val enterTime: SimTime, val priority: Priority?)
 
     val name = cq.name
     val timestamp = cq.env.now

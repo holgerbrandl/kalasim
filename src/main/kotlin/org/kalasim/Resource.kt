@@ -403,17 +403,17 @@ internal fun <E> PriorityQueue<E>.sortedIterator() = sequence {
 enum class ResourceMetric { Capacity, Claimed, Requesters, Claimers, Occupancy, Availability }
 data class fo(
     val duration: Double?,
-    val start: TickTime,
+    val start: SimTime,
     val value: Double,
     val metric: ResourceMetric,
-    val end: TickTime?,
+    val end: SimTime?,
     val resource: Any
 )
 
 data class ResourceTimelineSegment(
     val resource: Resource,
-    val start: TickTime,
-    val end: TickTime?,
+    val start: SimTime,
+    val end: SimTime?,
     val duration: Duration?,
     val metric: ResourceMetric,
     val value: Double,
@@ -461,7 +461,7 @@ val Resource.timeline: List<ResourceTimelineSegment>
         var statsDF = listOf(capStats, claimStats, availStats, occStats, requesters, claimers).concat()
         statsDF = statsDF.rename("timestamp" to "start")
         statsDF = statsDF.add("end") {
-            "start"<TickTime>() + ("duration"<Duration?>() ?: Duration.ZERO)
+            "start"<SimTime>() + ("duration"<Duration?>() ?: Duration.ZERO)
         }
         statsDF = statsDF.add("resource") { this@timeline }
 

@@ -20,8 +20,8 @@ import org.kalasim.plot.kravis.display
 
 fun <V : Number> MetricTimeline<V>.display(
     title: String = name,
-    from: TickTime? = null,
-    to: TickTime? = null,
+    from: SimTime? = null,
+    to: SimTime? = null,
     forceTickAxis: Boolean = false,
 ): Plot {
     val data = stepFun()
@@ -35,7 +35,7 @@ fun <V : Number> MetricTimeline<V>.display(
 }
 
 private fun DataFrame<*>.convertTick2Double(colName: String): DataFrame<*> {
-    return add(colName) { colName<TickTime>().epochSeconds }
+    return add(colName) { colName<SimTime>().epochSeconds }
 }
 
 
@@ -62,7 +62,7 @@ fun <T> CategoryTimeline<T>.display(
     val nlmStatsData = statsData()
     val stepFun = nlmStatsData.stepFun()
 
-    data class Segment<T>(val value: T, val start: TickTime, val end: TickTime)
+    data class Segment<T>(val value: T, val start: SimTime, val end: SimTime)
 
     val segments = stepFun.zipWithNext().map {
         Segment(

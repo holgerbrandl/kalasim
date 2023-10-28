@@ -13,7 +13,7 @@ import org.kalasim.misc.*
 import org.koin.core.Koin
 import java.util.*
 
-data class CQElement<C>(val component: C, val enterTime: TickTime, val priority: Priority? = null)
+data class CQElement<C>(val component: C, val enterTime: SimTime, val priority: Priority? = null)
 
 //fun <C> PriorityFCFSQueueComparator() = compareBy<CQElement<C>>(
 //    { it.priority?.value?.times(-1) ?: 0 },

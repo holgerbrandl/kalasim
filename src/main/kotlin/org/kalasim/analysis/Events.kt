@@ -11,7 +11,7 @@ enum class ResourceEventType { REQUESTED, CLAIMED, RELEASED, PUT, TAKE }
 
 
 class ResourceEvent(
-    time: TickTime,
+    time: SimTime,
     val requestId: Long,
     curComponent: Component?,
     val requester: Component,
@@ -67,9 +67,9 @@ class ResourceEvent(
 //internal fun Environment.asWtOptional(tickTime: TickTime) = if(hasAbsoluteTime()) toWallTime(tickTime) else null
 
 data class ResourceActivityEvent(
-    val requested: TickTime,
-    val honored: TickTime,
-    val released: TickTime,
+    val requested: SimTime,
+    val honored: SimTime,
+    val released: SimTime,
     val requester: Component,
     val resource: Resource,
     val activity: String?,
@@ -93,7 +93,7 @@ data class ResourceActivityEvent(
 
 
 open class InteractionEvent(
-    time: TickTime,
+    time: SimTime,
     val current: Component? = null,
     val component: Component? = null,
     open val action: String? = null,
@@ -111,8 +111,8 @@ open class InteractionEvent(
 
 /** Fired when a simulation state is changing its value. https://www.kalasim.org/state/ */
 open class  StateChangedEvent<T>(
-    time: TickTime,
-    val state: State<T> ,
+    time: SimTime,
+    val state: State<T>,
     val newValue: T,
     current: Component? = null,
     val trigger: Int? = null
@@ -140,7 +140,7 @@ open class  StateChangedEvent<T>(
 }
 
 class EntityCreatedEvent(
-    time: TickTime,
+    time: SimTime,
     val creator: Component?,
     val entity: SimulationEntity,
     val details: String? = null
@@ -157,7 +157,7 @@ class EntityCreatedEvent(
 
 /** An event indicating that the state of  component has changed. See https://www.kalasim.org/component/#lifecycle */
 open class ComponentStateChangeEvent(
-    time: TickTime,
+    time: SimTime,
     current: Component? = null,
     component: Component,
     val state: ComponentState,
@@ -178,11 +178,11 @@ open class ComponentStateChangeEvent(
  * See https://www.kalasim.org/component/#lifecycle
  */
 class RescheduledEvent(
-    time: TickTime,
+    time: SimTime,
     current: Component? = null,
     simEntity: Component,
     val description: String? = null,
-    val scheduledFor: TickTime,
+    val scheduledFor: SimTime,
     val type: ScheduledType
 ) : ComponentStateChangeEvent(time, current, simEntity, ComponentState.SCHEDULED) {
 

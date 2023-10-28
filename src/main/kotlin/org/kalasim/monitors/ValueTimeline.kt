@@ -1,7 +1,7 @@
 package org.kalasim.monitors
 
 import org.apache.commons.math3.distribution.EnumeratedDistribution
-import org.kalasim.TickTime
+import org.kalasim.SimTime
 import org.kalasim.misc.asCMPairList
 import kotlin.time.Duration
 
@@ -13,7 +13,7 @@ interface ValueTimeline<T> {
      *
      * @throws IllegalArgumentException When querying a time before the start of the recording
      * */
-    operator fun get(time: TickTime): T?
+    operator fun get(time: SimTime): T?
 
     operator fun get(time: Number): T?
 
@@ -36,11 +36,11 @@ interface ValueTimeline<T> {
     fun resetToCurrent()
 
     /** Discards all history before the given time. */
-    fun clearHistory(before: TickTime)
+    fun clearHistory(before: SimTime)
 }
 
 // replacement for Pair to get better auto-conversion to data-frame
-data class StepRecord<T>(val time: TickTime, val value: T)
+data class StepRecord<T>(val time: SimTime, val value: T)
 
 
 fun <T> LevelStatsData<T>.statisticalSummary(): EnumeratedDistribution<T> {
@@ -55,7 +55,7 @@ fun <T> LevelStatsData<T>.statisticalSummary(): EnumeratedDistribution<T> {
 
 data class LevelStatsData<T>(
     val values: List<T>,
-    val timepoints: List<TickTime>,
+    val timepoints: List<SimTime>,
     val durations: List<Duration>
 ) {
     /** Returns the step function of time, value pairs*/
@@ -76,7 +76,7 @@ data class LevelStatsData<T>(
     }
 }
 
-data class LevelStateRecord<T>(val timestamp: TickTime, val value: T, val duration: Duration?)
+data class LevelStateRecord<T>(val timestamp: SimTime, val value: T, val duration: Duration?)
 
 //
 //class IntVarTimeline(initialValue: Int = 0, name: String? = null, koin: Koin = DependencyContext.get()) {

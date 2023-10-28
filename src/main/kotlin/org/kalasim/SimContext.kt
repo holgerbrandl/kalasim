@@ -22,7 +22,7 @@ interface SimContext : KoinComponent {
         get() = asTicks()
 
     // Scoped extensions
-    fun Instant.toTickTime(): TickTimeOld {
+    fun Instant.toTickTime(): TickTime {
         require(env.startDate != null) { MISSING_TICK_TRAFO_ERROR }
         return env.wall2TickTime(this)
     }
@@ -32,7 +32,7 @@ interface SimContext : KoinComponent {
 
     /** Transforms a simulation time (typically `now`) to the corresponding wall time. */
     @Deprecated("no longer needed as sim-time is also expressed as kotlinx.datetimex.Instant starting in v0.12")
-    fun TickTimeOld.toWallTime(): Instant
+    fun TickTime.toWallTime(): Instant
     {
         require(env.startDate != null) { MISSING_TICK_TRAFO_ERROR }
         return env.tick2wallTime(this)

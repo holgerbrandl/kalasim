@@ -298,7 +298,7 @@ class EnvTests {
 
         environment.run(4.days)
 
-        environment.nowTT shouldBe TickTimeOld(4.0)
+        environment.nowTT shouldBe TickTime(4.0)
     }
 
     @Test

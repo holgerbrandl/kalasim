@@ -10,7 +10,6 @@ import org.kalasim.misc.time.sumOf
 import org.koin.core.Koin
 import java.util.*
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Allows to track a numeric quantity over time.
@@ -24,7 +23,7 @@ open class MetricTimeline<V : Number>(
     koin: Koin = DependencyContext.get()
 ) : Monitor<V>(name, koin), ValueTimeline<V> {
 
-     val timestamps = mutableListOf<TickTime>()
+     val timestamps = mutableListOf<SimTime>()
      val values = ifEnabled { mutableListOf<V>() }
 
     init {
@@ -40,7 +39,7 @@ open class MetricTimeline<V : Number>(
     }
 
 
-    override fun get(time: TickTime): V {
+    override fun get(time: SimTime): V {
         require(enabled){
             "timeline '$name' is disabled. Make sure to enable it locally,  or globally using a matching tracking-policy." +
                     " For details see https://www.kalasim.org/advanced/#continuous-simulation"
@@ -54,7 +53,7 @@ open class MetricTimeline<V : Number>(
     }
 
     override operator fun get(time: Number): V {
-        val tick2wallTime = get<Environment>().tick2wallTime(TickTimeOld(time.toDouble()))
+        val tick2wallTime = get<Environment>().tick2wallTime(TickTime(time.toDouble()))
         return get(tick2wallTime)
     }
 
@@ -105,7 +104,7 @@ open class MetricTimeline<V : Number>(
     override fun resetToCurrent() = reset(get(now))
 
     @Suppress("DuplicatedCode")
-    override fun clearHistory(before: TickTime) {
+    override fun clearHistory(before: SimTime) {
         val startFromIdx = timestamps.withIndex().firstOrNull { before > it.value }?.index ?: return
 
         for(i in 0 until startFromIdx) {
@@ -224,7 +223,7 @@ private fun <V : Number> combineInternal(
     // also see
     // https://www.geeksforgeeks.org/merge-two-sorted-linked-lists/
     // https://stackoverflow.com/questions/1774256/java-code-review-merge-sorted-lists-into-a-single-sorted-list
-    val joinTime = TreeSet<TickTime>().apply { addAll(mt.timestamps); addAll(other.timestamps); add(mt.now) }
+    val joinTime = TreeSet<SimTime>().apply { addAll(mt.timestamps); addAll(other.timestamps); add(mt.now) }
 
     val minTime = maxOf(mt.timestamps.first(), other.timestamps.first())
 //    val maxTime = Math.min(mt.timestamps.last(), other.timestamps.last())

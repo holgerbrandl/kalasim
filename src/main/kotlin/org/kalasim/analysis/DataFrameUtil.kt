@@ -25,8 +25,8 @@ fun DataFrame<*>.addTickTimes(sim: Environment, suffix: String = "_wt"): DataFra
 
     return tickTimeColumns.fold(this) { df, ttColumnName ->
         df.add(ttColumnName + suffix) {
-            val tickTime = ttColumnName<TickTime?>()
-            tickTime?.let { sim.toTickTime(it) }
+            val simTime = ttColumnName<SimTime?>()
+            simTime?.let { sim.toTickTime(it) }
         }
     }
 }

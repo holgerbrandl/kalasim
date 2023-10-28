@@ -42,7 +42,7 @@ class ClockSync(
      val holdTime = (1.0 / syncsPerTick.toDouble()).toDuration()
 
     private var syncStartWall: Instant? = null
-    private var syncStartSim: TickTime? = null
+    private var syncStartSim: SimTime? = null
 
     override fun process() = sequence {
 
@@ -90,6 +90,6 @@ class ClockSync(
 /**
  * Will be thrown if the maximum delay time is exceeded when using [clock synchronization](https://www.kalasim.org/advanced/#clock-synchronization).
  */
-class ClockOverloadException(val timestamp: TickTime, msg: String) : RuntimeException(msg)
+class ClockOverloadException(val timestamp: SimTime, msg: String) : RuntimeException(msg)
 
 

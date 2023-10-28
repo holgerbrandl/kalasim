@@ -238,7 +238,7 @@ class Floor(val level: Int, val queue: ComponentQueue<Visitor> = ComponentQueue(
     }
 }
 
-typealias Requests = MutableMap<Pair<Floor, Direction>, TickTime>
+typealias Requests = MutableMap<Pair<Floor, Direction>, SimTime>
 
 
 fun main() {

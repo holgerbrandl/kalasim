@@ -55,7 +55,7 @@ class GeneratorTest {
     fun `it should allow sampling iat from a triangular distribution`() = createTestSimulation(enableComponentLogger = false) {
         val nsm  = NumericStatisticMonitor()
 
-        var lastCreation :TickTime = now
+        var lastCreation :SimTime = now
 
         ComponentGenerator(iat = triangular(4,8,10).days) {
             val timeSinceLastArrival = now - lastCreation

@@ -389,7 +389,7 @@ class ComponentTests {
     fun `it should enforce that either hold or until is not null in hold`() = createTestSimulation {
         object : Component("foo") {
             override fun process() = sequence {
-                hold(until = null as TickTime?)
+                hold(until = null as SimTime?)
                 fail("it should not allow calling hold with duration and until being both null ")
             }
         }

@@ -48,7 +48,7 @@ fun declareDependencies(
 
 fun KoinModule.createSimulation(
     /** The start time of the simulation model. Defaults to 1970-01-01T00:00:00Z following the convention of kotlin.time.Instant.*/
-    startDate: TickTime = TickTime.fromEpochMilliseconds(0),
+    startDate: SimTime = TickTime.fromEpochMilliseconds(0),
     useCustomKoin: Boolean = false,
     /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
     durationUnit: DurationUnit = MINUTES,
@@ -65,7 +65,7 @@ fun KoinModule.createSimulation(
 
 fun createSimulation(
     /** The start time of the simulation model. Defaults to 1970-01-01T00:00:00Z following the convention of kotlin.time.Instant.*/
-    startDate: TickTime = TickTime.fromEpochMilliseconds(0),
+    startDate: SimTime = TickTime.fromEpochMilliseconds(0),
     dependencies: KoinModule? = null,
     useCustomKoin: Boolean = false,
     /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
@@ -103,7 +103,7 @@ fun main() {
 /** An environment hosts all elements of a simulation, maintains the event loop, and provides randomization support. For details see  https://www.kalasim.org/basics/#simulation-environment */
 open class Environment(
     /** The start time of the simulation model. Defaults to 1970-01-01T00:00:00Z following the convention of kotlin.time.Instant.*/
-    val startDate: TickTime = TickTime.fromEpochMilliseconds(0),
+    val startDate: SimTime = TickTime.fromEpochMilliseconds(0),
     /** If enabled, it will render a tabular view of recorded  interaction and resource events. */
     enableComponentLogger: Boolean = false,
 
@@ -167,7 +167,7 @@ open class Environment(
     val nowWT: Instant = now
 //        get() = now.toWallTime()
 
-    val nowTT: TickTimeOld
+    val nowTT: TickTime
         get() = now.toTickTime()
 
 
@@ -333,7 +333,7 @@ open class Environment(
      */
 //    @AmbiguousDuration
     fun run(
-        duration: Duration? = null, until: TickTime? = null, priority: Priority = NORMAL, urgent: Boolean = false,
+        duration: Duration? = null, until: SimTime? = null, priority: Priority = NORMAL, urgent: Boolean = false,
     ) {
         // also see https://simpy.readthedocs.io/en/latest/topical_guides/environments.html
         if(duration == null && until == null) {
@@ -492,7 +492,7 @@ open class Environment(
 
     private var queueCounter: Int = 0
 
-    internal fun push(component: Component, scheduledTime: TickTime, priority: Priority, urgent: Boolean) {
+    internal fun push(component: Component, scheduledTime: SimTime, priority: Priority, urgent: Boolean) {
         queueCounter++
 
 //        https://bezkoder.com/kotlin-priority-queue/
@@ -524,14 +524,14 @@ open class Environment(
     fun hasAbsoluteTime() = startDate != null
 
 
-    fun tick2wallTime(tickTime: TickTimeOld): TickTime {
+    fun tick2wallTime(tickTime: TickTime): SimTime {
         return startDate!! + tickTransform.ticks2Duration(tickTime.value)
     }
 
-    fun wall2TickTime(instant: TickTime): TickTimeOld {
+    fun wall2TickTime(instant: SimTime): TickTime {
         val offsetDuration = instant - startDate!!
 
-        return TickTimeOld(tickTransform.durationAsTicks(offsetDuration))
+        return TickTime(tickTransform.durationAsTicks(offsetDuration))
     }
 
 
@@ -541,7 +541,7 @@ open class Environment(
 
 
 data class QueueElement(
-    val component: Component, val time: TickTime, val priority: Priority, val queueCounter: Int, val urgent: Boolean
+    val component: Component, val time: SimTime, val priority: Priority, val queueCounter: Int, val urgent: Boolean
 ) : Comparable<QueueElement> {
     //TODO clarify if we need/want to also support urgent
 
@@ -566,7 +566,7 @@ fun Environment.enableComponentLogger() {
 }
 
 
-internal fun Environment.calcScheduleTime(until: TickTime?, duration: Duration?): TickTime {
+internal fun Environment.calcScheduleTime(until: SimTime?, duration: Duration?): SimTime {
     return if(until == null) {
         require(duration != null) { "neither duration nor till specified" }
         now + duration

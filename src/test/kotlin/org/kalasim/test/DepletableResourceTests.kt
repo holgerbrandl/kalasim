@@ -140,7 +140,7 @@ class DepletableResourceTests {
 //            levelTimeline.display().show()
         }
 
-        TickTime(Double.POSITIVE_INFINITY).toString()
+        SimTime(Double.POSITIVE_INFINITY).toString()
         // ensure that at least the first car was sucessfully refilled
         cg.history.first().componentState shouldBe ComponentState.DATA
     }

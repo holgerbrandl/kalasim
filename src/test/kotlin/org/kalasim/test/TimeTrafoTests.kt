@@ -10,7 +10,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class TimeTrafoTests {
 
-    class TimeTrafoTestEvent(time: TickTime) : Event(time)
+    class TimeTrafoTestEvent(time: SimTime) : Event(time)
 
     val startDate = Instant.parse("2021-01-24T12:00:00.00Z")
 

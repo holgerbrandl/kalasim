@@ -69,8 +69,8 @@ data class RequestContext(
     val requestId: Long,
     val quantity: Double,
     val priority: Priority?,
-    val requestedAt: TickTime?,
-    val honoredAt: TickTime?,
+    val requestedAt: SimTime?,
+    val honoredAt: SimTime?,
 ) {
     fun merge(rc: RequestContext): RequestContext {
         require(priority == rc.priority) { "Merging components with different priorities is not supported" }
@@ -84,7 +84,7 @@ data class RequestContext(
 @AmbiguousDurationComponent
 open class TickedComponent(
     name: String? = null,
-    at: TickTime? = null,
+    at: SimTime? = null,
     delay: Duration? = null,
     priority: Priority = NORMAL,
     process: ProcessPointer? = null,
@@ -127,7 +127,7 @@ open class TickedComponent(
     suspend fun SequenceScope<Component>.hold(
         duration: Number? = null,
         description: String? = null,
-        until: TickTime? = null,
+        until: SimTime? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
     ) {
@@ -140,7 +140,7 @@ open class TickedComponent(
     }
 
     suspend fun SequenceScope<Component>.activate(
-        at: TickTime? = null,
+        at: SimTime? = null,
         delay: Number = 0,
         priority: Priority = NORMAL,
         urgent: Boolean = false,
@@ -168,7 +168,7 @@ open class TickedComponent(
  */
 open class Component(
     name: String? = null,
-    at: TickTime? = null,
+    at: SimTime? = null,
     delay: Duration? = null,
     priority: Priority = NORMAL,
     process: ProcessPointer? = null,
@@ -198,7 +198,7 @@ open class Component(
 
     // TODO 0.6 get rid of this field (not needed because can be always retrieved from eventList if needed
     //  What are performance implications?
-    var scheduledTime: TickTime? = null
+    var scheduledTime: SimTime? = null
         internal set
 
     private var remainingDuration: Duration? = null
@@ -627,7 +627,7 @@ open class Component(
         resource: DepletableResource,
         quantity: Number = DEFAULT_REQUEST_QUANTITY,
         priority: Priority? = null,
-        failAt: TickTime? = null,
+        failAt: SimTime? = null,
         failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
     ): Unit = request(
@@ -672,7 +672,7 @@ open class Component(
         quantity: Number = DEFAULT_REQUEST_QUANTITY,
         priority: Priority? = null,
         description: String? = null,
-        failAt: TickTime? = null,
+        failAt: SimTime? = null,
         failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
         capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
@@ -701,7 +701,7 @@ open class Component(
     suspend fun SequenceScope<Component>.put(
         vararg resourceRequests: ResourceRequest,
         description: String? = null,
-        failAt: TickTime? = null,
+        failAt: SimTime? = null,
         failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
         capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
@@ -740,7 +740,7 @@ open class Component(
         quantity: Number = DEFAULT_REQUEST_QUANTITY,
         priority: Priority? = null,
         oneOf: Boolean = false,
-        failAt: TickTime? = null,
+        failAt: SimTime? = null,
         failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
         capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
@@ -780,7 +780,7 @@ open class Component(
         quantity: Number = DEFAULT_REQUEST_QUANTITY,
         priority: Priority? = null,
         oneOf: Boolean = false,
-        failAt: TickTime? = null,
+        failAt: SimTime? = null,
         failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
         capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
@@ -817,7 +817,7 @@ open class Component(
         description: String? = null,
         oneOf: Boolean = false,
         urgent: Boolean = false,
-        failAt: TickTime? = null,
+        failAt: SimTime? = null,
         failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
         capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
@@ -871,7 +871,7 @@ open class Component(
             scheduledTime = when {
                 failAt != null -> failAt
                 failDelay != null -> env.now + failDelay
-                else -> TickTime(Double.MAX_VALUE)
+                else -> SimTime(Double.MAX_VALUE)
             }
 
             failed = false
@@ -1174,7 +1174,7 @@ open class Component(
         require(this != env.main) { "main component not allowed" }
 
     internal fun reschedule(
-        scheduledTime: TickTime,
+        scheduledTime: SimTime,
         priority: Priority = NORMAL,
         urgent: Boolean = false,
         description: String? = null,
@@ -1223,7 +1223,7 @@ open class Component(
 
 
     suspend fun SequenceScope<Component>.activate(
-        at: TickTime? = null,
+        at: SimTime? = null,
         delay: Duration = Duration.ZERO,
         priority: Priority = NORMAL,
         urgent: Boolean = false,
@@ -1246,7 +1246,7 @@ open class Component(
      * * if the component is a data component, the generator function `process` will be used as the default process.
      */
     fun activate(
-        at: TickTime? = null,
+        at: SimTime? = null,
         delay: Duration = Duration.ZERO,
         priority: Priority = NORMAL,
         urgent: Boolean = false,
@@ -1333,7 +1333,7 @@ open class Component(
     suspend fun SequenceScope<Component>.hold(
         duration: Duration? = null,
         description: String? = null,
-        until: TickTime? = null,
+        until: SimTime? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
     ) = yieldCurrent {
@@ -1368,7 +1368,7 @@ open class Component(
     fun hold(
         duration: Duration? = null,
         description: String? = null,
-        until: TickTime? = null,
+        until: SimTime? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
     ) {
@@ -1507,7 +1507,7 @@ open class Component(
         state: State<T>,
         waitFor: T,
         triggerPriority: Priority = NORMAL,
-        failAt: TickTime? = null,
+        failAt: SimTime? = null,
         failDelay: Duration? = null,
         failPriority: Priority = NORMAL
     ) = wait(
@@ -1535,7 +1535,7 @@ open class Component(
     suspend fun <T> SequenceScope<Component>.wait(
         state: State<T>,
         triggerPriority: Priority = NORMAL,
-        failAt: TickTime? = null,
+        failAt: SimTime? = null,
         failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
         predicate: (T) -> Boolean
@@ -1564,7 +1564,7 @@ open class Component(
     suspend fun SequenceScope<Component>.wait(
         vararg stateRequests: StateRequest<*>,
         urgent: Boolean = false,
-        failAt: TickTime? = null,
+        failAt: SimTime? = null,
         failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
         all: Boolean = false
@@ -1584,7 +1584,7 @@ open class Component(
         scheduledTime = when {
             failAt != null -> failAt
             failDelay != null -> env.now + failDelay
-            else -> TickTime(Double.MAX_VALUE)
+            else -> SimTime(Double.MAX_VALUE)
         }
 
         stateRequests
@@ -1839,7 +1839,7 @@ infix fun Resource.withPriority(priority: Priority) = ResourceRequest(this, prio
 infix fun ResourceRequest.andPriority(priority: Priority?) = ResourceRequest(this.resource, this.quantity, priority)
 infix fun ResourceRequest.andPriority(priority: Int) = andPriority(Priority(priority))
 
-data class RequestScopeContext(val resource: Resource?, val requestingSince: TickTime)
+data class RequestScopeContext(val resource: Resource?, val requestingSince: SimTime)
 
 //    data class StateRequest<T>(val s: State<T>, val value: T? = null, val priority: Int? = null)
 data class StateRequest<T>(val state: State<T>, val priority: Priority? = null, val predicate: (T) -> Boolean) {
@@ -1864,25 +1864,25 @@ data class StateRequest<T>(val state: State<T>, val priority: Priority? = null, 
 
 infix fun <T> State<T>.turns(value: T) = StateRequest(this) { it == value }
 
-internal fun formatWithInf(time: TickTime) =
+internal fun formatWithInf(time: SimTime) =
     if(time.isDistantFuture) "<inf>" else TRACE_DF.format(time.epochSeconds)
 
-internal fun formatWithInf(time: TickTimeOld) =
+internal fun formatWithInf(time: TickTime) =
     if(time.value == Double.MAX_VALUE || time.value.isInfinite()) "<inf>" else TRACE_DF.format(time.value)
 
 
 data class ComponentLifecycleRecord(
     val component: String,
-    val createdAt: TickTime,
-    val inDataSince: TickTime?,
-    val inData: TickTime,
-    val inCurrent: TickTime,
-    val inStandby: TickTime,
-    val inPassive: TickTime,
-    val inInterrupted: TickTime,
-    val inScheduled: TickTime,
-    val inRequesting: TickTime,
-    val inWaiting: TickTime
+    val createdAt: SimTime,
+    val inDataSince: SimTime?,
+    val inData: SimTime,
+    val inCurrent: SimTime,
+    val inStandby: SimTime,
+    val inPassive: SimTime,
+    val inInterrupted: SimTime,
+    val inScheduled: SimTime,
+    val inRequesting: SimTime,
+    val inWaiting: SimTime
 )
 
 fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {

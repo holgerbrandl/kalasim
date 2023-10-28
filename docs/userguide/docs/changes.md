@@ -160,8 +160,8 @@ Breaking changes
 * Removed `components` from `Environment` and created `componentCollector` as optional replacement
 * Redesigned events & metrics API 
 * Updated to `koin` v3.1 (fixes [#15](https://github.com/holgerbrandl/kalasim/issues/15)): `GlobalContext` has been replaced with `DependencyContext`
-* Established use of `TickTime` across the entire API to disambiguate simulation time instants from durations, which are still modelled as `Double`
-* Changed `Component.now `and `Environment.now` to new value class `TickTime` for better type safety
+* Established use of `SimTime` across the entire API to disambiguate simulation time instants from durations, which are still modelled as `Double`
+* Changed `Component.now `and `Environment.now` to new value class `SimTime` for better type safety
 * Simplified `ClockSync` API by removing redundant `speedUp` parameter
 * `Component.status` has been renamed to `Component.componentState` to enable extending classes to use the property name `status` for domain modelling
 * Removed requirement to implement `info` in `SimulationEntity`

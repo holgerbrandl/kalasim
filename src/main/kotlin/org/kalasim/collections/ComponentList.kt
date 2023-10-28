@@ -21,7 +21,7 @@ class ComponentList<C>(
     koin: Koin = DependencyContext.get()
 ) : ComponentCollection<C>(name, capacity, koin), MutableList<C> by list {
 
-    internal val stayTracker = mutableMapOf<C, TickTime>()
+    internal val stayTracker = mutableMapOf<C, SimTime>()
 
     init {
         trackingPolicy = env.trackingPolicyFactory.getPolicy(this)

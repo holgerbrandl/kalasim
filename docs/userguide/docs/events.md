@@ -13,7 +13,7 @@ To analyze state changes in a simulation model, we may want to monitor [componen
 In addition, it also allows for custom event types that can be triggered with `log()` in [process definitions](component.md#process-definition)
 
 ```kotlin
-class MyEvent(time : TickTime) : Event(time)
+class MyEvent(time : SimTime) : Event(time)
 
 object : Component() {
     override fun process() = sequence {
@@ -77,7 +77,7 @@ Console logging is not active by default as it would considerably slow down larg
 A more selective monitor that will just events of a certain type is the event collector. It needs to be created before running the simulation (or from the moment when events shall be collected).
 
 ```kotlin
-class MyEvent(time : TickTime) : Event(time)
+class MyEvent(time : SimTime) : Event(time)
 
 // run the sim which create many events including some MyEvents
 env.run()

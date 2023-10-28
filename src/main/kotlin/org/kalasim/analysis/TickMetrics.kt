@@ -2,7 +2,6 @@
 
 package org.kalasim
 
-import org.json.JSONObject
 import org.kalasim.misc.*
 import org.kalasim.misc.buildJsonWithGson
 import org.kalasim.monitors.MetricTimeline
@@ -53,7 +52,7 @@ class TickMetrics(
     }
 }
 
-class MetricEvent(tickTime: TickTime, val tickWallDurationMs: Int) : Event(tickTime){
+class MetricEvent(simTime: SimTime, val tickWallDurationMs: Int) : Event(simTime){
     override fun toJson() = buildJsonWithGson()
 }
 

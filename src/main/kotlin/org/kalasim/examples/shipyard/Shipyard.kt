@@ -8,7 +8,7 @@ import kotlin.time.DurationUnit
 class Part(val partId: String, val makeTime: DurationDistribution, vararg val components: Part) : SimulationEntity(partId)
 
 // todo get rid of time attribute
-class PartCompleted(time: TickTime, val part: Part) : Event(time)
+class PartCompleted(time: SimTime, val part: Part) : Event(time)
 
 class PartAssembly(val part: Part) : Component() {
     val completed =  State(false)
