@@ -23,8 +23,8 @@ open class MetricTimeline<V : Number>(
     koin: Koin = DependencyContext.get()
 ) : Monitor<V>(name, koin), ValueTimeline<V> {
 
-     val timestamps = mutableListOf<SimTime>()
-     val values = ifEnabled { mutableListOf<V>() }
+    val timestamps = mutableListOf<SimTime>()
+    val values = ifEnabled { mutableListOf<V>() }
 
     init {
         addValue(initialValue)
@@ -40,7 +40,7 @@ open class MetricTimeline<V : Number>(
 
 
     override fun get(time: SimTime): V {
-        require(enabled){
+        require(enabled) {
             "timeline '$name' is disabled. Make sure to enable it locally,  or globally using a matching tracking-policy." +
                     " For details see https://www.kalasim.org/advanced/#continuous-simulation"
 
@@ -149,7 +149,7 @@ fun <V : Number> MetricTimeline<V>.printHistogram(
 //                .valuesIterator().iterator().asSequence().toList()
 //                .map { it to freq.getCount(it) }
 
-        colData.mapValues{ env.asTicks(it.value)}.printConsole(sortByWeight = sortByWeight)
+        colData.mapValues { env.asTicks(it.value) }.printConsole(sortByWeight = sortByWeight)
     } else {
 
         // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
@@ -189,6 +189,10 @@ internal enum class ArithmeticOp {
     }
 }
 
+//
+// pairwise operations
+//
+
 operator fun <V : Number> MetricTimeline<V>.plus(other: MetricTimeline<V>) =
     combineInternal(this, other, ArithmeticOp.Plus)
 
@@ -201,19 +205,22 @@ operator fun <V : Number> MetricTimeline<V>.times(other: MetricTimeline<V>) =
 operator fun <V : Number> MetricTimeline<V>.div(other: MetricTimeline<V>) =
     combineInternal(this, other, ArithmeticOp.Div)
 
-operator fun <V : Number> MetricTimeline<V>.div(factor: Double): MetricTimeline<Double> {
-    val constMT = MetricTimeline("Constant $factor", initialValue = factor)
-    .apply {
-        timestamps.apply { clear(); add(this@div.timestamps.first()) }
+// scalar operations
+
+operator fun <V : Number> MetricTimeline<V>.plus(factor: Number) = applyScalarFactor(factor, ArithmeticOp.Plus)
+operator fun <V : Number> MetricTimeline<V>.minus(factor: Number) = applyScalarFactor(factor, ArithmeticOp.Minus)
+operator fun <V : Number> MetricTimeline<V>.times(factor: Number) = applyScalarFactor(factor, ArithmeticOp.Times)
+operator fun <V : Number> MetricTimeline<V>.div(factor: Number) = applyScalarFactor(factor, ArithmeticOp.Div)
+
+private fun <V : Number> MetricTimeline<V>.applyScalarFactor(
+    factor: Number,
+    arithmeticOp: ArithmeticOp
+): MetricTimeline<Double> {
+    val constMT = MetricTimeline("Constant $factor", initialValue = factor).apply {
+        timestamps.apply { clear(); add(this.timestamps.first()) }
     }
-    return combineInternal(this.asDoubleTimeline(), constMT, ArithmeticOp.Div)
+    return combineInternal(asDoubleTimeline(), constMT, arithmeticOp)
 }
-
-fun <V : Number> List<MetricTimeline<V>>.sum(): MetricTimeline<Double> =
-    map { it.asDoubleTimeline() }.reduce { acc, mt -> acc + mt }
-
-fun <V : Number> List<MetricTimeline<V>>.mean(): MetricTimeline<Double> = sum() / size.toDouble()
-
 
 private fun <V : Number> combineInternal(
     mt: MetricTimeline<V>,
@@ -249,13 +256,28 @@ private fun <V : Number> combineInternal(
                 ArithmeticOp.Minus -> mt[time].toDouble() - other[time].toDouble()
                 ArithmeticOp.Times -> mt[time].toDouble() * other[time].toDouble()
                 ArithmeticOp.Div -> mt[time].toDouble() / other[time].toDouble()
-          }
+            }
 
-        merged.values.add(value)
-    }
+            merged.values.add(value)
+        }
 
     return merged
 }
+
+//
+// reduce and other set operations
+//
+
+/**
+ * Calculates the sum of a list of MetricTimeline objects.
+ *
+ * @return The sum of the MetricTimeline objects as a new MetricTimeline<Double> object.
+ */
+fun <V : Number> List<MetricTimeline<V>>.sum(): MetricTimeline<Double> =
+    map { it.asDoubleTimeline() }.reduce { acc, mt -> acc + mt }
+
+fun <V : Number> List<MetricTimeline<V>>.mean(): MetricTimeline<Double> = sum() / size.toDouble()
+
 
 
 // not pretty but allows assigning new names to merged timelines without make SimEntity.name var.
