@@ -97,7 +97,8 @@ class ComponentQueue<C>(
     private fun updateExitStats(cqe: CQElement<C>) {
         val (_, enterTime) = cqe
 
-        lengthOfStayStatistics.addValue((env.now - enterTime))
+
+        lengthOfStayStatistics.addValue(env.asTicks(env.now - enterTime))
         sizeTimeline.addValue(q.size)
     }
 
@@ -148,7 +149,7 @@ class QueueStatisticsSnapshot(cq: ComponentQueue<*>) : Jsonable() {
 
     override fun toJson() = json {
         "name" to name
-        "timestamp" to timestamp.value
+        "timestamp" to timestamp
         "type" to this@QueueStatisticsSnapshot.javaClass.simpleName //"queue statistics"
 
         "length_of_stay" to {

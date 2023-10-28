@@ -8,6 +8,7 @@ import org.jetbrains.kotlinx.dataframe.api.*
 import org.kalasim.*
 import org.kalasim.analysis.ResourceEvent
 import org.kalasim.plot.kravis.display
+import kotlin.time.Duration.Companion.minutes
 
 fun main() {
     val sim = createSimulation {
@@ -24,17 +25,18 @@ fun main() {
             override fun process() = sequence {
                 // add an intake activity
                 request(nurses) {
-                    hold(normal(15).sample())
+                    val normal = normal(15.minutes, 1.minutes)
+                    hold(normal.sample())
                 }
 
                 // add a consultation activity
                 request(doctors) {
-                    hold(normal(20).sample())
+                    hold(normal(20.minutes, 1.minutes).sample())
                 }
 
                 // add a planning activity
                 request(admin) {
-                    hold(normal(5).sample())
+                    hold(normal(5.minutes, 1.minutes).sample())
                 }
             }
         }

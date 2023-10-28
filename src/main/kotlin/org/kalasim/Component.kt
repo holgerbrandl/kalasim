@@ -1,7 +1,7 @@
 package org.kalasim
 
-import kotlinx.datetime.Instant
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.datetime.isDistantFuture
 import org.kalasim.ComponentState.*
 import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.ResourceSelectionPolicy.*
@@ -80,6 +80,79 @@ data class RequestContext(
     }
 }
 
+//@AmbiguousDurationComponent
+@AmbiguousDurationComponent
+open class TickedComponent(
+    name: String? = null,
+    at: TickTime? = null,
+    delay: Duration? = null,
+    priority: Priority = NORMAL,
+    process: ProcessPointer? = null,
+    koin: Koin = DependencyContext.get(),
+) : Component(name,at, delay, priority, process, koin){
+
+
+    /**
+     * Hold the component.
+     *
+     * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
+     *
+     * @param duration Time to hold.
+     * @param priority If a component has the same time on the event list, this component is sorted according to
+     * the priority. An event with a higher priority will be scheduled first.
+     */
+//    @OptIn(AmbiguousDuration::class)
+//    suspend fun SequenceScope<Component>.hold(
+//        duration: Number? = null,
+//        description: String? = null,
+//        until: Instant? = null,
+//        priority: Priority = NORMAL,
+//        urgent: Boolean = false
+//    ) = yieldCurrent {
+//        this@TickedComponent.hold(duration?.toDuration(), description, until?.let{TickTime(it)}, priority, urgent)
+//    }
+
+
+    /**
+     * Hold the component.
+     *
+     * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
+     *
+     * @param duration Time to hold. Either `duration` or `till` must be specified.
+     * @param until Absolute time until the component should be held
+     * @param priority If a component has the same time on the event list, this component is sorted according to
+     * the priority. An event with a higher priority will be scheduled first.
+     */
+//    @Deprecated("Use Duration instead of Number")
+    suspend fun SequenceScope<Component>.hold(
+        duration: Number? = null,
+        description: String? = null,
+        until: TickTime? = null,
+        priority: Priority = NORMAL,
+        urgent: Boolean = false
+    ) {
+//        val component = getThis()
+//        val other = this
+//        println(component)
+        yieldCurrent {
+            this@TickedComponent.hold(duration?.toDuration(), description, until, priority, urgent)
+        }
+    }
+
+    suspend fun SequenceScope<Component>.activate(
+        at: TickTime? = null,
+        delay: Number = 0,
+        priority: Priority = NORMAL,
+        urgent: Boolean = false,
+        keepRequest: Boolean = false,
+        keepWait: Boolean = false,
+        process: ProcessPointer? = null
+    ) = yieldCurrent {
+        this@TickedComponent.activate(at, delay.toDuration(), priority, urgent, keepRequest, keepWait, process)
+    }
+
+}
+
 
 // todo https://github.com/holgerbrandl/kalasim/issues/47
 /**
@@ -128,7 +201,7 @@ open class Component(
     var scheduledTime: TickTime? = null
         internal set
 
-    private var remainingDuration: Double? = null
+    private var remainingDuration: Duration? = null
 
 //    init {
 //        println(Component::process == this::process)
@@ -215,7 +288,7 @@ open class Component(
             }
         }
 
-        val tickDelay = delay?.asTicks() ?: 0
+        val tickDelay = delay?: Duration.ZERO
 
 //        if (at != null || (process != null && (process.name != "process" || overriddenProcess))) {
         @Suppress("LeakingThis")
@@ -335,7 +408,7 @@ open class Component(
      */
     fun passivate() {
         remainingDuration = if(componentState == CURRENT) {
-            0.0
+            Duration.ZERO
         } else {
             requireNotData()
             requireNotInterrupted()
@@ -797,7 +870,7 @@ open class Component(
 
             scheduledTime = when {
                 failAt != null -> failAt
-                failDelay != null -> env.now + failDelay.asTicks()
+                failDelay != null -> env.now + failDelay
                 else -> TickTime(Double.MAX_VALUE)
             }
 
@@ -1107,7 +1180,9 @@ open class Component(
         description: String? = null,
         type: ScheduledType
     ) {
-        require(scheduledTime >= env.now) { "scheduled time (${scheduledTime}) before now (${env.now})" }
+        require(scheduledTime >= env.now) {
+            "scheduled time (${scheduledTime}) before now (${env.now})"
+        }
 
         if(ASSERT_MODE == AssertMode.FULL) {
             require(this !in env.queue) {
@@ -1149,7 +1224,7 @@ open class Component(
 
     suspend fun SequenceScope<Component>.activate(
         at: TickTime? = null,
-        delay: Number = 0,
+        delay: Duration = Duration.ZERO,
         priority: Priority = NORMAL,
         urgent: Boolean = false,
         keepRequest: Boolean = false,
@@ -1172,7 +1247,7 @@ open class Component(
      */
     fun activate(
         at: TickTime? = null,
-        delay: Number = 0,
+        delay: Duration = Duration.ZERO,
         priority: Priority = NORMAL,
         urgent: Boolean = false,
         keepRequest: Boolean = false,
@@ -1218,9 +1293,9 @@ open class Component(
         }
 
         val scheduledTime = if(at == null) {
-            env.now + delay.toDouble()
+            env.now + delay
         } else {
-            at + delay.toDouble()
+            at + delay
         }
 
         reschedule(scheduledTime, priority, urgent, "Activating $extra", ACTIVATE)
@@ -1255,15 +1330,14 @@ open class Component(
      * @param priority If a component has the same time on the event list, this component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
-    @OptIn(AmbiguousDuration::class)
     suspend fun SequenceScope<Component>.hold(
         duration: Duration? = null,
         description: String? = null,
-        until: Instant? = null,
+        until: TickTime? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
     ) = yieldCurrent {
-        this@Component.hold(duration?.asTicks(), description, until?.toTickTime(), priority, urgent)
+        this@Component.hold(duration, description, until, priority, urgent)
     }
 
     /**
@@ -1277,14 +1351,9 @@ open class Component(
      */
     // todo: it would be more natural to simply support kotlin.time.Duration here
 //    @Deprecated("Use Duration instead of Ticks")
-//    suspend fun SequenceScope<Component>.hold(
-//        duration: Ticks,
-//        description: String? = null,
-//        priority: Priority = NORMAL,
-//        urgent: Boolean = false
-//    ) = yieldCurrent {
-//        this@Component.hold(duration.value, description, null, priority, urgent)
-//    }
+
+
+
 
     /**
      * Hold the component.
@@ -1296,36 +1365,8 @@ open class Component(
      * @param priority If a component has the same time on the event list, this component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
-//    @Deprecated("Use Duration instead of Number")
-    @AmbiguousDuration
-    suspend fun SequenceScope<Component>.hold(
-        duration: Number? = null,
-        description: String? = null,
-        until: TickTime? = null,
-        priority: Priority = NORMAL,
-        urgent: Boolean = false
-    ) {
-//        val component = getThis()
-//        val other = this
-//        println(component)
-        yieldCurrent {
-            this@Component.hold(duration, description, until, priority, urgent)
-        }
-    }
-
-    /**
-     * Hold the component.
-     *
-     * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
-     *
-     * @param duration Time to hold. Either `duration` or `till` must be specified.
-     * @param until Absolute time until the component should be held
-     * @param priority If a component has the same time on the event list, this component is sorted according to
-     * the priority. An event with a higher priority will be scheduled first.
-     */
-    @AmbiguousDuration
     fun hold(
-        duration: Number? = null,
+        duration: Duration? = null,
         description: String? = null,
         until: TickTime? = null,
         priority: Priority = NORMAL,
@@ -1542,7 +1583,7 @@ open class Component(
 
         scheduledTime = when {
             failAt != null -> failAt
-            failDelay != null -> env.now + failDelay.asTicks()
+            failDelay != null -> env.now + failDelay
             else -> TickTime(Double.MAX_VALUE)
         }
 
@@ -1613,7 +1654,7 @@ open class Component(
         get() = ComponentSnapshot(this)
 
 
-    private suspend fun SequenceScope<Component>.yieldCurrent(builder: () -> Unit = {}) {
+    internal suspend fun SequenceScope<Component>.yieldCurrent(builder: () -> Unit = {}) {
         val initialStatus = componentState
 
         require(initialStatus == CURRENT) {
@@ -1824,6 +1865,9 @@ data class StateRequest<T>(val state: State<T>, val priority: Priority? = null, 
 infix fun <T> State<T>.turns(value: T) = StateRequest(this) { it == value }
 
 internal fun formatWithInf(time: TickTime) =
+    if(time.isDistantFuture) "<inf>" else TRACE_DF.format(time.epochSeconds)
+
+internal fun formatWithInf(time: TickTimeOld) =
     if(time.value == Double.MAX_VALUE || time.value.isInfinite()) "<inf>" else TRACE_DF.format(time.value)
 
 

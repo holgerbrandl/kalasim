@@ -45,6 +45,7 @@ abstract class Event(
 //    fun eventType(): String = getNameClassValueCache(this.javaClass)
     val eventType: String by lazy{ getNameClassValueCache(this.javaClass)}
 
+    val tickTime = time.epochSeconds //todo@tt incorrect
 
     override fun toJson(): JSONObject = json {
         "time" to time

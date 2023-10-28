@@ -1,10 +1,12 @@
 package org.kalasim.test
 
+import kotlinx.datetime.Instant
 import org.apache.commons.math3.distribution.ConstantRealDistribution
 import org.kalasim.*
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import kotlin.test.assertEquals
+import kotlin.time.DurationUnit
 
 fun SimulationEntity.printInfo() = println(this)
 
@@ -41,8 +43,14 @@ internal fun captureOutput(expr: () -> Any): CapturedOutput {
 //internal fun String.trimAndReline() = trimIndent().replace("\n", System.getProperty("line.separator"))
 
 
-internal fun createTestSimulation(enableComponentLogger: Boolean = true, builder: Environment.() -> Unit) {
-    createSimulation{
+internal fun createTestSimulation(
+    startDate: Instant = Instant.fromEpochMilliseconds(0),
+    enableComponentLogger: Boolean = true,
+    /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
+    tickDurationUnit: DurationUnit = DurationUnit.MINUTES,
+    builder: Environment.() -> Unit,
+) {
+    createSimulation(startDate, tickDurationUnit = tickDurationUnit) {
         if(enableComponentLogger) enableComponentLogger()
         builder()
     }
@@ -74,15 +82,15 @@ internal fun <S : Environment> testModel(sim: S, smthg: S.() -> Unit): Unit = sm
  *
  * Note: the thrown NoSuchElementException will cause the event-loop to terminate a consuming ComponentGenerator
  */
-fun Environment.inversedIatDist(vararg arrivalTimes: Number) = object : ConstantRealDistribution(-1.0) {
+internal fun Environment.inversedIatDist(vararg arrivalTimes: Number) = object : ConstantRealDistribution(-1.0) {
 
-    val values = (listOf(now) + arrivalTimes.map { it.toDouble().tickTime })
+    val values = (listOf(now) + arrivalTimes.map {toWallTime(TickTimeOld(it.toDouble())) })
         .zipWithNext()
         .map { (prev, curVal) -> (curVal - prev) }
         .iterator()
 
 
-    override fun sample(): Double = values.next()
+    override fun sample(): Double = values.next().ticks
 }
 
 

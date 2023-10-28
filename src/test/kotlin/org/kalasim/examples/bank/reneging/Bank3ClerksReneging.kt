@@ -5,6 +5,7 @@ import org.kalasim.*
 import org.kalasim.misc.printThis
 import org.kalasim.monitors.printHistogram
 import org.koin.core.component.inject
+import kotlin.time.Duration.Companion.minutes
 
 
 //**{todo}** use monitors here and maybe even inject them
@@ -17,7 +18,7 @@ class CustomerGenerator : Component() {
     override fun process() = sequence {
         while (true) {
             Customer(get())
-            hold(uniform(5.0, 15.0).sample())
+            hold(uniform(5.0, 15.0).minutes.sample())
         }
     }
 }
@@ -42,7 +43,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
             }
         }
 
-        hold(50.0) // if not serviced within this time, renege
+        hold(50.minutes) // if not serviced within this time, renege
 
         if (waitingLine.contains(this@Customer)) {
             //  this@Customer.leave(waitingLine)
@@ -70,7 +71,7 @@ class Clerk : Component() {
             val customer = waitingLine.poll()
             customer.activate() // get the customer out of it's hold(50)
 
-            hold(30.0) // bearbeitungszeit
+            hold(30.minutes) // bearbeitungszeit
             customer.activate() // signal the customer that's all's done
         }
     }
@@ -78,7 +79,7 @@ class Clerk : Component() {
 
 
 fun main() {
-    val env = createSimulation  {
+    val env = createSimulation {
         enableComponentLogger()
 
         // register components needed for dependency injection

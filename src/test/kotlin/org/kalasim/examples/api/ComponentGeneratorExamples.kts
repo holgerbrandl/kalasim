@@ -5,7 +5,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 
-createSimulation{
+createSimulation {
 
     // example 1
     // we can schedule with a probabilist inter-arrival distribution

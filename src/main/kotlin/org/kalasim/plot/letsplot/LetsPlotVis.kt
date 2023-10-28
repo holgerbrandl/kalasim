@@ -18,7 +18,7 @@ import org.kalasim.plot.kravis.clistTimeline
 import org.kalasim.plot.kravis.display
 
 
-fun  <V:Number> MetricTimeline<V>.display(
+fun <V : Number> MetricTimeline<V>.display(
     title: String = name,
     from: TickTime? = null,
     to: TickTime? = null,
@@ -28,10 +28,6 @@ fun  <V:Number> MetricTimeline<V>.display(
         .filter { from == null || it.time >= from }
         .filter { to == null || it.time <= to }
 
-    val useWT = env.tickTransform != null && !forceTickAxis
-
-    fun wtTransform(tt: TickTime) = if (useWT) env.toWallTime(tt) else tt.value
-
     return data.toDataFrame()
         .convertTick2Double("time")
         .letsPlot() +
@@ -39,7 +35,7 @@ fun  <V:Number> MetricTimeline<V>.display(
 }
 
 private fun DataFrame<*>.convertTick2Double(colName: String): DataFrame<*> {
-    return add(colName){ colName<TickTime>().value}
+    return add(colName) { colName<TickTime>().epochSeconds }
 }
 
 
@@ -53,7 +49,7 @@ fun <T> FrequencyTable<T>.display(title: String? = null): Plot {
     var plot = toList().toDataFrame().letsPlot() +
             geomBar(stat = Stat.identity) { x = "first"; y = "second" }
 
-    if (title != null) plot += ggtitle(title)
+    if(title != null) plot += ggtitle(title)
 
     return plot
 }
@@ -65,10 +61,6 @@ fun <T> CategoryTimeline<T>.display(
 ): Plot {
     val nlmStatsData = statsData()
     val stepFun = nlmStatsData.stepFun()
-
-    val useWT = env.tickTransform != null && !forceTickAxis
-
-    fun wtTransform(tt: TickTime) = if (useWT) env.toWallTime(tt) else tt.value
 
     data class Segment<T>(val value: T, val start: TickTime, val end: TickTime)
 
@@ -83,7 +75,7 @@ fun <T> CategoryTimeline<T>.display(
         .convertTick2Double("end")
 //        .addColumn("start") { expr -> expr["start"].map<Double> { wtTransform(TickTime(it)) } }
 //        .addColumn("end") { expr -> expr["end"].map<Double> { wtTransform(TickTime(it)) } }
-        .add("value") {  "value"<ComponentState?>()?.toString() }
+        .add("value") { "value"<ComponentState?>()?.toString() }
 
 
     // why cant we use "x".asDiscreteVariable here?
@@ -98,7 +90,7 @@ fun <T> CategoryTimeline<T>.display(
             xlab("time") +
             ylab("") +
             ggtitle(title)
-                .also { if (useWT) it + scaleXDateTime() }
+            .also { if (!forceTickAxis) it + scaleXDateTime() }
 }
 
 
@@ -106,7 +98,6 @@ fun List<ResourceActivityEvent>.display(
     title: String? = null,
     forceTickAxis: Boolean = false,
 ): Plot {
-    val useWT = any { it.requestedWT != null } && !forceTickAxis
 
     val plotData = toDataFrame()
         //<Resource>
@@ -117,19 +108,21 @@ fun List<ResourceActivityEvent>.display(
 //        .addColumn("start") { expr -> expr["start"].map<TickTime> { it.value } }
 //        .addColumn("end") { expr -> expr["end"].map<TickTime> { it.value } }
 
+//    require(!forceTickAxis) { "tick axis not support. pls file an issue on github." }
+
     return plotData.letsPlot() +
             geomSegment(size = 10) {
                 y = "name"
                 yend = "name"
-                x = if (useWT) "startWT" else "requested"
-                xend = if (useWT) "endWT" else "released"
+                x = if(forceTickAxis) "requestedTT" else "requested"
+                xend = if(forceTickAxis) "releasedTT" else "released"
                 color = "activity"
 
             } +
             ylab("") +
             xlab("Time")
                 .also { if (title != null) ggtitle(title) }
-                .also { if (useWT) it + scaleXDateTime() }
+                .also { if (!forceTickAxis) it + scaleXDateTime() }
 }
 
 
@@ -142,23 +135,20 @@ fun List<ResourceTimelineSegment>.display(
     ),
     forceTickAxis: Boolean = false,
 ): Plot {
-    val useWT = any { it.startWT != null } && !forceTickAxis
-
-
     return filter { it.metric !in exclude }.toDataFrame()
 //        .addColumn("start") { expr -> expr["start"].map<TickTime> { it.value } }
         .convertTick2Double("start")
         .letsPlot() +
             geomStep {
 
-                x = if (useWT) "startWT" else "start"
+                x = if(forceTickAxis) "start" else "startTT"
                 y = "value"
                 color = "metric"
             } +
             // scales arg not yet supported https://github.com/JetBrains/lets-plot/issues/479
             facetWrap("color", ncol = 1)
-                .also { if (title != null) ggtitle(title) }
-                .also { if (useWT) it + scaleXDateTime() }
+                .also { if(title != null) ggtitle(title) }
+                .also { if(!forceTickAxis) it + scaleXDateTime() }
 }
 
 
@@ -177,11 +167,6 @@ fun List<Component>.displayStateTimeline(
     componentName: String = "Component",
     forceTickAxis: Boolean = false,
 ): Plot {
-//    val df = csTimelineDF(componentName)
-
-    val useWT = first().env.startDate != null && !forceTickAxis
-    fun wtTransform(tt: TickTime) = if (useWT) first().env.toWallTime(tt) else tt.value
-
     val df = clistTimeline()
         .toDataFrame()
         //<Component>
@@ -202,8 +187,8 @@ fun List<Component>.displayStateTimeline(
         xend = "end"
         color = "value"
     } + xlab(componentName)
-        .also { if (title != null) ggtitle(title) }
-        .also { if (useWT) it + scaleXDateTime() }
+        .also { if(title != null) ggtitle(title) }
+        .also { if (!forceTickAxis) it + scaleXDateTime() }
 }
 
 
@@ -220,5 +205,5 @@ fun List<Component>.displayStateProportions(
         fill = "value"
         weight = "duration"
     } + xlab("State Proportion")
-        .also { if (title != null) ggtitle(title) }
+        .also { if(title != null) ggtitle(title) }
 }

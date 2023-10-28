@@ -8,7 +8,7 @@ import kotlin.time.DurationUnit
 
 
 // note MINUTES is also kalasim's default
-createSimulation(durationUnit = DurationUnit.MINUTES) {
+createSimulation(tickDurationUnit = DurationUnit.MINUTES) {
     enableComponentLogger()
 
     object :Component(){

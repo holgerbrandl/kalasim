@@ -15,9 +15,9 @@ class ERTests {
 
         run(2.days)
 
-        treatedMonitor[now] shouldBe 87
-        deceasedMonitor[now] shouldBe 11
-        waitingLine.sizeTimeline[now] shouldBe 12
+        treatedMonitor[now] shouldBe 94
+        deceasedMonitor[now] shouldBe 12
+        waitingLine.sizeTimeline[now] shouldBe 11
     }
 }
 

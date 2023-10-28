@@ -5,8 +5,6 @@ import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import kravis.*
 import org.apache.commons.math3.distribution.UniformRealDistribution
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
-import org.apache.commons.math3.stat.descriptive.rank.Median
 import org.json.JSONObject
 import org.junit.Ignore
 import org.junit.Test
@@ -17,6 +15,8 @@ import org.kalasim.examples.bank.reneging.CustomerGenerator
 import org.kalasim.misc.median
 import org.kalasim.test.captureOutput
 import org.koin.core.context.stopKoin
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 
 
 class SalabimExampleTests {
@@ -37,44 +37,44 @@ class SalabimExampleTests {
 
         val expectedStats = JSONObject(
             """{
-              "queue_length": {
-                "all": {
-                  "duration": 50,
-                  "min": 0,
-                  "max": 1,
-                  "mean": 0.119,
-                  "standard_deviation": 0.327
-                },
-                "excl_zeros": {
-                  "duration": 5.965,
-                  "min": 1,
-                  "max": 1,
-                  "mean": 1,
-                  "standard_deviation": 0
-                }
-              },
-              "name": "waiting line",
-              "length_of_stay": {
-                "all": {
-                  "entries": 5,
-                  "median": 1.81,
-                  "mean": 1.193,
-                  "ninety_pct_quantile": 4.083,
-                  "standard_deviation": 1.81,
-                  "ninetyfive_pct_quantile": 4.083
-                },
-                "excl_zeros": {
-                  "entries": 2,
-                  "median": 1.557,
-                  "mean": 2.983,
-                  "ninety_pct_quantile": 4.083,
-                  "standard_deviation": 1.557,
-                  "ninetyfive_pct_quantile": 4.083
-                }
-              },
-              "type": "QueueStatisticsSnapshot",
-              "timestamp": 50
-            }"""
+  "queue_length": {
+    "all": {
+      "duration": "50m",
+      "min": 0,
+      "max": 1,
+      "mean": 0.121,
+      "standard_deviation": 0.33
+    },
+    "excl_zeros": {
+      "duration": "6m 3.289559556s",
+      "min": 1,
+      "max": 1,
+      "mean": 1,
+      "standard_deviation": 0
+    }
+  },
+  "name": "waiting line",
+  "length_of_stay": {
+    "all": {
+      "entries": 5,
+      "median": 1.836,
+      "mean": 1.211,
+      "ninety_pct_quantile": 4.142,
+      "standard_deviation": 1.836,
+      "ninetyfive_pct_quantile": 4.142
+    },
+    "excl_zeros": {
+      "entries": 2,
+      "median": 1.576,
+      "mean": 3.027,
+      "ninety_pct_quantile": 4.142,
+      "standard_deviation": 1.576,
+      "ninetyfive_pct_quantile": 4.142
+    }
+  },
+  "type": "QueueStatisticsSnapshot",
+  "timestamp": "1970-01-01T00:50:00Z"
+}"""
         )
 
         //https://github.com/stleary/JSON-java/issues/573
@@ -84,20 +84,19 @@ class SalabimExampleTests {
 
 
     @Test
-    fun `average waiting should be constant in bank with 1 clerk`() {
-        // todo what is the expected mean here from a queuing theory perspective?
+    fun `average waiting time should be constant in bank with 1 clerk`() {
+        val runtimes = (20..120 step 10).map { it.days }
 
-        val avgQueueMeans = (20..120 step 10).map { 1000.0 * it }.map { runtime ->
-//        val avgQueueMeans = listOf(200).map { 1000.0 * it }.map { runtime ->
-//        val avgQueueMeans = listOf(100000).map { runtime ->
-            runtime to declareDependencies {
-                dependency { Clerk() }
+        val avgQueueMeans = runtimes.map { runtime ->
+            runtime to createSimulation {
+                dependency { Clerk(9.5.minutes) }
                 dependency { ComponentQueue<Customer>("waiting line") }
-            }.createSimulation {
+
                 org.kalasim.examples.bank.oneclerk.CustomerGenerator()
+                // ... with uniform(5,15).minutes
+
                 run(runtime)
             }.run {
-
                 val losStats =
                     get<ComponentQueue<Customer>>().statistics.lengthOfStayStats
 
@@ -113,26 +112,29 @@ class SalabimExampleTests {
 
         print(avgQueueMeans)
 
+        @Suppress("ConstantConditionIf")
         if(false) {
             avgQueueMeans
                 .plot(x = { it.first }, y = { it.second.median })
                 .geomPoint()
                 .geomLine()
                 .show()
+
             Thread.sleep(100000)
         }
 
-        avgQueueMeans.map { it.second.median }.median() shouldBe 27.0.plusOrMinus(1.0)
+        // What is the expected mean here from a queuing theory perspective?
+        // What is the mean waiting time with a uniform arrival between 5 and 15 minutes and a processing time of 10.minutes --> ChatGPT: since not exponential arrival no precise answer but roughly
+        avgQueueMeans.map { it.second.median }.median() shouldBe 4.0.plusOrMinus(0.5)
     }
 
     @Test
     fun `Bank3clerks_reneging should work as expected`() {
-        val env = declareDependencies {
+        val env = createSimulation {
             // register components needed for dependency injection
             dependency { ComponentQueue<org.kalasim.examples.bank.reneging.Customer>("waitingline") }
             dependency { State(false, "worktodo") }
             dependency { (0..2).map { org.kalasim.examples.bank.reneging.Clerk() } }
-        }.createSimulation {
 
             // register other components to  be present when starting the simulation
             CustomerGenerator()
@@ -148,60 +150,58 @@ class SalabimExampleTests {
             run(500.0)
         }
 
-        val waitingLine: ComponentQueue<Customer> = env.get()
+        val waitingLine: ComponentQueue<Customer> = env.get<ComponentQueue<Customer>>()
 
         val expectedStats = JSONObject(
             """{
-              "queue_length": {
-                "all": {
-                  "duration": 2000,
-                  "min": 0,
-                  "max": 3,
-                  "mean": 0.547,
-                  "standard_deviation": 0.72
-                },
-                "excl_zeros": {
-                  "duration": 831.639,
-                  "min": 1,
-                  "max": 3,
-                  "mean": 1.316,
-                  "standard_deviation": 0.486
-                }
-              },
-              "name": "waitingline",
-              "length_of_stay": {
-                "all": {
-                  "entries": 50,
-                  "median": 7.185,
-                  "mean": 10.497,
-                  "ninety_pct_quantile": 18.284,
-                  "standard_deviation": 7.185,
-                  "ninetyfive_pct_quantile": 21.968
-                },
-                "excl_zeros": {
-                  "entries": 45,
-                  "median": 6.602,
-                  "mean": 11.664,
-                  "ninety_pct_quantile": 19.167,
-                  "standard_deviation": 6.602,
-                  "ninetyfive_pct_quantile": 22.567
-                }
-              },
-              "type": "QueueStatisticsSnapshot",
-              "timestamp": 2000
-            }"""
+  "queue_length": {
+    "all": {
+      "duration": "1d 9h 20m",
+      "min": 0,
+      "max": 3,
+      "mean": 0.547,
+      "standard_deviation": 0.72
+    },
+    "excl_zeros": {
+      "duration": "13h 51m 38.317861985s",
+      "min": 1,
+      "max": 3,
+      "mean": 1.316,
+      "standard_deviation": 0.486
+    }
+  },
+  "name": "waitingline",
+  "length_of_stay": {
+    "all": {
+      "entries": 50,
+      "median": 7.185,
+      "mean": 10.497,
+      "ninety_pct_quantile": 18.284,
+      "standard_deviation": 7.185,
+      "ninetyfive_pct_quantile": 21.968
+    },
+    "excl_zeros": {
+      "entries": 45,
+      "median": 6.602,
+      "mean": 11.664,
+      "ninety_pct_quantile": 19.167,
+      "standard_deviation": 6.602,
+      "ninetyfive_pct_quantile": 22.567
+    }
+  },
+  "type": "QueueStatisticsSnapshot",
+  "timestamp": "1970-01-02T09:20:00Z"
+}"""
         )
 
         waitingLine.statistics.toJson().toString(2) shouldBe expectedStats.toString(2)
 
         listOf(1.0).toDoubleArray()
-
     }
 
 
     @Test
     fun `bank with resource clerks should result in correct statistics`() {
-
         val env = createSimulation {
             // same logic as in Bank3ClerksResources.kt
             dependency { Resource("clerks", capacity = 3) }
@@ -236,6 +236,7 @@ class SalabimExampleTests {
     fun `the atm queue should have known properties`() {
 // TODO build tests using properties from https://en.wikipedia.org/wiki/M/M/1_queue
     }
+
 
     @Test
     fun `it should run all examples without exception`() {

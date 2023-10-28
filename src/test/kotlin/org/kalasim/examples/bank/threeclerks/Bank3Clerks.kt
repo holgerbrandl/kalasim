@@ -5,6 +5,7 @@ import org.kalasim.*
 import org.kalasim.plot.kravis.canDisplay
 import org.kalasim.plot.kravis.display
 import org.koin.core.component.inject
+import kotlin.time.Duration.Companion.minutes
 
 
 class CustomerGenerator : Component() {
@@ -12,7 +13,7 @@ class CustomerGenerator : Component() {
     override fun process() = sequence {
         while (true) {
             Customer(get())
-            hold(uniform(5.0, 15.0).sample())
+            hold(uniform(5.0, 15.0).minutes.sample())
         }
     }
 }
@@ -44,7 +45,7 @@ class Clerk : Component() {
                 passivate()
 
             val customer = waitingLine.poll()
-            hold(30.0) // bearbeitungszeit
+            hold(30.minutes) // bearbeitungszeit
             customer.activate() // signal the customer that's all's done
         }
     }

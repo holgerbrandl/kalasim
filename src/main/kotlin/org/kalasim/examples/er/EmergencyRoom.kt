@@ -1,5 +1,7 @@
 package org.kalasim.examples.er
 
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.kalasim.*
 import org.kalasim.examples.er.PatientStatus.*
 import org.kalasim.examples.er.Severity.*
@@ -252,7 +254,7 @@ class EmergencyRoom(
 ) : Environment(
     enableComponentLogger = enableComponentLogger,
     enableTickMetrics = enableTickMetrics,
-    durationUnit = DurationUnit.HOURS
+    tickDurationUnit = DurationUnit.HOURS
 ) {
 
     // todo this should be opt-in anyway https://github.com/holgerbrandl/kalasim/issues/66
@@ -326,7 +328,7 @@ class EmergencyRoom(
 
             // todo this is not pretty; How to model time-dependent iat?
             // reduce new patients during the night
-            val isDay = (now.value % 24) in 8.0..18.0
+            val isDay = (now.toLocalDateTime(TimeZone.UTC).hour % 24) in 8..18
             if((isDay || random.nextDouble() > 0.9) && waitingLine.size <= waitingAreaSize) {
                 register(patient)
             } else {

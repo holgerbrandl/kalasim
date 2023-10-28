@@ -6,6 +6,7 @@ import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import junit.framework.Assert.fail
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import krangl.cumSum
 import krangl.mean
@@ -34,13 +35,20 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
+fun main() {
+    val now = Clock.System.now()
+    val instant = now + 5.minutes
+    println(instant)
+}
+
+@OptIn(AmbiguousDurationComponent::class)
 class EnvTests {
 
     @Test
     fun `it should support more than one env`() {
         DependencyContext.stopKoin()
 
-        class TestComponent(koin: Koin) : Component(koin = koin) {
+        class TestComponent(koin: Koin) : TickedComponent(koin = koin) {
             override fun process() = sequence {
                 hold(2)
                 println("my env is ${env.getKoin()}")
@@ -76,7 +84,7 @@ class EnvTests {
     fun `it should run be possible to stop a simulation from an event-handler`() = createTestSimulation {
         var holdCounter = 0
 
-        object : Component() {
+        object : TickedComponent() {
             override fun repeatedProcess() = sequence {
                 hold(1)
                 holdCounter++
@@ -86,7 +94,7 @@ class EnvTests {
         }
 
         addEventListener<RescheduledEvent> {
-            if(it.time > 3 && it.type == ScheduledType.HOLD) {
+            if(it.time.toTickTime().value > 3 && it.type == ScheduledType.HOLD) {
                 stopSimulation()
             }
         }
@@ -245,7 +253,7 @@ class EnvTests {
         createSimulation {
             enableComponentLogger()
 
-            object : Component() {
+            object : TickedComponent() {
                 var waitCounter = 1
 
                 override fun repeatedProcess() = sequence {
@@ -258,9 +266,9 @@ class EnvTests {
             ClockSync(1.minutes, maxDelay = 1.seconds)
 
             shouldThrow<ClockOverloadException> {
-                run(10)
+                run(10.minutes)
             }.apply {
-                simTime shouldBeLessThan 10.tt
+                timestamp shouldBeLessThan startDate + 10.minutes
             }
         }
     }
@@ -270,7 +278,7 @@ class EnvTests {
         createSimulation {
             val cc = componentCollector()
 
-            object : Component() {
+            object : TickedComponent() {
                 override fun process() =
                     sequence {
                         hold(10)
@@ -278,7 +286,7 @@ class EnvTests {
             }
 
             run(until = null as Instant?)
-            now shouldBe 10.tt
+            nowTT shouldBe 10.tt
 
             cc.size shouldBe 1
         }
@@ -286,35 +294,35 @@ class EnvTests {
 
     @Test
     fun `it should allow to use custom duration units`() {
-        val environment = Environment(DurationUnit.DAYS)
+        val environment = Environment(tickDurationUnit = DurationUnit.DAYS)
 
         environment.run(4.days)
 
-        environment.now shouldBe TickTime(4)
+        environment.nowTT shouldBe TickTimeOld(4.0)
     }
 
     @Test
     fun `it should run until or duration until has reached`() {
         createSimulation {
-            run(until = TickTime(10))
-            now shouldBe 10.tt
+            run(until = env.asSimTime(10))
+            nowTT shouldBe 10.tt
         }
 
         createSimulation {
             run(duration = 5)
             run(duration = 5)
-            now shouldBe 10.tt
+            now shouldBe asSimTime(10)
         }
     }
 
     @Test
     fun `it should restore koin in before running sims in parallel`() {
         class QueueCustomer(mu: Double, val atm: Resource) : Component() {
-            val ed = exponential(mu)
+            val ed = exponential(mu.minutes)
 
             override fun process() = sequence {
                 request(atm) {
-                    hold(ed.sample())
+                    hold(ed())
                 }
             }
         }
@@ -323,7 +331,7 @@ class EnvTests {
             val atm = dependency { Resource("atm", 1) }
 
             init {
-                ComponentGenerator(iat = exponential(lambda)) {
+                ComponentGenerator(iat = exponential(lambda.minutes)) {
                     QueueCustomer(mu, atm)
                 }
             }
@@ -351,9 +359,9 @@ class EnvTests {
 
         object : Component() {
             override fun process() = sequence {
-                hold(10, "something is about to happen")
+                hold(10.minutes, "something is about to happen")
                 stopSimulation()
-                hold(10, "this ain't happening today")
+                hold(10.minutes, "this ain't happening today")
             }
         }
 
@@ -400,14 +408,12 @@ class EnvTests {
     @Test
     fun `it should enforce typed durations`() {
 
-        Environment(
-//            typedDurationsRequired = true
-        ).apply {
+        Environment().apply {
 
             object : Component() {
                 override fun process() = sequence {
                     // try holding without duration unit --> should fail!
-                    hold(10, "something is about to happen")
+                    hold(10.minutes, "something is about to happen")
                     stopSimulation()
                 }
             }
@@ -429,13 +435,16 @@ class EnvTests {
 
         doctors.first().snapshot.toJson().toIndentString() shouldBeDiff """
             {
-              "requestedBy": [],
+              "requestedBy": [{
+                "component": "room 2",
+                "quantity": 1
+              }],
               "claimedQuantity": 1,
-              "creationTime": 0,
-              "now": 240,
+              "creationTime": "1970-01-01T00:00:00Z",
+              "now": "1970-01-11T00:00:00Z",
               "name": "Dr. Howe",
               "claimedBy": [{
-                "first": "room 1",
+                "first": "room 0",
                 "second": null
               }],
               "capacity": 1
@@ -445,9 +454,9 @@ class EnvTests {
         waitingLine.first().snapshot.toJson().toIndentString() shouldBeDiff """
         {
           "scheduledTime": null,
-          "creationTime": 105.38,
-          "now": 240,
-          "name": "546 Carmen Johnson",
+          "creationTime": "1970-01-06T17:15:42.348298110Z",
+          "now": "1970-01-11T00:00:00Z",
+          "name": "724 Heriberto Farrell",
           "claims": {},
           "requests": {},
           "status": "DATA"
@@ -456,40 +465,40 @@ class EnvTests {
 
         waitingLine.sizeTimeline.snapshot.toJson().toIndentString() shouldBeDiff """
         {
-          "duration": 240,
+          "duration": "10d",
           "min": 0,
-          "max": 301,
-          "mean": 129.546,
-          "standard_deviation": 110.56
+          "max": 264,
+          "mean": 74.096,
+          "standard_deviation": 85.135
         }
         """.trimIndent()
 
         waitingLine.statistics.toJson().toIndentString() shouldBeDiff """
-        {
-          "size": {
-            "all": {
-              "duration": 240,
-              "min": 0,
-              "max": 301,
-              "mean": 129.546,
-              "standard_deviation": 110.56
-            },
-            "excl_zeros": {
-              "duration": 217.799,
-              "min": 1,
-              "max": 301,
-              "mean": 142.751,
-              "standard_deviation": 107.617
+            {
+              "size": {
+                "all": {
+                  "duration": "10d",
+                  "min": 0,
+                  "max": 264,
+                  "mean": 74.096,
+                  "standard_deviation": 85.135
+                },
+                "excl_zeros": {
+                  "duration": "8d 1h 22m 25.304357505s",
+                  "min": 1,
+                  "max": 264,
+                  "mean": 91.962,
+                  "standard_deviation": 85.751
+                }
+              },
+              "name": "ER Waiting Area Queue",
+              "length_of_stay": {
+                "all": {"entries": 0},
+                "excl_zeros": {"entries": 0}
+              },
+              "type": "ComponentListStatistics",
+              "timestamp": "1970-01-11T00:00:00Z"
             }
-          },
-          "name": "ER Waiting Area Queue",
-          "length_of_stay": {
-            "all": {"entries": 0},
-            "excl_zeros": {"entries": 0}
-          },
-          "type": "ComponentListStatistics",
-          "timestamp": 240
-        }
         """.trimIndent()
     }
 }
@@ -533,7 +542,7 @@ class CustomKoinModuleTests {
             run(50000.0)
 
             val waitingLine: ComponentQueue<Customer> = get()
-            waitingLine.creationTime.value.toInt() shouldBe 0
+            waitingLine.creationTime.epochSeconds shouldBe 0
 
             println(waitingLine.statistics.toJson())
         }

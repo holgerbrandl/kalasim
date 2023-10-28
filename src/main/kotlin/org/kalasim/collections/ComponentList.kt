@@ -49,7 +49,7 @@ class ComponentList<C>(
             changeListeners.forEach { it.removed(element) }
 
             val insertTime = stayTracker.remove(element)!!
-            lengthOfStayStatistics.addValue((env.now - insertTime))
+            lengthOfStayStatistics.addValue(env.asTicks(env.now - insertTime))
 
             sizeTimeline.addValue(size)
         }
@@ -89,7 +89,7 @@ class ComponentListStatistics(cl: ComponentList<*>) : Jsonable(){
 
     override fun toJson() = json {
         "name" to name
-        "timestamp" to timestamp.value
+        "timestamp" to timestamp
         "type" to this@ComponentListStatistics.javaClass.simpleName //"queue statistics"
 
         "length_of_stay" to {

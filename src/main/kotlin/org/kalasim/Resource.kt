@@ -10,6 +10,7 @@ import org.kalasim.monitors.copy
 import org.koin.core.Koin
 import java.util.*
 import kotlin.random.Random
+import kotlin.time.Duration
 
 // TODO Analyze we we support the same preemptible contract as simmer (Ucar2019, p11) (in particular restart)
 
@@ -24,22 +25,26 @@ sealed class RequestHonorPolicy {
     @Suppress("MemberVisibilityCanBePrivate")
     class WeightedFCFS(
         val alpha: Number,
-        val capTimeDiffAt: Number? = null,
+        val capTimeDiffAt: Duration? = null,
         val capQuantityAt: Number? = null
     ) : RequestHonorPolicy() {
 
         /** Calculate weighted score of quantity and ticks sind request. Requests resulting in large values will be honored first. */
-        fun computeRequestWeight(timeSinceRequest: Double, requestQuantity: Double): Double {
-            require(capTimeDiffAt == null || capTimeDiffAt.toDouble() > 0)
+        fun computeRequestWeight(timeSinceRequest: Duration, requestQuantity: Double): Double {
+            require(capTimeDiffAt == null || capTimeDiffAt.isPositive())
             require(capQuantityAt == null || capQuantityAt.toDouble() > 0)
 
-            val timeDiffTrimmed = trimOptional(timeSinceRequest, capTimeDiffAt?.toDouble())
+            val timeDiffTrimmed = trimDurationOptional(timeSinceRequest, capTimeDiffAt)
             val quantityTrimmed = trimOptional(requestQuantity, capQuantityAt?.toDouble())
 
-            return (alpha.toDouble() * timeDiffTrimmed) / quantityTrimmed
+            //TODO maybe we need a duration unit or tick-transform to do the mapping
+            return (alpha.toDouble() * timeDiffTrimmed.inWholeMinutes) / quantityTrimmed
         }
 
         private fun trimOptional(value: Double, maxValue: Double?) =
+            if(maxValue != null && value > maxValue) maxValue else value
+
+        private fun trimDurationOptional(value: Duration, maxValue: Duration?) =
             if(maxValue != null && value > maxValue) maxValue else value
 
 //        init {
@@ -409,7 +414,7 @@ data class ResourceTimelineSegment(
     val resource: Resource,
     val start: TickTime,
     val end: TickTime?,
-    val duration: Double?,
+    val duration: Duration?,
     val metric: ResourceMetric,
     val value: Double,
 //    val start_wt: Instant? = null,
@@ -428,10 +433,10 @@ data class ResourceTimelineSegment(
 //
 //    }
 
-    val startWT = resource.env.asWtOptional(start)
+//    val startWT = resource.env.asWtOptional(start)
 
-    @Suppress("unused")
-    val endWT = end?.let { resource.env.asWtOptional(it) }
+//    @Suppress("unused")
+//    val endWT = end?.let { resource.env.asWtOptional(it) }
 }
 
 
@@ -456,13 +461,13 @@ val Resource.timeline: List<ResourceTimelineSegment>
         var statsDF = listOf(capStats, claimStats, availStats, occStats, requesters, claimers).concat()
         statsDF = statsDF.rename("timestamp" to "start")
         statsDF = statsDF.add("end") {
-            "start"<TickTime>().value + ("duration"() ?: 0.0)
+            "start"<TickTime>() + ("duration"<Duration?>() ?: Duration.ZERO)
         }
         statsDF = statsDF.add("resource") { this@timeline }
 
         // convert to tick-time
 //        statsDF = statsDF.add("start") { expr -> expr["start"].map<Double> { TickTime(it) } }
-        statsDF = statsDF.convert("end").with { TickTime(it as Double) }
+        statsDF = statsDF.convert("end").with { it }
 
         // optionally add walltimes
 //        if (env.tickTransform != null) {

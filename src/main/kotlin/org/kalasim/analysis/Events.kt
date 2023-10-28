@@ -1,6 +1,7 @@
 package org.kalasim.analysis
 
 import com.github.holgerbrandl.jsonbuilder.json
+import kotlinx.datetime.isDistantFuture
 import org.json.JSONObject
 import org.kalasim.*
 import org.kalasim.misc.*
@@ -63,7 +64,7 @@ class ResourceEvent(
 
 }
 
-internal fun Environment.asWtOptional(tickTime: TickTime) = if(hasAbsoluteTime()) toWallTime(tickTime) else null
+//internal fun Environment.asWtOptional(tickTime: TickTime) = if(hasAbsoluteTime()) toWallTime(tickTime) else null
 
 data class ResourceActivityEvent(
     val requested: TickTime,
@@ -74,9 +75,9 @@ data class ResourceActivityEvent(
     val activity: String?,
     val quantity: Double,
 ) : Event(released) {
-    val requestedWT = resource.env.asWtOptional(requested)
-    val honoredWT = resource.env.asWtOptional(honored)
-    val releasedWT = resource.env.asWtOptional(released)
+//    val requestedWT = resource.env.asWtOptional(requested)
+//    val honoredWT = resource.env.asWtOptional(honored)
+//    val releasedWT = resource.env.asWtOptional(released)
 
     override fun toJson() = json {
         "eventType" to eventType
@@ -187,10 +188,11 @@ class RescheduledEvent(
 
     override val action: String
         get() {
-            val extra = ", scheduled for ${formatWithInf(scheduledFor)}"
+            val extra = ", scheduled for ${formatWithInf(component?.env?.wall2TickTime(scheduledFor)!!)}"
 
-            val delta = if(this.scheduledFor == time || (this.scheduledFor.value == Double.MAX_VALUE)) "" else {
-                "+" + TRACE_DF.format(scheduledFor - time) + " "
+            val delta = if(this.scheduledFor == time || (this.scheduledFor.isDistantFuture)) "" else {
+                val scheduledIn = component.env.asTicks(scheduledFor - time)
+                "+" + TRACE_DF.format(scheduledIn) + " "
             }
 
             val prettyType = when(type) {

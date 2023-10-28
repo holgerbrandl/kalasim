@@ -3,9 +3,11 @@ package org.kalasim.examples.api
 import org.kalasim.*
 import org.kalasim.analysis.ResourceEvent
 import org.kalasim.analysis.ResourceEventType
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 
-class Customer(val arrivalTime: Int, val requestQuantity: Int) : Component() {
+class Customer(val arrivalTime: Duration, val requestQuantity: Int) : Component() {
     val bananas = get<DepletableResource>()
 
     override fun process() = sequence {
@@ -21,21 +23,21 @@ fun fruitStore(honorPolicy: RequestHonorPolicy): List<ResourceEvent> {
 
         dependency { bananas }
 
-        Customer(1, 4)
-        Customer(6, 5)
-        Customer(15, 5)
-        Customer(24, 1)
-        Customer(40, 3)
+        Customer(1.minutes, 4)
+        Customer(6.minutes, 5)
+        Customer(15.minutes, 5)
+        Customer(24.minutes, 1)
+        Customer(40.minutes, 3)
 
         // refill the shelf after 5o ticks
         object : Component() {
             override fun process() = sequence {
-                hold(50)
+                hold(50.minutes)
 
                 // incrementally refill banana shelf
                 repeat(6) {
                     put(bananas, quantity = 4)
-                    hold(10)
+                    hold(10.minutes)
                 }
             }
         }

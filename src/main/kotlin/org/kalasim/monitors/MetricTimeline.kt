@@ -6,14 +6,18 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.kalasim.*
 import org.kalasim.analysis.snapshot.MetricTimelineSnapshot
 import org.kalasim.misc.*
+import org.kalasim.misc.time.sumOf
 import org.koin.core.Koin
 import java.util.*
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Allows to track a numeric quantity over time.
  *
  * @param initialValue initial value for a level timeline. It is important to set the value correctly. Default: 0
  */
+//todo invert argument order
 open class MetricTimeline<V : Number>(
     name: String? = null,
     internal val initialValue: V,
@@ -36,7 +40,7 @@ open class MetricTimeline<V : Number>(
     }
 
 
-    override fun get(time: Number): V {
+    override fun get(time: TickTime): V {
         require(enabled){
             "timeline '$name' is disabled. Make sure to enable it locally,  or globally using a matching tracking-policy." +
                     " For details see https://www.kalasim.org/advanced/#continuous-simulation"
@@ -46,12 +50,15 @@ open class MetricTimeline<V : Number>(
             "query time must be greater than timeline start (${timestamps.first()})"
         }
 
-        return timestamps.zip(values.toList()).reversed().first { it.first <= time.toDouble() }.second
+        return timestamps.zip(values.toList()).reversed().first { it.first <= time }.second
     }
 
-    operator fun get(time: TickTime) = get(time.value)
+    override operator fun get(time: Number): V {
+        val tick2wallTime = get<Environment>().tick2wallTime(TickTimeOld(time.toDouble()))
+        return get(tick2wallTime)
+    }
 
-    override fun total(value: V): Double = statsData().run {
+    override fun total(value: V): Duration? = statsData().run {
         // https://youtrack.jetbrains.com/issue/KT-43776
         values.zip(durations).filter { it.first == value }.sumOf { it.second }
     }
@@ -131,7 +138,7 @@ fun <V : Number> MetricTimeline<V>.printHistogram(
 
         values.forEach { freq.addValue(it as Comparable<*>) }
 
-        val colData: Map<Double, Double> =
+        val colData: Map<Double, Duration> =
             statistics().data.run {
                 durations.zip(values)
                     .groupBy { (_, value) -> value }
@@ -143,21 +150,23 @@ fun <V : Number> MetricTimeline<V>.printHistogram(
 //                .valuesIterator().iterator().asSequence().toList()
 //                .map { it to freq.getCount(it) }
 
-        colData.printConsole(sortByWeight = sortByWeight)
+        colData.mapValues{ env.asTicks(it.value)}.printConsole(sortByWeight = sortByWeight)
     } else {
 
         // todo make as pretty as in https://www.salabim.org/manual/Monitor.html
-        val hist: List<Pair<Double, Double>> = statistics().data.run {
-            val aggregatedMonitor: List<Pair<Double, Double>> =
+        val hist: List<Pair<Double, Duration>> = statistics().data.run {
+            val aggregatedMonitor: List<Pair<Double, Duration>> =
                 durations.zip(values).groupBy { (_, value) -> value }
                     .map { kv -> kv.key.toDouble() to kv.value.sumOf { it.first } }
 
             aggregatedMonitor
         }
 
+        val pmf = hist.map { it.first to it.second.inWholeSeconds.toDouble() }.asCMPairList()
+
         val stats =
             DescriptiveStatistics(
-                EnumeratedDistribution(hist.asCMPairList()).sample(1000, arrayOf<Double>()).toDoubleArray()
+                EnumeratedDistribution(pmf).sample(1000, arrayOf<Double>()).toDoubleArray()
             )
 
         stats.buildHistogram(binCount).printHistogram()

@@ -4,6 +4,7 @@ package org.kalasim.dokka
 
 import org.kalasim.*
 import org.kalasim.Priority.Companion.IMPORTANT
+import kotlin.time.Duration.Companion.minutes
 
 
 fun statesHowTo() {
@@ -12,9 +13,9 @@ fun statesHowTo() {
 
         object : Component("Car") {
             override fun process() = sequence {
-                hold(14, "driving")
+                hold(14.minutes, "driving")
                 wait(trafficLight, "green")
-                hold(7, "driving again")
+                hold(7.minutes, "driving again")
 
                 // or using predicate syntax
                 wait(trafficLight) { it.startsWith("gr") }
@@ -23,9 +24,9 @@ fun statesHowTo() {
 
         object : Component("TrafficController") {
             override fun repeatedProcess() = sequence {
-                hold(3)
+                hold(3.minutes)
                 trafficLight.value = "green"
-                hold(3)
+                hold(3.minutes)
                 trafficLight.value = "red"
 
                 // alternatively we could also use a state trigger
@@ -47,7 +48,7 @@ fun resourceHowTo() {
                 // the recommended way is to use request that is released automatically
                 request(clerks) {
                     // consume it
-                    hold(2)
+                    hold(2.minutes)
                 }
                 // no need to release it, if a `honorBlock` is provided it will be released automatically
 
@@ -63,7 +64,7 @@ fun resourceHowTo() {
                 request(clerks withQuantity 3.4 andPriority 3)
 
 
-                hold(2) // consume it
+                hold(2.minutes) // consume it
 
                 // note the requests from above are accumulated and need to be released manually
                 release(clerks, quantity = 2.0) // release some quantity

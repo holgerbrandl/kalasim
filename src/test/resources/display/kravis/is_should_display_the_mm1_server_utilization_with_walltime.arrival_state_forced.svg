@@ -51,13 +51,13 @@
         
         <rect x="77.60" y="23.18" width="420.92" height="449.33" style="stroke-width: 1.07; stroke: none; fill: #EBEBEB;"/>
         
-        <polyline points="130.25,472.50 130.25,23.18 " style="stroke-width: 0.53; stroke: #FFFFFF; stroke-linecap: butt;"/>
+        <polyline points="130.23,472.50 130.23,23.18 " style="stroke-width: 0.53; stroke: #FFFFFF; stroke-linecap: butt;"/>
         
-        <polyline points="207.83,472.50 207.83,23.18 " style="stroke-width: 0.53; stroke: #FFFFFF; stroke-linecap: butt;"/>
+        <polyline points="207.82,472.50 207.82,23.18 " style="stroke-width: 0.53; stroke: #FFFFFF; stroke-linecap: butt;"/>
         
-        <polyline points="285.42,472.50 285.42,23.18 " style="stroke-width: 0.53; stroke: #FFFFFF; stroke-linecap: butt;"/>
+        <polyline points="285.41,472.50 285.41,23.18 " style="stroke-width: 0.53; stroke: #FFFFFF; stroke-linecap: butt;"/>
         
-        <polyline points="363.01,472.50 363.01,23.18 " style="stroke-width: 0.53; stroke: #FFFFFF; stroke-linecap: butt;"/>
+        <polyline points="363.00,472.50 363.00,23.18 " style="stroke-width: 0.53; stroke: #FFFFFF; stroke-linecap: butt;"/>
         
         <polyline points="440.59,472.50 440.59,23.18 " style="stroke-width: 0.53; stroke: #FFFFFF; stroke-linecap: butt;"/>
         
@@ -67,11 +67,11 @@
         
         <polyline points="77.60,107.43 498.52,107.43 " style="stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;"/>
         
-        <polyline points="91.45,472.50 91.45,23.18 " style="stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;"/>
+        <polyline points="91.43,472.50 91.43,23.18 " style="stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;"/>
         
-        <polyline points="169.04,472.50 169.04,23.18 " style="stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;"/>
+        <polyline points="169.02,472.50 169.02,23.18 " style="stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;"/>
         
-        <polyline points="246.63,472.50 246.63,23.18 " style="stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;"/>
+        <polyline points="246.62,472.50 246.62,23.18 " style="stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;"/>
         
         <polyline points="324.21,472.50 324.21,23.18 " style="stroke-width: 1.07; stroke: #FFFFFF; stroke-linecap: butt;"/>
         
@@ -89,11 +89,11 @@
         
         <line x1="96.73" y1="388.26" x2="96.73" y2="388.26" style="stroke-width: 1.07; stroke-linecap: butt;"/>
         
-        <line x1="96.73" y1="107.43" x2="111.16" y2="107.43" style="stroke-width: 1.07; stroke-linecap: butt;"/>
+        <line x1="96.73" y1="107.43" x2="111.13" y2="107.43" style="stroke-width: 1.07; stroke-linecap: butt;"/>
         
-        <line x1="111.16" y1="388.26" x2="111.16" y2="388.26" style="stroke-width: 1.07; stroke-linecap: butt;"/>
+        <line x1="111.13" y1="388.26" x2="111.13" y2="388.26" style="stroke-width: 1.07; stroke-linecap: butt;"/>
         
-        <line x1="111.16" y1="247.84" x2="479.39" y2="247.84" style="stroke-width: 1.07; stroke-linecap: butt;"/>
+        <line x1="111.13" y1="247.84" x2="479.39" y2="247.84" style="stroke-width: 1.07; stroke-linecap: butt;"/>
         
         <circle cx="96.73" cy="247.84" r="1.95" style="stroke-width: 0.71; fill: #000000;"/>
         
@@ -107,9 +107,9 @@
         
         <circle cx="96.73" cy="107.43" r="1.95" style="stroke-width: 0.71; fill: #000000;"/>
         
-        <circle cx="111.16" cy="388.26" r="1.95" style="stroke-width: 0.71; fill: #000000;"/>
+        <circle cx="111.13" cy="388.26" r="1.95" style="stroke-width: 0.71; fill: #000000;"/>
         
-        <circle cx="111.16" cy="247.84" r="1.95" style="stroke-width: 0.71; fill: #000000;"/>
+        <circle cx="111.13" cy="247.84" r="1.95" style="stroke-width: 0.71; fill: #000000;"/>
         
     </g>
     
@@ -127,11 +127,11 @@
         
         <polyline points="74.86,107.43 77.60,107.43 " style="stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;"/>
         
-        <polyline points="91.45,475.24 91.45,472.50 " style="stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;"/>
+        <polyline points="91.43,475.24 91.43,472.50 " style="stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;"/>
         
-        <polyline points="169.04,475.24 169.04,472.50 " style="stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;"/>
+        <polyline points="169.02,475.24 169.02,472.50 " style="stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;"/>
         
-        <polyline points="246.63,475.24 246.63,472.50 " style="stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;"/>
+        <polyline points="246.62,475.24 246.62,472.50 " style="stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;"/>
         
         <polyline points="324.21,475.24 324.21,472.50 " style="stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;"/>
         
@@ -139,11 +139,11 @@
         
         <polyline points="479.39,475.24 479.39,472.50 " style="stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;"/>
         
-        <text x="91.45" y="483.74" text-anchor="middle" style="font-size: 8.80px;fill: #4D4D4D; font-family: &quot;Arial&quot;;" textLength="4.90px" lengthAdjust="spacingAndGlyphs">0</text>
+        <text x="91.43" y="483.74" text-anchor="middle" style="font-size: 8.80px;fill: #4D4D4D; font-family: &quot;Arial&quot;;" textLength="4.90px" lengthAdjust="spacingAndGlyphs">0</text>
         
-        <text x="169.04" y="483.74" text-anchor="middle" style="font-size: 8.80px;fill: #4D4D4D; font-family: &quot;Arial&quot;;" textLength="9.79px" lengthAdjust="spacingAndGlyphs">10</text>
+        <text x="169.02" y="483.74" text-anchor="middle" style="font-size: 8.80px;fill: #4D4D4D; font-family: &quot;Arial&quot;;" textLength="9.79px" lengthAdjust="spacingAndGlyphs">10</text>
         
-        <text x="246.63" y="483.74" text-anchor="middle" style="font-size: 8.80px;fill: #4D4D4D; font-family: &quot;Arial&quot;;" textLength="9.79px" lengthAdjust="spacingAndGlyphs">20</text>
+        <text x="246.62" y="483.74" text-anchor="middle" style="font-size: 8.80px;fill: #4D4D4D; font-family: &quot;Arial&quot;;" textLength="9.79px" lengthAdjust="spacingAndGlyphs">20</text>
         
         <text x="324.21" y="483.74" text-anchor="middle" style="font-size: 8.80px;fill: #4D4D4D; font-family: &quot;Arial&quot;;" textLength="9.79px" lengthAdjust="spacingAndGlyphs">30</text>
         

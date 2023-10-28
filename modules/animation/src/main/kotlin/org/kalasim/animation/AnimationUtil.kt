@@ -1,6 +1,7 @@
 package org.kalasim.animation
 
 import org.kalasim.Component
+import org.kalasim.asDuration
 
 fun <K, V> Map<K, V>.cmeAvoidingCopy(): Map<K, V> {
     while(true) {
@@ -21,8 +22,7 @@ fun <K> List<K>.cmeAvoidingCopy(): List<K> {
 }
 
 
-
-fun <K,V> Map<K, V>.asyncCopy(): Map<K, V> {
+fun <K, V> Map<K, V>.asyncCopy(): Map<K, V> {
     while(true) {
         try {
             return toMap()
@@ -30,6 +30,7 @@ fun <K,V> Map<K, V>.asyncCopy(): Map<K, V> {
         }
     }
 }
+
 fun <T> Set<T>.asyncCopy(): Set<T> {
     while(true) {
         try {
@@ -49,7 +50,7 @@ fun <T> List<T>.asyncCopy(): List<T> {
     }
 }
 
-fun <T> cmeGuard(function: ()->List<T>): List<T> {
+fun <T> cmeGuard(function: () -> List<T>): List<T> {
     while(true) {
         try {
             return function().toMutableList()
@@ -60,17 +61,18 @@ fun <T> cmeGuard(function: ()->List<T>): List<T> {
 }
 
 
-class AsyncAnimationStop(val rate:Double=1.0): Component(){
-    private var stop=false
+class AsyncAnimationStop(val rate: Double = 1.0) : Component() {
+    private var stop = false
 
-    fun stop(){
+    fun stop() {
         stop = true
     }
-    override fun repeatedProcess()= sequence<Component> {
-        if(stop){
+
+    override fun repeatedProcess() = sequence {
+        if(stop) {
             stopSimulation()
         }
 
-        hold(1/rate)
+        hold(env.asDuration(1 / rate))
     }
 }

@@ -47,37 +47,37 @@ fun declareDependencies(
 
 
 fun KoinModule.createSimulation(
+    /** The start time of the simulation model. Defaults to 1970-01-01T00:00:00Z following the convention of kotlin.time.Instant.*/
+    startDate: TickTime = TickTime.fromEpochMilliseconds(0),
+    useCustomKoin: Boolean = false,
     /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
     durationUnit: DurationUnit = MINUTES,
-    /** The absolute time at tick-time 0. Defaults to `null`.*/
-    startDate: Instant? = null,
-    useCustomKoin: Boolean = false,
     randomSeed: Int = DEFAULT_SEED,
     builder: Environment.() -> Unit,
 ): Environment = createSimulation(
-    durationUnit = durationUnit,
     startDate = startDate,
     dependencies = this,
     useCustomKoin = useCustomKoin,
+    tickDurationUnit = durationUnit,
     randomSeed = randomSeed,
     builder = builder
 )
 
 fun createSimulation(
-    /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
-    durationUnit: DurationUnit = MINUTES,
-    /** The absolute time at tick-time 0. Defaults to `null`.*/
-    startDate: Instant? = null,
+    /** The start time of the simulation model. Defaults to 1970-01-01T00:00:00Z following the convention of kotlin.time.Instant.*/
+    startDate: TickTime = TickTime.fromEpochMilliseconds(0),
     dependencies: KoinModule? = null,
     useCustomKoin: Boolean = false,
+    /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
+    tickDurationUnit: DurationUnit = MINUTES,
     randomSeed: Int = DEFAULT_SEED,
     builder: Environment.() -> Unit,
 ): Environment = Environment(
-    durationUnit = durationUnit,
     startDate = startDate,
+    tickDurationUnit = tickDurationUnit,
     dependencies = dependencies,
-    randomSeed = randomSeed,
-    koin = if(useCustomKoin) koinApplication { }.koin else null
+    koin = if(useCustomKoin) koinApplication { }.koin else null,
+    randomSeed = randomSeed
 ).apply(builder)
 
 
@@ -95,25 +95,26 @@ internal class MainComponent(koin: Koin) : Component(MAIN, koin = koin) {
 }
 
 fun main() {
-    val environment = Environment(DAYS)
+    val environment = Environment(tickDurationUnit = DAYS)
 
     environment.run(4.days)
 }
 
 /** An environment hosts all elements of a simulation, maintains the event loop, and provides randomization support. For details see  https://www.kalasim.org/basics/#simulation-environment */
 open class Environment(
-    /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
-    val durationUnit: DurationUnit = MINUTES,
-    /** The absolute time at tick-time 0. Defaults to `null`.*/
-    var startDate: Instant? = null,
+    /** The start time of the simulation model. Defaults to 1970-01-01T00:00:00Z following the convention of kotlin.time.Instant.*/
+    val startDate: TickTime = TickTime.fromEpochMilliseconds(0),
     /** If enabled, it will render a tabular view of recorded  interaction and resource events. */
     enableComponentLogger: Boolean = false,
+
     /** Measure the compute time per tick as function of time. For details see  https://www.kalasim.org/advanced/#operational-control */
     enableTickMetrics: Boolean = false,
+    /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
+    val tickDurationUnit: DurationUnit = MINUTES,
     dependencies: KoinModule? = null,
     koin: Koin? = null,
     randomSeed: Int = DEFAULT_SEED,
-    tickTimeOffset: TickTime = TickTime(0.0),
+//    tickTimeOffset: TickTime = TickTime(0.0),
     // see https://github.com/holgerbrandl/kalasim/issues/49
 //    val typedDurationsRequired: Boolean = false
 ) : SimContext, WithJson {
@@ -159,11 +160,17 @@ open class Environment(
 //    }
 
     /** The current time of the simulation. See https://www.kalasim.org/basics/#running-a-simulation.*/
-    var now = tickTimeOffset
+    var now = startDate
         private set // no longer needed/wanted --> use run
 
-    val nowWT: Instant
-        get() = now.toWallTime()
+    @Deprecated("use now instead", ReplaceWith("now"))
+    val nowWT: Instant = now
+//        get() = now.toWallTime()
+
+    val nowTT: TickTimeOld
+        get() = now.toTickTime()
+
+
 
 
     @Suppress("LeakingThis")
@@ -173,7 +180,7 @@ open class Environment(
 
 
     /** Allows to transform ticks to wall time (represented by `kotlinx.datetime.Instant`) */
-    internal var tickTransform: TickTransform = TickTransform(durationUnit)
+    internal var tickTransform: TickTransform = TickTransform(tickDurationUnit)
 
 
     /** The component of the currently iterated process definition. Read-only, as components enter the queue only
@@ -282,22 +289,23 @@ open class Environment(
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
-    @OptIn(AmbiguousDuration::class)
-    fun run(
-        duration: Duration? = null, until: Instant? = null, priority: Priority = NORMAL,
-    ) = run(duration?.asTicks(), until?.toTickTime(), priority)
-
-//    /**
-//     * Start execution of the simulation. See https://www.kalasim.org/basics/#running-a-simulation
-//     *
-//     * @param duration Time to run
-//     * @param priority If a component has the same time on the event list, the main component is sorted according to
-//     * the priority. An event with a higher priority will be scheduled first.
-//     */
+//    @OptIn(AmbiguousDuration::class)
 //    fun run(
-//        duration: Ticks? = null,
-//        priority: Priority = NORMAL
-//    ) = run(duration?.value, null, priority)
+//        duration: Duration? = null, until: Instant? = null, priority: Priority = NORMAL,
+//    ) = run(duration, until, priority)
+
+    /**
+     * Start execution of the simulation. See https://www.kalasim.org/basics/#running-a-simulation
+     *
+     * @param duration Time to run
+     * @param priority If a component has the same time on the event list, the main component is sorted according to
+     * the priority. An event with a higher priority will be scheduled first.
+     */
+    @AmbiguousDuration
+    fun run(
+        duration: Number?,
+        priority: Priority = NORMAL
+    ) = run(duration?.toDuration(), null, priority)
 
     /**
      * Start execution of the simulation
@@ -306,10 +314,10 @@ open class Environment(
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
-    @OptIn(AmbiguousDuration::class)
-    fun run(
-        until: Instant, priority: Priority = NORMAL,
-    ) = run(until = until.toTickTime(), priority = priority)
+//    @OptIn(AmbiguousDuration::class)
+//    fun run(
+//        until: Number, priority: Priority = NORMAL,
+//    ) = run(until = until.toTickTime(), priority = priority)
 
     /**
      * Start execution of the simulation
@@ -323,9 +331,9 @@ open class Environment(
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
-    @AmbiguousDuration
+//    @AmbiguousDuration
     fun run(
-        duration: Number? = null, until: TickTime? = null, priority: Priority = NORMAL, urgent: Boolean = false,
+        duration: Duration? = null, until: TickTime? = null, priority: Priority = NORMAL, urgent: Boolean = false,
     ) {
         // also see https://simpy.readthedocs.io/en/latest/topical_guides/environments.html
         if(duration == null && until == null) {
@@ -516,14 +524,14 @@ open class Environment(
     fun hasAbsoluteTime() = startDate != null
 
 
-    fun tick2wallTime(tickTime: TickTime): Instant {
+    fun tick2wallTime(tickTime: TickTimeOld): TickTime {
         return startDate!! + tickTransform.ticks2Duration(tickTime.value)
     }
 
-    fun wall2TickTime(instant: Instant): TickTime {
+    fun wall2TickTime(instant: TickTime): TickTimeOld {
         val offsetDuration = instant - startDate!!
 
-        return TickTime(tickTransform.durationAsTicks(offsetDuration))
+        return TickTimeOld(tickTransform.durationAsTicks(offsetDuration))
     }
 
 
@@ -538,7 +546,7 @@ data class QueueElement(
     //TODO clarify if we need/want to also support urgent
 
     override fun compareTo(other: QueueElement): Int =
-        compareValuesBy(this, other, { it.time.value }, { it.priority.value }, { it.queueCounter })
+        compareValuesBy(this, other, { it.time }, { it.priority.value }, { it.queueCounter })
 
 //    val heapSeq = if (urgent) -queueCounter else queueCounter
 
@@ -558,17 +566,14 @@ fun Environment.enableComponentLogger() {
 }
 
 
-internal fun Environment.calcScheduleTime(until: TickTime?, duration: Number?): TickTime {
-    return (until?.value to duration?.toDouble()).let { (till, duration) ->
-        if(till == null) {
-            require(duration != null) { "neither duration nor till specified" }
-            now.value + duration
-        } else {
-            require(duration == null) { "both duration and till specified" }
-            till
-        }
+internal fun Environment.calcScheduleTime(until: TickTime?, duration: Duration?): TickTime {
+    return if(until == null) {
+        require(duration != null) { "neither duration nor till specified" }
+        now + duration
+    } else {
+        require(duration == null) { "both duration and till specified" }
+        until
     }
-        .let { TickTime(it) }
 }
 
 

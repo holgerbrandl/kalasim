@@ -13,6 +13,9 @@ import org.kalasim.ComponentState.SCHEDULED
 import org.kalasim.analysis.InteractionEvent
 import org.kalasim.misc.*
 import kotlin.test.fail
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.DurationUnit
 
 
 internal class NoOpComponent(name: String? = null) : Component(name) {
@@ -76,7 +79,7 @@ class ComponentTests {
     @Test
     fun `it should capture component state with snapshot`() = createTestSimulation {
         val info = Component("foo").snapshot
-        run(10)
+        run(10.days)
 
         info.status shouldBe DATA
         info.scheduledTime shouldBe null
@@ -84,8 +87,8 @@ class ComponentTests {
         info.toString() shouldBeDiff """
             {
               "scheduledTime": null,
-              "creationTime": 0,
-              "now": 0,
+              "creationTime": "1970-01-01T00:00:00Z",
+              "now": "1970-01-01T00:00:00Z",
               "name": "foo",
               "claims": {},
               "requests": {},
@@ -100,7 +103,7 @@ class ComponentTests {
 
         class MyComponent : Component(process = MyComponent::myProcess) {
             fun myProcess() = sequence {
-                hold(1)
+                hold(1.day)
                 println("hello from $name")
 
                 isCurrent shouldBe true
@@ -113,11 +116,11 @@ class ComponentTests {
 
         c.componentState shouldBe SCHEDULED
 
-        run(2)
+        run(2.days)
         counter shouldBe 1
         c.componentState shouldBe DATA
 
-        c.activate(delay = 1)
+        c.activate(delay = 1.day)
         c.componentState shouldBe SCHEDULED
 
         run()
@@ -132,12 +135,12 @@ class ComponentTests {
         var repeatCounter = 0
         object : Component() {
             override fun repeatedProcess() = sequence {
-                hold(1)
+                hold(1.days)
                 repeatCounter++
             }
         }
 
-        run(8)
+        run(8.days)
 
         repeatCounter shouldBe 7
     }
@@ -158,7 +161,7 @@ class ComponentTests {
     @Test
     fun `it must enforce a process definition when using at`() = createTestSimulation {
         shouldThrow<IllegalArgumentException> {
-            Component("comp1", at = 3.tt)
+            Component("comp1", at = now + 3.minutes)
         }
     }
 
@@ -177,8 +180,8 @@ class ComponentTests {
     fun `it shall not allow self-activation with activate()`() = createTestSimulation {
         object : Component() {
 
-            override fun process() =sequence {
-                hold(1)
+            override fun process() = sequence {
+                hold(1.days)
                 activate()
                 fail("it must not get here")
             }
@@ -191,26 +194,26 @@ class ComponentTests {
     }
 
     @Test
-    fun `it shall activate a sub-proces with activate()`() = createTestSimulation {
+    fun `it shall activate a sub-process with activate()`() = createTestSimulation(tickDurationUnit = DurationUnit.DAYS) {
         class MultiProcessor : Component() {
             var sp1Started = false
-            var sp2Started= false
+            var sp2Started = false
 
-            override fun process() =sequence {
-                hold(1)
+            override fun process() = sequence {
+                hold(1.days)
             }
 
             fun subProcess1(): Sequence<Component> = sequence {
-                sp1Started=true
-                hold(1)
+                sp1Started = true
+                hold(1.days)
                 activate(process = MultiProcessor::subProcess2)
 
                 fail("it should never get here")
             }
 
             fun subProcess2(): Sequence<Component> = sequence {
-                sp2Started=true
-                hold(1)
+                sp2Started = true
+                hold(1.days)
                 activate(process = MultiProcessor::subProcess1)
 
                 fail("it should never get here")
@@ -221,12 +224,12 @@ class ComponentTests {
 
         run()
 
-        now shouldBe 1.tt
+        now shouldBe asSimTime(1)
 
         // activate sub-process
         mp.activate(process = MultiProcessor::subProcess1)
 
-        run(10)
+        run(10.days)
 
         mp.sp1Started shouldBe true
         mp.sp2Started shouldBe true
@@ -234,19 +237,19 @@ class ComponentTests {
     }
 
     @Test
-    fun `it shall consume a sub-process inplace`() = createTestSimulation {
+    fun `it shall consume a sub-process inplace`() = createTestSimulation(tickDurationUnit = DurationUnit.DAYS) {
         class MultiProcessor : Component() {
             var sp1Started = false
 
-            override fun process() =sequence {
-                hold(1)
+            override fun process() = sequence {
+                hold(1.days)
                 yieldAll(subProcess1())
-                hold(1)
+                hold(1.days)
             }
 
             fun subProcess1(): Sequence<Component> = sequence {
-                sp1Started=true
-                hold(1)
+                sp1Started = true
+                hold(1.days)
             }
         }
 
@@ -254,7 +257,7 @@ class ComponentTests {
 
         run()
 
-        now shouldBe 3.tt
+        now shouldBe asSimTime(3)
         mp.sp1Started shouldBe true
     }
 
@@ -266,14 +269,14 @@ class ComponentTests {
             object : Component("tester") {
                 override fun process() = sequence {
                     wait(State(true), true)
-                    hold(1)
+                    hold(1.minute)
                     request(Resource()) {
-                        hold(1)
+                        hold(1.minute)
                     }
                 }
             }
 
-            run(5)
+            run(5.minutes)
         }
     }.stdout shouldBeDiff """time      current               receiver              action                                                 info                               
 --------- --------------------- --------------------- ------------------------------------------------------ ----------------------------------
@@ -289,7 +292,7 @@ class ComponentTests {
 1.00                                                  Request honored by Resource.1; Activated, schedule... New state: scheduled
 1.00                                                  Hold +1.00, scheduled for 2.00                         New state: scheduled
 2.00                                                  Released 1.0 from 'Resource.1'
-2.00                                                  ResourceActivityEvent(requested=1.00, honored=1.00...
+2.00                                                  ResourceActivityEvent(requested=1970-01-01T00:01:0...
 2.00                                                  Ended                                                  New state: data""".trimIndent()
 
 
@@ -297,11 +300,11 @@ class ComponentTests {
     fun `it should yield and terminate automagically`() = createTestSimulation {
         val c = object : Component("foo") {
             override fun process() = sequence {
-                hold(2)
+                hold(2.days)
             }
         }
 
-        run(5)
+        run(5.days)
         c.componentState shouldBe DATA
     }
 
@@ -317,7 +320,7 @@ class ComponentTests {
         object : Component("foo") {
 
             override fun process() = sequence {
-                hold(2)
+                hold(2.days)
 
                 s.value = "bar"
 
@@ -369,7 +372,7 @@ class ComponentTests {
 
         object : Component("foo") {
             override fun process() = sequence {
-                hold(2)
+                hold(2.days)
                 s.value = "bar"
                 request(r) {}
                 log("work done")
@@ -401,9 +404,9 @@ class ComponentTests {
     fun `it should track status changes`() = createTestSimulation {
         val component = NoOpComponent("foo")
 
-        run(2)
-        component.activate(delay = 1)
-        run(2)
+        run(2.days)
+        component.activate(delay = 1.days)
+        run(2.days)
 
         component.stateTimeline.printHistogram()
     }
@@ -442,7 +445,7 @@ class ComponentTests {
         val tool = object : Component("tool") {
             override fun process() =
                 sequence {
-                    hold(10)
+                    hold(10.days)
                     log("production finished")
                 }
         }
@@ -450,16 +453,16 @@ class ComponentTests {
         val mechanic = object : Component("tool") {
             override fun process() =
                 sequence {
-                    hold(1)
+                    hold(1.days)
                     tool.interrupt()
 
                     // do maintenance
-                    hold(2)
+                    hold(2.days)
                     tool.resume()
                 }
         }
 
-        run(20)
+        run(20.days)
 
         tool.isData shouldBe true
         mechanic.isData shouldBe true
@@ -471,7 +474,7 @@ class ComponentTests {
         val tool = object : Component("tool") {
             override fun process() =
                 sequence {
-                    hold(10)
+                    hold(10.days)
                     log("production finished")
                 }
         }
@@ -479,30 +482,31 @@ class ComponentTests {
         val mechanic = object : Component("tool") {
             override fun process() =
                 sequence {
-                    hold(1)
+                    hold(1.days)
                     tool.interrupt()
 
-                    hold(1)
+                    hold(1.days)
                     shouldThrow<IllegalArgumentException> {
-                        tool.hold(1)
+                        tool.hold(1.days)
                     }
 
                     // do maintenance
-                    hold(2)
+                    hold(2.days)
                     tool.resume()
 
-                    tool.hold(1)
+                    tool.hold(1.days)
 
                 }
         }
 
-        run(20)
+        run(20.days)
 
         tool.isData shouldBe true
         mechanic.isData shouldBe true
     }
 
 
+    @OptIn(AmbiguousDurationComponent::class)
     @Test
     fun `it should interrupt and resume a passive component`() = createTestSimulation {
         val tool = object : Component("tool") {
@@ -513,7 +517,7 @@ class ComponentTests {
         run(1)
 
 
-        object : Component("interrupter") {
+        object : TickedComponent("interrupter") {
             override fun process() = sequence {
                 tool.interrupt()
 
@@ -536,7 +540,7 @@ class ComponentTests {
             override fun process() =
                 sequence {
                     println("huhu")
-                    hold(1)
+                    hold(1.minutes)
 //                yield(getThis())
                 }
         }
@@ -545,7 +549,7 @@ class ComponentTests {
             override fun process() =
                 sequence<Component> {
                     with(c) {
-                        hold(1)
+                        hold(1.minutes)
                     }
                     println("huhu2")
                 }
@@ -568,13 +572,13 @@ class ComponentTests {
             override fun process() =
                 sequence {
 
-                    hold(1)
+                    hold(1.minute)
 
                     throw MyException("something went wrong")
                 }
         }
 
-        shouldThrow<MyException> { run(10) }
+        shouldThrow<MyException> { run(10.minutes) }
     }
 }
 

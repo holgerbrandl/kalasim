@@ -34,15 +34,15 @@ class ClockSync(
         set(value) {
             field = value
 
-            syncStartWT = null
-            syncStartTicks = null
+            syncStartWall = null
+            syncStartSim = null
         }
 
 
-    private val holdTime = 1.0 / syncsPerTick.toDouble()
+     val holdTime = (1.0 / syncsPerTick.toDouble()).toDuration()
 
-    private var syncStartWT: Instant? = null
-    private var syncStartTicks: TickTime? = null
+    private var syncStartWall: Instant? = null
+    private var syncStartSim: TickTime? = null
 
     override fun process() = sequence {
 
@@ -51,13 +51,14 @@ class ClockSync(
             val tickDurationMs = tickDuration.inWholeMilliseconds.toDouble()
 
             // set the start time if not yet done (happens only after changing tickDuration
-            syncStartTicks = syncStartTicks ?: env.now
+            syncStartSim = syncStartSim ?: env.now
             val now = Clock.System.now()
-            syncStartWT = syncStartWT ?: now
+            syncStartWall = syncStartWall ?: now
 
 
-            val simTimeSinceSyncStart = ((env.now - syncStartTicks!!) * tickDurationMs).roundToLong().milliseconds
-            val wallTimeSinceSyncStart = now - syncStartWT!!
+//            val simTimeSinceSyncStart = ((env.now - syncStartTicks!!) * tickDurationMs).roundToLong().milliseconds
+            val simTimeSinceSyncStart = ((env.now - syncStartSim!!).asTicks() * tickDurationMs).roundToLong().milliseconds
+            val wallTimeSinceSyncStart = now - syncStartWall!!
 
             val sleepDuration = simTimeSinceSyncStart - wallTimeSinceSyncStart
 
@@ -80,6 +81,7 @@ class ClockSync(
             }
 
             // wait until the next sync event is due
+            println("holding for $holdTime")
             hold(holdTime)
         }
     }
@@ -88,6 +90,6 @@ class ClockSync(
 /**
  * Will be thrown if the maximum delay time is exceeded when using [clock synchronization](https://www.kalasim.org/advanced/#clock-synchronization).
  */
-class ClockOverloadException(val simTime: TickTime, msg: String) : RuntimeException(msg)
+class ClockOverloadException(val timestamp: TickTime, msg: String) : RuntimeException(msg)
 
 

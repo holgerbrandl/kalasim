@@ -13,7 +13,7 @@ fun main() {
         val fuelPump = Resource("tank", capacity = 3)
         val refilPermitted = State(false)
 
-        object : Component("refillController") {
+        object : TickedComponent("refillController") {
             override fun process() =
                 sequence {
                     while(true) {
@@ -25,7 +25,7 @@ fun main() {
                 }
         }
 
-        class Vehicle : Component() {
+        class Vehicle : TickedComponent() {
             val uni = uniform(0, 10)
 
             override fun process() =

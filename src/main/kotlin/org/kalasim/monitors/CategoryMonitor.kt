@@ -2,8 +2,10 @@ package org.kalasim.monitors
 
 import org.kalasim.analysis.snapshot.FrequencyTableSnapshot
 import org.kalasim.misc.*
+import org.kalasim.misc.time.sum
 import org.koin.core.Koin
 import kotlin.math.roundToInt
+import kotlin.time.Duration
 
 /**
  * Frequency tally levels irrespective of current (simulation) time.

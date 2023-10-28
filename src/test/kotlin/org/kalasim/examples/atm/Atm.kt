@@ -1,14 +1,14 @@
 //Atm.kt
 
 import kotlinx.coroutines.*
-import krangl.*
+import krangl.cumSum
 import kravis.geomTile
 import kravis.plot
 import org.jetbrains.kotlinx.dataframe.api.rename
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
 import org.jetbrains.kotlinx.dataframe.api.util.unfold
 import org.kalasim.*
-import org.kalasim.misc.cartesianProduct
+import org.kalasim.misc.*
 import org.kalasim.misc.roundAny
 import org.kalasim.plot.kravis.display
 
@@ -31,7 +31,7 @@ fun main() {
         val atm = Resource("atm", 1)
 
         class Customer : Component() {
-            val ed = exponential(mu)
+            val ed = exponential(mu).minutes
 
             override fun process() = sequence {
 
@@ -60,7 +60,7 @@ class AtmCustomer(
     val mu: Double,
     val atm: Resource,
 ) : Component() {
-    val ed = exponential(mu)
+    val ed = exponential(mu).minutes
 
     override fun process() = sequence {
         request(atm) {

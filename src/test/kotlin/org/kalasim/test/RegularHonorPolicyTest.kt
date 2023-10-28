@@ -6,17 +6,22 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.analysis.ResourceEvent
 import org.kalasim.analysis.ResourceEventType
+import org.kalasim.misc.AmbiguousDuration
+import org.kalasim.misc.AmbiguousDurationComponent
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 
 class RegularHonorPolicyTest {
 
-    class Customer(val arrivalTime: Int, val requestQuantity: Int) : Component() {
-        val lawyers = get<Resource>()
+    class Customer(val arrivalTime: Duration, val requestQuantity: Int) : Component() {
+        val bananas = get<Resource>()
 
         override fun process() = sequence {
             hold(arrivalTime)
-            request(lawyers, quantity = requestQuantity)
-            hold(1000)
-            // usually we would use a request scope and relase the resource when done, but here we don't
+            request(bananas, quantity = requestQuantity)
+            hold(1000.days)// todo why that?
+            // usually we would use a request scope and release the resource when done, but here we don't
         }
     }
 
@@ -27,27 +32,29 @@ class RegularHonorPolicyTest {
 
             dependency { lawyers }
 
-            Customer(1, 5)
-            Customer(6, 6)
-            Customer(15, 3)
+            Customer(1.minutes, 5)
+            Customer(6.minutes, 6)
+            Customer(15.minutes, 3)
 
-            Customer(24, 1)  //release after request
+            Customer(24.minutes, 1)  //release after request
 
-            Customer(30, 3)
+            Customer(30.minutes, 3)
 
-            Customer(37, 2)
+            Customer(37.minutes, 2)
 
             // refill the shelf after 5o ticks
             object : Component("release-manager") {
                 override fun process() = sequence {
-                    request(lawyers, quantity = lawyers.capacity) // law firm is fully booked
+                    request(lawyers, quantity = lawyers.capacity) // banana shelf is fully stocked
+
                     lawyers.claimed shouldBe 20
-                    hold(20)
+
+                    hold(20.minutes)
 
                     // incrementally refill banana shelf
                     repeat(5) {
                         release(lawyers, quantity = 4)
-                        hold(4)
+                        hold(4.minutes)
                     }
 
                     stopSimulation() // because otherwise customer will release when being terminated
@@ -113,14 +120,15 @@ class RegularHonorPolicyTest {
         } shouldBe listOf(3, 4, 1, 5, 2, 6)  // note: this was fixated after the first run
     }
 
+    @OptIn(AmbiguousDuration::class, AmbiguousDurationComponent::class)
     @Test
-    fun `it should honor huge request eventually when using weighted SQF`() = createTestSimulation(false) {
+    fun `it should honor huge request eventually when using weighted SQF`() = createTestSimulation(enableComponentLogger = false) {
         val lawyers = Resource(capacity = 10, honorPolicy = RequestHonorPolicy.WeightedFCFS(0.1))
 
         dependency { lawyers }
 
         val cg = ComponentGenerator(iat = exponential(6)) {
-            object : Component() {
+            object : TickedComponent() {
                 override fun process() = sequence {
                     request(lawyers) {
                         hold(25)
@@ -130,7 +138,7 @@ class RegularHonorPolicyTest {
         }
 
         // refill the shelf after 5o ticks
-        object : Component("huge request") {
+        object : TickedComponent("huge request") {
             override fun process() = sequence {
                 // wait for requests to gather
                 hold(200)
@@ -141,10 +149,10 @@ class RegularHonorPolicyTest {
             }
         }
 
-        val runFor = 1000
+        val runFor = 1000.minutes
         run(runFor)
 
         println("num created ${cg.numGenerated}")
-        now shouldBeLessThan TickTime(runFor)
+        now shouldBeLessThan startDate + runFor
     }
 }

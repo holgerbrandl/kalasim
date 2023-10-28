@@ -2,6 +2,7 @@
 import org.kalasim.*
 import org.kalasim.plot.kravis.display
 import org.koin.core.component.inject
+import kotlin.time.Duration.Companion.minutes
 
 
 class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
@@ -21,7 +22,7 @@ class Clerk : Component() {
                 standby()
 
             val customer = waitingLine.poll()
-            hold(32.0) // bearbeitungszeit
+            hold(32.minutes) // bearbeitungszeit
             customer.activate()
         }
     }

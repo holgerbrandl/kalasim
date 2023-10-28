@@ -1,4 +1,5 @@
 import org.kalasim.*
+import kotlin.time.Duration.Companion.minutes
 
 fun main() {
     class Driver : Resource()
@@ -11,7 +12,7 @@ fun main() {
 
         override fun process() = sequence {
             request(driver) {
-                hold(1.0, description = "driving")
+                hold(1.minutes, description = "driving")
 
                 wait(trafficLight, "green")
             }

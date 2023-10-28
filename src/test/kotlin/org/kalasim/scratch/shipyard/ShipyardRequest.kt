@@ -2,6 +2,8 @@ package org.kalasim.scratch.shipyard
 
 import org.kalasim.*
 import org.kalasim.plot.kravis.display
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 // Wait for a terminal to accumulate enough goods before starting shipment.
 //
@@ -15,7 +17,7 @@ fun main() {
 
             override fun process() = sequence {
                 while(true) {
-                    hold(1)
+                    hold(1.hours)
                     put(tank, 2)
                     log("tankLevel is ${tank.available}")
                 }
@@ -25,7 +27,7 @@ fun main() {
         object : Component("ship") {
             override fun process() = sequence {
                 request(terminal.tank withQuantity 30, description = "waiting for goods") {
-                    hold(30, "shipping goods")
+                    hold(30.minutes, "shipping goods")
                 }
             }
         }

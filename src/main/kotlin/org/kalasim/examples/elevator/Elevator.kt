@@ -9,15 +9,16 @@ import org.kalasim.examples.elevator.Direction.*
 import org.kalasim.misc.repeat
 import java.awt.Point
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 // For example documentation see https://www.kalasim.org/examples/office_tower/
 
-const val MOVE_TIME = 10
-const val DOOR_OPEN_TIME = 3
-const val DOOR_CLOSE_TIME = 3
-const val ENTER_TIME = 3
-const val EXIT_TIME = 3
+val MOVE_TIME = 10.seconds
+val DOOR_OPEN_TIME = 3.seconds
+val DOOR_CLOSE_TIME = 3.seconds
+val ENTER_TIME = 3.seconds
+val EXIT_TIME = 3.seconds
 
 
 enum class Direction {
@@ -44,7 +45,7 @@ class VisitorGenerator(
     val toRange: Pair<Int, Int>,
     val load: Int,
     name: String
-) : Component(name) {
+) : TickedComponent(name) {
 
     val fromTo = sequence {
         val dintFrom = discreteUniform(fromRange.first, fromRange.second)
@@ -213,7 +214,7 @@ class Elevator(showLog: Boolean = false,
                carCapacity: Int = 4,
                numCars: Int = 3,
                topFloor: Int = 15,
-) : Environment(enableComponentLogger = showLog, durationUnit = DurationUnit.MINUTES ) {
+) : Environment(enableComponentLogger = showLog, tickDurationUnit = DurationUnit.MINUTES) {
     init{
         dependency { this@Elevator }
     }

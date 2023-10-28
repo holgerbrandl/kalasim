@@ -6,7 +6,7 @@ plugins {
     signing
 
     // see https://kotlinlang.slack.com/archives/C4W52CFEZ/p1641056747134600
-    id("org.jetbrains.kotlin.jupyter.api") version "0.11.0-187" // "0.11.0-45"
+    id("org.jetbrains.kotlin.jupyter.api") version "0.12.0-81" // "0.11.0-45"
 
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }

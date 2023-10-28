@@ -12,6 +12,7 @@ import kotlin.math.roundToInt
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.minutes
 
+@Suppress("OPT_IN_USAGE")
 class QueueTests {
 
     @Test
@@ -36,7 +37,7 @@ class QueueTests {
         assertEquals(3, waitingLine.size, "expected 3 items in queue")
 
         // add a consumer
-        object : Component() {
+        object : TickedComponent() {
             override fun process() = sequence {
                 while (waitingLine.isNotEmpty()) {
                     waitingLine.poll()
@@ -82,10 +83,10 @@ class QueueTests {
 //                override fun process(): Sequence<Component> = super.process()
 //            }
 
-            val c1 = object : Component("comp1", at = 3.tt) {
+            val c1 = object : Component("comp1", at = startDate + 3.minutes) {
                 override fun process() = sequence<Component> {}
             }
-            val c2 = object : Component("comp2", at = 3.tt) {
+            val c2 = object : Component("comp2", at = startDate + 3.minutes) {
                 override fun process() = sequence<Component> {}
             }
 
@@ -115,10 +116,10 @@ class QueueTests {
 //                override fun process(): Sequence<Component> = super.process()
 //            }
 
-            val c1 = object : Component("comp1", at = 3.tt) {
+            val c1 = object : Component("comp1", at = startDate + 3.minutes) {
                 override fun process() = sequence<Component> {}
             }
-            val c2 = object : Component("comp2", at = 3.tt, priority = IMPORTANT) {
+            val c2 = object : Component("comp2", at = startDate + 3.minutes, priority = IMPORTANT) {
                 override fun process() = sequence<Component> {}
             }
             val tc = EventLog().also { addEventListener(it) }
@@ -138,13 +139,13 @@ class QueueTests {
         val inverseIat = inversedIatDist(6, 7, 9)
 
         run(inverseIat())
-        now shouldBe 6.tt
+        now shouldBe asSimTime(6)
 
         run(inverseIat())
-        now shouldBe 7.tt
+        now shouldBe asSimTime(7)
 
         run(inverseIat())
-        now shouldBe 9.tt
+        now shouldBe asSimTime(9)
 
         // since the underying iterator is exhausted now, we expect an exception
         shouldThrow<NoSuchElementException> {
@@ -161,7 +162,7 @@ class QueueTests {
         ComponentGenerator(inverseIat) { Component() }.addConsumer { generated.add(it) }
 
         run(20)
-        generated.map { it.creationTime.value.roundToInt() } shouldBe arrivalsTimes
+        generated.map { it.creationTime.toTickTime().value.roundToInt() } shouldBe arrivalsTimes
     }
 
     @OptIn(AmbiguousDuration::class)
@@ -176,13 +177,13 @@ class QueueTests {
             override fun process() = sequence {
                 val batchComplete = batch(waitingLine, 4, timeout = 10.minutes)
                 batchComplete.size shouldBe 4
-                env.now shouldBe 8.tt
+                env.nowTT shouldBe 8.tt
 
-                hold(until = TickTime(20))
+                hold(until = TickTimeOld(20.0).toWallTime())
 
                 val batchPartial = batch(waitingLine, 4, timeout = 10.minutes)
                 batchPartial.size shouldBe 2
-                env.now shouldBe 30.tt
+                env.now shouldBe asSimTime(30)
             }
         }
 
@@ -204,7 +205,7 @@ class QueueTests {
             override fun process() = sequence {
                 val batchComplete = batch(waitingLine, 4)
                 batchComplete.size shouldBe 4
-                env.now shouldBe 50.tt
+                env.nowTT shouldBe 50.tt
             }
         }
 

@@ -2,7 +2,7 @@ import org.kalasim.Component
 import org.kalasim.createSimulation
 import org.kalasim.plot.letsplot.display
 
-createSimulation() {
+createSimulation {
     enableTickMetrics()
 
     object : Component() {

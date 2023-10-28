@@ -7,6 +7,7 @@ import org.kalasim.monitors.*
 import org.kalasim.plot.kravis.display
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * A car arrives at the gas station for refueling.
@@ -24,7 +25,7 @@ object DeterministicRefuel {
     val FUEL_TANK_LEVEL =
         UniformRealDistribution(5.0, 25.0).apply { reseedRandomGenerator(1) }// Min/max levels of fuel tanks (in liters)
     val REFUELING_SPEED = 2.0  // liters / second
-    val TANK_TRUCK_TIME = 300.0  // Seconds it takes the tank truck to arrive
+    val TANK_TRUCK_TIME = 300.seconds  // Seconds it takes the tank truck to arrive
     val T_INTER = UniformRealDistribution(
         100.0,
         200.0
@@ -86,7 +87,7 @@ object DeterministicRefuel {
                 }
 
                 request(fuelPump withQuantity litersRequired)
-                hold(litersRequired / REFUELING_SPEED)
+                hold((litersRequired / REFUELING_SPEED).seconds)
                 get<IntTimeline>(named(CAR_LEAVING)).inc()
 //                get<MetricTimeline>(named(TRUCKS_EN_ROUTE)).inc()
             }

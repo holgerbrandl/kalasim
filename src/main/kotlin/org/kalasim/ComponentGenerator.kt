@@ -45,7 +45,7 @@ class ComponentGenerator<T>(
         koin: Koin = DependencyContext.get(),
         builder: Environment.(counter: Int) -> T
     ) : this(
-        DurationDistribution(koin.get<Environment>().durationUnit, iat),
+        DurationDistribution(koin.get<Environment>().tickDurationUnit, iat),
         startAt,
         forceStart,
         until,

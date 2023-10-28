@@ -212,7 +212,7 @@ class StateTests {
             }
         }
 
-        createSimulation  {
+        createSimulation {
             enableComponentLogger()
 //            single(TypeQualifier(String::class)) { State("red") }
 //            single(TypeQualifier(Boolean::class)) { State(false) }

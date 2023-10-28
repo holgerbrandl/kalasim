@@ -46,7 +46,7 @@ class PartAssembly(val part: Part) : Component() {
 }
 
 
-class Shipyard() : Environment(DurationUnit.DAYS) {
+class Shipyard() : Environment(tickDurationUnit = DurationUnit.DAYS) {
 
     val logger = KotlinLogging.logger {}
 

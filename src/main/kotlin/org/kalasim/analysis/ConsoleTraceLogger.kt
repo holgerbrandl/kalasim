@@ -55,7 +55,7 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
                     val receiverChanged = component != lastReceiver
 
                     listOf(
-                        TRACE_DF.format(time.value),
+                        TRACE_DF.format(time.epochSeconds/60.0),
                         if(ccChanged) current?.name else null,
                         if(receiverChanged) component?.name else null,
                         //                ((source?.name ?: "") + " " + (renderAction() ?: "")).trim(),
@@ -71,7 +71,7 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
                     val ccChanged = creator != lastCurrent
 
                     listOf(
-                        TRACE_DF.format(time.value),
+                        TRACE_DF.format(time.epochSeconds/60.0),
                         if(ccChanged) creator?.name else null,
                         entity.name,
                         "Created",
@@ -83,7 +83,7 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
                     }
                 }
                 else -> {
-                    listOf(TRACE_DF.format(time.value), "", "", toString())
+                    listOf(TRACE_DF.format(time.epochSeconds/60.0), "", "", toString())
                 }
             }
 

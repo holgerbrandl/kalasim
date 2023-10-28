@@ -12,11 +12,10 @@ class TimeTrafoTests {
 
     class TimeTrafoTestEvent(time: TickTime) : Event(time)
 
+    val startDate = Instant.parse("2021-01-24T12:00:00.00Z")
 
     @Test
-    fun `it should preserve precision when transforming ticks to wall time`() = createTestSimulation {
-        startDate = Instant.parse("2021-01-24T12:00:00.00Z")
-
+    fun `it should preserve precision when transforming ticks to wall time`() = createTestSimulation(startDate){
         toWallTime(15.tt) shouldNotBe toWallTime(15.32.tt)
 
         toWallTime(15.tt) shouldBe Instant.parse("2021-01-24T12:15:00Z")
@@ -26,24 +25,21 @@ class TimeTrafoTests {
     }
 
     @Test
-    fun `it should correctly project simulation times with offset-trafo`() = createTestSimulation {
-        startDate = Instant.parse("2021-01-24T12:00:00.00Z")
-
+    fun `it should correctly project simulation times with offset-trafo`() = createTestSimulation(startDate) {
         object : Component() {
             override fun process() = sequence {
 
                 addEventListener {
                     if (it !is TimeTrafoTestEvent) return@addEventListener
 
-                    println("tick time is ${toWallTime(now)}")
+                    println("tick time is $now")
 
-                    toWallTime(now) shouldBe toWallTime(it.time)
-                    toWallTime(now) shouldBe Instant.parse("2021-01-24T13:30:00.00Z")
+                    now shouldBe Instant.parse("2021-01-24T13:30:00.00Z")
                 }
 
-                hold(asTicks(90.minutes))
+                hold(90.minutes)
 
-                toTickTime(now.toWallTime()) shouldBe now
+                toWallTime(now.toTickTime()) shouldBe now
 
                 log(TimeTrafoTestEvent(now))
             }

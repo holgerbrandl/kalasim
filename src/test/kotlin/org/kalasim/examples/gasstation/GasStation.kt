@@ -8,6 +8,7 @@ import org.kalasim.monitors.printHistogram
 import org.kalasim.plot.kravis.display
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * A car arrives at the gas station for refueling.
@@ -23,9 +24,9 @@ val THRESHOLD = 25.0  // Threshold for calling the tank truck (in %)
 val FUEL_TANK_SIZE = 50.0  // liters
 val FUEL_TANK_LEVEL_RANGE = 5.. 25
 val REFUELING_SPEED = 2.0  // liters / second
-val TANK_TRUCK_TIME = 300.0  // Seconds it takes the tank truck to arrive
+val TANK_TRUCK_TIME = 300.seconds  // Seconds it takes the tank truck to arrive
 val INTER_ARRIVAL_TIME_RANGE = 10..100  // Create a car every [min, max] seconds
-val SIM_TIME = 20000.0  // Simulation time in seconds
+val SIM_TIME = 20000.seconds  // Simulation time in seconds
 
 // todo review status of https://youtrack.jetbrains.com/issue/KT-50586
 
@@ -71,7 +72,7 @@ class Car(
             val litersRequired = tankSize - fuelTankLevel
 
             take(stationTank, quantity = litersRequired)
-            hold(litersRequired / REFUELING_SPEED)
+            hold((litersRequired / REFUELING_SPEED).seconds)
             println("finished $name")
         }
     }
@@ -96,7 +97,7 @@ class GasStation : Environment(enableComponentLogger = true) {
                     wait(TankTruck().unloaded, true)
                 }
 
-                hold(10) // check every 10 seconds
+                hold(10.seconds) // check every 10 seconds
             }
         }
     }

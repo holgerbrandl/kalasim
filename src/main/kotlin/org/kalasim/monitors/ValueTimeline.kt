@@ -3,6 +3,7 @@ package org.kalasim.monitors
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.kalasim.TickTime
 import org.kalasim.misc.asCMPairList
+import kotlin.time.Duration
 
 
 interface ValueTimeline<T> {
@@ -12,11 +13,13 @@ interface ValueTimeline<T> {
      *
      * @throws IllegalArgumentException When querying a time before the start of the recording
      * */
+    operator fun get(time: TickTime): T?
+
     operator fun get(time: Number): T?
 
 
     /** Get the total time for which a timeline was is state `value`*/
-    fun total(value: T): Double?
+    fun total(value: T): Duration?
 
 
     /** Returns the step function of this monitored value along the time axis. */
@@ -43,7 +46,7 @@ data class StepRecord<T>(val time: TickTime, val value: T)
 fun <T> LevelStatsData<T>.statisticalSummary(): EnumeratedDistribution<T> {
     val distData =
         values.zip(durations).groupBy { it.first }
-            .mapValues { (_, values) -> values.sumOf { it.second } }
+            .mapValues { (_, values) -> values.sumOf { it.second.inWholeSeconds.toDouble() } }
             .asCMPairList()
 
     return EnumeratedDistribution(distData)
@@ -53,7 +56,7 @@ fun <T> LevelStatsData<T>.statisticalSummary(): EnumeratedDistribution<T> {
 data class LevelStatsData<T>(
     val values: List<T>,
     val timepoints: List<TickTime>,
-    val durations: List<Double>
+    val durations: List<Duration>
 ) {
     /** Returns the step function of time, value pairs*/
     fun stepFun(): List<StepRecord<T>> {
@@ -73,7 +76,7 @@ data class LevelStatsData<T>(
     }
 }
 
-data class LevelStateRecord<T>(val timestamp: TickTime, val value: T, val duration: Double?)
+data class LevelStateRecord<T>(val timestamp: TickTime, val value: T, val duration: Duration?)
 
 //
 //class IntVarTimeline(initialValue: Int = 0, name: String? = null, koin: Koin = DependencyContext.get()) {

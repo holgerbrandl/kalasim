@@ -4,8 +4,10 @@ package org.kalasim.scratch
 import kravis.*
 import org.apache.commons.math3.distribution.LogNormalDistribution
 import org.kalasim.*
-import java.lang.Double.min
 import kotlin.random.Random
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 fun main() {
 
@@ -15,11 +17,11 @@ fun main() {
     class SquidGame(
         val numSteps: Int = 18,
         val numPlayers: Int = 16,
-        val maxDuration: Int = 12 * 60
+        val maxDuration: Duration = 12 .minutes
     ) : Environment(randomSeed = random.nextInt()) {
 
         // randomization
-        val stepTime = LogNormalDistribution(rg, 3.5, 0.88)
+        val stepTime = LogNormalDistribution(rg, 3.5, 0.88).seconds
 //    val stepTime = uniform(10,30)
 
         val decision = enumerated(true, false)
@@ -38,10 +40,12 @@ fun main() {
 
         init {
             object : Component() {
+
+                val simStart = now
                 override fun process() = sequence {
                     queue@
                     for (player in 1..numPlayers) {
-                        hold(min(stepTime(), 100.0)) // cap time at 100sec
+                        hold(minOf(stepTime(), 100.seconds)) // cap time at 100sec
 
                         while (stepsLeft-- > 0) {
                             if (decision()) continue@queue
@@ -49,7 +53,7 @@ fun main() {
 
                         survivors.add(player)
 
-                        if (now > maxDuration) break // this wrong, here we need to model
+                        if ((now-simStart) > maxDuration) break // this wrong, here we need to model
                     }
                 }
             }

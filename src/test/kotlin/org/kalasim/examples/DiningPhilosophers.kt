@@ -1,28 +1,28 @@
 //DiningPhilosophers.kt
 package org.kalasim.examples
 
-import krangl.*
-import kravis.geomSegment
-import kravis.plot
 import org.jetbrains.kotlinx.dataframe.api.*
 import org.kalasim.*
 import org.kalasim.analysis.ResourceEvent
 import org.kalasim.analysis.ResourceEventType
 import org.kalasim.misc.repeat
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 
 fun main() {
     class Fork : Resource()
 
     class Philosopher(name: String, val leftFork: Fork, val rightFork: Fork) : Component(name) {
-        val thinking = exponential(1)
-        val eating = exponential(1)
+        val thinking = exponential(1.minutes)
+        val eating = exponential(1.minutes)
 
         override fun process() = sequence {
             while (true) {
                 hold(thinking())
                 request(leftFork) {
-                    hold(0.1) // wait before taking the second fork
+                    hold(10.seconds) // wait before taking the second fork
+
                     request(rightFork) {
                         hold(eating())
                         log("$name is eating")

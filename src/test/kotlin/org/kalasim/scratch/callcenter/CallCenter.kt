@@ -6,6 +6,8 @@ import org.kalasim.*
 import org.kalasim.plot.kravis.display
 import kotlin.math.max
 import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 
 enum class ShiftID { A, B, WeekEnd }
@@ -24,7 +26,7 @@ class Request : Component() {
 
     override fun process() = sequence {
         request(callCenter, capacityLimitMode = CapacityLimitMode.SCHEDULE) {
-            hold(1)
+            hold(1.minutes)
         }
     }
 }
@@ -46,7 +48,7 @@ open class ShiftManager : Component() {
         }
 
         // wait for end of shift
-        hold(if(currentShift == ShiftID.WeekEnd) 48 else 12)
+        hold(if(currentShift == ShiftID.WeekEnd) 48.hours else 12.hours)
     }
 }
 
@@ -78,7 +80,7 @@ class InterruptingShiftManager: ShiftManager() {
         }
 
         // wait for end of shift
-        hold(if(currentShift == ShiftID.WeekEnd) 48 else 12)
+        hold(if(currentShift == ShiftID.WeekEnd) 48.hours else 12.hours)
 
         // stop and reschedule the ongoing tasks
         callCenter.claimers.components.forEach {

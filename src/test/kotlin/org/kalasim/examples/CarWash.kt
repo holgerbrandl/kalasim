@@ -1,5 +1,6 @@
 //CarWash.kt
 import org.kalasim.*
+import kotlin.time.Duration.Companion.minutes
 
 /**
  *  A carwash has a limited number of washing machines and defines
@@ -13,7 +14,7 @@ fun main() {
 
     val RANDOM_SEED = 42
     val NUM_MACHINES = 2  // Number of machines in the carwash
-    val WASHTIME = 5      // Minutes it takes to clean a car
+    val WASHTIME = 5.minutes      // Minutes it takes to clean a car
     val T_INTER = 7.0       // Create a car every ~7 minutes
     val SIM_TIME = 20     // Simulation time in minutes
 
@@ -27,7 +28,7 @@ fun main() {
     }
 
 
-    val env = createSimulation( randomSeed = RANDOM_SEED) {
+    val env = createSimulation(randomSeed = RANDOM_SEED) {
         dependency { Resource("carwash", NUM_MACHINES) }
 
         enableComponentLogger()

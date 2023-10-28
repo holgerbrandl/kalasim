@@ -1,8 +1,8 @@
 package org.kalasim.scratch
 
-import org.kalasim.Component
-import org.kalasim.createSimulation
-import org.kalasim.enableComponentLogger
+import org.kalasim.*
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 // Objective:
 // dream to just say something like
@@ -20,7 +20,7 @@ fun main() {
                 sequence {
                     while (true) {
                         isBusy = !isBusy
-                        hold(3)
+                        hold(3.minutes)
                     }
                 }
         }
@@ -36,6 +36,6 @@ fun main() {
             }
         }
 
-        run(10)
+        run(10.hours)
     }
 }

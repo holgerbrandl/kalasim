@@ -3,6 +3,7 @@ package org.kalasim.test
 import io.kotest.matchers.shouldNotBe
 import org.junit.Test
 import org.kalasim.*
+import kotlin.time.Duration.Companion.seconds
 
 class TimeProgressionTest {
 
@@ -16,7 +17,7 @@ class TimeProgressionTest {
 
                 while (true) {
                     // wait for 1 sec
-                    hold(1.0)
+                    hold(1.seconds)
                     // and terminate it
 //                    terminate()
                 }
@@ -28,7 +29,7 @@ class TimeProgressionTest {
 
             Car()
 
-            run(5.0)
+            run(5.seconds)
 
             now shouldNotBe 0.0
         }

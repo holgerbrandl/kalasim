@@ -4,6 +4,7 @@ package org.kalasim.examples.bank.data
 
 import org.kalasim.*
 import org.koin.core.component.inject
+import kotlin.time.Duration.Companion.seconds
 
 
 class CustomerGenerator(val waitingLine: ComponentQueue<Customer>) : Component() {
@@ -20,7 +21,7 @@ class CustomerGenerator(val waitingLine: ComponentQueue<Customer>) : Component()
                 }
             }
 
-            hold(uniform(5.0, 15.0).sample())
+            hold(uniform(5.0, 15.0).minutes.sample())
         }
     }
 }
@@ -38,7 +39,7 @@ class Clerk : Component() {
                 passivate()
 
             waitingLine.poll() // returns next customer (value ignored here)
-            hold(30.0) // bearbeitungszeit
+            hold(30.seconds) // bearbeitungszeit
         }
     }
 }

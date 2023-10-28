@@ -1,9 +1,10 @@
-@file:OptIn(AmbiguousDuration::class, AmbiguousDuration::class)
+@file:OptIn(AmbiguousDuration::class, AmbiguousDuration::class, AmbiguousDurationComponent::class)
 
 package org.kalasim.examples
 
 import org.kalasim.*
 import org.kalasim.misc.AmbiguousDuration
+import org.kalasim.misc.AmbiguousDurationComponent
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -35,8 +36,8 @@ open class MMcQueue(
     // disabled because not strictly needed to study the queue parameters
     //    val traces: EventLog = enableEventLog()
 
-    class Customer(mu: Number) : Component() {
-        val ed = exponential(mu)
+    class Customer(mu: Number) : TickedComponent() {
+        val ed = exponential(mu.toDouble())
 
         override fun process() = sequence {
             request(get<Resource>()) {

@@ -17,8 +17,11 @@ import org.kalasim.ResourceSelectionPolicy.*
 import kotlinx.datetime.Instant
 import org.kalasim.misc.*
 import kotlin.repeat
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
+@OptIn(AmbiguousDurationComponent::class)
 class ResourceTests {
 
     @Test
@@ -48,7 +51,7 @@ class ResourceTests {
                 override fun process() = sequence {
                     while(true) {
                         request(resource withQuantity 1 andPriority Priority(prioPDF.sample()))
-                        hold(1)
+                        hold(1.minutes)
                         if(!isClaiming(resource)) {
                             break
                         } else {
@@ -72,7 +75,7 @@ class ResourceTests {
 
             override fun process() = sequence {
                 request(resource)
-                hold(1)
+                hold(1.minutes)
                 log("finished process, terminating...")
             }
         }
@@ -96,7 +99,7 @@ class ResourceTests {
             val postRequestHold: Int,
             val requestPriority: Int? = null,
             val failOnBump: Boolean = false
-        ) : Component(name) {
+        ) : TickedComponent(name) {
 
             override fun process() = sequence {
                 hold(preRequestHold)
@@ -164,7 +167,7 @@ class ResourceTests {
 
             override fun process() = sequence {
                 request(r)
-                hold(5)
+                hold(5.minutes)
                 log("finished process, terminating...")
             }
         }
@@ -172,7 +175,7 @@ class ResourceTests {
         val bc1 = BumpComponent()
         val bc2 = BumpComponent()
 
-        run(3)
+        run(3.minutes)
 
         bc1.isScheduled shouldBe true
         bc2.isRequesting shouldBe true
@@ -186,7 +189,7 @@ class ResourceTests {
 
             override fun process() = sequence {
                 request(r)
-                hold(5)
+                hold(5.minutes)
                 log("finished process, terminating...")
             }
         }
@@ -206,7 +209,7 @@ class ResourceTests {
 
         val results = mutableListOf<Priority?>()
 
-        class PrioComponent(val wait: Number, val claim: Number, val prio: Priority? = null) : Component() {
+        class PrioComponent(val wait: Duration, val claim: Duration, val prio: Priority? = null) : Component() {
             override fun process() = sequence {
                 hold(wait)
                 request(ResourceRequest(r, priority = prio)) {
@@ -216,19 +219,20 @@ class ResourceTests {
             }
         }
 
-        PrioComponent(1, 20, null)
-        PrioComponent(2, 20, null)
-        PrioComponent(3, 20, null)
-        PrioComponent(4, 20, null)
-        PrioComponent(5, 20, IMPORTANT)
-        PrioComponent(6, 20, LOWEST)
-        PrioComponent(7, 20, LOW)
-        PrioComponent(8, 20, NORMAL)
-        PrioComponent(9, 20, CRITICAL)
+        PrioComponent(1.minutes, 20.minutes)
+        PrioComponent(2.minutes, 20.minutes)
+        PrioComponent(3.minutes, 20.minutes)
+        PrioComponent(4.minutes, 20.minutes)
+        PrioComponent(5.minutes, 20.minutes, IMPORTANT)
+        PrioComponent(6.minutes, 20.minutes, LOWEST)
+        PrioComponent(7.minutes, 20.minutes, LOW)
+        PrioComponent(8.minutes, 20.minutes, NORMAL)
+        PrioComponent(9.minutes, 20.minutes, CRITICAL)
 
 
         // make sure that we can extract correctly sorted copy of the request queue
-        run(10)
+        run(10.minutes)
+
         r.requesters.asSortedList().map {
             it.component.name.substringAfterLast(".").toInt()
         } shouldBe listOf(9, 5, 3, 4, 8, 7, 6)
@@ -246,10 +250,10 @@ class ResourceTests {
 
         object : Component("earlyConsumer") {
             override fun process() = sequence {
-                hold(duration = 5.0)
+                hold(duration = 5.minutes)
 
                 request(resource) {
-                    hold(duration = 5.0)
+                    hold(duration = 5.minutes)
                 }
             }
         }
@@ -258,22 +262,22 @@ class ResourceTests {
 
         object : Component("big_consumer") {
             override fun process() = sequence {
-                hold(duration = 7.0)
+                hold(duration = 7.minutes)
 
                 request(resource withQuantity 2 andPriority Priority.CRITICAL) {
                     criticalRequestHonored = true
-                    hold(duration = 5.0, "consumed complete resource")
+                    hold(duration = 5.minutes, "consumed complete resource")
                 }
             }
         }
 
         object : Component("lateConsumer") {
             override fun process() = sequence {
-                hold(duration = 10.0)
+                hold(duration = 10.minutes)
 
                 request(resource) {
                     criticalRequestHonored shouldBe true // because it should be honoured after the big consumer
-                    hold(duration = 5.0, "late consumption")
+                    hold(duration = 5.minutes, "late consumption")
                 }
             }
         }
@@ -290,14 +294,14 @@ class ResourceTests {
         class Customer(val clerk: Resource) : Component() {
 
             override fun process() = sequence {
-                hold(duration = 5.0)
+                hold(duration = 5.minutes)
 
                 request(clerk, capacityLimitMode = CapacityLimitMode.SCHEDULE)
-                hold(duration = 2.0, priority = IMPORTANT)
+                hold(duration = 2.minutes, priority = IMPORTANT)
                 release(clerk)
 
                 passivate()
-                hold(duration = 5.0)
+                hold(duration = 5.minutes)
             }
         }
 
@@ -324,7 +328,7 @@ class ResourceTests {
             customer.stateTimeline.printHistogram()
 //                println(customer.statusTimeline[ComponentState.PASSIVE])
 
-            customer.stateTimeline.total(ComponentState.PASSIVE) shouldBe 8.0
+            customer.stateTimeline.total(ComponentState.PASSIVE) shouldBe 8.minutes
         }
     }
 
@@ -338,10 +342,10 @@ class ResourceTests {
 
             object : Component() {
                 override fun process() = sequence {
-                    hold(2)
+                    hold(2.minutes)
 
                     request(ResourceRequest(r)) {
-                        hold(1)
+                        hold(1.minutes)
                     }
                 }
             }
@@ -394,7 +398,7 @@ class ResourceTests {
                 request(r1) {
                     request(r1) {
                         request(r1) {
-                            hold(1)
+                            hold(1.minutes)
                         }
 
                         r1.claimed shouldBe 2
@@ -411,7 +415,7 @@ class ResourceTests {
 
     @OptIn(AmbiguousDuration::class)
     @Test
-    fun `it should track request scoped activities`() = createTestSimulation {
+    fun `it should track request scoped activities`() = createTestSimulation(Instant.parse("2021-01-01T00:00:00.00Z")) {
         val r1 = Resource(capacity = 4)
         val r2 = Resource(capacity = 4)
 
@@ -419,24 +423,24 @@ class ResourceTests {
         object : Component() {
             override fun process() = sequence {
                 request(r1)
-                hold(100)
+                hold(100.minutes)
                 release(r1)
             }
         }
 
         object : Component() {
             override fun process() = sequence {
-                hold(3)
+                hold(3.minutes)
 
                 request(r2) {
-                    hold(1)
+                    hold(1.minute)
 
                     request(r1, description = "foo") {
-                        hold(2)
+                        hold(2.minutes)
                         r1.claimed shouldBe 2
                     }
 
-                    hold(1)
+                    hold(1.minute)
                 }
             }
         }
@@ -445,8 +449,8 @@ class ResourceTests {
 
         r1.activities.apply {
             size shouldBe 1
-            first().requested.value shouldBe 4.0
-            first().released.value shouldBe 6.0
+            first().requested.toTickTime().value shouldBe 4.0
+            first().released.toTickTime().value shouldBe 6.0
             first().activity shouldBe "foo"
         }
 
@@ -459,9 +463,8 @@ class ResourceTests {
         timeline.size shouldBe 26
 
         // now set the tick-transform and check if the timeline includes walltime
-        startDate =Instant.parse("2021-01-01T00:00:00.00Z")
         val timelineWT = r1.timeline
-        timelineWT.first().startWT shouldNotBe null
+        timelineWT.first() shouldNotBe null
     }
 
 
@@ -523,12 +526,12 @@ class ResourceTests {
         val patient = object : Component() {
             override fun process() = sequence {
                 request(doctors, oneOf = true) {
-                    hold(1)
+                    hold(1.hours)
                 }
             }
         }
 
-        run(10)
+        run(10.hours)
 
         doctors.forEach { dr ->
             dr.requesters.q.shouldBeEmpty()
@@ -563,7 +566,7 @@ class ResourceSelectionTests {
 
         class ResourceConsumer(val resource: Resource) : Component() {
             override fun process() = sequence {
-                request(resource) { hold(10) }
+                request(resource) { hold(10.minutes) }
             }
         }
 
@@ -595,7 +598,7 @@ class ResourceSelectionTests {
                 repeat(9) {
                     val r = selectResource(resources, policy = RoundRobin)
                     request(r) {
-                        hold(1)
+                        hold(1.minutes)
                     }
 
                     obtainedResources.add(r)
@@ -603,7 +606,7 @@ class ResourceSelectionTests {
             }
         }
 
-        run(20)
+        run(20.minutes)
 
         c.obtainedResources shouldBe (resources + resources + resources)
     }

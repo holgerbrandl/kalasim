@@ -7,7 +7,6 @@ import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.loadFont
 import org.openrndr.draw.loadImage
-import org.openrndr.ffmpeg.ScreenRecorder
 import org.openrndr.svg.loadSVG
 import java.awt.geom.Point2D
 import java.lang.Thread.sleep
@@ -17,7 +16,7 @@ import kotlin.time.Duration.Companion.milliseconds
 fun main() {
     application {
         // setup simulation model
-        val sim = object : Environment(durationUnit = DurationUnit.SECONDS) {
+        val sim = object : Environment(tickDurationUnit = DurationUnit.SECONDS) {
             init {
                 ClockSync(tickDuration = 10.milliseconds, syncsPerTick = 100)
             }

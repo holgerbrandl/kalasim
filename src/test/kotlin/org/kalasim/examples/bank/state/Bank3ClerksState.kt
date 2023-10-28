@@ -5,13 +5,14 @@ package org.kalasim.examples.bank.state
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
 import org.koin.core.component.inject
+import kotlin.time.Duration.Companion.minutes
 
 class CustomerGenerator : Component() {
 
     override fun process() = sequence {
         while(true) {
             Customer(get(), get())
-            hold(UniformRealDistribution(env.rg, 5.0, 15.0).sample())
+            hold(UniformRealDistribution(env.rg, 5.0, 15.0).minutes.sample())
         }
     }
 }
@@ -36,7 +37,7 @@ class Clerk : Component() {
 
             val customer = waitingLine.poll()
 
-            hold(32.0) // bearbeitungszeit
+            hold(32.minutes) // bearbeitungszeit
             customer.activate()
         }
     }

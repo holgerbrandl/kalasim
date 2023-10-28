@@ -52,5 +52,4 @@ class GsonCLStatsAdapter : TypeAdapter<QueueStatistics>() {
     override fun read(`in`: JsonReader?): QueueStatistics {
         TODO("Not yet implemented")
     }
-
 }

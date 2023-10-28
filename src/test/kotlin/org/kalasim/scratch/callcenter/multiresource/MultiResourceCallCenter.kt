@@ -4,6 +4,8 @@ import kravis.SessionPrefs
 import kravis.device.SwingPlottingDevice
 import org.kalasim.*
 import org.kalasim.plot.kravis.display
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 
 enum class ShiftID { A, B, WeekEnd }
@@ -21,7 +23,7 @@ class Request : Component() {
 
     override fun process() = sequence {
         request(shiftManager.currentShift, capacityLimitMode = CapacityLimitMode.SCHEDULE) {
-            hold(1)
+            hold(1.minutes)
         }
     }
 }
@@ -54,7 +56,7 @@ open class ShiftManager : Component() {
         }
 
         // wait for end of shift
-        hold(if(nextShiftID == ShiftID.WeekEnd) 48 else 12)
+        hold(if(nextShiftID == ShiftID.WeekEnd) 48.hours else 12.hours)
     }
 }
 

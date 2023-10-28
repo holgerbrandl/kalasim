@@ -1,6 +1,7 @@
 package org.kalasim.analysis.snapshot
 
 import com.github.holgerbrandl.jsonbuilder.json
+import kotlinx.datetime.Instant
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.apache.commons.math3.stat.descriptive.moment.Mean
@@ -8,9 +9,11 @@ import org.apache.commons.math3.stat.descriptive.moment.Variance
 import org.json.JSONObject
 import org.kalasim.*
 import org.kalasim.misc.*
+import org.kalasim.misc.time.sum
 import org.kalasim.monitors.FrequencyTable
 import org.kalasim.monitors.MetricTimeline
 import kotlin.math.sqrt
+import kotlin.time.Duration
 
 /** A representation/snapshot of an entities current state. */
 interface EntitySnapshot : WithJson
@@ -20,20 +23,18 @@ interface EntitySnapshot : WithJson
 @Suppress("unused")
 open class ComponentSnapshot(component: Component) : AutoJson(), EntitySnapshot {
     val name = component.name
-    val creationTime: TickTime = component.creationTime
+    val creationTime: Instant = component.creationTime
     val now = component.now
     val status = component.componentState
-    val scheduledTime = component.scheduledTime
+    val scheduledTime: Instant? = component.scheduledTime
 
     val claims = component.claims.map { it.key.name to it.value.quantity }.toMap()
     val requests = component.requests.map { it.key.name to it.value.quantity }.toMap()
 }
 
 
-
 // todo add more context details here
 class ComponentGeneratorSnapshot<T>(cg: ComponentGenerator<T>) : ComponentSnapshot(cg)
-
 
 
 /** Captures the current state of a `State`*/
@@ -44,7 +45,6 @@ data class StateSnapshot(val time: TickTime, val name: String, val value: String
 //        return Json.encodeToString(this)
 //    }
 }
-
 
 
 @Suppress("unused")
@@ -65,7 +65,6 @@ class ResourceSnapshot(resource: Resource) : AutoJson(), EntitySnapshot {
         ReqComp(it.component.name, it.component.requests[resource]?.quantity)
     }
 }
-
 
 
 class ComponentListSnapshot<T>(cl: ComponentList<T>) : AutoJson(), EntitySnapshot {
@@ -106,10 +105,9 @@ class StatisticalSummarySnapshot(internal val ss: StatisticalSummary) : Statisti
     EntitySnapshot {
     override fun toJson(): JSONObject = ss.toJson()
 
-    val median : Double
+    val median: Double
         get() = (ss as DescriptiveStatistics).median
 }
-
 
 
 //
@@ -118,7 +116,7 @@ class StatisticalSummarySnapshot(internal val ss: StatisticalSummary) : Statisti
 
 class MetricTimelineSnapshot<V : Number>(nlm: MetricTimeline<V>, excludeZeros: Boolean = false) : Jsonable(),
     EntitySnapshot {
-    val duration: Double
+    val duration: Duration
 
     val mean: Double?
     val standardDeviation: Double?
@@ -138,8 +136,12 @@ class MetricTimelineSnapshot<V : Number>(nlm: MetricTimeline<V>, excludeZeros: B
         min = doubleValues.minOrNull()
         max = doubleValues.maxOrNull()
 
-        if(data.durations.any { it != 0.0 }) {
-            val durationsArray = data.durations.toDoubleArray()
+        if(data.durations.any { it.isPositive() }) {
+            val env = nlm.env
+            val durationsArray = data.durations.map {
+                env.asTicks(it)
+            }.toDoubleArray()
+
             mean = Mean().evaluate(doubleValues, durationsArray)
             standardDeviation = sqrt(Variance().evaluate(doubleValues, durationsArray))
 //            val median = Median().evaluate(data.values.toDoubleArray(), data.durations) // not supported by commons3
@@ -155,7 +157,7 @@ class MetricTimelineSnapshot<V : Number>(nlm: MetricTimeline<V>, excludeZeros: B
     }
 
     override fun toJson() = json {
-        "duration" to duration.roundAny()
+        "duration" to duration
         "mean" to mean?.roundAny()
         "standard_deviation" to standardDeviation?.roundAny().nanAsNull()
         "min" to min?.roundAny()

@@ -7,12 +7,11 @@ import org.kalasim.misc.asCMPairList
 import java.lang.Double.min
 import java.util.*
 import kotlin.math.max
-import kotlin.time.Duration
+import kotlin.time.*
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
 
 /**
  * Distribution support API with controlled randomization via `env.rg`
@@ -59,7 +58,7 @@ fun SimContext.exponential(mean: Number) = ExponentialDistribution(env.rg, mean.
  *
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
-fun SimContext.exponential(mean: Duration) = ExponentialDistribution(env.rg, mean.doubleSeconds).seconds
+fun SimContext.exponential(mean: Duration) = ExponentialDistribution(env.rg, mean.inSeconds).seconds
 
 /**
  * Normal distribution with built-in support for controlled-randomization.
@@ -78,9 +77,9 @@ fun SimContext.normal(mean: Number = 0, sd: Number = 1, rectify: Boolean = false
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
 fun SimContext.normal(mean: Duration, sd: Duration, rectify: Boolean = false): DurationDistribution = if(rectify) {
-    NormalDistribution(env.rg, mean.doubleSeconds, sd.doubleSeconds)
+    NormalDistribution(env.rg, mean.inSeconds, sd.inSeconds)
 } else {
-    RectifiedNormalDistribution(env.rg, mean.doubleSeconds, sd.doubleSeconds)
+    RectifiedNormalDistribution(env.rg, mean.inSeconds, sd.inSeconds)
 }.seconds
 
 
@@ -107,11 +106,7 @@ fun SimContext.triangular(lowerLimit: Number, mode: Number, upperLimit: Number):
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
 fun SimContext.triangular(lowerLimit: Duration, mode: Duration, upperLimit: Duration): DurationDistribution =
-    TriangularDistribution(env.rg, lowerLimit.doubleSeconds, mode.doubleSeconds, upperLimit.doubleSeconds).seconds
-
-internal val Duration.doubleSeconds
-    get() = inWholeSeconds.toDouble()
-
+    TriangularDistribution(env.rg, lowerLimit.inSeconds, mode.inSeconds, upperLimit.inSeconds).seconds
 
 /** Clip the values of the distribution to the provided interval. */
 // we could also adopt kotlin stdlib conventions and use coerceIn, coerceAtLeast and coerceAtMost
@@ -146,7 +141,7 @@ fun SimContext.uniform(lower: Number = 0, upper: Number = 1) =
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
 fun SimContext.uniform(lower: Duration, upper: Duration) =
-    UniformRealDistribution(env.rg, lower.doubleSeconds, upper.doubleSeconds).seconds
+    UniformRealDistribution(env.rg, lower.inSeconds, upper.inSeconds).seconds
 
 
 //
@@ -167,7 +162,6 @@ val RealDistribution.seconds get() = DurationDistribution(DurationUnit.SECONDS, 
 val RealDistribution.minutes get() = DurationDistribution(DurationUnit.MINUTES, this)
 val RealDistribution.hours get() = DurationDistribution(DurationUnit.HOURS, this)
 val RealDistribution.days get() = DurationDistribution(DurationUnit.DAYS, this)
-
 
 data class IntegerDurationDistribution(val unit: DurationUnit, val dist: IntegerDistribution) {
     fun invoke() = sample()

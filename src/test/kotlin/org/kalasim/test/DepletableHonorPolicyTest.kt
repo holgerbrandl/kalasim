@@ -5,10 +5,12 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.analysis.ResourceEvent
 import org.kalasim.analysis.ResourceEventType
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 class DepletableHonorPolicyTest {
 
-    class Customer(val arrivalTime: Int, val requestQuantity: Int) : Component() {
+    class Customer(val arrivalTime: Duration, val requestQuantity: Int) : Component() {
         val bananas = get<DepletableResource>()
 
         override fun process() = sequence {
@@ -24,22 +26,22 @@ class DepletableHonorPolicyTest {
 
             dependency { bananas }
 
-            Customer(1, 4)
-            Customer(6, 5)
-            Customer(15, 3)
-            Customer(24, 1)
-            Customer(40, 3)
-            Customer(44, 2)
+            Customer(1.minutes, 4)
+            Customer(6.minutes, 5)
+            Customer(15.minutes, 3)
+            Customer(24.minutes, 1)
+            Customer(40.minutes, 3)
+            Customer(44.minutes, 2)
 
-            // refill the shelf after 5o ticks
+            // refill the shelf after 5o minutes
             object : Component() {
                 override fun process() = sequence {
-                    hold(20)
+                    hold(20.minutes)
 
                     // incrementally refill banana shelf
                     repeat(6) {
                         put(bananas, quantity = 4)
-                        hold(10)
+                        hold(10.minutes)
                     }
                 }
             }

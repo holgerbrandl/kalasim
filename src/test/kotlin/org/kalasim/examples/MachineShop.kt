@@ -1,17 +1,17 @@
 //MachineShop.kt
-import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.*
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 
 
 val RANDOM_SEED: Int = 42
-val PT_MEAN: Double = 10.0 // Avg. processing time in minutes
-val PT_SIGMA: Double = 2.0 // Sigma of processing time
-val MTTF: Double = 300.0 // Mean time to failure in minutes
-val REPAIR_TIME: Double = 30.0 // Time it takes to repair a machine in minutes
-val JOB_DURATION: Double = 30.0 // Duration of other jobs in minutes
+val PT_MEAN = 10.minutes // Avg. processing time in minutes
+val PT_SIGMA = 2.minutes // Sigma of processing time
+val MTTF = 300.minutes // Mean time to failure in minutes
+val REPAIR_TIME = 30.minutes // Time it takes to repair a machine in minutes
+val JOB_DURATION = 30.minutes // Duration of other jobs in minutes
 val NUM_MACHINES: Int = 10   // Number of machines in the machine shop
-val WEEKS: Int = 4   // Simulation time in weeks
-val SIM_TIME: Number = WEEKS * 7 * 24 * 60  // Simulation time in minutes
+val SIM_TIME = 28.days  // Simulation time
 
 fun main() {
 
@@ -19,7 +19,7 @@ fun main() {
         var madeParts: Int = 0
             private set
 
-        val timePerPart: RealDistribution = normal(PT_MEAN, PT_SIGMA)
+        val timePerPart: DurationDistribution = normal(PT_MEAN, PT_SIGMA)
 
         override fun process(): Sequence<Component> = sequence {
             while (true) {

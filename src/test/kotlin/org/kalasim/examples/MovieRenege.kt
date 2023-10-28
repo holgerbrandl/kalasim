@@ -1,18 +1,19 @@
 //MovieRenege.kt
 import org.kalasim.*
 import org.kalasim.misc.roundAny
+import kotlin.time.Duration.Companion.minutes
 
 fun main() {
 
     val RANDOM_SEED = 158
     val TICKETS = 50  // Number of tickets per movie
-    val SIM_TIME = 120.0  // Simulate until
+    val SIM_TIME = 120.minutes  // Simulate until
 
     data class Movie(val name: String)
 
     val MOVIES = listOf("Julia Unchained", "Kill Process", "Pulp Implementation").map { Movie(it) }
 
-    createSimulation( randomSeed = RANDOM_SEED) {
+    createSimulation(randomSeed = RANDOM_SEED) {
         enableComponentLogger()
 
         // note: it's not really needed to model the theater (because it has no process), but we follow the julia model here
@@ -34,7 +35,7 @@ fun main() {
             }
         }
 
-        ComponentGenerator(iat = exponential(0.5)) {
+        ComponentGenerator(iat = exponential(0.5.minutes)) {
             Cineast(MOVIES.random(), discreteUniform(1, 6).sample())
         }
 
@@ -44,7 +45,7 @@ fun main() {
             val numLeftQueue = theater.numReneged[movie]!!
             val soldOutSince = theater.tickets[movie]!!.occupancyTimeline.stepFun()
                 // find the first time when tickets were sold out
-                .first { it.value == 1.0 }.time.value.roundAny(2)
+                .first { it.value == 1.0 }.time.toTickTime().value.roundAny(2)
 
             println("Movie ${movie.name} sold out $soldOutSince minutes after ticket counter opening.")
             println("$numLeftQueue walked away after film was sold out.")

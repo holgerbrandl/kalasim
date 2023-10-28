@@ -7,11 +7,10 @@ import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.apache.commons.math3.stat.descriptive.StatisticalSummaryValues
 import org.junit.Test
 import org.kalasim.misc.*
-import org.kalasim.misc.merge
-import org.kalasim.misc.mergeStats
 import org.kalasim.monitors.*
 import org.kalasim.test.MonitorTests.Car.*
 import org.kalasim.tt
+import kotlin.time.Duration.Companion.minutes
 
 @OptIn(AmbiguousDuration::class)
 class MonitorTests {
@@ -89,10 +88,10 @@ class MonitorTests {
     fun `Frequency level stats should be correct`() = createTestSimulation {
         val m = CategoryTimeline(AUDI)
 //        m.addValue(AUDI)
-        run(until = 2.tt)
+        run(until = startDate + 2.minutes)
 
         m.addValue(VW)
-        run(until = 8.tt)
+        run(until = startDate + 8.minutes)
 
         m.getPct(AUDI) shouldBe 0.25
 
@@ -214,19 +213,19 @@ class MergeTimelineTests {
         val mtA = IntTimeline()
         val mtB = IntTimeline()
 
-        run(until = 5.tt)
+        run(until = startDate + 5.minutes)
         mtA.addValue(23)
 
-        run(until = 10.tt)
+        run(until = startDate + 10.minutes)
         mtB.addValue(3)
 
-        run(until = 12.tt)
+        run(until = startDate + 12.minutes)
         mtB.addValue(5)
 
         val mtC = IntTimeline(initialValue = 5)
 
 
-        run(until = 14.tt)
+        run(until = startDate + 14.minutes)
         mtA.addValue(10)
         mtC.addValue(12)
 
@@ -244,7 +243,7 @@ class MergeTimelineTests {
         println(addedTL.values)
 
         addedTL.values shouldBe listOf(0.0, 23.0, 26.0, 28.0, 15.0)
-        addedTL.timestamps shouldBe listOf(0.0, 5.0, 10.0, 12.0, 14.0).map { it.tt }
+        addedTL.timestamps.map { it.toTickTime().value } shouldBe listOf(0.0, 5.0, 10.0, 12.0, 14.0)
 
         //  make sure that the other ops do not error do not error
         println(mtA + mtB)
@@ -258,10 +257,10 @@ class MergeTimelineTests {
 
 
         // also validate that when merging with c the later init is accounted for
-        val mtAC = (mtA+mtC)
-        mtAC[13] shouldBe (mtA[13]+mtC[13])
+        val mtAC = (mtA + mtC)
+        mtAC[13] shouldBe (mtA[13] + mtC[13])
         mtAC[100] shouldBe 22
-        shouldThrow<IllegalArgumentException>{mtAC[10]}
+        shouldThrow<IllegalArgumentException> { mtAC[10] }
     }
 }
 
@@ -274,16 +273,16 @@ class MergeMonitorStatsTests {
         val nlmA = IntTimeline()
         val nlmB = IntTimeline()
 
-        run(until = 5.tt)
+        run(until = startDate + 5.minutes)
         nlmA.addValue(23)
 
-        run(until = 10.tt)
+        run(until = startDate + 10.minutes)
         nlmB.addValue(3)
 
-        run(until = 12.tt)
+        run(until = startDate + 12.minutes)
         nlmB.addValue(5)
 
-        run(until = 14.tt)
+        run(until = startDate + 14.minutes)
         nlmA.addValue(10)
 
         //merge statistics
@@ -302,14 +301,14 @@ class MergeMonitorStatsTests {
         flmA.addValue(1)
         flmB.addValue(2)
 
-        run(until = 1.tt)
+        run(until = startDate + 1.minutes)
         flmB.addValue(4)
 
-        run(until = 3.tt)
+        run(until = startDate + 3.minutes)
         flmA.addValue(1)
 
         //merge statistics
-        run(until = 5.tt)
+        run(until = startDate + 5.minutes)
 
         val mergedStats: EnumeratedDistribution<Int> = listOf(flmA, flmB).mergeStats()
         println(mergedStats)

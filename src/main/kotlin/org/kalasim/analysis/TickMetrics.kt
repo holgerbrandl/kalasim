@@ -3,7 +3,7 @@
 package org.kalasim
 
 import org.json.JSONObject
-import org.kalasim.misc.DependencyContext
+import org.kalasim.misc.*
 import org.kalasim.misc.buildJsonWithGson
 import org.kalasim.monitors.MetricTimeline
 import org.koin.core.Koin
@@ -14,6 +14,7 @@ import kotlin.math.round
  *
  * https://www.kalasim.org/advanced/#operational-control
  */
+@OptIn(AmbiguousDurationComponent::class)
 class TickMetrics(
     val sampleTicks: Double = 1.0,
     /** Enable recording of tick metrics via a `timeline` attribute of this object. */
@@ -21,7 +22,7 @@ class TickMetrics(
     /** Emit events via the kalasim message bus. */
     val enableMetricEvents: Boolean = true,
     koin: Koin? = null
-) : Component(koin = koin ?: DependencyContext.get()) {
+) : TickedComponent(koin = koin ?: DependencyContext.get()) {
 
     val timeline = MetricTimeline(name, 0)
 

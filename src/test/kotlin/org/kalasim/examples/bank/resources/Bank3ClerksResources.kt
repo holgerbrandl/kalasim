@@ -4,13 +4,14 @@ package org.kalasim.examples.bank.resources
 import org.kalasim.*
 import org.kalasim.plot.kravis.canDisplay
 import org.kalasim.plot.kravis.display
+import kotlin.time.Duration.Companion.minutes
 
 
 class Customer(private val clerks: Resource) : Component() {
 
     override fun process() = sequence {
         request(clerks)
-        hold(30)
+        hold(30.minutes)
         release(clerks) // not really required
     }
 }

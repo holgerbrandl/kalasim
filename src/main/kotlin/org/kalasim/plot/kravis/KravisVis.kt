@@ -2,27 +2,29 @@ package org.kalasim.plot.kravis
 
 import kravis.*
 import kravis.device.JupyterDevice
+import kravis.device.SwingPlottingDevice
 import org.jetbrains.letsPlot.label.ggtitle
 import org.kalasim.*
 import org.kalasim.analysis.ResourceActivityEvent
 import org.kalasim.monitors.*
 import java.awt.GraphicsEnvironment
+import kotlin.time.Duration
 
 fun canDisplay() = !GraphicsEnvironment.isHeadless() && hasR()
 
 fun hasR(): Boolean {
-   try {
-       val rt = Runtime.getRuntime()
-       val proc = rt.exec("R --help")
-       proc.waitFor()
-       return proc.exitValue() == 0
-   }catch(e: Throwable){
-       return false
-   }
+    try {
+        val rt = Runtime.getRuntime()
+        val proc = rt.exec("R --help")
+        proc.waitFor()
+        return proc.exitValue() == 0
+    } catch(e: Throwable) {
+        return false
+    }
 }
 
 internal fun checkDisplay() {
-    if (!canDisplay()) {
+    if(!canDisplay()) {
         throw IllegalArgumentException(" No display or R not found")
     }
 }
@@ -32,7 +34,7 @@ internal fun printWarning(msg: String) {
 }
 
 private fun GGPlot.showOptional(): GGPlot = also {
-    if (USE_KRAVIS_VIEWER && SessionPrefs.OUTPUT_DEVICE !is JupyterDevice) {
+    if(USE_KRAVIS_VIEWER && SessionPrefs.OUTPUT_DEVICE !is JupyterDevice) {
         checkDisplay()
         show()
     }
@@ -40,7 +42,16 @@ private fun GGPlot.showOptional(): GGPlot = also {
 
 var USE_KRAVIS_VIEWER = false
 
-fun  <V:Number> MetricTimeline<V>.display(
+fun <V : Number> MetricTimeline<V>.display(
+    title: String = name,
+    from: TickTimeOld,
+    to: TickTimeOld,
+    forceTickAxis: Boolean = false,
+): GGPlot {
+    return display(title, env.toWallTime(from), env.toWallTime(to), forceTickAxis)
+}
+
+fun <V : Number> MetricTimeline<V>.display(
     title: String = name,
     from: TickTime? = null,
     to: TickTime? = null,
@@ -50,13 +61,9 @@ fun  <V:Number> MetricTimeline<V>.display(
         .filter { from == null || it.time >= from }
         .filter { to == null || it.time <= to }
 
-    val useWT = env.startDate != null && !forceTickAxis
-
-    fun wtTransform(tt: TickTime) = if (useWT) env.toWallTime(tt) else tt
-
     return data
         .plot(
-            x = { wtTransform(time) },
+            x = { if(forceTickAxis) env.toTickTime(time) else time },
             y = { value }
         )
         .xLabel("Time")
@@ -81,7 +88,7 @@ fun <T> FrequencyTable<T>.display(title: String? = null): GGPlot {
 
     return data.plot(x = { it.first }, y = { it.second })
         .geomCol()
-        .run { if (title != null) title(title) else this }
+        .run { if(title != null) title(title) else this }
         .showOptional()
 }
 
@@ -92,10 +99,6 @@ fun <T> CategoryTimeline<T>.display(
 ): GGPlot {
     val nlmStatsData = statsData()
     val stepFun = nlmStatsData.stepFun()
-
-    val useWT = env.startDate != null && !forceTickAxis
-
-    fun wtTransform(tt: TickTime) = if (useWT) env.toWallTime(tt) else tt
 
     data class Segment<T>(val value: T, val start: TickTime, val end: TickTime)
 
@@ -109,9 +112,9 @@ fun <T> CategoryTimeline<T>.display(
 
     // why cant we use "x".asDiscreteVariable here?
     return segments.plot(
-        x = { wtTransform(start) },
+        x = { if(forceTickAxis) env.toTickTime(start).value else start },
         y = { value },
-        xend = { wtTransform(end) },
+        xend = { if(forceTickAxis) env.toTickTime(end).value else end },
         yend = { value }
     )
         .xLabel("Time")
@@ -130,17 +133,17 @@ fun List<ResourceActivityEvent>.display(
     title: String? = null,
     forceTickAxis: Boolean = false,
 ): GGPlot {
-    val useWT = any { it.requestedWT != null } && !forceTickAxis
+    val env = this@display.first().requester.env
 
     return plot(y = { resource.name },
+        x = { if(forceTickAxis) env.toTickTime(honored).value else honored },
         yend = { resource.name },
-        x = { if (useWT) honoredWT else honored },
-        xend = { if (useWT) releasedWT else released },
+        xend = { if(forceTickAxis) env.toTickTime(released).value else released },
         color = { activity ?: "Other" })
         .geomSegment(size = 10.0)
         .yLabel("")
         .xLabel("Time")
-        .also { if (title != null) ggtitle(title) }
+        .also { if(title != null) ggtitle(title) }
         .showOptional()
 }
 
@@ -157,12 +160,14 @@ fun List<ResourceTimelineSegment>.display(
     ),
     forceTickAxis: Boolean = false,
 ): GGPlot {
-    val useWT = any { it.startWT != null } && !forceTickAxis
+//    val useWT = any { it.startWT != null } && !forceTickAxis
+    val env = this@display.first().resource.env
+
     return filter { it.metric !in exclude }
-        .plot(x = { if (useWT) startWT else start }, y = { value }, color = { metric })
+        .plot(x = { if(forceTickAxis) env.toTickTime(start).value else start }, y = { value }, color = { metric })
         .geomStep()
         .facetWrap("color", ncol = 1, scales = FacetScales.free_y)
-        .also { if (title != null) ggtitle(title) }
+        .also { if(title != null) ggtitle(title) }
         .showOptional()
 }
 
@@ -185,18 +190,15 @@ fun List<Component>.displayStateTimeline(
 //    val df = csTimelineDF(componentName)
     val df = clistTimeline()
 
-    val useWT = first().env.startDate != null && !forceTickAxis
-    fun wtTransform(tt: TickTime) = if (useWT) first().env.toWallTime(tt) else tt
-
     return df.plot(
         y = { first.name },
         yend = { first.name },
-        x = { wtTransform(second.timestamp) },
-        xend = { wtTransform(second.timestamp + (second.duration ?: 0.0)) },
+        x = { second.timestamp },
+        xend = { second.timestamp + (second.duration ?: Duration.ZERO) },
         color = { second.value }
     )
         .geomSegment()
-        .also { if (title != null) ggtitle(title) }
+        .also { if(title != null) ggtitle(title) }
         .xLabel(componentName)
         .showOptional()
 }
@@ -213,10 +215,15 @@ fun List<Component>.displayStateProportions(
 ): GGPlot {
     val df = clistTimeline()
 
-    return df.plot(y = { first.name }, fill = { second.value }, weight = { second.duration })
+
+    return df.plot(
+        y = { first.name },
+        fill = { second.value },
+        weight = { second.duration?.inMinutes }
+    )
         .geomBar(position = PositionFill())
         .xLabel("State Proportion")
-        .also { if (title != null) ggtitle(title) }
+        .also { if(title != null) ggtitle(title) }
         .showOptional()
 }
 

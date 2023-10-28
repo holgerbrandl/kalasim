@@ -7,6 +7,7 @@ import io.kotest.matchers.doubles.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.*
+import kotlin.time.Duration.Companion.minutes
 
 
 //**TODO**  may we should also test that take works with honorAll?
@@ -14,7 +15,7 @@ import org.kalasim.*
 class DepletableResourceTests {
 
     @Test
-    fun `it should realize depletable resource semantics`() = createTestSimulation { 
+    fun `it should realize depletable resource semantics`() = createTestSimulation {
         DepletableResource(capacity = 100, initialLevel = 0).apply {
             isFull shouldBe false
             isDepleted shouldBe true
@@ -30,8 +31,8 @@ class DepletableResourceTests {
         object : Component() {
             override fun process() = sequence {
 //                shouldThrow<InvalidRequestQuantity> {
-                    take(dr, 0.0)
-                    println("take succeeded")
+                take(dr, 0.0)
+                println("take succeeded")
 //                }
             }
         }
@@ -74,8 +75,8 @@ class DepletableResourceTests {
                 take(gasSupply, 80)
 
                 // Test schedule mode
-                put(gasSupply, 1000, capacityLimitMode = CapacityLimitMode.SCHEDULE, failAt = 10.tt)
-                now shouldBe 10.tt
+                put(gasSupply, 1000, capacityLimitMode = CapacityLimitMode.SCHEDULE, failAt = startDate + 10.minutes)
+                now shouldBe (startDate + 10.minutes)
                 gasSupply.level shouldBe 20
 
                 // but it should allow to max out capacity manually
@@ -110,7 +111,7 @@ class DepletableResourceTests {
         // add new gas continuously
         object : Component("Pipeline") {
             override fun repeatedProcess() = sequence {
-                hold(10, "refilling supply tank")
+                hold(10.minutes, "refilling supply tank")
 
                 put(gasSupply withQuantity 2)
                 println("new level is ${gasSupply.level}")
@@ -182,7 +183,7 @@ class DepletableResourceTests {
                 override fun process() = sequence<Component> {
                     put(dp, 200, capacityLimitMode = CapacityLimitMode.SCHEDULE)
 
-                    now shouldBe 20.tt
+                    now shouldBe (startDate + 20.minutes)
                     dp.level shouldBe 200
                 }
             }
@@ -252,7 +253,7 @@ class DepletableResourceTests {
 
         object : Component("Consumer") {
             override fun process() = sequence {
-                hold(duration = 5.0)
+                hold(duration = 5.minutes)
                 take(resource, 5)
             }
         }

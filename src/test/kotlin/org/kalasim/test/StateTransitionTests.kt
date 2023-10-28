@@ -5,8 +5,9 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.*
 import org.kalasim.analysis.EntityCreatedEvent
-import org.kalasim.misc.AmbiguousDuration
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 
 
 class StateTransitionTests {
@@ -24,11 +25,11 @@ class StateTransitionTests {
                 override fun process() = sequence {
                     while(true) {
                         TestCar()
-                        hold(1.0)
+                        hold(1.minutes)
                     }
                 }
             }
-        }.run(5.0)
+        }.run(5.minutes)
 
 //        events.forEach { println(it) }
 
@@ -56,75 +57,74 @@ class StateTransitionTests {
         }.run(1.0)
     }
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should correctly keep track of the state`() = createTestSimulation {
         val someState = State(false)
 
         val c = object : Component() {
             override fun process() = sequence<Component> {
-                hold(10)
+                hold(10.days)
                 wait(someState) { true }
             }
         }
 
-        run(20.0)
-        c!!.stateTimeline.printHistogram()
+        run(20.days)
+
+        c.stateTimeline.printHistogram()
     }
+}
 
+class ComponentReceiverInteractionTests {
 
-    class ComponentReceiverInteractionTests {
+    @Test
+    fun `it should passivate, cancel, hold and activate on behalf of another component`() =
+        createTestSimulation {
 
-        @Test
-        fun `it should passivate, cancel, hold and activate on behalf of another component`() =
-            createTestSimulation {
+            val r = Resource()
+            val s = State("foo")
 
-                val r = Resource()
-                val s = State("foo")
+            val other = object : Component("other") {
+                override fun process() =
+                    sequence {
+                        log("starting process!")
+                        hold(100.days)
 
-                val other = object : Component("other") {
-                    override fun process() =
-                        sequence {
-                            log("starting process!")
-                            hold(100)
-
-                            log("other process continued")
-                            hold(100)
-                        }
-                }
-
-
-                val comp = object : Component() {
-
-                    override fun process() =
-                        sequence {
-                            other.passivate()
-                            hold(4)
-
-                            other.activate()
-                            hold(4)
-
-                            other.cancel()
-                            hold(4)
-
-                            other.activate()
-                            other.hold(2)
-                            hold(4)
-                        }
-                }
-
-                // note this is a compiler test only. the example is not meaningful
-                run(1000)
-
-                comp.stateTimeline.statsData().values shouldBe listOf(
-                    DATA, SCHEDULED, CURRENT, SCHEDULED, CURRENT, SCHEDULED, CURRENT, SCHEDULED,
-                    CURRENT, SCHEDULED, CURRENT, DATA
-                )
-
-                other.stateTimeline.statsData().values shouldBe listOf(
-                    DATA, SCHEDULED, CURRENT, SCHEDULED, PASSIVE, SCHEDULED, CURRENT, SCHEDULED, DATA,
-                    SCHEDULED, SCHEDULED, CURRENT, SCHEDULED, CURRENT, SCHEDULED, CURRENT, DATA
-                )
+                        log("other process continued")
+                        hold(100.days)
+                    }
             }
-    }
+
+
+            val comp = object : Component() {
+
+                override fun process() =
+                    sequence {
+                        other.passivate()
+                        hold(4.days)
+
+                        other.activate()
+                        hold(4.days)
+
+                        other.cancel()
+                        hold(4.days)
+
+                        other.activate()
+                        other.hold(2.days)
+                        hold(4.days)
+                    }
+            }
+
+            // note this is a compiler test only. the example is not meaningful
+            run(1000.days)
+
+            comp.stateTimeline.statsData().values shouldBe listOf(
+                DATA, SCHEDULED, CURRENT, SCHEDULED, CURRENT, SCHEDULED, CURRENT, SCHEDULED,
+                CURRENT, SCHEDULED, CURRENT, DATA
+            )
+
+            other.stateTimeline.statsData().values shouldBe listOf(
+                DATA, SCHEDULED, CURRENT, SCHEDULED, PASSIVE, SCHEDULED, CURRENT, SCHEDULED, DATA,
+                SCHEDULED, SCHEDULED, CURRENT, SCHEDULED, CURRENT, SCHEDULED, CURRENT, DATA
+            )
+        }
 }

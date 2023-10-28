@@ -5,6 +5,7 @@ package org.kalasim.examples.bank.reneging_state
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
 import org.koin.core.component.inject
+import kotlin.time.Duration.Companion.minutes
 
 
 //to inject use data class Counter(var value: Int)
@@ -24,7 +25,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>, val workToDo: State<Bo
 
         waitingLine.add(this@Customer)
         workToDo.trigger(true, false, max = 1)
-        hold(50) // if not serviced within this time, renege
+        hold(50.minutes) // if not serviced within this time, renege
 
         if (waitingLine.contains(this@Customer)) {
             waitingLine.remove(this@Customer)
@@ -51,7 +52,7 @@ class Clerk(val workToDo: State<Boolean>) : Component() {
             waitingLine.printSummary()
 
             val customer = waitingLine.poll()
-            hold(30.0) // process customer
+            hold(30.minutes) // process customer
 
 //            require(customer.isPassive){ "not passive"}
             customer.activate() // signal the customer that's all's done

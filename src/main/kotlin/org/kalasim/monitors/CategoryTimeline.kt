@@ -2,7 +2,11 @@ package org.kalasim.monitors
 
 import org.kalasim.TickTime
 import org.kalasim.misc.*
+import org.kalasim.misc.time.sum
+import org.kalasim.toTickTime
 import org.koin.core.Koin
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 /**
  * Level monitors tally levels along with the current (simulation) time. e.g. the number of parts a machine is working on.
@@ -58,10 +62,14 @@ class CategoryTimeline<T>(
         timestamps.toMutableList()
             .apply { add(env.now) }
             .zipWithNext { first, second -> second - first }
+            .map{ it.toDouble(DurationUnit.MINUTES)}
             .toDoubleArray()
 
 
-    override fun get(time: Number): T? {
+    @AmbiguousDuration
+    override fun get(time: Number): T?  = get(time.toTickTime())
+
+    override fun get(time: TickTime): T? {
         require(enabled){
             "timeline '$name' is disabled. Make sure to enable it locally,  or globally using a matching tracking-policy." +
                     " For details see https://www.kalasim.org/advanced/#continuous-simulation"
@@ -72,16 +80,17 @@ class CategoryTimeline<T>(
         }
 
         // https://youtrack.jetbrains.com/issue/KT-43776
-        return timestamps.zip(values.toList()).reversed().first { it.first <= time.toDouble() }.second
+        return timestamps.zip(values.toList()).reversed().first { it.first <= time }.second
     }
 
-    operator fun get(time: TickTime) = get(time.value)
+//    operator fun get(time: TickTime) = get(time.value)
 
-    override fun total(value: T): Double = statsData().run {
+    override fun total(value: T): Duration? = statsData().run {
         // https://youtrack.jetbrains.com/issue/KT-43776
         values.zip(durations)
             .filter { it.first == value }
-            .sumOf { it.second }
+            .map{it.second}
+            .sum()
     }
 
     fun printHistogram(values: List<T>? = null, sortByWeight: Boolean = false) {

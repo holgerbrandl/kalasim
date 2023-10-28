@@ -8,8 +8,8 @@ import org.junit.Test
 import org.kalasim.Component
 import org.kalasim.State
 import org.kalasim.misc.AmbiguousDuration
-import org.kalasim.tt
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 
 class Tool : Component() {
@@ -32,7 +32,7 @@ class Tool : Component() {
 
         hold(100.minutes, "busy for another some ticks")
 
-        now shouldBe 100.tt
+        now shouldBe (env.startDate + 100.minutes)
 
         println(env.toJson())
     }
@@ -40,7 +40,7 @@ class Tool : Component() {
 
     private suspend fun SequenceScope<Component>.doSomething() {
         wait(state, true)
-        hold(50, "doing something")
+        hold(50.seconds, "doing something")
     }
 }
 
