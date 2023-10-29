@@ -314,6 +314,10 @@ triangular(lowerLimit = 0.days, mode = 2.weeks, upperLimit = 3.years)
 constant(42.days)
 ```
 
+!!! tip
+    In addition to dedicated duration distributions, all numeric distributions can be converted to duration distributions using duration unit indicators suffices. E.g `normal(23).days` 
+
+
 ### Enumerations
 
 Very often when working out simulation models, there is a need to sample with controlled randomization, from discrete populations, such as integer-ranges, IDs, enums or collections. Kalasim supports various integer distributions, uuid-sampling, as well as type-safe enumeration-sampling.

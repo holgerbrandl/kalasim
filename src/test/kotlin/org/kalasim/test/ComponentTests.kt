@@ -312,7 +312,7 @@ class ComponentTests {
     @Ignore
     @Test
     fun `it should allow to disable interaction logging`() = createTestSimulation {
-        trackingPolicyFactory.disableAll()
+        entityTrackingDefaults.disableAll()
 
         val r = Resource()//.apply {  trackingPolicy = ResourceTrackingConfig(logClaimRelease = false ) }
         val s: State<String> = State("foo")
@@ -341,47 +341,9 @@ class ComponentTests {
             last().shouldBeInstanceOf<InteractionEvent>()
             (last() as InteractionEvent).action shouldBe "work done"
         }
-    }
 
-    @Test
-    fun `it should allow to register and consume custom tracking policies`() = createTestSimulation {
-        class CustomConfig(val logSmthg: Boolean = true) : TrackingConfig
+//        InternalMetricsTrackingDefaults.enab()
 
-        trackingPolicyFactory.register(ResourceTrackingConfig().copy(trackUtilization = false)) {
-            it.name.startsWith("Counter")
-        }
-
-        trackingPolicyFactory.register(CustomConfig()) {
-            it.name.startsWith("Customer")
-        }
-
-        var configuredLog = false
-
-        object : Component("Customer1") {
-            override fun process() = sequence<Component> {
-                if(env.trackingPolicyFactory.getPolicy<CustomConfig>(getThis()).logSmthg) {
-                    println("custom configured logging")
-                    configuredLog = true
-                }
-            }
-        }
-
-        // do some random stuff to ensure that this does not interfere with custom tracking config
-        val r = Resource()//.apply {  trackingPolicy = ResourceTrackingConfig(logClaimRelease = false ) }
-        val s: State<String> = State("foo")
-
-        object : Component("foo") {
-            override fun process() = sequence {
-                hold(2.days)
-                s.value = "bar"
-                request(r) {}
-                log("work done")
-            }
-        }
-
-        run(10)
-
-        configuredLog shouldBe true
     }
 
 

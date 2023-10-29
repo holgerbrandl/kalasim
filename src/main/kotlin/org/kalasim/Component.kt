@@ -88,8 +88,9 @@ open class TickedComponent(
     delay: Duration? = null,
     priority: Priority = NORMAL,
     process: ProcessPointer? = null,
+    trackingConfig: ComponentTrackingConfig = ComponentTrackingConfig(),
     koin: Koin = DependencyContext.get(),
-) : Component(name,at, delay, priority, process, koin){
+) : Component(name,at, delay, priority, process, koin, trackingConfig){
 
 
     /**
@@ -173,6 +174,8 @@ open class Component(
     priority: Priority = NORMAL,
     process: ProcessPointer? = null,
     koin: Koin = DependencyContext.get(),
+    val trackingConfig: ComponentTrackingConfig = koin.getEnvDefaults().DefaultComponentConfig,
+
     // to be re-enabled/reworked as part of https://github.com/holgerbrandl/kalasim/issues/11
 //    builder: SequenceScope<Component>.() -> Unit = {   }
 ) : SimulationEntity(name, koin) {
@@ -186,6 +189,8 @@ open class Component(
 
     private val waits = mutableListOf<StateRequest<*>>()
 
+    init{
+    }
 
     /** Will be `true` if a component's request was not honored in time, or a wait predicate was not met before it timed outs. */
     var failed: Boolean = false
@@ -229,35 +234,15 @@ open class Component(
 
     val stateTimeline = CategoryTimeline(componentState, "status of ${this.name}", koin)
 
-    // define how logging is executed in this component
-    var trackingPolicy: ComponentTrackingConfig = ComponentTrackingConfig()
-        set(newPolicy) {
-            field = newPolicy
+    init {
 
-            with(newPolicy) {
-                stateTimeline.enabled = trackComponentState
-            }
+        with(trackingConfig) {
+            stateTimeline.enabled = trackComponentState
         }
 
-    init {
-        @Suppress("LeakingThis")
-        trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
-    }
-
-    init {
-//        val dataSuffix = if (process == null && this.name != MAIN) " data" else ""
-        log(trackingPolicy.logCreation) {
+        log(trackingConfig.logCreation) {
             EntityCreatedEvent(now, env.currentComponent, this)
         }
-
-        // the contract for initial auto-scheduling is
-        // either the user has set `at` which clearly indicates the intent for scheduling the component
-        // or
-        // the user has overridden `process`
-        // or
-        // the user has overridden `repeatedProcess`
-        // or
-        // has provided another process pointer (other than `process`)
 
         val overriddenProcess = javaClass.getMethod("process").declaringClass.simpleName != "Component"
         val overriddenRepeated = javaClass.getMethod("repeatedProcess").declaringClass.simpleName != "Component"
@@ -317,7 +302,6 @@ open class Component(
             lastProcess = process
 
             if(isGenerator) {
-                @Suppress("UNCHECKED_CAST")
                 val sequence = process.call(this)
                 GenProcessInternal(this, sequence, process.name)
             } else {
@@ -435,7 +419,7 @@ open class Component(
             )
         }
     ) {
-        log(trackingPolicy.logStateChangeEvents) { builder() }
+        log(trackingConfig.logStateChangeEvents) { builder() }
     }
 
     internal fun logInternal(enabled: Boolean, action: String) = log(enabled) {
@@ -473,7 +457,7 @@ open class Component(
             componentState = INTERRUPTED
         }
 
-        logInternal(trackingPolicy.logInteractionEvents, "interrupt (level=$interruptLevel)")
+        logInternal(trackingConfig.logInteractionEvents, "interrupt (level=$interruptLevel)")
     }
 
     /** Resumes an interrupted component. Can only be applied to interrupted components.
@@ -495,21 +479,21 @@ open class Component(
         interruptLevel--
 
         if(interruptLevel != 0 && !all) {
-            logInternal(trackingPolicy.logInteractionEvents, "resume stalled (interrupt level=$interruptLevel)")
+            logInternal(trackingConfig.logInteractionEvents, "resume stalled (interrupt level=$interruptLevel)")
         } else {
             componentState = interruptedStatus!!
 
-            logInternal(trackingPolicy.logInteractionEvents, "resume ($componentState)")
+            logInternal(trackingConfig.logInteractionEvents, "resume ($componentState)")
 
             when(componentState) {
                 PASSIVE -> {
-                    logInternal(trackingPolicy.logInteractionEvents, "passivate")
+                    logInternal(trackingConfig.logInteractionEvents, "passivate")
                 }
 
                 STANDBY -> {
                     scheduledTime = env.now
                     env.addStandBy(this)
-                    logInternal(trackingPolicy.logInteractionEvents, "standby")
+                    logInternal(trackingConfig.logInteractionEvents, "standby")
                 }
 
                 in listOf(SCHEDULED, WAITING, REQUESTING) -> {
@@ -899,7 +883,7 @@ open class Component(
 
                 resource.requesters.add(this@Component, priority = priority)
 
-                if(resource.trackingPolicy.logResourceChanges) {
+                if(resource.trackingConfig.logResourceChanges) {
                     log(
                         ResourceEvent(
                             env.now,
@@ -938,7 +922,7 @@ open class Component(
                         bumpCandidates.forEach {
                             it.releaseInternal(resource, bumpedBy = this@Component)
                             logInternal(
-                                trackingPolicy.logInteractionEvents,
+                                trackingConfig.logInteractionEvents,
                                 "$it bumped from $resource by ${this@Component}"
                             )
 
@@ -974,7 +958,7 @@ open class Component(
             resourceRequests.filter { it.resource.claimers.contains(this@Component) }.forEach {
                 release(it)
 
-                if(it.resource.trackingPolicy.trackActivities) {
+                if(it.resource.trackingConfig.trackActivities) {
                     val rse =
                         ResourceActivityEvent(
                             requestedAt,
@@ -1051,7 +1035,7 @@ open class Component(
                 val quantity = requestContext.quantity
                 resource.claimed += quantity //this will also update the timeline
 
-                log(trackingPolicy.logInteractionEvents) {
+                log(trackingConfig.logInteractionEvents) {
                     val type = when {
                         resource !is DepletableResource -> CLAIMED
                         quantity < 0 -> PUT
@@ -1206,9 +1190,9 @@ open class Component(
             env.push(this, scheduledTime, priority, urgent)
         }
 
-        if(trackingPolicy.logStateChangeEvents) {
+        if(trackingConfig.logStateChangeEvents) {
 
-            log(trackingPolicy.logStateChangeEvents) {
+            log(trackingConfig.logStateChangeEvents) {
                 RescheduledEvent(
                     now,
                     env.currentComponent,
@@ -1305,14 +1289,14 @@ open class Component(
 
     internal fun checkFail() {
         if(requests.isNotEmpty()) {
-            logInternal(trackingPolicy.logInteractionEvents, "request failed")
+            logInternal(trackingConfig.logInteractionEvents, "request failed")
             requests.forEach { it.key.removeRequester(this) }
             requests.clear()
             failed = true
         }
 
         if(waits.isNotEmpty()) {
-            logInternal(trackingPolicy.logInteractionEvents, "wait failed")
+            logInternal(trackingConfig.logInteractionEvents, "wait failed")
             waits.forEach { it.state.waiters.remove(this) }
 
             waits.clear()
@@ -1435,7 +1419,7 @@ open class Component(
         }
 
         if(releaseRequests.isEmpty()) {
-            logInternal(trackingPolicy.logInteractionEvents, "Releasing all claimed resources $claims")
+            logInternal(trackingConfig.logInteractionEvents, "Releasing all claimed resources $claims")
 
             for((r, _) in claims) {
                 releaseInternal(r)
@@ -1459,7 +1443,7 @@ open class Component(
 
         resource.claimed -= releaseQuantity
 
-        log(resource.trackingPolicy.logResourceChanges) {
+        log(resource.trackingConfig.logResourceChanges) {
             ResourceEvent(
                 env.now,
                 requestContext.requestId,
@@ -1767,6 +1751,7 @@ open class Component(
     }
 }
 
+internal fun Koin.getEnvDefaults(): SimEntityTrackingDefaults = get<Environment>().entityTrackingDefaults
 
 internal val SELECT_SCOPE_IDX = mutableMapOf<Int, Int>()
 

@@ -6,6 +6,7 @@ import com.github.holgerbrandl.jsonbuilder.json
 import org.json.JSONObject
 import org.kalasim.analysis.EntityCreatedEvent
 import org.kalasim.misc.Jsonable
+import kotlin.reflect.KClass
 
 fun main() {
     val name = getNameClassValueCache(Event::class.java)
@@ -43,7 +44,7 @@ abstract class Event(
     //included for more informative json serialization
     // todo this could be even lazy val
 //    fun eventType(): String = getNameClassValueCache(this.javaClass)
-    val eventType: String by lazy{ getNameClassValueCache(this.javaClass)}
+    val eventType: String by lazy { getNameClassValueCache(this.javaClass) }
 
     val tickTime = time.epochSeconds //todo@tt incorrect
 
@@ -63,8 +64,6 @@ fun interface EventListener {
 }
 
 
-
-
 /**
  * Activates a global event-log, which stores all events on the kalasim event bus.
  *
@@ -73,8 +72,10 @@ fun interface EventListener {
  * @sample org.kalasim.dokka.eventsHowTo
  */
 //@Deprecated("Use ", replaceWith = ReplaceWith("collect<Event>()"))
-fun Environment.enableEventLog(): EventLog {
-    val tc = dependency { EventLog() }
+fun Environment.enableEventLog(
+    blackList: List<KClass<*>> = listOf()
+): EventLog {
+    val tc = dependency { EventLog(blackList = blackList) }
     addEventListener(tc)
 
     return tc
@@ -82,11 +83,16 @@ fun Environment.enableEventLog(): EventLog {
 
 
 /** A list of all events that were created in a simulation run.  See [Event Log](https://www.kalasim.org/events/) for details. */
-class EventLog(val events: MutableList<Event> = mutableListOf()) : EventListener,
+class EventLog(
+    val events: MutableList<Event> = mutableListOf(),
+    val blackList: List<KClass<*>> = listOf()
+) : EventListener,
     MutableList<Event> by events {
 //    val events = mutableListOf<Event>()
 
     override fun consume(event: Event) {
+        if(blackList.any { it.isInstance(event) }) return
+
         events.add(event)
     }
 

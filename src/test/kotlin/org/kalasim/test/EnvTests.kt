@@ -5,6 +5,7 @@ import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.beInstanceOf
 import junit.framework.Assert.fail
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -16,9 +17,7 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.analysis.EntityCreatedEvent
 import org.kalasim.analysis.RescheduledEvent
-import org.kalasim.examples.bank.data.Clerk
-import org.kalasim.examples.bank.data.Customer
-import org.kalasim.examples.bank.data.CustomerGenerator
+import org.kalasim.examples.bank.data.*
 import org.kalasim.examples.er.EmergencyRoom
 import org.kalasim.misc.*
 import org.koin.core.Koin
@@ -70,8 +69,8 @@ class EnvTests {
 
         val component2 = TestComponent(koin = env2.getKoin())
 
-        env1.run(10)
-        env2.run(10)
+        env1.run(10.hours)
+        env2.run(10.hours)
 
         // make sure that the global context has not yet been started
 //        shouldThrow<IllegalStateException> {
@@ -239,8 +238,8 @@ class EnvTests {
     fun `it still should fail when last element in createSimulation is a dependency as this will fail internally otherwise`() {
         shouldThrow<IllegalArgumentException> {
             val sim = createSimulation {
-                dependency("foo") {  1 }
-                dependency("bar") {  2 }
+                dependency("foo") { 1 }
+                dependency("bar") { 2 }
             }
 
             sim.get<String>("foo")
@@ -389,8 +388,7 @@ class EnvTests {
     @Test
     fun `it should log events as json`() {
         captureOutput {
-            val er = EmergencyRoom()
-            er.trackingPolicyFactory.enableAll()
+            val er = EmergencyRoom(enableInternalMetrics = true)
 
 
             er.addEventListener {
@@ -546,5 +544,26 @@ class CustomKoinModuleTests {
 
             println(waitingLine.statistics.toJson())
         }
+    }
+
+    @Test
+    fun `it should allow to blacklist event types in event-log`() = createTestSimulation {
+
+        class MyGoodEvent(time: SimTime) : Event(time)
+        class MyBadEvent(time: SimTime) : Event(time)
+
+        val eventLog = enableEventLog(blackList = listOf(MyBadEvent::class))
+
+        object : Component(trackingConfig = ComponentTrackingConfig.NONE) {
+            override fun process() = sequence<Component> {
+                log(MyGoodEvent(now))
+                log(MyBadEvent(now))
+            }
+        }
+
+        run(10.minutes)
+
+        eventLog.size shouldBe 2
+        eventLog.last().shouldBe(beInstanceOf<MyGoodEvent>())
     }
 }

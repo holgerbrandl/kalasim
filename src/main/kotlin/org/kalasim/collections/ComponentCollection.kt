@@ -2,8 +2,7 @@
 
 package org.kalasim
 
-import org.kalasim.misc.ComponentCollectionTrackingConfig
-import org.kalasim.misc.DependencyContext
+import org.kalasim.misc.*
 import org.kalasim.monitors.*
 import org.koin.core.Koin
 
@@ -20,7 +19,8 @@ abstract class ComponentCollection<C>(
     name: String? = null,
     capacity: Int = Int.MAX_VALUE,
     koin: Koin = DependencyContext.get(),
-) : SimulationEntity(name, koin) {
+    val trackingConfig: ComponentCollectionTrackingConfig = koin.getEnvDefaults().DefaultComponentCollectionConfig,
+    ) : SimulationEntity(name, koin) {
 
     abstract val size: Int
 
@@ -50,20 +50,13 @@ abstract class ComponentCollection<C>(
     val capacityTimeline = MetricTimeline("Capacity of ${this.name}", initialValue = capacity, koin = koin)
 
 
-    var trackingPolicy: ComponentCollectionTrackingConfig = ComponentCollectionTrackingConfig()
-        set(newPolicy) {
-            field = newPolicy
-
-            with(newPolicy) {
-                sizeTimeline.enabled = trackCollectionStatistics
-                lengthOfStayStatistics.enabled = trackCollectionStatistics
-            }
+    init{
+        with(trackingConfig) {
+            sizeTimeline.enabled = trackCollectionStatistics
+            lengthOfStayStatistics.enabled = trackCollectionStatistics
         }
-
-    init {
-        @Suppress("LeakingThis")
-        trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
     }
+
 
     fun printHistogram() {
         if (lengthOfStayStatistics.values.size < 2) {

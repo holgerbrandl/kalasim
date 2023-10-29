@@ -249,8 +249,10 @@ class EmergencyRoom(
     val numRooms: Int = 4,
     /** The execution planning policy of the ER. */
     val nurse: HeadNurse = FifoNurse(),
+
     enableComponentLogger: Boolean = false,
     enableTickMetrics: Boolean = false,
+    enableInternalMetrics: Boolean = false,
 ) : Environment(
     enableComponentLogger = enableComponentLogger,
     enableTickMetrics = enableTickMetrics,
@@ -259,8 +261,9 @@ class EmergencyRoom(
 
     // todo this should be opt-in anyway https://github.com/holgerbrandl/kalasim/issues/66
     init{
-        trackingPolicyFactory.disableAll()
+        if(!enableInternalMetrics) entityTrackingDefaults.disableAll()
     }
+
     val waitingAreaSize = 300
 
     // todo also here having sorted queue is causing almost more problems than solving

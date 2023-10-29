@@ -1,51 +1,100 @@
 package org.kalasim.misc
 
-import org.kalasim.*
+
+/** Allows to set tracking defaults for internal metrics and logging.*/
+@Suppress("PropertyName")
+class SimEntityTrackingDefaults() {
+    var DefaultComponentConfig = ComponentTrackingConfig()
+    var DefaultStateConfig = StateTrackingConfig()
+    var DefaultResourceConfig = ResourceTrackingConfig()
+    var DefaultComponentCollectionConfig = ComponentCollectionTrackingConfig()
+
+    fun disableAll() {
+        DefaultComponentConfig = ComponentTrackingConfig.NONE
+        DefaultStateConfig = StateTrackingConfig.NONE
+        DefaultResourceConfig = ResourceTrackingConfig.NONE
+        DefaultComponentCollectionConfig = ComponentCollectionTrackingConfig.NONE
+    }
+}
 
 
-interface TrackingConfig
-
+/**
+ * Represents the configuration for component tracking.
+ *
+ * @property logCreation Whether to log component creation events.
+ * @property logStateChangeEvents Whether to log component state change events.
+ * @property logInteractionEvents Whether to log component interaction events.
+ * @property trackComponentState Whether to track component state.
+ */
 data class ComponentTrackingConfig(
     val logCreation: Boolean = true,
     val logStateChangeEvents: Boolean = true,
     val logInteractionEvents: Boolean = true,
     val trackComponentState: Boolean = true
-) : TrackingConfig {
+)  {
 
     companion object {
-        @Suppress("unused")
-        val NONE = ComponentTrackingConfig(false, false, false, false)
+        val NONE = ComponentTrackingConfig(
+            logCreation = false,
+            logStateChangeEvents = false,
+            logInteractionEvents = false,
+            trackComponentState = false
+        )
     }
 }
 
+/**
+ * Configuration class for resource tracking.
+ *
+ * This class provides options to enable or disable various tracking functionalities like logging,
+ * queue statistics tracking, utilization tracking, activity tracking, requester tracking, and claimer tracking.
+ *
+ * @property logCreation Whether to log resource creation events.
+ * @property logResourceChanges Whether to log resource change events.
+ * @property trackQueueStatistics Whether to track queue statistics.
+ * @property trackUtilization Whether to track resource utilization.
+ * @property trackActivities Whether to track resource activities.
+ * @property trackRequesters Whether to track resource requesters.
+ * @property trackClaimers Whether to track resource claimers.
+ */
 data class ResourceTrackingConfig(
     val logCreation: Boolean = true,
     val logResourceChanges: Boolean = true,
     val trackQueueStatistics: Boolean = true,
     val trackUtilization: Boolean = true,
-    val trackActivities: Boolean = true
-) : TrackingConfig {
+    val trackActivities: Boolean = true,
+    val trackRequesters: Boolean = true,
+    val trackClaimers: Boolean = true
+) {
 
     companion object {
-        @Suppress("unused")
         val NONE = ResourceTrackingConfig(
             logCreation = false,
             logResourceChanges = false,
             trackQueueStatistics = false,
-            trackUtilization = false
+            trackUtilization = false,
+            trackRequesters = false,
+            trackClaimers = false
         )
     }
 }
 
+/**
+ * Represents the configuration options for state tracking.
+ *
+ * @property logCreation Whether to log the creation of state instances.
+ * @property trackQueueStatistics Whether to track statistics about state queues.
+ * @property trackValue Whether to track the values of state instances.
+ * @property logTriggers Whether to log state triggers.
+ */
 data class StateTrackingConfig(
     val logCreation: Boolean = true,
     val trackQueueStatistics: Boolean = true,
     val trackValue: Boolean = true,
     val logTriggers: Boolean = true
-) : TrackingConfig {
+) {
 
     companion object {
-        @Suppress("unused")
         val NONE = StateTrackingConfig(
             logCreation = false,
             trackQueueStatistics = false,
@@ -55,58 +104,14 @@ data class StateTrackingConfig(
     }
 }
 
-data class ComponentCollectionTrackingConfig(val trackCollectionStatistics: Boolean = true) : TrackingConfig {
+/**
+ * Represents a configuration for tracking component collection statistics.
+ *
+ * @property trackCollectionStatistics Indicates whether to track collection statistics or not.
+ */
+data class ComponentCollectionTrackingConfig(val trackCollectionStatistics: Boolean = true)  {
 
     companion object {
-        @Suppress("unused")
         val NONE = ComponentCollectionTrackingConfig(false)
-    }
-}
-
-
-typealias EntityFilter = (SimulationEntity) -> Boolean
-
-class TrackingPolicyFactory {
-
-    val policies: List<Pair<EntityFilter, TrackingConfig>> = mutableListOf()
-
-    var defaultComponentConfig = ComponentTrackingConfig()
-    var defaultResourceConfig = ResourceTrackingConfig()
-    var defaultStateConfig = StateTrackingConfig()
-    var defaultCollectionConfig = ComponentCollectionTrackingConfig()
-
-    inline fun <reified T : TrackingConfig> getPolicy(entity: SimulationEntity): T {
-        val config = policies.firstOrNull { it.first(entity) && it.second is T }?.second
-
-        if (config != null) return config as T
-
-        return when (entity) {
-            is ComponentQueue<*> -> defaultCollectionConfig
-            is ComponentList<*> -> defaultCollectionConfig
-            is Component -> defaultComponentConfig
-            is Resource -> defaultResourceConfig
-            is State<*> -> defaultStateConfig
-
-            else -> TODO("no tracking configuration for entity ${entity}. Use env.addTrackingPolicy() to define it")
-        } as T
-    }
-
-    @Suppress("BooleanLiteralArgument")
-    fun disableAll() {
-        defaultComponentConfig = ComponentTrackingConfig.NONE
-        defaultResourceConfig = ResourceTrackingConfig.NONE
-        defaultStateConfig = StateTrackingConfig.NONE
-        defaultCollectionConfig = ComponentCollectionTrackingConfig.NONE
-    }
-
-    fun enableAll(){
-        defaultComponentConfig = ComponentTrackingConfig()
-        defaultResourceConfig = ResourceTrackingConfig()
-        defaultStateConfig = StateTrackingConfig()
-        defaultCollectionConfig = ComponentCollectionTrackingConfig()
-    }
-
-    fun register(customPolicy: TrackingConfig, filter: EntityFilter) {
-        (policies as MutableList).add(filter to customPolicy)
     }
 }

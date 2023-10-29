@@ -71,23 +71,9 @@ dependencies {
 //    implementation(kotlin("script-runtime"))
 }
 
-// see https://youtrack.jetbrains.com/issue/KT-52735
-val compileKotlin: KotlinCompile by tasks
-
-
-compileKotlin.kotlinOptions.freeCompilerArgs += "-Xallow-any-scripts-in-source-roots"
 
 //todo remove for release
 //compileKotlin.kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
-
-
-// to set bytecode version to 11 we need to do 2 things (note: this requires the usage projects to do the same)
-//compileKotlin.kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
-//
-//kotlin { // Extension to make an easy setup
-//    jvmToolchain(11) // Target version of generated JVM bytecode
-//}
-
 
 
 //https://github.com/Kotlin/kotlin-jupyter/blob/master/docs/libraries.md
@@ -104,22 +90,17 @@ val jar by tasks.getting(Jar::class) {
     }
 }
 
-//
-//subprojects {
-//    java.sourceCompatibility = JavaVersion.VERSION_1_8
-//    java.targetCompatibility = JavaVersion.VERSION_1_8
-//}
-
-//application {
-//    mainClassName = "MainKt"
-//}
-
-//bintray kts example https://gist.github.com/s1monw1/9bb3d817f31e22462ebdd1a567d8e78a
-
 java {
     withJavadocJar()
     withSourcesJar()
 }
+
+
+// see https://youtrack.jetbrains.com/issue/KT-52735
+val compileKotlin: KotlinCompile by tasks
+
+
+compileKotlin.kotlinOptions.freeCompilerArgs += "-Xallow-any-scripts-in-source-roots"
 
 kotlin {
     jvmToolchain(11)

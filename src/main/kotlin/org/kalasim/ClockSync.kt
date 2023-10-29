@@ -21,14 +21,7 @@ class ClockSync(
     val syncsPerTick: Number = 1,
     val maxDelay: Duration? = null,
     koin: Koin = DependencyContext.get()
-) : Component(koin = koin) {
-
-
-    init {
-        trackingPolicy = ComponentTrackingConfig(logCreation = false, logStateChangeEvents = false)
-        // disable trace monitoring for clock control
-//        env.traceFilters.add { it is InteractionEvent && it.curComponent is ClockSync }
-    }
+) : Component(trackingConfig = ComponentTrackingConfig(logCreation = false, logStateChangeEvents = false), koin = koin) {
 
     var tickDuration: Duration = tickDuration
         set(value) {

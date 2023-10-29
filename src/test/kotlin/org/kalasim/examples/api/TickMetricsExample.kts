@@ -1,5 +1,4 @@
-import org.kalasim.Component
-import org.kalasim.createSimulation
+import org.kalasim.*
 import org.kalasim.plot.letsplot.display
 
 createSimulation {
@@ -9,18 +8,18 @@ createSimulation {
         override fun process() = sequence {
             while (true) {
                 // create some artificial non-linear compute load
-                if (now.value < 7)
-                    Thread.sleep((now.value * 100).toLong())
+                if (nowTT.value < 7)
+                    Thread.sleep((nowTT.value * 100).toLong())
                 else {
                     Thread.sleep(100)
                 }
 
-                hold(1)
+                hold(1.minutes)
             }
         }
     }
 
-    run(10)
+    run(10.hours)
 
     tickMetrics.display().show()
 }

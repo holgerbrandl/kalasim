@@ -18,14 +18,11 @@ class ComponentList<C>(
     name: String? = null,
     capacity: Int = Int.MAX_VALUE,
     private val list: MutableList<C> = LinkedList<C>(),
-    koin: Koin = DependencyContext.get()
-) : ComponentCollection<C>(name, capacity, koin), MutableList<C> by list {
+    koin: Koin = DependencyContext.get(),
+    trackingConfig: ComponentCollectionTrackingConfig = koin.getEnvDefaults().DefaultComponentCollectionConfig,
+    ) : ComponentCollection<C>(name, capacity, koin, trackingConfig), MutableList<C> by list {
 
     internal val stayTracker = mutableMapOf<C, SimTime>()
-
-    init {
-        trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
-    }
 
     override fun add(element: C): Boolean {
         checkCapacity()
@@ -45,7 +42,7 @@ class ComponentList<C>(
         val removed = list.remove(element)
 //        require(remove) { "remove element not in collection" }
 
-        if (removed) {
+        if(removed) {
             changeListeners.forEach { it.removed(element) }
 
             val insertTime = stayTracker.remove(element)!!
@@ -63,15 +60,14 @@ class ComponentList<C>(
     val statistics: ComponentListStatistics
         get() = ComponentListStatistics(this)
 
-     override val snapshot
+    override val snapshot
         get() = ComponentListSnapshot(this)
 }
 
 
-
 //todo this duplicates the impl in ComponentQueue
 @Suppress("MemberVisibilityCanBePrivate")
-class ComponentListStatistics(cl: ComponentList<*>) : Jsonable(){
+class ComponentListStatistics(cl: ComponentList<*>) : Jsonable() {
 
     val name = cl.name
     val timestamp = cl.env.now

@@ -6,7 +6,6 @@ import org.kalasim.analysis.*
 import org.kalasim.analysis.snapshot.ResourceSnapshot
 import org.kalasim.misc.*
 import org.kalasim.monitors.*
-import org.kalasim.monitors.copy
 import org.koin.core.Koin
 import java.util.*
 import kotlin.random.Random
@@ -108,6 +107,7 @@ open class DepletableResource(
         RequestHonorPolicy.RANDOM, RequestHonorPolicy.RelaxedFCFS, is RequestHonorPolicy.WeightedFCFS -> {
             canHonorQuantity(quantity)
         }
+
         RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS -> {
             // note: SQF looks the same as StrictFCFS, but the queue comparator is different
 //            (quantity < 0 || requesters.q.peek().component == component) && canHonorQuantity(quantity)
@@ -145,7 +145,8 @@ open class Resource(
     capacity: Number = 1,
     val honorPolicy: RequestHonorPolicy = RequestHonorPolicy.StrictFCFS,
     val preemptive: Boolean = false,
-    koin: Koin = DependencyContext.get()
+    koin: Koin = DependencyContext.get(),
+    val trackingConfig: ResourceTrackingConfig = koin.getEnvDefaults().DefaultResourceConfig,
 ) : SimulationEntity(name = name, simKoin = koin) {
 
     internal var depletable: Boolean = false
@@ -162,10 +163,15 @@ open class Resource(
             RequestHonorPolicy.RANDOM -> RandomComparator(random)
             else -> PriorityFCFSQueueComparator()
         },
+        trackingConfig = ComponentCollectionTrackingConfig(trackingConfig.trackRequesters),
         koin = koin
     )
 
-    val claimers = ComponentQueue<Component>("claimers of ${this.name}", koin = koin)
+    val claimers = ComponentQueue<Component>(
+        "claimers of ${this.name}",
+        trackingConfig = ComponentCollectionTrackingConfig(trackingConfig.trackClaimers),
+        koin = koin
+    )
 
     var capacity = capacity.toDouble()
         set(newCapacity) {
@@ -229,16 +235,15 @@ open class Resource(
         get() = capacity - claimed
 
 
-
     // because Double.MAX_VALUE-1< Double.MAX_VALUE  is wrong on the JVM (because of limited precision)
     // we need to ensure that capacities are in a range where kalasim will function correctly
     private fun validateCapacityRange(capacity: Number) {
-        require(capacity.toDouble() >=0 &&  capacity.toDouble() <= Int.MAX_VALUE) {
+        require(capacity.toDouble() >= 0 && capacity.toDouble() <= Int.MAX_VALUE) {
             "Only capacities in range [0, Int.MAX_VALUE] are supported by kalasim"
         }
     }
 
-    init{
+    init {
         validateCapacityRange(capacity)
     }
 
@@ -255,31 +260,20 @@ open class Resource(
     val occupancyTimeline
         get() = claimedTimeline / capacityTimeline
 
+    init {
+        with(trackingConfig) {
+            capacityTimeline.enabled = trackUtilization
+            claimedTimeline.enabled = trackUtilization
 
-    var trackingPolicy
-            : ResourceTrackingConfig = ResourceTrackingConfig()
-        set(newPolicy) {
-            field = newPolicy
-
-            with(newPolicy) {
-                capacityTimeline.enabled = trackUtilization
-                claimedTimeline.enabled = trackUtilization
-
-//                availabilityTimeline.enabled = trackUtilization
-//                occupancyTimeline.enabled = trackUtilization
-
-                requesters.lengthOfStayStatistics.enabled = trackQueueStatistics
-                requesters.sizeTimeline.enabled = trackQueueStatistics
-                claimers.lengthOfStayStatistics.enabled = trackQueueStatistics
-                claimers.sizeTimeline.enabled = trackQueueStatistics
-            }
+            requesters.lengthOfStayStatistics.enabled = trackQueueStatistics
+            requesters.sizeTimeline.enabled = trackQueueStatistics
+            claimers.lengthOfStayStatistics.enabled = trackQueueStatistics
+            claimers.sizeTimeline.enabled = trackQueueStatistics
         }
+    }
 
     init {
-        @Suppress("LeakingThis")
-        trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
-
-        log(trackingPolicy.logCreation) {
+        log(trackingConfig.logCreation) {
             EntityCreatedEvent(
                 now,
                 env.currentComponent,
@@ -306,6 +300,7 @@ open class Resource(
                     .takeWhile { it.component.tryRequest() }
                     .count() // actually trigger otherwise lazy sequence
             }
+
             RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS, RequestHonorPolicy.RANDOM -> {
                 // original port from salabim
                 while(requesters.q.isNotEmpty()) {
@@ -320,6 +315,7 @@ open class Resource(
                     }
                 }
             }
+
             is RequestHonorPolicy.WeightedFCFS -> {
                 // Note: This is an insanely expensive operation, as we need to resort the requesters queue
                 val sortedWith = requesters.q.toList()
@@ -349,6 +345,7 @@ open class Resource(
         RequestHonorPolicy.RANDOM, RequestHonorPolicy.RelaxedFCFS, is RequestHonorPolicy.WeightedFCFS -> {
             canHonorQuantity(quantity)
         }
+
         RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS -> {
             // note: it's looks the same as StrictFCFS, but the queue comparator is different
             requesters.q.peek().component == component && canHonorQuantity(quantity)

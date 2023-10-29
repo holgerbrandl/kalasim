@@ -3,8 +3,7 @@ package org.kalasim
 import org.kalasim.analysis.EntityCreatedEvent
 import org.kalasim.analysis.StateChangedEvent
 import org.kalasim.analysis.snapshot.StateSnapshot
-import org.kalasim.misc.DependencyContext
-import org.kalasim.misc.StateTrackingConfig
+import org.kalasim.misc.*
 import org.kalasim.monitors.CategoryTimeline
 import org.kalasim.monitors.MetricTimeline
 import org.kalasim.monitors.NumericStatisticMonitor
@@ -21,7 +20,8 @@ open class State<T>(
     initialValue: T,
     name: String? = null,
     koin: Koin = DependencyContext.get(),
-) : SimulationEntity(name, koin) {
+    val trackingConfig: StateTrackingConfig = koin.getEnvDefaults().DefaultStateConfig,
+    ) : SimulationEntity(name, koin) {
 
     private var maxTriggerCxt: Int? = null
     private val isTriggerCxt
@@ -36,7 +36,7 @@ open class State<T>(
             field = value
 
             // salabim also logs the set even if the state.value may not change
-            log(trackingPolicy.logTriggers) {
+            log(trackingConfig.logTriggers) {
                 StateChangedEvent(
                     env.now,
                     this,
@@ -70,24 +70,15 @@ open class State<T>(
     val lengthOfStay: NumericStatisticMonitor
         get() = waiters.lengthOfStayStatistics
 
+    init {
+        with(trackingConfig) {
+            lengthOfStay.enabled = trackQueueStatistics
+            queueLength.enabled = trackQueueStatistics
 
-    var trackingPolicy: StateTrackingConfig = StateTrackingConfig()
-        set(newPolicy) {
-            field = newPolicy
-
-            with(newPolicy) {
-                lengthOfStay.enabled = trackQueueStatistics
-                queueLength.enabled = trackQueueStatistics
-
-                timeline.enabled = trackValue
-            }
+            timeline.enabled = trackValue
         }
 
-    init {
-        @Suppress("LeakingThis")
-        trackingPolicy = env.trackingPolicyFactory.getPolicy(this)
-
-        log(trackingPolicy.logCreation) {
+        log(trackingConfig.logCreation) {
             EntityCreatedEvent(now, env.currentComponent, this, "Initial value: $value")
         }
     }

@@ -50,23 +50,12 @@ To further fine-tune and optimize simulation performance and to reveal bottlenec
 
 ## Continuous Simulation
 
-For some use-cases, simulations may run for a very long simulation and wall time. To prevent internal metrics gathering from consuming all available memory, it needs to be disabled or at least configured carefully. This can be achieved, but either disabling [timelines and monitors](monitors.md) manually on a per-entity basis, or by setting a sensible default strategy using the `Environment.trackingPolicyFactory`
+For some use-cases, simulations may run for a very long simulation and wall time. To prevent internal metrics gathering from consuming all available memory, it needs to be disabled or at least configured carefully. This can be achieved, but either disabling [timelines and monitors](monitors.md) manually on a per-entity basis, or by setting a sensible default policy via `Environment.entityTrackingDefaults`
 
 For each entity type a corresponding tracking-policy `TrackingConfig` can be provisioned along with an entity matcher to narrow down its scope. A _tracking-policy_ allows to change 
 
 1. How events are logged 
 2. How internal metrics are gathered
-
-```kotlin
-// first define the policy and matcher
-env.trackingPolicyFactory
-    .register(ResourceTrackingConfig().copy(trackUtilization = false)) {
-            it.name.startsWith("Counter")
-}
-
-// Second, we can create entities that will comply to the polices if being matched
-val r = Resource("Counter 22")
-```
 
 There are different default implementations, but the user can also implement and register custom tracking-configurations.
 
@@ -74,12 +63,15 @@ There are different default implementations, but the user can also implement and
 * ResourceTrackingConfig
 * StateTrackingConfig
 * ComponentCollectionTrackingConfig
-
+* 
+```kotlin hl_lines="5"
+{!api/InternalMetricsConfig.kts!}
+```
 
 !!!note
-    Tracking configuration policies must be set before instantiating simulation entities to be used. After entities have been created, the user can still configure via `c.trackingConfig`.
+    Tracking configuration policies defaults must be set before instantiating simulation entities to be used
 
-To disable all metrics and to minimize internal event logging, the user can run `env.trackingPolicyFactory.disableAll()`
+To disable all metrics and to minimize internal event logging, the user can run `env.entityTrackingDefaults.disableAll()`
 
 The same mechanism applies also fine-tune the internal [event logging](events.md). By disabling some -  not-needed for production - events, simulation performance can be improved significantly.
 

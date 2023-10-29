@@ -32,8 +32,9 @@ class ComponentQueue<C>(
     // for queue alternatives see https://docs.oracle.com/javase/tutorial/collections/implementations/queue.html
     val q: Queue<CQElement<C>> = PriorityQueue(comparator),
     capacity: Int = Int.MAX_VALUE,
-    koin: Koin = DependencyContext.get()
-) : ComponentCollection<C>(name, capacity, koin) {
+    koin: Koin = DependencyContext.get(),
+    trackingConfig: ComponentCollectionTrackingConfig = koin.getEnvDefaults().DefaultComponentCollectionConfig,
+    ) : ComponentCollection<C>(name, capacity,  koin, trackingConfig) {
 
 
     /** Length of queue timeline. Internally a simple wrapper around `sizeTimeline`.*/
@@ -70,7 +71,7 @@ class ComponentQueue<C>(
         updateExitStats(cqe)
 
 
-        log(trackingPolicy.trackCollectionStatistics) {
+        log(trackingConfig.trackCollectionStatistics) {
             if(cqe.component is Component) {
                 InteractionEvent(env.now, env.currentComponent, cqe.component as Component, "Left $name")
             } else {

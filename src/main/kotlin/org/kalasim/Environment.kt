@@ -142,8 +142,6 @@ open class Environment(
     internal var eventListeners: List<EventListener> = emptyList()
 
 
-    val trackingPolicyFactory = TrackingPolicyFactory()
-
 //    val traceFilters = mutableListOf<EventFilter>()
 //
 //    init {
@@ -206,6 +204,7 @@ open class Environment(
         qualifier: String, noinline parameters: ParametersDefinition? = null,
     ): T = getKoin().get(named(qualifier), parameters)
 
+    val entityTrackingDefaults =  SimEntityTrackingDefaults()
 
     init {
 
@@ -231,6 +230,9 @@ open class Environment(
 //            "createAtStart must be enabled by convention to instantiate injected components before starting the simulation"
 //        }
 
+
+
+        // self register the environment
         getKoin().loadModules(listOf(module {
             single {
                 this@Environment
