@@ -216,9 +216,10 @@ private fun <V : Number> MetricTimeline<V>.applyScalarFactor(
     factor: Number,
     arithmeticOp: ArithmeticOp
 ): MetricTimeline<Double> {
-    val constMT = MetricTimeline("Constant $factor", initialValue = factor).apply {
-        timestamps.apply { clear(); add(this.timestamps.first()) }
-    }
+    val constMT = MetricTimeline("Constant $factor", initialValue = factor.toDouble())
+
+    constMT.timestamps.apply { clear(); add(this@applyScalarFactor.timestamps.first()) }
+
     return combineInternal(asDoubleTimeline(), constMT, arithmeticOp)
 }
 
