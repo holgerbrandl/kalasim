@@ -22,7 +22,7 @@ fun main() {
         val timePerPart: DurationDistribution = normal(PT_MEAN, PT_SIGMA)
 
         override fun process(): Sequence<Component> = sequence {
-            while (true) {
+            while(true) {
                 // start working on a new part
                 log("building a new part")
                 hold(timePerPart())
@@ -42,11 +42,11 @@ fun main() {
         fun breakMachine(): Sequence<Component> = sequence {
             val timeToFailure = exponential(MTTF)
 
-            while (true) {
+            while(true) {
                 hold(timeToFailure())
 
                 // handle the rare case that the model
-                if (machine.isInterrupted) continue
+                if(machine.isInterrupted) continue
 
                 machine.interrupt()
 
@@ -79,11 +79,11 @@ fun main() {
         // https://kotlinlang.org/docs/reference/object-declarations.html#object-expressions
         object : Component("side jobs") {
             override fun process() = sequence {
-                while (true) {
+                while(true) {
                     request(ResourceRequest(repairMan, priority = Priority(-1)))
                     hold(JOB_DURATION)
 
-                    if (isBumped(repairMan)) {
+                    if(isBumped(repairMan)) {
                         log("other job was bumped")
                         continue
                     }

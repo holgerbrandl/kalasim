@@ -26,7 +26,7 @@ class Faker(val random: Random) {
     )
 
     data class PersonName(val first: String, val last: String, val gender: Gender) {
-        val fullName: String= "$first $last"
+        val fullName: String = "$first $last"
     }
 
 

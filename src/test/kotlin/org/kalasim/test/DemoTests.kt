@@ -1,12 +1,13 @@
 package org.kalasim.test
 
+import krangl.irisData
+import krangl.toMap
+import org.jetbrains.kotlinx.dataframe.api.print
+import org.jetbrains.kotlinx.dataframe.api.toDataFrame
 import org.jetbrains.letsPlot.geom.*
 import org.jetbrains.letsPlot.ggsize
 import org.jetbrains.letsPlot.intern.Plot
 import org.jetbrains.letsPlot.letsPlot
-import krangl.*
-import org.jetbrains.kotlinx.dataframe.api.print
-import org.jetbrains.kotlinx.dataframe.api.toDataFrame
 import org.kalasim.EventLog
 import org.kalasim.analysis.InteractionEvent
 import org.kalasim.enableEventLog
@@ -25,7 +26,7 @@ fun main() {
         server.requesters.lengthOfStayStatistics.display().show()
     }
 
-    mm1Queue.get< EventLog>().filterIsInstance<InteractionEvent>().toDataFrame().print()
+    mm1Queue.get<EventLog>().filterIsInstance<InteractionEvent>().toDataFrame().print()
 }
 
 

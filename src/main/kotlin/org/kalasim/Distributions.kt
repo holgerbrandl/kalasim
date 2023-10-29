@@ -7,11 +7,12 @@ import org.kalasim.misc.asCMPairList
 import java.lang.Double.min
 import java.util.*
 import kotlin.math.max
-import kotlin.time.*
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 /**
  * Distribution support API with controlled randomization via `env.rg`
@@ -203,7 +204,6 @@ fun SimContext.discreteUniform(range: IntRange) = discreteUniform(range.first, r
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
 fun SimContext.discreteUniform(lower: Int, upper: Int) = UniformIntegerDistribution(env.rg, lower, upper)
-
 
 
 //

@@ -8,7 +8,7 @@ import org.jetbrains.kotlinx.dataframe.api.rename
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
 import org.jetbrains.kotlinx.dataframe.api.util.unfold
 import org.kalasim.*
-import org.kalasim.misc.*
+import org.kalasim.misc.cartesianProduct
 import org.kalasim.misc.roundAny
 import org.kalasim.plot.kravis.display
 

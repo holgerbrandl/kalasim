@@ -1,4 +1,5 @@
 package org.kalasim.test
+
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import org.junit.Test
@@ -10,9 +11,9 @@ import kotlin.time.Duration.Companion.seconds
 class AnimationTest {
 
     @Test
-    fun`it should allow querying different hold fractions`() = createTestSimulation {
+    fun `it should allow querying different hold fractions`() = createTestSimulation {
 
-        val o1 = object : AnimationComponent(Point2D.Double(0.0,0.0)){
+        val o1 = object : AnimationComponent(Point2D.Double(0.0, 0.0)) {
             override fun process() = sequence {
                 hold(10.seconds, "h1")
                 hold(10.seconds, "h2")
@@ -20,7 +21,7 @@ class AnimationTest {
             }
         }
         // mix in some holds with the same name but unrelated component
-        object : Component(){
+        object : Component() {
             override fun process() = sequence {
                 hold(2.seconds)
                 hold(10.seconds, "h1")
@@ -29,8 +30,8 @@ class AnimationTest {
             }
         }
 
-        o1.registerHoldTracker("h2"){
-            description=="h2"
+        o1.registerHoldTracker("h2") {
+            description == "h2"
         }
 
         run(8.seconds)

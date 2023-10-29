@@ -17,8 +17,8 @@ class Clerk : Component() {
     val waitingLine: ComponentQueue<Customer> by inject()
 
     override fun process() = sequence {
-        while (true) {
-            while (waitingLine.isEmpty())
+        while(true) {
+            while(waitingLine.isEmpty())
                 standby()
 
             val customer = waitingLine.poll()

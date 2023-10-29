@@ -15,7 +15,7 @@ var numReneged = 0
 class Customer(val clerks: Resource) : Component() {
 
     override fun process() = sequence {
-        if (clerks.requesters.size >= 5) {
+        if(clerks.requesters.size >= 5) {
             numBalked++
             log("balked")
             cancel()
@@ -23,7 +23,7 @@ class Customer(val clerks: Resource) : Component() {
 
         request(clerks, failDelay = 50.minutes)
 
-        if (failed) {
+        if(failed) {
             numReneged++
             log("reneged")
         } else {

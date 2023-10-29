@@ -2,10 +2,8 @@ package org.kalasim.monitors
 
 import org.kalasim.analysis.snapshot.FrequencyTableSnapshot
 import org.kalasim.misc.*
-import org.kalasim.misc.time.sum
 import org.koin.core.Koin
 import kotlin.math.roundToInt
-import kotlin.time.Duration
 
 /**
  * Frequency tally levels irrespective of current (simulation) time.
@@ -64,7 +62,6 @@ fun <T> CategoryMonitor<T>.printHistogram(values: List<T>? = null, sortByWeight:
 }
 
 
-
 typealias FrequencyTable<T> = Map<T, Double>
 
 
@@ -74,7 +71,7 @@ fun <T> FrequencyTable<T>.printConsole(
     values: List<T>? = null
 ) {
     // if value range is provided adopt it
-    val hist = if (values != null) {
+    val hist = if(values != null) {
         val parList = this.toList().partition { (bin, _) -> values.contains(bin) }
         // also complement missing values
 
@@ -88,7 +85,7 @@ fun <T> FrequencyTable<T>.printConsole(
     } else {
         this.toList()
     }.run {
-        if (sortByWeight) {
+        if(sortByWeight) {
             sortedByDescending { it.second }
         } else this
     }

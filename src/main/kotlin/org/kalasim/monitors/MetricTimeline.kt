@@ -280,7 +280,6 @@ fun <V : Number> List<MetricTimeline<V>>.sum(): MetricTimeline<Double> =
 fun <V : Number> List<MetricTimeline<V>>.mean(): MetricTimeline<Double> = sum() / size.toDouble()
 
 
-
 // not pretty but allows assigning new names to merged timelines without make SimEntity.name var.
 internal fun <V : Number> MetricTimeline<V>.copy(name: String = this.name): MetricTimeline<V> =
     MetricTimeline<V>(name, initialValue = initialValue, koin = getKoin()).apply {

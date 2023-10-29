@@ -15,7 +15,7 @@ class NumericStatisticMonitor(name: String? = null, koin: Koin = DependencyConte
         get() = sumStats.values
 
     override fun addValue(value: Number) {
-        if (!enabled) return
+        if(!enabled) return
 
         sumStats.addValue(value.toDouble())
     }
@@ -64,7 +64,7 @@ class NumericStatisticMonitor(name: String? = null, koin: Koin = DependencyConte
         println("Summary of: '${name}'")
         statistics().printThis()
 
-        if (values.size > 2) {
+        if(values.size > 2) {
             println("Histogram of: '${name}'")
             sumStats.buildHistogram(binCount).printHistogram()
         } else {
@@ -79,7 +79,7 @@ class NumericStatisticMonitor(name: String? = null, koin: Koin = DependencyConte
 //        val stats: StatisticalSummary = if(rollingStats) SummaryStatistics() else DescriptiveStatistics()
         val stats = DescriptiveStatistics()
 
-        if (excludeZeros) {
+        if(excludeZeros) {
             values.filter { it > 0 }.forEach {
                 stats.addValue(it)
             }
@@ -92,6 +92,6 @@ class NumericStatisticMonitor(name: String? = null, koin: Koin = DependencyConte
     }
 
 
-     override val snapshot
+    override val snapshot
         get() = statistics(false)
 }

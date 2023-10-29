@@ -71,7 +71,7 @@ data class LevelStatsData<T>(
      *                  at the end of the list. This is in particular helpful when visualizing these data
      */
     fun asList(includeNow: Boolean = true): List<LevelStateRecord<T>> {
-        val durationsExt = if (includeNow) durations + null else durations
+        val durationsExt = if(includeNow) durations + null else durations
         return stepFun().zip(durationsExt).map { LevelStateRecord(it.first.time, it.first.value, it.second) }
     }
 }

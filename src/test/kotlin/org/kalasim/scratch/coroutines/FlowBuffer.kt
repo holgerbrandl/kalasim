@@ -6,7 +6,7 @@ import kotlinx.coroutines.runBlocking
 
 object BufferTakeAll {
     fun dressMaker(): Flow<Int> = flow {
-        for (i in 1..3) {
+        for(i in 1..3) {
             println("Dress $i in the making")
             delay(100)
             println("Dress $i ready for sale")
@@ -29,7 +29,7 @@ object BufferTakeAll {
 
 object ConflateThrifty {
     fun dressMaker(): Flow<Int> = flow {
-        for (i in 1..3) {
+        for(i in 1..3) {
             println("Dress $i in the making")
             delay(100)
             println("Dress $i ready for sale")
@@ -54,7 +54,7 @@ object ConflateThrifty {
 
 object CollectLatest {
     fun dressMaker(): Flow<Int> = flow {
-        for (i in 1..3) {
+        for(i in 1..3) {
             println("Dress $i in the making")
             delay(100)
             println("Dress $i ready for sale")

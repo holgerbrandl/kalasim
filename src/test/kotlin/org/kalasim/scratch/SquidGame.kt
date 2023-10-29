@@ -17,7 +17,7 @@ fun main() {
     class SquidGame(
         val numSteps: Int = 18,
         val numPlayers: Int = 16,
-        val maxDuration: Duration = 12 .minutes
+        val maxDuration: Duration = 12.minutes
     ) : Environment(randomSeed = random.nextInt()) {
 
         // randomization
@@ -44,16 +44,16 @@ fun main() {
                 val simStart = now
                 override fun process() = sequence {
                     queue@
-                    for (player in 1..numPlayers) {
+                    for(player in 1..numPlayers) {
                         hold(minOf(stepTime(), 100.seconds)) // cap time at 100sec
 
-                        while (stepsLeft-- > 0) {
-                            if (decision()) continue@queue
+                        while(stepsLeft-- > 0) {
+                            if(decision()) continue@queue
                         }
 
                         survivors.add(player)
 
-                        if ((now-simStart) > maxDuration) break // this wrong, here we need to model
+                        if((now - simStart) > maxDuration) break // this wrong, here we need to model
                     }
                 }
             }

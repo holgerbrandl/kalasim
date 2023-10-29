@@ -11,7 +11,7 @@ import kotlin.time.Duration.Companion.minutes
 class CustomerGenerator : Component() {
 
     override fun process() = sequence {
-        while (true) {
+        while(true) {
             Customer(get())
             hold(uniform(5.0, 15.0).minutes.sample())
         }
@@ -24,8 +24,8 @@ class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
     override fun process() = sequence {
         waitingLine.add(this@Customer)
 
-        for (c in clerks) {
-            if (c.isPassive) {
+        for(c in clerks) {
+            if(c.isPassive) {
                 c.activate()
                 break // activate at max one clerk
             }
@@ -40,8 +40,8 @@ class Clerk : Component() {
     private val waitingLine: ComponentQueue<Customer> by inject()
 
     override fun process() = sequence {
-        while (true) {
-            if (waitingLine.isEmpty())
+        while(true) {
+            if(waitingLine.isEmpty())
                 passivate()
 
             val customer = waitingLine.poll()
@@ -63,7 +63,7 @@ fun main() {
 
         val waitingLine: ComponentQueue<Customer> = get()
 
-        if (canDisplay()) {
+        if(canDisplay()) {
 //        waitingLine.lengthOfStayMonitor.printHistogram()
 //        waitingLine.queueLengthMonitor.printHistogram()
 

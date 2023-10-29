@@ -90,7 +90,7 @@ open class TickedComponent(
     process: ProcessPointer? = null,
     trackingConfig: ComponentTrackingConfig = ComponentTrackingConfig(),
     koin: Koin = DependencyContext.get(),
-) : Component(name,at, delay, priority, process, koin, trackingConfig){
+) : Component(name, at, delay, priority, process, koin, trackingConfig) {
 
 
     /**
@@ -189,7 +189,7 @@ open class Component(
 
     private val waits = mutableListOf<StateRequest<*>>()
 
-    init{
+    init {
     }
 
     /** Will be `true` if a component's request was not honored in time, or a wait predicate was not met before it timed outs. */
@@ -273,7 +273,7 @@ open class Component(
             }
         }
 
-        val tickDelay = delay?: Duration.ZERO
+        val tickDelay = delay ?: Duration.ZERO
 
 //        if (at != null || (process != null && (process.name != "process" || overriddenProcess))) {
         @Suppress("LeakingThis")
@@ -1337,8 +1337,6 @@ open class Component(
 //    @Deprecated("Use Duration instead of Ticks")
 
 
-
-
     /**
      * Hold the component.
      *
@@ -1746,7 +1744,7 @@ open class Component(
     }
 
 
-    suspend fun SequenceScope<Component>.join(components: List<Component>)  = sequence<Component> {
+    suspend fun SequenceScope<Component>.join(components: List<Component>) = sequence<Component> {
         wait(*components.map { it.componentState() turns PASSIVE }.toTypedArray())
     }
 }

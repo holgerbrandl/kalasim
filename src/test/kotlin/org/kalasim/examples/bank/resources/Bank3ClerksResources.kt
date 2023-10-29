@@ -20,7 +20,7 @@ class Customer(private val clerks: Resource) : Component() {
 fun main() {
     val env = createSimulation {
         dependency { Resource("clerks", capacity = 3) }
-        
+
         ComponentGenerator(iat = uniform(5.0, 15.0)) { Customer(get()) }
     }
 
@@ -29,7 +29,7 @@ fun main() {
     env.get<Resource>().apply {
         printSummary()
 
-        if (canDisplay()) {
+        if(canDisplay()) {
             claimedTimeline.display()
             requesters.queueLengthTimeline.display()
         }

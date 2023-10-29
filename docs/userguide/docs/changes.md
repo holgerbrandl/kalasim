@@ -7,6 +7,7 @@
 Breaking API Changes
 
 * Most importantly we have migrated the API to use `org.kalasim.SimTime` to track simulation. `SimTime` is a simple typealias for `kotlinx.datetime.Instant`, effectively giving users the full flexibility of using a well designed and established date-time concept. `org.kalasim.TickTime` is still available for backward compatibility reasons, but is opt-in or required to subclass `TickedComponent`.
+* Simplified the configurability for [tracking](advanced.md#continuous-simulation) of entity timelines and statistics. It's now more direct via constructor parameters in addition to environment defaults
 * [#65](https://github.com/holgerbrandl/kalasim/issues/65) Improved arithmetics of [metric timelines](monitors.md#value-monitors)
 
 Minor improvements

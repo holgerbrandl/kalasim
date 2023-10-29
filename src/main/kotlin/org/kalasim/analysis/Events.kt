@@ -110,17 +110,17 @@ open class InteractionEvent(
 
 
 /** Fired when a simulation state is changing its value. https://www.kalasim.org/state/ */
-open class  StateChangedEvent<T>(
+open class StateChangedEvent<T>(
     time: SimTime,
     val state: State<T>,
     val newValue: T,
     current: Component? = null,
     val trigger: Int? = null
-): InteractionEvent(time, current, null){
+) : InteractionEvent(time, current, null) {
 
     override val action: String?
         get() {
-            return if(trigger!=null) {
+            return if(trigger != null) {
                 "State changes to '$newValue' with trigger allowing $trigger components"
             } else {
                 "State changed to '$newValue'"
@@ -133,7 +133,7 @@ open class  StateChangedEvent<T>(
         "current" to current?.name
         "state" to state.name
         "newValue" to newValue
-        if(trigger!=null) {
+        if(trigger != null) {
             "trigger" to trigger
         }
     }
@@ -162,7 +162,7 @@ open class ComponentStateChangeEvent(
     component: Component,
     val state: ComponentState,
     details: String? = null
-) : InteractionEvent(time, current, component, details){
+) : InteractionEvent(time, current, component, details) {
 
     override fun toJson(): JSONObject = json {
         "time" to time

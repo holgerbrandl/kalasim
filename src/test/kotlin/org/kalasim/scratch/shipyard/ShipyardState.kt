@@ -15,11 +15,11 @@ fun main() {
             val tankState = State(false)
 
             override fun process() = sequence {
-                while (true) {
+                while(true) {
                     hold(1.minutes)
 
                     put(tank, 2)
-                    if (tank.level > 10) {
+                    if(tank.level > 10) {
                         tankState.value = true
                     }
                 }

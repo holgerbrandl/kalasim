@@ -18,12 +18,17 @@ abstract class Monitor<T>(
 
 
     // is this good practise
-    fun enable(){ enabled = true}
-    fun disable(){ enabled = false}
+    fun enable() {
+        enabled = true
+    }
+
+    fun disable() {
+        enabled = false
+    }
 
     fun <T> ifEnabled(query: () -> T): T {
         if(!enabled) {
-            throw  IllegalArgumentException("can not query disabled timeline")
+            throw IllegalArgumentException("can not query disabled timeline")
         }
 
         return query()

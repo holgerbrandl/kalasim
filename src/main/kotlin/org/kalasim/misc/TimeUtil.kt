@@ -2,15 +2,13 @@
 
 package org.kalasim.misc.time
 
-import org.jetbrains.kotlinx.dataframe.math.mean
-import org.jetbrains.kotlinx.dataframe.math.median
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
 
 // Duration utilities
 /** Compute the sum of a set of durations.*/
 fun Iterable<Duration>.sum(): Duration = sumOf { it }
+
 /** Compute the sum of a set of durations via a selector function.*/
 fun <T> Iterable<T>.sumOf(selector: (T) -> Duration) = map { selector(it) }.run {
     reduce { a, b -> a + b }
@@ -30,12 +28,12 @@ fun Iterable<Duration>.median(): Duration = meanOf { it }
 
 /** Compute the median of a set of durations via a selector function.*/
 fun <T> Iterable<T>.medianOf(selector: (T) -> Duration): Duration? = map { selector(it) }.run {
-    if (isEmpty()) {
+    if(isEmpty()) {
         return null
     }
 
     val sortedDurations = sorted()
-    return if (size % 2 == 0) {
+    return if(size % 2 == 0) {
         // Even list size: median is average of two middle numbers
         val midIndex = size / 2
         (sortedDurations[midIndex - 1] + sortedDurations[midIndex]) / 2

@@ -2,7 +2,8 @@
 
 package org.kalasim
 
-import org.kalasim.misc.*
+import org.kalasim.misc.ComponentCollectionTrackingConfig
+import org.kalasim.misc.DependencyContext
 import org.kalasim.monitors.*
 import org.koin.core.Koin
 
@@ -20,13 +21,13 @@ abstract class ComponentCollection<C>(
     capacity: Int = Int.MAX_VALUE,
     koin: Koin = DependencyContext.get(),
     val trackingConfig: ComponentCollectionTrackingConfig = koin.getEnvDefaults().DefaultComponentCollectionConfig,
-    ) : SimulationEntity(name, koin) {
+) : SimulationEntity(name, koin) {
 
     abstract val size: Int
 
     var capacity = capacity
         set(newCapacity) {
-            if (newCapacity > size) {
+            if(newCapacity > size) {
                 val msg = "can not reduce capacity to $newCapacity below current collection size of $size"
                 throw CapacityLimitException(this, msg, now, newCapacity)
             }
@@ -38,7 +39,7 @@ abstract class ComponentCollection<C>(
 
 
     internal fun checkCapacity() {
-        if (size > capacity) {
+        if(size > capacity) {
             throw CapacityLimitException(this, "Can not more items to collection", now, capacity)
         }
     }
@@ -50,7 +51,7 @@ abstract class ComponentCollection<C>(
     val capacityTimeline = MetricTimeline("Capacity of ${this.name}", initialValue = capacity, koin = koin)
 
 
-    init{
+    init {
         with(trackingConfig) {
             sizeTimeline.enabled = trackCollectionStatistics
             lengthOfStayStatistics.enabled = trackCollectionStatistics
@@ -59,7 +60,7 @@ abstract class ComponentCollection<C>(
 
 
     fun printHistogram() {
-        if (lengthOfStayStatistics.values.size < 2) {
+        if(lengthOfStayStatistics.values.size < 2) {
             println("Skipping histogram of '$name' because of to few data")
         } else {
             lengthOfStayStatistics.printHistogram()

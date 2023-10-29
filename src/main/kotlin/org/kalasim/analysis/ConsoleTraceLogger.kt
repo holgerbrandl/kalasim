@@ -6,7 +6,6 @@ import org.kalasim.misc.titlecaseFirstChar
 import java.util.logging.Level
 
 
-
 class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
 
     enum class EventsTableColumn { Time, Current, Receiver, Action, Info }
@@ -55,23 +54,26 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
                     val receiverChanged = component != lastReceiver
 
                     listOf(
-                        TRACE_DF.format(time.epochSeconds/60.0),
+                        TRACE_DF.format(time.epochSeconds / 60.0),
                         if(ccChanged) current?.name else null,
                         if(receiverChanged) component?.name else null,
                         //                ((source?.name ?: "") + " " + (renderAction() ?: "")).trim(),
                         (action ?: "").titlecaseFirstChar(),
-                        if(event is ComponentStateChangeEvent){ "New state: ${event.state.toString().lowercase()}"} else ""
+                        if(event is ComponentStateChangeEvent) {
+                            "New state: ${event.state.toString().lowercase()}"
+                        } else ""
                     ).apply {
                         // update last element
                         lastCurrent = this@with.current
                         lastReceiver = this@with.component
                     }
                 }
+
                 is EntityCreatedEvent -> {
                     val ccChanged = creator != lastCurrent
 
                     listOf(
-                        TRACE_DF.format(time.epochSeconds/60.0),
+                        TRACE_DF.format(time.epochSeconds / 60.0),
                         if(ccChanged) creator?.name else null,
                         entity.name,
                         "Created",
@@ -82,8 +84,9 @@ class ConsoleTraceLogger(var logLevel: Level = Level.INFO) : EventListener {
                         lastReceiver = this@with.entity
                     }
                 }
+
                 else -> {
-                    listOf(TRACE_DF.format(time.epochSeconds/60.0), "", "", toString())
+                    listOf(TRACE_DF.format(time.epochSeconds / 60.0), "", "", toString())
                 }
             }
 

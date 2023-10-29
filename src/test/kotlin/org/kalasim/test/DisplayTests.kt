@@ -1,7 +1,6 @@
 package org.kalasim.test
 
 import io.kotest.assertions.fail
-import kotlinx.datetime.Instant
 import kravis.GGPlot
 import kravis.SessionPrefs
 import kravis.render.LocalR
@@ -53,7 +52,8 @@ class DisplayTests : AbstractSvgPlotRegression() {
 //                    show()
 //                    Thread.sleep(10000)
 
-                        assertExpected(this, "proportions") }
+                    assertExpected(this, "proportions")
+                }
 
             displayStateTimeline("MM1 Server Utilization")
                 .apply { assertExpected(this, "timeline") }
@@ -127,7 +127,7 @@ abstract class AbstractSvgPlotRegression {
         val methodName = name.methodName ?: return // because we're running not in test mode
 
         val file = File(testDataDir, methodName.replace(" ", "_") + "${subtest?.let { ".$it" } ?: ""}.svg")
-        if (!file.exists()) {
+        if(!file.exists()) {
             file.writeText(svgDoc)
             fail("could not find expected result.")
         }
@@ -137,7 +137,7 @@ abstract class AbstractSvgPlotRegression {
         val expected = file.readText().trim() //.run { prettyFormat(this, 4) }
 
         // note assertEquals would be cleaner but since its printing the complete diff, it's polluting the travis logs
-                assertEquals(expected, svgDoc)
+        assertEquals(expected, svgDoc)
         val failMsg = "svg mismatch got:\n${svgDoc.lines().take(30).joinToString("\n")}"
         Assert.assertTrue(failMsg, expected.equals(svgDoc))
 
@@ -157,7 +157,7 @@ abstract class AbstractSvgPlotRegression {
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", indent.toString())
             transformer.transform(xmlInput, xmlOutput)
             return xmlOutput.writer.toString()
-        } catch (e: Exception) {
+        } catch(e: Exception) {
             throw RuntimeException(e) // simple exception handling, please review it
         }
 

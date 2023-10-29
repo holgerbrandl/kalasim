@@ -3,7 +3,8 @@ package org.kalasim.test
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
 import org.kalasim.misc.printThis
-import org.kalasim.monitors.*
+import org.kalasim.monitors.IntTimeline
+import org.kalasim.monitors.printHistogram
 import org.kalasim.plot.kravis.display
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -75,7 +76,7 @@ object DeterministicRefuel {
                 val litersRequired = FUEL_TANK_SIZE - fuelTankLevel
 
                 // order a new Tank if the fuelpump runs of out fuel
-                if ((fuelPump.available - litersRequired) / fuelPump.capacity * 100 < THRESHOLD) {
+                if((fuelPump.available - litersRequired) / fuelPump.capacity * 100 < THRESHOLD) {
                     log("running out of fuel at $gasStation. Ordering new fuel truck...")
                     TankTruck()
 

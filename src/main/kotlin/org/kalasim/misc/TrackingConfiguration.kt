@@ -31,7 +31,7 @@ data class ComponentTrackingConfig(
     val logStateChangeEvents: Boolean = true,
     val logInteractionEvents: Boolean = true,
     val trackComponentState: Boolean = true
-)  {
+) {
 
     companion object {
         val NONE = ComponentTrackingConfig(
@@ -109,7 +109,7 @@ data class StateTrackingConfig(
  *
  * @property trackCollectionStatistics Indicates whether to track collection statistics or not.
  */
-data class ComponentCollectionTrackingConfig(val trackCollectionStatistics: Boolean = true)  {
+data class ComponentCollectionTrackingConfig(val trackCollectionStatistics: Boolean = true) {
 
     companion object {
         val NONE = ComponentCollectionTrackingConfig(false)

@@ -1,10 +1,10 @@
 package org.kalasim.test
 
 import io.kotest.matchers.shouldBe
-import org.kalasim.examples.shipyard.Shipyard
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.examples.shipyard.PartCompleted
+import org.kalasim.examples.shipyard.Shipyard
 
 class JoinTests {
 

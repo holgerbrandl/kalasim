@@ -24,20 +24,20 @@ val EXIT_TIME = 3.seconds
 enum class Direction {
     DOWN, STILL, UP;
 
-    fun asIncrement(): Int = when (this) {
+    fun asIncrement(): Int = when(this) {
         DOWN -> -1
         STILL -> 0
         UP -> 1
     }
 
-    fun invert(): Direction = when (this) {
+    fun invert(): Direction = when(this) {
         DOWN -> UP
         STILL -> throw IllegalArgumentException()
         UP -> DOWN
     }
 }
 
-private fun getDirection(from: Int, to: Int) = if (from < to) UP else DOWN
+private fun getDirection(from: Int, to: Int) = if(from < to) UP else DOWN
 
 
 class VisitorGenerator(
@@ -55,12 +55,12 @@ class VisitorGenerator(
     }.filter { it.first != it.second }.iterator()
 
     override fun process() = sequence {
-        while (true) {
+        while(true) {
             val (from, to) = fromTo.next()
 
             Visitor(from, to)
 
-            if (load == 0) passivate()
+            if(load == 0) passivate()
 
             val iat = 3600 / load
             hold(uniform(0.5, 1.5).sample() * iat) // TODO should we hold before the first visitor?
@@ -95,7 +95,7 @@ class Visitor(val from: Int, val to: Int) : Component() {
 
 
 class Car(initialFloor: Floor, val capacity: Int) :
-    AnimationComponent(Point(1,initialFloor.level )) {
+    AnimationComponent(Point(1, initialFloor.level)) {
     var direction = STILL
     var floor = initialFloor
 
@@ -108,14 +108,14 @@ class Car(initialFloor: Floor, val capacity: Int) :
 
 
     override fun process() = sequence {
-        while (true) {
+        while(true) {
             val requests = get<Requests>()
 
-            if (direction == STILL && requests.isEmpty()) passivate()
+            if(direction == STILL && requests.isEmpty()) passivate()
 
             val leaving = visitors.components.filter { it.toFloor == floor }
 
-            if (leaving.isNotEmpty()) {
+            if(leaving.isNotEmpty()) {
                 log("Stopping on floor ${floor.level} because ${leaving.size} passenger want to get out")
 
                 openDoor()
@@ -127,16 +127,16 @@ class Car(initialFloor: Floor, val capacity: Int) :
                 hold(EXIT_TIME, description = "Passengers exiting")
             }
 
-            if (direction == STILL) direction = enumerated(UP, DOWN).sample()
+            if(direction == STILL) direction = enumerated(UP, DOWN).sample()
 
 
             // https://kotlinlang.slack.com/archives/C0922A726/p1610700674029200
             run {
                 // try to continue in the same direction or change
-                for (dir in listOf(direction, direction.invert())) {
+                for(dir in listOf(direction, direction.invert())) {
                     direction = dir
 
-                    if (requests.containsKey(floor to direction)) {
+                    if(requests.containsKey(floor to direction)) {
                         requests.remove(floor to direction) // consume it right away so that other cars doors won't open as well
 
                         this@sequence.openDoor()
@@ -158,19 +158,19 @@ class Car(initialFloor: Floor, val capacity: Int) :
                         // If there are still visitors going up/down in that floor
                         // then restore the request to the list of requests
                         val countInDirection = floor.queue.components.count { it.direction == direction }
-                        if (countInDirection > 0) {
+                        if(countInDirection > 0) {
                             requests.putIfAbsent(floor to direction, env.now)
                         }
                     }
 
                     // if car is empty, than continue the loop to change direction if there are requests
-                    if (visitors.isNotEmpty()) {
+                    if(visitors.isNotEmpty()) {
                         return@run
                     }
                 }
 
                 // loop terminated through exhaustion, i.e. there are passengers in the car
-                direction = if (requests.isNotEmpty()) {
+                direction = if(requests.isNotEmpty()) {
                     val earliestRequest = requests.minByOrNull { it.value }!!
                     // start in this direction
                     getDirection(floor.level, earliestRequest.key.first.level)
@@ -184,7 +184,7 @@ class Car(initialFloor: Floor, val capacity: Int) :
             val floors = get<Elevator>().floors
 
 
-            if (direction != STILL) {
+            if(direction != STILL) {
                 val nextFloor = floors[floors.indexOf(floor) + direction.asIncrement()]
 //                hold(MOVE_TIME, description = "Moving to ${nextFloor.level}")
                 move(Point(0, nextFloor.level), description = "Moving to ${nextFloor.level}", speed = 0.1)
@@ -195,34 +195,35 @@ class Car(initialFloor: Floor, val capacity: Int) :
     }
 
     suspend fun SequenceScope<Component>.openDoor() {
-        if (door == OPEN) return
+        if(door == OPEN) return
         hold(DOOR_OPEN_TIME, description = "Opening door of ${this@Car.name}")
         door = OPEN
     }
 
     suspend fun SequenceScope<Component>.closeDoor() {
-        if (door == CLOSED) return
+        if(door == CLOSED) return
         hold(DOOR_CLOSE_TIME, description = "Closing door of ${this@Car.name}")
         door = CLOSED
     }
 }
 
-class Elevator(showLog: Boolean = false,
-               load0N: Int = 50,
-               loadNN: Int = 100,
-               loadN0: Int = 100,
-               carCapacity: Int = 4,
-               numCars: Int = 3,
-               topFloor: Int = 15,
+class Elevator(
+    showLog: Boolean = false,
+    load0N: Int = 50,
+    loadNN: Int = 100,
+    loadN0: Int = 100,
+    carCapacity: Int = 4,
+    numCars: Int = 3,
+    topFloor: Int = 15,
 ) : Environment(enableComponentLogger = showLog, tickDurationUnit = DurationUnit.MINUTES) {
-    init{
+    init {
         dependency { this@Elevator }
     }
 
     val floors = repeat(1 + topFloor) { Floor(it - 1) }
     val cars = repeat(numCars) { Car(floors.first(), carCapacity) }
 
-    val requests: Requests = dependency {  mutableMapOf() }
+    val requests: Requests = dependency { mutableMapOf() }
 
     init {
         VisitorGenerator(0 to 0, 1 to topFloor, load0N, "vg_0_n")

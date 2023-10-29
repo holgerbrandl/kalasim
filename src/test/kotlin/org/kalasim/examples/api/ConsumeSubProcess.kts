@@ -5,7 +5,7 @@ createSimulation {
 
     object : Component() {
 
-        override fun process() =sequence {
+        override fun process() = sequence {
             hold(1)
             // to consume the sub-process we use yieldAll
             yieldAll(subProcess())

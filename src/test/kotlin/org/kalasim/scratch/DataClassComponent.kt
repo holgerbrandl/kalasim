@@ -1,7 +1,5 @@
-import org.kalasim.Component
+import org.kalasim.*
 import org.kalasim.analysis.ConsoleTraceLogger
-import org.kalasim.createSimulation
-import org.kalasim.enableComponentLogger
 
 // can components be extended into data classes? Yes they can.
 

@@ -3,10 +3,9 @@ package org.kalasim
 import org.kalasim.analysis.EntityCreatedEvent
 import org.kalasim.analysis.StateChangedEvent
 import org.kalasim.analysis.snapshot.StateSnapshot
-import org.kalasim.misc.*
-import org.kalasim.monitors.CategoryTimeline
-import org.kalasim.monitors.MetricTimeline
-import org.kalasim.monitors.NumericStatisticMonitor
+import org.kalasim.misc.DependencyContext
+import org.kalasim.misc.StateTrackingConfig
+import org.kalasim.monitors.*
 import org.koin.core.Koin
 
 /**
@@ -21,7 +20,7 @@ open class State<T>(
     name: String? = null,
     koin: Koin = DependencyContext.get(),
     val trackingConfig: StateTrackingConfig = koin.getEnvDefaults().DefaultStateConfig,
-    ) : SimulationEntity(name, koin) {
+) : SimulationEntity(name, koin) {
 
     private var maxTriggerCxt: Int? = null
     private val isTriggerCxt

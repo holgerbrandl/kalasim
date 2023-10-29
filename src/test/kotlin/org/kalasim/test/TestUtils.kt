@@ -84,7 +84,7 @@ internal fun <S : Environment> testModel(sim: S, smthg: S.() -> Unit): Unit = sm
  */
 internal fun Environment.inversedIatDist(vararg arrivalTimes: Number) = object : ConstantRealDistribution(-1.0) {
 
-    val values = (listOf(now) + arrivalTimes.map {toWallTime(TickTime(it.toDouble())) })
+    val values = (listOf(now) + arrivalTimes.map { toWallTime(TickTime(it.toDouble())) })
         .zipWithNext()
         .map { (prev, curVal) -> (curVal - prev) }
         .iterator()

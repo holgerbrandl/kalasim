@@ -108,7 +108,9 @@ class RegularHonorPolicyTest {
         takes.map {
             it.requester.name.replace("Customer.", "").toInt()
         } shouldBe listOf(3, 4, 1, 5, 2, 6)  // note: this was inferred from the test and not worked out on paper
-    }  @Test
+    }
+
+    @Test
 
 
     // NOTE: This test will inevetiably fail, if more numbers were samples in the test-sim than when fixating the result
@@ -122,37 +124,38 @@ class RegularHonorPolicyTest {
 
     @OptIn(AmbiguousDuration::class, AmbiguousDurationComponent::class)
     @Test
-    fun `it should honor huge request eventually when using weighted SQF`() = createTestSimulation(enableComponentLogger = false) {
-        val lawyers = Resource(capacity = 10, honorPolicy = RequestHonorPolicy.WeightedFCFS(0.1))
+    fun `it should honor huge request eventually when using weighted SQF`() =
+        createTestSimulation(enableComponentLogger = false) {
+            val lawyers = Resource(capacity = 10, honorPolicy = RequestHonorPolicy.WeightedFCFS(0.1))
 
-        dependency { lawyers }
+            dependency { lawyers }
 
-        val cg = ComponentGenerator(iat = exponential(6)) {
-            object : TickedComponent() {
-                override fun process() = sequence {
-                    request(lawyers) {
-                        hold(25)
+            val cg = ComponentGenerator(iat = exponential(6)) {
+                object : TickedComponent() {
+                    override fun process() = sequence {
+                        request(lawyers) {
+                            hold(25)
+                        }
                     }
                 }
             }
-        }
 
-        // refill the shelf after 5o ticks
-        object : TickedComponent("huge request") {
-            override fun process() = sequence {
-                // wait for requests to gather
-                hold(200)
+            // refill the shelf after 5o ticks
+            object : TickedComponent("huge request") {
+                override fun process() = sequence {
+                    // wait for requests to gather
+                    hold(200)
 
-                request(lawyers, quantity = 10) {
-                    stopSimulation()
+                    request(lawyers, quantity = 10) {
+                        stopSimulation()
+                    }
                 }
             }
+
+            val runFor = 1000.minutes
+            run(runFor)
+
+            println("num created ${cg.numGenerated}")
+            now shouldBeLessThan startDate + runFor
         }
-
-        val runFor = 1000.minutes
-        run(runFor)
-
-        println("num created ${cg.numGenerated}")
-        now shouldBeLessThan startDate + runFor
-    }
 }

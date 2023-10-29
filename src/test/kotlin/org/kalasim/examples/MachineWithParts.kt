@@ -12,7 +12,7 @@ class Part(val machine: Machine, partNo: Int) :
     val ttr = uniform(3.hours, 6.hours)  //  time to repair distribution
 
     override fun process() = sequence {
-        while (true) {
+        while(true) {
             hold(ttf())
             machine.interrupt()
             hold(ttr())
@@ -29,7 +29,7 @@ class Machine : Component() {
     }
 
     override fun process() = sequence {
-        while (true) {
+        while(true) {
             val r = get<Resource>()
             request(r)
             hold(5.minutes)

@@ -136,7 +136,7 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
             // surgery time is a weighted by business in the ER and severity of the patient
             val severityWeightedSurgeryTime = patient.severityWeightedSurgeryTime
 
-            val surgeryTime =  severityWeightedSurgeryTime * stressFactor
+            val surgeryTime = severityWeightedSurgeryTime * stressFactor
             hold(
                 surgeryTime,
                 description = "Surgery of patient $patient in room ${this@Room} by doctor $doctor"
@@ -260,7 +260,7 @@ class EmergencyRoom(
 ) {
 
     // todo this should be opt-in anyway https://github.com/holgerbrandl/kalasim/issues/66
-    init{
+    init {
         if(!enableInternalMetrics) entityTrackingDefaults.disableAll()
     }
 
@@ -280,7 +280,8 @@ class EmergencyRoom(
         val qualDist = discreteUniform(physicianQualRange)
 
         List(numPhysicians) {
-            Doctor("Dr. ${faker.makeName().last}", sampleQualification(qualDist())) }
+            Doctor("Dr. ${faker.makeName().last}", sampleQualification(qualDist()))
+        }
     }
 
     init {

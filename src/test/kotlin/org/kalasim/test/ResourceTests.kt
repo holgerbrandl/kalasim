@@ -4,6 +4,7 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import kotlinx.datetime.Instant
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.junit.Assert
 import org.junit.Test
@@ -14,7 +15,6 @@ import org.kalasim.Priority.Companion.LOW
 import org.kalasim.Priority.Companion.LOWEST
 import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.ResourceSelectionPolicy.*
-import kotlinx.datetime.Instant
 import org.kalasim.misc.*
 import kotlin.repeat
 import kotlin.time.Duration

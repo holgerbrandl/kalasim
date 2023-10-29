@@ -7,7 +7,7 @@ createSimulation {
 
     // add custom log consumer
     addAsyncEventListener<InteractionEvent> { event ->
-        if (event.current?.name == "ComponentGenerator.1")
+        if(event.current?.name == "ComponentGenerator.1")
             println(event)
     }
 

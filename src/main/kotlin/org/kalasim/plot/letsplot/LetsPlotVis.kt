@@ -90,7 +90,7 @@ fun <T> CategoryTimeline<T>.display(
             xlab("time") +
             ylab("") +
             ggtitle(title)
-            .also { if (!forceTickAxis) it + scaleXDateTime() }
+                .also { if(!forceTickAxis) it + scaleXDateTime() }
 }
 
 
@@ -121,8 +121,8 @@ fun List<ResourceActivityEvent>.display(
             } +
             ylab("") +
             xlab("Time")
-                .also { if (title != null) ggtitle(title) }
-                .also { if (!forceTickAxis) it + scaleXDateTime() }
+                .also { if(title != null) ggtitle(title) }
+                .also { if(!forceTickAxis) it + scaleXDateTime() }
 }
 
 
@@ -188,7 +188,7 @@ fun List<Component>.displayStateTimeline(
         color = "value"
     } + xlab(componentName)
         .also { if(title != null) ggtitle(title) }
-        .also { if (!forceTickAxis) it + scaleXDateTime() }
+        .also { if(!forceTickAxis) it + scaleXDateTime() }
 }
 
 

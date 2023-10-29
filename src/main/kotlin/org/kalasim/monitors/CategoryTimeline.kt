@@ -1,7 +1,8 @@
 package org.kalasim.monitors
 
 import org.kalasim.SimTime
-import org.kalasim.misc.*
+import org.kalasim.misc.AmbiguousDuration
+import org.kalasim.misc.DependencyContext
 import org.kalasim.misc.time.sum
 import org.kalasim.toTickTime
 import org.koin.core.Koin
@@ -37,7 +38,7 @@ class CategoryTimeline<T>(
     }
 
     override fun addValue(value: T) {
-        if (!enabled) return
+        if(!enabled) return
 
         timestamps.add(env.now)
         values.add(value)
@@ -62,20 +63,20 @@ class CategoryTimeline<T>(
         timestamps.toMutableList()
             .apply { add(env.now) }
             .zipWithNext { first, second -> second - first }
-            .map{ it.toDouble(DurationUnit.MINUTES)}
+            .map { it.toDouble(DurationUnit.MINUTES) }
             .toDoubleArray()
 
 
     @AmbiguousDuration
-    override fun get(time: Number): T?  = get(time.toTickTime())
+    override fun get(time: Number): T? = get(time.toTickTime())
 
     override fun get(time: SimTime): T? {
-        require(enabled){
+        require(enabled) {
             "timeline '$name' is disabled. Make sure to enable it locally,  or globally using a matching tracking-policy." +
                     " For details see https://www.kalasim.org/advanced/#continuous-simulation"
 
         }
-        require(timestamps.first() <= time ) {
+        require(timestamps.first() <= time) {
             "query time must be greater than timeline start (${timestamps.first()})"
         }
 
@@ -89,7 +90,7 @@ class CategoryTimeline<T>(
         // https://youtrack.jetbrains.com/issue/KT-43776
         values.zip(durations)
             .filter { it.first == value }
-            .map{it.second}
+            .map { it.second }
             .sum()
     }
 
@@ -99,7 +100,7 @@ class CategoryTimeline<T>(
         println("# Levels: ${this.values.distinct().size}")
         println()
 
-        if (this.values.size <= 1) {
+        if(this.values.size <= 1) {
             println("Skipping histogram of '$name' because of to few data")
             return
         }
@@ -139,7 +140,7 @@ class CategoryTimeline<T>(
     override fun clearHistory(before: SimTime) {
         val startFromIdx = timestamps.withIndex().firstOrNull { before > it.value }?.index ?: return
 
-        for (i in 0 until startFromIdx) {
+        for(i in 0 until startFromIdx) {
             val newTime = timestamps.subList(0, startFromIdx)
             val newValues = values.subList(0, startFromIdx)
 

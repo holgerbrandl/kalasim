@@ -6,7 +6,7 @@ import com.github.holgerbrandl.jsonbuilder.json
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.json.JSONObject
-import org.kalasim.analysis.*
+import org.kalasim.analysis.InteractionEvent
 import org.kalasim.analysis.snapshot.MetricTimelineSnapshot
 import org.kalasim.analysis.snapshot.QueueSnapshot
 import org.kalasim.misc.*
@@ -20,8 +20,8 @@ data class CQElement<C>(val component: C, val enterTime: SimTime, val priority: 
 //    { it.enterTime }
 //)
 
-class  PriorityFCFSQueueComparator<C> : Comparator<CQElement<C>> {
-    override fun compare(o1: CQElement<C>, o2: CQElement<C>): Int  =
+class PriorityFCFSQueueComparator<C> : Comparator<CQElement<C>> {
+    override fun compare(o1: CQElement<C>, o2: CQElement<C>): Int =
         compareValuesBy(o1, o2, { it.priority?.value?.times(-1) ?: DEFAULT_QUEUE_PRIORITY }, { it.enterTime })
 }
 
@@ -34,7 +34,7 @@ class ComponentQueue<C>(
     capacity: Int = Int.MAX_VALUE,
     koin: Koin = DependencyContext.get(),
     trackingConfig: ComponentCollectionTrackingConfig = koin.getEnvDefaults().DefaultComponentCollectionConfig,
-    ) : ComponentCollection<C>(name, capacity,  koin, trackingConfig) {
+) : ComponentCollection<C>(name, capacity, koin, trackingConfig) {
 
 
     /** Length of queue timeline. Internally a simple wrapper around `sizeTimeline`.*/
@@ -128,7 +128,6 @@ class ComponentQueue<C>(
     override val snapshot
         get() = QueueSnapshot(this)
 }
-
 
 
 @Suppress("MemberVisibilityCanBePrivate")

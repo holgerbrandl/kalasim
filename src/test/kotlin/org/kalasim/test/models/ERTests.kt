@@ -9,7 +9,7 @@ import kotlin.time.Duration.Companion.days
 class ERTests {
 
     @Test
-    fun `it should save some patients deterministically`() = testModel(EmergencyRoom()){
+    fun `it should save some patients deterministically`() = testModel(EmergencyRoom()) {
         waitingLine.sizeTimeline.enabled = true
         waitingLine.sizeTimeline.printSummary()
 

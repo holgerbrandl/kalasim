@@ -8,7 +8,7 @@ val transformedSetup: String =
     setupMD.readLines()
         .joinToString(System.lineSeparator()) {
             val prefix = """    implementation "com.github.holgerbrandl:kalasim:"""
-            if (it.startsWith(prefix)) {
+            if(it.startsWith(prefix)) {
                 """    implementation "com.github.holgerbrandl:kalasim:$newVersion""""
             } else {
                 it

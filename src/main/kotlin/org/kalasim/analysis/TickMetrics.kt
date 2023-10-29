@@ -3,7 +3,6 @@
 package org.kalasim
 
 import org.kalasim.misc.*
-import org.kalasim.misc.buildJsonWithGson
 import org.kalasim.monitors.MetricTimeline
 import org.koin.core.Koin
 import kotlin.math.round
@@ -25,8 +24,8 @@ class TickMetrics(
 
     val timeline = MetricTimeline(name, 0)
 
-    init{
-        require( env.queue.count{ it is TickMetrics} ==1){
+    init {
+        require(env.queue.count { it is TickMetrics } == 1) {
             "tick metrics must be enabled just once"
         }
     }
@@ -34,25 +33,25 @@ class TickMetrics(
     override fun process() = sequence {
 //        hold(ceil(now.value))
 
-        while (true) {
+        while(true) {
             val before = System.currentTimeMillis()
             hold(sampleTicks)
             val after = System.currentTimeMillis()
 
             val tickDuration = round((after - before).toDouble() / sampleTicks).toInt()
 
-            if (enableMetricEvents) {
+            if(enableMetricEvents) {
                 log(MetricEvent(now, tickDuration))
             }
 
-            if (enableMonitor) {
+            if(enableMonitor) {
                 timeline.addValue(tickDuration)
             }
         }
     }
 }
 
-class MetricEvent(simTime: SimTime, val tickWallDurationMs: Int) : Event(simTime){
+class MetricEvent(simTime: SimTime, val tickWallDurationMs: Int) : Event(simTime) {
     override fun toJson() = buildJsonWithGson()
 }
 

@@ -28,7 +28,7 @@ fun main() {
             override fun process() = sequence {
                 request(theater.counter) {
                     request(theater.tickets[movie]!! withQuantity numTickets, failAt = 0.simTime)
-                    if (failed) {
+                    if(failed) {
                         theater.numReneged.merge(movie, 1, Int::plus)
                     }
                 }

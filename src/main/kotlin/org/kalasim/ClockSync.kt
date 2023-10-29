@@ -21,7 +21,10 @@ class ClockSync(
     val syncsPerTick: Number = 1,
     val maxDelay: Duration? = null,
     koin: Koin = DependencyContext.get()
-) : Component(trackingConfig = ComponentTrackingConfig(logCreation = false, logStateChangeEvents = false), koin = koin) {
+) : Component(
+    trackingConfig = ComponentTrackingConfig(logCreation = false, logStateChangeEvents = false),
+    koin = koin
+) {
 
     var tickDuration: Duration = tickDuration
         set(value) {
@@ -32,14 +35,14 @@ class ClockSync(
         }
 
 
-     val holdTime = (1.0 / syncsPerTick.toDouble()).toDuration()
+    val holdTime = (1.0 / syncsPerTick.toDouble()).toDuration()
 
     private var syncStartWall: Instant? = null
     private var syncStartSim: SimTime? = null
 
     override fun process() = sequence {
 
-        while (true) {
+        while(true) {
             //wait until we have caught up with wall clock
             val tickDurationMs = tickDuration.inWholeMilliseconds.toDouble()
 
@@ -50,7 +53,8 @@ class ClockSync(
 
 
 //            val simTimeSinceSyncStart = ((env.now - syncStartTicks!!) * tickDurationMs).roundToLong().milliseconds
-            val simTimeSinceSyncStart = ((env.now - syncStartSim!!).asTicks() * tickDurationMs).roundToLong().milliseconds
+            val simTimeSinceSyncStart =
+                ((env.now - syncStartSim!!).asTicks() * tickDurationMs).roundToLong().milliseconds
             val wallTimeSinceSyncStart = now - syncStartWall!!
 
             val sleepDuration = simTimeSinceSyncStart - wallTimeSinceSyncStart
@@ -59,7 +63,7 @@ class ClockSync(
 //                println("sim $simTimeSinceSyncStart wall $wallTimeSinceSyncStart; Resync by sleep for ${sleepDuration}ms")
 //            }
 
-            if (maxDelay != null && sleepDuration > maxDelay) {
+            if(maxDelay != null && sleepDuration > maxDelay) {
                 throw ClockOverloadException(
                     env.now,
                     "Maximum delay between wall clock and simulation clock exceeded at time ${env.now}. " +
@@ -68,7 +72,7 @@ class ClockSync(
             }
 
             // simulation is too fast if value is larger
-            if (sleepDuration > Duration.ZERO) {
+            if(sleepDuration > Duration.ZERO) {
                 // wait accordingly to let wall clock catch up
                 Thread.sleep(sleepDuration.inWholeMilliseconds)
             }

@@ -5,7 +5,7 @@ import org.koin.core.Koin
 
 class IntTimeline(
     name: String? = null,
-     initialValue: Int = 0,
+    initialValue: Int = 0,
     koin: Koin = DependencyContext.get()
 ) : MetricTimeline<Int>(name, initialValue, koin) {
 

@@ -14,7 +14,6 @@ class Histogram(val bins: List<HistogramBin>) {
 }
 
 
-
 // https://stackoverflow.com/questions/10786465/how-to-generate-bins-for-histogram-using-apache-math-3-0-in-java
 internal fun DescriptiveStatistics.buildHistogram(
     binCount: Int = 30,
@@ -28,7 +27,7 @@ internal fun DescriptiveStatistics.buildHistogram(
     val distribution = EmpiricalDistribution(binCount)
     distribution.load(values)
     var k = 0
-    for (ss in distribution.binStats) {
+    for(ss in distribution.binStats) {
         histogram[k++] = ss.n
     }
 

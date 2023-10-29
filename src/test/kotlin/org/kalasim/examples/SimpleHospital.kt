@@ -113,7 +113,7 @@ fun List<ResourceEvent>.displayTimeline(
     // complement step fun until now
 
 
-    return smoothed.plot(x = "time", y = if (avg) "mean" else "value", color = "statistic")
+    return smoothed.plot(x = "time", y = if(avg) "mean" else "value", color = "statistic")
         .xLabel("time").yLabel("").geomStep(alpha = 0.6).facetWrap("resource")
 }
 

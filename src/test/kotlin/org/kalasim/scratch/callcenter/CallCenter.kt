@@ -52,7 +52,7 @@ open class ShiftManager : Component() {
     }
 }
 
-class InterruptingShiftManager: ShiftManager() {
+class InterruptingShiftManager : ShiftManager() {
     override fun repeatedProcess() = sequence {
         val currentShift = shiftIt.next()
 
@@ -92,20 +92,21 @@ class InterruptingShiftManager: ShiftManager() {
 }
 
 
-abstract class CallCenter(val arrivalRate: Double = 0.3, logEvents: Boolean = true) : Environment(enableComponentLogger=logEvents) {
+abstract class CallCenter(val arrivalRate: Double = 0.3, logEvents: Boolean = true) :
+    Environment(enableComponentLogger = logEvents) {
     // not defined at this point
-    abstract val shiftManager : ShiftManager
+    abstract val shiftManager: ShiftManager
 
     val callCenter = dependency { Resource("Call Center") }
 
-    init{
-        ComponentGenerator(iat = exponential(arrivalRate)){ Request() }
+    init {
+        ComponentGenerator(iat = exponential(arrivalRate)) { Request() }
     }
 }
 
 
 fun main() {
-    val sim = object: CallCenter() {
+    val sim = object : CallCenter() {
         override val shiftManager = ShiftManager()
     }
 
@@ -125,15 +126,16 @@ fun main() {
 
 
     // now investigate a more correct manager who will interrupt ongoing tasks
-    val intSim = object: CallCenter() {
+    val intSim = object : CallCenter() {
         override val shiftManager = InterruptingShiftManager()
     }
 
     intSim.run(600)
-    intSim.callCenter.requesters.queueLengthTimeline.display("Request queue length with revised handover process").show()
+    intSim.callCenter.requesters.queueLengthTimeline.display("Request queue length with revised handover process")
+        .show()
 
     // try again but with more customers
-    val highWorkLoadSim = object: CallCenter(arrivalRate = 0.2) {
+    val highWorkLoadSim = object : CallCenter(arrivalRate = 0.2) {
         override val shiftManager = InterruptingShiftManager()
     }
     highWorkLoadSim.run(600)

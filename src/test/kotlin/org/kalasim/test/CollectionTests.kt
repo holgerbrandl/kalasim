@@ -23,6 +23,7 @@ class ComponentListTest {
         cl.toString().printThis()
     }
 }
+
 class ComponentQueueTests {
 
     @Test

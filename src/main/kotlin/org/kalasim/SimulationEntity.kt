@@ -66,7 +66,7 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
 //        private set
 
     @Deprecated("no longer needed as sim-time is also expressed as kotlinx.datetimex.Instant starting in v0.12")
-    val nowWT : Instant = now
+    val nowWT: Instant = now
 //        get() = now.toWallTime()
 
 
@@ -106,7 +106,7 @@ internal fun Class<*>.defaultName(nameCache: MutableMap<String, Int>) =
     simpleName.ifEmpty { "Component" } + "." + getComponentCounter(simpleName, nameCache)
 
 private fun String.defaultName(nameCache: MutableMap<String, Int>) =
-    this + getComponentCounter(this.removeRange(length-1 until length), nameCache)
+    this + getComponentCounter(this.removeRange(length - 1 until length), nameCache)
 
 private fun getComponentCounter(className: String, nameCache: MutableMap<String, Int>) =
     nameCache.merge(className, 1, Int::plus)

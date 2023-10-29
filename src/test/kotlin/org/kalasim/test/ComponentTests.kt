@@ -194,47 +194,48 @@ class ComponentTests {
     }
 
     @Test
-    fun `it shall activate a sub-process with activate()`() = createTestSimulation(tickDurationUnit = DurationUnit.DAYS) {
-        class MultiProcessor : Component() {
-            var sp1Started = false
-            var sp2Started = false
+    fun `it shall activate a sub-process with activate()`() =
+        createTestSimulation(tickDurationUnit = DurationUnit.DAYS) {
+            class MultiProcessor : Component() {
+                var sp1Started = false
+                var sp2Started = false
 
-            override fun process() = sequence {
-                hold(1.days)
+                override fun process() = sequence {
+                    hold(1.days)
+                }
+
+                fun subProcess1(): Sequence<Component> = sequence {
+                    sp1Started = true
+                    hold(1.days)
+                    activate(process = MultiProcessor::subProcess2)
+
+                    fail("it should never get here")
+                }
+
+                fun subProcess2(): Sequence<Component> = sequence {
+                    sp2Started = true
+                    hold(1.days)
+                    activate(process = MultiProcessor::subProcess1)
+
+                    fail("it should never get here")
+                }
             }
 
-            fun subProcess1(): Sequence<Component> = sequence {
-                sp1Started = true
-                hold(1.days)
-                activate(process = MultiProcessor::subProcess2)
+            val mp = MultiProcessor()
 
-                fail("it should never get here")
-            }
+            run()
 
-            fun subProcess2(): Sequence<Component> = sequence {
-                sp2Started = true
-                hold(1.days)
-                activate(process = MultiProcessor::subProcess1)
+            now shouldBe asSimTime(1)
 
-                fail("it should never get here")
-            }
+            // activate sub-process
+            mp.activate(process = MultiProcessor::subProcess1)
+
+            run(10.days)
+
+            mp.sp1Started shouldBe true
+            mp.sp2Started shouldBe true
+
         }
-
-        val mp = MultiProcessor()
-
-        run()
-
-        now shouldBe asSimTime(1)
-
-        // activate sub-process
-        mp.activate(process = MultiProcessor::subProcess1)
-
-        run(10.days)
-
-        mp.sp1Started shouldBe true
-        mp.sp2Started shouldBe true
-
-    }
 
     @Test
     fun `it shall consume a sub-process inplace`() = createTestSimulation(tickDurationUnit = DurationUnit.DAYS) {

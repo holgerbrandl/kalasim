@@ -2,9 +2,9 @@ package org.kalasim.test
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import kotlinx.datetime.Instant
 import org.junit.Test
 import org.kalasim.*
-import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -15,7 +15,7 @@ class TimeTrafoTests {
     val startDate = Instant.parse("2021-01-24T12:00:00.00Z")
 
     @Test
-    fun `it should preserve precision when transforming ticks to wall time`() = createTestSimulation(startDate){
+    fun `it should preserve precision when transforming ticks to wall time`() = createTestSimulation(startDate) {
         toWallTime(15.tt) shouldNotBe toWallTime(15.32.tt)
 
         toWallTime(15.tt) shouldBe Instant.parse("2021-01-24T12:15:00Z")
@@ -30,7 +30,7 @@ class TimeTrafoTests {
             override fun process() = sequence {
 
                 addEventListener {
-                    if (it !is TimeTrafoTestEvent) return@addEventListener
+                    if(it !is TimeTrafoTestEvent) return@addEventListener
 
                     println("tick time is $now")
 

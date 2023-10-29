@@ -1,5 +1,4 @@
 //LoggingAdapter.kts
-import org.kalasim.analysis.ResourceEvent
 import org.kalasim.examples.er.EmergencyRoom
 import java.util.logging.Logger
 import kotlin.time.Duration.Companion.days
@@ -8,11 +7,11 @@ import kotlin.time.Duration.Companion.days
 val er = EmergencyRoom()
 
 // Add a custom event handler to forward events to the used logging library
-er.addEventListener { event->
+er.addEventListener { event ->
     // resolve the event type to a dedicated logger to allow fine-grained control
     val logger = Logger.getLogger(event::class.java.name)
 
-    logger.info{event.toString()}
+    logger.info { event.toString() }
 }
 
 // Run the sim

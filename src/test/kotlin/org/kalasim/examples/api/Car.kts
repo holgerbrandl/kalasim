@@ -4,7 +4,6 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 
-
 class Driver : Resource()
 class TrafficLight : State<String>("red")
 

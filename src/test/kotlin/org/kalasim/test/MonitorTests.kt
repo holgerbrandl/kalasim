@@ -9,7 +9,6 @@ import org.junit.Test
 import org.kalasim.misc.*
 import org.kalasim.monitors.*
 import org.kalasim.test.MonitorTests.Car.*
-import org.kalasim.tt
 import kotlin.time.Duration.Companion.minutes
 
 @OptIn(AmbiguousDuration::class)

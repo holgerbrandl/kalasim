@@ -169,8 +169,6 @@ open class Environment(
         get() = now.toTickTime()
 
 
-
-
     @Suppress("LeakingThis")
     // That's a pointless self-recursion, but it allows to simplify support API (tick-transform, distributions, etc.)
     /** Self-pointer. Pointless from a user-perspective, but helpful to build the kalasim APIs more efficiently.*/
@@ -204,7 +202,7 @@ open class Environment(
         qualifier: String, noinline parameters: ParametersDefinition? = null,
     ): T = getKoin().get(named(qualifier), parameters)
 
-    val entityTrackingDefaults =  SimEntityTrackingDefaults()
+    val entityTrackingDefaults = SimEntityTrackingDefaults()
 
     init {
 
@@ -229,7 +227,6 @@ open class Environment(
 //        require(koins.createAtStart) {
 //            "createAtStart must be enabled by convention to instantiate injected components before starting the simulation"
 //        }
-
 
 
         // self register the environment

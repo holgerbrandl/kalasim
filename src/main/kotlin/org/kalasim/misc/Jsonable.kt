@@ -117,7 +117,7 @@ fun JSONObject.toIndentString(): String = toString(JSON_INDENT)
 
 internal class GsonInstantTypeAdapter : TypeAdapter<Instant>() {
     override fun write(out: JsonWriter?, value: Instant?) {
-        if (value == null) {
+        if(value == null) {
             out?.nullValue()
         } else {
 //            out?.jsonValue("\""+value.toString()+"\"")

@@ -20,24 +20,23 @@ public inline val Long.day get() = toDuration(DurationUnit.DAYS)
 
 /** The value of this duration expressed as a Double number of days. */
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-val  Duration.inDays: Double
+val Duration.inDays: Double
     get() = toDouble(DurationUnit.DAYS)
 
 /** The value of this duration expressed as a Double number of hours. */
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-val  Duration.inHours: Double
+val Duration.inHours: Double
     get() = toDouble(DurationUnit.HOURS)
 
 /** The value of this duration expressed as a Double number of minutes. */
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-val  Duration.inMinutes: Double
+val Duration.inMinutes: Double
     get() = toDouble(DurationUnit.MINUTES)
 
 /** The value of this duration expressed as a Double number of seconds. */
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 internal val Duration.inSeconds
     get() = toDouble(DurationUnit.SECONDS)
-
 
 
 public inline val Int.weeks get() = times(7).toDuration(DurationUnit.DAYS)

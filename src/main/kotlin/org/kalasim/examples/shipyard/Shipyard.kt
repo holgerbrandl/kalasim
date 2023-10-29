@@ -5,13 +5,14 @@ import org.kalasim.*
 import kotlin.time.Duration.Companion.days
 import kotlin.time.DurationUnit
 
-class Part(val partId: String, val makeTime: DurationDistribution, vararg val components: Part) : SimulationEntity(partId)
+class Part(val partId: String, val makeTime: DurationDistribution, vararg val components: Part) :
+    SimulationEntity(partId)
 
 // todo get rid of time attribute
 class PartCompleted(time: SimTime, val part: Part) : Event(time)
 
 class PartAssembly(val part: Part) : Component() {
-    val completed =  State(false)
+    val completed = State(false)
 
     val orgTime = normal(10, 3).minutes
 
@@ -36,7 +37,7 @@ class PartAssembly(val part: Part) : Component() {
         // assembly them
         hold(part.makeTime())
 
-        logger.info{ "completed assembly of part ${this}" }
+        logger.info { "completed assembly of part ${this}" }
 
         completed.value = true
 
@@ -53,11 +54,11 @@ class Shipyard() : Environment(tickDurationUnit = DurationUnit.DAYS) {
     // utility to model rectified normal distribution with a fifth of the mean as sd
 //    fun norm5(mean: Duration)= normal(mean, mean/5, true)
 
-    fun configureOrders( bom: List<Part>  = exampleBOM(), iat: DurationDistribution = normal(24, 2).hours){
+    fun configureOrders(bom: List<Part> = exampleBOM(), iat: DurationDistribution = normal(24, 2).hours) {
         ComponentGenerator(iat) {
             bom.random()
         }.addConsumer {
-            PartAssembly(it).componentState().onChange{
+            PartAssembly(it).componentState().onChange {
                 println("state changed ${it.value}")
             }
         }
@@ -66,7 +67,7 @@ class Shipyard() : Environment(tickDurationUnit = DurationUnit.DAYS) {
 
     fun exampleBOM(): List<Part> {
 
-        val rumpf = Part("rumpf",  normal(1.days, 0.2.days, true))
+        val rumpf = Part("rumpf", normal(1.days, 0.2.days, true))
         val deck = Part("deck", normal(2.days, 0.2.days, true))
         val segment = Part("segment", normal(5.days, 2.days, true))
         val bridge = Part("bridge", normal(3.days, 1.days, true))

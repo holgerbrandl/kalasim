@@ -64,7 +64,7 @@ open class MMcQueue(
 }
 
 fun main() {
-    MMcQueue(c = 3, mu= 4, lambda = 12).apply {
+    MMcQueue(c = 3, mu = 4, lambda = 12).apply {
 //        addEventListener { println(it) }
 
         run(1000)

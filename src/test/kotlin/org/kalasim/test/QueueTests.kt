@@ -39,7 +39,7 @@ class QueueTests {
         // add a consumer
         object : TickedComponent() {
             override fun process() = sequence {
-                while (waitingLine.isNotEmpty()) {
+                while(waitingLine.isNotEmpty()) {
                     waitingLine.poll()
                     // wait for it...
                     hold(5.0)

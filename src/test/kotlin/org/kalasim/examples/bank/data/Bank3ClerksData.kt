@@ -11,11 +11,11 @@ class CustomerGenerator(val waitingLine: ComponentQueue<Customer>) : Component()
     private val clerks: List<Clerk> by inject()
 
     override fun process() = sequence {
-        while (true) {
+        while(true) {
             waitingLine.add(Customer())
 
-            for (clerk in clerks) {
-                if (clerk.isPassive) {
+            for(clerk in clerks) {
+                if(clerk.isPassive) {
                     clerk.activate()
                     break
                 }
@@ -34,8 +34,8 @@ class Clerk : Component() {
     override fun process() = sequence {
         val waitingLine = get<ComponentQueue<Customer>>()
 
-        while (true) {
-            if (waitingLine.isEmpty())
+        while(true) {
+            if(waitingLine.isEmpty())
                 passivate()
 
             waitingLine.poll() // returns next customer (value ignored here)

@@ -3,7 +3,7 @@ package org.kalasim
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.kalasim.misc.AmbiguousDuration
-import kotlin.time.*
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.microseconds
@@ -11,6 +11,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 // note: remove @JvmInline because it did not seem ready on the java-interop-side
 // value class ? --> Blocked by https://github.com/holgerbrandl/kalasim/issues/45

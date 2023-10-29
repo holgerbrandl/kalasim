@@ -17,7 +17,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>, val workToDo: State<Bo
     private val clerks: List<Clerk> by inject()
 
     override fun process() = sequence {
-        if (waitingLine.size >= 5) {
+        if(waitingLine.size >= 5) {
             numBalked++
             log("balked")
             cancel()
@@ -27,7 +27,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>, val workToDo: State<Bo
         workToDo.trigger(true, false, max = 1)
         hold(50.minutes) // if not serviced within this time, renege
 
-        if (waitingLine.contains(this@Customer)) {
+        if(waitingLine.contains(this@Customer)) {
             waitingLine.remove(this@Customer)
             numReneged++
             log("reneged")
@@ -43,8 +43,8 @@ class Clerk(val workToDo: State<Boolean>) : Component() {
     private val waitingLine: ComponentQueue<Customer> by inject()
 
     override fun process() = sequence {
-        while (true) {
-            if (waitingLine.isEmpty()) {
+        while(true) {
+            if(waitingLine.isEmpty()) {
                 wait(workToDo, true)
             }
 

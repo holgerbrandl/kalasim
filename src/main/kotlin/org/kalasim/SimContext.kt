@@ -1,7 +1,7 @@
 package org.kalasim
 
-import org.koin.core.component.KoinComponent
 import kotlinx.datetime.Instant
+import org.koin.core.component.KoinComponent
 import kotlin.time.Duration
 
 /**
@@ -32,14 +32,13 @@ interface SimContext : KoinComponent {
 
     /** Transforms a simulation time (typically `now`) to the corresponding wall time. */
     @Deprecated("no longer needed as sim-time is also expressed as kotlinx.datetimex.Instant starting in v0.12")
-    fun TickTime.toWallTime(): Instant
-    {
+    fun TickTime.toWallTime(): Instant {
         require(env.startDate != null) { MISSING_TICK_TRAFO_ERROR }
         return env.tick2wallTime(this)
     }
 
 
-    fun Number.toDuration() : Duration = env.tickTransform.ticks2Duration(this.toDouble())
+    fun Number.toDuration(): Duration = env.tickTransform.ticks2Duration(this.toDouble())
 
 
     // would be nice but makes it harder to use TickTime outside of env

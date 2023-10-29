@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 val GAS_STATION_SIZE = 200.0  // liters
 val THRESHOLD = 25.0  // Threshold for calling the tank truck (in %)
 val FUEL_TANK_SIZE = 50.0  // liters
-val FUEL_TANK_LEVEL_RANGE = 5.. 25
+val FUEL_TANK_LEVEL_RANGE = 5..25
 val REFUELING_SPEED = 2.0  // liters / second
 val TANK_TRUCK_TIME = 300.seconds  // Seconds it takes the tank truck to arrive
 val INTER_ARRIVAL_TIME_RANGE = 10..100  // Create a car every [min, max] seconds
@@ -51,11 +51,11 @@ class TankTruck : Component() {
 }
 
 /** A car arrives at the gas station for refueling.
-*
-* It requests one of the gas station's fuel pumps and tries to get the
-* desired amount of gas from it. If the stations reservoir is
-* depleted, the car has to wait for the tank truck to arrive.
-*/
+ *
+ * It requests one of the gas station's fuel pumps and tries to get the
+ * desired amount of gas from it. If the stations reservoir is
+ * depleted, the car has to wait for the tank truck to arrive.
+ */
 class Car(
     val tankSize: Double = FUEL_TANK_SIZE,
 ) : Component() {

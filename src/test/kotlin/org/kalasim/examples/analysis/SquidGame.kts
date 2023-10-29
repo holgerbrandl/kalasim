@@ -31,10 +31,10 @@ class SquidGame(
     init {
         object : Component() {
             override fun process() = sequence {
-                while (stepsLeft-- > 0) {
+                while(stepsLeft-- > 0) {
                     hold(min(stepTime(), 100.0)) // cap time at 100sec
-                    if (decision()) playersLeft--
-                    if (playersLeft == 0 || now > maxDuration) passivate()
+                    if(decision()) playersLeft--
+                    if(playersLeft == 0 || now > maxDuration) passivate()
                 }
             }
         }

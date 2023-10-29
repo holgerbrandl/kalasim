@@ -20,7 +20,7 @@ fun main() {
         val eating = exponential(1.minutes)
 
         override fun process() = sequence {
-            while (true) {
+            while(true) {
                 hold(thinking())
                 request(leftFork) {
                     hold(10.seconds) // wait before taking the second fork
@@ -57,7 +57,7 @@ fun main() {
 
     val tc = sim.get<EventLog>()
     val requests = tc.filterIsInstance<ResourceEvent>().map {
-        val amountDirected = (if (it.type == ResourceEventType.RELEASED) -1 else 1) * it.amount
+        val amountDirected = (if(it.type == ResourceEventType.RELEASED) -1 else 1) * it.amount
         RequestRecord(it.requester.name, it.time, it.resource.name, amountDirected)
     }
 

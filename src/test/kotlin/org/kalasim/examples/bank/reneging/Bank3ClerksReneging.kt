@@ -16,7 +16,7 @@ var numReneged: Int = 0
 class CustomerGenerator : Component() {
 
     override fun process() = sequence {
-        while (true) {
+        while(true) {
             Customer(get())
             hold(uniform(5.0, 15.0).minutes.sample())
         }
@@ -27,7 +27,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
     private val clerks: List<Clerk> by inject()
 
     override fun process() = sequence {
-        if (waitingLine.size >= 5) {
+        if(waitingLine.size >= 5) {
             numBalked++
 
             log("balked")
@@ -36,8 +36,8 @@ class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
 
         waitingLine.add(this@Customer)
 
-        for (c in clerks) {
-            if (c.isPassive) {
+        for(c in clerks) {
+            if(c.isPassive) {
                 c.activate()
                 break // activate only one clerk
             }
@@ -45,7 +45,7 @@ class Customer(val waitingLine: ComponentQueue<Customer>) : Component() {
 
         hold(50.minutes) // if not serviced within this time, renege
 
-        if (waitingLine.contains(this@Customer)) {
+        if(waitingLine.contains(this@Customer)) {
             //  this@Customer.leave(waitingLine)
             waitingLine.remove(this@Customer)
 
@@ -64,8 +64,8 @@ class Clerk : Component() {
     private val waitingLine: ComponentQueue<Customer> by inject()
 
     override fun process() = sequence {
-        while (true) {
-            if (waitingLine.isEmpty())
+        while(true) {
+            if(waitingLine.isEmpty())
                 passivate()
 
             val customer = waitingLine.poll()

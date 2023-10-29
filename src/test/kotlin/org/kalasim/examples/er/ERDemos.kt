@@ -1,6 +1,5 @@
 package org.kalasim.examples.er
 
-import com.github.holgerbrandl.kdfutils.toKranglDF
 import kravis.geomBar
 import kravis.plot
 import org.jetbrains.kotlinx.dataframe.api.*
@@ -12,7 +11,7 @@ import kotlin.time.Duration.Companion.days
 object MinimalisticER {
     @JvmStatic
     fun main(args: Array<String>) {
-        EmergencyRoom(numPhysicians = 30, numRooms = 10,).apply {
+        EmergencyRoom(numPhysicians = 30, numRooms = 10).apply {
 
             run(365.days)
         }
@@ -53,9 +52,9 @@ object SimpleER {
             df.groupBy("status").count().print()
             df.rowsCount()
 
-           // https://github.com/JetBrains/lets-plot-kotlin/issues/82
+            // https://github.com/JetBrains/lets-plot-kotlin/issues/82
 //            (df.letsPlot{ x = "status" } + geomBar ()).show()
-            df.plot(x="status").geomBar().show()
+            df.plot(x = "status").geomBar().show()
             Thread.sleep(101000)
 
             // visualize room setup as gant chart

@@ -18,7 +18,7 @@ fun main() {
 
             override fun process() =
                 sequence {
-                    while (true) {
+                    while(true) {
                         isBusy = !isBusy
                         hold(3.minutes)
                     }
@@ -32,7 +32,7 @@ fun main() {
                 }
 
             suspend fun SequenceScope<Component>.waitPredicate(predicate: () -> Boolean) {
-                while (!predicate()) standby()
+                while(!predicate()) standby()
             }
         }
 

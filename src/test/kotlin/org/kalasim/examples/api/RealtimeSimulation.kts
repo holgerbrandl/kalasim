@@ -1,6 +1,4 @@
-import org.kalasim.ClockSync
-import org.kalasim.createSimulation
-import org.kalasim.enableComponentLogger
+import org.kalasim.*
 import kotlin.time.Duration.Companion.seconds
 
 val timeBefore = System.currentTimeMillis()
