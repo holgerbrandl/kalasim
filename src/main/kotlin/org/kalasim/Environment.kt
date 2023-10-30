@@ -197,10 +197,34 @@ open class Environment(
         qualifier: Qualifier? = null, noinline parameters: ParametersDefinition? = null,
     ): T = getKoin().get(qualifier, parameters)
 
+    /**
+     * Retrieves an instance of type [T] from from simulation environment or null if not found.
+     *
+     * @param qualifier The optional qualifier to distinguish between multiple instances of the same type [T]. Default is null.
+     * @param parameters The optional parameters definition for resolving the instance. Default is null.
+     * @return An instance of type [T] retrieved from simulation environment, or null if not found.
+     */
+    inline fun <reified T : Any> getOrNull(
+        qualifier: Qualifier? = null, noinline parameters: ParametersDefinition? = null,
+    ): T? = getKoin().getOrNull(qualifier, parameters)
+
     /** Resolves a dependency in the simulation. Dependencies can be disambiguated by using a qualifier.*/
     inline fun <reified T : Any> get(
         qualifier: String, noinline parameters: ParametersDefinition? = null,
     ): T = getKoin().get(named(qualifier), parameters)
+
+    /**
+     * Retrieves an instance of type [T] from simulation environment, identified by [qualifier].
+     *
+     * @param T the type of instance to retrieve.
+     * @param qualifier the name qualifier for the instance.
+     * @param parameters an optional function that defines the parameters to be used for resolving instances.
+     *
+     * @return an instance of type [T] if found in simulation environment, otherwise null.
+     */
+    inline fun <reified T : Any> getOrNull(
+        qualifier: String, noinline parameters: ParametersDefinition? = null,
+    ): T? = getKoin().getOrNull(named(qualifier), parameters)
 
     val entityTrackingDefaults = SimEntityTrackingDefaults()
 
