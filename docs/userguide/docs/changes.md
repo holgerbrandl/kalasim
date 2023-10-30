@@ -4,7 +4,7 @@
 
 !! not yet released!
 
-Breaking API Changes
+Major & Breaking API Changes
 
 * Most importantly we have migrated the API to use `org.kalasim.SimTime` to track simulation. `SimTime` is a simple typealias for `kotlinx.datetime.Instant`, effectively giving users the full flexibility of using a well designed and established date-time concept. `org.kalasim.TickTime` is still available for backward compatibility reasons, but is opt-in or required to subclass `TickedComponent`.
 * Simplified the configurability for [tracking](advanced.md#continuous-simulation) of entity timelines and statistics. It's now more direct via constructor parameters in addition to environment defaults
@@ -12,6 +12,7 @@ Breaking API Changes
 
 Minor improvements
 
+* [#51](https://github.com/holgerbrandl/kscript/issues/51) Added `description` for better readiability when supepending exeuction for simulatoin states using [`wait()`](component.md#wait) 
 * [#56](https://github.com/holgerbrandl/kalasim/issues/56) Improved support for [duration distributions](basics.md#duration-distributions) 
 
 Starting with this release we have switched to calendar versioning for better clarity regarding our release density, timing and schedule.

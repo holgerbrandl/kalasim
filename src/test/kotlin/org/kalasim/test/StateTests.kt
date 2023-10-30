@@ -93,7 +93,7 @@ class StateTests {
                 object : Component("A") {
                     override fun process() = sequence {
                         wasAStarted = true
-                        wait(state, TestColor.GREEN)
+                        wait(state, TestColor.GREEN, "waiting for green")
                         fail()
                     }
                 }
@@ -123,7 +123,7 @@ class StateTests {
             .00                             B                     Created
             .00                                                   Activated, scheduled for .00                           New state: scheduled
             .00                             main                  Running; Hold +1.00, scheduled for 1.00                New state: scheduled
-            .00       A                     A                     Waiting, scheduled for <inf>                           New state: scheduled
+            .00       A                     A                     Waiting for green; Waiting, scheduled for <inf>        New state: scheduled
             .00       B                     B                     Waiting, scheduled for <inf>                           New state: scheduled
             1.00      main                                        State changes to 'GREEN' with trigger allowing 1 c...
             1.00                            B                     Waiting, scheduled for 1.00                            New state: scheduled

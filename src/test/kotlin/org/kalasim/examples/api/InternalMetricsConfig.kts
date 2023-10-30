@@ -27,7 +27,8 @@ createSimulation {
     enableComponentLogger()
 
     // in addition or alternatively we can also change the environment defaults
-    entityTrackingDefaults.DefaultComponentConfig = ComponentTrackingConfig(logStateChangeEvents = false)
+    entityTrackingDefaults.DefaultComponentConfig =
+        ComponentTrackingConfig(logStateChangeEvents = false)
 
     // create simulation entities
     dependency { TrafficLight() }

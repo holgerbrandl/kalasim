@@ -246,13 +246,27 @@ ship2.activate(delay=50)
 
 ### hold
 
-Hold is the way to make a - usually `current` - component `scheduled`.
+This method is used to hold the component for a specific duration (of simulation time). Hold is the way to make a - usually `current` - component `scheduled`.
+
+ If a description is provided, it can be used to identify the hold operation when analyzing the simulation results. If an until parameter is provided, the component will be held until the specified simulation time. If a priority is provided, it will determine the order in which the component will be scheduled if there are other components with the same hold duration. A higher priority value indicates a higher priority. If the urgent flag is set to true, the component will be scheduled with the highest possible priority.
+
+Supported parameters in `hold`
+
+* `duration` - The duration for which the component should be held. 
+* `description` - An optional description for the hold operation.
+* `until` - The simulation time until which the component should be held. If provided, the component will be held until the specified simulation time.
+* `priority` - The priority of the hold operation. A higher priority value indicates a higher priority. Defaults to `NORMAL`.
+* `urgent` - A flag indicating whether the hold operation is urgent. If set to true, the component will be scheduled with the highest possible priority. Defaults to `false`.
+
+Either `duration` or `until` must be specfied when calling `hold()` to indicate the intended delay.
+
+Usage Example:
 
 ```kotlin
-object : Component(){
+object : Component("Driver"){
     override fun process() = sequence {
         request(driver) {
-            hold(1.0, description="some action that lasts 1 tick")
+            hold(1.minutes, description="some action that lasts 1 tick")
         }
     }
 }
@@ -354,6 +368,17 @@ If the component is [canceled](#cancel), [activated](#activate), [passivated](#p
 Examples
 
 * [Gas Station](examples/gas_station.md)
+
+Supported parameters in `wait`
+
+* `state` -  A state variable
+* `waitFor` -  The state value to wait for
+* `description` -  The description of the wait request.
+* `triggerPriority` -  The queue priority to be used along with a [state change trigger](https://www.kalasim.org/state/#state-change-triggers)
+* `failAt` -  If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
+* `failDelay` -  If the request is not honored before `now + failDelay`,
+the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
+* `failPriority` -  Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
 
 
 ### interrupt

@@ -63,9 +63,9 @@ There are different default implementations, but the user can also implement and
 * ResourceTrackingConfig
 * StateTrackingConfig
 * ComponentCollectionTrackingConfig
-* 
-```kotlin hl_lines="5"
-{!api/InternalMetricsConfig.kts!}
+
+```kotlin hl_lines="7 8 11 30"
+//{!api/InternalMetricsConfig.kts!}
 ```
 
 !!!note

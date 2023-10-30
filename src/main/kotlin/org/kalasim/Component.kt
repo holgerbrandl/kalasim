@@ -1306,13 +1306,29 @@ open class Component(
 
 
     /**
-     * Hold the component.
+     * Holds the component. For details see [user manual](https://www.kalasim.org/component/#hold)
      *
-     * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
+     * This method is used to hold the component for a specific duration, with an optional description,
+     * until a specific simulation time, with an optional priority, and an optional urgent flag.
      *
-     * @param duration Time to hold.
-     * @param priority If a component has the same time on the event list, this component is sorted according to
-     * the priority. An event with a higher priority will be scheduled first.
+     * The component will be held for the specified duration or until the next simulation event,
+     * whichever comes first. If a duration is not provided, the component will be held until the
+     * next simulation event. If a description is provided, it can be used to identify the hold
+     * operation when analyzing the simulation results. If an until parameter is provided, the
+     * component will be held until the specified simulation time. If a priority is provided, it will
+     * determine the order in which the component will be scheduled if there are other components
+     * with the same hold duration. A higher priority value indicates a higher priority. If the
+     * urgent flag is set to true, the component will be scheduled with the highest possible priority.
+     *
+     * @param duration The duration for which the component should be held. If not provided, the
+     * component will be held until the next simulation event.
+     * @param description An optional description for the hold operation.
+     * @param until The simulation time until which the component should be held. If provided, the
+     * component will be held until the specified simulation time.
+     * @param priority The priority of the hold operation. A higher priority value indicates a higher
+     * priority. Defaults to NORMAL.
+     * @param urgent A flag indicating whether the hold operation is urgent. If set to true, the
+     * component will be scheduled with the highest possible priority. Defaults to false.
      */
     suspend fun SequenceScope<Component>.hold(
         duration: Duration? = null,
@@ -1479,6 +1495,7 @@ open class Component(
      *
      * @param state A state variable
      * @param waitFor The state value to wait for
+     * @param description The description of the wait request.
      * @param triggerPriority The queue priority to be used along with a [state change trigger](https://www.kalasim.org/state/#state-change-triggers)
      * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failDelay If the request is not honored before `now + failDelay`,
@@ -1488,35 +1505,38 @@ open class Component(
     suspend fun <T> SequenceScope<Component>.wait(
         state: State<T>,
         waitFor: T,
+        description: String? = null,
         triggerPriority: Priority = NORMAL,
         failAt: SimTime? = null,
         failDelay: Duration? = null,
         failPriority: Priority = NORMAL
     ) = wait(
         StateRequest(state, priority = triggerPriority) { state.value == waitFor },
+        description = description,
         failPriority = failPriority,
         failAt = failAt,
         failDelay = failDelay,
     )
 
     /**
-     * Wait for any or all of the given [state](https://www.kalasim.org/state) values are met.
+     * Wait for the given [state](https://www.kalasim.org/state) predicate to be met.
      *
      * For `wait` contract see [user manual](https://www.kalasim.org/component/#wait)
      *
      * @sample org.kalasim.dokka.statesHowTo
      *
-     * @param state A state variable
-     * @param triggerPriority The queue priority to be used along with a [state change trigger](https://www.kalasim.org/state/#state-change-triggers)
-     * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
-     * @param failDelay If the request is not honored before `now + failDelay`,
-    the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
+     * @param state The state variable to wait for.
+     * @param triggerPriority The queue priority to be used along with a state [state change trigger](https://www.kalasim.org/state/#state-change-triggers)
+     * @param description The description of the wait request.
+     * @param failAt If the request is not honored before failAt, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
+     * @param failDelay If the request is not honored before now + failDelay, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failPriority Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
-     * @param predicate The predicate on the state to wait for
+     * @param predicate The predicate on the state to wait for.
      */
     suspend fun <T> SequenceScope<Component>.wait(
         state: State<T>,
         triggerPriority: Priority = NORMAL,
+        description: String? = null,
         failAt: SimTime? = null,
         failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
@@ -1534,9 +1554,10 @@ open class Component(
      *
      * For `wait` contract see [user manual](https://www.kalasim.org/component/#wait)
      *
-     * @sample TODO
+     * @sample org.kalasim.dokka.statesHowTo
      *
      * @param stateRequests Requests indicating a state and a target condition or predicate for fulfilment
+     * @param description The description of the wait request.
      * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
      * @param failDelay Skip and set `failed` if the request is not honored before `now + failDelay`,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
@@ -1545,6 +1566,7 @@ open class Component(
      */
     suspend fun SequenceScope<Component>.wait(
         vararg stateRequests: StateRequest<*>,
+        description: String? = null,
         urgent: Boolean = false,
         failAt: SimTime? = null,
         failDelay: Duration? = null,
@@ -1581,7 +1603,13 @@ open class Component(
         tryWait()
 
         if(waits.isNotEmpty()) {
-            reschedule(scheduledTime!!, priority = failPriority, urgent = urgent, type = WAIT)
+            reschedule(
+                scheduledTime!!,
+                priority = failPriority,
+                urgent = urgent,
+                description = description,
+                type = WAIT
+            )
         }
     }
 
