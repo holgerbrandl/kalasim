@@ -45,9 +45,8 @@ fun <V : Number> MetricTimeline<V>.display(
     title: String = name,
     from: TickTime,
     to: TickTime,
-    forceTickAxis: Boolean = false,
 ): GGPlot {
-    return display(title, env.toWallTime(from), env.toWallTime(to), forceTickAxis)
+    return display(title, env.toWallTime(from), env.toWallTime(to), true)
 }
 
 fun <V : Number> MetricTimeline<V>.display(
@@ -62,7 +61,7 @@ fun <V : Number> MetricTimeline<V>.display(
 
     return data
         .plot(
-            x = { if(forceTickAxis) env.toTickTime(time) else time },
+            x = { if(forceTickAxis) env.toTickTime(time).value else time },
             y = { value }
         )
         .xLabel("Time")

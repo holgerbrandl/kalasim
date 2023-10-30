@@ -6,14 +6,14 @@ plugins {
     signing
 
     // see https://kotlinlang.slack.com/archives/C4W52CFEZ/p1641056747134600
-    id("org.jetbrains.kotlin.jupyter.api") version "0.12.0-81" // "0.11.0-45"
+    id("org.jetbrains.kotlin.jupyter.api") version "0.12.0-62" // "0.11.0-45"
 
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("io.github.gradle-nexus.publish-plugin") version "1.2.0"
 }
 
 group = "com.github.holgerbrandl"
 //version = "0.8.101"
-version = "0.11.7-SNAPSHOT"
+version = "0.12-SNAPSHOT"
 //version = "0.12-SNAPSHOT"
 
 
@@ -160,16 +160,18 @@ nexusPublishing {
 //    packageGroup.set("com.github.holgerbrandl.kalasim")
 
     repositories {
-        sonatype {
-//            print("staging id is ${project.properties["sonatypeStagingProfileId"]}")
-            stagingProfileId.set(project.properties["sonatypeStagingProfileId"] as String?)
-
-//            nexusUrl.set(uri("https://oss.sonatype.org/"))
-//            snapshotRepositoryUrl.set(uri("https://oss.sonatype.org/content/repositories/snapshots/"))
-
-            username.set(project.properties["ossrhUsername"] as String?) // defaults to project.properties["myNexusUsername"]
-            password.set(project.properties["ossrhPassword"] as String?) // defaults to project.properties["myNexusPassword"]
-        }
+        sonatype()
+//
+//        sonatype {
+////            print("staging id is ${project.properties["sonatypeStagingProfileId"]}")
+//            stagingProfileId.set(project.properties["sonatypeStagingProfileId"] as String?)
+//
+////            nexusUrl.set(uri("https://oss.sonatype.org/"))
+////            snapshotRepositoryUrl.set(uri("https://oss.sonatype.org/content/repositories/snapshots/"))
+//
+//            username.set(project.properties["ossrhUsername"] as String?) // defaults to project.properties["myNexusUsername"]
+//            password.set(project.properties["ossrhPassword"] as String?) // defaults to project.properties["myNexusPassword"]
+//        }
     }
 }
 

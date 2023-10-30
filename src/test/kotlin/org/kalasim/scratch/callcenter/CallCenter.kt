@@ -4,10 +4,15 @@ import kravis.SessionPrefs
 import kravis.device.SwingPlottingDevice
 import org.kalasim.*
 import org.kalasim.plot.kravis.display
+import java.io.File
 import kotlin.math.max
 import kotlin.math.roundToInt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 
 enum class ShiftID { A, B, WeekEnd }
@@ -20,13 +25,14 @@ val shiftModel = sequence {
 }
 
 
-// model requests with static duration for now once they got hold of an operator
 class Request : Component() {
     val callCenter = get<Resource>()
 
     override fun process() = sequence {
         request(callCenter, capacityLimitMode = CapacityLimitMode.SCHEDULE) {
+            // model requests with static duration for now once they got hold of an operator
             hold(1.minutes)
+//            hold(exponential(1.minutes).sample())
         }
     }
 }
@@ -92,15 +98,20 @@ class InterruptingShiftManager : ShiftManager() {
 }
 
 
-abstract class CallCenter(val arrivalRate: Double = 0.3, logEvents: Boolean = true) :
-    Environment(enableComponentLogger = logEvents) {
-    // not defined at this point
+abstract class CallCenter(val interArrivalRate: Duration = 18.minutes, logEvents: Boolean = false) :
+    Environment(
+        enableComponentLogger = logEvents,
+        // note tick duration is just needed here to simplify visualization
+        tickDurationUnit = DurationUnit.HOURS
+    ) {
+
+    // intentionally not defined at this point
     abstract val shiftManager: ShiftManager
 
     val callCenter = dependency { Resource("Call Center") }
 
     init {
-        ComponentGenerator(iat = exponential(arrivalRate)) { Request() }
+        ComponentGenerator(iat = exponential(interArrivalRate)) { Request() }
     }
 }
 
@@ -110,35 +121,41 @@ fun main() {
         override val shiftManager = ShiftManager()
     }
 
-    sim.run(600)
+    sim.run(30.days)
 
-    sim.callCenter.requesters.queueLengthTimeline.display()
+    SessionPrefs.OUTPUT_DEVICE = SwingPlottingDevice() // bug in library, kernel detection seems buggy
 
-    SessionPrefs.OUTPUT_DEVICE = SwingPlottingDevice()
+    sim.callCenter.requesters.queueLengthTimeline.display(forceTickAxis = true)//.show()
+
     val claimedTimeline = sim.callCenter.claimers.queueLengthTimeline
 
 
-    sim.callCenter.requesters.queueLengthTimeline.display().show()
-    claimedTimeline.display().show()
+    sim.callCenter.requesters.queueLengthTimeline.display(forceTickAxis = true).save(File("tt.png").toPath())//show()
+    claimedTimeline.display(forceTickAxis = true).show()
 
-    claimedTimeline.display("A-B", from = 11.tt, to = 13.tt).show()
+        claimedTimeline.display("A-B", from = 11.tt, to = 13.tt).show()
     claimedTimeline.display("B-A", from = 23.tt, to = 25.tt).show()
-
+//    with(sim){
+//        claimedTimeline.display("A-B", forceTickAxis = true, from = 11.asSimTime(), to = 13.asSimTime()).show()
+//        claimedTimeline.display("B-A", forceTickAxis = true,  from = 23.asSimTime(), to = 25.asSimTime()).show()
+//    }
 
     // now investigate a more correct manager who will interrupt ongoing tasks
     val intSim = object : CallCenter() {
         override val shiftManager = InterruptingShiftManager()
     }
 
-    intSim.run(600)
-    intSim.callCenter.requesters.queueLengthTimeline.display("Request queue length with revised handover process")
+    intSim.run(30.days)
+
+    intSim.callCenter.requesters.queueLengthTimeline.display("Request queue length with revised handover process", forceTickAxis = true)
         .show()
 
     // try again but with more customers
-    val highWorkLoadSim = object : CallCenter(arrivalRate = 0.2) {
+    val highWorkloadCenter = object : CallCenter(interArrivalRate = 12.minutes) {
         override val shiftManager = InterruptingShiftManager()
     }
-    highWorkLoadSim.run(600)
 
-    highWorkLoadSim.callCenter.claimers.queueLengthTimeline.display("high B-A", from = 23.tt, to = 25.tt).show()
+    highWorkloadCenter.run(30.days)
+
+    highWorkloadCenter.callCenter.claimers.queueLengthTimeline.display("high B-A", from = 23.tt, to = 25.tt).show()
 }

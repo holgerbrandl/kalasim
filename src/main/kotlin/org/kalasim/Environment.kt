@@ -533,6 +533,7 @@ open class Environment(
         return TickTime(tickTransform.durationAsTicks(offsetDuration))
     }
 
+    fun Number.asSimTime() =  env.asSimTime(this)
 
     // deprecated because nothing should be logged outside a process
 //    fun log(msg: String) = main.log(msg)
