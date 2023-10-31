@@ -9,7 +9,9 @@ class Something(val counter: Counter) : Component() {
         counter.value++
     }
 }
-configureEnvironment {
+createSimulation {
     dependency { Counter(0) }
     dependency { Something(get()) }
-}.run(10)
+
+    run(10)
+}

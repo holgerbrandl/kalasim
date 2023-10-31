@@ -1,17 +1,20 @@
 package org.kalasim.scratch.callcenter
 
+import kravis.GGPlot
 import kravis.SessionPrefs
 import kravis.device.SwingPlottingDevice
 import org.kalasim.*
 import org.kalasim.plot.kravis.display
-import java.io.File
+import java.awt.Desktop
+import java.awt.Dimension
+import java.nio.file.Files
+import java.time.Instant
 import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 
@@ -31,13 +34,13 @@ class Request : Component() {
     override fun process() = sequence {
         request(callCenter, capacityLimitMode = CapacityLimitMode.SCHEDULE) {
             // model requests with static duration for now once they got hold of an operator
-            hold(1.minutes)
-//            hold(exponential(1.minutes).sample())
+//            hold(1.minutes)
+            hold(exponential(30.minutes).sample())
         }
     }
 }
 
-open class ShiftManager : Component() {
+class ShiftManager : Component() {
     val shiftIt = shiftModel.iterator()
     val callCenter = get<Resource>()
 
@@ -58,7 +61,10 @@ open class ShiftManager : Component() {
     }
 }
 
-class InterruptingShiftManager : ShiftManager() {
+class InterruptingShiftManager : Component() {
+    val shiftIt = shiftModel.iterator()
+    val callCenter = get<Resource>()
+
     override fun repeatedProcess() = sequence {
         val currentShift = shiftIt.next()
 
@@ -98,7 +104,7 @@ class InterruptingShiftManager : ShiftManager() {
 }
 
 
-abstract class CallCenter(val interArrivalRate: Duration = 18.minutes, logEvents: Boolean = false) :
+abstract class CallCenter(val interArrivalRate: Duration = 10.minutes, logEvents: Boolean = false) :
     Environment(
         enableComponentLogger = logEvents,
         // note tick duration is just needed here to simplify visualization
@@ -106,7 +112,7 @@ abstract class CallCenter(val interArrivalRate: Duration = 18.minutes, logEvents
     ) {
 
     // intentionally not defined at this point
-    abstract val shiftManager: ShiftManager
+    abstract val shiftManager: Component
 
     val callCenter = dependency { Resource("Call Center") }
 
@@ -125,20 +131,19 @@ fun main() {
 
     SessionPrefs.OUTPUT_DEVICE = SwingPlottingDevice() // bug in library, kernel detection seems buggy
 
-    sim.callCenter.requesters.queueLengthTimeline.display(forceTickAxis = true)//.show()
+    sim.callCenter.requesters.queueLengthTimeline
+        .display(forceTickAxis = true).showFile()
 
     val claimedTimeline = sim.callCenter.claimers.queueLengthTimeline
 
 
-    sim.callCenter.requesters.queueLengthTimeline.display(forceTickAxis = true).save(File("tt.png").toPath())//show()
-    claimedTimeline.display(forceTickAxis = true).show()
+    sim.callCenter.requesters.queueLengthTimeline
+        .display(forceTickAxis = true).showFile()
 
-        claimedTimeline.display("A-B", from = 11.tt, to = 13.tt).show()
-    claimedTimeline.display("B-A", from = 23.tt, to = 25.tt).show()
-//    with(sim){
-//        claimedTimeline.display("A-B", forceTickAxis = true, from = 11.asSimTime(), to = 13.asSimTime()).show()
-//        claimedTimeline.display("B-A", forceTickAxis = true,  from = 23.asSimTime(), to = 25.asSimTime()).show()
-//    }
+    claimedTimeline.display(forceTickAxis = true).showFile()
+
+    claimedTimeline.display("A-B", from = 11.tt, to = 13.tt).showFile()
+    claimedTimeline.display("B-A", from = 23.tt, to = 25.tt).showFile()
 
     // now investigate a more correct manager who will interrupt ongoing tasks
     val intSim = object : CallCenter() {
@@ -147,15 +152,25 @@ fun main() {
 
     intSim.run(30.days)
 
-    intSim.callCenter.requesters.queueLengthTimeline.display("Request queue length with revised handover process", forceTickAxis = true)
-        .show()
+    intSim.callCenter.requesters.queueLengthTimeline
+        .display("Request queue length with revised handover process", forceTickAxis = true)
+        .showFile()
+
 
     // try again but with more customers
-    val highWorkloadCenter = object : CallCenter(interArrivalRate = 12.minutes) {
+    val highWorkloadCenter = object : CallCenter(interArrivalRate = 8.minutes) {
         override val shiftManager = InterruptingShiftManager()
     }
 
     highWorkloadCenter.run(30.days)
 
-    highWorkloadCenter.callCenter.claimers.queueLengthTimeline.display("high B-A", from = 23.tt, to = 25.tt).show()
+    highWorkloadCenter.callCenter.claimers.queueLengthTimeline.display("high B-A", from = 23.tt, to = 25.tt).showFile()
+}
+
+private fun GGPlot.showFile() {
+    val file = Files.createTempFile("kravis" + Instant.now().toString().replace(":", ""), ".png")
+
+    save(file, Dimension(1000, 800))
+
+    Desktop.getDesktop().open(file.toFile())
 }
