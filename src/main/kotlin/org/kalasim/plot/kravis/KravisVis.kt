@@ -4,9 +4,12 @@ import kravis.*
 import kravis.device.JupyterDevice
 import org.jetbrains.letsPlot.label.ggtitle
 import org.kalasim.*
+import org.kalasim.Component
 import org.kalasim.analysis.ResourceActivityEvent
 import org.kalasim.monitors.*
-import java.awt.GraphicsEnvironment
+import java.awt.*
+import java.nio.file.Files
+import java.time.Instant
 import kotlin.time.Duration
 
 fun canDisplay() = !GraphicsEnvironment.isHeadless() && hasR()
@@ -253,4 +256,16 @@ internal fun List<Component>.clistTimeline() = flatMap { eqn ->
     eqn.stateTimeline
         .statsData().asList().map { eqn to it }
 }
+
+
+
+// todo move to kravis library
+fun GGPlot.showFile() {
+    val file = Files.createTempFile("kravis" + Instant.now().toString().replace(":", ""), ".png")
+
+    save(file, Dimension(1000, 800))
+
+    Desktop.getDesktop().open(file.toFile())
+}
+
 

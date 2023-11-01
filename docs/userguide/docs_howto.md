@@ -79,6 +79,11 @@ jupyter nbconvert --kernel=kotlin --to markdown  atm_queue.ipynb --out  atm_queu
 jupyter nbconvert --kernel=kotlin --to markdown  gas_station.ipynb --out  gas_station.md
 
 
+cd ${KALASIM_HOME}/docs/userguide/docs/examples
+
+jupyter nbconvert --kernel=kotlin --execute  callcenter.ipynb  --to notebook --inplace
+jupyter nbconvert --kernel=kotlin --to markdown  callcenter.ipynb --out  callcenter.md
+
 
 cd ${KALASIM_HOME}/docs/userguide/docs/animation
 

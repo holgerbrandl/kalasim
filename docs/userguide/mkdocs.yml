@@ -90,6 +90,7 @@ nav:
     - The Ferryman: examples/ferryman.md
     - Emergyency Room: examples/emergency_room.md
     - Lunar Mining: animation/lunar_mining.md
+    - Call Center: examples/callcenter.md
 
   - Advanced:
     - advanced.md
