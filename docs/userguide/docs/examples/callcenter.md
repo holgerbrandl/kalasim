@@ -125,7 +125,7 @@ abstract class CallCenter(
 }
 ```
 
-Let's run the unit for 1000 hours
+Let's runthe modelfor 1000 hours
 
 
 ```kotlin
