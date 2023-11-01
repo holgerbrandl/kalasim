@@ -125,7 +125,7 @@ abstract class CallCenter(
 }
 ```
 
-Let's run the model for 1000 hours
+Let's run the model for a month
 
 
 ```kotlin
@@ -144,13 +144,10 @@ sim.serviceAgents.requesters.queueLengthTimeline.display()
 
 ```
 
-
-
-
     
 ![jpeg](callcenter_files/callcenter_15_0.jpg)
-    
 
+What do we see here? After some warmup in the first week of January, we see requiests piling up over the weekend. These requests are subsequently processed in the next 6 business days. So even if customers may need to wait for a few business days, they are ultimatly served. So from a qeuing theory this system is stable, that is does not end up with an infiinte queue length.
 
 
 ## Model Accuracy During Shift Handover 
@@ -281,7 +278,7 @@ Notably, this model has the almost the same dynamics, but is stable from a queui
 We have successfully modelled a variable shift length schedule and performed a sizing analysis. An initial model indicated that a weekday shift would be sufficiently staffed with 5 workers. However, a more detailed model, which also considers transition effects between shifts, led to the conclusion that 6 support technicians are required to serve the multitude of customers of Future Kalasim Inc.
 
 
-Could we have solved this more elegantly using the mathematics of queuing theory? Such models are a great starting point, but usually, they very quickly fail. That's when discrete event simulation can develop its beauty and potential. Flexible shift schedules are common in many industries, and the model introduced above could be easily adjusted to account for more business constraints and processes.
+Could we have solved this more elegantly using the mathematics of queuing theory? Such models are a great starting point, but usually, they very quickly fail to deliver when realistic, non-stationary requirements are considered. That's when discrete event simulation can develop its beauty and potential. Flexible shift schedules are common in many industries, and the model introduced above could be easily adjusted to account for more business constraints and processes.
 
 The  use-case was adopted from the [simmer mailing list](https://groups.google.com/g/simmer-devel/c/gsr6F7CJQf8/m/euW1ZaU0DAAJ)
 
