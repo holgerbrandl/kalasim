@@ -147,7 +147,7 @@ sim.serviceAgents.requesters.queueLengthTimeline.display()
     
 ![jpeg](callcenter_files/callcenter_15_0.jpg)
 
-What do we see here? After some warmup in the first week of January, we see requiests piling up over the weekend. These requests are subsequently processed in the next 6 business days. So even if customers may need to wait for a few business days, they are ultimatly served. So from a qeuing theory this system is stable, that is does not end up with an infiinte queue length.
+What can we discern from this? Following an initial warm-up during the first week of January, there is a noticeable increase in requests accumulating over the weekend. These requests then undergo processing over the next five business days. While customers might experience a short wait, their requests are ultimately addressed. Therefore, based on queuing theory, the system is stable and does not result in an infinite queue length.
 
 
 ## Model Accuracy During Shift Handover 
