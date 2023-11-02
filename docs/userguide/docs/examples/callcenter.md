@@ -14,7 +14,7 @@ Let's take a glimpse into the near future where kalasim has taken up a dominant 
 
 <!-- source https://www.communitechservices.com/no-toggle-single-screen-access -->
 
-Choosing an appropriate shift model and planning shift capacity are key in this - and any successful - business operations. Due to the complex dynamics and interplay, it's often very challenging to determine capacity and pinpoint bottlenecks in such systems on paper.
+Choosing an appropriate shift model and planning shift capacity are key in this - and any successful - business operation. Due to the complex dynamics and interplay, it's often very challenging to determine capacity and pinpoint bottlenecks in such systems on paper.
 
 Here is how the envisioned call center functions:
 
