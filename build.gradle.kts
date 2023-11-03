@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.9.10"
+    kotlin("jvm") version "1.9.20"
     `maven-publish`
     signing
 
     // see https://kotlinlang.slack.com/archives/C4W52CFEZ/p1641056747134600
-    id("org.jetbrains.kotlin.jupyter.api") version "0.12.0-62" // "0.11.0-45"
+    id("org.jetbrains.kotlin.jupyter.api") version "0.12.0-82-1"
 
     id("io.github.gradle-nexus.publish-plugin") version "1.2.0"
 }
@@ -26,7 +26,7 @@ dependencies {
     api("org.apache.commons:commons-math3:3.6.1")
     // note updated postponed because of regression errors
     api("io.insert-koin:koin-core:3.1.2")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.10")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.20")
 
     api("org.json:json:20230227") // because version 20220924 is reported as vulerable
     api("com.github.holgerbrandl:jsonbuilder:0.10")
@@ -40,11 +40,11 @@ dependencies {
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
 
-    api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+    api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
 
     api("io.github.oshai:kotlin-logging-jvm:5.1.0")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.10")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.20")
     testImplementation("io.kotest:kotest-assertions-core:5.5.5")
 
     // **TODO** move to api to require users to pull it in if needed
@@ -55,8 +55,8 @@ dependencies {
     compileOnly("com.github.holgerbrandl:kravis:0.9.95")
     testImplementation("com.github.holgerbrandl:kravis:0.9.95")
 
-    compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.3.0")
-    testImplementation("org.jetbrains.lets-plot:lets-plot-batik:3.1.0")
+    compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.4.3")
+    testImplementation("org.jetbrains.lets-plot:lets-plot-batik:4.0.1")
     //    testImplementation("org.jetbrains.lets-plot:lets-plot-jfx:1.5.4")
 
     //experimental dependencies  use for experimentation

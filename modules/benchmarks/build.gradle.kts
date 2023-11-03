@@ -3,7 +3,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 plugins {
-    kotlin("jvm") version "1.9.10"
+    kotlin("jvm") version "1.9.20"
     id("java")
     id("me.champeau.jmh") version "0.7.1"
 //    id("io.morethan.jmhreport") version "0.9.0"
@@ -21,7 +21,7 @@ dependencies {
 
 //    jmh(kotlin("stdlib"))
     jmh("org.apache.commons:commons-lang3:3.12.0")
-    jmh("org.slf4j:slf4j-simple:1.6.1")
+    jmh("org.slf4j:slf4j-simple:2.0.9")
 
     jmh("com.github.holgerbrandl:kalasim:0.9.2-SNAPSHOT")
 
