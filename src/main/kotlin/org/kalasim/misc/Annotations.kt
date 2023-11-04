@@ -6,7 +6,7 @@ package org.kalasim.misc
     message = "This API is not recommended as the duration unit is not specified. Remove any doubt by adding .minutes, .hours, .days accordingly. The default duration unit of a simulation environment is MINUTES."
 )
 @Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR, AnnotationTarget.CLASS, AnnotationTarget.PROPERTY)
 annotation class AmbiguousDuration
 
 @RequiresOptIn(

@@ -80,7 +80,18 @@ data class RequestContext(
     }
 }
 
-//@AmbiguousDurationComponent
+/**
+ * Represents a ticked component in the simulation. A ticked component provides in addition to `SimTime` interactions,
+ * complementary methods that do work with TickTime instead
+ *
+ * @param name The name of the ticked component.
+ * @param at The initial simulation time at which the ticked component is created.
+ * @param delay The delay time before the ticked component becomes active.
+ * @param priority The priority of the ticked component.
+ * @param process The process pointer associated with the ticked component.
+ * @param trackingConfig The component tracking configuration.
+ * @param koin The Koin instance used for dependency injection.
+ */
 @AmbiguousDurationComponent
 open class TickedComponent(
     name: String? = null,
@@ -103,7 +114,6 @@ open class TickedComponent(
      * @param priority If a component has the same time on the event list, this component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
-//    @Deprecated("Use Duration instead of Number")
     suspend fun SequenceScope<Component>.hold(
         duration: Number? = null,
         description: String? = null,
@@ -111,9 +121,6 @@ open class TickedComponent(
         priority: Priority = NORMAL,
         urgent: Boolean = false
     ) {
-//        val component = getThis()
-//        val other = this
-//        println(component)
         yieldCurrent {
             this@TickedComponent.hold(duration?.toDuration(), description, until, priority, urgent)
         }
@@ -134,7 +141,6 @@ open class TickedComponent(
 }
 
 
-// todo https://github.com/holgerbrandl/kalasim/issues/47
 /**
  * A kalasim component is used as component (primarily for queueing) or as a component with a process.
  * Usually, a component will be defined as a subclass of Component.
@@ -225,18 +231,20 @@ open class Component(
 
         val overriddenProcess = javaClass.getMethod("process").declaringClass.simpleName != "Component"
         val overriddenRepeated = javaClass.getMethod("repeatedProcess").declaringClass.simpleName != "Component"
-        val customProcess = process != null && process.name != "process"
+        val isCustomProcess = process != null && process.name != "process"
         val isNone = process != null && process.name == "none"
 
-        require(!overriddenProcess || !overriddenRepeated || !customProcess) {
-            "Just one custom process can be provided. So either provide a custom pointer, or override process, or override repeatedProcess"
+        if(!isCustomProcess) {
+            require(!(overriddenProcess && overriddenRepeated)) {
+                " So either override process or override repeatedProcess but not both"
+            }
         }
 
         val processPointer: KFunction1<Nothing, Sequence<Component>>? = when {
             isNone -> null
             overriddenProcess -> Component::process
             overriddenRepeated -> Component::processLoop
-            customProcess -> process
+            isCustomProcess -> process
             else -> null
         }
 
@@ -1654,7 +1662,6 @@ open class Component(
                Unfortunately, this can't be resolved at compile time.
            """.trimIndent()
         }
-
 
         builder()
 

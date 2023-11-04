@@ -32,12 +32,6 @@ internal const val MAIN = "main"
 
 typealias KoinModule = org.koin.core.module.Module
 
-// https://github.com/InsertKoinIO/koin/issues/801
-@Deprecated("Use createSimulation() instead", ReplaceWith("declareDependencies(builder).createSimulation {}"))
-fun configureEnvironment(
-    enableComponentLogger: Boolean = false, builder: KoinModule.() -> Unit,
-): Environment = declareDependencies(builder).createSimulation {}
-
 
 @Suppress("DeprecatedCallableAddReplaceWith")
 @Deprecated("Use createSimulation() instead")
@@ -112,17 +106,11 @@ open class Environment(
     val startDate: SimTime = SimTime.fromEpochMilliseconds(0),
     /** If enabled, it will render a tabular view of recorded interaction, state change and resource events. */
     enableComponentLogger: Boolean = false,
-
-    /** Measure the compute time per tick as function of time. For details see  https://www.kalasim.org/advanced/#operational-control */
-    enableTickMetrics: Boolean = false,
     /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
     val tickDurationUnit: DurationUnit = MINUTES,
     dependencies: KoinModule? = null,
     koin: Koin? = null,
     randomSeed: Int = DEFAULT_SEED,
-//    tickTimeOffset: TickTime = TickTime(0.0),
-    // see https://github.com/holgerbrandl/kalasim/issues/49
-//    val typedDurationsRequired: Boolean = false
 ) : SimContext, WithJson {
 
     private var running: Boolean = false
@@ -144,24 +132,9 @@ open class Environment(
             .map { it.component }
             .toList()
 
-    // intenionally immutable to avoid checkForCodmodificatio when iterating it (suggested by chat-gpt)
+    // intentionally immutable to avoid checkForCoModification when iterating it (suggested by chat-gpt)
     internal var eventListeners: List<EventListener> = emptyList()
 
-
-//    val traceFilters = mutableListOf<EventFilter>()
-//
-//    init {
-//        traceFilters.add(EventFilter {
-//            if(it !is InteractionEvent) return@EventFilter true
-//
-//            val action = it.renderAction()
-//
-//            !(action.contains("entering requesters")
-//                    || action.contains("entering claimers")
-//                    || action.contains("removed from requesters")
-//                    || action.contains("removed from claimers"))
-//        })
-//    }
 
     /** The current time of the simulation. See https://www.kalasim.org/basics/#running-a-simulation.*/
     var now = startDate
@@ -169,8 +142,8 @@ open class Environment(
 
     @Deprecated("use now instead", ReplaceWith("now"))
     val nowWT: Instant = now
-//        get() = now.toWallTime()
 
+    @AmbiguousDuration
     val nowTT: TickTime
         get() = now.toTickTime()
 
@@ -186,7 +159,8 @@ open class Environment(
 
 
     /** The component of the currently iterated process definition. Read-only, as components enter the queue only
-     * indirectly via scheduling interactions such as for example hold(), request() or wait(). */
+     * indirectly via scheduling interactions such as for example hold(), request() or wait().
+     */
     var currentComponent: Component? = null
         private set
 
@@ -197,12 +171,20 @@ open class Environment(
 
     final override fun getKoin(): Koin = _koin
 
-    //redeclare to simplify imports
-    /** Resolves a dependency in the simulation. Dependencies can be disambiguated by using a qualifier.*/
+    /**
+     * Resolves a dependency in the simulation.
+     * Dependencies can be disambiguated by using a qualifier.
+     *
+     * @param qualifier - The qualifier to disambiguate dependencies (optional, default is null).
+     * @param parameters - The parameters definition for the dependency (optional, default is null).
+     *
+     * @return The resolved dependency of type T.
+     */
     inline fun <reified T : Any> get(
         qualifier: Qualifier? = null, noinline parameters: ParametersDefinition? = null,
     ): T = getKoin().get(qualifier, parameters)
 
+    
     /**
      * Retrieves an instance of type [T] from from simulation environment or null if not found.
      *
@@ -214,11 +196,20 @@ open class Environment(
         qualifier: Qualifier? = null, noinline parameters: ParametersDefinition? = null,
     ): T? = getKoin().getOrNull(qualifier, parameters)
 
-    /** Resolves a dependency in the simulation. Dependencies can be disambiguated by using a qualifier.*/
+    /**
+     * Resolves a dependency in the simulation.
+     * Dependencies can be disambiguated by using a qualifier.
+     *
+     * @param qualifier - The qualifier to disambiguate dependencies (optional, default is null).
+     * @param parameters - The parameters definition for the dependency (optional, default is null).
+     *
+     * @return The resolved dependency of type T.
+     */
     inline fun <reified T : Any> get(
         qualifier: String, noinline parameters: ParametersDefinition? = null,
     ): T = getKoin().get(named(qualifier), parameters)
 
+    
     /**
      * Retrieves an instance of type [T] from simulation environment, identified by [qualifier].
      *
@@ -235,10 +226,6 @@ open class Environment(
     val entityTrackingDefaults = SimEntityTrackingDefaults()
 
     init {
-
-        // start console logger
-
-//        addTraceListener { print(it) }
         if(enableComponentLogger) {
             enableComponentLogger()
         }
@@ -252,12 +239,6 @@ open class Environment(
 //        CustomContext.startKoin(koinContext = CustomContext()) { modules(module { single { this@Environment } }) }
             DependencyContext.startKoin()
         }
-
-
-//        require(koins.createAtStart) {
-//            "createAtStart must be enabled by convention to instantiate injected components before starting the simulation"
-//        }
-
 
         // self register the environment
         getKoin().loadModules(listOf(module {
@@ -276,8 +257,6 @@ open class Environment(
 //        KoinContextHandler.get()._scopeRegistry.rootScope.createEagerInstances()
 //        startKoin { modules(koins) }
         }
-
-//        curComponent = main
     }
 
 
@@ -297,31 +276,9 @@ open class Environment(
             return tm.timeline
         }
 
-//    private var endOnEmptyEventlist = false
-
     private val standBy = mutableListOf<Component>()
     private val pendingStandBy = mutableListOf<Component>()
 
-//    fun build(vararg compoennts: Component) = components.forEach { this + it }
-
-    // seesm unused. To be deleted in v0.9
-//    fun build(builder: (Environment.() -> Unit)): Environment {
-//        builder(this)
-//        return (this)
-//    }
-
-
-    /**
-     * Start execution of the simulation. See https://www.kalasim.org/basics/#running-a-simulation
-     *
-     * @param duration Time to run. Requires tick-transform to be configured.
-     * @param priority If a component has the same time on the event list, the main component is sorted according to
-     * the priority. An event with a higher priority will be scheduled first.
-     */
-//    @OptIn(AmbiguousDuration::class)
-//    fun run(
-//        duration: Duration? = null, until: Instant? = null, priority: Priority = NORMAL,
-//    ) = run(duration, until, priority)
 
     /**
      * Start execution of the simulation. See https://www.kalasim.org/basics/#running-a-simulation
@@ -336,18 +293,7 @@ open class Environment(
         priority: Priority = NORMAL
     ) = run(duration?.toDuration(), null, priority)
 
-    /**
-     * Start execution of the simulation
-     *
-     * @param until Absolute time until the which the simulation should run. Requires tick-transform to be configured.
-     * @param priority If a component has the same time on the event list, the main component is sorted according to
-     * the priority. An event with a higher priority will be scheduled first.
-     */
-//    @OptIn(AmbiguousDuration::class)
-//    fun run(
-//        until: Number, priority: Priority = NORMAL,
-//    ) = run(until = until.toTickTime(), priority = priority)
-
+  
     /**
      * Start execution of the simulation
      *
@@ -360,14 +306,14 @@ open class Environment(
      * @param priority If a component has the same time on the event list, the main component is sorted according to
      * the priority. An event with a higher priority will be scheduled first.
      */
-//    @AmbiguousDuration
     fun run(
-        duration: Duration? = null, until: SimTime? = null, priority: Priority = NORMAL, urgent: Boolean = false,
+        duration: Duration? = null,
+        until: SimTime? = null,
+        priority: Priority = NORMAL,
+        urgent: Boolean = false,
     ) {
         // also see https://simpy.readthedocs.io/en/latest/topical_guides/environments.html
-        if(duration == null && until == null) {
-//            endOnEmptyEventlist = true
-        } else {
+        if(duration != null || until != null) {
             val scheduledTime = calcScheduleTime(until, duration)
 
             main.reschedule(scheduledTime, priority, urgent, "running", ScheduledType.HOLD)
@@ -406,13 +352,7 @@ open class Environment(
             time to c
         } else {
             publishEvent(InteractionEvent(now, currentComponent, null, "run end; no events left"))
-            val t =
-//                if (endOnEmptyEventlist) {
-//                publishEvent(InteractionEvent(now, curComponent, null, null, "run end; no events left"))
-                now
-//            } else {
-//                TickTime(Double.MAX_VALUE)
-//            }
+            val t = now
 
             t to main
         }
@@ -437,7 +377,6 @@ open class Environment(
         c.scheduledTime = null
 
         currentComponent = c
-//        c.log(c, info)
     }
 
 
@@ -550,19 +489,21 @@ open class Environment(
             .toTypedArray()
     }
 
-    fun hasAbsoluteTime() = startDate != null
 
 
+    @OptIn(AmbiguousDuration::class)
     fun tick2wallTime(tickTime: TickTime): SimTime {
-        return startDate!! + tickTransform.ticks2Duration(tickTime.value)
+        return startDate + tickTransform.ticks2Duration(tickTime.value)
     }
 
+    @OptIn(AmbiguousDuration::class)
     fun wall2TickTime(instant: SimTime): TickTime {
-        val offsetDuration = instant - startDate!!
+        val offsetDuration = instant - startDate
 
         return TickTime(tickTransform.durationAsTicks(offsetDuration))
     }
 
+    @AmbiguousDuration
     fun Number.asSimTime() =  env.asSimTime(this)
 
     // deprecated because nothing should be logged outside a process

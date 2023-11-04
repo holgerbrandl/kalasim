@@ -251,11 +251,9 @@ class EmergencyRoom(
     val nurse: HeadNurse = FifoNurse(),
 
     enableComponentLogger: Boolean = false,
-    enableTickMetrics: Boolean = false,
     enableInternalMetrics: Boolean = false,
 ) : Environment(
     enableComponentLogger = enableComponentLogger,
-    enableTickMetrics = enableTickMetrics,
     tickDurationUnit = DurationUnit.HOURS
 ) {
 

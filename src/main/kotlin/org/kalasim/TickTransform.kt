@@ -39,7 +39,9 @@ typealias SimTime = Instant
 @Deprecated("use is disencouraged because it has an implicit reference to tick-duration of environment")
 fun SimTime(offset: Number) = SimTime.fromEpochMilliseconds(offset.toLong())
 
-@Deprecated("use kotlinx.datetime.Instant equivalent instead")
+
+
+//@Deprecated("use kotlinx.datetime.Instant equivalent instead")
 @JvmInline
 value class TickTime(val value: Double)
 

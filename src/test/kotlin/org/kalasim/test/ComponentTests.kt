@@ -364,6 +364,18 @@ class ComponentTests {
 
 
     @Test
+    fun `it should fail if both process and repeatedProcess are provided`() = createTestSimulation {
+        shouldThrow<IllegalArgumentException> {
+            object : Component("foo") {
+                override fun process() = sequence<Component> {}
+
+                override fun repeatedProcess() = sequence<Component> {}
+            }
+        }
+    }
+
+
+    @Test
     fun `it should track status changes`() = createTestSimulation {
         val component = NoOpComponent("foo")
 
