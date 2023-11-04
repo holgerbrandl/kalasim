@@ -45,15 +45,15 @@ dependencies {
     api("io.github.oshai:kotlin-logging-jvm:5.1.0")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.20")
-    testImplementation("io.kotest:kotest-assertions-core:\t5.7.2")
+    testImplementation("io.kotest:kotest-assertions-core:5.7.2")
 
     // **TODO** move to api to require users to pull it in if needed
     implementation("com.github.holgerbrandl:krangl:0.18.4") // must needed for kravis
-    implementation("com.github.holgerbrandl:kdfutils:1.2")
-    testImplementation("com.github.holgerbrandl:kdfutils:1.2")
+    implementation("com.github.holgerbrandl:kdfutils:1.3.3")
+    testImplementation("com.github.holgerbrandl:kdfutils:1.3.3")
 
-    compileOnly("com.github.holgerbrandl:kravis:0.9.95")
-    testImplementation("com.github.holgerbrandl:kravis:0.9.95")
+    compileOnly("com.github.holgerbrandl:kravis:0.9.96")
+    testImplementation("com.github.holgerbrandl:kravis:0.9.96")
 
     compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.4.3")
     testImplementation("org.jetbrains.lets-plot:lets-plot-batik:4.0.1")

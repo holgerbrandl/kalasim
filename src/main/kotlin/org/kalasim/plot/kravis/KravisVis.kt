@@ -257,15 +257,3 @@ internal fun List<Component>.clistTimeline() = flatMap { eqn ->
         .statsData().asList().map { eqn to it }
 }
 
-
-
-// todo move to kravis library
-fun GGPlot.showFile() {
-    val file = Files.createTempFile("kravis" + Instant.now().toString().replace(":", ""), ".png")
-
-    save(file, Dimension(1000, 800))
-
-    Desktop.getDesktop().open(file.toFile())
-}
-
-

@@ -48,7 +48,7 @@ class MyEvent(time : SimTime) : Event(time)
 // run the sim which create many events including some MyEvents
 env.run()
 
-val myEvents :List<MyEvent> = collect<MyEvent>()
+val myEvents : List<MyEvent> = collect<MyEvent>()
 
 // or collect with an additional filter condition
 val myFilteredEvents :List<MyEvent> = collect<MyEvent> {

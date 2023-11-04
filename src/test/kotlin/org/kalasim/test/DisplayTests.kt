@@ -3,10 +3,12 @@ package org.kalasim.test
 import io.kotest.assertions.fail
 import kravis.GGPlot
 import kravis.SessionPrefs
+import kravis.device.showFile
 import kravis.render.LocalR
 import org.junit.*
 import org.junit.Assert.assertEquals
 import org.junit.rules.TestName
+import org.kalasim.asSimTime
 import org.kalasim.examples.MM1Queue
 import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.plot.kravis.*
@@ -27,17 +29,26 @@ class DisplayTests : AbstractSvgPlotRegression() {
     fun beforeMethod() {
         // Only run tests that rely on for brandl or if users has exported KALASIM_RUN_DISPLAY_TESTS as 'true'
         // https://stackoverflow.com/questions/1689242/conditionally-ignoring-tests-in-junit-4
-        val runDisplaytests =
+        val runDisplayTests =
             System.getProperty("KALASIM_RUN_DISPLAY_TESTS").toBoolean() || System.getProperty("user.name") == "brandl"
-        Assume.assumeTrue(runDisplaytests);
+        Assume.assumeTrue(runDisplayTests)
     }
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `is should display the mm1 server utilization`() {
         val mm1 = MM1Queue()
 
         mm1.run(50.minutes)
 //        mm1.customers
+
+        mm1.server.requesters.queueLengthTimeline
+            .display("Trimmed queue timeline", mm1.asSimTime(5), mm1.asSimTime(10))
+//            .showFile()
+            .apply {
+                assertExpected(this, "trimmed_queue_timeline")
+            }
+
 
 //        USE_KRAVIS_VIEWER = true
 
@@ -71,7 +82,6 @@ class DisplayTests : AbstractSvgPlotRegression() {
 
     }
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     fun `is should display the mm1 server utilization with walltime`() {
 
@@ -139,7 +149,8 @@ abstract class AbstractSvgPlotRegression {
         // note assertEquals would be cleaner but since its printing the complete diff, it's polluting the travis logs
         assertEquals(expected, svgDoc)
         val failMsg = "svg mismatch got:\n${svgDoc.lines().take(30).joinToString("\n")}"
-        Assert.assertTrue(failMsg, expected.equals(svgDoc))
+        @Suppress("HttpUrlsUsage")
+        Assert.assertTrue(failMsg, expected == svgDoc)
 
         // compare actual images
         //        saveImage(File(testDataDir, name.methodName.replace(" ", "_") + ".png"))
