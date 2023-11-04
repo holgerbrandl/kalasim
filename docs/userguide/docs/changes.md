@@ -15,6 +15,7 @@ Minor improvements
 * [#51](https://github.com/holgerbrandl/kscript/issues/51) Added `description` for better readiability when supepending exeuction for simulatoin states using [`wait()`](component.md#wait) 
 * [#56](https://github.com/holgerbrandl/kalasim/issues/56) Improved support for [duration distributions](basics.md#duration-distributions) 
 * Expose `Environment.getOrNull<T>()` from [koin](https://github.com/InsertKoinIO/koin/issues/182) to check for presence of registered dependencies in simulation environment
+* [#46](https://github.com/holgerbrandl/kalasim/issues/46) clarify use of collect with filter 
 
 Starting with this release we have switched to calendar versioning for better clarity regarding our release density, timing and schedule.
 

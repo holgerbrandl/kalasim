@@ -5,11 +5,15 @@ import org.kalasim.analysis.*
 createSimulation {
     enableComponentLogger()
 
-    val tc = enableEventLog()
+    // enable a global list that will capture all events excluding StateChangedEvent
+    val eventLog = enableEventLog(blackList = listOf(StateChangedEvent::class))
 
-    tc.filter { it is InteractionEvent && it.component?.name == "foo" }
+    // run the simulation
+    run(5.0)
 
-    val claims = tc //
+    eventLog.filter { it is InteractionEvent && it.component?.name == "foo" }
+
+    val claims = eventLog //
         .filterIsInstance<ResourceEvent>()
         .filter { it.type == ResourceEventType.CLAIMED }
-}.run(5.0)
+}

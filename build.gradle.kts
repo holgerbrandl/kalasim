@@ -30,7 +30,7 @@ dependencies {
 
     api("org.json:json:20230227") // because version 20220924 is reported as vulerable
     api("com.github.holgerbrandl:jsonbuilder:0.10")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
     //  api("io.github.microutils:kotlin-logging:1.12.5")
 //    api("org.slf4j:slf4j-simple:1.7.32")
@@ -45,7 +45,7 @@ dependencies {
     api("io.github.oshai:kotlin-logging-jvm:5.1.0")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.20")
-    testImplementation("io.kotest:kotest-assertions-core:5.5.5")
+    testImplementation("io.kotest:kotest-assertions-core:\t5.7.2")
 
     // **TODO** move to api to require users to pull it in if needed
     implementation("com.github.holgerbrandl:krangl:0.18.4") // must needed for kravis

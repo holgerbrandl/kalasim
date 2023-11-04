@@ -75,9 +75,6 @@ To disable all metrics and to minimize internal event logging, the user can run 
 
 The same mechanism applies also fine-tune the internal [event logging](events.md). By disabling some -  not-needed for production - events, simulation performance can be improved significantly.
 
-The user can also register her own `TrackConfig` implementations using the factory. See [here](https://github.com/holgerbrandl/kalasim/blob/4f284e6f52ab9ab2f09b6bf5331f4fd413476702/src/test/kotlin/org/kalasim/test/ComponentTests.kt#L134-L134) for simple example. 
-
-
 
 ## Save and Load Simulations
 

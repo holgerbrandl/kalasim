@@ -62,7 +62,6 @@ class Shipyard() : Environment(tickDurationUnit = DurationUnit.DAYS) {
                 println("state changed ${it.value}")
             }
         }
-
     }
 
     fun exampleBOM(): List<Part> {

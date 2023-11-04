@@ -57,8 +57,7 @@ class EnvTests {
         val env1 = Environment(koin = koinApplication { }.koin)
 
         env1.apply {
-
-            val component = TestComponent(koin = getKoin())
+            TestComponent(koin = getKoin())
             Resource(koin = env1.getKoin())
             State(false, koin = getKoin())
             ComponentQueue<Component>(koin = getKoin())
@@ -67,7 +66,7 @@ class EnvTests {
 
         val env2 = Environment(koin = koinApplication { }.koin)
 
-        val component2 = TestComponent(koin = env2.getKoin())
+        TestComponent(koin = env2.getKoin())
 
         env1.run(10.hours)
         env2.run(10.hours)
@@ -102,6 +101,7 @@ class EnvTests {
         holdCounter shouldBe 4
     }
 
+    @AmbiguousDuration
     @Test
     fun `it should run be possible to run an old koin-context`() {
 
@@ -156,9 +156,10 @@ class EnvTests {
     }
 
 
+    @AmbiguousDuration
     @Test
     fun `it should consume events asynchronously`() = createTestSimulation {
-        ComponentGenerator(iat = constant(1)) { Component("Car.${it}") }
+        ComponentGenerator(iat = constant(5).minutes) { Component("Car.${it}") }
 
         var consumed = false
 
@@ -178,7 +179,7 @@ class EnvTests {
 //        }
 
         // run the simulation
-        run(5)
+        run(5.hours)
 
         sleep(4000)
 
@@ -204,6 +205,7 @@ class EnvTests {
     }
 
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should allow collecting events by type`() = createTestSimulation {
         ClockSync(500.milliseconds)
@@ -211,12 +213,17 @@ class EnvTests {
         val creations = collect<EntityCreatedEvent>()
         val cg = ComponentGenerator(exponential(1), total = 10) { Component() }
 
+        // also check the filter works
+        val creations2 = collect<EntityCreatedEvent> { it.time  < 3.asSimTime()}
+
+
         run(10)
 
         creations.size shouldBe (cg.total + 1) // +1 because of main
+
+        creations2.size shouldBe 5 // because sim is deterministic here
     }
 
-    @Suppress("DEPRECATION")
     @Test
     fun `it still support configuring dependencies before creating the simulation`() {
         class Car : Component() {
@@ -225,7 +232,7 @@ class EnvTests {
             }
         }
 
-        val env = createSimulation {
+       createSimulation {
             dependency { Car() }
 
             run(5.minutes)
@@ -237,6 +244,7 @@ class EnvTests {
     @Test
     fun `it still should fail when last element in createSimulation is a dependency as this will fail internally otherwise`() {
         shouldThrow<IllegalArgumentException> {
+            @Suppress("UNUSED_EXPRESSION")
             val sim = createSimulation {
                 dependency("foo") { 1 }
                 dependency("bar") { 2 }
@@ -297,9 +305,10 @@ class EnvTests {
 
         environment.run(4.days)
 
-        environment.nowTT shouldBe TickTime(4.0)
+        environment.nowTT shouldBe 4.tt
     }
 
+    @AmbiguousDuration
     @Test
     fun `it should run until or duration until has reached`() {
         createSimulation {
@@ -314,6 +323,7 @@ class EnvTests {
         }
     }
 
+    @AmbiguousDuration
     @Test
     fun `it should restore koin in before running sims in parallel`() {
         class QueueCustomer(mu: Double, val atm: Resource) : Component() {
@@ -524,9 +534,10 @@ class CustomKoinModuleTests {
         now shouldBeGreaterThan koin.get<Tester>().created
     }
 
+    @AmbiguousDuration
     @Test
     fun `it should create components on simulation start`() {
-        val deps = declareDependencies {
+        createSimulation {
             // register components needed for dependency injection
             dependency {
                 println("foo")
@@ -534,9 +545,8 @@ class CustomKoinModuleTests {
             }
             dependency { CustomerGenerator(get()) }
             dependency { (1..3).map { Clerk() } }
-        }
 
-        createSimulation(dependencies = deps) {
+
             run(50000.0)
 
             val waitingLine: ComponentQueue<Customer> = get()

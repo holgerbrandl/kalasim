@@ -49,6 +49,8 @@ fun declareDependencies(
 fun KoinModule.createSimulation(
     /** The start time of the simulation model. Defaults to 1970-01-01T00:00:00Z following the convention of kotlin.time.Instant.*/
     startDate: SimTime = SimTime.fromEpochMilliseconds(0),
+    /** If enabled, it will render a tabular view of recorded interaction, state change and resource events. */
+    enableComponentLogger: Boolean = false,
     useCustomKoin: Boolean = false,
     /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
     durationUnit: DurationUnit = MINUTES,
@@ -56,6 +58,7 @@ fun KoinModule.createSimulation(
     builder: Environment.() -> Unit,
 ): Environment = createSimulation(
     startDate = startDate,
+    enableComponentLogger=enableComponentLogger,
     dependencies = this,
     useCustomKoin = useCustomKoin,
     tickDurationUnit = durationUnit,
@@ -66,6 +69,8 @@ fun KoinModule.createSimulation(
 fun createSimulation(
     /** The start time of the simulation model. Defaults to 1970-01-01T00:00:00Z following the convention of kotlin.time.Instant.*/
     startDate: SimTime = SimTime.fromEpochMilliseconds(0),
+    /** If enabled, it will render a tabular view of recorded interaction, state change and resource events. */
+    enableComponentLogger: Boolean = false,
     dependencies: KoinModule? = null,
     useCustomKoin: Boolean = false,
     /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
@@ -74,6 +79,7 @@ fun createSimulation(
     builder: Environment.() -> Unit,
 ): Environment = Environment(
     startDate = startDate,
+    enableComponentLogger= enableComponentLogger,
     tickDurationUnit = tickDurationUnit,
     dependencies = dependencies,
     koin = if(useCustomKoin) koinApplication { }.koin else null,
@@ -104,7 +110,7 @@ fun main() {
 open class Environment(
     /** The start time of the simulation model. Defaults to 1970-01-01T00:00:00Z following the convention of kotlin.time.Instant.*/
     val startDate: SimTime = SimTime.fromEpochMilliseconds(0),
-    /** If enabled, it will render a tabular view of recorded  interaction and resource events. */
+    /** If enabled, it will render a tabular view of recorded interaction, state change and resource events. */
     enableComponentLogger: Boolean = false,
 
     /** Measure the compute time per tick as function of time. For details see  https://www.kalasim.org/advanced/#operational-control */

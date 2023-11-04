@@ -12,6 +12,7 @@ createSimulation {
         }
     }
 
+    // register to these events from the environment level
     addEventListener<MyEvent> { println(it.context) }
 
     run()

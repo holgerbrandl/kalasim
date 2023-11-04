@@ -3,7 +3,7 @@ import org.kalasim.examples.er.EmergencyRoom
 import java.util.logging.Logger
 import kotlin.time.Duration.Companion.days
 
-// Create simulation
+// Create a simulation of an emergency room
 val er = EmergencyRoom()
 
 // Add a custom event handler to forward events to the used logging library
@@ -14,5 +14,5 @@ er.addEventListener { event ->
     logger.info { event.toString() }
 }
 
-// Run the sim
+// Run the model for 100 days
 er.run(100.days)

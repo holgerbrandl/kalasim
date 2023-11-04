@@ -98,27 +98,6 @@ open class TickedComponent(
      *
      * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
      *
-     * @param duration Time to hold.
-     * @param priority If a component has the same time on the event list, this component is sorted according to
-     * the priority. An event with a higher priority will be scheduled first.
-     */
-//    @OptIn(AmbiguousDuration::class)
-//    suspend fun SequenceScope<Component>.hold(
-//        duration: Number? = null,
-//        description: String? = null,
-//        until: Instant? = null,
-//        priority: Priority = NORMAL,
-//        urgent: Boolean = false
-//    ) = yieldCurrent {
-//        this@TickedComponent.hold(duration?.toDuration(), description, until?.let{TickTime(it)}, priority, urgent)
-//    }
-
-
-    /**
-     * Hold the component.
-     *
-     * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
-     *
      * @param duration Time to hold. Either `duration` or `till` must be specified.
      * @param until Absolute time until the component should be held
      * @param priority If a component has the same time on the event list, this component is sorted according to
@@ -1543,6 +1522,7 @@ open class Component(
         predicate: (T) -> Boolean
     ) = wait(
         StateRequest(state, predicate = predicate, priority = triggerPriority),
+        description = description,
         failPriority = failPriority,
         failAt = failAt,
         failDelay = failDelay,

@@ -67,6 +67,8 @@ fun interface EventListener {
 /**
  * Activates a global event-log, which stores all events on the kalasim event bus.
  *
+ * The log will be also registered as `EventLog` to the internal dependency registry.
+ *
  * See [Event Log](https://www.kalasim.org/events/) for details.
  *
  * @sample org.kalasim.dokka.eventsHowTo
@@ -108,7 +110,7 @@ class EventLog(
  * @sample org.kalasim.dokka.eventsHowTo
  * @param filter Optional filter lambda to further filter the events when populating the list
  */
-inline fun <reified E : Event> Environment.collect(crossinline filter: E.() -> Boolean = { true }): List<E> {
+inline fun <reified E : Event> Environment.collect(crossinline filter: (E) -> Boolean = { true }): List<E> {
     val traces: MutableList<E> = mutableListOf()
 
     addEventListener {
