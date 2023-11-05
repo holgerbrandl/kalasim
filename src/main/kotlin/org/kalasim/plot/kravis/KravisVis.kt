@@ -8,8 +8,6 @@ import org.kalasim.Component
 import org.kalasim.analysis.ResourceActivityEvent
 import org.kalasim.monitors.*
 import java.awt.*
-import java.nio.file.Files
-import java.time.Instant
 import kotlin.time.Duration
 
 fun canDisplay() = !GraphicsEnvironment.isHeadless() && hasR()
@@ -49,7 +47,7 @@ fun <V : Number> MetricTimeline<V>.display(
     from: TickTime,
     to: TickTime,
 ): GGPlot {
-    return display(title, env.toWallTime(from), env.toWallTime(to), true)
+    return display(title, env.asSimTime(from), env.asSimTime(to), true)
 }
 
 fun <V : Number> MetricTimeline<V>.display(
@@ -64,7 +62,7 @@ fun <V : Number> MetricTimeline<V>.display(
 
     return data
         .plot(
-            x = { if(forceTickAxis) env.toTickTime(time).value else time },
+            x = { if(forceTickAxis) env.asTickTime(time).value else time },
             y = { value }
         )
         .xLabel("Time")
@@ -113,9 +111,9 @@ fun <T> CategoryTimeline<T>.display(
 
     // why cant we use "x".asDiscreteVariable here?
     return segments.plot(
-        x = { if(forceTickAxis) env.toTickTime(start).value else start },
+        x = { if(forceTickAxis) env.asTickTime(start).value else start },
         y = { value },
-        xend = { if(forceTickAxis) env.toTickTime(end).value else end },
+        xend = { if(forceTickAxis) env.asTickTime(end).value else end },
         yend = { value }
     )
         .xLabel("Time")
@@ -137,9 +135,9 @@ fun List<ResourceActivityEvent>.display(
     val env = this@display.first().requester.env
 
     return plot(y = { resource.name },
-        x = { if(forceTickAxis) env.toTickTime(honored).value else honored },
+        x = { if(forceTickAxis) env.asTickTime(honored).value else honored },
         yend = { resource.name },
-        xend = { if(forceTickAxis) env.toTickTime(released).value else released },
+        xend = { if(forceTickAxis) env.asTickTime(released).value else released },
         color = { activity ?: "Other" })
         .geomSegment(size = 10.0)
         .yLabel("")
@@ -165,7 +163,7 @@ fun List<ResourceTimelineSegment>.display(
     val env = this@display.first().resource.env
 
     return filter { it.metric !in exclude }
-        .plot(x = { if(forceTickAxis) env.toTickTime(start).value else start }, y = { value }, color = { metric })
+        .plot(x = { if(forceTickAxis) env.asTickTime(start).value else start }, y = { value }, color = { metric })
         .geomStep()
         .facetWrap("color", ncol = 1, scales = FacetScales.free_y)
         .also { if(title != null) ggtitle(title) }
@@ -191,11 +189,17 @@ fun List<Component>.displayStateTimeline(
 //    val df = csTimelineDF(componentName)
     val df = clistTimeline()
 
+    val env = first().env
+
     return df.plot(
         y = { first.name },
         yend = { first.name },
-        x = { second.timestamp },
-        xend = { second.timestamp + (second.duration ?: Duration.ZERO) },
+        x = { with(second) { if(forceTickAxis) env.asTickTime(timestamp).value else timestamp } },
+        xend = {
+            with(second.timestamp + (second.duration ?: Duration.ZERO)) {
+                if(forceTickAxis) env.asTickTime(this).value else this
+            }
+        },
         color = { second.value }
     )
         .geomSegment()

@@ -2,6 +2,7 @@ package org.kalasim.animation
 
 import org.kalasim.Component
 import org.kalasim.asDuration
+import org.kalasim.misc.AmbiguousDuration
 
 fun <K, V> Map<K, V>.cmeAvoidingCopy(): Map<K, V> {
     while(true) {
@@ -68,6 +69,7 @@ class AsyncAnimationStop(val rate: Double = 1.0) : Component() {
         stop = true
     }
 
+    @OptIn(AmbiguousDuration::class)
     override fun repeatedProcess() = sequence {
         if(stop) {
             stopSimulation()

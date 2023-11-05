@@ -38,7 +38,7 @@ fun main() {
         program {
             // load resources such as images
             val image = loadImage("src/main/resources/1024px-Phlegra_Montes_on_Mars_ESA211127.jpg")
-            val truck = loadSVG("src/main/resources/tractor-svgrepo-com.svg")
+//            val truck = loadSVG("src/main/resources/tractor-svgrepo-com.svg")
             val font = loadFont("file:IBM_Plex_Mono/IBMPlexMono-Bold.ttf", 24.0)
 
             // optionally enable video recording

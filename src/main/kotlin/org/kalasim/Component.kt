@@ -842,7 +842,7 @@ open class Component(
             scheduledTime = when {
                 failAt != null -> failAt
                 failDelay != null -> env.now + failDelay
-                else -> SimTime(Double.MAX_VALUE)
+                else -> SimTime.DISTANT_FUTURE
             }
 
             failed = false
@@ -1576,7 +1576,7 @@ open class Component(
         scheduledTime = when {
             failAt != null -> failAt
             failDelay != null -> env.now + failDelay
-            else -> SimTime(Double.MAX_VALUE)
+            else -> SimTime.DISTANT_FUTURE
         }
 
         stateRequests
@@ -1862,27 +1862,28 @@ data class StateRequest<T>(val state: State<T>, val priority: Priority? = null, 
 
 infix fun <T> State<T>.turns(value: T) = StateRequest(this) { it == value }
 
-internal fun formatWithInf(time: SimTime) =
-    if(time.isDistantFuture) "<inf>" else TRACE_DF.format(time.epochSeconds)
+internal fun formatWithInf(env: Environment?, time: SimTime?) : String =
+    if(time==null || time.isDistantFuture) "<inf>" else formatWithInf(env?.asTickTime(time))
 
-internal fun formatWithInf(time: TickTime) =
-    if(time.value == Double.MAX_VALUE || time.value.isInfinite()) "<inf>" else TRACE_DF.format(time.value)
+internal fun formatWithInf(time: TickTime?) : String =
+    if(time==null || time.value == Double.MAX_VALUE || time.value.isInfinite()) "<inf>" else TRACE_DF.format(time.value)
 
 
 data class ComponentLifecycleRecord(
     val component: String,
     val createdAt: SimTime,
     val inDataSince: SimTime?,
-    val inData: SimTime,
-    val inCurrent: SimTime,
-    val inStandby: SimTime,
-    val inPassive: SimTime,
-    val inInterrupted: SimTime,
-    val inScheduled: SimTime,
-    val inRequesting: SimTime,
-    val inWaiting: SimTime
+    val inData: Duration,
+    val inCurrent: Duration,
+    val inStandby: Duration,
+    val inPassive: Duration,
+    val inInterrupted: Duration,
+    val inScheduled: Duration,
+    val inRequesting: Duration,
+    val inWaiting: Duration
 )
 
+@OptIn(AmbiguousDuration::class)
 fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {
     val c = this
 
@@ -1892,14 +1893,14 @@ fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {
         c.name,
         c.creationTime,
         inDataSince = if(c.isData) c.stateTimeline.statsData().timepoints.last() else null,
-        (histogram[DATA] ?: 0.0).toTickTime(),
-        (histogram[CURRENT] ?: 0.0).toTickTime(),
-        (histogram[STANDBY] ?: 0.0).toTickTime(),
-        (histogram[PASSIVE] ?: 0.0).toTickTime(),
-        (histogram[INTERRUPTED] ?: 0.0).toTickTime(),
-        (histogram[SCHEDULED] ?: 0.0).toTickTime(),
-        (histogram[REQUESTING] ?: 0.0).toTickTime(),
-        (histogram[WAITING] ?: 0.0).toTickTime(),
+        env.asDuration(histogram[DATA] ?: 0.0),
+        env.asDuration(histogram[CURRENT] ?: 0.0),
+        env.asDuration(histogram[STANDBY] ?: 0.0),
+        env.asDuration(histogram[PASSIVE] ?: 0.0),
+        env.asDuration(histogram[INTERRUPTED] ?: 0.0),
+        env.asDuration(histogram[SCHEDULED] ?: 0.0),
+        env.asDuration(histogram[REQUESTING] ?: 0.0),
+        env.asDuration(histogram[WAITING] ?: 0.0),
     )
 }
 

@@ -6,6 +6,7 @@ import org.kalasim.animation.AnimationComponent
 import org.kalasim.examples.elevator.Car.DoorState.CLOSED
 import org.kalasim.examples.elevator.Car.DoorState.OPEN
 import org.kalasim.examples.elevator.Direction.*
+import org.kalasim.misc.AmbiguousDurationComponent
 import org.kalasim.misc.repeat
 import java.awt.Point
 import kotlin.time.Duration.Companion.days
@@ -40,6 +41,7 @@ enum class Direction {
 private fun getDirection(from: Int, to: Int) = if(from < to) UP else DOWN
 
 
+@OptIn(AmbiguousDurationComponent::class)
 class VisitorGenerator(
     val fromRange: Pair<Int, Int>,
     val toRange: Pair<Int, Int>,

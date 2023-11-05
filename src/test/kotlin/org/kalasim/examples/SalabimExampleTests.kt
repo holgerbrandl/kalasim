@@ -1,3 +1,5 @@
+@file:OptIn(AmbiguousDuration::class)
+
 package org.kalasim.examples
 
 import io.kotest.matchers.comparables.shouldBeLessThan
@@ -12,6 +14,7 @@ import org.kalasim.*
 import org.kalasim.examples.bank.oneclerk.Clerk
 import org.kalasim.examples.bank.oneclerk.Customer
 import org.kalasim.examples.bank.reneging.CustomerGenerator
+import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.median
 import org.kalasim.test.captureOutput
 import org.koin.core.context.stopKoin

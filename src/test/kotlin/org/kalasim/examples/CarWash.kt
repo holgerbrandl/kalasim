@@ -1,5 +1,6 @@
 //CarWash.kt
 import org.kalasim.*
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
 /**
@@ -16,7 +17,7 @@ fun main() {
     val NUM_MACHINES = 2  // Number of machines in the carwash
     val WASHTIME = 5.minutes      // Minutes it takes to clean a car
     val T_INTER = 7.0       // Create a car every ~7 minutes
-    val SIM_TIME = 20     // Simulation time in minutes
+    val SIM_TIME = 20.days     // Simulation time
 
     class Car : Component() {
         override fun process() = sequence {
@@ -44,5 +45,5 @@ fun main() {
     println("Check out http://youtu.be/fXXmeP9TvBg while simulating ... ;-)")
 
     // Start the simulation
-    env.run(until = SIM_TIME.toTickTime())
+    env.run(SIM_TIME)
 }

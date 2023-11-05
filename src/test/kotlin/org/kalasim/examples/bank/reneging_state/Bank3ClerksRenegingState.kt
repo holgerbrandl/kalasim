@@ -4,6 +4,7 @@ package org.kalasim.examples.bank.reneging_state
 
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
+import org.kalasim.misc.AmbiguousDuration
 import org.koin.core.component.inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -61,6 +62,7 @@ class Clerk(val workToDo: State<Boolean>) : Component() {
 }
 
 
+@AmbiguousDuration
 fun main() {
     val env = createSimulation {
         enableComponentLogger()
@@ -80,7 +82,7 @@ fun main() {
     val waitingLine: ComponentQueue<Customer> = env.get()
     val workToDo: State<Boolean> = env.get()
 
-    env.run(until = 50000.toTickTime())
+    env.run(50000)
 
     // with kravis
 //        waitingLine.queueLengthMonitor.display()

@@ -506,6 +506,8 @@ open class Environment(
     @AmbiguousDuration
     fun Number.asSimTime() =  env.asSimTime(this)
 
+    fun TickTime.asSimTime() =  env.asSimTime(this)
+
     // deprecated because nothing should be logged outside a process
 //    fun log(msg: String) = main.log(msg)
 }

@@ -17,7 +17,7 @@ class ComponentGenerator<T>(
     val iat: DurationDistribution,
     startAt: SimTime? = null,
     val forceStart: Boolean = false,
-    var until: SimTime = SimTime(Double.MAX_VALUE),
+    val until: SimTime? = null ,
     val total: Int = Int.MAX_VALUE,
     name: String? = null,
     priority: Priority = Priority.NORMAL,
@@ -37,7 +37,7 @@ class ComponentGenerator<T>(
         iat: RealDistribution,
         startAt: SimTime? = null,
         forceStart: Boolean = false,
-        until: SimTime = SimTime(Double.MAX_VALUE),
+        until: SimTime? = null,
         total: Int = Int.MAX_VALUE,
         name: String? = null,
         priority: Priority = Priority.NORMAL,
@@ -66,7 +66,7 @@ class ComponentGenerator<T>(
         iat: Duration,
         startAt: SimTime? = null,
         forceStart: Boolean = false,
-        until: SimTime = SimTime(Double.MAX_VALUE),
+        until: SimTime? = null,
         total: Int = Int.MAX_VALUE,
         name: String? = null,
         priority: Priority = Priority.NORMAL,
@@ -108,7 +108,7 @@ class ComponentGenerator<T>(
         while(true) {
             val interArrivalTime = iatSeq.next()
 
-            if((env.now + interArrivalTime) > until || isData) {
+            if(until!=null && (env.now + interArrivalTime) > until || isData) {
 //                yield(activate(at = until, process = ComponentGenerator<T>::doFinalize))
                 break
             }

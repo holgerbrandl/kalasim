@@ -67,7 +67,7 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
 
     @Deprecated("no longer needed as sim-time is also expressed as kotlinx.datetimex.Instant starting in v0.12")
     val nowWT: Instant = now
-//        get() = now.toWallTime()
+//        get() = now.asSimTime()
 
 
     val random

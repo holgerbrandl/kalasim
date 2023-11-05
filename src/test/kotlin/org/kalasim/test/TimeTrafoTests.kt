@@ -16,9 +16,9 @@ class TimeTrafoTests {
 
     @Test
     fun `it should preserve precision when transforming ticks to wall time`() = createTestSimulation(startDate) {
-        toWallTime(15.tt) shouldNotBe toWallTime(15.32.tt)
+        asSimTime(15.tt) shouldNotBe asSimTime(15.32.tt)
 
-        toWallTime(15.tt) shouldBe Instant.parse("2021-01-24T12:15:00Z")
+        asSimTime(15.tt) shouldBe Instant.parse("2021-01-24T12:15:00Z")
 
         300.seconds.asTicks() shouldNotBe 350.seconds.asTicks()
         30.seconds.asTicks() shouldBe 0.5
@@ -39,7 +39,7 @@ class TimeTrafoTests {
 
                 hold(90.minutes)
 
-                toWallTime(now.toTickTime()) shouldBe now
+                asSimTime(now.toTickTime()) shouldBe now
 
                 log(TimeTrafoTestEvent(now))
             }

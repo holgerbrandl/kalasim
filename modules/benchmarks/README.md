@@ -10,7 +10,10 @@ For gradle plugin options see https://github.com/melix/jmh-gradle-plugin
 
 * This will execute all (methods annotated with `@Benchmark`) benchmarks with their predefined parameters:
 
-`./gradlew --console=plain clean jmh`
+```bash
+# cd  cd /d/projects/scheduling/kalasim/modules/benchmarks
+./gradlew --console=plain clean jmh`
+```
 
 * Output is saved as CSV in `benchmarks/build/results/jmh/results.csv`
 
@@ -39,6 +42,8 @@ java -jar build/libs/benchmarks-jmh.jar  org.kalasim.benchmarks.FabBench
 ```
 
 ## References
+
+https://github.com/Kotlin/kotlinx-benchmark
 
 https://howtodoinjava.com/java/library/jmh-java-microbenchmark-harness/
 

@@ -8,6 +8,7 @@ import org.jetbrains.kotlinx.dataframe.api.*
 import org.kalasim.*
 import org.kalasim.analysis.ResourceEvent
 import org.kalasim.plot.kravis.display
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
 fun main() {
@@ -41,12 +42,12 @@ fun main() {
             }
         }
 
-        ComponentGenerator(normal(10, 2)) {
+        ComponentGenerator(normal(10, 2).minutes) {
             Patient()
         }
 
 
-        run(100)
+        run(20.days)
 
         nurses.occupancyTimeline.display()
         nurses.capacityTimeline.display()
@@ -79,25 +80,23 @@ fun main() {
 
 fun List<ResourceEvent>.displayTimeline(
     resources: List<Resource>? = null,
-    items: List<String> = listOf("capacity", "requesters", "claimers"),
+//    items: List<String> = listOf("capacity", "requesters", "claimers"),
     avg: Boolean = true
 ): GGPlot {
     // see https://github.com/r-simmer/simmer.plot/blob/master/R/plot.resources.R
 
     val data = this.filter { resources == null || resources.contains(it.resource) }
 
-    val env = data.first().requester.env
-
+//    val env = data.first().requester.env
 //    return data.plot(
 //        x = ResourceEvent::eventTime,
 //        y = ResourceEvent::occupancy
 //    ).xLabel("time").yLabel("").geomStep()
 
-    var df = data.toDataFrame()
+    val df = data.toDataFrame()
 //        .remove("type", "requester", "occupancy", "amount")
         .select("time", "resource", "capacity", "claimed", "requesters")
         .toKranglDF()
-
         .gather("statistic", "value", { listOf("capacity", "claimed", "requesters") })
 //        .sortedBy("resource", "time")
 
@@ -116,10 +115,3 @@ fun List<ResourceEvent>.displayTimeline(
     return smoothed.plot(x = "time", y = if(avg) "mean" else "value", color = "statistic")
         .xLabel("time").yLabel("").geomStep(alpha = 0.6).facetWrap("resource")
 }
-
-@JvmName("displayString")
-fun List<String>.display() {
-
-
-}
-//fun EventLog.get

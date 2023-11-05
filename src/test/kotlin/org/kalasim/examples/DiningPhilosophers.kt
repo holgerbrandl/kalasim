@@ -1,6 +1,10 @@
 //DiningPhilosophers.kt
 package org.kalasim.examples
 
+import com.github.holgerbrandl.kdfutils.toKranglDF
+import kravis.geomSegment
+import kravis.plot
+import org.jetbrains.kotlinx.dataframe.DataFrame
 import org.jetbrains.kotlinx.dataframe.api.*
 import org.kalasim.*
 import org.kalasim.analysis.ResourceEvent
@@ -35,7 +39,7 @@ fun main() {
     val sim = createSimulation {
         enableComponentLogger()
 
-        val ec = collect<Event>()
+//        val ec = collect<Event>()
 
         // create forks and resources
         val names = listOf("Socrates", "Pythagoras", "Plato", "Aristotle")
@@ -45,13 +49,14 @@ fun main() {
             Philosopher(name, forks[idx], forks[(idx + 1).rem(forks.size)])
         }
 
-        run(50)
+        run(50.minutes)
     }
 
     // Analysis (gather monitoring data (as in simmer:get_mon_arrivals)
     data class RequestRecord(val requester: String, val timestamp: SimTime, val resource: String, val quantity: Double)
 
     val tc = sim.get<EventLog>()
+
     val requests = tc.filterIsInstance<ResourceEvent>().map {
         val amountDirected = (if(it.type == ResourceEventType.RELEASED) -1 else 1) * it.amount
         RequestRecord(it.requester.name, it.time, it.resource.name, amountDirected)
@@ -59,20 +64,16 @@ fun main() {
 
     // transform data into shape suitable for interval plotting
     val requestsDf = requests.toDataFrame()
-
         .groupBy("requester")
         .sortBy("requester", "timestamp")
-        // TODO how to express lag here?
 //        .add("end_time") {   it["timestamp"].lag() }
         .add("end_time") { next()?.get("timestamp") }
         .add("state") { if(index().rem(2) == 0) "hungry" else "eating" }
         .filter { "quantity"<Int>() > 0 }
-//        .ungroup()
+        .toDataFrame()
 
     // visualize with kravis
-    // todo bring back once kravis has been fully ported
-//    requestsDf
-//        .toKranglDF()
-//        .plot(x = "timestamp", xend = "end_time", y = "requester", yend = "requester", color = "state")
-//        .geomSegment(size = 15.0)
+    requestsDf
+        .plot(x = "timestamp", xend = "end_time", y = "requester", yend = "requester", color = "state")
+        .geomSegment(size = 15.0)
 }

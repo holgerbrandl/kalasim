@@ -23,7 +23,7 @@ dependencies {
     jmh("org.apache.commons:commons-lang3:3.12.0")
     jmh("org.slf4j:slf4j-simple:2.0.9")
 
-    jmh("com.github.holgerbrandl:kalasim:0.9.2-SNAPSHOT")
+    jmh("com.github.holgerbrandl:kalasim:2023.1-SNAPSHOT")
 
 //    jmh ("com.systema.risuite:fsm-simulator:2.4.1")
 //    jmh(project(":"))

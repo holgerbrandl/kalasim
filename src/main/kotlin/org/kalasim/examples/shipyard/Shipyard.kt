@@ -77,8 +77,8 @@ class Shipyard() : Environment(tickDurationUnit = DurationUnit.DAYS) {
         // subcomponents
         val products = listOf(
             Part("ship1", normal(5.days, 2.days, rectify = true), rumpf, deck, bridge),
-            Part("ship2", normal(3.days, 1.days, rectify = true), rumpf, rumpf, rumpf),
-            Part("ship3", normal(3.days, 1.days, rectify = true), rumpf, bridge, deck)
+            Part("ship2", normal(3.days, 1.days, rectify = true), rumpf, rumpf, rumpf, lackieren),
+            Part("ship3", normal(3.days, 1.days, rectify = true), rumpf, bridge, deck, kitchen)
         )
 
         return products

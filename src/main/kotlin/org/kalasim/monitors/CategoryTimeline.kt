@@ -1,10 +1,9 @@
 package org.kalasim.monitors
 
-import org.kalasim.SimTime
+import org.kalasim.*
 import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.DependencyContext
 import org.kalasim.misc.time.sum
-import org.kalasim.toTickTime
 import org.koin.core.Koin
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -68,7 +67,7 @@ class CategoryTimeline<T>(
 
 
     @AmbiguousDuration
-    override fun get(time: Number): T? = get(time.toTickTime())
+    override fun get(time: Number): T? = get(env.asSimTime(time))
 
     override fun get(time: SimTime): T? {
         require(enabled) {

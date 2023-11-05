@@ -469,8 +469,8 @@ val Resource.timeline: List<ResourceTimelineSegment>
 
         // optionally add walltimes
 //        if (env.tickTransform != null) {
-//            statsDF = statsDF.add("start_wt") { it["start"].map<TickTime> { env.toWallTime(it) } }
-//            statsDF = statsDF.add("end_wt") { it["end"].map<TickTime> { env.toWallTime(it) } }
+//            statsDF = statsDF.add("start_wt") { it["start"].map<TickTime> { env.asSimTime(it) } }
+//            statsDF = statsDF.add("end_wt") { it["end"].map<TickTime> { env.asSimTime(it) } }
 //        }
 
         return statsDF.toListOf<ResourceTimelineSegment>()

@@ -179,7 +179,7 @@ class QueueTests {
                 batchComplete.size shouldBe 4
                 env.nowTT shouldBe 8.tt
 
-                hold(until = TickTime(20.0).toWallTime())
+                hold(until = TickTime(20.0).asSimTime())
 
                 val batchPartial = batch(waitingLine, 4, timeout = 10.minutes)
                 batchPartial.size shouldBe 2

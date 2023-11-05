@@ -36,7 +36,8 @@ import kotlin.time.DurationUnit
 
 typealias SimTime = Instant
 
-@Deprecated("use is disencouraged because it has an implicit reference to tick-duration of environment")
+@Suppress("DeprecatedCallableAddReplaceWith")
+@Deprecated("Use is Disencouraged because it has an implicit reference to tick-duration of environment")
 fun SimTime(offset: Number) = SimTime.fromEpochMilliseconds(offset.toLong())
 
 
@@ -52,13 +53,15 @@ value class Ticks(val value: Double) {
     constructor(instant: Number) : this(instant.toDouble())
 }
 
+@Suppress("DEPRECATION")
+@AmbiguousDuration
 val Number.simTime: SimTime
     get() = SimTime(this)
 
 val Number.tt: TickTime
     get() = TickTime(this.toDouble())
 
-fun Number.toTickTime() = SimTime(this)
+fun Number.asTickTime() = TickTime(this.toDouble())
 
 
 // https://stackoverflow.com/questions/32437550/whats-the-difference-between-instant-and-localdatetime
@@ -101,16 +104,16 @@ fun Environment.asTicks(duration: Duration): Double = duration.asTicks()
 @AmbiguousDuration
 fun Environment.asSimTime(someWhen: Number): SimTime = startDate + asDuration(someWhen)
 
+
+@OptIn(AmbiguousDuration::class)
+fun Environment.asSimTime(time: TickTime) = startDate + asDuration(time.value)
+
+
 @AmbiguousDuration
 fun Environment.asDuration(duration: Number): Duration = duration.let {
     tickTransform.ticks2Duration(duration.toDouble())
 }
 
 /** Transforms an wall `Instant` to simulation time.*/
-fun Environment.toTickTime(instant: SimTime) = instant.toTickTime()
+fun Environment.asTickTime(instant: SimTime) = instant.toTickTime()
 
-/** Transforms a simulation time (typically `now`) to the corresponding wall time. */
-fun Environment.toWallTime(time: TickTime) = time.toWallTime()
-//fun Environment.toWallTimeOrNull(time: TickTime) = time.toWallTime()
-
-//operator fun Instant.plus(duration: Duration): Instant = this.plus(duration.toJavaDuration())

@@ -64,7 +64,7 @@ class ResourceEvent(
 
 }
 
-//internal fun Environment.asWtOptional(tickTime: TickTime) = if(hasAbsoluteTime()) toWallTime(tickTime) else null
+//internal fun Environment.asWtOptional(tickTime: TickTime) = if(hasAbsoluteTime()) asSimTime(tickTime) else null
 
 data class ResourceActivityEvent(
     val requested: SimTime,
@@ -188,10 +188,10 @@ class RescheduledEvent(
 
     override val action: String
         get() {
-            val extra = ", scheduled for ${formatWithInf(component?.env?.wall2TickTime(scheduledFor)!!)}"
+            val extra = ", scheduled for ${formatWithInf(component?.env, scheduledFor)}"
 
             val delta = if(this.scheduledFor == time || (this.scheduledFor.isDistantFuture)) "" else {
-                val scheduledIn = component.env.asTicks(scheduledFor - time)
+                val scheduledIn = component!!.env.asTicks(scheduledFor - time)
                 "+" + TRACE_DF.format(scheduledIn) + " "
             }
 

@@ -22,7 +22,7 @@ fun <V : Number> MetricTimeline<V>.display(
     title: String = name,
     from: SimTime? = null,
     to: SimTime? = null,
-    forceTickAxis: Boolean = false,
+//    forceTickAxis: Boolean = false,
 ): Plot {
     val data = stepFun()
         .filter { from == null || it.time >= from }

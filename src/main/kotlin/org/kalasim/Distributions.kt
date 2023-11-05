@@ -109,18 +109,6 @@ fun SimContext.triangular(lowerLimit: Number, mode: Number, upperLimit: Number):
 fun SimContext.triangular(lowerLimit: Duration, mode: Duration, upperLimit: Duration): DurationDistribution =
     TriangularDistribution(env.rg, lowerLimit.inSeconds, mode.inSeconds, upperLimit.inSeconds).seconds
 
-/** Clip the values of the distribution to the provided interval. */
-// we could also adopt kotlin stdlib conventions and use coerceIn, coerceAtLeast and coerceAtMost
-@Deprecated("Use rectify argument when creating normal distribution with normal(mean,sd, rectify=true)")
-fun RealDistribution.clip(lower: Number = 0, upper: Number = Double.MAX_VALUE) =
-    Clipper(this, lower.toDouble(), upper.toDouble())
-
-
-@Deprecated("substituted with rectify argument in normal()")
-class Clipper internal constructor(val dist: RealDistribution, val lower: Double, val upper: Double) {
-    operator fun invoke(): Double = min(max(dist(), lower), upper)
-}
-
 
 /**
  * Uniform distribution with built-in support for controlled-randomization.

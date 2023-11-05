@@ -17,7 +17,7 @@ Minor improvements
 * Expose `Environment.getOrNull<T>()` from [koin](https://github.com/InsertKoinIO/koin/issues/182) to check for presence of registered dependencies in simulation environment
 * [#46](https://github.com/holgerbrandl/kalasim/issues/46) clarify use of collect with filter 
 * [#52](https://github.com/holgerbrandl/kalasim/issues/54) Improved visualization of metric timelines to support zoom range
-* [#67](https://github.com/holgerbrandl/kalasim/issues/67) & [#65](https://github.com/holgerbrandl/kalasim/issues/65)  Added more safety guard mechanisms to prevent context violations when branching component processes.
+* [#67](https://github.com/holgerbrandl/kalasim/issues/67) & [#64](https://github.com/holgerbrandl/kalasim/issues/64) Added more safety guard mechanisms to prevent context violations when branching component processes.
 
 Starting with this release we have switched to calendar versioning for better clarity regarding our release density, timing and schedule.
 
@@ -216,7 +216,7 @@ createSimulation {
     tickTransform = OffsetTransform(Instant.now(), DurationUnit.MINUTES)
 
     run(Duration.ofMinutes(90).asTicks())
-    println(toWallTime(now))
+    println(asSimTime(now))
 }
 ```
 

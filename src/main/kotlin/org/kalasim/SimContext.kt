@@ -21,22 +21,14 @@ interface SimContext : KoinComponent {
     val Duration.ticks: Double
         get() = asTicks()
 
-    // Scoped extensions
-    fun Instant.toTickTime(): TickTime {
-        require(env.startDate != null) { MISSING_TICK_TRAFO_ERROR }
+    /**
+     * Converts an [SimTime] to a [TickTime] using the current environment's wall-to-tick time conversion.
+     *
+     * @return The converted [TickTime].
+     */// Scoped extensions
+    fun SimTime.toTickTime(): TickTime {
         return env.wall2TickTime(this)
     }
-
-//    operator fun TickTime.plus(duration: Duration): TickTime = TickTime(value + duration.asTicks())
-//    operator fun TickTime.minus(duration: Duration): TickTime = TickTime(value - duration.asTicks())
-
-    /** Transforms a simulation time (typically `now`) to the corresponding wall time. */
-    @Deprecated("no longer needed as sim-time is also expressed as kotlinx.datetimex.Instant starting in v0.12")
-    fun TickTime.toWallTime(): Instant {
-        require(env.startDate != null) { MISSING_TICK_TRAFO_ERROR }
-        return env.tick2wallTime(this)
-    }
-
 
     fun Number.toDuration(): Duration = env.tickTransform.ticks2Duration(this.toDouble())
 
