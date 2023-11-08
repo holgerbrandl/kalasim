@@ -1,5 +1,7 @@
 package org.kalasim.monitors
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.apache.commons.math3.stat.Frequency
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
@@ -10,6 +12,15 @@ import org.kalasim.misc.time.sumOf
 import org.koin.core.Koin
 import java.util.*
 import kotlin.time.Duration
+
+//class MetricWalltTimeline<V : Number>(
+//    name: String? = null,
+//    initialValue: V,
+//    koin: Koin = DependencyContext.get()
+//) : MetricTimeline<V>(name, initialValue, koin){
+//
+//    override fun getCurrentTime(): SimTime = Clock.System.now()
+//}
 
 /**
  * Allows to track a numeric quantity over time.
@@ -34,7 +45,7 @@ open class MetricTimeline<V : Number>(
     override fun addValue(value: V) {
         if(!enabled) return
 
-        timestamps.add(env.now)
+        timestamps.add(getCurrentTime())
         values.add(value)
     }
 
@@ -71,7 +82,7 @@ open class MetricTimeline<V : Number>(
 
         val valuesLst = values.toList()
 
-        val timepointsExt = timestamps + env.now
+        val timepointsExt = timestamps + getCurrentTime()
         val durations = timepointsExt.toMutableList().zipWithNext { first, second -> second - first }
 
         return if(excludeZeros) {
@@ -83,6 +94,8 @@ open class MetricTimeline<V : Number>(
             LevelStatsData(valuesLst, timestamps, durations)
         }
     }
+
+    private fun getCurrentTime() = env.now
 
     /** Returns the step function of this monitored value along the time axis. */
     override fun stepFun() = statsData().stepFun()

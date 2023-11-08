@@ -16,7 +16,7 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
     final override val env = getKoin().get<Environment>()
 
     /** The (possibly auto-generated) name of this simulation entity.*/
-    val name = name?.run {
+    val name: String = name?.run {
         if(endsWithCDU()) defaultName(env.nameCache) else this
     } ?: javaClass.defaultName(env.nameCache)
 

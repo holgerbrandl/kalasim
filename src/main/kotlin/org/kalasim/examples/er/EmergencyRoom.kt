@@ -250,11 +250,12 @@ class EmergencyRoom(
     /** The execution planning policy of the ER. */
     val nurse: HeadNurse = FifoNurse(),
 
+    tickDurationUnit: DurationUnit = DurationUnit.HOURS,
     enableComponentLogger: Boolean = false,
     enableInternalMetrics: Boolean = false,
 ) : Environment(
     enableComponentLogger = enableComponentLogger,
-    tickDurationUnit = DurationUnit.HOURS
+    tickDurationUnit = tickDurationUnit
 ) {
 
     // todo this should be opt-in anyway https://github.com/holgerbrandl/kalasim/issues/66

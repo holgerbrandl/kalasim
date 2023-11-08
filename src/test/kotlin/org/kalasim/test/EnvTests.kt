@@ -7,7 +7,6 @@ import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
 import junit.framework.Assert.fail
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import krangl.cumSum
 import krangl.mean
@@ -15,8 +14,7 @@ import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
-import org.kalasim.analysis.EntityCreatedEvent
-import org.kalasim.analysis.RescheduledEvent
+import org.kalasim.analysis.*
 import org.kalasim.examples.bank.data.*
 import org.kalasim.examples.er.EmergencyRoom
 import org.kalasim.misc.*
@@ -33,12 +31,6 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
-
-fun main() {
-    val now = Clock.System.now()
-    val instant = now + 5.minutes
-    println(instant)
-}
 
 @OptIn(AmbiguousDurationComponent::class)
 class EnvTests {
@@ -204,6 +196,72 @@ class EnvTests {
         (System.currentTimeMillis() - timeBefore) / 1000.0 shouldBe 5.0.plusOrMinus(1.0)
     }
 
+    @Test
+    fun `it should log bus metrics`() {
+        lateinit var sim : Environment
+
+        val creationOutput = captureOutput {
+            sim = EmergencyRoom(tickDurationUnit = DurationUnit.MINUTES, enableInternalMetrics = true).apply {
+                // add mus metrics monitoring
+               dependency { BusMetrics(timelineInterval = 10.minutes, walltimeInterval = 7.seconds)}
+
+                // configure a down-takting
+                ClockSync(500.milliseconds)
+            }
+        }
+
+        creationOutput.stdout shouldBeDiff ""
+
+
+        val runOutput = captureOutput {
+           sim.run(30.minutes)
+        }
+
+        runOutput.stdout shouldBeDiff """
+            INFO 1 - BusMetrics.1: 13 events processed in last 10m
+            INFO 1 - BusMetrics.1: 1 events processed in last 10m
+            INFO 1 - BusMetrics.1: 7 events processed in last 10m
+        """.trimIndent()
+
+        val postOutput = captureOutput {
+            sleep(10.seconds.inWholeMilliseconds)
+        }
+
+        postOutput.stdout shouldBeDiff """
+            INFO 1 - BusMetrics.1: 0.0 events processed on average per wall-time second
+        """.trimIndent()
+
+
+        val busMetrics = sim.get<BusMetrics>()
+
+        busMetrics.stop()
+        busMetrics.eventDistribution.statistics["RescheduledEvent"] shouldBe 10.0
+
+        // nothing must be logged after stop
+        val stoppedOutput = captureOutput {
+            sleep(5.seconds.inWholeMilliseconds)
+        }
+        stoppedOutput.stdout shouldBeDiff ""
+    }
+
+    @Test
+    fun `it should run a process at the end of the run time`() = createTestSimulation {
+        // it's an important part of the spec if scheduled tasks at the end of the run() interval are executed or not
+        // That's why we hardcode this behavior in a test
+
+        var afterHour= false
+
+        object : Component(){
+            override fun process() = sequence {
+                hold(60.minutes)
+                afterHour = true
+            }
+        }
+
+        run(1.hour, priority = Priority.LOW)
+
+        afterHour shouldBe true
+    }
 
     @OptIn(AmbiguousDuration::class)
     @Test
@@ -214,7 +272,7 @@ class EnvTests {
         val cg = ComponentGenerator(exponential(1), total = 10) { Component() }
 
         // also check the filter works
-        val creations2 = collect<EntityCreatedEvent> { it.time  < 3.asSimTime()}
+        val creations2 = collect<EntityCreatedEvent> { it.time < 3.asSimTime() }
 
 
         run(10)
@@ -232,7 +290,7 @@ class EnvTests {
             }
         }
 
-       createSimulation {
+        createSimulation {
             dependency { Car() }
 
             run(5.minutes)

@@ -78,7 +78,6 @@ class ClockSync(
             }
 
             // wait until the next sync event is due
-            println("holding for $holdTime")
             hold(holdTime)
         }
     }

@@ -61,6 +61,8 @@ dependencies {
 
     //experimental dependencies  use for experimentation
     testImplementation("com.thoughtworks.xstream:xstream:1.4.20")
+    testImplementation("org.slf4j:slf4j-simple:1.7.30")
+
 
     //https://youtrack.jetbrains.com/issue/KT-44197
 

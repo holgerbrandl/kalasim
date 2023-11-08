@@ -14,7 +14,7 @@ fun SimulationEntity.printInfo() = println(this)
 
 internal data class CapturedOutput(val stdout: String, val stderr: String)
 
-internal fun captureOutput(expr: () -> Any): CapturedOutput {
+internal fun captureOutput(expr: () -> Unit): CapturedOutput {
     val origOut = System.out
     val origErr = System.err
     // https://stackoverflow.com/questions/216894/get-an-outputstream-into-a-string

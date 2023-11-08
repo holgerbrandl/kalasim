@@ -142,7 +142,7 @@ class ComponentTests {
 
         run(8.days)
 
-        repeatCounter shouldBe 7
+        repeatCounter shouldBe 8
     }
 
 
@@ -294,7 +294,8 @@ class ComponentTests {
 1.00                                                  Hold +1.00, scheduled for 2.00                         New state: scheduled
 2.00                                                  Released 1.0 from 'Resource.1'
 2.00                                                  ResourceActivityEvent(requested=1970-01-01T00:01:0...
-2.00                                                  Ended                                                  New state: data""".trimIndent()
+2.00                                                  Ended                                                  New state: data
+""".trimIndent()
 
 
     @Test

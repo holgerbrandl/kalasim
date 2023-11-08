@@ -145,11 +145,13 @@ open class TickedComponent(
  * A kalasim component is used as component (primarily for queueing) or as a component with a process.
  * Usually, a component will be defined as a subclass of Component.
  *
- *  @param name name of the component.  if the name ends with a period (.), auto-indexing will be applied  if the name end with a comma, auto serializing starting at 1 will be applied  if omitted, the name will be derived from the class it is defined in (lowercase)
- * @param at schedule time
- * @param delay schedule with a delay if omitted, no delay
+ * For more information about components see [user manual](https://www.kalasim.org/component).
+ *
+ * @param name name of the component.  if the name ends with a period (.), auto-indexing will be applied  if the name end with a comma, auto serializing starting at 1 will be applied  if omitted, the name will be derived from the class it is defined in (lowercase)
+ * @param at Schedule time
+ * @param delay Schedule with a delay if omitted, no delay
  * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
- * @param process  of process to be started.  if None (default), it will try to start self.process()
+ * @param process The process to be started. If None (default), it will try to start self.process()
  * @param koin The dependency resolution context to be used to resolve the `org.kalasim.Environment`
  */
 open class Component(
@@ -165,7 +167,7 @@ open class Component(
 //    builder: SequenceScope<Component>.() -> Unit = {   }
 ) : SimulationEntity(name, koin) {
 
-    val logger = KotlinLogging.logger {}
+    val logger = KotlinLogging.logger(this.name)
 
     private var oneOfRequest: Boolean = false
 
@@ -173,9 +175,6 @@ open class Component(
     internal val claims = mutableMapOf<Resource, RequestContext>()
 
     private val waits = mutableListOf<StateRequest<*>>()
-
-    init {
-    }
 
     /** Will be `true` if a component's request was not honored in time, or a wait predicate was not met before it timed outs. */
     var failed: Boolean = false
@@ -193,11 +192,6 @@ open class Component(
 
     private var remainingDuration: Duration? = null
 
-//    init {
-//        println(Component::process == this::process)
-//        this.javaClass.getMethod("process").getDeclaringClass();
-//    }
-
     fun interface ComponentStateChangeListener {
         fun stateChanged(component: Component)
     }
@@ -212,9 +206,7 @@ open class Component(
             stateTimeline.addValue(value)
 
             stateChangeListeners.forEach { it.stateChanged(this) }
-//            if (trackingPolicy.logStateChangeEvents) log(stateChangeEvent())
         }
-//        get() = csState.value
 
 
     val stateTimeline = CategoryTimeline(componentState, "status of ${this.name}", koin)
@@ -263,7 +255,6 @@ open class Component(
         val tickDelay = delay ?: Duration.ZERO
 
 //        if (at != null || (process != null && (process.name != "process" || overriddenProcess))) {
-        @Suppress("LeakingThis")
         if(simProcess != null && this !is MainComponent) {
             val scheduledTime = if(at == null) {
                 env.now + tickDelay
@@ -318,18 +309,6 @@ open class Component(
         }
     }
 
-//    open fun ProcessContext.repeatedProcess() = sequence<Component> { }
-//
-//    open fun repeatedProcess() = sequence<Component> { }
-
-
-    /** Generator function that implements "process". This can be overwritten in component classes a convenience alternative to process itself.*/
-    // no longer needed  and redundant API
-//    open suspend fun ProcContext.process(it: Component) {}
-
-    // no longer needed  and redundant API
-//    open suspend fun ProcContext.process() {}
-
     /** @return `true` if status is `PASSIVE`, `false` otherwise. */
     val isPassive: Boolean
         get() = componentState == PASSIVE
@@ -365,17 +344,19 @@ open class Component(
         get() = waits.isNotEmpty()
 
 
-    /** Passivate a component.
+    /**
+     * Passivate a component.
      *
-     * For `passivate` contract see [user manual](https://www.kalasim.org/component/#passivate)
+     * For `passivate()` contract see [user manual](https://www.kalasim.org/component/#passivate)
      */
     suspend fun SequenceScope<Component>.passivate(): Unit = yieldCurrent {
         this@Component.passivate()
     }
 
-    /** Passivate a component.
+    /**
+     * Passivate a component.
      *
-     * For `passivate` contract see [user manual](https://www.kalasim.org/component/#passivate)
+     * For `passivate()` contract see [user manual](https://www.kalasim.org/component/#passivate)
      */
     fun passivate() {
         remainingDuration = if(componentState == CURRENT) {
@@ -393,6 +374,7 @@ open class Component(
 
         logStateChange()
     }
+
 
     fun logStateChange(
         details: String? = null,
@@ -423,8 +405,10 @@ open class Component(
 
     private var interruptedStatus: ComponentState? = null
 
-    /** interrupt level of an interrupted component  non interrupted components return 0. */
-    var interruptLevel = 0
+    /**
+     * Interrupt level of an interrupted component  non interrupted components return 0.
+     */
+    private var interruptLevel = 0
         private set
 
     /** Interrupt the component.
@@ -447,16 +431,11 @@ open class Component(
         logInternal(trackingConfig.logInteractionEvents, "interrupt (level=$interruptLevel)")
     }
 
-    /** Resumes an interrupted component. Can only be applied to interrupted components.
+    /**
+     * Resumes an interrupted component.
      *
-     * For the full contract definition see https://www.kalasim.org/component/#interrupt
-
-     * @param all If `true`, the component returns to the original status, regardless of the number of interrupt levels if
-     * `false` (default), the interrupt level will be decremented and if the level reaches 0, the component will return
-     * to the original status.
-     * @param priority If a component has the same time on the event list, this component is sorted according to
-    the priority.
-     */
+     * Can only be applied to interrupted components.
+     * For the full contract definition, see [https*/
     fun resume(all: Boolean = false, priority: Priority = NORMAL) {
         // not part of original impl
         require(componentState == INTERRUPTED) { "Can only resume interrupted components" }

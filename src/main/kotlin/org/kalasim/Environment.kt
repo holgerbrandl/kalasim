@@ -9,6 +9,7 @@ import org.apache.commons.math3.random.RandomGenerator
 import org.kalasim.ComponentState.CURRENT
 import org.kalasim.ComponentState.STANDBY
 import org.kalasim.Defaults.DEFAULT_SEED
+import org.kalasim.Priority.Companion.LOWEST
 import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.analysis.ConsoleTraceLogger
 import org.kalasim.analysis.InteractionEvent
@@ -113,7 +114,7 @@ open class Environment(
     randomSeed: Int = DEFAULT_SEED,
 ) : SimContext, WithJson {
 
-    private var running: Boolean = false
+    internal var running: Boolean = false
 
     val rg: RandomGenerator = JDKRandomGenerator(randomSeed)
     val random: kotlin.random.Random = kotlin.random.Random(randomSeed.toLong())
@@ -295,21 +296,22 @@ open class Environment(
 
   
     /**
-     * Start execution of the simulation
+     * Start execution of the simulation.
      *
-     * If neither `until` nor `ticks` are specified, the main component will be reactivated at
+     * If neither `until` nor `ticks` are specified, the simulation will be reactivated at
      * the time there are no more events on the event-list, i.e. possibly not at Double.MAX_VALUE. If you want
      * to keep a simulation running simply call `run(Double.MAX_VALUE)`.
      *
      * @param duration Time to run
      * @param until Absolute tick-time until the which the simulation should run
-     * @param priority If a component has the same time on the event list, the main component is sorted according to
-     * the priority. An event with a higher priority will be scheduled first.
+     * @param priority Adjusts the termination priority. By default the simulation is scheduled with Priority.LOWEST,
+     * that is components scheduled for the same time specified by `duration` or `until` will be run before the simulation is stopped.
+     * An event with a higher priority will be scheduled first.
      */
     fun run(
         duration: Duration? = null,
         until: SimTime? = null,
-        priority: Priority = NORMAL,
+        priority: Priority = LOWEST,
         urgent: Boolean = false,
     ) {
         // also see https://simpy.readthedocs.io/en/latest/topical_guides/environments.html

@@ -38,7 +38,7 @@ class StateTransitionTests {
         println("car events are ${interactions.map { it.toString() }.joinToString("\n")}")
 
         val cars = interactions.map { it.entity }.distinct().filter { it.name.startsWith("TestCar") }
-        assertEquals(5, cars.size, "expected cars count does not match")
+        assertEquals(6, cars.size, "expected cars count does not match")
     }
 
 

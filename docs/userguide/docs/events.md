@@ -38,6 +38,7 @@ createSimulation {
 Event listener implementations typically do not want to consume all events but filter for specific types or simulation entities. This filtering can be implemented in the listener or by providing a the type of interest, when adding the listener.
 
 
+
 ## Event Collector
 
 A more selective monitor that will just events of a certain type is the event collector. It needs to be created before running the simulation (or from the moment when events shall be collected).
@@ -126,9 +127,26 @@ createSimuation(enableComponentLogger = true){
 !!!note 
     The user can change the width of individual columns with `ConsoleTraceLogger.setColumnWidth()`
 
+
+## Bus Metrics
+
+By creating a `BusMetrics` within a simulation environment, log statistics (load & distribution) are computed and logged to the bus.
+
+```kotlin
+createSimulation{
+    BusMetrics(
+        timelineInterval = 3.seconds,
+        walltimeInterval =  20.seconds
+    )    
+}
+```
+Here, every 3 seconds in simulation time, the event rate is logged. Additionally, every 20 walltime second, the event rate is logged asynchronously.
+
+Metrics are logged via `slf4j`. The async logging can be stopped via `busMetrics.stop()`.
+
 ## Logging Framework Support
 
-It's very easy to also log `kalasim` events via another logging library such as [log4j](https://logging.apache.org/log4j), [https://logging.apache.org/log4j/2.x/](https://www.slf4j.org), [kotlin-logging](https://github.com/MicroUtils/kotlin-logging) or the jdk-bundled [util-logger](https://docs.oracle.com/javase/7/docs/api/java/util/logging/Logger.html). This is how it works:
+`kalasim` is using [`slf4j`](https://www.slf4j.org/) as logging abstraction layer. So, it's very easy to also log `kalasim` events via another logging library such as [log4j](https://logging.apache.org/log4j), [https://logging.apache.org/log4j/2.x/](https://www.slf4j.org), [kotlin-logging](https://github.com/MicroUtils/kotlin-logging) or the jdk-bundled [util-logger](https://docs.oracle.com/javase/7/docs/api/java/util/logging/Logger.html). This is how it works:
 
 ```kotlin
 //{!api/LoggingAdapter.kts!}
