@@ -58,6 +58,10 @@ dependencies {
 
 //    api("com.github.holgerbrandl:kravis:0.8.5")
 
+    implementation ("org.jetbrains.kotlinx:dataframe:0.12.0")
+    implementation("com.github.holgerbrandl:kdfutils:1.3.3")
+
+
     runtimeOnly(openrndr("gl3"))
     runtimeOnly(openrndrNatives("gl3"))
 //    implementation(openrndr("openal"))
