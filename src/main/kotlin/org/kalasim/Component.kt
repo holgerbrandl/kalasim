@@ -14,6 +14,7 @@ import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
 import kotlin.math.*
 import kotlin.reflect.KFunction1
+import kotlin.reflect.KFunction2
 import kotlin.time.Duration
 
 
@@ -137,6 +138,18 @@ open class TickedComponent(
     ) = yieldCurrent {
         this@TickedComponent.activate(at, delay.toDuration(), priority, urgent, keepRequest, keepWait, process)
     }
+
+//    suspend fun SequenceScope<Component>.activate(
+//        at: SimTime? = null,
+//        delay: Number = 0,
+//        priority: Priority = NORMAL,
+//        urgent: Boolean = false,
+//        keepRequest: Boolean = false,
+//        keepWait: Boolean = false,
+//        process: ProcessPointer2? = null
+//    ) = yieldCurrent {
+//        this@TickedComponent.activate(at, delay.toDuration(), priority, urgent, keepRequest, keepWait, process)
+//    }
 
 }
 
@@ -1771,6 +1784,7 @@ enum class ResourceSelectionPolicy {
 //
 
 typealias ProcessPointer = KFunction1<*, Sequence<Component>>
+typealias ProcessPointer2 = KFunction2<*, Any, Sequence<Component>>
 
 
 interface SimProcess {

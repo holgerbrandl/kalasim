@@ -1,54 +1,11 @@
-package org.kalasim
+package org.kalasim.logistics
 
 import com.github.holgerbrandl.kdfutils.renameToSnakeCase
-import org.jetbrains.kotlinx.dataframe.api.renameToCamelCase
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
 import org.jetbrains.kotlinx.dataframe.api.util.unfold
 import org.jetbrains.kotlinx.dataframe.io.writeCSV
 import kotlin.math.*
 import kotlin.random.Random
-
-// define simple geometries
-data class Point(val x: Double, val y: Double)
-
-
-fun Point.rotate(center: Point, angle: Double): Point {
-    val rad = Math.toRadians(angle)
-    val cos = cos(rad)
-    val sin = sin(rad)
-    val x = this.x - center.x
-    val y = this.y - center.y
-    val newX = x * cos - y * sin + center.x
-    val newY = x * sin + y * cos + center.y
-    return Point(newX, newY)
-}
-
-
-fun Point.scale(factor: Double): Point = Point(x * factor, y * factor)
-
-fun Point.normalize(): Point {
-    val length = sqrt(x * x + y * y)
-    return Point(x / length, y / length)
-}
-
-data class Rectangle(val offset: Point, val width: Double, val height: Double)
-
-// define routing model
-open class Node(val id: String, val position: Point)
-open class PathSegment(val id: String, val from: Node, val to: Node, val bidirectional: Boolean)
-data class Port(val id: String, val distance: Double, val segment: PathSegment){
-    val pathIntersection: Point = Point(
-            segment.from.position.x + distance * (segment.to.position.x - segment.from.position.x),
-            segment.from.position.y + distance * (segment.to.position.y - segment.from.position.y)
-        )
-    }
-
-
-// example usecase: city
-data class Car(val id: String, val distance: Double, val segment: PathSegment)
-
-enum class BuildingType { Business, Factory, Home }
-data class Building(val id: String, val area: Rectangle, val port: Port, val type: BuildingType)
 
 fun createPathGrid(
     xBlocks: Int = 16,
@@ -98,6 +55,9 @@ fun createPathGrid(
     return pathSegments
 }
 
+enum class BuildingType { Business, Factory, Home }
+data class Building(val id: String, val area: Rectangle, val port: Port, val type: BuildingType)
+
 
 fun createBuildings(pathSegments: List<PathSegment>, seed: Int = 42): List<Building> {
     val buildings = mutableListOf<Building>()
@@ -138,12 +98,6 @@ fun createBuildings(pathSegments: List<PathSegment>, seed: Int = 42): List<Build
     return buildings
 }
 
-data class Speed(val kmh: Double)
-
-val Number.kmh get() = Speed(this.toDouble())
-
-class Vehicle(from: Building, to: Building, speed: Speed)
-
 fun buildCity(): Pair<List<PathSegment>, List<Building>> {
     val grid: List<PathSegment> = createPathGrid()
     val buildings: List<Building> = createBuildings(grid)
@@ -156,7 +110,7 @@ fun buildCity(): Pair<List<PathSegment>, List<Building>> {
         .renameToSnakeCase()
         .writeCSV("segments.csv")
 
-    buildings .toDataFrame()
+    buildings.toDataFrame()
         .unfold<Port>("port", addPrefix = true)
         .unfold<Point>("port_pathIntersection", addPrefix = true)
         .renameToSnakeCase()
