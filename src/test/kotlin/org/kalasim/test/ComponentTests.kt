@@ -311,6 +311,7 @@ class ComponentTests {
     }
 
 
+    // TODO bring back with proper spec
     @Ignore
     @Test
     fun `it should allow to disable interaction logging`() = createTestSimulation {
@@ -555,6 +556,116 @@ class ComponentTests {
         }
 
         shouldThrow<MyException> { run(10.minutes) }
+    }
+
+
+    @Test
+    fun someTest() = createTestSimulation {
+
+        data class Recipe(val name: String)
+
+        var dinnersReady: SimTime? = null
+        var specialDinnerReady: SimTime? = null
+        var hadBreak = false
+
+        class Kitchen : Component() {
+            override fun process(): Sequence<Component> = sequence {
+                hold(10.minutes, "opening restaurant")
+            }
+
+
+            fun cookSomething(recipe: Recipe) = sequence {
+                hold(10.minutes)
+
+                println("dinner's ready! I am serving $recipe today")
+                dinnersReady = now
+            }
+
+            fun lunchTime(): Sequence<Component> = sequence {
+                hold(15.minute)
+
+                activate(::cookSomethingSpecial, Recipe("cake"), true, delay = 5.minutes)
+            }
+
+
+            fun cookSomethingSpecial(recipe: Recipe, spicy: Boolean) = sequence {
+                hold(15.minutes, "cooking...")
+
+                log("dinner's ready! I am serving ${if(spicy) "spicy" else ""} $recipe today")
+                specialDinnerReady = now
+            }
+
+            fun cookNothing() = sequence {
+                hold(10.minutes, "lets take a break")
+                hadBreak = true
+            }
+
+            fun foo() = ""
+        }
+
+        val kitchen = Kitchen()
+
+        // run the default process
+        run()
+
+        now shouldBe (startDate+10.minutes)
+
+        // run it again
+        kitchen.activate()
+        run()
+
+        now shouldBe (startDate+20.minutes)
+
+        // test that we can activate a process without args from outside
+//        kitchen.activate(process=Kitchen::cookSomething) // should throw compile error
+//        run()
+//        dinnersReady shouldBe (startDate + 30.minutes)
+
+        // test that we can activate a process with args from within process
+        kitchen.activate(process = Kitchen::lunchTime)
+        run()
+        specialDinnerReady shouldBe (startDate + 55.minutes)
+
+        kitchen.activate(process = Kitchen::cookNothing)
+        run()
+        now shouldBe (startDate + 65.minutes)
+        hadBreak shouldBe true
+
+        // test that we can activate from outside the process
+        kitchen.activate(process = Kitchen::cookSomething, processArgument = Recipe("lasagne"))
+        run()
+        dinnersReady shouldBe (startDate + 75.minutes)
+
+
+        kitchen.activate(Kitchen::cookSomething, Recipe("lasagne"))
+        run()
+        dinnersReady shouldBe (startDate + 85.minutes)
+
+        // test that multiple args can be compiled and provided from outside
+        kitchen.activate(
+            process = Kitchen::cookSomethingSpecial,
+            processArgument = Recipe("lasagne"),
+            otherArgument = true
+        )
+        run()
+        specialDinnerReady shouldBe (startDate + 100.minutes)
+
+
+        // test that we can activate from outside the process with 2 arguments
+        kitchen.activate(Kitchen::cookSomethingSpecial, Recipe("lasagne"), true)
+        run()
+        specialDinnerReady shouldBe (startDate + 115.minutes)
+
+
+        object : Component(){
+            override fun process()=sequence<Component> {
+                hold(10.minutes)
+                kitchen.activate(Kitchen::cookSomething, Recipe("pizza"))
+            }
+        }
+
+        run()
+        dinnersReady shouldBe (startDate + 135.minutes)
     }
 }
 

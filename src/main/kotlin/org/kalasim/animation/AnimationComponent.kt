@@ -13,7 +13,7 @@ import kotlin.properties.Delegates
 open class AnimationComponent(
     initialPosition: Point2D? = null,
     name: String? = null,
-    process: ProcessPointer? = null,
+    process: GeneratorFunRef? = null,
 ) : Component(name, process = process) {
 
     private var from: Point2D = initialPosition ?: Point(0, 0)

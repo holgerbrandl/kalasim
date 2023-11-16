@@ -13,8 +13,7 @@ import org.kalasim.misc.*
 import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
 import kotlin.math.*
-import kotlin.reflect.KFunction1
-import kotlin.reflect.KFunction2
+import kotlin.reflect.*
 import kotlin.time.Duration
 
 
@@ -99,7 +98,7 @@ open class TickedComponent(
     at: SimTime? = null,
     delay: Duration? = null,
     priority: Priority = NORMAL,
-    process: ProcessPointer? = null,
+    process: GeneratorFunRef? = null,
     trackingConfig: ComponentTrackingConfig = ComponentTrackingConfig(),
     koin: Koin = DependencyContext.get(),
 ) : Component(name, at, delay, priority, process, koin, trackingConfig) {
@@ -134,22 +133,40 @@ open class TickedComponent(
         urgent: Boolean = false,
         keepRequest: Boolean = false,
         keepWait: Boolean = false,
-        process: ProcessPointer? = null
+        process: GeneratorFunRef? = null
     ) = yieldCurrent {
-        this@TickedComponent.activate(at, delay.toDuration(), priority, urgent, keepRequest, keepWait, process)
+        this@TickedComponent.activate(
+            at,
+            delay.toDuration(),
+            priority,
+            urgent,
+            keepRequest,
+            keepWait,
+            process as ProcessPointerWithArg<*>
+        )
     }
 
-//    suspend fun SequenceScope<Component>.activate(
-//        at: SimTime? = null,
-//        delay: Number = 0,
-//        priority: Priority = NORMAL,
-//        urgent: Boolean = false,
-//        keepRequest: Boolean = false,
-//        keepWait: Boolean = false,
-//        process: ProcessPointer2? = null
-//    ) = yieldCurrent {
-//        this@TickedComponent.activate(at, delay.toDuration(), priority, urgent, keepRequest, keepWait, process)
-//    }
+    suspend fun <T : Any> SequenceScope<Component>.activate(
+        process: ProcessPointerWithArgs<*, T>,
+        processArgument: T,
+        at: SimTime? = null,
+        delay: Number = 0,
+        priority: Priority = NORMAL,
+        urgent: Boolean = false,
+        keepRequest: Boolean = false,
+        keepWait: Boolean = false,
+    ) = yieldCurrent {
+        this@TickedComponent.activate(
+            process,
+            processArgument,
+            at,
+            delay.toDuration(),
+            priority,
+            urgent,
+            keepWait,
+            keepRequest
+        )
+    }
 
 }
 
@@ -172,7 +189,7 @@ open class Component(
     at: SimTime? = null,
     delay: Duration? = null,
     priority: Priority = NORMAL,
-    process: ProcessPointer? = null,
+    process: GeneratorFunRef? = null,
     koin: Koin = DependencyContext.get(),
     val trackingConfig: ComponentTrackingConfig = koin.getEnvDefaults().DefaultComponentConfig,
 
@@ -245,17 +262,15 @@ open class Component(
             }
         }
 
-        val processPointer: KFunction1<Nothing, Sequence<Component>>? = when {
+        val generatorFunRef: GeneratorFunRef? = when {
             isNone -> null
-            overriddenProcess -> Component::process
-            overriddenRepeated -> Component::processLoop
+            overriddenProcess -> ::process
+            overriddenRepeated -> ::processLoop
             isCustomProcess -> process
             else -> null
         }
 
-        if(processPointer != null) {
-            this.simProcess = ingestFunPointer(processPointer)
-        }
+        this.simProcess = generatorFunRef?.ingestFunPointer()
 
         //  what's the point of scheduling it at `at`  without a process definition?
         //  --> main is one major reason, we need the engine to progress the time until a given point
@@ -279,29 +294,26 @@ open class Component(
         }
     }
 
-    private var lastProcess: ProcessPointer? = null
+    private var lastProcess: ProcessReference? = null
 
-    private fun ingestFunPointer(process: ProcessPointer?): SimProcess? {
-//        if(process != null ){
-//            print("param type is " + process!!.returnType)
-//            if(process!!.returnType.toString().startsWith("kotlin.sequences.Sequence"))
-//        }
+    class ProcessReference(val generatorFunRef: GeneratorFunRef, vararg val arguments: Any)
 
-        return if(process != null) {
-            val isGenerator = process.returnType.toString().startsWith("kotlin.sequences.Sequence")
+    private fun GeneratorFunRef.ingestFunPointer(vararg processArgs: Any): SimProcess? {
+        val isGenerator = returnType.toString().startsWith("kotlin.sequences.Sequence")
 
-            lastProcess = process
-
-            if(isGenerator) {
-                val sequence = process.call(this)
-                GenProcessInternal(this, sequence, process.name)
-            } else {
-                error("non-generating processes are no longer supported. If you feel this is a bug please file an issue at https://github.com/holgerbrandl/kalasim/issues")
-//                SimpleProcessInternal(this, process, process.name)
-            }
-        } else {
-            null
+        require(isGenerator) {
+            error("non-generating processes are no longer supported. If you feel this is a bug please file an issue at https://github.com/holgerbrandl/kalasim/issues")
         }
+
+        lastProcess = ProcessReference(this, *processArgs)
+
+        val sequence = if(parameters.run { isNotEmpty() && first().kind.name == "INSTANCE" }) {
+            call(this@Component, *processArgs)
+        } else {
+            call(*processArgs)
+        }
+
+        return GenProcessInternal(this@Component, sequence, name)
     }
 
 
@@ -1192,9 +1204,76 @@ open class Component(
         urgent: Boolean = false,
         keepRequest: Boolean = false,
         keepWait: Boolean = false,
-        process: ProcessPointer? = null
+        process: GeneratorFunRef? = null
     ) = yieldCurrent {
-        this@Component.activate(at, delay, priority, urgent, keepRequest, keepWait, process)
+        this@Component.activateInternal(
+            process?.let{ProcessReference(it as GeneratorFunRef)},
+            at,
+            delay,
+            priority,
+            urgent,
+            keepRequest,
+            keepWait,
+        )
+    }
+
+
+    suspend fun <T : Any> SequenceScope<Component>.activate(
+        process: ProcessPointerWithArg<T>,
+        processArgument: T,
+        at: SimTime? = null,
+        delay: Duration = Duration.ZERO,
+        priority: Priority = NORMAL,
+        urgent: Boolean = false,
+        keepRequest: Boolean = false,
+        keepWait: Boolean = false,
+
+        ) = yieldCurrent {
+        this@Component.activateInternal(
+            ProcessReference(process as GeneratorFunRef, processArgument),
+            at,
+            delay,
+            priority,
+            urgent,
+            keepRequest,
+            keepWait
+        )
+    }
+
+    suspend fun <T : Any, S : Any> SequenceScope<Component>.activate(
+        process: ProcessPointerWithArgs<T, S>,
+        processArgument: T,
+        otherArgument: S,
+        at: SimTime? = null,
+        delay: Duration = Duration.ZERO,
+        priority: Priority = NORMAL,
+        urgent: Boolean = false,
+        keepRequest: Boolean = false,
+        keepWait: Boolean = false,
+
+        ) = yieldCurrent {
+        this@Component.activateInternal(
+            ProcessReference(process as GeneratorFunRef, processArgument, otherArgument),
+            at,
+            delay,
+            priority,
+            urgent,
+            keepRequest,
+            keepWait
+        )
+    }
+
+    fun activate(
+        at: SimTime? = null,
+        delay: Duration = Duration.ZERO,
+        priority: Priority = NORMAL,
+        urgent: Boolean = false,
+        keepRequest: Boolean = false,
+        keepWait: Boolean = false,
+        process: ProcessPointerWithArg<*>? = null
+    ): Component {
+        activateInternal(process?.let { ProcessReference(it) }, at, delay, priority, urgent, keepRequest, keepWait)
+        return this
     }
 
     /**
@@ -1208,17 +1287,79 @@ open class Component(
      * * if None (default), process will not be changed
      * * if the component is a data component, the generator function `process` will be used as the default process.
      */
-    fun activate(
+    fun <T : Any> activate(
+        process: ProcessPointerWithArgs<*, T>,
+        processArgument: T,
         at: SimTime? = null,
         delay: Duration = Duration.ZERO,
         priority: Priority = NORMAL,
         urgent: Boolean = false,
         keepRequest: Boolean = false,
         keepWait: Boolean = false,
-        process: ProcessPointer? = null
 //        process: ProcessPointer? = Component::process
     ): Component {
 
+        activateInternal(
+            ProcessReference(process as GeneratorFunRef, processArgument),
+            at,
+            delay,
+            priority,
+            urgent,
+            keepRequest,
+            keepWait
+        )
+
+        return this
+    }
+
+
+    /**
+     * Activate component
+     *
+     * For `activate` contract see [user manual](https://www.kalasim.org/component/#activate)
+     *
+     * @param at Schedule time
+     * @param delay Schedule with a delay if omitted, no delay is used
+     * @param process Name of process to be started.
+     * * if None (default), process will not be changed
+     * * if the component is a data component, the generator function `process` will be used as the default process.
+     */
+    fun <T : Any, S : Any> activate(
+        process: ProcessPointerWith2Args<*, T, S>,
+        processArgument: T,
+        otherArgument: S,
+        at: SimTime? = null,
+        delay: Duration = Duration.ZERO,
+        priority: Priority = NORMAL,
+        urgent: Boolean = false,
+        keepRequest: Boolean = false,
+        keepWait: Boolean = false,
+//        process: ProcessPointer? = Component::process
+    ): Component {
+
+        activateInternal(
+            ProcessReference(process as GeneratorFunRef, processArgument, otherArgument),
+            at,
+            delay,
+            priority,
+            urgent,
+            keepRequest,
+            keepWait
+        )
+
+        return this
+    }
+
+    private fun activateInternal(
+        process: ProcessReference?,
+        at: SimTime?,
+        delay: Duration,
+        priority: Priority,
+        urgent: Boolean,
+        keepRequest: Boolean,
+        keepWait: Boolean,
+
+        ) {
         require(componentState != CURRENT || process != null) {
             // original contract
             "Can not activate the CURRENT component. If needed simply use hold method."
@@ -1229,7 +1370,7 @@ open class Component(
         }
 
         // todo why this convoluted logic??
-        val processPointer: ProcessPointer? = process
+        val processReference: ProcessReference? = process
             ?: if(componentState == DATA) {
                 lastProcess
             } else {
@@ -1238,15 +1379,15 @@ open class Component(
 
         var extra = ""
 
-        if(processPointer != null) {
-            this.simProcess = ingestFunPointer(processPointer)
+        if(processReference != null) {
+            this.simProcess = processReference.generatorFunRef.ingestFunPointer(*processReference.arguments)
 
-            extra = "process=${processPointer.name}"
+            extra = "process=${processReference.generatorFunRef.name}"
         }
 
         if(componentState != CURRENT) {
             remove()
-            if(processPointer != null) {
+            if(processReference != null) {
                 if(!(keepRequest || keepWait)) {
                     checkFail()
                 }
@@ -1262,8 +1403,6 @@ open class Component(
         }
 
         reschedule(scheduledTime, priority, urgent, "Activating $extra", ACTIVATE)
-
-        return this
     }
 
     internal fun checkFail() {
@@ -1783,8 +1922,10 @@ enum class ResourceSelectionPolicy {
 // Abstract component process to be either generator or simple function
 //
 
-typealias ProcessPointer = KFunction1<*, Sequence<Component>>
-typealias ProcessPointer2 = KFunction2<*, Any, Sequence<Component>>
+typealias GeneratorFunRef = KFunction<Sequence<Component>>
+typealias ProcessPointerWithArg<T> = KFunction1<T, Sequence<Component>>
+typealias ProcessPointerWithArgs<T, S> = KFunction2<T, S, Sequence<Component>>
+typealias ProcessPointerWith2Args<C, T, S> = KFunction3<C, T, S, Sequence<Component>>
 
 
 interface SimProcess {
@@ -1855,11 +1996,11 @@ data class StateRequest<T>(val state: State<T>, val priority: Priority? = null, 
 
 infix fun <T> State<T>.turns(value: T) = StateRequest(this) { it == value }
 
-internal fun formatWithInf(env: Environment?, time: SimTime?) : String =
-    if(time==null || time.isDistantFuture) "<inf>" else formatWithInf(env?.asTickTime(time))
+internal fun formatWithInf(env: Environment?, time: SimTime?): String =
+    if(time == null || time.isDistantFuture) "<inf>" else formatWithInf(env?.asTickTime(time))
 
-internal fun formatWithInf(time: TickTime?) : String =
-    if(time==null || time.value == Double.MAX_VALUE || time.value.isInfinite()) "<inf>" else TRACE_DF.format(time.value)
+internal fun formatWithInf(time: TickTime?): String =
+    if(time == null || time.value == Double.MAX_VALUE || time.value.isInfinite()) "<inf>" else TRACE_DF.format(time.value)
 
 
 data class ComponentLifecycleRecord(

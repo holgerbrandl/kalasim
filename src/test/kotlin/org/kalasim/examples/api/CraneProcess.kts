@@ -2,7 +2,7 @@
 import org.kalasim.*
 
 class Crane(
-    process: ProcessPointer? = Component::process
+    process: GeneratorFunRef? = Component::process
 ) : Component(process = Crane::load) {
     fun unload() = sequence<Component> {
         // hold, request, wait ...

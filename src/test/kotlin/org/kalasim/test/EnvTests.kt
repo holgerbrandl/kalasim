@@ -218,9 +218,9 @@ class EnvTests {
         }
 
         runOutput.stdout shouldBeDiff """
-            INFO 1 - BusMetrics.1: 13 events processed in last 10m
-            INFO 1 - BusMetrics.1: 1 events processed in last 10m
-            INFO 1 - BusMetrics.1: 7 events processed in last 10m
+            INFO BusMetrics - BusMetrics: 13 events processed in last 10m
+            INFO BusMetrics - BusMetrics: 1 events processed in last 10m
+            INFO BusMetrics - BusMetrics: 7 events processed in last 10m
         """.trimIndent()
 
         val postOutput = captureOutput {
@@ -228,7 +228,7 @@ class EnvTests {
         }
 
         postOutput.stdout shouldBeDiff """
-            INFO 1 - BusMetrics.1: 0.0 events processed on average per wall-time second
+            INFO BusMetrics - BusMetrics: 0.0 events processed on average per wall-time second
         """.trimIndent()
 
 

@@ -11,7 +11,7 @@ open class Vehicle(startingPosition: Port, val speed: Speed = 100.kmh) :
     var currentPort: Port = startingPosition
     val pathFinder = get<PathFinder>()
 
-    suspend fun moveTo(target: Port) = sequence {
+     fun moveTo(target: Port) = sequence {
         val path = pathFinder.findPath(currentPort, target)
 
         path.route.vertexList.forEach { node ->
@@ -21,6 +21,19 @@ open class Vehicle(startingPosition: Port, val speed: Speed = 100.kmh) :
     }
 
     fun move(target: Port){
-//        activate(process=Vehicle::moveTo)
+        activate(Vehicle::moveTo, target)
     }
 }
+
+//fun main() {
+//
+//    suspend fun foo() : Sequence<Component> = sequence { yield(Component())}
+//    suspend fun bar(smthg:String)  : Sequence<Component> = sequence { yield(Component()) }
+//
+//
+//    val fun1 : KFunction1<*, String> = ::foo
+//    val fun2 : KSuspendFunction1<*,  String> = ::foo
+//    val fun3 : KSuspendFunction1<*, *, String> = ::foo
+//    val fun4 : KSuspendFunction2<*, *, String> = ::bar
+//
+//}
