@@ -10,6 +10,7 @@ Major & Breaking API Changes
 * Simplified the configurability for [tracking](advanced.md#continuous-simulation) of entity timelines and statistics. It's now more direct via constructor parameters in addition to environment defaults
 * [#68](https://github.com/holgerbrandl/kalasim/issues/68) Improved arithmetics of [metric timelines](monitors.md#value-monitors)
 * [#65](https://github.com/holgerbrandl/kalasim/issues/65) provide a [statistics API](events.md#bus-metrics) for the internal event bus
+* [#69](https://github.com/holgerbrandl/kalasim/issues/69) Allow [activating](component.md#activate) processes with argument in a type-safe manner
 
 Minor improvements
 
