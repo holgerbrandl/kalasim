@@ -1890,6 +1890,8 @@ open class Component(
     }
 
 
+    suspend fun SequenceScope<Component>.join(vararg components: Component) =  join(components.toList())
+
     suspend fun SequenceScope<Component>.join(components: List<Component>) = sequence<Component> {
         wait(*components.map { it.componentState() turns PASSIVE }.toTypedArray())
     }

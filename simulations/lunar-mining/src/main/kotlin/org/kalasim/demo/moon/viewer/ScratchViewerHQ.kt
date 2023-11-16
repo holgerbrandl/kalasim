@@ -15,7 +15,7 @@ fun main() = application {
 }
 
 
-object SvgTest{
+object SvgTest {
     @JvmStatic
     fun main(args: Array<String>) {
         application {
@@ -33,5 +33,18 @@ object SvgTest{
                 }
             }
         }
+    }
+}
+
+
+object : Component("Something") {
+    override fun process() = sequence {
+        hold(10.minutes, description = "some action")
+        // ^^ This is telling kalasim to suspend execution of this process
+        // for 10 simulation minutes
+
+        // ... 10 minutes later ...
+        // After these 10 minutes, it will continue execution of the process
+        hold(1.minutes, description = "some other action ")
     }
 }

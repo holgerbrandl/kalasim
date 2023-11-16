@@ -107,6 +107,17 @@ It is also possible to prepare multiple process definition, which may become act
 
 Effectively, creation and start of `crane1` and `crane2` is the same.
 
+### Inlining Subprocesses
+
+In situations where a user want's to run/consume an another process definition, without loosing the current process state, it is possible to yield all process steps with [`yieldAll()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence-scope/yield-all.html) the subprocess:
+
+```kotlin hl_lines="1000"
+{!api/ConsumeSubProcess.kts!}
+```
+
+### Toggling processes
+
+It's a very effective tool in discrete simulation, to toggle the process definition of a component at runtime. We can do so very effectively using [`activate()`](#activate)  
 
 ## Lifecycle
 
@@ -183,9 +194,55 @@ The scheme below shows how interaction relate to component state transitions:
 1. <a id="f8"></a> Increases the `interruptLevel`
 
 
+### hold
+
+This method is utilized to suspend a component for a specific duration of simulation time. It changes that the state of a - usually `current` - component to `scheduled`. By invoking the hold method, control is returned from the process definition back to the simulation engine.
+After the specified hold duration, the engine will resume the execution of the process definition. This becomes a crucial method in `kalasim`, as it dictates the temporal flow of the overall process.
+
+Here's a basic example illustrating this process:
+
+```kotlin
+object : Component("Something") {
+    override fun process() = sequence {
+        hold(10.minutes, description = "some action")
+        // ^^ This is telling kalasim to suspend execution of this process 
+        // for 10 simulation minutes
+
+        // ... 10 minutes later ...
+        // After these 10 minutes, it will continue execution of the process
+        hold(1.minutes, description = "some other action ")
+    }
+}
+```
+
+Supported parameters in `hold()` are
+
+* `duration` - The duration for which the component should be held.
+* `description` - An optional description for the hold operation.
+* `until` - The simulation time until which the component should be held. If provided, the component will be held until the specified simulation time.
+* `priority` - The priority of the hold operation. A higher priority value indicates a higher priority. Defaults to `NORMAL`.
+* `urgent` - A flag indicating whether the hold operation is urgent. If set to true, the component will be scheduled with the highest possible priority. Defaults to `false`.
+
+Either `duration` or `until` must be specified when calling `hold()` to indicate the intended delay.
+
+The [state](#lifecycle) contract when calling `hold()` is as follows
+
+* If the component is `CURRENT`, it will suspend execution internally, and the component becomes scheduled for the specified time
+* If the component to be held is passive, the component becomes scheduled for the specified time.
+* If the component to be held is scheduled, the component will be rescheduled for the specified time, thus
+  essentially the same as activate.
+* If the component to be held is standby, the component becomes scheduled for the specified time.
+* If the component to be activated is requesting, the request will be terminated, the attribute failed
+  set and the component will become scheduled. It is recommended to use the more versatile activate method.
+* If the component to be activated is waiting, the wait will be
+  terminated, the attribute failed set and the component will become scheduled. It is recommended to
+  use the more versatile activate method.
+* If the component is interrupted, the component will be activated at the specified time.
+
+
 ### activate
 
-`activate()` will schedule execution at the specified time. If no time is specified, execution will be scheduled for the current simulation time. If you do not specify a process, the current process will be scheduled for *continuation*. If a `process` argument is provided, the process will be *started* (or *restarted* if it is equal to the currently active process).
+`activate()` will schedule execution of a [process definition](#process-definition) at the specified time. If no time is specified, execution will be scheduled for the current simulation time. If you do not specify a process, the current process will be scheduled for *continuation*. If a `process` argument is provided, the process will be *started* (or *restarted* if it is equal to the currently active process).
 
 ```kotlin
 Car() // default to process=Component::process or Component::repeatedProcess   
@@ -193,9 +250,11 @@ Car(process=Component::none) // no process, which effectivly makes the car DATA
 
 val car = Car(process=Car::driving) // start car in driving mode  
 
-car1.activate(process=Car::refilling) //  stop driving (if still ongoing) and activate refilling process
+// stop driving (if still ongoing) and activate refilling process
+car1.activate(process=Car::refilling)
 
-car0.activate()  // activate defined process if set, otherwise error
+// activate defined process if set, otherwise error
+car0.activate()  
 ```
 
 <!--* If the component to be activated is `CURRENT`, always use `yield(activate())`. The effect is that the-->
@@ -220,19 +279,13 @@ car0.activate()  // activate defined process if set, otherwise error
 
 In situations where the current process need to be restarted, we can use activate `yield(activate(process = Component::process))` which will bypass the internal requirement that the activated component must not be `CURRENT`.
 
-In situations where a user want's to run/consume an another process definition, without loosing the current process state, it is possible to yield all process steps with [`yieldAll()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence-scope/yield-all.html) the subprocess:
-
-```kotlin hl_lines="1000"
-{!api/ConsumeSubProcess.kts!}
-```
 
 Although not very common, it is also possible to activate a component at a certain time or with a specified delay:
 
 ```kotlin
 ship1.activate(at=100)
-ship2.activate(delay=50)
+ship2.activate(delay=50.minutes)
 ```
-
 
 !!!note
     It is possible to use `activate()` outside of a process definition, e.g. to toggle processes after some time  
@@ -244,51 +297,18 @@ ship2.activate(delay=50)
     ```
     However, in most situations this is better modelled within a [process definition](#process-definition).
 
-### hold
+Using `activate()` we can toggle processes very effectively in a simulation model. There are 3 ways to do so
 
-This method is used to hold the component for a specific duration (of simulation time). Hold is the way to make a - usually `current` - component `scheduled`.
+1. From with a component's [process defintion](#process-definition)
+2. Within another component [process defintion](#process-definition)
+3. Outside of any process definition. 
 
- If a description is provided, it can be used to identify the hold operation when analyzing the simulation results. If an until parameter is provided, the component will be held until the specified simulation time. If a priority is provided, it will determine the order in which the component will be scheduled if there are other components with the same hold duration. A higher priority value indicates a higher priority. If the urgent flag is set to true, the component will be scheduled with the highest possible priority.
-
-Supported parameters in `hold`
-
-* `duration` - The duration for which the component should be held. 
-* `description` - An optional description for the hold operation.
-* `until` - The simulation time until which the component should be held. If provided, the component will be held until the specified simulation time.
-* `priority` - The priority of the hold operation. A higher priority value indicates a higher priority. Defaults to `NORMAL`.
-* `urgent` - A flag indicating whether the hold operation is urgent. If set to true, the component will be scheduled with the highest possible priority. Defaults to `false`.
-
-Either `duration` or `until` must be specfied when calling `hold()` to indicate the intended delay.
-
-Usage Example:
+The following example illustrates these examples as well as [process inlining](#inlining-subprocesses):
 
 ```kotlin
-object : Component("Driver"){
-    override fun process() = sequence {
-        request(driver) {
-            hold(1.minutes, description="some action that lasts 1 tick")
-        }
-    }
-}
+//{!api/Restaurant.kts!}
 ```
-
-* If the component is `CURRENT`, it will suspend execution internally, and the component becomes scheduled for the specified time
-* If the component to be held is passive, the component becomes scheduled for the specified time.
-* If the component to be held is scheduled, the component will be rescheduled for the specified time, thus
-  essentially the same as activate.
-* If the component to be held is standby, the component becomes scheduled for the specified time.
-* If the component to be activated is requesting, the request will be terminated, the attribute failed
-  set and the component will become scheduled. It is recommended to use the more versatile activate method.
-* If the component to be activated is waiting, the wait will be
-  terminated, the attribute failed set and the component will become scheduled. It is recommended to
-  use the more versatile activate method.
-* If the component is interrupted, the component will be activated at the specified time.
-
-If a [tick transformation](advanced.md#tick-transformation) is configured, it also allows to express run durations more naturally:
-```
-hold(2.hours)
-hold(until= now + 3.hours )
-```
+Notably, we can provide process arguments here in a typesafe manner.
 
 ### passivate
 
