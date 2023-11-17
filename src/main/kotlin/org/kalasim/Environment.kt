@@ -440,7 +440,7 @@ open class Environment(
 
 
     /** Remove a component from the event-queue. Also, remove it from standing-by list, if currently on stand-by.*/
-    fun remove(c: Component) {
+    internal fun remove(c: Component) {
         unschedule(c)
 
         // TODO what is happening here, can we simplify that?

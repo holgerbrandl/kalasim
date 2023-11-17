@@ -111,13 +111,25 @@ Effectively, creation and start of `crane1` and `crane2` is the same.
 
 To run/consume/inline another [process definition](#process-definition), we can use[`yieldAll(subProcess())`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence-scope/yield-all.html) to inline `subProcess()` defined for the same component. This allows to inline the entire process definition in a blocking manner. Here's an example how to do so:
 
-```kotlin hl_lines="1000"
-{!api/ConsumeSubProcess.kts!}
+```kotlin
+//{!api/ConsumeSubProcess.kts!}
 ```
 
 ### Toggling processes
 
-It's a very effective tool in discrete simulation, to toggle the process definition of a component at runtime. We can do so very effectively using [`activate()`](#activate)  
+It's a very effective tool in discrete simulation, to toggle the process definition of a component at runtime. Using [`activate()`](#activate) we can toggle processes very effectively in a simulation model. There are 3 ways to do so
+
+1. From with a component's [process defintion](#process-definition)
+2. Within another component process defintion
+3. Outside of any process definition.
+
+The following example illustrates these examples as well as [process inlining](#inlining-subprocesses):
+
+```kotlin
+//{!api/Restaurant.kts!}
+```
+Notably, we can provide process arguments here in a typesafe manner.
+
 
 ## Lifecycle
 
@@ -225,6 +237,9 @@ Supported parameters in `hold()` are
 
 Either `duration` or `until` must be specified when calling `hold()` to indicate the intended delay.
 
+
+#### State Contract
+
 The [state](#lifecycle) contract when calling `hold()` is as follows
 
 * If the component is `CURRENT`, it will suspend execution internally, and the component becomes scheduled for the specified time
@@ -257,6 +272,22 @@ car1.activate(process=Car::refilling)
 car0.activate()  
 ```
 
+#### Parameters
+
+Supported parameters in `activate()`
+
+* `process` - The name of the process to be started. If set to `None`, the process will not be changed. If the component is a data component, the generator function `process` will be used as the default process. Optionally type safe arguments can be provided to the generator function  via `processArgument` and `otherProcessArgument`
+* `processArgument` - The argument to be passed to the process.
+* `at` - The schedule time. If omitted, no `delay` is used.
+* `delay` - The delay before starting the process. It uses a `Duration` object to specify the delay amount. The default value is `Duration.ZERO`.
+* `priority` - The priority level of the activation. It uses the `Priority` enumeration with options HIGH, NORMAL, and LOW. The default value is NORMAL.
+* `urgent` - Indicates whether the activation is urgent or not. If set to true, the activation will be treated as urgent. The default value is false.
+* `keepRequest` - Indicates whether to keep the activation request even after the process is started. If set to true, the activation request will be kept. The default value is false.
+* `keepWait` - Indicates whether to keep waiting for the process to complete before returning. If set to true, the activation will not return until the process is complete. The default value is false.
+#### State Contract
+
+The [state](#lifecycle) contract when calling `hold()` is as follows
+
 <!--* If the component to be activated is `CURRENT`, always use `yield(activate())`. The effect is that the-->
 <!--  component becomes scheduled, thus this is essentially equivalent to the preferred hold method.-->
 * If the component to be activated is `DATA`, unless provided with `process` the default `Component::process` will be scheduled at the specified time.
@@ -272,6 +303,7 @@ car0.activate()
   scheduled.
 * If the component is `INTERRUPTED`, the component will be activated at the specified time.
 
+#### Misc
 
 !!!important
     It is not possible to `activate()` the `CURRENT` component without providing a `process` argument. `kalasim` will throw an error in this situation. The effect of a "self"-activate would be that the component becomes scheduled, thus this is essentially equivalent to the preferred hold method, so please use `hold` instead. The error is a safe-guard mechanism to prevent the user from unintentionally rescheduling the current component again. 
@@ -297,18 +329,7 @@ ship2.activate(delay=50.minutes)
     ```
     However, in most situations this is better modelled within a [process definition](#process-definition).
 
-Using `activate()` we can toggle processes very effectively in a simulation model. There are 3 ways to do so
-
-1. From with a component's [process defintion](#process-definition)
-2. Within another component [process defintion](#process-definition)
-3. Outside of any process definition. 
-
-The following example illustrates these examples as well as [process inlining](#inlining-subprocesses):
-
-```kotlin
-//{!api/Restaurant.kts!}
-```
-Notably, we can provide process arguments here in a typesafe manner.
+We can use `activate`  to [toggle](#toggling-processes) the active process of a component
 
 ### passivate
 

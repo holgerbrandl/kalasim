@@ -1107,11 +1107,6 @@ open class Component(
     }
 
 
-//    @Deprecated("no longer needed, handled by queue directly")
-//    private fun enterSorted(requesters: Queue<Component>, priority: Int) {
-//    }
-
-
     // kept in Component API for api compatibility with salabim
     private fun remove() {
         env.remove(this)
@@ -1197,6 +1192,26 @@ open class Component(
     }
 
 
+    /**
+     * Activate a component.
+     *
+     * This method is used to activate a component. The activation process starts a specified process with the given arguments.
+     *
+     * Please refer to the [user manual](https://www.kalasim.org/component/#activate) for more information on the `activate` contract.
+     *
+     * @param process The name of the process to be started. If set to `None`, the process will not be changed. If the
+     * component is a data component, the generator function `process` will be used as the default process. Optionally type safe
+     * arguments can be provided to the generator function  via `processArgument` and `otherProcessArgument`
+     * @param processArgument The argument to be passed to the process.
+     * @param at The schedule time. If omitted, no `delay` is used.
+     * @param delay The delay before starting the process. It uses a `Duration` object to specify the delay amount. The default value is `Duration.ZERO`.
+     * @param priority The priority level of the activation. It uses the `Priority` enumeration with options HIGH, NORMAL, and LOW. The default value is NORMAL.
+     * @param urgent Indicates whether the activation is urgent or not. If set to true, the activation will be treated as urgent. The default value is false.
+     * @param keepRequest Indicates whether to keep the activation request even after the process is started. If set to true, the activation request will be kept. The default value is false.
+     * @param keepWait Indicates whether to keep waiting for the process to complete before returning. If set to true, the activation will not return until the process is complete. The default value is false.
+     *
+     * @return The activated component.
+     */
     suspend fun SequenceScope<Component>.activate(
         at: SimTime? = null,
         delay: Duration = Duration.ZERO,
@@ -1218,6 +1233,26 @@ open class Component(
     }
 
 
+    /**
+     * Activate a component.
+     *
+     * This method is used to activate a component. The activation process starts a specified process with the given arguments.
+     *
+     * Please refer to the [user manual](https://www.kalasim.org/component/#activate) for more information on the `activate` contract.
+     *
+     * @param process The name of the process to be started. If set to `None`, the process will not be changed. If the
+     * component is a data component, the generator function `process` will be used as the default process. Optionally type safe
+     * arguments can be provided to the generator function  via `processArgument` and `otherProcessArgument`
+     * @param processArgument The argument to be passed to the process.
+     * @param at The schedule time. If omitted, no `delay` is used.
+     * @param delay The delay before starting the process. It uses a `Duration` object to specify the delay amount. The default value is `Duration.ZERO`.
+     * @param priority The priority level of the activation. It uses the `Priority` enumeration with options HIGH, NORMAL, and LOW. The default value is NORMAL.
+     * @param urgent Indicates whether the activation is urgent or not. If set to true, the activation will be treated as urgent. The default value is false.
+     * @param keepRequest Indicates whether to keep the activation request even after the process is started. If set to true, the activation request will be kept. The default value is false.
+     * @param keepWait Indicates whether to keep waiting for the process to complete before returning. If set to true, the activation will not return until the process is complete. The default value is false.
+     *
+     * @return The activated component.
+     */
     suspend fun <T : Any> SequenceScope<Component>.activate(
         process: ProcessPointerWithArg<T>,
         processArgument: T,
@@ -1240,10 +1275,30 @@ open class Component(
         )
     }
 
+    /**
+     * Activate a component.
+     *
+     * This method is used to activate a component. The activation process starts a specified process with the given arguments.
+     *
+     * Please refer to the [user manual](https://www.kalasim.org/component/#activate) for more information on the `activate` contract.
+     *
+     * @param process The name of the process to be started. If set to `None`, the process will not be changed. If the
+     * component is a data component, the generator function `process` will be used as the default process. Optionally type safe
+     * arguments can be provided to the generator function  via `processArgument` and `otherProcessArgument`
+     * @param processArgument The argument to be passed to the process.
+     * @param at The schedule time. If omitted, no `delay` is used.
+     * @param delay The delay before starting the process. It uses a `Duration` object to specify the delay amount. The default value is `Duration.ZERO`.
+     * @param priority The priority level of the activation. It uses the `Priority` enumeration with options HIGH, NORMAL, and LOW. The default value is NORMAL.
+     * @param urgent Indicates whether the activation is urgent or not. If set to true, the activation will be treated as urgent. The default value is false.
+     * @param keepRequest Indicates whether to keep the activation request even after the process is started. If set to true, the activation request will be kept. The default value is false.
+     * @param keepWait Indicates whether to keep waiting for the process to complete before returning. If set to true, the activation will not return until the process is complete. The default value is false.
+     *
+     * @return The activated component.
+     */
     suspend fun <T : Any, S : Any> SequenceScope<Component>.activate(
         process: ProcessPointerWithArgs<T, S>,
         processArgument: T,
-        otherArgument: S,
+        otherProcessArgument: S,
         at: SimTime? = null,
         delay: Duration = Duration.ZERO,
         priority: Priority = NORMAL,
@@ -1253,7 +1308,7 @@ open class Component(
 
         ) = yieldCurrent {
         this@Component.activateInternal(
-            ProcessReference(process as GeneratorFunRef, processArgument, otherArgument),
+            ProcessReference(process as GeneratorFunRef, processArgument, otherProcessArgument),
             at,
             delay,
             priority,
@@ -1263,6 +1318,26 @@ open class Component(
         )
     }
 
+    /**
+     * Activate a component.
+     *
+     * This method is used to activate a component. The activation process starts a specified process with the given arguments.
+     *
+     * Please refer to the [user manual](https://www.kalasim.org/component/#activate) for more information on the `activate` contract.
+     *
+     * @param process The name of the process to be started. If set to `None`, the process will not be changed. If the
+     * component is a data component, the generator function `process` will be used as the default process. Optionally type safe
+     * arguments can be provided to the generator function  via `processArgument` and `otherProcessArgument`
+     * @param processArgument The argument to be passed to the process.
+     * @param at The schedule time. If omitted, no `delay` is used.
+     * @param delay The delay before starting the process. It uses a `Duration` object to specify the delay amount. The default value is `Duration.ZERO`.
+     * @param priority The priority level of the activation. It uses the `Priority` enumeration with options HIGH, NORMAL, and LOW. The default value is NORMAL.
+     * @param urgent Indicates whether the activation is urgent or not. If set to true, the activation will be treated as urgent. The default value is false.
+     * @param keepRequest Indicates whether to keep the activation request even after the process is started. If set to true, the activation request will be kept. The default value is false.
+     * @param keepWait Indicates whether to keep waiting for the process to complete before returning. If set to true, the activation will not return until the process is complete. The default value is false.
+     *
+     * @return The activated component.
+     */
     fun activate(
         at: SimTime? = null,
         delay: Duration = Duration.ZERO,
@@ -1277,15 +1352,24 @@ open class Component(
     }
 
     /**
-     * Activate component
+     * Activate a component.
      *
-     * For `activate` contract see [user manual](https://www.kalasim.org/component/#activate)
+     * This method is used to activate a component. The activation process starts a specified process with the given arguments.
      *
-     * @param at Schedule time
-     * @param delay Schedule with a delay if omitted, no delay is used
-     * @param process Name of process to be started.
-     * * if None (default), process will not be changed
-     * * if the component is a data component, the generator function `process` will be used as the default process.
+     * Please refer to the [user manual](https://www.kalasim.org/component/#activate) for more information on the `activate` contract.
+     *
+     * @param process The name of the process to be started. If set to `None`, the process will not be changed. If the
+     * component is a data component, the generator function `process` will be used as the default process. Optionally type safe
+     * arguments can be provided to the generator function  via `processArgument` and `otherProcessArgument`
+     * @param processArgument The argument to be passed to the process.
+     * @param at The schedule time. If omitted, no `delay` is used.
+     * @param delay The delay before starting the process. It uses a `Duration` object to specify the delay amount. The default value is `Duration.ZERO`.
+     * @param priority The priority level of the activation. It uses the `Priority` enumeration with options HIGH, NORMAL, and LOW. The default value is NORMAL.
+     * @param urgent Indicates whether the activation is urgent or not. If set to true, the activation will be treated as urgent. The default value is false.
+     * @param keepRequest Indicates whether to keep the activation request even after the process is started. If set to true, the activation request will be kept. The default value is false.
+     * @param keepWait Indicates whether to keep waiting for the process to complete before returning. If set to true, the activation will not return until the process is complete. The default value is false.
+     *
+     * @return The activated component.
      */
     fun <T : Any> activate(
         process: ProcessPointerWithArgs<*, T>,

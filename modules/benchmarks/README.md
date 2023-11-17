@@ -11,7 +11,7 @@ For gradle plugin options see https://github.com/melix/jmh-gradle-plugin
 * This will execute all (methods annotated with `@Benchmark`) benchmarks with their predefined parameters:
 
 ```bash
-# cd  cd /d/projects/scheduling/kalasim/modules/benchmarks
+# cd /d/projects/scheduling/kalasim/modules/benchmarks
 ./gradlew --console=plain clean jmh`
 ```
 

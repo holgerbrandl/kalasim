@@ -25,9 +25,17 @@ fun simpleCrossing(): GeoMap {
     val segment01_10 = PathSegment("segment01_10", node01, node10)
     val segment01_11 = PathSegment("segment01_11", node01, node11)
 
+    // parking
+    val port00_01 = Port("port00_01", 0.2, segment00_01)
+    val port00_10 = Port("port00_10", 0.2, segment00_10)
+    val port01_10 = Port("port01_10", 0.2, segment01_10)
+    val port01_11 = Port("port01_11", 0.2, segment01_11)
+
+
     return GeoMap(
         listOf(segment00_01, segment00_10, segment01_10, segment01_11),
         listOf(node00, node01, node11, node10),
+        listOf(port00_01, port00_10, port01_10, port01_11)
     )
 }
 
@@ -36,11 +44,13 @@ class VehicleTests {
     @Test
     fun `it should respect the right of way`() {
         createSimulation {
+            enableComponentLogger()
+
             val map = simpleCrossing()
 
             class Car(startingPosition: Port) : Vehicle(startingPosition)
 
-            dependency {  PathFinder(map) }
+            dependency { PathFinder(map) }
 
 //            val startTime = uniform(0, 10).minutes
 
@@ -49,10 +59,13 @@ class VehicleTests {
             }
 
             repeat(10) {
-                cars.forEach { it.move(map.ports.random(random)) }
-                run(1.hour)
+                cars.forEach {
+                    it.activate(Vehicle::moveTo, map.ports.random(random))
+                }
             }
 
+
+            run(1.hour)
         }
     }
 }
