@@ -109,7 +109,7 @@ Effectively, creation and start of `crane1` and `crane2` is the same.
 
 ### Inlining Subprocesses
 
-In situations where a user want's to run/consume an another process definition, without loosing the current process state, it is possible to yield all process steps with [`yieldAll()`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence-scope/yield-all.html) the subprocess:
+To run/consume/inline another [process definition](#process-definition), we can use[`yieldAll(subProcess())`](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence-scope/yield-all.html) to inline `subProcess()` defined for the same component. This allows to inline the entire process definition in a blocking manner. Here's an example how to do so:
 
 ```kotlin hl_lines="1000"
 {!api/ConsumeSubProcess.kts!}
