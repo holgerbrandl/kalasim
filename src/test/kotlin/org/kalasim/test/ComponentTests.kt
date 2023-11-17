@@ -560,7 +560,7 @@ class ComponentTests {
 
 
     @Test
-    fun someTest() = createTestSimulation {
+    fun itShouldAllowTogglingProcesses() = createTestSimulation {
 
         data class Recipe(val name: String)
 
