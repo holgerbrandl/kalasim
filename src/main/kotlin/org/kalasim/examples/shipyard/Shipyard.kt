@@ -2,11 +2,24 @@ package org.kalasim.examples.shipyard
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.kalasim.*
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.DurationUnit
 
-class Part(val partId: String, val makeTime: DurationDistribution, vararg val components: Part) :
-    SimulationEntity(partId)
+class Part(
+    val partId: String,
+    val makeTime: Duration,
+    /** Standard deviation of the makespan. */
+    val makeTimeSD: Duration,
+    vararg val components: Part,
+    val finalProduct: Boolean = false
+) {
+
+    fun computeMinimalMakespan(): Duration {
+        return makeTime - (makeTimeSD ) + (components.maxOfOrNull { it.computeMinimalMakespan() } ?: Duration.ZERO)
+    }
+}
 
 // todo get rid of time attribute
 class PartCompleted(time: SimTime, val part: Part) : Event(time)
@@ -35,9 +48,14 @@ class PartAssembly(val part: Part) : Component() {
 
 
         // assembly them
-        hold(part.makeTime())
+        // use exponential here? rexp(10, rate=1/10)
+        val makeTimeDist = uniform(part.makeTime- part.makeTimeSD, part.makeTime+ part.makeTimeSD)
+        val duration = makeTimeDist()
 
-        logger.info { "completed assembly of part ${this}" }
+        println(duration)
+        hold(duration)
+
+//        logger.info { "completed assembly of part ${this}" }
 
         completed.value = true
 
@@ -47,14 +65,14 @@ class PartAssembly(val part: Part) : Component() {
 }
 
 
-class Shipyard() : Environment(tickDurationUnit = DurationUnit.DAYS) {
+class Shipyard : Environment(tickDurationUnit = DurationUnit.DAYS) {
 
     val logger = KotlinLogging.logger {}
 
     // utility to model rectified normal distribution with a fifth of the mean as sd
 //    fun norm5(mean: Duration)= normal(mean, mean/5, true)
 
-    fun configureOrders(bom: List<Part> = exampleBOM(), iat: DurationDistribution = normal(24, 2).hours) {
+    fun configureOrders(bom: List<Part> = exampleBOM(), iat: DurationDistribution = normal(24.hours, 2.hours, true)) {
         ComponentGenerator(iat) {
             bom.random()
         }.addConsumer {
@@ -66,19 +84,21 @@ class Shipyard() : Environment(tickDurationUnit = DurationUnit.DAYS) {
 
     fun exampleBOM(): List<Part> {
 
-        val rumpf = Part("rumpf", normal(1.days, 0.2.days, true))
-        val deck = Part("deck", normal(2.days, 0.2.days, true))
-        val segment = Part("segment", normal(5.days, 2.days, true))
-        val bridge = Part("bridge", normal(3.days, 1.days, true))
-        val kitchen = Part("kitchen", normal(3.days, 1.days, true))
-        val lackieren = Part("lackieren", normal(3.days, 1.days, true), segment, deck)
+        val hullFront = Part("hull-front", 2.days, 1.days)
+        val hullBack = Part("hull-back", 3.days, 1.days)
+
+        val rumpf = Part("rumpf", 1.days,  0.5.days, hullFront, hullBack)
+        val deck = Part("deck", 2.days, 0.2.days)
+        val bridge = Part("bridge", 3.days, 1.days)
+        val kitchen = Part("kitchen", 3.days, 1.days)
+        val lackieren = Part("lackieren", 3.days, 1.days, rumpf, deck)
 
 
         // subcomponents
         val products = listOf(
-            Part("ship1", normal(5.days, 2.days, rectify = true), rumpf, deck, bridge),
-            Part("ship2", normal(3.days, 1.days, rectify = true), rumpf, rumpf, rumpf, lackieren),
-            Part("ship3", normal(3.days, 1.days, rectify = true), rumpf, bridge, deck, kitchen)
+            Part("ship1", 5.days, 1.days,  lackieren, deck, bridge, finalProduct = true),
+            Part("ship2", 3.days, 0.5.days,  lackieren, bridge, finalProduct = true),
+            Part("ship3", 3.days, 0.5.days,  bridge, deck, kitchen, finalProduct = true)
         )
 
         return products

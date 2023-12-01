@@ -26,33 +26,29 @@ dependencies {
     api("org.apache.commons:commons-math3:3.6.1")
     // note updated postponed because of regression errors
     api("io.insert-koin:koin-core:3.1.2")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.20")
 
-    api("org.json:json:20230227") // because version 20220924 is reported as vulerable
+    api("org.json:json:20230227")
     api("com.github.holgerbrandl:jsonbuilder:0.10")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-
-    //  api("io.github.microutils:kotlin-logging:1.12.5")
-//    api("org.slf4j:slf4j-simple:1.7.32")
-
-    implementation("com.google.code.gson:gson:2.10.1")
-
-//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0")
-//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
 
     api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
 
     api("io.github.oshai:kotlin-logging-jvm:5.1.0")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.20")
-    testImplementation("io.kotest:kotest-assertions-core:5.7.2")
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.20")
+
+    compileOnly("com.github.holgerbrandl:kravis:0.9.96")
 
     // **TODO** move to api to require users to pull it in if needed
     implementation("com.github.holgerbrandl:krangl:0.18.4") // must needed for kravis
     implementation("com.github.holgerbrandl:kdfutils:1.3.3")
+
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.20")
+    testImplementation("io.kotest:kotest-assertions-core:5.7.2")
+
     testImplementation("com.github.holgerbrandl:kdfutils:1.3.3")
 
-    compileOnly("com.github.holgerbrandl:kravis:0.9.96")
     testImplementation("com.github.holgerbrandl:kravis:0.9.96")
 
     compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.4.3")

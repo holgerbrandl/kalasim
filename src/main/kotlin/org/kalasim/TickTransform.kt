@@ -102,7 +102,7 @@ internal const val MISSING_TICK_TRAFO_ERROR = "Tick transformation not configure
 fun Environment.asTicks(duration: Duration): Double = duration.asTicks()
 
 @AmbiguousDuration
-fun Environment.asSimTime(someWhen: Number): SimTime = startDate + asDuration(someWhen)
+fun Environment.asSimTime(ticksSinceSimStart: Number): SimTime = startDate + asDuration(ticksSinceSimStart)
 
 
 @OptIn(AmbiguousDuration::class)

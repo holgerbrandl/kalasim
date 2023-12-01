@@ -2,6 +2,7 @@ package org.kalasim
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.datetime.isDistantFuture
+import org.kalasim.Component.*
 import org.kalasim.ComponentState.*
 import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.ResourceSelectionPolicy.*
@@ -1202,7 +1203,6 @@ open class Component(
      * @param process The name of the process to be started. If set to `None`, the process will not be changed. If the
      * component is a data component, the generator function `process` will be used as the default process. Optionally type safe
      * arguments can be provided to the generator function  via `processArgument` and `otherProcessArgument`
-     * @param processArgument The argument to be passed to the process.
      * @param at The schedule time. If omitted, no `delay` is used.
      * @param delay The delay before starting the process. It uses a `Duration` object to specify the delay amount. The default value is `Duration.ZERO`.
      * @param priority The priority level of the activation. It uses the `Priority` enumeration with options HIGH, NORMAL, and LOW. The default value is NORMAL.
@@ -1222,7 +1222,7 @@ open class Component(
         process: GeneratorFunRef? = null
     ) = yieldCurrent {
         this@Component.activateInternal(
-            process?.let{ProcessReference(it as GeneratorFunRef)},
+            process?.let { ProcessReference(it) },
             at,
             delay,
             priority,
@@ -1328,7 +1328,6 @@ open class Component(
      * @param process The name of the process to be started. If set to `None`, the process will not be changed. If the
      * component is a data component, the generator function `process` will be used as the default process. Optionally type safe
      * arguments can be provided to the generator function  via `processArgument` and `otherProcessArgument`
-     * @param processArgument The argument to be passed to the process.
      * @param at The schedule time. If omitted, no `delay` is used.
      * @param delay The delay before starting the process. It uses a `Duration` object to specify the delay amount. The default value is `Duration.ZERO`.
      * @param priority The priority level of the activation. It uses the `Priority` enumeration with options HIGH, NORMAL, and LOW. The default value is NORMAL.
@@ -1542,18 +1541,6 @@ open class Component(
         this@Component.hold(duration, description, until, priority, urgent)
     }
 
-    /**
-     * Hold the component.
-     *
-     * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
-     *
-     * @param duration Time to hold.
-     * @param priority If a component has the same time on the event list, this component is sorted according to
-     * the priority. An event with a higher priority will be scheduled first.
-     */
-    // todo: it would be more natural to simply support kotlin.time.Duration here
-//    @Deprecated("Use Duration instead of Ticks")
-
 
     /**
      * Hold the component.
@@ -1616,7 +1603,7 @@ open class Component(
 
 
     /**
-     * Release a quantity from a resource or resources.
+     * Releases the specified resources.
      *
      * It is not possible to release from an anonymous resource, this way.
      * Use Resource.release() in that case.
@@ -1765,7 +1752,7 @@ open class Component(
      * @param failDelay Skip and set `failed` if the request is not honored before `now + failDelay`,
     the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
      * @param failPriority Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
-     * @param all If `false` (default), continue, if any of the given state/values is met. if `true`, continue if all of the given state/values are met.
+     * @param all If `false`, continue, if any of the given state/values is met. if `true` (default), continue if all of the given state/values are met.
      */
     suspend fun SequenceScope<Component>.wait(
         vararg stateRequests: StateRequest<*>,
@@ -1774,7 +1761,7 @@ open class Component(
         failAt: SimTime? = null,
         failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
-        all: Boolean = false
+        all: Boolean = true
     ) = yieldCurrent {
         if(componentState != CURRENT) {
             requireNotMain()
@@ -1974,11 +1961,23 @@ open class Component(
     }
 
 
-    suspend fun SequenceScope<Component>.join(vararg components: Component) =  join(components.toList())
+    /**
+     * Suspends the execution of the current sequence scope until all the components in the provided [components] list
+     * have their state changed to [DATA].
+     *
+     * @param components The list of components to wait for.
+     */
+    suspend fun SequenceScope<Component>.join(vararg components: Component) = join(components.toList())
 
-    suspend fun SequenceScope<Component>.join(components: List<Component>) = sequence<Component> {
-        wait(*components.map { it.componentState() turns PASSIVE }.toTypedArray())
-    }
+    /**
+     * Suspends the execution of the current sequence scope until all the components in the provided [components] list
+     * have their state changed to [DATA].
+     *
+     * @param components The list of components to wait for.
+     */
+    suspend fun SequenceScope<Component>.join(components: List<Component>) =
+        wait(*components.map { it.componentState() turns ComponentState.DATA }.toTypedArray(), all=true)
+//        wait(*components.map { it.componentState() turns DATA }.toTypedArray<StateRequest<ComponentState>>())
 }
 
 internal fun Koin.getEnvDefaults(): SimEntityTrackingDefaults = get<Environment>().entityTrackingDefaults
@@ -1989,7 +1988,10 @@ internal val SELECT_SCOPE_IDX = mutableMapOf<Int, Int>()
 /** Create a state component to lifecycle monitoring using a https://www.kalasim.org/state/. */
 class LifecycleState(val component: Component) : State<ComponentState>(component.componentState) {
     init {
-        changeListeners.add { value = component.componentState }
+//        changeListeners.add { value = component.componentState }
+        component.stateChangeListeners.add{
+            value = component.componentState
+        }
     }
 }
 
@@ -2020,7 +2022,8 @@ interface SimProcess {
     val name: String
 }
 
-class GenProcessInternal(val component: Component, seq: Sequence<Component>, override val name: String) : SimProcess {
+class GenProcessInternal(val component: Component, seq: Sequence<Component>, override val name: String) :
+    SimProcess {
 
     val iterator = seq.iterator()
 

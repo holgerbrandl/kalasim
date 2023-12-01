@@ -1,23 +1,61 @@
 package org.kalasim.test
 
-import io.kotest.matchers.shouldBe
+import io.kotest.matchers.comparables.shouldBeLessThan
+import junit.framework.TestCase.assertEquals
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.examples.shipyard.PartCompleted
 import org.kalasim.examples.shipyard.Shipyard
+import org.kalasim.misc.AmbiguousDuration
+import kotlin.time.Duration.Companion.hours
+
 
 class JoinTests {
 
+    @OptIn(AmbiguousDuration::class)
     @Test
-    fun `it should join processes at ease`() {
-        val shipyard = Shipyard().apply {
-            configureOrders()
-            enableEventLog()
-            run(4.weeks)
+    fun `it should join processes at ease`() = createTestSimulation() {
+        val c1 = object : Component() {
+            override fun process() = sequence {
+                hold(10.hours)
+            }
         }
 
-        println(shipyard)
+        val c2 = object : Component() {
+            override fun process() = sequence {
+                hold(6.hours)
+            }
+        }
 
-        shipyard.get<EventLog>().filterIsInstance<PartCompleted>().isNotEmpty() shouldBe true
+        object : Component() {
+            override fun process() = sequence {
+                join(c1, c2)
+                require(c1.isData)
+                hold(1.hours)
+            }
+        }
+
+        run()
+
+        now - startDate shouldBe 11.hours
+    }
+
+
+    @Test
+    fun `ìt should produced ships in the right order`() = testModel(Shipyard()) {
+        configureOrders()
+        enableEventLog()
+
+        addEventListener<PartCompleted> {
+            if(it.part.finalProduct) {
+                stopSimulation()
+            }
+        }
+
+        run()
+
+        val ship = get<EventLog>().filterIsInstance<PartCompleted>().first { it.part.finalProduct }
+
+        ship.part.computeMinimalMakespan() shouldBeLessThan (now - startDate)
     }
 }
