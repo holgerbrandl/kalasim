@@ -94,7 +94,7 @@ fun main() {
         }
 
         // Run simulation
-        run(1000)
+        run(1000.minutes)
         run(SIM_TIME)
 
         // Analysis

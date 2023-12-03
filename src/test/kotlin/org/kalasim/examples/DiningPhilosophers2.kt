@@ -50,7 +50,7 @@ fun main() {
     }
 
     val sim = DiningTable()
-    sim.run(50)
+    sim.run(50.minutes)
 
     // Analysis (gather monitoring data (as in simmer:get_mon_arrivals)
     data class RequestRecord(val requester: String, val timestamp: SimTime, val resource: String, val quantity: Double)
@@ -61,7 +61,7 @@ fun main() {
         RequestRecord(it.requester.name, it.time, it.resource.name, amountDirected)
     }
 
-    // transform data into shape suiteable for interval plotting
+    // transform data into shape suitable for interval plotting
 
     val requestsDf = requests.toDataFrame()
         .groupBy("requester")

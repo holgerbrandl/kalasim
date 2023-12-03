@@ -2,11 +2,11 @@ package org.kalasim.test
 
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import junit.framework.Assert.fail
 import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.misc.AmbiguousDuration
+import kotlin.test.fail
 
 class StateTests {
 
@@ -56,7 +56,7 @@ class StateTests {
             }
         }
 
-        val sim = createSimulation {
+        createSimulation {
             enableComponentLogger()
             dependency { State("red") }
 
@@ -84,6 +84,7 @@ class StateTests {
 
     private enum class TestColor { RED, GREEN }
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it trigger once and keep the other waiters`() {
         captureOutput {

@@ -16,7 +16,8 @@ fun main() {
     val RANDOM_SEED = 42
     val NUM_MACHINES = 2  // Number of machines in the carwash
     val WASHTIME = 5.minutes      // Minutes it takes to clean a car
-    val T_INTER = 7.0       // Create a car every ~7 minutes
+    val T_INTER = 7.minutes       // Create a car every ~7 minutes
+    val T_INTER_SD = 2.minutes       // variance of inter-arrival
     val SIM_TIME = 20.days     // Simulation time
 
     class Car : Component() {
@@ -37,7 +38,7 @@ fun main() {
         //Create 4 initial cars
         repeat(3) { Car() }
         // Create more cars while the simulation is running
-        ComponentGenerator(iat = uniform(T_INTER - 2, T_INTER + 2)) { Car() }
+        ComponentGenerator(iat = uniform(T_INTER - T_INTER_SD, T_INTER + T_INTER_SD)) { Car() }
     }
 
 

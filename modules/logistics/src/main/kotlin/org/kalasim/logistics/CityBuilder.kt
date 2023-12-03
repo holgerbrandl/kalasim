@@ -103,8 +103,6 @@ fun createBuildings(pathSegments: List<PathSegment>, seed: Int = 42): List<Build
 data class CityMap(val roads: List<PathSegment>, val buildings: List<Building> = listOf()) {
 
     fun exportCsv(basePath: Path) {
-
-
         roads.toDataFrame()
             .unfold<Node>("from", addPrefix = true)
             .unfold<Node>("to", addPrefix = true)

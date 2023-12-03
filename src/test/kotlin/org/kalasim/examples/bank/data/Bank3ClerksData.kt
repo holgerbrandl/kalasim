@@ -4,6 +4,7 @@ package org.kalasim.examples.bank.data
 
 import org.kalasim.*
 import org.koin.core.component.inject
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -46,15 +47,13 @@ class Clerk : Component() {
 
 
 fun main() {
-    val deps = declareDependencies {
+    createSimulation {
         // register components needed for dependency injection
         dependency { ComponentQueue<Customer>("waitingline") }
         dependency { CustomerGenerator(get()) }
         dependency { (1..3).map { Clerk() } }
-    }
 
-    createSimulation(dependencies = deps) {
-        run(50000.0)
+        run(50.days)
 
         val waitingLine: ComponentQueue<Customer> = get()
 

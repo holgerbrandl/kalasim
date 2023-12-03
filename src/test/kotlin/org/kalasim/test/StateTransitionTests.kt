@@ -5,6 +5,7 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.*
 import org.kalasim.analysis.EntityCreatedEvent
+import org.kalasim.misc.AmbiguousDuration
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
@@ -35,13 +36,14 @@ class StateTransitionTests {
 
         val interactions = traces.filterIsInstance<EntityCreatedEvent>()
         // make sure multiple cars are created
-        println("car events are ${interactions.map { it.toString() }.joinToString("\n")}")
+        println("car events are ${interactions.joinToString("\n") { it.toString() }}")
 
         val cars = interactions.map { it.entity }.distinct().filter { it.name.startsWith("TestCar") }
         assertEquals(6, cars.size, "expected cars count does not match")
     }
 
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun customProc() {
         class Customer : Component(process = Customer::doSmthg) {
@@ -62,7 +64,7 @@ class StateTransitionTests {
         val someState = State(false)
 
         val c = object : Component() {
-            override fun process() = sequence<Component> {
+            override fun process() = sequence {
                 hold(10.days)
                 wait(someState) { true }
             }
@@ -80,8 +82,8 @@ class ComponentReceiverInteractionTests {
     fun `it should passivate, cancel, hold and activate on behalf of another component`() =
         createTestSimulation {
 
-            val r = Resource()
-            val s = State("foo")
+//            Resource()
+//            State("foo")
 
             val other = object : Component("other") {
                 override fun process() =

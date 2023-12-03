@@ -86,6 +86,7 @@ class ResourceTests {
         resource.claimers.size shouldBe 0
     }
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `preemptive resources should bump components depending on priority`() = createTestSimulation {
 
@@ -290,6 +291,7 @@ class ResourceTests {
     }
 
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should reevaluate requests upon capacity changes`() {
 
@@ -334,6 +336,7 @@ class ResourceTests {
         }
     }
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should auto-release resources in builder`() {
 
@@ -392,6 +395,7 @@ class ResourceTests {
         honorBlockReached shouldBe true
     }
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should be possible to use nested requests on the same resource`() = createTestSimulation {
         val r1 = Resource(capacity = 4)
@@ -471,6 +475,7 @@ class ResourceTests {
     }
 
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should correctly set failed after timeout`() {
 
@@ -547,6 +552,7 @@ class ResourceTests {
 }
 
 class ResourceSelectionTests {
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should allow to select with FIRST_AVAILBLE`() = createTestSimulation {
         val resources = List(3) { Resource().apply { capacity = 0.0 } }
@@ -563,6 +569,7 @@ class ResourceSelectionTests {
         run(3)
     }
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should allow to select with ShortestQueue`() = createTestSimulation {
         val resources = List(3) { Resource() }

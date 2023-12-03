@@ -28,5 +28,5 @@ fun main() {
         // finetune column width for website
 
         Car()
-    }.run(5.0)
+    }.run(5.minutes)
 }

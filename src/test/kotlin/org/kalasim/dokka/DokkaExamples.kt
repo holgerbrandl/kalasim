@@ -3,11 +3,13 @@ package org.kalasim.dokka
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.junit.Test
 import org.kalasim.Environment
+import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.asCMPairList
 import org.kalasim.monitors.CategoryTimeline
 
 
 // Adopted from example in https://www.salabim.org/manual/Monitor.html
+@OptIn(AmbiguousDuration::class)
 fun freqLevelDemo() {
     val data = listOf(
         "foo" to 0.1,

@@ -142,8 +142,7 @@ class DepletableResourceTests {
 //            levelTimeline.display().show()
         }
 
-        SimTime(Double.POSITIVE_INFINITY).toString()
-        // ensure that at least the first car was sucessfully refilled
+        // ensure that at least the first car was successfully refilled
         cg.history.first().componentState shouldBe ComponentState.DATA
     }
 
@@ -174,6 +173,7 @@ class DepletableResourceTests {
     }
 
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should ensure that a level increase is stalled until capacity becomes available`() =
         createTestSimulation {
@@ -229,6 +229,7 @@ class DepletableResourceTests {
     }
 
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should respect queue priorities when restoring resource`() = createTestSimulation {
         val resource = DepletableResource(capacity = 10, initialLevel = 7)
