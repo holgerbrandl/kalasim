@@ -1,17 +1,17 @@
 package org.kalasim.animation
 
 import kotlinx.coroutines.*
-import org.kalasim.*
+import org.kalasim.ClockSync
+import org.kalasim.Environment
 import org.kalasim.misc.DependencyContext
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.loadFont
 import org.openrndr.draw.loadImage
-import org.openrndr.svg.loadSVG
 import java.awt.geom.Point2D
 import java.lang.Thread.sleep
-import kotlin.time.DurationUnit
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
 
 fun main() {
     application {

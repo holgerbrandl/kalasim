@@ -1,10 +1,7 @@
 package org.kalasim.animation.examples.elevator
 
-import kotlinx.coroutines.*
-import org.kalasim.*
 import org.kalasim.animation.*
 import org.kalasim.examples.elevator.*
-import org.kalasim.misc.DependencyContext
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.*
@@ -15,14 +12,13 @@ import org.openrndr.math.Vector3
 import org.openrndr.math.transforms.buildTransform
 import org.openrndr.math.transforms.project
 import org.openrndr.shape.*
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 
 fun main() = application {
 
     var frameCounter = 0
-    var elevator: Elevator = startSimulation(Elevator(), 50.milliseconds)
+    var elevator: Elevator = Elevator().apply { startSimulation(50.milliseconds) }
 
 
     // see also https://openrndr.slack.com/archives/CBJGUKVSQ/p1641933241043200
@@ -77,15 +73,16 @@ fun main() = application {
             fun resetModel() {
                 println("file saved!")
 //                elevator.stopSimulation()
-                elevator.get<AsyncAnimationStop>().stop()
+                elevator.getOrNull<AsyncAnimationStop>()?.stop()
 
                 // Setup new simulation model
-                elevator = startSimulation(
-                    with(settings) {
-                        Elevator(false, load0N, loadNN, loadN0, capacity, numElevators, topFloors)
-                    },
-                    tickMillis = ((100 - speed + 1) / 1.5).milliseconds
-                )
+                elevator = with(settings) {
+                    Elevator(false, load0N, loadNN, loadN0, capacity, numElevators, topFloors)
+                }.apply {
+                    startSimulation(
+                        tickMillis = ((100 - speed + 1) / 1.5).milliseconds
+                    )
+                }
             }
         }
 
@@ -254,20 +251,6 @@ fun main() = application {
                 text("Time: ${elevator.now}", width - 150.0, height - 10.0)
                 text("Frame: ${frameCounter++}", width - 150.0, height - 30.0)
             }
-        }
-    }
-}
-
-
-fun startSimulation(elevator: Elevator, tickMillis: Duration = 50.milliseconds): Elevator {
-    return elevator.apply {
-        ClockSync(tickDuration = tickMillis, syncsPerTick = 10)
-
-        dependency { AsyncAnimationStop() }
-
-        CoroutineScope(Dispatchers.Default).launch {
-            DependencyContext.setKoin(getKoin())
-            run()
         }
     }
 }

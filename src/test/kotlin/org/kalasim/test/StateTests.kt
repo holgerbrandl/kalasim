@@ -6,6 +6,7 @@ import junit.framework.Assert.fail
 import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
+import org.kalasim.misc.AmbiguousDuration
 
 class StateTests {
 
@@ -35,6 +36,7 @@ class StateTests {
 //        StateRequest(State(3.0)) { it*3 < 42 }
     }
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should wait until a predicate is met`() {
 
@@ -133,6 +135,7 @@ class StateTests {
         """.trimIndent()
     }
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should wait until multiple predicates are honored`() {
 
@@ -192,6 +195,7 @@ class StateTests {
     }
 
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     @Ignore("Because its unclear how to do this nicely. The workaround it to use named koin-entities")
     // https://kotlinlang.slack.com/archives/C67HDJZ2N/p1607195460178600

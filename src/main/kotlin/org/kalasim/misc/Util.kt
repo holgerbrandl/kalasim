@@ -2,6 +2,7 @@ package org.kalasim.misc
 
 import kotlinx.coroutines.*
 import org.apache.commons.math3.util.Precision
+import java.nio.file.Path
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
@@ -99,3 +100,22 @@ typealias CommonMathPair<K, V> = org.apache.commons.math3.util.Pair<K, V>
 fun <T, S> List<Pair<T, S>>.asCMPairList(): List<CommonMathPair<T, S>> = map { CommonMathPair(it.first, it.second) }
 
 fun <T, S> Map<T, S>.asCMPairList(): List<CommonMathPair<T, S>> = map { CommonMathPair(it.key, it.value) }
+
+
+/**
+ * Returns a new [Path] object with the specified extension.
+ *
+ * @param extension the extension to be appended to the file name
+ * @param stripExisting true if the existing extension should be stripped before appending the new extension,
+ *                      false otherwise (default)
+ * @return a new [Path] object with the specified extension
+ */
+fun Path.withExtension(extension: String, stripExisting: Boolean = false): Path {
+    val fileName = if(stripExisting) {
+        fileName.toString().substringBeforeLast('.')
+    } else {
+        fileName.toString()
+    }
+
+    return this.parent.resolve("$fileName.$extension")
+}

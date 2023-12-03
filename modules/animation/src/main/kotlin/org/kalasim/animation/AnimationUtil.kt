@@ -1,8 +1,25 @@
 package org.kalasim.animation
 
-import org.kalasim.Component
-import org.kalasim.asDuration
+import kotlinx.coroutines.*
+import org.kalasim.*
 import org.kalasim.misc.AmbiguousDuration
+import org.kalasim.misc.DependencyContext
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+
+
+fun <T : Environment> T.startSimulation(tickMillis: Duration = 50.milliseconds) {
+    apply {
+        ClockSync(tickDuration = tickMillis, syncsPerTick = 10)
+
+        dependency { AsyncAnimationStop() }
+
+        CoroutineScope(Dispatchers.Default).launch {
+            DependencyContext.setKoin(getKoin())
+            run()
+        }
+    }
+}
 
 fun <K, V> Map<K, V>.cmeAvoidingCopy(): Map<K, V> {
     while(true) {

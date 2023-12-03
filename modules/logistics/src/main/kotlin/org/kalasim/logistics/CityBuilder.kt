@@ -4,6 +4,8 @@ import com.github.holgerbrandl.kdfutils.renameToSnakeCase
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
 import org.jetbrains.kotlinx.dataframe.api.util.unfold
 import org.jetbrains.kotlinx.dataframe.io.writeCSV
+import org.kalasim.misc.withExtension
+import java.nio.file.Path
 import kotlin.math.*
 import kotlin.random.Random
 
@@ -98,28 +100,35 @@ fun createBuildings(pathSegments: List<PathSegment>, seed: Int = 42): List<Build
     return buildings
 }
 
-fun buildCity(): Pair<List<PathSegment>, List<Building>> {
+data class CityMap(val roads: List<PathSegment>, val buildings: List<Building> = listOf()) {
+
+    fun exportCsv(basePath: Path) {
+
+
+        roads.toDataFrame()
+            .unfold<Node>("from", addPrefix = true)
+            .unfold<Node>("to", addPrefix = true)
+            .unfold<Point>("from_position", addPrefix = true)
+            .unfold<Point>("to_position", addPrefix = true)
+            .renameToSnakeCase()
+            .writeCSV(basePath.withExtension("segments.csv").toFile())
+
+        buildings.toDataFrame()
+            .unfold<Port>("port", addPrefix = true)
+            .unfold<Point>("port_pathIntersection", addPrefix = true)
+            .renameToSnakeCase()
+            .writeCSV(basePath.withExtension("buildings.csv").toFile())
+    }
+}
+
+fun buildCity(): CityMap {
     val grid: List<PathSegment> = createPathGrid()
     val buildings: List<Building> = createBuildings(grid)
-
-    grid.toDataFrame()
-        .unfold<Node>("from", addPrefix = true)
-        .unfold<Node>("to", addPrefix = true)
-        .unfold<Point>("from_position", addPrefix = true)
-        .unfold<Point>("to_position", addPrefix = true)
-        .renameToSnakeCase()
-        .writeCSV("segments.csv")
-
-    buildings.toDataFrame()
-        .unfold<Port>("port", addPrefix = true)
-        .unfold<Point>("port_pathIntersection", addPrefix = true)
-        .renameToSnakeCase()
-        .writeCSV("buildings.csv")
 
     // build a city center
 
 
-    return grid to buildings
+    return CityMap(grid, buildings)
 }
 
 // highways

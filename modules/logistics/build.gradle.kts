@@ -23,7 +23,7 @@ dependencies {
     api("com.github.holgerbrandl:kdfutils:1.3.3")
 
     implementation("org.jgrapht:jgrapht-core:1.5.2")
-    implementation("eu.sirotin.kotunil:kotunil-jvm:4.1.1")
+//    implementation("eu.sirotin.kotunil:kotunil-jvm:4.1.1")
 
     api("com.github.holgerbrandl:kdfutils:1.3.3")
 

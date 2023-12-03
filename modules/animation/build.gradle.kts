@@ -27,7 +27,7 @@ val orxFeatures = setOf(
 
 val openrndrUseSnapshot = false
 //val openrndrVersion = if (openrndrUseSnapshot) "0.5.1-SNAPSHOT" else "0.3.58"
-val openrndrVersion = if (openrndrUseSnapshot) "0.5.1-SNAPSHOT" else "0.4.2"
+val openrndrVersion = if(openrndrUseSnapshot) "0.5.1-SNAPSHOT" else "0.4.3"
 
 val openrndrFeatures = setOf(
     "video"
@@ -52,6 +52,7 @@ repositories {
 
 dependencies {
     api(project(":"))
+    api(project(":modules:logistics"))
 
 //    implementation(project ("kalasim"))
 //    api("com.github.holgerbrandl:kalasim:0.7.93-SNAPSHOT")

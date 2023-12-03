@@ -7,6 +7,7 @@ import io.kotest.matchers.doubles.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.*
+import org.kalasim.misc.AmbiguousDuration
 import kotlin.time.Duration.Companion.minutes
 
 
@@ -101,6 +102,7 @@ class DepletableResourceTests {
     }
 
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it allow filling and emptying from 0 to capacity limit`() = createTestSimulation {
         val gasSupply = DepletableResource(capacity = 100, initialLevel = 0)

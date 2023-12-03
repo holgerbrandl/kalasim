@@ -19,7 +19,7 @@ class PathFinder(network: GeoMap) {
     val pathGraph: Graph<Node, DefaultWeightedEdge> =
         DefaultDirectedWeightedGraph(DefaultWeightedEdge::class.java)
 
-    private val pathCache: MutableMap<Pair<Port, Port>, Path> = mutableMapOf()
+    private val pathCache: MutableMap<Pair<Port, Port>, GeoPath> = mutableMapOf()
 
     init {
         network.nodes.forEach {
@@ -45,7 +45,7 @@ class PathFinder(network: GeoMap) {
     }
 
 
-    fun findPath(from: Port, to: Port): Path = pathCache.getOrPut(Pair(from, to)) {
+    fun findPath(from: Port, to: Port): GeoPath = pathCache.getOrPut(Pair(from, to)) {
         val sourceNode = from.segment.to
         val targetNode = to.segment.from
 
@@ -54,9 +54,9 @@ class PathFinder(network: GeoMap) {
 
         val path: GraphPath<Node, DefaultWeightedEdge> = iPaths.getPath(targetNode)
 
-        Path(from, to, path)
+        GeoPath(from, to, path)
     }
 
 }
 
-data class Path(val from: Port,  val to: Port, val route: GraphPath<Node, DefaultWeightedEdge>)
+data class GeoPath(val from: Port, val to: Port, val route: GraphPath<Node, DefaultWeightedEdge>)

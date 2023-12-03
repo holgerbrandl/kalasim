@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldNotBe
 import kotlinx.datetime.Instant
 import org.junit.Test
 import org.kalasim.*
+import org.kalasim.misc.AmbiguousDuration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -24,6 +25,7 @@ class TimeTrafoTests {
         30.seconds.asTicks() shouldBe 0.5
     }
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should correctly project simulation times with offset-trafo`() = createTestSimulation(startDate) {
         object : Component() {

@@ -63,6 +63,7 @@ class ResourceTests {
         }
     }
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should release resourced when terminating`() = createTestSimulation {
 
@@ -181,6 +182,7 @@ class ResourceTests {
         bc2.isRequesting shouldBe true
     }
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should not bump regular non-preemptive resources`() = createTestSimulation {
         val r = Resource()
@@ -361,6 +363,7 @@ class ResourceTests {
         }
     }
 
+    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should report correct resource in honor block when using oneOf mode`() = createTestSimulation {
         val r1 = Resource(capacity = 3)

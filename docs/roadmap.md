@@ -5,6 +5,11 @@
 
 ## v0.9
 
+**TODO** inspire from https://gjmcn.github.io/atomic-agents/index.html#/
+
+---
+
+
 **TODO** remove all direct imports of krangl api
 
 ---
