@@ -23,9 +23,12 @@ dependencies {
     api("com.github.holgerbrandl:kdfutils:1.3.3")
 
     implementation("org.jgrapht:jgrapht-core:1.5.2")
-//    implementation("eu.sirotin.kotunil:kotunil-jvm:4.1.1")
 
-    api("com.github.holgerbrandl:kdfutils:1.3.3")
+    api("com.github.holgerbrandl:kdfutils:1.3.4")
+
+    // todo@2023.1 disable for release
+    implementation("org.slf4j:slf4j-simple:1.7.30")
+
 
     testImplementation(kotlin("test"))
     testImplementation(project(":"))

@@ -21,7 +21,7 @@ open class AnimationComponent(
 
     private var started by Delegates.notNull<SimTime>()
     private var currentSpeed by Delegates.notNull<Double>()
-    private lateinit var estimatedArrival: SimTime
+    private var estimatedArrival: SimTime = now
 
     suspend fun SequenceScope<Component>.move(
         nextTarget: Point2D,
@@ -37,7 +37,7 @@ open class AnimationComponent(
         val duration = (distance / speed).toDuration()
         estimatedArrival = now + duration
 
-        hold(duration, description ?: "moving to ${nextTarget}", priority = priority)
+        hold(duration, description ?: "moving to $nextTarget", priority = priority)
         from = to!!
         to = null
     }

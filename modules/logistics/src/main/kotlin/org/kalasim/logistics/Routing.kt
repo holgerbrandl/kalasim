@@ -1,10 +1,7 @@
 package org.kalasim.logistics
 
-import org.jgrapht.GraphPath
-import org.jgrapht.graph.DefaultWeightedEdge
-import org.kalasim.animation.AnimationComponent
-import java.awt.geom.Point2D
-import kotlin.math.*
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 // define routing model
 
@@ -37,9 +34,27 @@ open class Port(val id: String, val distance: Double, val segment: PathSegment) 
         segment.from.position.x + distance * (segment.to.position.x - segment.from.position.x),
         segment.from.position.y + distance * (segment.to.position.y - segment.from.position.y)
     )
+
+    override fun toString() = id
 }
 
-data class GeoMap(val segments: List<PathSegment>, val nodes: List<Node>, val ports: List<Port> = listOf())
+data class GeoMap(val segments: List<PathSegment>, val nodes: Collection<Node>, val ports: List<Port> = listOf()) {
+
+    fun getLimits(expand: Double = 0.2): Rectangle {
+        val minX = nodes.minOf { it.position.x }
+        val minY = nodes.minOf { it.position.y }
+        val maxX = nodes.maxOf { it.position.x }
+        val maxY = nodes.maxOf { it.position.y }
+
+        val xRange = maxX - minX
+        val yRange = maxY - minY
+
+        val upperLeft = Point(minX - xRange * expand, minY - yRange * expand)
+        val lowerRight = Point(maxX + xRange * expand, maxY + yRange * expand)
+
+        return Rectangle(upperLeft, lowerRight)
+    }
+}
 
 data class StartingPosition(val port: Port)
 

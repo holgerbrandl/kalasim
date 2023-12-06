@@ -4,9 +4,10 @@ import org.kalasim.logistics.*
 
 
 fun simpleGridMap(): CityMap {
-    val roads = createPathGrid(2, 2)
+//    val roads = createPathGrid(2, 2)
 
-    return CityMap(roads)
+
+    return buildCity()
 }
 
 @Suppress("LocalVariableName")

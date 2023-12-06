@@ -28,21 +28,32 @@ fun Point.normalize(): Point {
     return Point(x / length, y / length)
 }
 
-data class Rectangle(val offset: Point, val width: Double, val height: Double)
+typealias Rectangle = java.awt.geom.Rectangle2D.Double
+//data class Rectangle(val offset: Point, val width: Double, val height: Double){
+//    constructor(upperLeft:Point, lowerRight:Point): this(upperLeft, lowerRight.x-upperLeft.x, lowerRight.y-upperLeft.y )
+//}
+
+fun Rectangle(upperLeft: Point, lowerRight: Point) =
+    Rectangle(upperLeft.x, upperLeft.y, lowerRight.x - upperLeft.x, lowerRight.y - upperLeft.y)
 
 
 //val someSpeed: Expression = 2.m/s
 //val someAcceleration: Expression = 2.m/(s*s)
 //someAcceleration.
 
-@JvmInline
-value class Speed(val kmh: Number){
+//todo inline blocked by https://github.com/Kotlin/dataframe/issues/526
+//@JvmInline
+//value
+class Speed(val kmh: Number) {
     val meterPerSecond : Double
         get()= kmh.toDouble()/3.6
 
 }
 
+class Acceleration(val metersPerSecondSquared: Number)
 
+
+val Number.acc get() = Acceleration(toDouble())
 val Number.kmh get() = Speed(this.toDouble())
 val Number.mph get() = (toDouble()* 1.60934).kmh
 

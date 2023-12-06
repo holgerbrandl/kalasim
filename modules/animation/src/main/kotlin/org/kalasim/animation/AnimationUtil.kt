@@ -8,9 +8,9 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 
-fun <T : Environment> T.startSimulation(tickMillis: Duration = 50.milliseconds) {
+fun <T : Environment> T.startSimulation(tickDuration: Duration = 50.milliseconds, smoothness: Int = 10) {
     apply {
-        ClockSync(tickDuration = tickMillis, syncsPerTick = 10)
+        ClockSync(tickDuration = tickDuration, syncsPerTick = smoothness)
 
         dependency { AsyncAnimationStop() }
 

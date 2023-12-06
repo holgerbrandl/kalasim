@@ -80,7 +80,7 @@ fun main() = application {
                     Elevator(false, load0N, loadNN, loadN0, capacity, numElevators, topFloors)
                 }.apply {
                     startSimulation(
-                        tickMillis = ((100 - speed + 1) / 1.5).milliseconds
+                        tickDuration = ((100 - speed + 1) / 1.5).milliseconds
                     )
                 }
             }

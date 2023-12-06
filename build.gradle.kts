@@ -42,7 +42,7 @@ dependencies {
 
     // **TODO** move to api to require users to pull it in if needed
     implementation("com.github.holgerbrandl:krangl:0.18.4") // must needed for kravis
-    implementation("com.github.holgerbrandl:kdfutils:1.3.3")
+    implementation("com.github.holgerbrandl:kdfutils:1.3.4")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.20")
     testImplementation("io.kotest:kotest-assertions-core:5.7.2")

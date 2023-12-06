@@ -6,6 +6,7 @@ import java.nio.file.Path
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.*
+import kotlin.io.path.absolute
 
 
 internal var JSON_DF = DecimalFormat("###.00", DecimalFormatSymbols(Locale.ENGLISH))
@@ -111,11 +112,7 @@ fun <T, S> Map<T, S>.asCMPairList(): List<CommonMathPair<T, S>> = map { CommonMa
  * @return a new [Path] object with the specified extension
  */
 fun Path.withExtension(extension: String, stripExisting: Boolean = false): Path {
-    val fileName = if(stripExisting) {
-        fileName.toString().substringBeforeLast('.')
-    } else {
-        fileName.toString()
-    }
+    val fileName = fileName.toString().let { if(stripExisting) it.substringBeforeLast('.') else it }
 
-    return this.parent.resolve("$fileName.$extension")
+    return absolute().parent.resolve("$fileName.$extension")
 }
