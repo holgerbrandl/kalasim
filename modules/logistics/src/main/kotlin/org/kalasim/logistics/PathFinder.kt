@@ -10,7 +10,7 @@ import org.kalasim.logistics.MovementDirection.Reverse
 enum class MovementDirection { Forward, Reverse }
 
 data class DirectedPathSegment(val segment: PathSegment, val direction: MovementDirection) {
-    val targetPosition: Point
+    val endPoint: Point
         get() = when(direction) {
             Forward -> Point(segment.to.position.x, segment.to.position.y)
             Reverse -> Point(segment.from.position.x, segment.from.position.y)

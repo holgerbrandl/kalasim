@@ -2,30 +2,31 @@ package org.kalasim.animation
 
 import org.kalasim.*
 import org.kalasim.analysis.RescheduledEvent
-import java.awt.Point
 import java.awt.geom.Point2D
 import kotlin.math.sqrt
 import kotlin.properties.Delegates
+
+typealias Point = Point2D.Double
 
 /** A component that has a position on a planar 2D surface. While being on the move, it allows to query its current
  *  position. This is most useful when visualizing a simulation state.
  */
 open class AnimationComponent(
-    initialPosition: Point2D? = null,
+    initialPosition: Point? = null,
     name: String? = null,
     process: GeneratorFunRef? = null,
 ) : Component(name, process = process) {
 
-    private var from: Point2D = initialPosition ?: Point(0, 0)
-    private var to: Point2D? = null
+    private var from: Point = initialPosition ?: Point(0.0, 0.0)
+    private var to: Point? = null
 
     private var started by Delegates.notNull<SimTime>()
-    private var currentSpeed by Delegates.notNull<Double>()
+    var currentSpeed by Delegates.notNull<Speed>()
     private var estimatedArrival: SimTime = now
 
     suspend fun SequenceScope<Component>.move(
-        nextTarget: Point2D,
-        speed: Double,
+        nextTarget: Point,
+        speed: Speed,
         description: String? = null,
         priority: Priority = Priority.NORMAL,
     ) {
@@ -34,7 +35,9 @@ open class AnimationComponent(
         currentSpeed = speed
 
         val distance = distance()
-        val duration = (distance / speed).toDuration()
+
+        //todo use type duration compation
+        val duration = (distance.meters.toDouble() / speed.meterPerSecond).toDuration()
         estimatedArrival = now + duration
 
         hold(duration, description ?: "moving to $nextTarget", priority = priority)
@@ -42,14 +45,14 @@ open class AnimationComponent(
         to = null
     }
 
-    private fun distance(): Double {
+    private fun distance(): Distance {
         val xDist = to!!.x - from.x
         val yDist = to!!.y - from.y
 
-        return sqrt(xDist * xDist + yDist * yDist)
+        return sqrt(xDist * xDist + yDist * yDist).meters
     }
 
-    val currentPosition: Point2D
+    val currentPosition: Point
         get() {
             val currentTo = to // used for better thread safety
 
@@ -59,7 +62,7 @@ open class AnimationComponent(
                 val xDist = currentTo.x - from.x
                 val yDist = currentTo.y - from.y
 
-                Point2D.Double(
+                Point(
 //                    from.x*(1-percentDone) + to!!.x*percentDone,
 //                    from.y*(1-percentDone) + to!!.y*percentDone
                     from.x + percentDone * xDist, from.y + percentDone * yDist

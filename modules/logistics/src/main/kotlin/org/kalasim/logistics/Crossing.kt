@@ -9,11 +9,13 @@ class PathOccupancyTracker {
     fun enteringSegment(vehicle: Vehicle, directedSegment: DirectedPathSegment) {
         roadOccupancy.toList().firstOrNull { it.second.contains(vehicle) }?.second?.remove(vehicle)
 
-        roadOccupancy.getOrPut(directedSegment) { mutableListOf() }.add(vehicle)
+        (findVehicles(directedSegment) as MutableList<Vehicle>).add(vehicle)
     }
 
-    val roadOccupancy = mutableMapOf<DirectedPathSegment, MutableList<Vehicle>>()
+    fun findVehicles(directedSegment: DirectedPathSegment): List<Vehicle> =
+        roadOccupancy.getOrPut(directedSegment) { mutableListOf() }
 
+    val roadOccupancy = mutableMapOf<DirectedPathSegment, MutableList<Vehicle>>()
 }
 
 
