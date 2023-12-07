@@ -1,14 +1,29 @@
 package org.kalasim.logistics
 
 import org.kalasim.*
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 
-class Crossing(numVehicles: Int = 1) : Environment() {
 
-    val cityMap = dependency { buildCity(3, 3, numBuildings = 20) }
+class PathOccupancyTracker {
+    fun enteringSegment(vehicle: Vehicle, directedSegment: DirectedPathSegment) {
+        roadOccupancy.toList().firstOrNull { it.second.contains(vehicle) }?.second?.remove(vehicle)
+
+        roadOccupancy.getOrPut(directedSegment) { mutableListOf() }.add(vehicle)
+    }
+
+    val roadOccupancy = mutableMapOf<DirectedPathSegment, MutableList<Vehicle>>()
+
+}
+
+
+class Crossing(numVehicles: Int = 2, xBlocks: Int = 2, yBlocks: Int = 2, numBuildings: Int = 10) : Environment() {
+
+    val cityMap = dependency { buildCity(xBlocks, yBlocks, numBuildings = numBuildings) }
 //    val cityMap = dependency { buildCity(15, 15, numBuildings = 100) }
 
     val geomMap = dependency { cityMap.toGeoMap() }
+    val roadManager = dependency { PathOccupancyTracker() }
 
     init {
         dependency { PathFinder(geomMap) }
@@ -20,7 +35,7 @@ class Crossing(numVehicles: Int = 1) : Environment() {
         var lastPosition = startingPosition
 
         override fun repeatedProcess() = sequence {
-            hold(30.seconds)
+            hold(2.minutes)
 
             val destination = get<CityMap>().buildings.random(random)
             // option1: toggle subprocess; Note: car won't repeat when doing so
@@ -40,9 +55,9 @@ class Crossing(numVehicles: Int = 1) : Environment() {
 }
 
 fun main() {
-    val sim = Crossing().apply {
+    val sim = Crossing(2).apply {
         enableComponentLogger()
     }
 
-    sim.run(1.hour)
+    sim.run(100.days)
 }

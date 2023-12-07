@@ -1,6 +1,7 @@
 package org.kalasim.animation.examples.traffic
 
 import org.kalasim.animation.*
+import org.kalasim.logistics.CollisionSampler
 import org.kalasim.logistics.Crossing
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
@@ -51,7 +52,10 @@ fun main() = application {
 
                 sim = with(settings) {
                     // todo inject parameters here
-                    Crossing()
+                    Crossing(2, numBuildings = 4).apply {
+//                    Crossing(20,20,15, 15)
+                        CollisionSampler()
+                    }
                 }
                 // Setup new simulation model
                 sim.startSimulation(tickDuration = 1.seconds, 200)

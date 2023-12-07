@@ -32,7 +32,14 @@ open class PathSegment(
         get() = sqrt((from.position.x - to.position.x).pow(2.0) + (from.position.y - to.position.y).pow(2.0))
 }
 
-open class Port(val id: String, val distance: Double, val segment: PathSegment) {
+enum class PortConnectivity { Forward, Reverse, Bidirectional }
+
+open class Port(
+    val id: String,
+    val distance: Double,
+    val segment: PathSegment,
+    val directionality: PortConnectivity = PortConnectivity.Forward
+) {
     val position: Point = Point(
         segment.from.position.x + distance * (segment.to.position.x - segment.from.position.x),
         segment.from.position.y + distance * (segment.to.position.y - segment.from.position.y)
