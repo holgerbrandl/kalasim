@@ -5,7 +5,10 @@ import kotlin.math.sqrt
 
 // define routing model
 
-open class Node(val id: String, val position: Point)
+open class Node(val id: String, val position: Point) {
+    val x = position.x
+    val y = position.y
+}
 
 
 /**

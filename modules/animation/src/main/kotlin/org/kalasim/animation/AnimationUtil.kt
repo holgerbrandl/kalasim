@@ -2,8 +2,11 @@ package org.kalasim.animation
 
 import kotlinx.coroutines.*
 import org.kalasim.*
+import org.kalasim.logistics.Rectangle
 import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.DependencyContext
+import org.openrndr.math.Vector2
+import java.awt.geom.Point2D
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -94,4 +97,9 @@ class AsyncAnimationStop(val rate: Double = 1.0) : Component() {
 
         hold(env.asDuration(1 / rate))
     }
+}
+
+fun Point2D.Double.toOpenRendrVector2(): Vector2 = Vector2(x, y)
+fun Rectangle.toOpenRendrRectangle(): org.openrndr.shape.Rectangle {
+    return org.openrndr.shape.Rectangle(x, y, width, height)
 }

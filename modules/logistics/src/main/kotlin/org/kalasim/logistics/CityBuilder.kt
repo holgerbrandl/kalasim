@@ -69,31 +69,30 @@ fun trimValue(value: Double, tolerance: Double): Double = when {
 }
 
 
-fun createRectangle(
+data class Line(val start: Point, val end: Point)
+
+
+fun computeBuildingArea(
     port: Port,
     distance: Double,
-    width: Double,
-    height: Double,
-    isLeft: Boolean,
+    width: Double = 5.0,
+    height: Double = 3.0,
+    sideSwitch: Boolean
 ): Rectangle {
+    val isVerticalSeg = abs(port.segment.from.x - port.segment.to.x) < 1E-5
 
-    val dx = port.segment.to.position.x - port.segment.from.position.x
-    val dy = port.segment.to.position.y - port.segment.from.position.y
-    val angle = atan2(dy, dx)
+    return if(isVerticalSeg) {
+        val x0 = port.position.x + (if(sideSwitch) distance else -1 * distance)
+        val x1 = x0 + (if(sideSwitch) height else -1 * height)
+        Rectangle(Point(x0, port.position.y - width / 2), Point(x1, port.position.y + width / 2))
+    } else {
+        val y0 = port.position.y + (if(sideSwitch) distance else -1 * distance)
+        val y1 = y0 + (if(sideSwitch) height else -1 * height)
+        Rectangle(Point(port.position.x - width / 2, y0), Point(port.position.x + width / 2, y1))
+    }
 
-    val halfWidth = width / 2
-    val sideMultiplier = if(isLeft) -1 else 1
-
-    val bottomCenterX =
-        port.position.x + distance * cos(angle) + (sideMultiplier * halfWidth * sin(angle))
-    val bottomCenterY =
-        port.position.y + distance * sin(angle) - (sideMultiplier * halfWidth * cos(angle))
-
-    val rectLowerLeftX = bottomCenterX - halfWidth * cos(angle)
-    val rectLowerLeftY = bottomCenterY - halfWidth * sin(angle)
-
-    return Rectangle(rectLowerLeftX, rectLowerLeftY, width, height)
 }
+
 
 fun createBuildings(
     pathSegments: List<PathSegment>,
@@ -140,12 +139,7 @@ fun createBuildings(
 
         val port = Port(buildingId, trimValue(r.nextDouble(1.0), avoidCrossTol), segment)
 
-
-        val area = createRectangle(port, 0.5, 6.0, 5.0, true)
-        // todo try facing away from the end of the segment (to avoid overlap with crossings)
-//        val rectanglePosition = segment.to.position.rotate(segment.from.position, -90.0)
-//            .normalize()
-//            .scale(rectangleDistanceFromSegment) // a position that is rectangleDistanceFromSegment away from the path segment
+        val area = computeBuildingArea(port, 0.5, 6.0, 5.0, r.nextBoolean())
         val building = Building(buildingId, area, port, buildingType)
 
         buildings.add(building)

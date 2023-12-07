@@ -3,15 +3,14 @@ package org.kalasim.logistics
 import org.kalasim.*
 import kotlin.time.Duration.Companion.seconds
 
-class Crossing : Environment() {
+class Crossing(numVehicles: Int = 1) : Environment() {
 
     val cityMap = dependency { buildCity(3, 3, numBuildings = 20) }
+//    val cityMap = dependency { buildCity(15, 15, numBuildings = 100) }
 
     val geomMap = dependency { cityMap.toGeoMap() }
 
     init {
-//        enableComponentLogger()
-
         dependency { PathFinder(geomMap) }
     }
 
@@ -21,7 +20,7 @@ class Crossing : Environment() {
         var lastPosition = startingPosition
 
         override fun repeatedProcess() = sequence {
-            hold(10.seconds)
+            hold(30.seconds)
 
             val destination = get<CityMap>().buildings.random(random)
             // option1: toggle subprocess; Note: car won't repeat when doing so
@@ -35,7 +34,7 @@ class Crossing : Environment() {
     }
 
 
-    val cars = List(1) {
+    val cars = List(numVehicles) {
         Car(cityMap.buildings.random(random), random.nextInt(50, 150).kmh)
     }
 }

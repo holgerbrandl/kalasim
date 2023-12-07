@@ -1,9 +1,7 @@
 package org.kalasim.animation.examples.traffic
 
-import org.kalasim.animation.AsyncAnimationStop
-import org.kalasim.animation.startSimulation
+import org.kalasim.animation.*
 import org.kalasim.logistics.Crossing
-import org.kalasim.logistics.Rectangle
 import org.openrndr.application
 import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.loadFont
@@ -11,17 +9,11 @@ import org.openrndr.extra.color.presets.*
 import org.openrndr.extra.gui.GUI
 import org.openrndr.extra.parameters.ActionParameter
 import org.openrndr.extra.parameters.IntParameter
-import org.openrndr.math.Vector2
-import java.awt.geom.Point2D
 import kotlin.time.Duration.Companion.seconds
 
 fun main() = application {
-
     var frameCounter = 0
     var sim = Crossing()
-
-//        sim.cityMap.exportCsv(Path.of("meinestadt"))
-
 
     // see also https://openrndr.slack.com/archives/CBJGUKVSQ/p1641933241043200
     val sideBarWidth = 200
@@ -32,23 +24,16 @@ fun main() = application {
         title = "Crossing"
     }
 
-
     program {
 //        val image = loadImage("src/test/resources/Campus_Tower_Frankfurt.jpg")
         val font = loadFont("file:modules/animation/src/test/resources/IBM_Plex_Mono/IBMPlexMono-Bold.ttf", 24.0)
 
 //        extend(ScreenRecorder())
-
         val gui = GUI()
 
         val settings = object {
-            @IntParameter("# Floors", 2, 20, order = 0)
-            var topFloors: Int = 10
-
-            @ActionParameter("save", order = 0)
-            fun doSave() {
-                println("file saved!")
-            }
+            @IntParameter("# Vehicles", 2, 20, order = 0)
+            var numVehicles: Int = 10
         }
 
         val simSettings = object {
@@ -62,10 +47,10 @@ fun main() = application {
 
             fun resetModel() {
                 println("file saved!")
-//                elevator.stopSimulation()
                 sim.getOrNull<AsyncAnimationStop>()?.stop()
 
                 sim = with(settings) {
+                    // todo inject parameters here
                     Crossing()
                 }
                 // Setup new simulation model
@@ -74,40 +59,32 @@ fun main() = application {
         }
 
 
-        gui.onChange { _, _ ->
-            println("restarting sim...")
-            simSettings.restartModel()
-        }
+        gui.onChange { _, _ -> simSettings.restartModel() }
 
         gui.compartmentsCollapsedByDefault = false
-        gui.add(settings, "Elevator Settings")
-        gui.add(simSettings, "Simulation Settings")
-
+        gui.add(settings, "Model Settings")
+        gui.add(simSettings, "Runtime Settings")
 
         extend(gui)
 
-
-        val mapLimits = sim.geomMap.getLimits(0.4)
+        val mapLimits = sim.geomMap.getLimits(0.1)
 
         extend {
-            // todo bring back image
-//            drawer.image(image, sideBarWidth.toDouble(), 0.0, width.toDouble() - sideBarWidth, height.toDouble())
-            drawer.clear(ColorRGBa.BLACK)
-
-
-
-            drawer.translate(sideBarWidth.toDouble(), 0.0)
-
-            val gridUnitScaleX = (width - sideBarWidth.toDouble()) / mapLimits.width // todo use corrected width here
-            val gridUnitScaleY = height / mapLimits.height
-
-            // establish a grid system
-            drawer.scale(gridUnitScaleX, gridUnitScaleY)
-            drawer.translate(mapLimits.x.times(-1.0), mapLimits.y.times(-1.0))
-
             with(drawer) {
+//                image(image, sideBarWidth.toDouble(), 0.0, width.toDouble() - sideBarWidth, height.toDouble())
+                clear(ColorRGBa.BLACK)
 
-                // render the ceiling
+                translate(sideBarWidth.toDouble(), 0.0)
+
+                val gridUnitScaleX =
+                    (width - sideBarWidth.toDouble()) / mapLimits.width // todo use corrected width here
+                val gridUnitScaleY = height / mapLimits.height
+
+                // establish a grid system
+                scale(gridUnitScaleX, gridUnitScaleY)
+                translate(mapLimits.x.times(-1.0), mapLimits.y.times(-1.0))
+
+
                 strokeWeight = 0.1
                 stroke = ColorRGBa.LIGHT_GRAY
 
@@ -122,26 +99,26 @@ fun main() = application {
                     )
                 }
 
-
-                // rendr buildings with load-ports
+                // render buildings with load-ports
+                stroke = ColorRGBa.DARK_GREEN
+                fill = ColorRGBa.DARK_GREEN
                 sim.cityMap.buildings.forEach { building ->
-                    stroke = ColorRGBa.LIGHT_GREEN
-                    rectangle(building.area.toOpenRendrRect())
+                    rectangle(building.area.toOpenRendrRectangle())
                 }
 
+                stroke = ColorRGBa.DARK_GREEN
+                fill = ColorRGBa.DARK_GREEN
+
                 sim.cityMap.buildings.forEach { building ->
-                    stroke = ColorRGBa.LIGHT_CORAL
-                    fill = ColorRGBa.LIGHT_CORAL
-                    fontMap = font
+//                    fontMap = font
 //                    text(building.id, building.port.position.x, building.port.position.y)
-//                    rectangle(building.port.position.x, building.port.position.y, 6.0,6.0)
-                    circle(building.port.position.toOpenRendrPoint(), 1.0)
+                    circle(building.port.position.toOpenRendrVector2(), 0.7)
                 }
 
                 stroke = ColorRGBa.LIGHT_BLUE
 
                 sim.cars.forEach { car ->
-                    rectangle(car.currentPosition.x, car.currentPosition.y, 1.0, 1.0)
+                    rectangle(car.currentPosition.x, car.currentPosition.y, 1.5, 1.5)
                 }
 
                 fontMap = font
@@ -151,16 +128,9 @@ fun main() = application {
                 defaults()
                 fill = ColorRGBa.WHITE
                 fontMap = font
-                text("Time: ${sim.now}", width - 150.0, height - 10.0)
-                text("Frame: ${frameCounter++}", width - 150.0, height - 30.0)
+                text("Time: ${sim.now}", sideBarWidth.toDouble() + 10, height - 10.0)
+                text("Frame: ${frameCounter++}", sideBarWidth.toDouble() + 10, height - 30.0)
             }
         }
     }
 }
-
-private fun Point2D.Double.toOpenRendrPoint(): Vector2 = Vector2(x, y)
-
-private fun Rectangle.toOpenRendrRect(): org.openrndr.shape.Rectangle {
-    return org.openrndr.shape.Rectangle(x, y, width, height)
-}
-
