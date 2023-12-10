@@ -1,7 +1,6 @@
 package org.kalasim.logistics
 
-import kotlin.math.pow
-import kotlin.math.sqrt
+import org.kalasim.animation.*
 
 // define routing model
 
@@ -29,7 +28,7 @@ open class PathSegment(
 ) {
 
     val length
-        get() = sqrt((from.position.x - to.position.x).pow(2.0) + (from.position.y - to.position.y).pow(2.0))
+        get() = from.position - to.position
 }
 
 enum class PortConnectivity { Forward, Reverse, Bidirectional }

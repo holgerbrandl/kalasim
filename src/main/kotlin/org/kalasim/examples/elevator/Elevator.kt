@@ -1,21 +1,19 @@
 //Elevator.kt
 package org.kalasim.examples.elevator
 
+import kotlinx.datetime.Clock.System
 import org.kalasim.*
-import org.kalasim.animation.AnimationComponent
+import org.kalasim.animation.*
 import org.kalasim.examples.elevator.Car.DoorState.CLOSED
 import org.kalasim.examples.elevator.Car.DoorState.OPEN
 import org.kalasim.examples.elevator.Direction.*
-import org.kalasim.misc.AmbiguousDurationComponent
 import org.kalasim.misc.repeat
-import java.awt.Point
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 // For example documentation see https://www.kalasim.org/examples/office_tower/
 
-val MOVE_TIME = 10.seconds
 val DOOR_OPEN_TIME = 3.seconds
 val DOOR_CLOSE_TIME = 3.seconds
 val ENTER_TIME = 3.seconds
@@ -41,13 +39,12 @@ enum class Direction {
 private fun getDirection(from: Int, to: Int) = if(from < to) UP else DOWN
 
 
-@OptIn(AmbiguousDurationComponent::class)
 class VisitorGenerator(
     val fromRange: Pair<Int, Int>,
     val toRange: Pair<Int, Int>,
     val load: Int,
     name: String
-) : TickedComponent(name) {
+) : Component(name) {
 
     val fromTo = sequence {
         val dintFrom = discreteUniform(fromRange.first, fromRange.second)
@@ -64,8 +61,8 @@ class VisitorGenerator(
 
             if(load == 0) passivate()
 
-            val iat = 3600 / load
-            hold(uniform(0.5, 1.5).sample() * iat) // TODO should we hold before the first visitor?
+            val iat = (3600 / load).seconds
+            hold(iat * uniform(0.5, 1.5).sample()) // TODO should we hold before the first visitor?
         }
     }
 }
@@ -188,8 +185,12 @@ class Car(initialFloor: Floor, val capacity: Int) :
 
             if(direction != STILL) {
                 val nextFloor = floors[floors.indexOf(floor) + direction.asIncrement()]
-//                hold(MOVE_TIME, description = "Moving to ${nextFloor.level}")
-                move(Point(0, nextFloor.level), description = "Moving to ${nextFloor.level}", speed = 0.1)
+
+                move(
+                    Point(0, nextFloor.level),
+                    description = "Moving to ${nextFloor.level}",
+                    speed = 0.2.metersPerSecond
+                )
 
                 floor = nextFloor
             }
@@ -198,7 +199,10 @@ class Car(initialFloor: Floor, val capacity: Int) :
 
     suspend fun SequenceScope<Component>.openDoor() {
         if(door == OPEN) return
+        println("${this@Car} opening at ${System.now()}")
         hold(DOOR_OPEN_TIME, description = "Opening door of ${this@Car.name}")
+        println("${this@Car} opened at ${System.now()}")
+
         door = OPEN
     }
 

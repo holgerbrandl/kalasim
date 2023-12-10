@@ -12,13 +12,12 @@ import org.openrndr.math.Vector3
 import org.openrndr.math.transforms.buildTransform
 import org.openrndr.math.transforms.project
 import org.openrndr.shape.*
-import kotlin.time.Duration.Companion.milliseconds
 
 
 fun main() = application {
 
     var frameCounter = 0
-    var elevator: Elevator = Elevator().apply { startSimulation(50.milliseconds) }
+    lateinit var elevator: Elevator //= Elevator().apply { startSimulation(1.minutes) }
 
 
     // see also https://openrndr.slack.com/archives/CBJGUKVSQ/p1641933241043200
@@ -62,8 +61,8 @@ fun main() = application {
         }
 
         val simSettings = object {
-            @IntParameter("Speed", 0, 100, order = 0)
-            var speed: Int = 50
+            @IntParameter("Speed", 1, 60, order = 0)
+            var speed: Int = 10
 
             @ActionParameter("Reset")
             fun restartModel() {
@@ -71,24 +70,24 @@ fun main() = application {
             }
 
             fun resetModel() {
-                println("file saved!")
 //                elevator.stopSimulation()
-                elevator.getOrNull<AsyncAnimationStop>()?.stop()
+                try {
+                    elevator.getOrNull<AsyncAnimationStop>()?.stop()
+                } catch(_: UninitializedPropertyAccessException) {
+                }
 
                 // Setup new simulation model
                 elevator = with(settings) {
                     Elevator(false, load0N, loadNN, loadN0, capacity, numElevators, topFloors)
                 }.apply {
-                    startSimulation(
-                        tickDuration = ((100 - speed + 1) / 1.5).milliseconds
-                    )
+                    startSimulation(speedUp = speed.toDouble())
                 }
             }
         }
 
 
         gui.onChange { name, value ->
-            println("restarting sim...")
+            println("restarting sim after changing ${name} to '${value}'...")
             simSettings.restartModel()
         }
 
@@ -206,9 +205,11 @@ fun main() = application {
                             fill = ColorRGBa.GREEN
                             triangle(true)
                         }
+
                         Direction.STILL -> {
                             ShapeContour.EMPTY
                         }
+
                         Direction.UP -> {
                             fill = ColorRGBa.RED
                             triangle(false)
@@ -266,6 +267,3 @@ fun triangle(isDown: Boolean) = contour {
 
     close()
 }
-
-fun Drawer.rectangle(x: Number, y: Number, width: Number, height: Number) =
-    rectangle(x.toDouble(), y.toDouble(), width.toDouble(), height.toDouble())

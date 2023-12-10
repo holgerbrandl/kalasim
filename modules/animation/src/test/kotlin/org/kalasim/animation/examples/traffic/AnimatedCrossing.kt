@@ -1,5 +1,6 @@
 package org.kalasim.animation.examples.traffic
 
+import kotlinx.datetime.*
 import org.kalasim.animation.*
 import org.kalasim.logistics.CollisionSampler
 import org.kalasim.logistics.Crossing
@@ -8,9 +9,10 @@ import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.loadFont
 import org.openrndr.extra.color.presets.*
 import org.openrndr.extra.gui.GUI
-import org.openrndr.extra.parameters.ActionParameter
-import org.openrndr.extra.parameters.IntParameter
-import kotlin.time.Duration.Companion.seconds
+import org.openrndr.extra.parameters.*
+import java.time.format.DateTimeFormatter
+
+//import java.time.format.DateTimeFormatter
 
 fun main() = application {
     var frameCounter = 0
@@ -38,8 +40,8 @@ fun main() = application {
         }
 
         val simSettings = object {
-            @IntParameter("Speed", 0, 100, order = 0)
-            var speed: Int = 50
+            @DoubleParameter("Speed", 0.1, 10.0)
+            var speed: Double = 1.0
 
             @ActionParameter("Reset")
             fun restartModel() {
@@ -47,7 +49,6 @@ fun main() = application {
             }
 
             fun resetModel() {
-                println("file saved!")
                 sim.getOrNull<AsyncAnimationStop>()?.stop()
 
                 sim = with(settings) {
@@ -58,7 +59,7 @@ fun main() = application {
                     }
                 }
                 // Setup new simulation model
-                sim.startSimulation(tickDuration = 1.seconds, 200)
+                sim.startSimulation(speed.toDouble(), 1600)
             }
         }
 
@@ -132,9 +133,14 @@ fun main() = application {
                 defaults()
                 fill = ColorRGBa.WHITE
                 fontMap = font
-                text("Time: ${sim.now}", sideBarWidth.toDouble() + 10, height - 10.0)
+                text("Time: ${sim.now.format("HH:mm:ss:SSS")}", sideBarWidth.toDouble() + 10, height - 10.0)
                 text("Frame: ${frameCounter++}", sideBarWidth.toDouble() + 10, height - 30.0)
             }
         }
     }
 }
+
+
+fun Instant.format(format: String) = toLocalDateTime(TimeZone.UTC)
+    .toJavaLocalDateTime()
+    .format(DateTimeFormatter.ofPattern(format))

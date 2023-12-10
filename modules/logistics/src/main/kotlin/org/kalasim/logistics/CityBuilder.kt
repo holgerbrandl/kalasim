@@ -5,9 +5,11 @@ import org.jetbrains.kotlinx.dataframe.api.toDataFrame
 import org.jetbrains.kotlinx.dataframe.api.util.unfold
 import org.jetbrains.kotlinx.dataframe.api.util.unfoldByProperty
 import org.jetbrains.kotlinx.dataframe.io.writeCSV
+import org.kalasim.animation.*
 import org.kalasim.misc.withExtension
 import java.nio.file.Path
-import kotlin.math.*
+import kotlin.math.abs
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 fun createPathGrid(
@@ -68,10 +70,6 @@ fun trimValue(value: Double, tolerance: Double): Double = when {
     else -> value
 }
 
-
-data class Line(val start: Point, val end: Point)
-
-
 fun computeBuildingArea(
     port: Port,
     distance: Double,
@@ -102,27 +100,22 @@ fun createBuildings(
 ): List<Building> {
     val buildings = mutableListOf<Building>()
 
-    val rectangleDistanceFromSegment = 2.0  // distance of rectangle from pathSegment
+//    val rectangleDistanceFromSegment = 2.0  // distance of rectangle from pathSegment
     val r = Random(seed)
 
-    val mapCenter =
-        pathSegments.map { it.from.position.x }.average() to pathSegments.map { it.from.position.y }.average()
-    val rangeX = pathSegments.map { it.from.position.x }.run { max() - min() }
-    val rangeY = pathSegments.map { it.from.position.y }.run { max() - min() }
+    val mapCenter = Point(
+        pathSegments.map { it.from.position.x }.average(),
+        pathSegments.map { it.from.position.y }.average()
+    )
+    val range = pathSegments.maxOf { (Point(0, 0) - it.from.position).meters }.meters
 
-    val centerThreshold = rangeX * 0.2
-    val outsideThreshold = rangeY * 0.7
+    val centerThreshold = range * 0.2
+    val outsideThreshold = range * 0.6
 
     repeat(numBuildings) {
         val segment = pathSegments.random(r)
         val mapCenterDistance =
-            sqrt(
-                (segment.from.position.x - mapCenter.first).pow(2.0) + (segment.from.position.y - mapCenter.second).pow(
-                    2.0
-                )
-            ) + r.nextDouble(
-                -10.0, 10.00
-            ) // Euclidean distance from origin
+            segment.from.position - mapCenter + r.nextDouble(-10.0, 10.00).meters // Euclidean distance from origin
 
 
         val buildingType = when {

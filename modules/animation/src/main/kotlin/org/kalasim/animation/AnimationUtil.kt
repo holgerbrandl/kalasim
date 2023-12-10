@@ -7,13 +7,13 @@ import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.DependencyContext
 import org.openrndr.math.Vector2
 import java.awt.geom.Point2D
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
 
-fun <T : Environment> T.startSimulation(tickDuration: Duration = 50.milliseconds, smoothness: Int = 10) {
+fun <T : Environment> T.startSimulation(speedUp: Double = 1.0, smoothness: Int = 100) {
+    require(speedUp > 0) { "speed up must be strictly positive" }
+
     apply {
-        ClockSync(tickDuration = tickDuration, syncsPerTick = smoothness)
+        ClockSync(speedUp = speedUp, syncsPerTick = smoothness)
 
         dependency { AsyncAnimationStop() }
 

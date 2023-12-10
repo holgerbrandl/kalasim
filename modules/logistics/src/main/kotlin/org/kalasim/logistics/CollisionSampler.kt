@@ -1,6 +1,7 @@
 package org.kalasim.logistics
 
 import org.kalasim.Component
+import org.kalasim.animation.*
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.seconds

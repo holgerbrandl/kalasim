@@ -2,11 +2,11 @@ package org.kalasim.logistics
 
 import org.kalasim.*
 import org.kalasim.animation.*
-import org.kalasim.logistics.MovingState.*
-import org.kalasim.logistics.MovingState.Acceleration
+import org.kalasim.logistics.MovingState.Accelerating
+import org.kalasim.logistics.MovingState.Stopped
 
 
-enum class MovingState { Moving, Stopped, Acceleration }
+enum class MovingState { Moving, Stopped, Accelerating }
 enum class LogicalMovingState { EnteringSegment, LeavingSegment }
 
 open class Vehicle(startingPosition: Port, val speed: Speed = 100.kmh, val acc: Acceleration = 2.acc) :
@@ -17,7 +17,7 @@ open class Vehicle(startingPosition: Port, val speed: Speed = 100.kmh, val acc: 
 
 
     val movingState = State(Stopped)
-    val logicalMovementState = State(LogicalMovingState)
+    val logicalMovementState = State(LogicalMovingState.EnteringSegment)
 
     init {
         val segmentOccupancy: DirectedPathSegment = when(startingPosition.directionality) {
@@ -74,7 +74,7 @@ open class Vehicle(startingPosition: Port, val speed: Speed = 100.kmh, val acc: 
 
 
                     // not null, that we collide
-                    val beforeCollision = predictedCollision - 5.meters
+                    val beforeCollision = predictedCollision //- 5.meters todo bring back
                     move(beforeCollision, speed, "moving ${this@Vehicle} to $nextTarget")
 
                     // match speed
@@ -129,7 +129,7 @@ open class Vehicle(startingPosition: Port, val speed: Speed = 100.kmh, val acc: 
 
 class DistanceChecker(val collisionCandidate: Vehicle, val vehicle: Vehicle) : Component() {
     override fun repeatedProcess() = sequence<Component> {
-        wait(collisionCandidate.movingState turns Acceleration)
+        wait(collisionCandidate.movingState turns Accelerating)
         vehicle.adjustSpeed(collisionCandidate.currentSpeed)
     }
 }

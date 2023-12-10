@@ -1,8 +1,10 @@
 package org.kalasim.logistics
 
 import org.kalasim.*
+import org.kalasim.animation.Speed
+import org.kalasim.animation.kmh
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 
 class PathOccupancyTracker {
@@ -37,8 +39,6 @@ class Crossing(numVehicles: Int = 2, xBlocks: Int = 2, yBlocks: Int = 2, numBuil
         var lastPosition = startingPosition
 
         override fun repeatedProcess() = sequence {
-            hold(2.minutes)
-
             val destination = get<CityMap>().buildings.random(random)
             // option1: toggle subprocess; Note: car won't repeat when doing so
 //            activate(process = ::moveTo, processArgument = destination)
@@ -47,6 +47,8 @@ class Crossing(numVehicles: Int = 2, xBlocks: Int = 2, yBlocks: Int = 2, numBuil
             // option2: yield to keep repeated-process going
             yieldAll(moveTo(destination.port))
             logger.info { "Arrived at $lastPosition" }
+
+            hold(15.seconds)
         }
     }
 

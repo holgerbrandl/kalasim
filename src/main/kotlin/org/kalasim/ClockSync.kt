@@ -2,8 +2,7 @@ package org.kalasim
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import org.kalasim.misc.ComponentTrackingConfig
-import org.kalasim.misc.DependencyContext
+import org.kalasim.misc.*
 import org.koin.core.Koin
 import kotlin.math.roundToLong
 import kotlin.time.Duration
@@ -18,13 +17,35 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 class ClockSync(
     tickDuration: Duration,
-    val syncsPerTick: Number = 1,
+    val syncsPerTick: Number = 10,
     val maxDelay: Duration? = null,
     koin: Koin = DependencyContext.get()
 ) : Component(
     trackingConfig = ComponentTrackingConfig(logCreation = false, logStateChangeEvents = false),
     koin = koin
 ) {
+    // todo add secondary constructor that accepts speed-parameter instead of too complex
+    /**
+     * A component that allows to synchronize wall time to simulation. See the [user manual](https://www.kalasim.org/advanced/#clock-synchronization) for an in-depth overview about clock synchronization.
+     *
+     * @param speedUp If set to 1.0 this will run with wall-time. Setting it to 2 would be twice as fast as wall-time and so on.
+     * @param syncsPerTick Defines how often a clock synchronization should happen. Per default it synchronizes once per _tick_ (i.e. an 1-increment of simulation time).
+     * @param maxDelay If provided, `kalasim` will throw an `ClockOverloadException` if the specified delay is exceeded by difference of wall-time and (transformed) simulation time. Defaults to `null`.
+     */
+    @OptIn(AmbiguousDuration::class)
+    constructor(
+        speedUp: Double = 1.0,
+        syncsPerTick: Number = 10,
+        maxDelay: Duration? = null,
+        koin: Koin = DependencyContext.get()
+    ) : this(
+        // compute necessary tick duration
+        koin.get<Environment>().asDuration(1.0 / speedUp),
+        syncsPerTick,
+        maxDelay,
+        koin
+    )
+
 
     var tickDuration: Duration = tickDuration
         set(value) {
@@ -58,6 +79,8 @@ class ClockSync(
             val wallTimeSinceSyncStart = now - syncStartWall!!
 
             val sleepDuration = simTimeSinceSyncStart - wallTimeSinceSyncStart
+
+//            println("synchronizing will wall by sleeping for $sleepDuration")
 
 //            if (abs(sleepDuration.toMillis()) > 5000L) {
 //                println("sim $simTimeSinceSyncStart wall $wallTimeSinceSyncStart; Resync by sleep for ${sleepDuration}ms")

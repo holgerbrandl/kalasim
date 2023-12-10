@@ -4,6 +4,8 @@ import org.jgrapht.Graph
 import org.jgrapht.GraphPath
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath
 import org.jgrapht.graph.DefaultDirectedWeightedGraph
+import org.kalasim.animation.Point
+import org.kalasim.animation.kmh
 import org.kalasim.logistics.MovementDirection.Forward
 import org.kalasim.logistics.MovementDirection.Reverse
 
@@ -44,7 +46,7 @@ class PathFinder(val network: GeoMap) {
                 pathGraph.addEdge(from, segment.to, DirectedPathSegment(segment, Forward))
 
                 //weight of the edge (we default to a very fast max speed if not defined)
-                val calculatedWeight = length / (speedLimit?.meterPerSecond ?: 100.0)
+                val calculatedWeight = (length / (speedLimit ?: 100.kmh)).inWholeSeconds.toDouble()
 
                 pathGraph.setEdgeWeight(from, to, calculatedWeight)
 

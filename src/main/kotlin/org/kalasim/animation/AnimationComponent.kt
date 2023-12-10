@@ -2,11 +2,8 @@ package org.kalasim.animation
 
 import org.kalasim.*
 import org.kalasim.analysis.RescheduledEvent
-import java.awt.geom.Point2D
-import kotlin.math.sqrt
 import kotlin.properties.Delegates
 
-typealias Point = Point2D.Double
 
 /** A component that has a position on a planar 2D surface. While being on the move, it allows to query its current
  *  position. This is most useful when visualizing a simulation state.
@@ -34,10 +31,9 @@ open class AnimationComponent(
         started = now
         currentSpeed = speed
 
-        val distance = distance()
+        val distance = to!! - from
 
-        //todo use type duration compation
-        val duration = (distance.meters.toDouble() / speed.meterPerSecond).toDuration()
+        val duration = distance / speed
         estimatedArrival = now + duration
 
         hold(duration, description ?: "moving to $nextTarget", priority = priority)
@@ -45,12 +41,6 @@ open class AnimationComponent(
         to = null
     }
 
-    private fun distance(): Distance {
-        val xDist = to!!.x - from.x
-        val yDist = to!!.y - from.y
-
-        return sqrt(xDist * xDist + yDist * yDist).meters
-    }
 
     val currentPosition: Point
         get() {
@@ -142,5 +132,6 @@ open class AnimationComponent(
         return (now - rescheduledEvent.time) / (rescheduledEvent.scheduledFor - rescheduledEvent.time)
     }
 }
+
 
 typealias AnimationHoldMatcher = RescheduledEvent.() -> Boolean

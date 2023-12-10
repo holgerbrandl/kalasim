@@ -1,5 +1,6 @@
 package org.kalasim.logistics.examples
 
+import org.kalasim.animation.Point
 import org.kalasim.logistics.*
 
 
