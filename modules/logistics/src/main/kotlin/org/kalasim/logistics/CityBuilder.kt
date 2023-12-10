@@ -62,7 +62,13 @@ fun createPathGrid(
 }
 
 enum class BuildingType { Business, Factory, Home }
-data class Building(val id: String, val area: Rectangle, val port: Port, val type: BuildingType)
+
+data class Building(
+    val id: String,
+    val port: Port,
+    val area: Rectangle = computeBuildingArea(port, 0.5, 6.0, 5.0, true),
+    val type: BuildingType = BuildingType.Home
+)
 
 fun trimValue(value: Double, tolerance: Double): Double = when {
     value < tolerance -> tolerance
@@ -133,7 +139,7 @@ fun createBuildings(
         val port = Port(buildingId, trimValue(r.nextDouble(1.0), avoidCrossTol), segment)
 
         val area = computeBuildingArea(port, 0.5, 6.0, 5.0, r.nextBoolean())
-        val building = Building(buildingId, area, port, buildingType)
+        val building = Building(buildingId, port, area, buildingType)
 
         buildings.add(building)
     }
@@ -177,6 +183,24 @@ fun buildCity(
 
     return CityMap(grid, buildings)
 }
+
+fun generateRoad(numSegments: Int, numBuildings: Int): Crossing {
+
+    val segments = List(numSegments + 1) { Node("n${it}", Point(0, 100 * it)) }
+        .zipWithNext()
+        .mapIndexed { idx, (from, to) ->
+
+            PathSegment("seg_$idx", from, to)
+        }
+
+    // build `numBuildings` for each segments
+    val buildings = segments.flatMap {
+        createBuildings(listOf(it), numBuildings = numBuildings)
+    }
+
+    return Crossing(0, CityMap(segments, buildings))
+}
+
 
 // highways
 fun main() {

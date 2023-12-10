@@ -19,6 +19,8 @@ open class Vehicle(startingPosition: Port, val speed: Speed = 100.kmh, val acc: 
     val movingState = State(Stopped)
     val logicalMovementState = State(LogicalMovingState.EnteringSegment)
 
+    val occupancyTracker = get<PathOccupancyTracker>()
+
     init {
         val segmentOccupancy: DirectedPathSegment = when(startingPosition.directionality) {
             PortConnectivity.Forward -> DirectedPathSegment(startingPosition.segment, MovementDirection.Forward)
@@ -26,7 +28,7 @@ open class Vehicle(startingPosition: Port, val speed: Speed = 100.kmh, val acc: 
             PortConnectivity.Bidirectional -> DirectedPathSegment(startingPosition.segment, MovementDirection.Forward)
         }
 
-        get<PathOccupancyTracker>().enteringSegment(this@Vehicle, segmentOccupancy)
+        occupancyTracker.enteringSegment(this@Vehicle, segmentOccupancy)
     }
 
     val pathFinder = get<PathFinder>()

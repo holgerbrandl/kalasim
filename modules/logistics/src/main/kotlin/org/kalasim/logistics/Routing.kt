@@ -1,6 +1,7 @@
 package org.kalasim.logistics
 
 import org.kalasim.animation.*
+import java.lang.Double.max
 
 // define routing model
 
@@ -29,6 +30,8 @@ open class PathSegment(
 
     val length
         get() = from.position - to.position
+
+    override fun toString() = id
 }
 
 enum class PortConnectivity { Forward, Reverse, Bidirectional }
@@ -49,7 +52,7 @@ open class Port(
 
 data class GeoMap(val segments: List<PathSegment>, val nodes: Collection<Node>, val ports: List<Port> = listOf()) {
 
-    fun getLimits(expand: Double = 0.2): Rectangle {
+    fun getLimits(expand: Double = 0.2, minSize: Double = 20.0): Rectangle {
         val minX = nodes.minOf { it.position.x }
         val minY = nodes.minOf { it.position.y }
         val maxX = nodes.maxOf { it.position.x }
@@ -58,15 +61,12 @@ data class GeoMap(val segments: List<PathSegment>, val nodes: Collection<Node>, 
         val xRange = maxX - minX
         val yRange = maxY - minY
 
-        val upperLeft = Point(minX - xRange * expand, minY - yRange * expand)
-        val lowerRight = Point(maxX + xRange * expand, maxY + yRange * expand)
+        val upperLeft = Point(minX - max(xRange * expand, minSize), minY - yRange * expand)
+        val lowerRight = Point(maxX + max(xRange * expand, minSize), maxY + yRange * expand)
 
         return Rectangle(upperLeft, lowerRight)
     }
 }
-
-data class StartingPosition(val port: Port)
-
 
 
 

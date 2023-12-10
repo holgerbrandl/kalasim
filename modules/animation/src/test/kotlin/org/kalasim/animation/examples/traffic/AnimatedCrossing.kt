@@ -1,6 +1,5 @@
 package org.kalasim.animation.examples.traffic
 
-import kotlinx.datetime.*
 import org.kalasim.animation.*
 import org.kalasim.logistics.CollisionSampler
 import org.kalasim.logistics.Crossing
@@ -9,20 +8,21 @@ import org.openrndr.color.ColorRGBa
 import org.openrndr.draw.loadFont
 import org.openrndr.extra.color.presets.*
 import org.openrndr.extra.gui.GUI
-import org.openrndr.extra.parameters.*
-import java.time.format.DateTimeFormatter
+import org.openrndr.extra.parameters.ActionParameter
+import org.openrndr.extra.parameters.DoubleParameter
 
-//import java.time.format.DateTimeFormatter
 
-fun main() = application {
+fun main() = animateCrossing { Crossing(2, numBuildings = 4) }
+
+fun animateCrossing(builder: () -> Crossing = { Crossing() }) = application {
     var frameCounter = 0
-    var sim = Crossing()
+    lateinit var sim: Crossing
 
     // see also https://openrndr.slack.com/archives/CBJGUKVSQ/p1641933241043200
     val sideBarWidth = 200
     configure {
         width = 1024 + sideBarWidth
-        height = 800
+        height = 650
         windowResizable = true
         title = "Crossing"
     }
@@ -35,8 +35,8 @@ fun main() = application {
         val gui = GUI()
 
         val settings = object {
-            @IntParameter("# Vehicles", 2, 20, order = 0)
-            var numVehicles: Int = 10
+//            @IntParameter("# Vehicles", 2, 20, order = 0)
+//            var numVehicles: Int = 10
         }
 
         val simSettings = object {
@@ -49,17 +49,19 @@ fun main() = application {
             }
 
             fun resetModel() {
-                sim.getOrNull<AsyncAnimationStop>()?.stop()
+                try {
+                    sim.getOrNull<AsyncAnimationStop>()?.stop()
+                } catch(_: UninitializedPropertyAccessException) {
+                }
 
                 sim = with(settings) {
                     // todo inject parameters here
-                    Crossing(2, numBuildings = 4).apply {
-//                    Crossing(20,20,15, 15)
+                    builder().apply {
                         CollisionSampler()
                     }
                 }
                 // Setup new simulation model
-                sim.startSimulation(speed.toDouble(), 1600)
+                sim.startSimulation(speed, 1600)
             }
         }
 
@@ -82,7 +84,7 @@ fun main() = application {
                 translate(sideBarWidth.toDouble(), 0.0)
 
                 val gridUnitScaleX =
-                    (width - sideBarWidth.toDouble()) / mapLimits.width // todo use corrected width here
+                    (width - sideBarWidth.toDouble()) / mapLimits.width
                 val gridUnitScaleY = height / mapLimits.height
 
                 // establish a grid system
@@ -141,6 +143,3 @@ fun main() = application {
 }
 
 
-fun Instant.format(format: String) = toLocalDateTime(TimeZone.UTC)
-    .toJavaLocalDateTime()
-    .format(DateTimeFormatter.ofPattern(format))

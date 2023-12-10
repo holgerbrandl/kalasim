@@ -4,22 +4,25 @@ import org.kalasim.Component
 import org.kalasim.animation.*
 import kotlin.math.pow
 import kotlin.math.sqrt
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-class CollisionSampler : Component() {
+class CollisionSampler(val samplingRate: Duration = 1.seconds) : Component() {
 
     override fun repeatedProcess() = sequence {
-        hold(5.seconds)
+        hold(samplingRate)
 
-        get<PathOccupancyTracker>().roadOccupancy.filterValues { it.isNotEmpty() }.forEach { dirSegment, cars ->
-            val vehiclePositions = cars.map { Point(it.currentPosition.x, it.currentPosition.y) }
+        get<PathOccupancyTracker>().roadOccupancy
+            .filterValues { it.isNotEmpty() }
+            .forEach { (dirSegment, cars) ->
+                val vehiclePositions = cars.map { Point(it.currentPosition.x, it.currentPosition.y) }
 
-            logger.info { "minimal vehcile distance on $dirSegment is ${vehiclePositions.minimalDistance()}" }
+                logger.info { "minimal vehicle distance on $dirSegment is ${vehiclePositions.minimalDistance()}" }
 
-            require(!vehiclePositions.hasCollision()) {
-                "collision detected via sampling on $dirSegment for $cars"
+                require(!vehiclePositions.hasCollision()) {
+                    "collision detected via sampling on $dirSegment for $cars"
+                }
             }
-        }
     }
 }
 

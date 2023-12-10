@@ -1,12 +1,14 @@
 package org.kalasim.animation
 
 import kotlinx.coroutines.*
+import kotlinx.datetime.*
 import org.kalasim.*
 import org.kalasim.logistics.Rectangle
 import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.DependencyContext
 import org.openrndr.math.Vector2
 import java.awt.geom.Point2D
+import java.time.format.DateTimeFormatter
 
 
 fun <T : Environment> T.startSimulation(speedUp: Double = 1.0, smoothness: Int = 100) {
@@ -103,3 +105,7 @@ fun Point2D.Double.toOpenRendrVector2(): Vector2 = Vector2(x, y)
 fun Rectangle.toOpenRendrRectangle(): org.openrndr.shape.Rectangle {
     return org.openrndr.shape.Rectangle(x, y, width, height)
 }
+
+fun Instant.format(format: String) = toLocalDateTime(TimeZone.UTC)
+    .toJavaLocalDateTime()
+    .format(DateTimeFormatter.ofPattern(format))

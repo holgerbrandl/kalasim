@@ -1,10 +1,8 @@
 package org.kalasim.logistics
 
 import org.kalasim.*
-import org.kalasim.animation.Speed
 import org.kalasim.animation.kmh
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.seconds
 
 
 class PathOccupancyTracker {
@@ -21,42 +19,45 @@ class PathOccupancyTracker {
 }
 
 
-class Crossing(numVehicles: Int = 2, xBlocks: Int = 2, yBlocks: Int = 2, numBuildings: Int = 10) : Environment() {
+open class Crossing(numVehicles: Int = 0, cityMap: CityMap) : Environment() {
+    fun buildingMap(): List<PathSegment> {
+        TODO("Not yet implemented")
+    }
 
-    val cityMap = dependency { buildCity(xBlocks, yBlocks, numBuildings = numBuildings) }
-//    val cityMap = dependency { buildCity(15, 15, numBuildings = 100) }
+    constructor(numVehicles: Int = 2, xBlocks: Int = 2, yBlocks: Int = 2, numBuildings: Int = 10) : this(
+        numVehicles,
+        buildCity(xBlocks, yBlocks, numBuildings = numBuildings)
+    )
+
+    val cityMap: CityMap = dependency { cityMap }
 
     val geomMap = dependency { cityMap.toGeoMap() }
-    val roadManager = dependency { PathOccupancyTracker() }
 
     init {
+        dependency { PathOccupancyTracker() }
         dependency { PathFinder(geomMap) }
     }
 
+    val cars = mutableListOf<Vehicle>()
 
-    class Car(startingPosition: Building, speed: Speed = 100.kmh) : Vehicle(startingPosition.port, speed) {
+    fun addCar(vehicle: Vehicle) = cars.add(vehicle)
 
-        var lastPosition = startingPosition
-
-        override fun repeatedProcess() = sequence {
-            val destination = get<CityMap>().buildings.random(random)
-            // option1: toggle subprocess; Note: car won't repeat when doing so
-//            activate(process = ::moveTo, processArgument = destination)
-
-            logger.info { "Moving from $lastPosition to $destination" }
-            // option2: yield to keep repeated-process going
-            yieldAll(moveTo(destination.port))
-            logger.info { "Arrived at $lastPosition" }
-
-            hold(15.seconds)
+    init {
+        if(numVehicles > 0) {
+            List(numVehicles) {
+                RandomMoveCar(
+                    cityMap.buildings.random(random),
+                    random.nextInt(50, 150).kmh
+                )
+            }.apply { cars.addAll(this) }
         }
     }
-
-
-    val cars = List(numVehicles) {
-        Car(cityMap.buildings.random(random), random.nextInt(50, 150).kmh)
-    }
 }
+
+fun Crossing.segments2buildings() = cityMap.buildings.groupBy { it.port.segment }
+    .mapValues { (seg, buildings) -> buildings.sortedBy { it.port.distance } }
+    .toList()
+
 
 fun main() {
     val sim = Crossing(2).apply {
