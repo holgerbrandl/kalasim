@@ -17,7 +17,7 @@ class CollisionSampler(val samplingRate: Duration = 1.seconds) : Component() {
             .forEach { (dirSegment, cars) ->
                 val vehiclePositions = cars.map { Point(it.currentPosition.x, it.currentPosition.y) }
 
-                logger.info { "minimal vehicle distance on $dirSegment is ${vehiclePositions.minimalDistance()}" }
+//                logger.info { "minimal vehicle distance on $dirSegment is ${vehiclePositions.minimalDistance()}" }
 
                 require(!vehiclePositions.hasCollision()) {
                     "collision detected via sampling on $dirSegment for $cars"

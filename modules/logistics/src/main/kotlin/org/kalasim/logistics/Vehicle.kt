@@ -36,7 +36,6 @@ open class Vehicle(startingPosition: Port, val speed: Speed = 100.kmh, val acc: 
     fun moveTo(target: Port): Sequence<Component> = sequence {
         val occupancyTracker = get<PathOccupancyTracker>()
 
-        //        logger.info{ "computing port from $currentPort to $target"}
         val path = pathFinder.findPath(currentPort!!, target)
 
         logger.info { "computed port from $ to $target" }
@@ -62,14 +61,21 @@ open class Vehicle(startingPosition: Port, val speed: Speed = 100.kmh, val acc: 
                 it.currentPosition.distance(directedSegment.endPoint)
             }
 
+            logger.info { "computed preceding vehicle as $collisionCandidate" }
+
             // ranfahren & match speed (evtl port direkt anfahren und gegner ausser acht lassen, falls bis ankunft vorbeigefahren)
 
             // compute collision on current path segment
             val predictedCollision: Point? = collisionCandidate?.let { computeCollision(this@Vehicle, it) }
 
+            logger.info { "predicted collision point to $predictedCollision" }
+
             // predictedCollision --> null: no collison on path segment
 
             if(predictedCollision != null) {
+
+                logger.info { "predicted moving to collison point $predictedCollision" }
+
                 // what if it stops again?
                 move(nextTarget, speed, "moving ${this@Vehicle} to $nextTarget")
 
@@ -83,7 +89,11 @@ open class Vehicle(startingPosition: Port, val speed: Speed = 100.kmh, val acc: 
 //                    // stau
 //                    wait(collisionCandidate.movingState turn moving)
 //                }
+
+                // spawn sub-processes to keep distance and to continue
                 val distanceChecker = DistanceChecker(collisionCandidate, this@Vehicle)
+
+                //todo needed?
                 val segChangeListener = SegmentChangeTracker(collisionCandidate, this@Vehicle)
 
                 move(
@@ -128,14 +138,17 @@ open class Vehicle(startingPosition: Port, val speed: Speed = 100.kmh, val acc: 
 }
 
 class DistanceChecker(val collisionCandidate: Vehicle, val vehicle: Vehicle) : Component() {
-    override fun repeatedProcess() = sequence<Component> {
+    override fun repeatedProcess() = sequence {
+        logger.info { "monitoring for preceding vehicle '$collisionCandidate' for speed change " }
         wait(collisionCandidate.movingState turns Accelerating)
+
+        logger.info { "detected speed-chang at preceding vehicle '$collisionCandidate'" }
         vehicle.adjustSpeed(collisionCandidate.currentSpeed)
     }
 }
 
 class SegmentChangeTracker(val collisionCandidate: Vehicle, val vehicle: Vehicle) : Component() {
-    override fun repeatedProcess() = sequence<Component> {
+    override fun repeatedProcess() = sequence {
         wait(collisionCandidate.logicalMovementState turns LogicalMovingState.LeavingSegment)
         vehicle.adjustSpeed()
     }

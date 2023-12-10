@@ -28,13 +28,11 @@ class CollisionAvoidanceTests {
 
     @Test
     fun `car must wait until road ahead is empty`() = createTestSimulation {
-        enableComponentLogger()
-
         val road = generateRoad(numSegments = 2, numBuildings = 2)
-
 
         val roadDict = road.segments2buildings()
 
+        // create a faster car
         road.addCar(object : Vehicle(roadDict[0].second[0].port) {
             override fun process() = sequence<Component> {
                 hold(2.seconds)
@@ -42,6 +40,7 @@ class CollisionAvoidanceTests {
             }
         })
 
+        // create a slower car on the same road to trigger a collision situation
         road.addCar(object : Vehicle(roadDict[0].second[1].port, speed = 30.kmh) {
             override fun process() = sequence<Component> {
                 hold(5.seconds)
