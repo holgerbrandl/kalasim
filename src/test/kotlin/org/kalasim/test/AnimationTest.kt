@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.Component
 import org.kalasim.animation.AnimationComponent
+import org.kalasim.misc.createTestSimulation
 import java.awt.geom.Point2D
 import kotlin.time.Duration.Companion.seconds
 

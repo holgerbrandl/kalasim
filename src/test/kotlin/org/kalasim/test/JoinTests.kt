@@ -1,12 +1,11 @@
 package org.kalasim.test
 
 import io.kotest.matchers.comparables.shouldBeLessThan
-import junit.framework.TestCase.assertEquals
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.examples.shipyard.PartCompleted
 import org.kalasim.examples.shipyard.Shipyard
-import org.kalasim.misc.AmbiguousDuration
+import org.kalasim.misc.*
 import kotlin.time.Duration.Companion.hours
 
 

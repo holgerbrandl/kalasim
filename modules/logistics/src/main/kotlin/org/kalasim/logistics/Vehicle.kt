@@ -33,82 +33,80 @@ open class Vehicle(startingPosition: Port, val speed: Speed = 100.kmh, val acc: 
 
     val pathFinder = get<PathFinder>()
 
-    fun moveTo(target: Port): Sequence<Component> {
+    fun moveTo(target: Port): Sequence<Component> = sequence {
         val occupancyTracker = get<PathOccupancyTracker>()
 
-        return sequence {
-            //        logger.info{ "computing port from $currentPort to $target"}
-            val path = pathFinder.findPath(currentPort!!, target)
+        //        logger.info{ "computing port from $currentPort to $target"}
+        val path = pathFinder.findPath(currentPort!!, target)
 
-            logger.info { "computed port from $ to $target" }
+        logger.info { "computed port from $ to $target" }
 
-            val startPort = currentPort
-            currentPort = null
-            move(startPort!!.segment.to.position, speed = speed, description = "moving ${this@Vehicle}")
+        val startPort = currentPort
+        currentPort = null
+        move(startPort!!.segment.to.position, speed = speed, description = "moving ${this@Vehicle}")
 
-            path.route.edgeList.forEach { directedSegment ->
-                occupancyTracker.enteringSegment(this@Vehicle, directedSegment)
+        path.route.edgeList.forEach { directedSegment ->
+            occupancyTracker.enteringSegment(this@Vehicle, directedSegment)
 
-                val nextTarget = directedSegment.endPoint
+            val nextTarget = directedSegment.endPoint
 
-                val vehicleDistEndPoint = this@Vehicle.currentPosition.distance(directedSegment.endPoint)
+            val vehicleDistEndPoint = this@Vehicle.currentPosition.distance(directedSegment.endPoint)
 
-                val collisionCandidate = occupancyTracker.findVehicles(directedSegment).filter {
-                    it != this@Vehicle
-                }.filter {
-                    // remove vehicles behind
-                    vehicleDistEndPoint > it.currentPosition.distance(directedSegment.endPoint)
-                }.maxByOrNull {
-                    // find closest
-                    it.currentPosition.distance(directedSegment.endPoint)
-                }
+            val collisionCandidate = occupancyTracker.findVehicles(directedSegment).filter {
+                it != this@Vehicle
+            }.filter {
+                // remove vehicles behind
+                vehicleDistEndPoint > it.currentPosition.distance(directedSegment.endPoint)
+            }.maxByOrNull {
+                // find closest
+                it.currentPosition.distance(directedSegment.endPoint)
+            }
 
-                // ranfahren & match speed (evtl port direkt anfahren und gegner ausser acht lassen, falls bis ankunft vorbeigefahren)
+            // ranfahren & match speed (evtl port direkt anfahren und gegner ausser acht lassen, falls bis ankunft vorbeigefahren)
 
-                // compute collision on current path segment
-                val predictedCollision: Point? = collisionCandidate?.let { computeCollision(this@Vehicle, it) }
+            // compute collision on current path segment
+            val predictedCollision: Point? = collisionCandidate?.let { computeCollision(this@Vehicle, it) }
 
-                // predictedCollision --> null: no collison on path segment
+            // predictedCollision --> null: no collison on path segment
 
-                if(predictedCollision != null) {
-                    // what if it stops again?
-                    move(nextTarget, speed, "moving ${this@Vehicle} to $nextTarget")
+            if(predictedCollision != null) {
+                // what if it stops again?
+                move(nextTarget, speed, "moving ${this@Vehicle} to $nextTarget")
 
 
-                    // not null, that we collide
-                    val beforeCollision = predictedCollision //- 5.meters todo bring back
-                    move(beforeCollision, speed, "moving ${this@Vehicle} to $nextTarget")
+                // not null, that we collide
+                val beforeCollision = predictedCollision //- 5.meters todo bring back
+                move(beforeCollision, speed, "moving ${this@Vehicle} to $nextTarget")
 
-                    // match speed
+                // match speed
 //                if(collisionCandidate.movingState.value == Stopped){
 //                    // stau
 //                    wait(collisionCandidate.movingState turn moving)
 //                }
-                    val distanceChecker = DistanceChecker(collisionCandidate, this@Vehicle)
-                    val segChangeListener = SegmentChangeTracker(collisionCandidate, this@Vehicle)
+                val distanceChecker = DistanceChecker(collisionCandidate, this@Vehicle)
+                val segChangeListener = SegmentChangeTracker(collisionCandidate, this@Vehicle)
 
-                    move(
-                        nextTarget,
-                        speed = collisionCandidate.speed,
-                        description = "moving ${this@Vehicle} to $nextTarget"
-                    )
+                move(
+                    nextTarget,
+                    speed = collisionCandidate.speed,
+                    description = "moving ${this@Vehicle} to $nextTarget"
+                )
 
-                    move(nextTarget, speed, "moving ${this@Vehicle} to $nextTarget")
+                move(nextTarget, speed, "moving ${this@Vehicle} to $nextTarget")
 
-                    distanceChecker.cancel()
-                    segChangeListener.cancel()
-                } else {
-                    move(nextTarget, speed, "moving ${this@Vehicle} to $nextTarget")
-                }
+                distanceChecker.cancel()
+                segChangeListener.cancel()
+            } else {
+                move(nextTarget, speed, "moving ${this@Vehicle} to $nextTarget")
             }
-
-            //todo extract CO as function and apply here as well
-            move(target.position, speed = speed, description = "moving ${this@Vehicle}")
-
-            logger.info { "reached target from $ to $target" }
-
-            currentPort = target
         }
+
+        //todo extract CO as function and apply here as well
+        move(target.position, speed = speed, description = "moving ${this@Vehicle}")
+
+        logger.info { "reached target from $ to $target" }
+
+        currentPort = target
     }
 
     private fun computeCollision(vehicle: Vehicle, collisionCandidate: Vehicle): Point? {

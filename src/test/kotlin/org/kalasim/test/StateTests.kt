@@ -6,6 +6,7 @@ import org.junit.Ignore
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.misc.AmbiguousDuration
+import org.kalasim.misc.createTestSimulation
 import kotlin.test.fail
 
 class StateTests {

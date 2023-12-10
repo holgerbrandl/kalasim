@@ -8,6 +8,7 @@ import io.kotest.matchers.shouldBe
 import org.junit.Test
 import org.kalasim.*
 import org.kalasim.misc.AmbiguousDuration
+import org.kalasim.misc.createTestSimulation
 import kotlin.time.Duration.Companion.minutes
 
 

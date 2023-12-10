@@ -6,6 +6,7 @@ import org.kalasim.*
 import org.kalasim.ComponentState.*
 import org.kalasim.analysis.EntityCreatedEvent
 import org.kalasim.misc.AmbiguousDuration
+import org.kalasim.misc.createTestSimulation
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes

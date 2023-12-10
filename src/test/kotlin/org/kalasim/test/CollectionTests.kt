@@ -3,8 +3,7 @@ package org.kalasim.test
 import org.junit.Test
 import org.kalasim.ComponentList
 import org.kalasim.ComponentQueue
-import org.kalasim.misc.printThis
-import org.kalasim.misc.toIndentString
+import org.kalasim.misc.*
 
 class ComponentListTest {
 

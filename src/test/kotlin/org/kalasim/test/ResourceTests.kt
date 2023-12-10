@@ -267,7 +267,7 @@ class ResourceTests {
             override fun process() = sequence {
                 hold(duration = 7.minutes)
 
-                request(resource withQuantity 2 andPriority Priority.CRITICAL) {
+                request(resource withQuantity 2 andPriority CRITICAL) {
                     criticalRequestHonored = true
                     hold(duration = 5.minutes, "consumed complete resource")
                 }

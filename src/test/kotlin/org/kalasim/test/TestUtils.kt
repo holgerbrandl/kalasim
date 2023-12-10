@@ -1,17 +1,14 @@
 package org.kalasim.test
 
 import junit.framework.TestCase
-import kotlinx.datetime.Instant
 import org.apache.commons.math3.distribution.ConstantRealDistribution
 import org.kalasim.*
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import kotlin.test.assertEquals
-import kotlin.time.DurationUnit
 
 fun SimulationEntity.printInfo() = println(this)
 
-// this class is simply copied from https://github.com/holgerbrandl/krangl
 
 internal data class CapturedOutput(val stdout: String, val stderr: String)
 
@@ -43,39 +40,6 @@ internal fun captureOutput(expr: () -> Unit): CapturedOutput {
 // https://stackoverflow.com/questions/48933641/kotlin-add-carriage-return-into-multiline-string
 //internal fun String.trimAndReline() = trimIndent().replace("\n", System.getProperty("line.separator"))
 
-
-internal fun createTestSimulation(
-    startDate: Instant = Instant.fromEpochMilliseconds(0),
-    enableComponentLogger: Boolean = true,
-    /** The duration unit of this environment. Every tick corresponds to a unit duration. See https://www.kalasim.org/basics/#running-a-simulation */
-    tickDurationUnit: DurationUnit = DurationUnit.MINUTES,
-    builder: Environment.() -> Unit,
-) {
-    createSimulation(startDate, tickDurationUnit = tickDurationUnit) {
-        if(enableComponentLogger) enableComponentLogger()
-        builder()
-    }
-}
-
-internal fun <S : Environment> testModel(sim: S, smthg: S.() -> Unit): Unit = smthg(sim)
-
-
-//relates to https://github.com/holgerbrandl/kalasim/issues/11
-//internal fun testComponent(enableComponentLogger: Boolean = true, block:  suspend SequenceScope<Component>.() -> Unit) = createTestSimulation {
-//
-//    object : Component() {
-//        override fun process() = sequence {
-//            block()
-//        }
-//    }
-//
-//}
-//
-//fun main() {
-//    testComponent {
-//        hold(1)
-//    }
-//}
 
 
 /** Converts a list of fixed history into a inter-arrival distribution. Once the list is exhausted it will throw an

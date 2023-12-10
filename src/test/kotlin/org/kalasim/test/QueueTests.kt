@@ -8,6 +8,7 @@ import org.kalasim.ComponentState.DATA
 import org.kalasim.Priority.Companion.IMPORTANT
 import org.kalasim.analysis.InteractionEvent
 import org.kalasim.misc.AmbiguousDuration
+import org.kalasim.misc.createTestSimulation
 import kotlin.math.roundToInt
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.minutes

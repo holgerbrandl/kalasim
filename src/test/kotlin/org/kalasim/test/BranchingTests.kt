@@ -8,6 +8,7 @@ import org.junit.Test
 import org.kalasim.Component
 import org.kalasim.State
 import org.kalasim.misc.AmbiguousDuration
+import org.kalasim.misc.createTestSimulation
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 

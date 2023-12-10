@@ -6,8 +6,8 @@ import org.junit.Test
 import org.kalasim.*
 import org.kalasim.analysis.ResourceEvent
 import org.kalasim.analysis.ResourceEventType
-import org.kalasim.misc.AmbiguousDuration
-import org.kalasim.misc.AmbiguousDurationComponent
+import org.kalasim.misc.*
+import kotlin.repeat
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
