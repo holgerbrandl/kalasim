@@ -4,22 +4,10 @@ import org.jgrapht.Graph
 import org.jgrapht.GraphPath
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath
 import org.jgrapht.graph.DefaultDirectedWeightedGraph
-import org.kalasim.animation.Point
 import org.kalasim.animation.kmh
 import org.kalasim.logistics.MovementDirection.Forward
 import org.kalasim.logistics.MovementDirection.Reverse
 
-enum class MovementDirection { Forward, Reverse }
-
-data class DirectedPathSegment(val segment: PathSegment, val direction: MovementDirection) {
-    val endPoint: Point
-        get() = when(direction) {
-            Forward -> Point(segment.to.position.x, segment.to.position.y)
-            Reverse -> Point(segment.from.position.x, segment.from.position.y)
-        }
-
-    override fun toString(): String = segment.id + if(direction == Forward) "(->)" else "(<-)"
-}
 
 /**
  * Class representing a path finder in a given road network.
@@ -81,4 +69,21 @@ class PathFinder(val network: GeoMap) {
 
 }
 
-data class GeoPath(val from: Port, val to: Port, val route: GraphPath<Node, DirectedPathSegment>)
+data class GeoPath(val from: Port, val to: Port, val route: GraphPath<Node, DirectedPathSegment>) {
+    fun isChangingSegment() = route.edgeList.isNotEmpty() || (from.directionality != to.directionality)
+
+    fun toSegments(): List<RelativeSegmentPosition> = buildList {
+        if(route.edgeList.isEmpty()) {
+            if(from.toDirectedPathSegment() != to.toDirectedPathSegment()) {
+                add(RelativeSegmentPosition(from.toDirectedPathSegment(), 1.0))
+            } else {
+                require(from.toRelSegmentPosition().relativePosition > to.toRelSegmentPosition().relativePosition)
+            }
+        } else {
+            add(RelativeSegmentPosition(from.toDirectedPathSegment(), 1.0))
+            route.edgeList.forEach { add(RelativeSegmentPosition(it, 1.0)) }
+        }
+
+        add(to.toRelSegmentPosition())
+    }
+}

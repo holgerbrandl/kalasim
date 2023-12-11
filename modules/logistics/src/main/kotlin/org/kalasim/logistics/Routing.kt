@@ -2,6 +2,7 @@ package org.kalasim.logistics
 
 import org.kalasim.animation.*
 import java.lang.Double.max
+import kotlin.time.Duration
 
 // define routing model
 
@@ -33,6 +34,67 @@ open class PathSegment(
 
     override fun toString() = id
 }
+
+
+enum class MovementDirection { Forward, Reverse }
+
+data class DirectedPathSegment(val segment: PathSegment, val direction: MovementDirection) {
+    val end: Point
+        get() = when(direction) {
+            MovementDirection.Forward -> Point(segment.to.position.x, segment.to.position.y)
+            MovementDirection.Reverse -> Point(segment.from.position.x, segment.from.position.y)
+        }
+
+    val start: Point
+        get() = when(direction) {
+            MovementDirection.Forward -> Point(segment.from.position.x, segment.from.position.y)
+            MovementDirection.Reverse -> Point(segment.to.position.x, segment.to.position.y)
+        }
+
+    fun relativePosition(currentPosition: Point): Double = (currentPosition - start) / segment.length
+    fun relativeSegmentPosition(currentPosition: Point) =
+        RelativeSegmentPosition(this, relativePosition(currentPosition))
+
+    override fun toString(): String = segment.id + if(direction == MovementDirection.Forward) "(->)" else "(<-)"
+
+}
+
+data class RelativeSegmentPosition(val directedPathSegment: DirectedPathSegment, val relativePosition: Double) {
+    operator fun plus(distance: Distance): RelativeSegmentPosition {
+        val relativeMovement = distance.meters / directedPathSegment.segment.length.meters
+
+        return RelativeSegmentPosition(directedPathSegment, relativePosition + relativeMovement)
+    }
+
+    operator fun minus(distance: Distance) = plus(-distance)
+
+    val absPosition: Point
+        get() = Point(
+            directedPathSegment.start.x + (directedPathSegment.end.x - directedPathSegment.start.x) * relativePosition,
+            directedPathSegment.start.y + (directedPathSegment.end.y - directedPathSegment.start.y) * relativePosition
+        )
+}
+
+
+fun Port.toDirectedPathSegment(): DirectedPathSegment {
+    return when(directionality) {
+        PortConnectivity.Forward -> DirectedPathSegment(segment, MovementDirection.Forward)
+        PortConnectivity.Reverse -> DirectedPathSegment(segment, MovementDirection.Reverse)
+        PortConnectivity.Bidirectional -> DirectedPathSegment(segment, MovementDirection.Forward)
+    }
+}
+
+fun Port.toRelSegmentPosition(): RelativeSegmentPosition {
+    val relativeSegmentPosition: RelativeSegmentPosition = when(directionality) {
+        PortConnectivity.Reverse ->
+            RelativeSegmentPosition(DirectedPathSegment(segment, MovementDirection.Reverse), 1 - distance)
+
+        PortConnectivity.Forward, PortConnectivity.Bidirectional ->
+            RelativeSegmentPosition(DirectedPathSegment(segment, MovementDirection.Forward), distance)
+    }
+    return relativeSegmentPosition
+}
+
 
 enum class PortConnectivity { Forward, Reverse, Bidirectional }
 
@@ -68,5 +130,27 @@ data class GeoMap(val segments: List<PathSegment>, val nodes: Collection<Node>, 
     }
 }
 
+
+// also see collision_avoidance.md
+fun computeCollisionPoint(
+    ownPosition: RelativeSegmentPosition,
+    precedingPos: RelativeSegmentPosition,
+    ownSpeed: Speed,
+    precedingSpeed: Speed
+): Pair<Duration, RelativeSegmentPosition>? {
+    require(ownPosition.directedPathSegment == precedingPos.directedPathSegment)
+
+    if(ownSpeed <= precedingSpeed) return null // collision can't happen if same speed or slower
+
+    // compute time until collision
+    val timeToCollision = (precedingPos.absPosition - ownPosition.absPosition) / (ownSpeed - precedingSpeed)
+
+    // compute collision coordinates
+    val colCoord = ownPosition + (ownSpeed * timeToCollision)
+
+    require(timeToCollision > Duration.ZERO) { "negative collision duration has unlikely semantics" }
+
+    return timeToCollision to colCoord
+}
 
 

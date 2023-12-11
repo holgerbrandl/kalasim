@@ -94,7 +94,6 @@ fun computeBuildingArea(
         val y1 = y0 + (if(sideSwitch) height else -1 * height)
         Rectangle(Point(port.position.x - width / 2, y0), Point(port.position.x + width / 2, y1))
     }
-
 }
 
 

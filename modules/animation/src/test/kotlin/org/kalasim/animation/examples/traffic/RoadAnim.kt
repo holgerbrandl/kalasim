@@ -20,7 +20,7 @@ object RoadAnim {
                     }
                 })
 
-                addCar(object : Vehicle(roadDict[0].second[1].port, speed = 30.kmh) {
+                addCar(object : Vehicle(roadDict[0].second[1].port, maxSpeed = 30.kmh) {
                     override fun process() = sequence<Component> {
                         hold(5.seconds)
                         yieldAll(moveTo(roadDict[1].second[1].port))

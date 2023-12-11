@@ -6,7 +6,7 @@ segments = read_csv("city_map.segments.csv")
 buildings = read_csv("city_map.buildings.csv")
 
 ggplot(segments, aes(from_position_x, from_position_y, xend = to_position_x, yend = to_position_y)) +
-  geom_segment(size = 3, color="azure2") +
+  geom_segment(size = 3, color = "azure2") +
   # theme_void() +
   theme_bw() +
   theme(axis.line = element_blank(), axis.text.x = element_blank(),

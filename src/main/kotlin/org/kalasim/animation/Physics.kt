@@ -1,14 +1,29 @@
 package org.kalasim.animation
 
+import org.kalasim.misc.roundAny
 import java.awt.geom.Point2D
+import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 
+/**
+ * Type-safe wrapper around a speed measurement.
+ */
 class Speed internal constructor(val metersPerSecond: Number) {
+    operator fun minus(other: Speed) =
+        Speed(metersPerSecond.toDouble() - other.metersPerSecond.toDouble())
+
+    operator fun times(duration: Duration): Distance =
+        Distance(metersPerSecond.toDouble() * duration.toDouble(DurationUnit.SECONDS))
+
     val kmh: Double
         get() = metersPerSecond.toDouble() * 3.6
+
+    override fun toString() = "${metersPerSecond.toDouble().roundAny(2)} m/s"
+    operator fun compareTo(other: Speed) = metersPerSecond.toDouble().compareTo(other.metersPerSecond.toDouble())
 }
 
 val Number.metersPerSecond get() = Speed(this.toDouble())
@@ -26,9 +41,14 @@ data class Distance(val meters: Double) : Comparable<Distance> {
 
     operator fun div(speed: Speed): Duration = (meters / speed.metersPerSecond.toDouble()).seconds
 
+    operator fun div(other: Distance): Double = meters / other.meters
+
     operator fun times(scaling: Double): Distance = Distance(this.meters * scaling)
     operator fun plus(other: Distance) = Distance(this.meters + other.meters)
     override fun compareTo(other: Distance): Int = meters.compareTo(other.meters)
+    operator fun unaryMinus(): Distance = Distance(-meters)
+
+
 }
 
 val Number.meters get() = Distance(toDouble())
@@ -48,4 +68,15 @@ operator fun Point.minus(from: Point): Distance {
     val yDist = y - from.y
 
     return sqrt(xDist * xDist + yDist * yDist).meters
+}
+
+
+fun List<Point>.hasCollision(dist: Distance = 1.meters) =
+    any { point -> any { it != point && it.distance(point) < dist.meters } }
+
+
+fun List<Point>.minimalDistance(): Double {
+    return if(size < 2) 0.0 else withIndex().flatMap { (i, a) ->
+        drop(i + 1).map { b -> sqrt((a.x - b.x).pow(2.0) + (a.y - b.y).pow(2.0)) }
+    }.minOrNull() ?: Double.MAX_VALUE
 }

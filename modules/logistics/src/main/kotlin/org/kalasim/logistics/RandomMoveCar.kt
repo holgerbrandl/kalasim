@@ -4,7 +4,8 @@ import org.kalasim.animation.Speed
 import org.kalasim.animation.kmh
 import kotlin.time.Duration.Companion.seconds
 
-class RandomMoveCar(startingPosition: Building, speed: Speed = 100.kmh) : Vehicle(startingPosition.port, speed) {
+class RandomMoveCar(startingPosition: Building, speed: Speed = 100.kmh) :
+    Vehicle(startingPosition.port, maxSpeed = speed) {
 
     var lastPosition = startingPosition
 
