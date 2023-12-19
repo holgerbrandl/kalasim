@@ -79,7 +79,7 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
-            artifactId = "kalasim-animation"
+            artifactId = "kalasim-logistics"
 
 //          artifact sourcesJar { classifier "sources" }
 //          artifact javadocJar
