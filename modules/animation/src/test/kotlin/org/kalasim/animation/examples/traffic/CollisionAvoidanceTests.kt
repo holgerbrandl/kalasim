@@ -128,7 +128,7 @@ class CollisionAvoidanceTests {
         // enable collision sampler (only to fail fast)
         CollisionSampler(100.milliseconds)
 
-//        animateCrossing { road }
+        animateCrossing { road }
 
         road.run(3.hours)
 

@@ -61,20 +61,21 @@ open class Vehicle(
 
         currentPort = null
 
-        moveAlongPath(path.route)
+        moveAlongPath(path.route.map { it.end })
 
-        logger.info { "reached target $target at ${startingPosition}" }
+        logger.info { "reached target $target at $startingPosition" }
 
         currentPort = target
     }
 
-    suspend fun SequenceScope<Component>.moveAlongPath(wayPoints: List<RelativeSegmentEdge>) {
+    suspend fun SequenceScope<Component>.moveAlongPath(wayPoints: List<RelativeSegmentPosition>) {
+//        wayPoints.map{ it.end}.forEach { wayPoint->
         wayPoints.forEach { wayPoint ->
             //            logicalMovementState.value = LogicalMovingState.EnteringSegment
-            occupancyTracker.enteringSegment(this@Vehicle, wayPoint.start.directedPathSegment)
-            currentSegment = wayPoint.start.directedPathSegment
+            occupancyTracker.enteringSegment(this@Vehicle, wayPoint.directedPathSegment)
+            currentSegment = wayPoint.directedPathSegment
 
-            moveToCO(wayPoint.end)
+            moveToCO(wayPoint)
             //            logicalMovementState.value = LogicalMovingState.LeavingSegment
         }
     }
