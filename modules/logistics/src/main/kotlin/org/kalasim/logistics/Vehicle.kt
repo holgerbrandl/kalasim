@@ -2,8 +2,8 @@ package org.kalasim.logistics
 
 import org.kalasim.*
 import org.kalasim.animation.*
-import org.kalasim.logistics.MovingState.Accelerating
 import org.kalasim.logistics.MovingState.Stopped
+import org.kalasim.misc.InternalKalasimApi
 
 
 enum class MovingState { Moving, Stopped, Accelerating }
@@ -11,18 +11,35 @@ enum class LogicalMovingState { EnteringSegment, LeavingSegment }
 
 
 open class Vehicle(
-    startingPosition: Port,
+    val startingPosition: RelativeSegmentPosition,
     name: String? = null,
-    val maxSpeed: Speed = 100.kmh,
+    val maxSpeed: Speed = 100.kmh
 //    val acc: Acceleration = 2.acc
-) :
-    AnimationComponent(startingPosition.position, name) {
+) : AnimationComponent(startingPosition.position, name) {
+
+    constructor(
+        startingPosition: Pair<Port, MovementDirection>,
+        name: String? = null,
+        maxSpeed: Speed = 100.kmh
+    ) : this(startingPosition.first.toRelSegmentPosition(startingPosition.second), name, maxSpeed) {
+        currentPort = startingPosition.component1()
+    }
+
+    constructor(
+        startingPosition: Port,
+        name: String? = null,
+        maxSpeed: Speed = 100.kmh
+    ) : this(startingPosition to MovementDirection.Forward, name, maxSpeed)
+
+    var followVehicle: Vehicle? = null
 
     /** The last visited port. When not in motion the last visited port.*/
-    var currentPort: Port? = startingPosition
-    var currentSegment: DirectedPathSegment = startingPosition.toDirectedPathSegment()
+    var currentPort: Port? = null
+    var currentSegment: DirectedPathSegment = startingPosition.directedPathSegment
 
     val movingState = State(Stopped)
+
+    @Deprecated("not needed")
     val logicalMovementState = State(LogicalMovingState.EnteringSegment)
 
     val occupancyTracker = get<PathOccupancyTracker>().apply {
@@ -33,35 +50,54 @@ open class Vehicle(
 
 
     fun moveTo(target: Port): Sequence<Component> = sequence {
+        logger.info { "computing path from $startingPosition from to $target" }
+
         val path = pathFinder.findPath(currentPort!!, target)
 
-        logger.info { "computed port from $ to $target" }
+//        if(path.route.isEmpty()){
+        require(path.route.isNotEmpty()) {
+            logger.error { "Could not find route from $startingPosition to $target" }
+        }
 
         currentPort = null
 
-        path.toSegments().forEach { wayPoint ->
-            occupancyTracker.enteringSegment(this@Vehicle, wayPoint.directedPathSegment)
-            moveToCO(wayPoint)
-        }
+        moveAlongPath(path.route)
 
-        logger.info { "reached target from $ to $target" }
+        logger.info { "reached target $target at ${startingPosition}" }
 
         currentPort = target
     }
 
+    suspend fun SequenceScope<Component>.moveAlongPath(wayPoints: List<RelativeSegmentEdge>) {
+        wayPoints.forEach { wayPoint ->
+            //            logicalMovementState.value = LogicalMovingState.EnteringSegment
+            occupancyTracker.enteringSegment(this@Vehicle, wayPoint.start.directedPathSegment)
+            currentSegment = wayPoint.start.directedPathSegment
 
-    private suspend fun SequenceScope<Component>.moveToCO(nextTarget: RelativeSegmentPosition) {
+            moveToCO(wayPoint.end)
+            //            logicalMovementState.value = LogicalMovingState.LeavingSegment
+        }
+    }
+
+    fun enterNetwork(port: Port) {
+
+    }
+
+    fun exitNetwork(port: Port) {}
+
+
+    suspend fun SequenceScope<Component>.moveToCO(nextTarget: RelativeSegmentPosition) {
         val directedSegment = nextTarget.directedPathSegment
-        val vehicleDistEndPoint = this@Vehicle.currentPosition.distance(nextTarget.absPosition)
+        val vehicleDistEndPoint = this@Vehicle.currentPosition.distance(nextTarget.position)
 
         val collisionCandidate = occupancyTracker.findVehicles(directedSegment).filter {
             it != this@Vehicle
         }.filter {
             // remove vehicles behind
-            vehicleDistEndPoint > it.currentPosition.distance(nextTarget.absPosition)
+            vehicleDistEndPoint > it.currentPosition.distance(nextTarget.position)
         }.maxByOrNull {
             // find closest
-            it.currentPosition.distance(nextTarget.absPosition)
+            it.currentPosition.distance(nextTarget.position)
         }
 
         logger.info { "computed preceding vehicle as $collisionCandidate" }
@@ -90,57 +126,81 @@ open class Vehicle(
             // what if it stops again?
 //            move(nextTarget.absPosition, speed, "moving ${this@Vehicle} to $nextTarget")
 
-
             // not null, that we collide
             val beforeCollision = relColCoord - 5.meters //todo bring back
-            move(beforeCollision.absPosition, maxSpeed, "moving ${this@Vehicle} to $nextTarget")
+//            movingState.value = Accelerating
+//            movingState.value = MovingState.Moving
+            move(beforeCollision, maxSpeed, "moving ${this@Vehicle} to $nextTarget")
 
             // spawn sub-processes to keep distance and to continue
-            val distanceChecker = DistanceChecker(collisionCandidate, this@Vehicle)
+//            val distanceChecker = DistanceChecker(collisionCandidate, this@Vehicle)
+            collisionCandidate.followVehicle = this@Vehicle
 
-            //todo needed?
-            val segChangeListener = SegmentChangeTracker(collisionCandidate, this@Vehicle)
+            //todo needed? --> yes if vehicle disappears at port
+//            val segChangeListener = SegmentChangeTracker(collisionCandidate, this@Vehicle)
 
             move(
-                nextTarget.absPosition,
-                speed = collisionCandidate.maxSpeed,
+                nextTarget,
+                speed = collisionCandidate.currentSpeed,
                 description = "moving ${this@Vehicle} to $nextTarget"
             )
 
-            distanceChecker.cancel()
-            segChangeListener.cancel()
+//            distanceChecker.cancel()
+            followVehicle = null
+//            segChangeListener.cancel()
         } else {
             logger.info { "no detection, proceeding until final target '$nextTarget' on segment '$currentSegment'" }
 
-            move(nextTarget.absPosition, maxSpeed, "moving ${this@Vehicle} to $nextTarget")
+            move(nextTarget, maxSpeed, "moving ${this@Vehicle} to $nextTarget")
         }
     }
 
+    suspend fun SequenceScope<Component>.move(
+        nextTarget: RelativeSegmentPosition,
+        speed: Speed,
+        description: String? = null,
+        priority: Priority = Priority.NORMAL,
+    ) {
+        followVehicle?.adjustSpeed(speed)
+        move(nextTarget.position, speed, description, priority)
+    }
 
-    fun adjustSpeed(maxSpeed: Speed? = null) {
-        //todo do not interrupt or cancel running component process
-        val newSpeed = maxSpeed ?: this.maxSpeed
+    @OptIn(InternalKalasimApi::class)
+    fun adjustSpeed(predecSpeed: Speed? = null) {
+        val newSpeed = predecSpeed ?: this.maxSpeed
 
-        TODO()
-        // todo cap on max segement speed
+        if(currentSpeed == newSpeed) {
+            return
+        }
 
-        // next
-        // wo stehts
-        // adjust currentSpeed and reschedule hold
-//        reschedule()
+        // update current status and reschedule current move with new speed
+        val distance = to!! - currentPosition
 
+        val duration = distance / newSpeed
+        estimatedArrival = now + duration
+        started = now
+
+        currentSpeed = newSpeed
+        // inherit priority from parent
+
+        env.remove(this)
+        reschedule(estimatedArrival, description = "moving to $to", type = ScheduledType.HOLD)
+        //duration, description ?: "moving to $nextTarget", priority = priority)
+
+        // inform follow vehicle
+        followVehicle?.adjustSpeed(newSpeed)
     }
 }
 
-class DistanceChecker(val collisionCandidate: Vehicle, val vehicle: Vehicle) : Component() {
-    override fun repeatedProcess() = sequence {
-        logger.info { "monitoring for preceding vehicle '$collisionCandidate' for speed change " }
-        wait(collisionCandidate.movingState turns Accelerating)
-
-        logger.info { "detected speed-chang at preceding vehicle '$collisionCandidate'" }
-        vehicle.adjustSpeed(collisionCandidate.currentSpeed)
-    }
-}
+//class DistanceChecker(val collisionCandidate: Vehicle, val vehicle: Vehicle) : Component() {
+//    override fun repeatedProcess() = sequence {
+//        logger.info { "monitoring for preceding vehicle '$collisionCandidate' for speed change " }
+//        wait(collisionCandidate.movingState turns Accelerating)
+//
+//        logger.info { "detected speed-chang at preceding vehicle '$collisionCandidate'" }
+//        vehicle.adjustSpeed(collisionCandidate.currentSpeed)
+//    }
+//}
 
 class SegmentChangeTracker(val collisionCandidate: Vehicle, val vehicle: Vehicle) : Component() {
     override fun repeatedProcess() = sequence {

@@ -168,7 +168,7 @@ data class CityMap(val roads: List<PathSegment>, val buildings: List<Building> =
     // shouldn't we better use inheritance here?
     fun toGeoMap(): GeoMap {
         val nodes = (roads.map { it.from } + roads.map { it.to }).toSet()
-        return GeoMap(roads, nodes, buildings.map { it.port })
+        return GeoMap(roads, buildings.map { it.port })
     }
 }
 
@@ -197,7 +197,8 @@ fun generateRoad(numSegments: Int, numBuildings: Int): Crossing {
         createBuildings(listOf(it), numBuildings = numBuildings)
     }
 
-    return Crossing(0, CityMap(segments, buildings))
+    val cityMap = CityMap(segments, buildings)
+    return Crossing(cityMap, 0)
 }
 
 

@@ -24,7 +24,7 @@ dependencies {
 
     implementation("org.jgrapht:jgrapht-core:1.5.2")
 
-    api("com.github.holgerbrandl:kdfutils:1.3.4")
+    api("com.github.holgerbrandl:kdfutils:1.3.5")
 
     // todo@2023.1 disable for release
     implementation("org.slf4j:slf4j-simple:1.7.30")

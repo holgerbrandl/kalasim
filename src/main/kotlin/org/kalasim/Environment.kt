@@ -308,6 +308,7 @@ open class Environment(
      * that is components scheduled for the same time specified by `duration` or `until` will be run before the simulation is stopped.
      * An event with a higher priority will be scheduled first.
      */
+    @OptIn(InternalKalasimApi::class)
     fun run(
         duration: Duration? = null,
         until: SimTime? = null,
@@ -440,7 +441,8 @@ open class Environment(
 
 
     /** Remove a component from the event-queue. Also, remove it from standing-by list, if currently on stand-by.*/
-    internal fun remove(c: Component) {
+    @InternalKalasimApi
+    fun remove(c: Component) {
         unschedule(c)
 
         // TODO what is happening here, can we simplify that?

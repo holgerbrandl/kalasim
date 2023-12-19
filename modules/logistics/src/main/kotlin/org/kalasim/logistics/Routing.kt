@@ -6,9 +6,13 @@ import kotlin.time.Duration
 
 // define routing model
 
-open class Node(val id: String, val position: Point) {
+open class Node(val id: String, final override val position: Point) : MapPosition {
     val x = position.x
     val y = position.y
+
+    fun euclideanDistanceTo(other: Node) = (position - other.position).absoluteValue
+
+    override fun toString() = id
 }
 
 
@@ -32,7 +36,7 @@ open class PathSegment(
     val length
         get() = from.position - to.position
 
-    override fun toString() = id
+    override fun toString() = "$id($from->$to)"
 }
 
 
@@ -51,15 +55,35 @@ data class DirectedPathSegment(val segment: PathSegment, val direction: Movement
             MovementDirection.Reverse -> Point(segment.to.position.x, segment.to.position.y)
         }
 
-    fun relativePosition(currentPosition: Point): Double = (currentPosition - start) / segment.length
+    fun relativePosition(currentPosition: Point): Double {
+        val prop = (currentPosition - start) / segment.length
+        return when(direction) {
+            MovementDirection.Forward -> prop
+            MovementDirection.Reverse -> 1 - prop
+        }
+    }
+
     fun relativeSegmentPosition(currentPosition: Point) =
         RelativeSegmentPosition(this, relativePosition(currentPosition))
 
-    override fun toString(): String = segment.id + if(direction == MovementDirection.Forward) "(->)" else "(<-)"
-
+    override fun toString(): String =
+        segment.toString() + (if(direction == MovementDirection.Forward) "[>>]" else "[<<]")
 }
 
-data class RelativeSegmentPosition(val directedPathSegment: DirectedPathSegment, val relativePosition: Double) {
+interface MapPosition {
+    val position: Point
+
+//    val x: Double
+//    val y: Double
+}
+
+//typealias MapPosition= Point
+
+data class RelativeSegmentPosition(
+    val directedPathSegment: DirectedPathSegment,
+    val relativePosition: Double
+) : MapPosition {
+
     operator fun plus(distance: Distance): RelativeSegmentPosition {
         val relativeMovement = distance.meters / directedPathSegment.segment.length.meters
 
@@ -68,57 +92,100 @@ data class RelativeSegmentPosition(val directedPathSegment: DirectedPathSegment,
 
     operator fun minus(distance: Distance) = plus(-distance)
 
-    val absPosition: Point
+    // just needed for internal validation
+    fun upstreamOf(end: RelativeSegmentPosition): Boolean = relativePosition < end.relativePosition
+
+    override val position: Point
         get() = Point(
             directedPathSegment.start.x + (directedPathSegment.end.x - directedPathSegment.start.x) * relativePosition,
             directedPathSegment.start.y + (directedPathSegment.end.y - directedPathSegment.start.y) * relativePosition
         )
+
+    override fun toString() =
+        "RSP(segment=$directedPathSegment, position=[${position.x}, ${position.y}], rp=$relativePosition)"
 }
 
-
-fun Port.toDirectedPathSegment(): DirectedPathSegment {
-    return when(directionality) {
-        PortConnectivity.Forward -> DirectedPathSegment(segment, MovementDirection.Forward)
-        PortConnectivity.Reverse -> DirectedPathSegment(segment, MovementDirection.Reverse)
-        PortConnectivity.Bidirectional -> DirectedPathSegment(segment, MovementDirection.Forward)
+data class RelativeSegmentEdge(val start: RelativeSegmentPosition, val end: RelativeSegmentPosition) {
+    init {
+        // validate edge integrity
+        require(start.upstreamOf(end)) {
+            "invalid order of start $start and end $end on segment"
+        }
+        require(start.directedPathSegment == end.directedPathSegment)
     }
 }
 
-fun Port.toRelSegmentPosition(): RelativeSegmentPosition {
-    val relativeSegmentPosition: RelativeSegmentPosition = when(directionality) {
-        PortConnectivity.Reverse ->
-            RelativeSegmentPosition(DirectedPathSegment(segment, MovementDirection.Reverse), 1 - distance)
 
-        PortConnectivity.Forward, PortConnectivity.Bidirectional ->
-            RelativeSegmentPosition(DirectedPathSegment(segment, MovementDirection.Forward), distance)
+//fun Port.toDirectedPathSegment(): DirectedPathSegment {
+//    return when(directionality) {
+//        PortConnectivity.Forward -> DirectedPathSegment(segment, MovementDirection.Forward)
+//        PortConnectivity.Reverse -> DirectedPathSegment(segment, MovementDirection.Reverse)
+//        PortConnectivity.Bidirectional -> DirectedPathSegment(segment, MovementDirection.Forward)
+//    }
+//}
+
+fun Port.toRelSegmentPosition(direction: MovementDirection): RelativeSegmentPosition = when(direction) {
+    MovementDirection.Forward -> {
+        RelativeSegmentPosition(DirectedPathSegment(segment, MovementDirection.Forward), distance)
     }
-    return relativeSegmentPosition
+
+    MovementDirection.Reverse -> {
+        require(segment.bidirectional)
+        RelativeSegmentPosition(DirectedPathSegment(segment, MovementDirection.Reverse), 1 - distance)
+    }
 }
 
 
-enum class PortConnectivity { Forward, Reverse, Bidirectional }
+enum class PortConnectivity {
+
+    Forward, Reverse, Bidirectional;
+
+    val isForward: Boolean
+        get() = (this == Forward) || (this == Bidirectional)
+
+    val isReverse: Boolean
+        get() = (this == Reverse) || (this == Bidirectional)
+}
+
 
 open class Port(
-    val id: String,
+    id: String,
     val distance: Double,
     val segment: PathSegment,
+    // todo make bidirectional the default as it's more generic
     val directionality: PortConnectivity = PortConnectivity.Forward
-) {
-    val position: Point = Point(
+) : Node(
+    id, Point(
         segment.from.position.x + distance * (segment.to.position.x - segment.from.position.x),
         segment.from.position.y + distance * (segment.to.position.y - segment.from.position.y)
     )
-
+) {
     override fun toString() = id
 }
 
-data class GeoMap(val segments: List<PathSegment>, val nodes: Collection<Node>, val ports: List<Port> = listOf()) {
+
+//
+//fun Port.toDirectedPathSegment(): DirectedPathSegment {
+//    return when(directionality) {
+//        PortConnectivity.Forward -> DirectedPathSegment(segment, MovementDirection.Forward)
+//        PortConnectivity.Reverse -> DirectedPathSegment(segment, MovementDirection.Reverse)
+//        PortConnectivity.Bidirectional -> DirectedPathSegment(segment, MovementDirection.Forward)
+//    }
+//}
+
+data class GeoMap(
+    val segments: List<PathSegment>,
+//    val nodes: Collection<Node>,
+    val ports: List<Port> = listOf()
+) {
+
+    val crossings: Set<Node> = (segments.map { it.from } + segments.map { it.to }).toSet()
 
     fun getLimits(expand: Double = 0.2, minSize: Double = 20.0): Rectangle {
-        val minX = nodes.minOf { it.position.x }
-        val minY = nodes.minOf { it.position.y }
-        val maxX = nodes.maxOf { it.position.x }
-        val maxY = nodes.maxOf { it.position.y }
+        val minX = crossings.minOf { it.position.x }
+        val minY = crossings.minOf { it.position.y }
+        val maxX = crossings.maxOf { it.position.x }
+        val maxY = crossings.maxOf { it.position.y }
 
         val xRange = maxX - minX
         val yRange = maxY - minY
@@ -143,7 +210,7 @@ fun computeCollisionPoint(
     if(ownSpeed <= precedingSpeed) return null // collision can't happen if same speed or slower
 
     // compute time until collision
-    val timeToCollision = (precedingPos.absPosition - ownPosition.absPosition) / (ownSpeed - precedingSpeed)
+    val timeToCollision = (precedingPos.position - ownPosition.position) / (ownSpeed - precedingSpeed)
 
     // compute collision coordinates
     val colCoord = ownPosition + (ownSpeed * timeToCollision)
@@ -152,5 +219,3 @@ fun computeCollisionPoint(
 
     return timeToCollision to colCoord
 }
-
-

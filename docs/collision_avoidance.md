@@ -43,3 +43,13 @@ The position can be computed similarly to how it is done in the Port class:
 
 x = segment.from.position.x + d * (segment.to.position.x - segment.from.position.x) y = segment.from.position.y + d * (
 segment.to.position.y - segment.from.position.y)
+
+## model
+
+we need to have a logical position for routing and a physical position for rendering and analysis.
+
+The initial position is a port (which allows for bidirectional start depending on path segment)
+
+### port
+
+a vehicle is 

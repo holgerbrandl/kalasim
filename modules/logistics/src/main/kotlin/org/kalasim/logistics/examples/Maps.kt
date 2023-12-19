@@ -41,7 +41,7 @@ fun simpleCrossing(): GeoMap {
 
     return GeoMap(
         listOf(segment00_01, segment00_10, segment01_10, segment01_11),
-        listOf(node00, node01, node11, node10),
+//        listOf(node00, node01, node11, node10),
         listOf(port00_01, port00_10, port01_10, port01_11)
     )
 }

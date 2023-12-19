@@ -17,10 +17,10 @@ open class AnimationComponent(
     private var from: Point = initialPosition ?: Point(0.0, 0.0)
     protected var to: Point? = null
 
-    private var started by Delegates.notNull<SimTime>()
+    protected var started by Delegates.notNull<SimTime>()
     var currentSpeed = 0.kmh
 
-    private var estimatedArrival: SimTime = now
+    protected var estimatedArrival: SimTime = now
 
     suspend fun SequenceScope<Component>.move(
         nextTarget: Point,

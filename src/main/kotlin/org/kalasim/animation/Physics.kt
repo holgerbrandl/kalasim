@@ -2,8 +2,7 @@ package org.kalasim.animation
 
 import org.kalasim.misc.roundAny
 import java.awt.geom.Point2D
-import kotlin.math.pow
-import kotlin.math.sqrt
+import kotlin.math.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -48,7 +47,8 @@ data class Distance(val meters: Double) : Comparable<Distance> {
     override fun compareTo(other: Distance): Int = meters.compareTo(other.meters)
     operator fun unaryMinus(): Distance = Distance(-meters)
 
-
+    val absoluteValue: Distance
+        get() = if(meters <= 0.0) meters.absoluteValue.meters else this
 }
 
 val Number.meters get() = Distance(toDouble())
@@ -64,6 +64,13 @@ typealias Point = Point2D.Double
 fun Point(x: Number, y: Number): Point = Point(x.toDouble(), y.toDouble())
 
 operator fun Point.minus(from: Point): Distance {
+    val xDist = x - from.x
+    val yDist = y - from.y
+
+    return sqrt(xDist * xDist + yDist * yDist).meters
+}
+
+fun Point.distanceTo(from: Point): Distance {
     val xDist = x - from.x
     val yDist = y - from.y
 

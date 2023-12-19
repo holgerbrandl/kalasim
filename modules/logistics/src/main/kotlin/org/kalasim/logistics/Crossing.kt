@@ -19,14 +19,14 @@ class PathOccupancyTracker {
 }
 
 
-open class Crossing(numVehicles: Int = 0, cityMap: CityMap) : Environment() {
+open class Crossing(cityMap: CityMap, numVehicles: Int = 0) : Environment() {
     fun buildingMap(): List<PathSegment> {
         TODO("Not yet implemented")
     }
 
     constructor(numVehicles: Int = 2, xBlocks: Int = 2, yBlocks: Int = 2, numBuildings: Int = 10) : this(
-        numVehicles,
-        buildCity(xBlocks, yBlocks, numBuildings = numBuildings)
+        buildCity(xBlocks, yBlocks, numBuildings = numBuildings),
+        numVehicles
     )
 
     val cityMap: CityMap = dependency { cityMap }

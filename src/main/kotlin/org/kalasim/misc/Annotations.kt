@@ -21,3 +21,11 @@ annotation class AmbiguousDurationComponent
 //@Retention(AnnotationRetention.BINARY)
 //@Target(AnnotationTarget.CONSTRUCTOR, AnnotationTarget.FUNCTION)
 //annotation class EnvironmentWithoutDurationUnit
+
+@RequiresOptIn(
+    level = RequiresOptIn.Level.ERROR,
+    message = "This API is not recommended for public use. It's consumed only internally in modules of kalasim."
+)
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.FUNCTION)
+annotation class InternalKalasimApi

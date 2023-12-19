@@ -185,6 +185,7 @@ open class TickedComponent(
  * @param process The process to be started. If None (default), it will try to start self.process()
  * @param koin The dependency resolution context to be used to resolve the `org.kalasim.Environment`
  */
+@OptIn(InternalKalasimApi::class)
 open class Component(
     name: String? = null,
     at: SimTime? = null,
@@ -1144,7 +1145,9 @@ open class Component(
     private fun requireNotMain() =
         require(this != env.main) { "main component not allowed" }
 
-    internal fun reschedule(
+    @InternalKalasimApi
+    // todo rename to `schedule` because re is not really part of contract
+    fun reschedule(
         scheduledTime: SimTime,
         priority: Priority = NORMAL,
         urgent: Boolean = false,
@@ -2130,3 +2133,16 @@ fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {
 
 class InvalidRequestQuantity(msg: String) : Throwable(msg)
 
+
+// just needed to expose certain internal functions to experts
+//object InternalCompomnentUtil{
+//    internal fun reschedule(
+//        component: Component,
+//        scheduledTime: SimTime,
+//        priority: Priority = Priority.NORMAL,
+//        urgent: Boolean = false,
+//        description: String? = null,
+//        type: ScheduledType
+//    ) {
+//        component.reschedule()
+//    }
