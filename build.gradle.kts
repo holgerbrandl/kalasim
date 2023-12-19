@@ -12,8 +12,8 @@ plugins {
 }
 
 group = "com.github.holgerbrandl"
-//version = "0.8.101"
-version = "2023.1-SNAPSHOT"
+version = "0.12.100"
+//version = "2023.1-SNAPSHOT"
 //version = "0.12-SNAPSHOT"
 
 
@@ -105,9 +105,9 @@ kotlin {
 }
 
 // compile bytecode to java 8 (default is java 6)
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
-}
+//tasks.withType<KotlinCompile> {
+//    kotlinOptions.jvmTarget = "11"
+//}
 
 // disabled because docs examples were moved back into tests
 //java {

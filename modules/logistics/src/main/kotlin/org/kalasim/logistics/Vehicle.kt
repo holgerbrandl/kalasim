@@ -72,8 +72,6 @@ open class Vehicle(
 //        wayPoints.map{ it.end}.forEach { wayPoint->
         wayPoints.forEach { wayPoint ->
             //            logicalMovementState.value = LogicalMovingState.EnteringSegment
-            occupancyTracker.enteringSegment(this@Vehicle, wayPoint.directedPathSegment)
-            currentSegment = wayPoint.directedPathSegment
 
             moveToCO(wayPoint)
             //            logicalMovementState.value = LogicalMovingState.LeavingSegment
@@ -88,6 +86,10 @@ open class Vehicle(
 
 
     suspend fun SequenceScope<Component>.moveToCO(nextTarget: RelativeSegmentPosition) {
+        occupancyTracker.enteringSegment(this@Vehicle, nextTarget.directedPathSegment)
+        currentSegment = nextTarget.directedPathSegment
+
+
         val directedSegment = nextTarget.directedPathSegment
         val vehicleDistEndPoint = this@Vehicle.currentPosition.distance(nextTarget.position)
 
