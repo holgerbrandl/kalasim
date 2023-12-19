@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-
 plugins {
     kotlin("jvm")
     `maven-publish`
@@ -122,7 +119,6 @@ signing {
     sign(publishing.publications["maven"])
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
+kotlin {
+    jvmToolchain(11)
 }
-
