@@ -46,7 +46,7 @@ open class Vehicle(
         enteringSegment(this@Vehicle, currentSegment)
     }
 
-    val pathFinder = get<PathFinder>()
+    val pathFinder by lazy { get<PathFinder>() }
 
 
     fun moveTo(target: Port): Sequence<Component> = sequence {
