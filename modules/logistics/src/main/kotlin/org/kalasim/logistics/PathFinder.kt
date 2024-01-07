@@ -44,6 +44,10 @@ class PathFinder(val geoMap: GeoMap) {
             val calculatedWeight =
                 (from.position.distanceTo(to.position) / (segment.speedLimit ?: 500.kmh)).toDouble(DurationUnit.SECONDS)
 
+            println("adding $from, $to, ${RelativeSegmentEdge(fromPosition, toPosition)}")
+            require(!pathGraph.containsEdge(RelativeSegmentEdge(fromPosition, toPosition))) {
+                "edge contained already"
+            }
             require(pathGraph.addEdge(from, to, RelativeSegmentEdge(fromPosition, toPosition))) {
                 "duplicated edge addition"
             }

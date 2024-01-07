@@ -20,9 +20,6 @@ class PathOccupancyTracker {
 
 
 open class Crossing(cityMap: CityMap, numVehicles: Int = 0) : Environment() {
-    fun buildingMap(): List<PathSegment> {
-        TODO("Not yet implemented")
-    }
 
     constructor(numVehicles: Int = 2, xBlocks: Int = 2, yBlocks: Int = 2, numBuildings: Int = 10) : this(
         buildCity(xBlocks, yBlocks, numBuildings = numBuildings),

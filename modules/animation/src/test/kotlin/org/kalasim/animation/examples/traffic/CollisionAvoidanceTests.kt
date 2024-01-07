@@ -30,7 +30,7 @@ class CollisionAvoidanceTests {
 
     @Test
     fun `car must wait until road ahead is empty`() = createTestSimulation {
-        val road = generateRoad(numSegments = 2, numBuildings = 2)
+        val road = generateRoadWithBuildings(numSegments = 2, numBuildings = 2)
 
         val roadDict = road.segments2buildings()
 
@@ -38,7 +38,7 @@ class CollisionAvoidanceTests {
         road.addCar(object : Vehicle(roadDict[0].second[0].port, "car1") {
             override fun process() = sequence {
                 hold(2.seconds)
-                yieldAll(moveTo(roadDict[1].second[0].port))
+                moveTo(roadDict[1].second[0].port)
             }
         })
 
@@ -46,14 +46,14 @@ class CollisionAvoidanceTests {
         road.addCar(object : Vehicle(roadDict[0].second[1].port, "car2", maxSpeed = 30.kmh) {
             override fun process() = sequence {
                 hold(5.seconds)
-                yieldAll(moveTo(roadDict[1].second[1].port))
+                moveTo(roadDict[1].second[1].port)
             }
         })
 
         // enable collision sampler (only to fail fast)
         CollisionSampler(100.milliseconds)
 
-        animateCrossing { road }
+//        animateCrossing { road }
 
         road.run(3.hours)
 
@@ -64,7 +64,7 @@ class CollisionAvoidanceTests {
 
     @Test
     fun `car must wait until road ahead is empty with crossing`() = createTestSimulation {
-        val road = generateRoad(numSegments = 2, numBuildings = 2)
+        val road = generateRoadWithBuildings(numSegments = 2, numBuildings = 2)
 
         val roadDict = road.segments2buildings()
 
@@ -72,7 +72,7 @@ class CollisionAvoidanceTests {
         road.addCar(object : Vehicle(roadDict[0].second[0].port, "car1", maxSpeed = 150.kmh) {
             override fun process() = sequence {
                 hold(3.seconds)
-                yieldAll(moveTo(roadDict[1].second[0].port))
+                moveTo(roadDict[1].second[0].port)
             }
         })
 
@@ -80,14 +80,14 @@ class CollisionAvoidanceTests {
         road.addCar(object : Vehicle(roadDict[0].second[1].port, "car2", maxSpeed = 5.kmh) {
             override fun process() = sequence {
                 hold(2.seconds)
-                yieldAll(moveTo(roadDict[1].second[1].port))
+                moveTo(roadDict[1].second[1].port)
             }
         })
 
         // enable collision sampler (only to fail fast)
         CollisionSampler(100.milliseconds)
 
-        animateCrossing { road }
+//        animateCrossing { road }
 
         road.run(3.hours)
 
@@ -113,7 +113,7 @@ class CollisionAvoidanceTests {
         road.addCar(object : Vehicle(roadDict[0].second[0].port, "fast_car", maxSpeed = 150.kmh) {
             override fun process() = sequence {
                 hold(2.seconds)
-                yieldAll(moveTo(roadDict[0].second[2].port))
+                moveTo(roadDict[0].second[2].port)
             }
         })
 
@@ -121,14 +121,14 @@ class CollisionAvoidanceTests {
         road.addCar(object : Vehicle(roadDict[0].second[1].port, "slow_car", maxSpeed = 5.kmh) {
             override fun process() = sequence {
                 hold(10.seconds)
-                yieldAll(moveTo(roadDict[0].second[3].port))
+                moveTo(roadDict[0].second[3].port)
             }
         })
 
         // enable collision sampler (only to fail fast)
         CollisionSampler(100.milliseconds)
 
-        animateCrossing { road }
+//        animateCrossing { road }
 
         road.run(3.hours)
 

@@ -2,6 +2,7 @@
 
 ## Next steps
 
+animation with compose https://lush93md.medium.com/animations-in-jetpack-compose-3faeb710f415
 
 ## v0.9
 

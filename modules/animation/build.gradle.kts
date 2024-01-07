@@ -84,6 +84,8 @@ dependencies {
         api(orx(feature))
     }
 
+    testImplementation("io.kotest:kotest-assertions-core:5.7.2")
+
     testImplementation(kotlin("test"))
 }
 

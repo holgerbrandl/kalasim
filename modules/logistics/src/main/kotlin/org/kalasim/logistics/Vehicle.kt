@@ -49,8 +49,18 @@ open class Vehicle(
     val pathFinder by lazy { get<PathFinder>() }
 
 
-    fun moveTo(target: Port): Sequence<Component> = sequence {
+    fun moveTo(target: Port) = sequence {
+        moveTo(target)
+    }
+
+
+    suspend fun SequenceScope<Component>.moveTo(target: Port) {
         logger.info { "computing path from $startingPosition from to $target" }
+
+        if(target == currentPort) {
+            logger.info { "skipping movement because target '$target' matches current position" }
+            return
+        }
 
         val path = pathFinder.findPath(currentPort!!, target)
 
@@ -68,6 +78,7 @@ open class Vehicle(
         currentPort = target
     }
 
+
     suspend fun SequenceScope<Component>.moveAlongPath(wayPoints: List<RelativeSegmentPosition>) {
 //        wayPoints.map{ it.end}.forEach { wayPoint->
         wayPoints.forEach { wayPoint ->
@@ -82,7 +93,9 @@ open class Vehicle(
 
     }
 
-    fun exitNetwork(port: Port) {}
+    fun exitNetwork(port: Port) {
+
+    }
 
 
     suspend fun SequenceScope<Component>.moveToCO(nextTarget: RelativeSegmentPosition) {
@@ -97,6 +110,7 @@ open class Vehicle(
             it != this@Vehicle
         }.filter {
             // remove vehicles behind
+            //TODO target might be wrong reference --> use relative ref instead
             vehicleDistEndPoint > it.currentPosition.distance(nextTarget.position)
         }.maxByOrNull {
             // find closest
@@ -121,6 +135,7 @@ open class Vehicle(
 
         // predictedCollision --> null: no collision on path segment
 
+        // TODO followVehicle not set --> what if it stops
         if(predictedCollision != null && predictedCollision.second.relativePosition < 1.0) {
             val (timeUntilCol, relColCoord) = predictedCollision
 
@@ -152,7 +167,7 @@ open class Vehicle(
             followVehicle = null
 //            segChangeListener.cancel()
         } else {
-            logger.info { "no detection, proceeding until final target '$nextTarget' on segment '$currentSegment'" }
+            logger.info { "no collision candidate detected down the patth, proceeding until final target '$nextTarget' on segment '$currentSegment'" }
 
             move(nextTarget, maxSpeed, "moving ${this@Vehicle} to $nextTarget")
         }

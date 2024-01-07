@@ -117,7 +117,7 @@ fun createBuildings(
     val centerThreshold = range * 0.2
     val outsideThreshold = range * 0.6
 
-    repeat(numBuildings) {
+    while(buildings.size != numBuildings) {
         val segment = pathSegments.random(r)
         val mapCenterDistance =
             segment.from.position - mapCenter + r.nextDouble(-10.0, 10.00).meters // Euclidean distance from origin
@@ -129,7 +129,7 @@ fun createBuildings(
             else -> BuildingType.Home
         }
 
-        val buildingId = "building_${it}"
+        val buildingId = "building_${buildings.size + 1}"
 
         require(avoidCrossTol < 0.5 && avoidCrossTol > 0) {
             "building position tolerance should be in [0, 0.5] but was $avoidCrossTol"
@@ -140,7 +140,15 @@ fun createBuildings(
         val area = computeBuildingArea(port, 0.5, 6.0, 5.0, r.nextBoolean())
         val building = Building(buildingId, port, area, buildingType)
 
-        buildings.add(building)
+        // avoid port duplicates (which lack meaningful semantics
+        // TODO support better duplicate checking also considering bidrectional
+        if(buildings.none {
+                building.port.toRelSegmentPosition(MovementDirection.Forward) == it.port.toRelSegmentPosition(
+                    MovementDirection.Forward
+                )
+            }) {  // because here both ports are forward
+            buildings.add(building)
+        }
     }
 
     return buildings
@@ -170,6 +178,10 @@ data class CityMap(val roads: List<PathSegment>, val buildings: List<Building> =
         val nodes = (roads.map { it.from } + roads.map { it.to }).toSet()
         return GeoMap(roads, buildings.map { it.port })
     }
+
+    companion object {
+        fun fromPorts(roads: List<PathSegment>, ports: List<Port>) = CityMap(roads, ports.map { Building(it.id, it) })
+    }
 }
 
 fun buildCity(
@@ -183,14 +195,9 @@ fun buildCity(
     return CityMap(grid, buildings)
 }
 
-fun generateRoad(numSegments: Int, numBuildings: Int): Crossing {
+fun generateRoadWithBuildings(numSegments: Int, numBuildings: Int): Crossing {
 
-    val segments = List(numSegments + 1) { Node("n${it}", Point(0, 100 * it)) }
-        .zipWithNext()
-        .mapIndexed { idx, (from, to) ->
-
-            PathSegment("seg_$idx", from, to)
-        }
+    val segments = generateRoad(numSegments)
 
     // build `numBuildings` for each segments
     val buildings = segments.flatMap {
@@ -200,6 +207,13 @@ fun generateRoad(numSegments: Int, numBuildings: Int): Crossing {
     val cityMap = CityMap(segments, buildings)
     return Crossing(cityMap, 0)
 }
+
+fun generateRoad(numSegments: Int) = List(numSegments + 1) { Node("n${it}", Point(0, 100 * it)) }
+    .zipWithNext()
+    .mapIndexed { idx, (from, to) ->
+
+        PathSegment("seg_$idx", from, to)
+    }
 
 
 // highways

@@ -16,7 +16,7 @@ class RandomMoveCar(startingPosition: Building, speed: Speed = 100.kmh) :
 
         logger.info { "Moving from $lastPosition to $destination" }
         // option2: yield to keep repeated-process going
-        yieldAll(moveTo(destination.port))
+        moveTo(destination.port)
         logger.info { "Arrived at $lastPosition" }
 
         hold(15.seconds)

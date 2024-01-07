@@ -175,9 +175,14 @@ open class Port(
 
 data class GeoMap(
     val segments: List<PathSegment>,
-//    val nodes: Collection<Node>,
     val ports: List<Port> = listOf()
 ) {
+
+    init {
+        require(ports.distinctBy { it.position }.size == ports.size) {
+            "no pair of ports must have the same exact map position"
+        }
+    }
 
     val crossings: Set<Node> = (segments.map { it.from } + segments.map { it.to }).toSet()
 
