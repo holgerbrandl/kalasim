@@ -38,7 +38,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.20")
 
-    compileOnly("com.github.holgerbrandl:kravis:0.9.96")
+    implementation("com.github.holgerbrandl:kravis:0.9.96")
 
     // **TODO** move to api to require users to pull it in if needed
     implementation("com.github.holgerbrandl:krangl:0.18.4") // must needed for kravis

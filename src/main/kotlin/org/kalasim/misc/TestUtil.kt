@@ -26,4 +26,8 @@ fun createTestSimulation(
     }
 }
 
-internal fun <S : Environment> testModel(sim: S, smthg: S.() -> Unit): Unit = smthg(sim)
+/**
+ *  Provide a evaluation context for a model returnning `Unit`.
+ * Typically used to write tests @Test fun `it should simulate`() = testModel(Atm(){ assert this or that}
+ */
+fun <S : Environment> testModel(sim: S, smthg: S.() -> Unit): Unit = smthg(sim)

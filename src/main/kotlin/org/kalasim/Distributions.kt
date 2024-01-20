@@ -4,9 +4,7 @@ import org.apache.commons.math3.distribution.*
 import org.apache.commons.math3.random.RandomGenerator
 import org.kalasim.misc.ImplementMe
 import org.kalasim.misc.asCMPairList
-import java.lang.Double.min
 import java.util.*
-import kotlin.math.max
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -71,6 +69,12 @@ fun SimContext.normal(mean: Number = 0, sd: Number = 1, rectify: Boolean = false
 } else {
     RectifiedNormalDistribution(env.rg, mean.toDouble(), sd.toDouble())
 }
+
+
+// for consistency also provide sampling via invoke for common other distribution
+operator fun NormalDistribution.invoke(): Double = sample()
+operator fun ExponentialDistribution.invoke(): Double = sample()
+
 
 /**
  * Normal distribution with built-in support for controlled-randomization.
