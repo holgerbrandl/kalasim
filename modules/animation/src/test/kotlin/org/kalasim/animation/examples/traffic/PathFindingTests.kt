@@ -43,7 +43,7 @@ class PathFindingTests {
 //            animateCrossing { crossing }
             crossing.run(1.days)
 
-            car.currentPosition shouldBeInCloseProximityOf ports[0].position
+            car.currentPosition shouldBeInProximityOf ports[0].position
         }
     }
 
@@ -96,6 +96,6 @@ class PathFindingTests {
 
         crossing.run(1.days)
 
-        car.currentPosition shouldBeInCloseProximityOf ports[0].position
+        car.currentPosition shouldBeInProximityOf ports[0].position
     }
 }

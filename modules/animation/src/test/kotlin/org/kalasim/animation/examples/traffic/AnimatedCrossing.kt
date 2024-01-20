@@ -141,5 +141,3 @@ fun animateCrossing(builder: () -> Crossing = { Crossing() }) = application {
         }
     }
 }
-
-

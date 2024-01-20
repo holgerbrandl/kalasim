@@ -23,6 +23,8 @@ open class Vehicle(
         maxSpeed: Speed = 100.kmh
     ) : this(startingPosition.first.toRelSegmentPosition(startingPosition.second), name, maxSpeed) {
         currentPort = startingPosition.component1()
+
+//        enterNetwork(startingPosition)
     }
 
     constructor(
@@ -89,16 +91,29 @@ open class Vehicle(
         }
     }
 
-    fun enterNetwork(port: Port) {
+    // enter with speed 0
+    fun enterNetwork(port: Port) = port.toRelSegmentPosition(MovementDirection.Forward)
+    fun SequenceScope<Component>.enterNetwork(segPos: RelativeSegmentPosition) {
+        // check if segment can be entered --> PT (if not register to passing vehicle or some OT state (to avoid sampling)
+
+        // figure follow vehicle and reregister
+        occupancyTracker.enteringSegment(this@Vehicle, segPos.directedPathSegment)
+
+        // register to preceding vehicle and OT
 
     }
 
-    fun exitNetwork(port: Port) {
+    fun exitNetwork() {
+        // rewrite prec and follow vehicle
 
+        // set some flag (for visualization purpose --> could be inferred from OT
+
+        // unregister from OT
     }
 
 
     suspend fun SequenceScope<Component>.moveToCO(nextTarget: RelativeSegmentPosition) {
+        require(currentPosition isOnSegment nextTarget.directedPathSegment)
         occupancyTracker.enteringSegment(this@Vehicle, nextTarget.directedPathSegment)
         currentSegment = nextTarget.directedPathSegment
 
@@ -111,7 +126,7 @@ open class Vehicle(
         }.filter {
             // remove vehicles behind
             //TODO target might be wrong reference --> use relative ref instead
-            vehicleDistEndPoint > it.currentPosition.distance(nextTarget.position)
+            vehicleDistEndPoint > it.currentPosition.distance(it.currentSegment.end)
         }.maxByOrNull {
             // find closest
             it.currentPosition.distance(nextTarget.position)
@@ -208,6 +223,10 @@ open class Vehicle(
         // inform follow vehicle
         followVehicle?.adjustSpeed(newSpeed)
     }
+}
+
+private infix fun Point.isOnSegment(directedPathSegment: DirectedPathSegment): Boolean {
+    TODO("Not yet implemented")
 }
 
 //class DistanceChecker(val collisionCandidate: Vehicle, val vehicle: Vehicle) : Component() {

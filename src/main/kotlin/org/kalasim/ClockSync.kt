@@ -46,6 +46,12 @@ class ClockSync(
         koin
     )
 
+    fun adjustSpeedUp(speedUp: Double) {
+        require(speedUp > 0) { "speed up must be positive" }
+        logger.info { "adjusting speed up to $speedUp" }
+
+        tickDuration = env.asDuration(1.0 / speedUp)
+    }
 
     var tickDuration: Duration = tickDuration
         set(value) {

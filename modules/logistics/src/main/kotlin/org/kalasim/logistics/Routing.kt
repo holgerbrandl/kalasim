@@ -40,6 +40,29 @@ open class PathSegment(
 }
 
 
+fun PathSegment.containsPoint(point: Point, epsilon: Distance = 0.1.meters): Boolean {
+    val start = from.position
+    val end = to.position
+
+    // Calculate the distance from the point to both ends of the segment
+    val distanceFromStart = point.distanceTo(start)
+    val distanceFromEnd = point.distanceTo(end)
+
+    // Calculate the total length of the segment
+    val segmentLength = from.euclideanDistanceTo(to)
+
+    // Check if the sum of distances is approximately equal to the length of the segment
+//    return (distanceFromStart + distanceFromEnd - segmentLength).absoluteValue- < epsilon
+    return false
+}
+
+// Function to calculate Euclidean distance between two points
+//fun euclideanDistance(p1: Point, p2: Point): Double {
+//    return sqrt((p1.x - p2.x).pow(2) + (p1.y - p2.y).pow(2))
+//}
+
+
+
 enum class MovementDirection { Forward, Reverse }
 
 data class DirectedPathSegment(val segment: PathSegment, val direction: MovementDirection) {

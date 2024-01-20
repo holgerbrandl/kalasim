@@ -46,6 +46,7 @@ data class Distance(val meters: Double) : Comparable<Distance> {
     operator fun plus(other: Distance) = Distance(this.meters + other.meters)
     override fun compareTo(other: Distance): Int = meters.compareTo(other.meters)
     operator fun unaryMinus(): Distance = Distance(-meters)
+    operator fun minus(other: Distance) = Distance(this.meters - other.meters)
 
     val absoluteValue: Distance
         get() = if(meters <= 0.0) meters.absoluteValue.meters else this
