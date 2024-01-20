@@ -65,9 +65,9 @@ fun SimContext.exponential(mean: Duration) = ExponentialDistribution(env.rg, mea
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
 fun SimContext.normal(mean: Number = 0, sd: Number = 1, rectify: Boolean = false): NormalDistribution = if(rectify) {
-    NormalDistribution(env.rg, mean.toDouble(), sd.toDouble())
-} else {
     RectifiedNormalDistribution(env.rg, mean.toDouble(), sd.toDouble())
+} else {
+    NormalDistribution(env.rg, mean.toDouble(), sd.toDouble())
 }
 
 
@@ -82,17 +82,18 @@ operator fun ExponentialDistribution.invoke(): Double = sample()
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
 fun SimContext.normal(mean: Duration, sd: Duration, rectify: Boolean = false): DurationDistribution = if(rectify) {
-    NormalDistribution(env.rg, mean.inSeconds, sd.inSeconds)
-} else {
     RectifiedNormalDistribution(env.rg, mean.inSeconds, sd.inSeconds)
+} else {
+    NormalDistribution(env.rg, mean.inSeconds, sd.inSeconds)
 }.seconds
 
 
 private class RectifiedNormalDistribution(rng: RandomGenerator, mean: Double, sd: Double) :
     NormalDistribution(rng, mean, sd) {
-    override fun probability(x0: Double, x1: Double): Double {
-        return super.probability(x0, x1).let { if(it < 0) 0.0 else it }
-    }
+
+    override fun sample(sampleSize: Int): DoubleArray = Array(sampleSize) { sample() }.toDoubleArray()
+
+    override fun sample(): Double = super.sample().let { if(it < 0) 0.0 else it }
 }
 
 
