@@ -1,12 +1,13 @@
 package org.kalasim.examples.taxiinc.vehiclerouting.score;
 
-import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
-import org.optaplanner.core.api.score.stream.Constraint;
-import org.optaplanner.core.api.score.stream.ConstraintFactory;
-import org.optaplanner.core.api.score.stream.ConstraintProvider;
+import ai.timefold.solver.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
+import ai.timefold.solver.core.api.score.stream.Constraint;
+import ai.timefold.solver.core.api.score.stream.ConstraintFactory;
+import ai.timefold.solver.core.api.score.stream.ConstraintProvider;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.Customer;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.timewindowed.TimeWindowedCustomer;
-import static org.optaplanner.core.api.score.stream.ConstraintCollectors.sum;
+
+import static ai.timefold.solver.core.api.score.stream.ConstraintCollectors.sum;
 
 public class VehicleRoutingConstraintProvider implements ConstraintProvider {
 

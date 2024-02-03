@@ -1,10 +1,10 @@
 package org.kalasim.examples.taxiinc.vehiclerouting.domain.timewindowed;
 
-import org.optaplanner.core.api.domain.entity.PlanningEntity;
-import org.optaplanner.core.api.domain.variable.ShadowVariable;
+import ai.timefold.solver.core.api.domain.entity.PlanningEntity;
+import ai.timefold.solver.core.api.domain.variable.ShadowVariable;
+import org.kalasim.examples.taxiinc.vehiclerouting.ArrivalTimeUpdatingVariableListener;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.Customer;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.Location;
-import org.kalasim.examples.taxiinc.vehiclerouting.ArrivalTimeUpdatingVariableListener;
 
 @PlanningEntity
 public class TimeWindowedCustomer extends Customer {

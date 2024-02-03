@@ -1,13 +1,13 @@
 package org.kalasim.examples.taxiinc.vehiclerouting;
 
+import ai.timefold.solver.core.api.domain.variable.VariableListener;
+import ai.timefold.solver.core.api.score.director.ScoreDirector;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.Customer;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.VehicleRoutingSolution;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.timewindowed.TimeWindowedCustomer;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.timewindowed.TimeWindowedDepot;
-import org.optaplanner.core.api.domain.variable.VariableListener;
-import org.optaplanner.core.api.score.director.ScoreDirector;
 
-import java.util.*;
+import java.util.Objects;
 
 // TODO When this class is added only for TimeWindowedCustomer, use TimeWindowedCustomer instead of Customer
 public class ArrivalTimeUpdatingVariableListener implements VariableListener<VehicleRoutingSolution, Customer> {

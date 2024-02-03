@@ -1,16 +1,16 @@
 package org.kalasim.examples.taxiinc.vehiclerouting.domain;
 
+import ai.timefold.solver.core.api.domain.solution.PlanningEntityCollectionProperty;
+import ai.timefold.solver.core.api.domain.solution.PlanningScore;
+import ai.timefold.solver.core.api.domain.solution.PlanningSolution;
+import ai.timefold.solver.core.api.domain.solution.ProblemFactCollectionProperty;
+import ai.timefold.solver.core.api.domain.valuerange.ValueRangeProvider;
+import ai.timefold.solver.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.DistanceType;
-import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
-import org.optaplanner.core.api.domain.solution.PlanningScore;
-import org.optaplanner.core.api.domain.solution.PlanningSolution;
-import org.optaplanner.core.api.domain.solution.ProblemFactCollectionProperty;
-import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
-import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.Location;
 
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.List;
 
 @PlanningSolution
 public class VehicleRoutingSolution extends AbstractPersistable {

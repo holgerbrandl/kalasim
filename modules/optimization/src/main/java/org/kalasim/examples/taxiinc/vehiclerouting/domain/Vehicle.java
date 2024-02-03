@@ -1,10 +1,11 @@
 package org.kalasim.examples.taxiinc.vehiclerouting.domain;
 
-import org.optaplanner.core.api.domain.entity.PlanningEntity;
-import org.optaplanner.core.api.domain.variable.PlanningListVariable;
+import ai.timefold.solver.core.api.domain.entity.PlanningEntity;
+import ai.timefold.solver.core.api.domain.variable.PlanningListVariable;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.Location;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @PlanningEntity
 public class Vehicle extends AbstractPersistable  {

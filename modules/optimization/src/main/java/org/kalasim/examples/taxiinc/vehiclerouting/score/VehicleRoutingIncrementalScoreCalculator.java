@@ -1,14 +1,16 @@
 package org.kalasim.examples.taxiinc.vehiclerouting.score;
 
-import org.optaplanner.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
-import org.optaplanner.core.api.score.calculator.IncrementalScoreCalculator;
+import ai.timefold.solver.core.api.score.buildin.hardsoftlong.HardSoftLongScore;
+import ai.timefold.solver.core.api.score.calculator.IncrementalScoreCalculator;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.Customer;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.Vehicle;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.VehicleRoutingSolution;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.timewindowed.TimeWindowedCustomer;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.timewindowed.TimeWindowedVehicleRoutingSolution;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class VehicleRoutingIncrementalScoreCalculator
         implements IncrementalScoreCalculator<VehicleRoutingSolution, HardSoftLongScore> {

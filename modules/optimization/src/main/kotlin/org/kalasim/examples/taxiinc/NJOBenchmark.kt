@@ -1,19 +1,16 @@
 package org.kalasim.examples.taxiinc.opt2
 
-import org.optaplanner.benchmark.api.PlannerBenchmark
-import org.optaplanner.benchmark.api.PlannerBenchmarkFactory
-import org.optaplanner.benchmark.config.PlannerBenchmarkConfig
-import org.optaplanner.benchmark.config.ProblemBenchmarksConfig
-import org.optaplanner.benchmark.config.SolverBenchmarkConfig
-import org.optaplanner.benchmark.config.blueprint.SolverBenchmarkBluePrintConfig
-import org.optaplanner.benchmark.config.blueprint.SolverBenchmarkBluePrintType
-import org.optaplanner.benchmark.config.statistic.ProblemStatisticType
-import org.optaplanner.benchmark.config.statistic.SingleStatisticType
-import org.optaplanner.core.config.solver.EnvironmentMode
-import org.optaplanner.core.config.solver.SolverConfig
-import org.optaplanner.core.config.solver.termination.TerminationConfig
+import ai.timefold.solver.benchmark.api.PlannerBenchmark
+import ai.timefold.solver.benchmark.api.PlannerBenchmarkFactory
+import ai.timefold.solver.benchmark.config.*
+import ai.timefold.solver.benchmark.config.blueprint.SolverBenchmarkBluePrintConfig
+import ai.timefold.solver.benchmark.config.blueprint.SolverBenchmarkBluePrintType
+import ai.timefold.solver.benchmark.config.statistic.ProblemStatisticType
+import ai.timefold.solver.benchmark.config.statistic.SingleStatisticType
+import ai.timefold.solver.core.config.solver.EnvironmentMode
+import ai.timefold.solver.core.config.solver.SolverConfig
+import ai.timefold.solver.core.config.solver.termination.TerminationConfig
 import java.io.File
-
 
 
 fun main() {

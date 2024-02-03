@@ -1,13 +1,14 @@
 package org.kalasim.examples.taxiinc.vehiclerouting.domain.solver;
 
+import ai.timefold.solver.core.impl.heuristic.selector.common.decorator.SelectionSorterWeightFactory;
+import org.kalasim.examples.taxiinc.vehiclerouting.domain.Customer;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.Depot;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.VehicleRoutingSolution;
-import org.optaplanner.core.impl.heuristic.selector.common.decorator.SelectionSorterWeightFactory;
-import org.kalasim.examples.taxiinc.vehiclerouting.domain.Customer;
 
-import java.util.*;
+import java.util.Comparator;
 
-import static java.util.Comparator.*;
+import static java.util.Comparator.comparingDouble;
+import static java.util.Comparator.comparingLong;
 
 /**
  * On large datasets, the constructed solution looks like pizza slices.

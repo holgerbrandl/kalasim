@@ -1,14 +1,13 @@
 package org.kalasim.examples.taxiinc.vehiclerouting.domain;
 
-import org.kalasim.examples.taxiinc.vehiclerouting.ArrivalTimeUpdatingVariableListener;
+import ai.timefold.solver.core.api.domain.entity.PlanningEntity;
+import ai.timefold.solver.core.api.domain.variable.InverseRelationShadowVariable;
+import ai.timefold.solver.core.api.domain.variable.NextElementShadowVariable;
+import ai.timefold.solver.core.api.domain.variable.PreviousElementShadowVariable;
+import ai.timefold.solver.core.api.domain.variable.ShadowVariable;
 import org.kalasim.examples.taxiinc.vehiclerouting.SimpleVRPVariableListener;
-import org.kalasim.examples.taxiinc.vehiclerouting.domain.solver.DepotAngleCustomerDifficultyWeightFactory;
-import org.optaplanner.core.api.domain.entity.PlanningEntity;
-import org.optaplanner.core.api.domain.variable.InverseRelationShadowVariable;
-import org.optaplanner.core.api.domain.variable.NextElementShadowVariable;
-import org.optaplanner.core.api.domain.variable.PreviousElementShadowVariable;
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.Location;
-import org.optaplanner.core.api.domain.variable.ShadowVariable;
+import org.kalasim.examples.taxiinc.vehiclerouting.domain.solver.DepotAngleCustomerDifficultyWeightFactory;
 
 @PlanningEntity(difficultyWeightFactoryClass = DepotAngleCustomerDifficultyWeightFactory.class)
 public class Customer extends AbstractPersistable {

@@ -1,16 +1,13 @@
 package org.kalasim.examples.taxiinc.vehiclerouting
 
+import ai.timefold.solver.core.api.solver.SolverFactory
+import ai.timefold.solver.core.config.solver.EnvironmentMode
+import ai.timefold.solver.core.config.solver.SolverConfig
+import ai.timefold.solver.core.config.solver.termination.TerminationConfig
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
-import org.kalasim.examples.taxiinc.vehiclerouting.domain.Customer
-import org.kalasim.examples.taxiinc.vehiclerouting.domain.Depot
-import org.kalasim.examples.taxiinc.vehiclerouting.domain.Vehicle
-import org.kalasim.examples.taxiinc.vehiclerouting.domain.VehicleRoutingSolution
+import org.kalasim.examples.taxiinc.vehiclerouting.domain.*
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.AirLocation
 import org.kalasim.examples.taxiinc.vehiclerouting.domain.location.DistanceType
-import org.optaplanner.core.api.solver.SolverFactory
-import org.optaplanner.core.config.solver.EnvironmentMode
-import org.optaplanner.core.config.solver.SolverConfig
-import org.optaplanner.core.config.solver.termination.TerminationConfig
 import java.io.File
 import kotlin.random.Random
 

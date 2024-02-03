@@ -1,6 +1,6 @@
 package org.kalasim.examples.taxiinc.vehiclerouting.domain;
 
-import org.optaplanner.core.api.domain.lookup.PlanningId;
+import ai.timefold.solver.core.api.domain.lookup.PlanningId;
 
 public abstract class AbstractPersistable {
 
