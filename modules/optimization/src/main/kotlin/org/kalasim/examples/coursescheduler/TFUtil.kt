@@ -2,6 +2,7 @@ package org.kalasim.examples.coursescheduler
 
 import ai.timefold.solver.core.api.domain.variable.VariableListener
 import ai.timefold.solver.core.api.score.director.ScoreDirector
+import kotlinx.datetime.*
 
 open class BasicVariableListener<S, E>() : VariableListener<S, E> {
     override fun beforeEntityAdded(scoreDirector: ScoreDirector<S>, entity: E) {}
@@ -18,3 +19,6 @@ fun <T, Solution_> ScoreDirector<Solution_>.change(name: String, task: T, block:
     task.block(task)
     afterVariableChanged(task, name)
 }
+
+fun LocalDate.asInstant(): Instant = atStartOfDayIn(TimeZone.UTC)
+

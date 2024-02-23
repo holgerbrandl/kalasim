@@ -8,11 +8,11 @@ import ai.timefold.solver.core.api.domain.solution.*
 import ai.timefold.solver.core.api.domain.valuerange.ValueRangeProvider
 import ai.timefold.solver.core.api.domain.variable.AbstractVariableListener
 import ai.timefold.solver.core.api.domain.variable.PlanningVariable
-import ai.timefold.solver.core.api.score.ScoreManager
 import ai.timefold.solver.core.api.score.buildin.hardmediumsoft.HardMediumSoftScore
 import ai.timefold.solver.core.api.score.director.ScoreDirector
 import ai.timefold.solver.core.api.score.stream.*
 import ai.timefold.solver.core.api.score.stream.ConstraintCollectors.*
+import ai.timefold.solver.core.api.solver.SolutionManager
 import ai.timefold.solver.core.api.solver.SolverFactory
 import ai.timefold.solver.core.config.solver.EnvironmentMode
 import ai.timefold.solver.core.config.solver.SolverConfig
@@ -63,7 +63,7 @@ class CleverDispatcher : FifoDispatcher() {
                     from = it.from
                     to = it.to
                     passengers = it.numPassengers
-                    plannedStart = (now - it.plannedStart).toDuration()
+                    plannedStart = now - it.plannedStart
                 }
             }
 
@@ -71,7 +71,7 @@ class CleverDispatcher : FifoDispatcher() {
                 Taxi().apply {
                     taxiId = it.name
                     capacity = it.cabinCapacity.capacity.toInt()
-                    readyIn = (now - (it.estArrivalTime ?: now)).toDuration()
+                    readyIn = now - (it.estArrivalTime ?: now)
 //                        if(it.status.value == TaxiStatus.Driving) ()
                     readyPosition = it.finalJobDestination ?: it.position
                 }
@@ -352,9 +352,8 @@ fun main() {
         .map { (taxi, orders) -> taxi!!.taxiId to orders.joinToString { it.orderId } })
 
 
-    val explainScore = ScoreManager.create(solverFactory)
-        .explainScore(solved)
+    val explainScore = SolutionManager.create(solverFactory).explain(solved)
 
     println(explainScore.getSummary())
-    println(ScoreManager.create(solverFactory).getSummary(solved))
+//    println(explainScore.getSummary())
 }

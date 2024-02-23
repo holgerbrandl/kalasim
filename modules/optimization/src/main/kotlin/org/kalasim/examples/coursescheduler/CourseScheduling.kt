@@ -8,6 +8,7 @@ import ai.timefold.solver.core.api.domain.variable.*
 import ai.timefold.solver.core.api.score.buildin.hardmediumsoft.HardMediumSoftScore
 import ai.timefold.solver.core.api.score.director.ScoreDirector
 import ai.timefold.solver.core.api.score.stream.*
+import ai.timefold.solver.core.api.score.stream.ConstraintCollectors.sum
 import ai.timefold.solver.core.api.score.stream.Joiners.overlapping
 import ai.timefold.solver.core.api.solver.SolutionManager
 import ai.timefold.solver.core.api.solver.SolverFactory
@@ -19,6 +20,8 @@ import ai.timefold.solver.core.config.solver.termination.TerminationConfig
 import kotlinx.datetime.*
 import org.jetbrains.kotlinx.dataframe.api.print
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
+import org.kalasim.examples.coursescheduler.*
+import kotlin.math.roundToInt
 import kotlin.math.sqrt
 import kotlin.properties.Delegates
 import kotlin.time.Duration
@@ -239,11 +242,9 @@ open class CourseConstraints : ConstraintProvider {
                     { course: Course -> course.start!! },
                     { course: Course -> course.end!! })
             )
-            .groupBy({ day, course -> day }, { date: LocalDate, course: Course ->
+            .groupBy({ day, course -> day }, sum { date: LocalDate, course: Course ->
                 // compute proportional coffee demand
-                course.coffeeDemandAt(date).apply {
-//                    println(this)
-                }
+                course.coffeeDemandAt(date).roundToInt()
             })
             .filter { _, consumedCoffee ->
                 consumedCoffee > hourlyCoffeeMachineOutput * 24
@@ -266,8 +267,6 @@ fun main() {
         Room("Room B", scheduleStart),
     )
 
-//    val partDist = UniformIntegerDistribution(JDKRandomGenerator(42), 10, 10)
-//    val durationDist = UniformIntegerDistribution(JDKRandomGenerator(42), 10, 10)
     val courses = listOf(
         Course("C1", 9, 3.days),
         Course("C2", 13, 36.hours),

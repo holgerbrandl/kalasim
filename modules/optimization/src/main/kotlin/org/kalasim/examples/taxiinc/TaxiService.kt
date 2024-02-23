@@ -8,6 +8,7 @@ import org.kalasim.*
 import org.kalasim.examples.taxiinc.TaxiStatus.*
 import org.kalasim.examples.taxiinc.opt2.CleverDispatcher
 import org.kalasim.misc.mergeStats
+import org.kalasim.misc.time.mean
 import java.awt.Point
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
@@ -96,7 +97,7 @@ class Taxi(val speedKmh: Double = 40.0) : Component() {
 
     }
 
-    var estArrivalTime: TickTime? = null
+    var estArrivalTime: SimTime? = null
     var finalJobDestination: Quarter? = null
 
     private suspend fun SequenceScope<Component>.driveTo(destination: Quarter) {
@@ -115,13 +116,13 @@ class Taxi(val speedKmh: Double = 40.0) : Component() {
 }
 
 
-class TaxiDriveEvent(val cabinLoad: Int, val distance: Double, ts: TickTime) : Event(ts)
+class TaxiDriveEvent(val cabinLoad: Int, val distance: Double, ts: SimTime) : Event(ts)
 
 
 data class Order(
     val from: Quarter,
     val to: Quarter,
-    val plannedStart: TickTime,
+    val plannedStart: SimTime,
     val numPassengers: Int = 1,
 ) : Component() {
     override fun process() = sequence {
@@ -134,7 +135,7 @@ data class Order(
 
 enum class OrderStatus { Created, Dispatched, Waiting, Pickup, Completed }
 
-class OrderChangeEvent(val order: Order, val status: OrderStatus, timestamp: TickTime) : Event(timestamp)
+class OrderChangeEvent(val order: Order, val status: OrderStatus, timestamp: SimTime) : Event(timestamp)
 
 
 data class Job(val orders: List<Order>) {
@@ -156,7 +157,7 @@ open class FifoDispatcher : Component(), Dispatcher {
         val nextJob = next?.let { Job(listOf(it)) }
 
         if(nextJob != null) {
-            val timeUntilPickup = (now - nextJob.plannedStart).toDuration()
+            val timeUntilPickup = now - nextJob.plannedStart
 
             val prePickup = 10.minutes
 
@@ -226,12 +227,12 @@ class TaxiInc(dispatcherClass: Class<out Dispatcher>) : Environment() {
 
         val avgDriveTime = orderTx.filter { listOf(OrderStatus.Pickup, OrderStatus.Completed).contains(it.status) }
             .groupBy { it.order }.filter { it.value.size == 2 }.map { (_, tx) -> (tx.last().time - tx.first().time) }
-            .mean().toDuration()
+            .mean()
 
 
         val avgWaitTime4Pickup =
             orderTx.filter { listOf(OrderStatus.Waiting, OrderStatus.Pickup).contains(it.status) }.groupBy { it.order }
-                .filter { it.value.size == 2 }.map { (_, tx) -> (tx.last().time - tx.first().time) }.mean().toDuration()
+                .filter { it.value.size == 2 }.map { (_, tx) -> (tx.last().time - tx.first().time) }.mean()
 
         return json {
             "idleprop" to idleProportion

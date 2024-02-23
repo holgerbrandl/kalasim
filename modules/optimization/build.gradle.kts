@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.8.10"
+    kotlin("jvm") version "1.9.21"
 }
 
 group = "org.kalasim.examples"
@@ -19,8 +19,8 @@ dependencies {
 //    api("com.github.holgerbrandl:kalasim:0.9-SNAPSHOT")
     api("com.github.holgerbrandl:kalasim:0.12.105")
 
-    api("ai.timefold.solver:timefold-solver-core:1.6.0")
-    api("ai.timefold.solver:timefold-solver-benchmark:1.6.0")
+    api("ai.timefold.solver:timefold-solver-core:1.7.0")
+    api("ai.timefold.solver:timefold-solver-benchmark:1.7.0")
 
     api("ch.qos.logback:logback-classic:1.4.12")
 
