@@ -1,4 +1,4 @@
-package com.systema.peo.bilbo.analysis.scratch
+package org.kalasim.examples.coursescheduler
 
 import ai.timefold.solver.core.api.domain.entity.PlanningEntity
 import ai.timefold.solver.core.api.domain.lookup.PlanningId
@@ -20,7 +20,6 @@ import ai.timefold.solver.core.config.solver.termination.TerminationConfig
 import kotlinx.datetime.*
 import org.jetbrains.kotlinx.dataframe.api.print
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
-import org.kalasim.examples.coursescheduler.*
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 import kotlin.properties.Delegates
