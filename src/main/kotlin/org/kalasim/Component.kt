@@ -171,6 +171,9 @@ open class TickedComponent(
 
 }
 
+val logger = KotlinLogging.logger {}
+
+
 
 /**
  * A kalasim component is used as component (primarily for queueing) or as a component with a process.
@@ -199,7 +202,6 @@ open class Component(
 //    builder: SequenceScope<Component>.() -> Unit = {   }
 ) : SimulationEntity(name, koin) {
 
-    val logger = KotlinLogging.logger(this.name)
 
     private var oneOfRequest: Boolean = false
 
