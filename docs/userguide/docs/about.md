@@ -71,6 +71,19 @@ Inspirations
 
 * [atomic-agents](https://gjmcn.github.io/atomic-agents/index.html) - Spatial Agent-based Modeling in JavaScript
 
+### YouKit Profiler
+
+With `kalasim`, we strive to enable large-scale time-discrete simulation models.
+To optimize the API and the engine for perormance, we rely
+on [YourKit profiler](https://www.yourkit.com/java/profiler/).
+With its wonderful interface into JDK performace metrics,
+YourKit profiler allows us to signifantly improve the overall speed while reducing the memory footprint of `kalasim`.
+
+![](https://www.yourkit.com/images/yklogo.png)
+
+YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling Java and .NET
+applications. YourKit is the creator of [YourKit Java Profiler](https://www.yourkit.com/java/profiler/).
+
 ## Repo Maintainer
 
 [Holger Brandl](https://linkedin.com/in/holgerbrandl/) holds a Ph.D. degree in machine learning and has developed new concepts in the field of computational linguistics. More recently he has co-authored [publications](https://orcid.org/0000-0003-1911-8570) in high-ranking journals such as Nature and Science.
