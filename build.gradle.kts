@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "com.github.holgerbrandl"
-version = "0.12.106"
+version = "0.12.107"
 //version = "2023.1-SNAPSHOT"
 //version = "0.12-SNAPSHOT"
 
@@ -27,13 +27,13 @@ dependencies {
     // note updated postponed because of regression errors
     api("io.insert-koin:koin-core:3.1.2")
 
-    api("org.json:json:20230227")
+    api("org.json:json:20240303")
     api("com.github.holgerbrandl:jsonbuilder:0.10")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 
     api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
 
-    api("io.github.oshai:kotlin-logging-jvm:5.1.0")
+    api("io.github.oshai:kotlin-logging-jvm:6.0.9")
 
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.20")
@@ -42,17 +42,19 @@ dependencies {
 
     // **TODO** move to api to require users to pull it in if needed
     implementation("com.github.holgerbrandl:krangl:0.18.4") // must needed for kravis
+    implementation("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.7.0") // override old version in krangl
+
     implementation("com.github.holgerbrandl:kdfutils:1.3.5")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.20")
     testImplementation("io.kotest:kotest-assertions-core:5.7.2")
 
-    testImplementation("com.github.holgerbrandl:kdfutils:1.3.3")
+    testImplementation("com.github.holgerbrandl:kdfutils:1.3.5")
 
     testImplementation("com.github.holgerbrandl:kravis:0.9.96")
 
-    compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.4.3")
-    testImplementation("org.jetbrains.lets-plot:lets-plot-batik:4.0.1")
+    compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.7.0")
+    testImplementation("org.jetbrains.lets-plot:lets-plot-batik:4.7.0")
     //    testImplementation("org.jetbrains.lets-plot:lets-plot-jfx:1.5.4")
 
     //experimental dependencies  use for experimentation
