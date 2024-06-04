@@ -162,6 +162,8 @@ open class State<T>(
     /** Register a change listener. Will be invoked on every value change of the state. */
     fun onChange(function: StateChangeListener<T>) = changeListeners.add(function)
 
+    fun removeChangeListener(function: StateChangeListener<T>) = changeListeners.remove(function)
+
     override val snapshot
         get() = StateSnapshot(env.now, name, value.toString(), waiters.q.map { it.component.name })
 }
