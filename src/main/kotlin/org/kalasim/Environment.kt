@@ -142,7 +142,8 @@ open class Environment(
         private set // no longer needed/wanted --> use run
 
     @Deprecated("use now instead", ReplaceWith("now"))
-    val nowWT: Instant = now
+    val nowWT: Instant
+        get() = now
 
     @AmbiguousDuration
     val nowTT: TickTime
