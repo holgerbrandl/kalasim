@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "com.github.holgerbrandl"
-version = "0.12.109"
+version = "0.12.110-SNAPSHOT"
 //version = "2023.1-SNAPSHOT"
 //version = "0.12-SNAPSHOT"
 
