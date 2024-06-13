@@ -7,7 +7,7 @@
 To get started simply add it as a dependency:
 ```
 dependencies {
-    implementation "com.github.holgerbrandl:kalasim:0.12.108"
+    implementation "com.github.holgerbrandl:kalasim:0.12.109"
 }
 ```
 

@@ -1,5 +1,6 @@
 package org.kalasim
 
+import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.datetime.isDistantFuture
 import org.kalasim.Component.*
@@ -13,6 +14,7 @@ import org.kalasim.analysis.snapshot.ComponentSnapshot
 import org.kalasim.misc.*
 import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
+import java.util.logging.Logger
 import kotlin.math.*
 import kotlin.reflect.*
 import kotlin.time.Duration
@@ -168,10 +170,8 @@ open class TickedComponent(
             keepRequest
         )
     }
-
 }
 
-val logger = KotlinLogging.logger {}
 
 
 
@@ -1983,6 +1983,14 @@ open class Component(
     suspend fun SequenceScope<Component>.join(components: List<Component>) =
         wait(*components.map { it.componentState() turns ComponentState.DATA }.toTypedArray(), all=true)
 //        wait(*components.map { it.componentState() turns DATA }.toTypedArray<StateRequest<ComponentState>>())
+
+
+    companion object{
+        val logger  = KotlinLogging.logger{}
+//        val logger : KLogger
+//    get() = KotlinLogging.logger(javaClass.canonicalName)
+
+    }
 }
 
 internal fun Koin.getEnvDefaults(): SimEntityTrackingDefaults = get<Environment>().entityTrackingDefaults

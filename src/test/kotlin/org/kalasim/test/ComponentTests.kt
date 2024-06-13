@@ -488,6 +488,8 @@ class ComponentTests {
     fun `it should interrupt and resume a passive component`() = createTestSimulation {
         val tool = object : Component("tool") {
             override fun process() = sequence {
+                logger.info{ "starting process"}
+
                 passivate()
             }
         }
