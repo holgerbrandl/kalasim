@@ -13,8 +13,6 @@ plugins {
 
 group = "com.github.holgerbrandl"
 version = "0.12.110-SNAPSHOT"
-//version = "2023.1-SNAPSHOT"
-//version = "0.12-SNAPSHOT"
 
 
 repositories {
@@ -38,6 +36,8 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.20")
 
+//    implementation("org.jetbrains.kotlinx:dataframe:0.13.1")
+
     implementation("com.github.holgerbrandl:kravis:0.9.96")
 
     // **TODO** move to api to require users to pull it in if needed
@@ -46,13 +46,13 @@ dependencies {
 
     implementation("com.github.holgerbrandl:kdfutils:1.3.5")
 
+    compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.7.0")
+
+
     testImplementation("io.kotest:kotest-assertions-core:5.7.2")
-
     testImplementation("com.github.holgerbrandl:kdfutils:1.3.5")
-
     testImplementation("com.github.holgerbrandl:kravis:0.9.96")
 
-    compileOnly("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.7.0")
     testImplementation("org.jetbrains.lets-plot:lets-plot-batik:4.3.3")
     //    testImplementation("org.jetbrains.lets-plot:lets-plot-jfx:1.5.4")
 
@@ -60,22 +60,11 @@ dependencies {
     testImplementation("com.thoughtworks.xstream:xstream:1.4.20")
     testImplementation("org.slf4j:slf4j-simple:1.7.30")
 
-
-    //https://youtrack.jetbrains.com/issue/KT-44197
-
-    // internalized name part because 5mb
-//    implementation ("io.github.serpro69:kotlin-faker:1.14.0")
-
     testImplementation(kotlin("script-runtime"))
     testImplementation(kotlin("test"))
-//    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.0.20")
-
-//    implementation(kotlin("script-runtime"))
 }
 
 
-//todo remove for release
-//compileKotlin.kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
 
 tasks.test {
     useJUnitPlatform()
@@ -104,32 +93,21 @@ java {
 // see https://youtrack.jetbrains.com/issue/KT-52735
 val compileKotlin: KotlinCompile by tasks
 
+compileKotlin.compilerOptions {
+    freeCompilerArgs.addAll(listOf("-Xallow-any-scripts-in-source-roots"))
+//    freeCompilerArgs.addAll(listOf("-Xcontext-receivers"))
+}
 
-compileKotlin.kotlinOptions.freeCompilerArgs += "-Xallow-any-scripts-in-source-roots"
 
 kotlin {
     jvmToolchain(11)
 }
-
-// compile bytecode to java 8 (default is java 6)
-//tasks.withType<KotlinCompile> {
-//    kotlinOptions.jvmTarget = "11"
-//}
-
-// disabled because docs examples were moved back into tests
-//java {
-//    sourceSets["test"].java {
-//        srcDir("docs/userguide/examples/kotlin")
-//    }
-//}
 
 
 publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
-//          artifact sourcesJar { classifier "sources" }
-//          artifact javadocJar
 
             pom {
                 url.set("https://www.kalasim.org")
@@ -163,20 +141,8 @@ publishing {
 
 nexusPublishing {
 //    packageGroup.set("com.github.holgerbrandl.kalasim")
-
     repositories {
         sonatype()
-//
-//        sonatype {
-////            print("staging id is ${project.properties["sonatypeStagingProfileId"]}")
-//            stagingProfileId.set(project.properties["sonatypeStagingProfileId"] as String?)
-//
-////            nexusUrl.set(uri("https://oss.sonatype.org/"))
-////            snapshotRepositoryUrl.set(uri("https://oss.sonatype.org/content/repositories/snapshots/"))
-//
-//            username.set(project.properties["ossrhUsername"] as String?) // defaults to project.properties["myNexusUsername"]
-//            password.set(project.properties["ossrhPassword"] as String?) // defaults to project.properties["myNexusPassword"]
-//        }
     }
 }
 
@@ -186,9 +152,3 @@ signing {
 }
 
 fun findProperty(s: String) = project.findProperty(s) as String?
-
-
-//val compileKotlin: KotlinCompile by tasks
-//compileKotlin.kotlinOptions {
-//    freeCompilerArgs = listOf("-Xinline-classes")
-//}
