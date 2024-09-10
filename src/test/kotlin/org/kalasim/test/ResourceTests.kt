@@ -6,8 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.datetime.Instant
 import org.apache.commons.math3.distribution.EnumeratedDistribution
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.kalasim.*
 import org.kalasim.Priority.Companion.CRITICAL
 import org.kalasim.Priority.Companion.IMPORTANT
@@ -17,6 +16,7 @@ import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.ResourceSelectionPolicy.*
 import org.kalasim.misc.*
 import kotlin.repeat
+import kotlin.test.fail
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -116,7 +116,7 @@ class ResourceTests {
 
                 if(isBumped(resource)) {
                     log("got bumped from $resource")
-                    if(failOnBump) Assert.fail()
+                    if(failOnBump) fail()
                     return@sequence
                 }
 

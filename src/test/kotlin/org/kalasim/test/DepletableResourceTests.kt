@@ -5,7 +5,7 @@ import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.doubles.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.kalasim.*
 import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.createTestSimulation

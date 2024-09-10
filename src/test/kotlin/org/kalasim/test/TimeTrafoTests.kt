@@ -3,7 +3,7 @@ package org.kalasim.test
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import kotlinx.datetime.Instant
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.kalasim.*
 import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.createTestSimulation

@@ -2,7 +2,7 @@ package org.kalasim.test
 
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.kalasim.Component
 import org.kalasim.animation.AnimationComponent
 import org.kalasim.misc.createTestSimulation

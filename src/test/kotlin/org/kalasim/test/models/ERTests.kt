@@ -1,7 +1,7 @@
 package org.kalasim.test.models
 
 import io.kotest.matchers.shouldBe
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.kalasim.examples.er.EmergencyRoom
 import org.kalasim.misc.testModel
 import kotlin.time.Duration.Companion.days

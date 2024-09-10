@@ -8,8 +8,8 @@ import io.kotest.matchers.shouldBe
 import kravis.*
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.json.JSONObject
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import org.kalasim.*
 import org.kalasim.examples.bank.oneclerk.Clerk
 import org.kalasim.examples.bank.oneclerk.Customer
@@ -235,7 +235,7 @@ class SalabimExampleTests {
 
 
     @Test
-    @Ignore
+    @Disabled
     fun `the atm queue should have known properties`() {
 // TODO build tests using properties from https://en.wikipedia.org/wiki/M/M/1_queue
     }

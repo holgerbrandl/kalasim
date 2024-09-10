@@ -1,6 +1,6 @@
 package org.kalasim.test
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.kalasim.ComponentList
 import org.kalasim.ComponentQueue
 import org.kalasim.misc.*

@@ -1,7 +1,7 @@
 package org.kalasim.dokka
 
 import org.apache.commons.math3.distribution.EnumeratedDistribution
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.kalasim.Environment
 import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.asCMPairList

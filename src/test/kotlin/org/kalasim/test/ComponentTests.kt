@@ -5,8 +5,8 @@ package org.kalasim.test
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.DATA
 import org.kalasim.ComponentState.SCHEDULED
@@ -312,7 +312,7 @@ class ComponentTests {
 
 
     // TODO bring back with proper spec
-    @Ignore
+    @Disabled
     @Test
     fun `it should allow to disable interaction logging`() = createTestSimulation {
         entityTrackingDefaults.disableAll()

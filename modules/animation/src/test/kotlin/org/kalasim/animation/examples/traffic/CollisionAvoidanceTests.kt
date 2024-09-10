@@ -1,17 +1,18 @@
 package org.kalasim.animation.examples.traffic
 
-import org.junit.Assert
+import org.junit.jupiter.api.Disabled
 import org.kalasim.*
 import org.kalasim.animation.*
 import org.kalasim.logistics.*
 import org.kalasim.misc.createTestSimulation
 import kotlin.test.Test
+import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-@Disbled // todo bring back
+@Disabled // todo bring back
 class CollisionAvoidanceTests {
 
     @Test
@@ -210,12 +211,12 @@ class CollisionAvoidanceTests {
     }
 }
 
-infix fun Point.shouldBeInProximityOf(position: Point) = Assert.assertTrue(this.distanceTo(position) < 0.1.meters)
+infix fun Point.shouldBeInProximityOf(position: Point) = assertTrue(this.distanceTo(position) < 0.1.meters)
 infix fun Vehicle.shouldBeInProximityOf(position: Point) = currentPosition shouldBeInProximityOf position
 infix fun Vehicle.shouldBeInProximityOf(building: Building) =
     currentPosition shouldBeInProximityOf building.port.position
 
-infix fun Point.shouldBeNotInProximityOf(position: Point) = Assert.assertTrue(this.distanceTo(position) < 0.1.meters)
+infix fun Point.shouldBeNotInProximityOf(position: Point) = assertTrue(this.distanceTo(position) < 0.1.meters)
 infix fun Vehicle.shouldBeNotInProximityOf(position: Point) = currentPosition shouldBeNotInProximityOf position
 infix fun Vehicle.shouldBeNotInProximityOf(building: Building) =
     currentPosition shouldBeNotInProximityOf building.port.position

@@ -4,7 +4,7 @@ package org.kalasim.test
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.kalasim.Component
 import org.kalasim.State
 import org.kalasim.misc.AmbiguousDuration

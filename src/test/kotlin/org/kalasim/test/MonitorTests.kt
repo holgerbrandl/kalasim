@@ -5,7 +5,7 @@ import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.apache.commons.math3.stat.descriptive.StatisticalSummaryValues
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.kalasim.misc.*
 import org.kalasim.monitors.*
 import org.kalasim.test.MonitorTests.Car.*

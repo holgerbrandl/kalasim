@@ -2,8 +2,8 @@ package org.kalasim.test
 
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import org.kalasim.*
 import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.createTestSimulation
@@ -199,7 +199,7 @@ class StateTests {
 
     @OptIn(AmbiguousDuration::class)
     @Test
-    @Ignore("Because its unclear how to do this nicely. The workaround it to use named koin-entities")
+    @Disabled("Because its unclear how to do this nicely. The workaround it to use named koin-entities")
     // https://kotlinlang.slack.com/archives/C67HDJZ2N/p1607195460178600
     // https://github.com/InsertKoinIO/koin/issues/976
     fun `resolve generic parameters and honor multiple predicates without subclassing`() {

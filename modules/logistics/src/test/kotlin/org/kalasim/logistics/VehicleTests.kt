@@ -1,15 +1,15 @@
 package org.kalasim.logistics
 
+import org.junit.jupiter.api.Disabled
 import org.kalasim.*
 import org.kalasim.logistics.examples.simpleCrossing
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 
 class VehicleTests {
 
     @Test
-    @Ignore //TODO bring back for 2014.1
+    @Disabled //TODO bring back for 2014.1
     fun `it should respect the right of way`() {
         createSimulation {
             enableComponentLogger()

@@ -1,6 +1,5 @@
 package org.kalasim.test
 
-import junit.framework.TestCase
 import org.apache.commons.math3.distribution.ConstantRealDistribution
 import org.kalasim.*
 import java.io.ByteArrayOutputStream
@@ -65,6 +64,6 @@ infix fun String.shouldBeDiff(expected: String) = assertEquals(expected, this)
 
 inline infix fun <reified T> T.shouldBe(expected: Any) {
     if(expected !is T) throw IllegalArgumentException("Type mismatch. Expected type was ${T::class}, actual type was ${expected::class}")
-    TestCase.assertEquals(this, expected)
+    assertEquals(this, expected)
 }
 

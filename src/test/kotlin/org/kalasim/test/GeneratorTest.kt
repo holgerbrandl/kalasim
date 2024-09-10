@@ -3,7 +3,7 @@ package org.kalasim.test
 import io.kotest.matchers.doubles.*
 import io.kotest.matchers.shouldBe
 import org.apache.commons.math3.distribution.ExponentialDistribution
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.kalasim.*
 import org.kalasim.analysis.EntityCreatedEvent
 import org.kalasim.misc.*

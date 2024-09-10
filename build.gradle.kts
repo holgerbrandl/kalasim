@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.9.20"
+    kotlin("jvm") version "2.0.20"
     `maven-publish`
     signing
 
     // see https://kotlinlang.slack.com/archives/C4W52CFEZ/p1641056747134600
-    id("org.jetbrains.kotlin.jupyter.api") version "0.12.0-82-1"
+    id("org.jetbrains.kotlin.jupyter.api") version "0.12.0-285"
 
     id("io.github.gradle-nexus.publish-plugin") version "1.2.0"
 }
@@ -36,7 +36,7 @@ dependencies {
     api("io.github.oshai:kotlin-logging-jvm:6.0.9")
 
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.20")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.20")
 
     implementation("com.github.holgerbrandl:kravis:0.9.96")
 
@@ -46,7 +46,6 @@ dependencies {
 
     implementation("com.github.holgerbrandl:kdfutils:1.3.5")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.20")
     testImplementation("io.kotest:kotest-assertions-core:5.7.2")
 
     testImplementation("com.github.holgerbrandl:kdfutils:1.3.5")
@@ -68,6 +67,9 @@ dependencies {
 //    implementation ("io.github.serpro69:kotlin-faker:1.14.0")
 
     testImplementation(kotlin("script-runtime"))
+    testImplementation(kotlin("test"))
+//    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.0.20")
+
 //    implementation(kotlin("script-runtime"))
 }
 
@@ -75,6 +77,9 @@ dependencies {
 //todo remove for release
 //compileKotlin.kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
 
+tasks.test {
+    useJUnitPlatform()
+}
 
 //https://github.com/Kotlin/kotlin-jupyter/blob/master/docs/libraries.md
 tasks.processJupyterApiResources {

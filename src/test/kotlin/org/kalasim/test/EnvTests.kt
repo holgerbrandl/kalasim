@@ -6,13 +6,12 @@ import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
-import junit.framework.Assert.fail
 import kotlinx.datetime.Instant
 import krangl.cumSum
 import krangl.mean
 import org.apache.commons.math3.distribution.UniformRealDistribution
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import org.kalasim.*
 import org.kalasim.analysis.*
 import org.kalasim.examples.bank.data.*
@@ -25,6 +24,7 @@ import org.koin.dsl.module
 import java.io.File
 import java.lang.Thread.sleep
 import kotlin.io.path.div
+import kotlin.test.fail
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
@@ -470,7 +470,7 @@ class EnvTests {
 
 
     // https://github.com/holgerbrandl/kalasim/issues/49
-    @Ignore
+    @Disabled
     @Test
     fun `it should enforce typed durations`() {
 

@@ -2,7 +2,7 @@ package org.kalasim.test
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.DATA
 import org.kalasim.Priority.Companion.IMPORTANT

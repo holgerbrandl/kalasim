@@ -1,7 +1,7 @@
 package org.kalasim.test
 
 import io.kotest.matchers.shouldNotBe
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.kalasim.*
 import kotlin.time.Duration.Companion.seconds
 

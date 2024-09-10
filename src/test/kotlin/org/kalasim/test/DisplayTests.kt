@@ -3,11 +3,11 @@ package org.kalasim.test
 import io.kotest.assertions.fail
 import kravis.GGPlot
 import kravis.SessionPrefs
-import kravis.device.showFile
 import kravis.render.LocalR
-import org.junit.*
-import org.junit.Assert.assertEquals
-import org.junit.rules.TestName
+import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.kalasim.asSimTime
 import org.kalasim.examples.MM1Queue
 import org.kalasim.misc.AmbiguousDuration
@@ -17,7 +17,8 @@ import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.stream.StreamSource
-import kotlin.io.path.*
+import kotlin.io.path.createTempFile
+import kotlin.io.path.readText
 import kotlin.time.Duration.Companion.minutes
 
 class DisplayTests : AbstractSvgPlotRegression() {
@@ -25,18 +26,18 @@ class DisplayTests : AbstractSvgPlotRegression() {
     override val testDataDir: File
         get() = File("src/test/resources/display/kravis")
 
-    @Before
+    @BeforeEach
     fun beforeMethod() {
         // Only run tests that rely on for brandl or if users has exported KALASIM_RUN_DISPLAY_TESTS as 'true'
         // https://stackoverflow.com/questions/1689242/conditionally-ignoring-tests-in-junit-4
         val runDisplayTests =
             System.getProperty("KALASIM_RUN_DISPLAY_TESTS").toBoolean() || System.getProperty("user.name") == "brandl"
-        Assume.assumeTrue(runDisplayTests)
+        assumeTrue(runDisplayTests)
     }
 
     @OptIn(AmbiguousDuration::class)
     @Test
-    fun `is should display the mm1 server utilization`() {
+    fun `it should display the mm1 server utilization`() {
         val mm1 = MM1Queue()
 
         mm1.run(50.minutes)
@@ -83,7 +84,7 @@ class DisplayTests : AbstractSvgPlotRegression() {
     }
 
     @Test
-    fun `is should display the mm1 server utilization with walltime`() {
+    fun `it should display the mm1 server utilization with walltime`() {
 
         val mm1 = MM1Queue()
 
@@ -118,9 +119,12 @@ class DisplayTests : AbstractSvgPlotRegression() {
 
 abstract class AbstractSvgPlotRegression {
 
-    @Rule
-    @JvmField
-    val name = TestName()
+    lateinit var testName: String
+
+    @BeforeEach
+    fun setUp(testInfo: TestInfo) {
+        testName = testInfo.displayName.replace(" ", "_").replace("[()]+".toRegex(), "")
+    }
 
 
     abstract val testDataDir: File
@@ -129,14 +133,14 @@ abstract class AbstractSvgPlotRegression {
 //        if(true) return
         val plotFile = plot.save(createTempFile(suffix = ".svg"))
 
-        Assert.assertTrue(plotFile.exists() && plotFile.fileSize() > 0)
+//        assertTrue(plotFile.exists() && plotFile.fileSize() > 0)
 
         val svgDoc = plotFile.readText().run { prettyFormat(this, 4) }.trim()
         //        val obtained = prettyFormat(svgDoc, 4).trim()
 
-        val methodName = name.methodName ?: return // because we're running not in test mode
+        val methodName = testName ?: return // because we're running not in test mode
 
-        val file = File(testDataDir, methodName.replace(" ", "_") + "${subtest?.let { ".$it" } ?: ""}.svg")
+        val file = File(testDataDir, methodName + "${subtest?.let { ".$it" } ?: ""}.svg")
         if(!file.exists()) {
             file.writeText(svgDoc)
             fail("could not find expected result.")
@@ -150,7 +154,7 @@ abstract class AbstractSvgPlotRegression {
         assertEquals(expected, svgDoc)
         val failMsg = "svg mismatch got:\n${svgDoc.lines().take(30).joinToString("\n")}"
         @Suppress("HttpUrlsUsage")
-        Assert.assertTrue(failMsg, expected == svgDoc)
+        assertTrue(expected == svgDoc, failMsg)
 
         // compare actual images
         //        saveImage(File(testDataDir, name.methodName.replace(" ", "_") + ".png"))
@@ -175,12 +179,12 @@ abstract class AbstractSvgPlotRegression {
     }
 
 
-    @Before
+    @BeforeEach
     fun setup() {
         // prevent these tests from running on github-CI
         // https://stackoverflow.com/questions/1689242/conditionally-ignoring-tests-in-junit-4
         // An assumption failure causes the test to be ignored.
-        Assume.assumeTrue(canDisplay() && System.getenv("SKIP_DISPLAY_TESTS") == null)
+        assumeTrue(canDisplay() && System.getenv("SKIP_DISPLAY_TESTS") == null)
 
 //        SessionPrefs.RENDER_BACKEND = RserveEngine()
 //        SessionPrefs.RENDER_BACKEND = Docker("holgerbrandl/kravis_core:3.5.1")
