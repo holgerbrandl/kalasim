@@ -605,7 +605,7 @@ class CustomKoinModuleTests {
             dependency { (1..3).map { Clerk() } }
 
 
-            run(50000.0)
+            run(10.days)
 
             val waitingLine: ComponentQueue<Customer> = get()
             waitingLine.creationTime.epochSeconds shouldBe 0

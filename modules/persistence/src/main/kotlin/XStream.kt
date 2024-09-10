@@ -50,5 +50,5 @@ fun main() {
     val restoredEnv: Environment = xstream.fromXML(envXML) as Environment
 
     println("running restored simulation")
-    restoredEnv.run(10.0)
+    restoredEnv.run(10.hours)
 }

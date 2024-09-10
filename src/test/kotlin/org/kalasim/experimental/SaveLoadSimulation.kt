@@ -6,18 +6,20 @@ import com.thoughtworks.xstream.security.AnyTypePermission
 import org.kalasim.*
 import org.kalasim.examples.MM1Queue
 import java.util.*
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.days
 
 object XStreamPersistence {
     @JvmStatic
     fun main(args: Array<String>) {
-        class Foo : Component()
-
+//        class Foo : Component()
+//
 //        val env = createSimulation {
 //            Foo()
 //            Resource()
 //        }
 
-        val env = MM1Queue().apply { run(10) }
+        val env = MM1Queue().apply { run(10.hours) }
 
         // save it to xml
         //    https://github.com/x-stream/xstream/issues/101
@@ -33,7 +35,7 @@ object XStreamPersistence {
         val restoredEnv: Environment = xstream.fromXML(envXML) as Environment
 
         println("running restored simulation")
-        restoredEnv.run(10.0)
+        restoredEnv.run(10.hours)
     }
 }
 
@@ -62,7 +64,7 @@ object GsonPersistence {
         val restoredEnv: Environment = gson.fromJson(envXML, Environment::class.java)
 
         println("running restored simulation")
-        restoredEnv.run(10.0)
+        restoredEnv.run(10.days)
     }
 }
 

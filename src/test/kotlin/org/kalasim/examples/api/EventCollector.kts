@@ -9,7 +9,7 @@ createSimulation {
     val eventLog = enableEventLog(blackList = listOf(StateChangedEvent::class))
 
     // run the simulation
-    run(5.0)
+    run(5.seconds)
 
     eventLog.filter { it is InteractionEvent && it.component?.name == "foo" }
 

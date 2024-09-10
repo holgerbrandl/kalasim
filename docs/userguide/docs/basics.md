@@ -21,7 +21,7 @@ val env : Environment = createSimulation(){
     // Create simulation entities in here 
     Car()
     Resource("Car Wash")
-}.run(5.0)
+}.run(5.minutes)
 ```
 
 Within its environment, a simulation contains one or multiple [components](component.md) with [process definition](component.md#process-definition)s that define their behavior and interplay with other simulation entities.

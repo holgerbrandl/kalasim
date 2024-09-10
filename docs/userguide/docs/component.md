@@ -443,8 +443,8 @@ We start with a not so elegant solution:
 ```kotlin
 object : Component() {
     override fun process() = sequence<Component>{
-        hold(5.0)
-        hold(5.0)
+        hold(5.days)
+        hold(5.hours)
     }
 }
 ```
@@ -459,7 +459,7 @@ object : Component() {
     }
 
     private suspend fun SequenceScope<Component>.holdMinutes() {
-        hold(5.0)
+        hold(5.minutes)
     }
 }
 ```

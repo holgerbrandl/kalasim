@@ -11,6 +11,7 @@ import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.createTestSimulation
 import kotlin.math.roundToInt
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 @Suppress("OPT_IN_USAGE")
@@ -50,7 +51,7 @@ class QueueTests {
             }
         }
 
-        env.run(50.0)
+        env.run(50.hours)
 
         assertEquals(0, waitingLine.size, "expected empty queue")
     }

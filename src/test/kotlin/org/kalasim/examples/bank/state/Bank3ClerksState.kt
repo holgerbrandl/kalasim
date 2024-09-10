@@ -60,7 +60,7 @@ fun main() {
 
     }
 
-    env.run(500.0)
+    env.run(500.minutes)
 
     println(env.get<ComponentQueue<Customer>>().statistics)
     env.get<State<Boolean>>().printSummary()

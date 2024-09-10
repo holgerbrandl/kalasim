@@ -33,10 +33,10 @@ A generator is a function that returns `Sequence<Component>`. Within these proce
 In this example,
 
 ```kotlin
-hold(1.0)
+hold(1.hour)
 ```
 
-suspends execution control and *comes back* after 1 time unit (referred to as _tick_). Apart from [`hold`](../component.md#hold), `kalasim` supports a rich vocabulary of interaction methods including [`passivate`](../component.md#passivate), [`request`](../component.md#request), [`wait`](../component.md#wait) and [`component`](../component.md#standby).
+suspends execution control and *comes back* after 1 hour (of simulated time). Apart from [`hold`](../component.md#hold), `kalasim` supports a rich vocabulary of interaction methods including [`passivate`](../component.md#passivate), [`request`](../component.md#request), [`wait`](../component.md#wait) and [`component`](../component.md#standby).
 
 
 The main body of every `kalasim` model usually starts with:
@@ -52,10 +52,10 @@ As there is a generator function called `process` in `Car`, this process descrip
 With
 
 ```kotlin
-run(5.0)
+run(5.minutes)
 ```
 
-we start the simulation and get back control after 5 ticks. A component called *main* is defined under the hood to get access to the main process.
+we start the simulation and get back control after 5 simulated minutes. A component called *main* is defined under the hood to get access to the main process.
 
 When we run this program, we get the following output (displayed as table for convenience):
 

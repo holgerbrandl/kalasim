@@ -44,10 +44,10 @@ Once the clerk is active (again), it gets the first customer out of the waitingl
 val customer = waitingLine.poll()
 ```
 
-and holds for 30 time units with:
+and holds for 10 days units with:
 
 ```kotlin
-hold(10.0)
+hold(10.days)
 ```
 
 After that hold the customer is activated and will terminate:
@@ -292,10 +292,10 @@ cancel()
 
 This makes the current component (a customer) a `DATA` component (and be subject to garbage collection), if the queue length is `5` or more.
 
-The *reneging* is implemented after a hold of `50`. If a clerk can service a customer, it will take the customer out of the waitingline and will activate it at that moment. The customer just has to check whether he/she is still in the waiting line. If so, he/she has not been serviced in time and thus will renege.
+The *reneging* is implemented after a hold of 50 minutes. If a clerk can service a customer, it will take the customer out of the waitingline and will activate it at that moment. The customer just has to check whether he/she is still in the waiting line. If so, he/she has not been serviced in time and thus will renege.
 
 ```kotlin
-hold(50.0)
+hold(50.minutes)
 
 if (waitingLine.contains(this@Customer)) {
     waitingLine.leave(this@Customer)
@@ -311,7 +311,7 @@ if (waitingLine.contains(this@Customer)) {
 All the clerk has to do when starting servicing a client is to get the next customer in line out of the queue (as before) and activate this customer (at time now). The effect is that the hold of the customer will end.
 
 ```kotlin
-hold(30.0) 
+hold(30.minutes) 
 customer.activate() // signal the customer that's all's done
 ```
 

@@ -59,7 +59,7 @@ fun main() {
         dependency { CustomerGenerator() }
         dependency { (1..3).map { Clerk() } }
 
-        run(50000.0)
+        run(50000.minutes)
 
         val waitingLine: ComponentQueue<Customer> = get()
 

@@ -57,7 +57,7 @@ class StateTransitionTests {
 
         Environment().apply {
             Customer()
-        }.run(1.0)
+        }.run(1.minute)
     }
 
     @Test

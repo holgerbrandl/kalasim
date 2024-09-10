@@ -7,6 +7,7 @@ import org.kalasim.plot.kravis.canDisplay
 import org.kalasim.plot.kravis.display
 import org.koin.core.component.inject
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 
@@ -63,7 +64,7 @@ fun main() {
         CustomerGenerator()
     }
 
-    env.run(50.0)
+    env.run(50.hours)
 
     val waitingLine: ComponentQueue<Customer> = env.get()
 

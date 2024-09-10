@@ -8,6 +8,8 @@ import org.kalasim.*
 import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.createTestSimulation
 import kotlin.test.fail
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 class StateTests {
 
@@ -68,14 +70,14 @@ class StateTests {
 
             trafficLight.printSummary()
 
-            run(10.0)
+            run(10.minutes)
 
             trafficLight.snapshot.waiters.size shouldBe 1
 
             // toggle state
             trafficLight.value = "green"
 
-            run(10.0)
+            run(10.minutes)
 
             trafficLight.printSummary()
 
@@ -166,14 +168,14 @@ class StateTests {
 
             trafficLight.printSummary()
 
-            run(10.0)
+            run(10.minutes)
 
             trafficLight.snapshot.waiters.size shouldBe 1
 
             // toggle state
             trafficLight.value = "green"
 
-            run(10.0)
+            run(10.minutes)
 
             trafficLight.printSummary()
 
@@ -186,7 +188,7 @@ class StateTests {
 
             car.printSummary()
 
-            run(10.0)
+            run(10.minutes)
 
             car.isWaiting shouldBe false
             car.isData shouldBe true
@@ -232,14 +234,14 @@ class StateTests {
 
             trafficLight.printSummary()
 
-            run(10.0)
+            run(10.minutes)
 
             trafficLight.snapshot.waiters.size shouldBe 1
 
             // toggle state
             trafficLight.value = "green"
 
-            run(10.0)
+            run(10.minutes)
 
             trafficLight.printSummary()
 

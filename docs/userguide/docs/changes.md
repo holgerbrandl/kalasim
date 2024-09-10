@@ -285,12 +285,12 @@ Major Enhancements
 ```kotlin
 // before
 object : Component() {
-    override fun process() = sequence { yield(hold(1.0)) }
+    override fun process() = sequence { yield(hold(1.minutes)) }
 }
 
 // now
 object : Component() {
-    override fun process() = sequence { hold(1.0) }
+    override fun process() = sequence { hold(1.hours) }
 }
 ```
 

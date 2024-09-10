@@ -20,6 +20,7 @@ import org.kalasim.test.captureOutput
 import org.koin.core.context.stopKoin
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.minutes
 
 
 class SalabimExampleTests {
@@ -34,7 +35,7 @@ class SalabimExampleTests {
             org.kalasim.examples.bank.oneclerk.CustomerGenerator()
         }
 
-        env.run(50.0)
+        env.run(50.minutes)
 
         val waitingLine: ComponentQueue<Customer> = env.get()
 
@@ -146,11 +147,11 @@ class SalabimExampleTests {
                 get()
 
             waitingLine.lengthOfStayStatistics.enabled = false
-            run(1500.0)
+            run(1500.minutes)
 
             waitingLine.lengthOfStayStatistics.enabled = true
 //            waitingLine.lengthOfStayMonitor.reset()
-            run(500.0)
+            run(500.minutes)
         }
 
         val waitingLine: ComponentQueue<Customer> = env.get<ComponentQueue<Customer>>()

@@ -41,7 +41,7 @@ fun main() {
         ComponentGenerator(uniform(5, 15)) { Customer(get()) }
     }
 
-    env.run(500.0)
+    env.run(500.minutes)
 
     env.get<ComponentQueue<Customer>>().apply {
         printSummary()

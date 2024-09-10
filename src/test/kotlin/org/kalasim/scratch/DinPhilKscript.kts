@@ -26,7 +26,7 @@ class Philosopher(name: String, val leftFork: Fork, val rightFork: Fork) : Compo
         while(true) {
             hold(thinking())
             request(leftFork) {
-                hold(0.1) // wait before taking the second fork
+                hold(0.minutes) // wait before taking the second fork
                 request(rightFork) {
                     hold(eating())
                     log("$name is eating")

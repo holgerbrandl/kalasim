@@ -92,10 +92,10 @@ fun main() {
         val waitingLine: ComponentQueue<Customer> = get()
 
         waitingLine.lengthOfStayStatistics.enabled = false
-        run(1500.0)
+        run(1500.minutes)
 
         waitingLine.lengthOfStayStatistics.enabled = true
-        run(500.0)
+        run(500.minutes)
 
         // with console
         waitingLine.lengthOfStayStatistics.printHistogram()
