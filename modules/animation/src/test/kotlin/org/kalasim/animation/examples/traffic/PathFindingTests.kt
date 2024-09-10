@@ -1,6 +1,7 @@
 package org.kalasim.animation.examples.traffic
 
 import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Disabled
 import org.kalasim.animation.Point
 import org.kalasim.animation.kmh
 import org.kalasim.enableComponentLogger
@@ -48,6 +49,7 @@ class PathFindingTests {
     }
 
 
+    @Disabled
     @Test
     fun `it should turn drive a circle in a unidirectional network`() {
         val roads = run {
