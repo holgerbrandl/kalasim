@@ -11,7 +11,6 @@ import kotlin.time.Duration.Companion.hours
 
 class JoinTests {
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should join processes at ease`() = createTestSimulation() {
         val c1 = object : Component() {
@@ -41,7 +40,7 @@ class JoinTests {
 
 
     @Test
-    fun `ìt should produced ships in the right order`() = testModel(Shipyard()) {
+    fun `it should produced ships in the right order`() = testModel(Shipyard()) {
         configureOrders()
         enableEventLog()
 

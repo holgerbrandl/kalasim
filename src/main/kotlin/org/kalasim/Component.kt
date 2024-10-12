@@ -107,6 +107,8 @@ open class TickedComponent(
 ) : Component(name, at, delay, priority, process, koin, trackingConfig) {
 
 
+    @AmbiguousDuration
+    @Deprecated("use typed version hold(kotlin.time.Duration) instead")
     /**
      * Hold the component.
      *

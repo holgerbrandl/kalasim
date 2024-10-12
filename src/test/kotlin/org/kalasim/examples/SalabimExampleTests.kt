@@ -1,4 +1,3 @@
-@file:OptIn(AmbiguousDuration::class)
 
 package org.kalasim.examples
 
@@ -14,12 +13,12 @@ import org.kalasim.*
 import org.kalasim.examples.bank.oneclerk.Clerk
 import org.kalasim.examples.bank.oneclerk.Customer
 import org.kalasim.examples.bank.reneging.CustomerGenerator
-import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.median
 import org.kalasim.test.captureOutput
 import org.koin.core.context.stopKoin
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 
@@ -211,17 +210,13 @@ class SalabimExampleTests {
             dependency { Resource("clerks", capacity = 3) }
 
             ComponentGenerator(
-                iat = UniformRealDistribution(
-                    rg,
-                    5.0,
-                    15.0
-                )
+                iat = uniform(5.0, 15.0).minutes
             ) {
                 org.kalasim.examples.bank.resources.Customer(get())
             }
         }
 
-        env.run(5000)
+        env.run(4.hours)
 
         val clerks = env.get<Resource>()
         clerks.apply {

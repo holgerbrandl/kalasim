@@ -1,6 +1,5 @@
 //Atm.kt
 
-@file:OptIn(AmbiguousDuration::class)
 
 import kotlinx.coroutines.*
 import krangl.cumSum
@@ -12,6 +11,8 @@ import org.jetbrains.kotlinx.dataframe.api.util.unfold
 import org.kalasim.*
 import org.kalasim.misc.*
 import org.kalasim.plot.kravis.display
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.days
 
 //https://youtrack.jetbrains.com/issue/KT-44062
 
@@ -43,9 +44,9 @@ fun main() {
             }
         }
 
-        ComponentGenerator(iat = exponential(lambda)) { Customer() }
+        ComponentGenerator(iat = exponential(lambda).minutes) { Customer() }
 
-        run(2000)
+        run(1.week)
 
         atm.occupancyTimeline.display()
         atm.requesters.queueLengthTimeline.display()
@@ -57,6 +58,7 @@ fun main() {
 
 // Classical WhatIf
 // Define simulation entities
+@Suppress("CanBeParameter")
 class AtmCustomer(
     val mu: Double,
     val atm: Resource,
@@ -74,7 +76,7 @@ class AtmQueue(val lambda: Double, val mu: Double) : Environment() {
     val atm = dependency { Resource("atm", 1) }
 
     init {
-        ComponentGenerator(iat = exponential(lambda)) {
+        ComponentGenerator(iat = exponential(lambda).minutes) {
             AtmCustomer(mu, atm)
         }
     }
@@ -91,7 +93,7 @@ object WhatIf {
 
         // run 100x times
         val atms = cartesianProduct(lambdas, mus).map { (lambda, mu) ->
-            AtmQueue(lambda, mu).apply { run(100) }
+            AtmQueue(lambda, mu).apply { run(10.days) }
         }
 
         atms.map {
@@ -103,6 +105,7 @@ object WhatIf {
     }
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 object PWhatIf {
     @JvmStatic
     fun main(args: Array<String>) {
@@ -124,7 +127,7 @@ object PWhatIf {
 
         // simulate in parallel
         atms.pmap {
-            it.run(100)
+            it.run(12.hours)
         }
 
         // extract stats and visualize
@@ -132,7 +135,7 @@ object PWhatIf {
 
         meanQLength.plot(x = { first.lambda }, y = { first.mu }, fill = { second })
             .geomTile()
-            .title("Mean ATM Queue Length vs Labmda and Mu")
-            .xLabel("Labmda").yLabel("Mu")
+            .title("Mean ATM Queue Length vs Lambda and Mu")
+            .xLabel("Lambda").yLabel("Mu")
     }
 }

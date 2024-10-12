@@ -31,10 +31,10 @@ createSimulation {
         }
     }
 
-    ComponentGenerator(uniform(0, 15)) { Passenger() }
+    ComponentGenerator(uniform(0, 15).minutes) { Passenger() }
         .addConsumer { fm.left2Right.add(it) }
 
-    ComponentGenerator(uniform(0, 12)) { Passenger() }
+    ComponentGenerator(uniform(0, 12).minutes) { Passenger() }
         .addConsumer { fm.right2Left.add(it) }
 
     run(10000.minutes)

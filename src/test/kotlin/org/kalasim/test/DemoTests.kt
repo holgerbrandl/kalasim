@@ -12,16 +12,15 @@ import org.kalasim.EventLog
 import org.kalasim.analysis.InteractionEvent
 import org.kalasim.enableEventLog
 import org.kalasim.examples.MM1Queue
-import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.plot.letsplot.display
+import kotlin.time.Duration.Companion.days
 
 
-@OptIn(AmbiguousDuration::class)
 fun main() {
     val mm1Queue = MM1Queue().apply {
         enableEventLog()
 
-        run(100)
+        run(10.days)
         server.claimedTimeline.display().show()
         server.requesters.lengthOfStayStatistics.display().show()
     }

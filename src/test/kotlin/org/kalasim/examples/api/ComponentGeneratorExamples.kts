@@ -33,5 +33,5 @@ createSimulation {
 
     // example 3 no-longer recommend:
     // inter-arrival distribution without duration unit
-    ComponentGenerator(uniform(3, 4)) { Customer(it) }
+    ComponentGenerator(uniform(3, 4).minutes) { Customer(it) }
 }

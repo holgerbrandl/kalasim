@@ -141,6 +141,14 @@ open class Environment(
     var now = startDate
         private set // no longer needed/wanted --> use run
 
+
+    /**
+     * Represents the current total runtime of this simulation environment.
+     * The value is computed as the difference between the current time `now` and the `startDate`.
+     */
+    val runtime
+        get() = now - startDate
+
     @Deprecated("use now instead", ReplaceWith("now"))
     val nowWT: Instant
         get() = now
@@ -290,6 +298,7 @@ open class Environment(
      * the priority. An event with a higher priority will be scheduled first.
      */
     @AmbiguousDuration
+    @Deprecated("Use type safe wrapper run(kotlin.time.Duration) instead")
     fun run(
         duration: Number?,
         priority: Priority = NORMAL

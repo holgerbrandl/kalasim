@@ -122,7 +122,6 @@ class RegularHonorPolicyTest {
         } shouldBe listOf(3, 4, 1, 5, 2, 6)  // note: this was fixated after the first run
     }
 
-    @OptIn(AmbiguousDuration::class, AmbiguousDurationComponent::class)
     @Test
     fun `it should honor huge request eventually when using weighted SQF`() =
         createTestSimulation(enableComponentLogger = false) {
@@ -130,21 +129,21 @@ class RegularHonorPolicyTest {
 
             dependency { lawyers }
 
-            val cg = ComponentGenerator(iat = exponential(6)) {
-                object : TickedComponent() {
+            val cg = ComponentGenerator(iat = exponential(6).days) {
+                object : Component() {
                     override fun process() = sequence {
                         request(lawyers) {
-                            hold(25)
+                            hold(25.days)
                         }
                     }
                 }
             }
 
             // refill the shelf after 5o ticks
-            object : TickedComponent("huge request") {
+            object : Component("huge request") {
                 override fun process() = sequence {
                     // wait for requests to gather
-                    hold(200)
+                    hold(200.days)
 
                     request(lawyers, quantity = 10) {
                         stopSimulation()
@@ -152,7 +151,7 @@ class RegularHonorPolicyTest {
                 }
             }
 
-            val runFor = 1000.minutes
+            val runFor = 1000.days
             run(runFor)
 
             println("num created ${cg.numGenerated}")

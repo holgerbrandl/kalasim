@@ -5,6 +5,7 @@ import org.apache.commons.math3.random.RandomGenerator
 import org.kalasim.misc.ImplementMe
 import org.kalasim.misc.asCMPairList
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -44,6 +45,24 @@ fun constant(value: Duration) = DurationDistribution(
     ConstantRealDistribution(value.toDouble(DurationUnit.SECONDS))
 )
 
+data class Rate(val eventsPerTimeunit: Number, val timeUnit :  TimeUnit = TimeUnit.SECONDS ){
+
+    val mean: Duration
+        get() {
+            val rateValue = eventsPerTimeunit.toDouble()
+            return if (rateValue != 0.0) {
+                // Convert the rate to the default time unit (seconds) and then find the inverse.
+                val timeInSeconds = timeUnit.toSeconds(1L).toDouble()
+                val periodInSeconds = timeInSeconds / rateValue
+                periodInSeconds.seconds
+            } else {
+                Duration.INFINITE // Handle the case when rate is zero to prevent division by zero
+            }
+        }
+
+}
+
+
 
 /**
  * Exponential distribution with built-in support for controlled-randomization.
@@ -51,6 +70,7 @@ fun constant(value: Duration) = DurationDistribution(
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
 fun SimContext.exponential(mean: Number) = ExponentialDistribution(env.rg, mean.toDouble())
+fun SimContext.exponential(rate: Rate) = ExponentialDistribution(env.rg, rate.mean.inSeconds).seconds
 
 /**
  * Exponential distribution with built-in support for controlled-randomization.

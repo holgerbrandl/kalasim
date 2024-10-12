@@ -1,10 +1,11 @@
 package org.kalasim.test
 
+import org.kalasim.day
 import org.kalasim.examples.MM1Queue
-import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.plot.letsplot.display
+import org.kalasim.week
+import org.kalasim.weeks
 
-@OptIn(AmbiguousDuration::class)
 fun main() {
     val mm1 = MM1Queue()
 
@@ -15,7 +16,7 @@ fun main() {
 //        tickUnit = DurationUnit.MINUTES
 //    )
 
-    mm1.run(50)
+    mm1.run(1.week)
 
 //    mm1.server.activities.display("MM1 Server Utilization").show()
 

@@ -86,7 +86,7 @@ class GasStation : Environment(enableComponentLogger = true) {
 
     init {
         // Generate new cars that arrive at the gas station.
-        ComponentGenerator(iat = with(INTER_ARRIVAL_TIME_RANGE) { uniform(first, last) }) { Car() }
+        ComponentGenerator(iat = with(INTER_ARRIVAL_TIME_RANGE) { uniform(first, last).minutes }) { Car() }
 
         //Periodically check the level of the *fuel_pump* and call the tank truck if the level falls below a threshold.
         object : Component("gas_station_control") {

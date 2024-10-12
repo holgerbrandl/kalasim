@@ -2,11 +2,10 @@
 package org.kalasim.examples.bank.reneging_state
 
 
-import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.kalasim.*
-import org.kalasim.misc.AmbiguousDuration
 import org.koin.core.component.inject
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.days
 
 
 //to inject use data class Counter(var value: Int)
@@ -15,6 +14,7 @@ var numReneged: Int = 0
 
 
 class Customer(val waitingLine: ComponentQueue<Customer>, val workToDo: State<Boolean>) : Component() {
+    @Suppress("unused")
     private val clerks: List<Clerk> by inject()
 
     override fun process() = sequence {
@@ -62,7 +62,6 @@ class Clerk(val workToDo: State<Boolean>) : Component() {
 }
 
 
-@AmbiguousDuration
 fun main() {
     val env = createSimulation {
         enableComponentLogger()
@@ -71,18 +70,18 @@ fun main() {
         dependency { ComponentQueue<Customer>("waitingline") }
         dependency { State(false, "worktodo") }
         dependency { (0..2).map { Clerk(get()) } }
+
+        // register other components to be present when starting the simulation
+        ComponentGenerator(iat = uniform(5.0, 15.0).minutes) {
+            Customer(get(), get())
+        }
     }
 
-    // register other components to be present when starting the simulation
-    ComponentGenerator(iat = UniformRealDistribution(env.rg, 5.0, 15.0)) {
-        val customer = Customer(get(), get())
-        customer
-    }
 
     val waitingLine: ComponentQueue<Customer> = env.get()
     val workToDo: State<Boolean> = env.get()
 
-    env.run(50000)
+    env.run(3.days)
 
     // with kravis
 //        waitingLine.queueLengthMonitor.display()

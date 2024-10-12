@@ -3,7 +3,7 @@ import org.kalasim.*
 import org.kalasim.analysis.InteractionEvent
 
 createSimulation {
-    ComponentGenerator(iat = constant(1)) { Component("Car.${it}") }
+    ComponentGenerator(iat = constant(1).days) { Component("Car.${it}") }
 
     // add custom log consumer
     addAsyncEventListener<InteractionEvent> { event ->
@@ -12,5 +12,5 @@ createSimulation {
     }
 
     // run the simulation
-    run(10)
+    run(10.weeks)
 }

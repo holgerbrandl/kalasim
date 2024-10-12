@@ -67,6 +67,7 @@ class CategoryTimeline<T>(
 
 
     @AmbiguousDuration
+    @Deprecated("use get(SimTime) instead")
     override fun get(time: Number): T? = get(env.asSimTime(time))
 
     override fun get(time: SimTime): T? {

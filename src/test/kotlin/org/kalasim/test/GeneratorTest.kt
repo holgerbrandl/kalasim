@@ -74,19 +74,18 @@ class GeneratorTest {
                 ?.key shouldBe 8.0.plusOrMinus(0.1)
         }
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should allow to stop a generator from inside`() = createTestSimulation {
-        val cg = ComponentGenerator(iat = constant(1), keepHistory = true) { it.toString() }
+        val cg = ComponentGenerator(iat = constant(1).days, keepHistory = true) { it.toString() }
 
-        run(10)
+        run(10.days)
 
         cg.addConsumer { cg.cancel() }
 
-        run(3)
+        run(3.days)
 
         cg.addConsumer { fail() }
 
-        run(10)
+        run(10.days)
     }
 }

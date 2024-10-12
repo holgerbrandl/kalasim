@@ -5,10 +5,8 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.kalasim.*
-import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.createTestSimulation
 import kotlin.test.fail
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 class StateTests {
@@ -39,7 +37,6 @@ class StateTests {
 //        StateRequest(State(3.0)) { it*3 < 42 }
     }
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should wait until a predicate is met`() {
 
@@ -87,7 +84,6 @@ class StateTests {
 
     private enum class TestColor { RED, GREEN }
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it trigger once and keep the other waiters`() {
         captureOutput {
@@ -112,9 +108,9 @@ class StateTests {
                     }
                 }
 
-                run(1)
+                run(1.minute)
                 state.trigger(TestColor.GREEN, max = 1)
-                run(1)
+                run(1.minute)
 
                 wasAStarted shouldBe true
                 wasBHonored shouldBe true
@@ -139,7 +135,6 @@ class StateTests {
         """.trimIndent()
     }
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should wait until multiple predicates are honored`() {
 
@@ -152,6 +147,7 @@ class StateTests {
             val engine = get<Engine>()
 
             override fun process() = sequence {
+                @Suppress("RedundantValueArgument")
                 wait(trafficLight turns "green", engine turns true, all = true)
                 log("passing crossing")
 //                terminate()
@@ -199,7 +195,6 @@ class StateTests {
     }
 
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     @Disabled("Because its unclear how to do this nicely. The workaround it to use named koin-entities")
     // https://kotlinlang.slack.com/archives/C67HDJZ2N/p1607195460178600
@@ -214,6 +209,7 @@ class StateTests {
             val engine = get<State<Boolean>>()
 
             override fun process() = sequence {
+                @Suppress("RedundantValueArgument")
                 wait(trafficLight turns "green", engine turns true, all = true)
                 log("passing crossing")
 //                terminate()

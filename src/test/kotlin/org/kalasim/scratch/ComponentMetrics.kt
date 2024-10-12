@@ -3,8 +3,12 @@ package org.kalasim.scratch
 import org.jetbrains.kotlinx.dataframe.api.print
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
 import org.kalasim.*
+import org.kalasim.hours
 import org.kalasim.monitors.printConsole
 import org.kalasim.plot.kravis.display
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.hours
 
 fun main() {
     createSimulation {
@@ -13,34 +17,37 @@ fun main() {
         val fuelPump = Resource("tank", capacity = 3)
         val refilPermitted = State(false)
 
-        object : TickedComponent("refillController") {
+        object : Component("refillController") {
             override fun process() =
                 sequence {
                     while(true) {
-                        hold(uniform(0, 10)())
+                        val uniform = uniform(0, 10).seconds
+
+                        hold(uniform())
                         refilPermitted.value = true
-                        hold(uniform(0, 10)())
+                        hold(uniform())
                         refilPermitted.value = false
                     }
                 }
         }
 
-        class Vehicle : TickedComponent() {
-            val uni = uniform(0, 10)
+        class Vehicle : Component() {
+            val uni = uniform(0, 10).seconds
 
             override fun process() =
                 sequence {
                     hold(uni())
                     wait(refilPermitted, true)
+
                     request(fuelPump) {
-                        hold(3)
+                        hold(3.minutes)
                     }
                 }
         }
 
-        val cg = ComponentGenerator(exponential(1), keepHistory = true) { Vehicle() }
+        val cg = ComponentGenerator(exponential(1).seconds, keepHistory = true) { Vehicle() }
 
-        run(1000)
+        run(5.hours)
 
         //gather arrival data
         val pStats: List<ComponentLifecycleRecord> = cg.history.map { it.toLifeCycleRecord() }

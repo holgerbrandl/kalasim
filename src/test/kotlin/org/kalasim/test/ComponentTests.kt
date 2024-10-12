@@ -1,5 +1,3 @@
-@file:OptIn(AmbiguousDuration::class)
-
 package org.kalasim.test
 
 import io.kotest.assertions.throwables.shouldThrow
@@ -152,7 +150,7 @@ class ComponentTests {
         val c = Component()
 //        object : Component(){}
 
-        run(20)
+        run(20.minutes)
 
         c.componentState shouldBe DATA
     }
@@ -225,7 +223,7 @@ class ComponentTests {
 
             run()
 
-            now shouldBe asSimTime(1)
+            runtime shouldBe 1.day
 
             // activate sub-process
             mp.activate(process = MultiProcessor::subProcess1)
@@ -258,7 +256,8 @@ class ComponentTests {
 
         run()
 
-        now shouldBe asSimTime(3)
+        runtime shouldBe 3.days
+
         mp.sp1Started shouldBe true
     }
 
@@ -337,16 +336,13 @@ class ComponentTests {
 
         val tc = enableEventLog()
 
-        run(10)
+        run(10.minutes)
 
         tc.events.apply {
             size shouldBe 2
             last().shouldBeInstanceOf<InteractionEvent>()
             (last() as InteractionEvent).action shouldBe "work done"
         }
-
-//        InternalMetricsTrackingDefaults.enab()
-
     }
 
 
@@ -360,7 +356,7 @@ class ComponentTests {
         }
 
         shouldThrow<IllegalArgumentException> {
-            run(5)
+            run(5.minutes)
         }
     }
 
@@ -391,29 +387,27 @@ class ComponentTests {
     @Test
     fun `it should preserve process definition after being data`() = createTestSimulation {
         // note: regression test, because initially broken
-        @Suppress("UNUSED_VARIABLE") val salabimTwin = """
-            import salabim as sim
-
-
-            class Customer(sim.Component):
-                def process(self):
-                    print("huhu")
-
-
-            env = sim.Environment(trace=True)
-
-            c = Customer()
-
-            env.run(till=1)
-
-            c.activate()
-        """
+        // same logic in salabim
+//            import salabim as sim
+//
+//            class Customer(sim.Component):
+//                def process(self):
+//                    print("huhu")
+//
+//
+//            env = sim.Environment(trace=True)
+//
+//            c = Customer()
+//
+//            env.run(till=1)
+//
+//            c.activate()
 
         val c = NoOpComponent("foo")
 
-        run(1)
+        run(1.minute)
         c.activate()
-        run(1)
+        run(1.minute)
     }
 
 
@@ -493,7 +487,7 @@ class ComponentTests {
                 passivate()
             }
         }
-        run(1)
+        run(1.minute)
 
 
         object : TickedComponent("interrupter") {
@@ -507,7 +501,7 @@ class ComponentTests {
             }
         }
 
-        run(10)
+        run(10.minutes)
 
         tool.isPassive shouldBe true
     }
@@ -536,7 +530,7 @@ class ComponentTests {
 
         val tc = EventLog().apply { addEventListener(this) }
 
-        run(20)
+        run(20.minutes)
 
         (tc[4] as InteractionEvent).component!!.name shouldBe "other"
     }
@@ -602,6 +596,7 @@ class ComponentTests {
                 hadBreak = true
             }
 
+            @Suppress("unused")
             fun foo() = ""
         }
 

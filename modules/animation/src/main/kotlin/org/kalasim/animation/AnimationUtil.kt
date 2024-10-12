@@ -4,11 +4,11 @@ import kotlinx.coroutines.*
 import kotlinx.datetime.*
 import org.kalasim.*
 import org.kalasim.logistics.Rectangle
-import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.DependencyContext
 import org.openrndr.math.Vector2
 import java.awt.geom.Point2D
 import java.time.format.DateTimeFormatter
+import kotlin.time.Duration
 
 
 fun <T : Environment> T.startSimulation(speedUp: Double = 1.0, smoothness: Int = 100) {
@@ -84,20 +84,20 @@ fun <T> cmeGuard(function: () -> List<T>): List<T> {
 }
 
 
-class AsyncAnimationStop(val rate: Double = 1.0) : Component() {
+
+class AsyncAnimationStop(val samplingDuration: Duration  = 1.minute) : Component() {
     private var stop = false
 
     fun stop() {
         stop = true
     }
 
-    @OptIn(AmbiguousDuration::class)
     override fun repeatedProcess() = sequence {
         if(stop) {
             stopSimulation()
         }
 
-        hold(env.asDuration(1 / rate))
+        hold(samplingDuration)
     }
 }
 

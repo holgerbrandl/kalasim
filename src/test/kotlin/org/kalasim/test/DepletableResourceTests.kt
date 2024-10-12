@@ -7,7 +7,6 @@ import io.kotest.matchers.doubles.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.kalasim.*
-import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.createTestSimulation
 import kotlin.time.Duration.Companion.minutes
 
@@ -103,7 +102,6 @@ class DepletableResourceTests {
     }
 
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it allow filling and emptying from 0 to capacity limit`() = createTestSimulation {
         val gasSupply = DepletableResource(capacity = 100, initialLevel = 0)
@@ -131,9 +129,9 @@ class DepletableResourceTests {
             }
         }
 
-        val cg = ComponentGenerator(iat = exponential(10), keepHistory = true) { Car(tankSize()) }
+        val cg = ComponentGenerator(iat = exponential(10).minutes, keepHistory = true) { Car(tankSize()) }
 
-        run(1000)
+        run(3.weeks)
 
         with(gasSupply) {
             claimers.size shouldBe 0
@@ -174,7 +172,6 @@ class DepletableResourceTests {
     }
 
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should ensure that a level increase is stalled until capacity becomes available`() =
         createTestSimulation {
@@ -191,9 +188,9 @@ class DepletableResourceTests {
                 }
             }
 
-            run(20)
+            run(20.minutes)
             dp.capacity = 500.0
-            run(1)
+            run(1.minutes)
 
             queue shouldNotContain c
         }
@@ -230,7 +227,6 @@ class DepletableResourceTests {
     }
 
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should respect queue priorities when restoring resource`() = createTestSimulation {
         val resource = DepletableResource(capacity = 10, initialLevel = 7)
@@ -262,7 +258,7 @@ class DepletableResourceTests {
             }
         }
 
-        run(10)
+        run(10.minutes)
 
         normalPutHonored shouldBe false
         prioPutHonored shouldBe true

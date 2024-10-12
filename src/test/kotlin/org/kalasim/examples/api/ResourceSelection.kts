@@ -23,6 +23,6 @@ createSimulation {
         }
     }
 
-    ComponentGenerator(exponential(1)) { Patient() }
+    ComponentGenerator(exponential(1).minutes) { Patient() }
     run(100)
 }

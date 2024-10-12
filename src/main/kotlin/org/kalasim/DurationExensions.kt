@@ -5,14 +5,20 @@ package org.kalasim
 import kotlin.time.*
 
 
-public inline val Int.minute get() = toDuration(DurationUnit.MINUTES)
-public inline val Long.minute get() = toDuration(DurationUnit.MINUTES)
+inline val Int.minute get() = toDuration(DurationUnit.MINUTES)
+inline val Long.minute get() = toDuration(DurationUnit.MINUTES)
 
-public inline val Int.hour get() = toDuration(DurationUnit.HOURS)
-public inline val Long.hour get() = toDuration(DurationUnit.HOURS)
+inline val Int.hour get() = toDuration(DurationUnit.HOURS)
+inline val Long.hour get() = toDuration(DurationUnit.HOURS)
 
-public inline val Int.day get() = toDuration(DurationUnit.DAYS)
-public inline val Long.day get() = toDuration(DurationUnit.DAYS)
+inline val Int.day get() = toDuration(DurationUnit.DAYS)
+inline val Long.day get() = toDuration(DurationUnit.DAYS)
+
+// also add week for convenience
+inline val Int.weeks get() = times(7).toDuration(DurationUnit.DAYS)
+
+inline val Int.week get() = toDuration(DurationUnit.DAYS)
+inline val Long.week get() = toDuration(DurationUnit.DAYS)
 
 //typealias days = kotlin.time.Duration.Companion.
 
@@ -39,4 +45,3 @@ internal val Duration.inSeconds
     get() = toDouble(DurationUnit.SECONDS)
 
 
-public inline val Int.weeks get() = times(7).toDuration(DurationUnit.DAYS)

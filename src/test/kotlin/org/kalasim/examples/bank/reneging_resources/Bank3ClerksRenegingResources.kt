@@ -34,11 +34,11 @@ class Customer(val clerks: Resource) : Component() {
 }
 
 fun main() {
-    declareDependencies {
+    createSimulation {
         dependency { Resource("clerks", capacity = 3) }
-    }.createSimulation {
+
         // register other components to  be present when starting the simulation
-        ComponentGenerator(iat = uniform(5.0, 15.0)) {
+        ComponentGenerator(iat = uniform(5.0, 15.0).minutes) {
             Customer(get())
         }
 

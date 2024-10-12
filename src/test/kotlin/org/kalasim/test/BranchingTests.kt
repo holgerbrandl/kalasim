@@ -1,4 +1,3 @@
-@file:OptIn(AmbiguousDuration::class)
 
 package org.kalasim.test
 
@@ -7,8 +6,8 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.kalasim.Component
 import org.kalasim.State
-import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.createTestSimulation
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -57,7 +56,7 @@ class BranchingTests {
     fun `it should evolve a branch independently from the callee`() = createTestSimulation {
         val tool = Tool()
 
-        run(300)
+        run(6.hours)
 
         tool.isData shouldBe true
 

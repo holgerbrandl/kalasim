@@ -9,7 +9,6 @@ import io.kotest.matchers.types.beInstanceOf
 import kotlinx.datetime.Instant
 import krangl.cumSum
 import krangl.mean
-import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.kalasim.*
@@ -93,12 +92,11 @@ class EnvTests {
         holdCounter shouldBe 4
     }
 
-    @AmbiguousDuration
     @Test
     fun `it should run be possible to run an old koin-context`() {
 
         // Note: make sure that we need DI during execution
-        class TestResource(resource: Resource) : Component()
+        class TestResource(@Suppress("unused") resource: Resource) : Component()
 
         val env1 = Environment().apply {
             Component()
@@ -109,12 +107,11 @@ class EnvTests {
 
             State(false)
             ComponentQueue<Component>()
-            ComponentGenerator(iat = UniformRealDistribution()) { TestResource(getKoin().get()) }
+            ComponentGenerator(iat = uniform().days) { TestResource(getKoin().get()) }
 
-            run(1)
+            run(1.minute)
         }
 
-        println("setting up second simulation environment")
         val env2 = Environment().apply {
             Component()
 
@@ -124,9 +121,9 @@ class EnvTests {
             State(false)
 
             ComponentQueue<Component>()
-            ComponentGenerator(iat = UniformRealDistribution()) { TestResource(getKoin().get()) }
+            ComponentGenerator(iat = uniform().days) { TestResource(getKoin().get()) }
 
-            run(1)
+            run(1.minute)
         }
 
         println("continuing env1...")
@@ -134,7 +131,8 @@ class EnvTests {
 
         env1.addEventListener { println(it) }
 //        shouldThrow<IllegalStateException> {
-        env1.run(10)
+        env1.run(10.minutes)
+
         env1.apply {
             LateArriver(getKoin())
         }
@@ -148,7 +146,6 @@ class EnvTests {
     }
 
 
-    @AmbiguousDuration
     @Test
     fun `it should consume events asynchronously`() = createTestSimulation {
         ComponentGenerator(iat = constant(5).minutes) { Component("Car.${it}") }
@@ -177,7 +174,7 @@ class EnvTests {
 
         consumed shouldBe true
 
-        // technically not needed here, but enabled for sake of test caverage
+        // technically not needed here, but enabled for sake of test coverage
         asyncListener.stop()
     }
 
@@ -190,7 +187,7 @@ class EnvTests {
 
             ClockSync(500.milliseconds)
 
-            run(10)
+            run(10.minutes)
         }
 
         (System.currentTimeMillis() - timeBefore) / 1000.0 shouldBe 5.0.plusOrMinus(1.0)
@@ -198,12 +195,12 @@ class EnvTests {
 
     @Test
     fun `it should log bus metrics`() {
-        lateinit var sim : Environment
+        lateinit var sim: Environment
 
         val creationOutput = captureOutput {
             sim = EmergencyRoom(tickDurationUnit = DurationUnit.MINUTES, enableInternalMetrics = true).apply {
                 // add mus metrics monitoring
-               dependency { BusMetrics(timelineInterval = 10.minutes, walltimeInterval = 7.seconds)}
+                dependency { BusMetrics(timelineInterval = 10.minutes, walltimeInterval = 7.seconds) }
 
                 // configure a down-takting
                 ClockSync(500.milliseconds)
@@ -214,7 +211,7 @@ class EnvTests {
 
 
         val runOutput = captureOutput {
-           sim.run(30.minutes)
+            sim.run(30.minutes)
         }
 
         runOutput.stdout shouldBeDiff """
@@ -249,9 +246,9 @@ class EnvTests {
         // it's an important part of the spec if scheduled tasks at the end of the run() interval are executed or not
         // That's why we hardcode this behavior in a test
 
-        var afterHour= false
+        var afterHour = false
 
-        object : Component(){
+        object : Component() {
             override fun process() = sequence {
                 hold(60.minutes)
                 afterHour = true
@@ -263,19 +260,19 @@ class EnvTests {
         afterHour shouldBe true
     }
 
-    @OptIn(AmbiguousDuration::class)
+
     @Test
     fun `it should allow collecting events by type`() = createTestSimulation {
         ClockSync(500.milliseconds)
 
         val creations = collect<EntityCreatedEvent>()
-        val cg = ComponentGenerator(exponential(1), total = 10) { Component() }
+        val cg = ComponentGenerator(exponential(1).minutes, total = 10) { Component() }
 
         // also check the filter works
-        val creations2 = collect<EntityCreatedEvent> { it.time < 3.asSimTime() }
+        val creations2 = collect<EntityCreatedEvent> { it.time < startDate + 3.minutes }
 
 
-        run(10)
+        run(10.minutes)
 
         creations.size shouldBe (cg.total + 1) // +1 because of main
 
@@ -351,7 +348,7 @@ class EnvTests {
             }
 
             run(until = null as Instant?)
-            nowTT shouldBe 10.tt
+            runtime shouldBe 10.minutes
 
             cc.size shouldBe 1
         }
@@ -359,29 +356,27 @@ class EnvTests {
 
     @Test
     fun `it should allow to use custom duration units`() {
-        val environment = Environment(tickDurationUnit = DurationUnit.DAYS)
+        val env = Environment(tickDurationUnit = DurationUnit.DAYS)
 
-        environment.run(4.days)
+        env.run(4.days)
 
-        environment.nowTT shouldBe 4.tt
+        env.runtime shouldBe 4.days
     }
 
-    @AmbiguousDuration
     @Test
     fun `it should run until or duration until has reached`() {
         createSimulation {
-            run(until = env.asSimTime(10))
-            nowTT shouldBe 10.tt
+            run(until = now + 10.minutes)
+            runtime shouldBe 10.minutes
         }
 
         createSimulation {
-            run(duration = 5)
-            run(duration = 5)
-            now shouldBe asSimTime(10)
+            run(duration = 5.minutes)
+            run(duration = 5.minutes)
+            now shouldBe startDate + 10.minutes
         }
     }
 
-    @AmbiguousDuration
     @Test
     fun `it should restore koin in before running sims in parallel`() {
         class QueueCustomer(mu: Double, val atm: Resource) : Component() {
@@ -395,7 +390,8 @@ class EnvTests {
         }
 
         class Queue(lambda: Double, val mu: Double) : Environment() {
-            val atm = dependency { Resource("atm", 1) }
+            @Suppress("RedundantValueArgument")
+            val atm = dependency { Resource("atm", capacity = 1) }
 
             init {
                 ComponentGenerator(iat = exponential(lambda.minutes)) {
@@ -412,7 +408,7 @@ class EnvTests {
         }
 
         // simulate in parallel
-        atms.fastMap { it.run(100) }
+        atms.fastMap { it.run(100.minutes) }
 
         // to average over all configs does not make much sense conceptually, but allows to test for regressions
         val meanQLength = atms.map { it.get<Resource>().statistics.requesters.lengthStats.mean!! }.mean()
@@ -592,7 +588,6 @@ class CustomKoinModuleTests {
         now shouldBeGreaterThan koin.get<Tester>().created
     }
 
-    @AmbiguousDuration
     @Test
     fun `it should create components on simulation start`() {
         createSimulation {

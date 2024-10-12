@@ -7,6 +7,8 @@ import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.AmbiguousDurationComponent
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.time.DurationUnit
 
 /**
  * An implementation of an MM1 queue, see https://en.wikipedia.org/wiki/M/M/1_queue, which
@@ -26,7 +28,8 @@ class MM1Queue(
 open class MMcQueue(
     c: Int = 1,
     lambda: Number = 5,
-    mu: Number = 10
+    mu: Number = 10,
+    durationUnit : DurationUnit = DurationUnit.SECONDS
 ) : Environment() {
 
     val server: Resource
@@ -57,7 +60,7 @@ open class MMcQueue(
 
         server = dependency { Resource("server", c) }
 
-        componentGenerator = ComponentGenerator(iat = exponential(lambda), keepHistory = true) {
+        componentGenerator = ComponentGenerator(iat = exponential(lambda).minutes, keepHistory = true) {
             Customer(mu)
         }
     }

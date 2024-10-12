@@ -6,12 +6,12 @@ import io.kotest.matchers.shouldBe
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.apache.commons.math3.stat.descriptive.StatisticalSummaryValues
 import org.junit.jupiter.api.Test
+import org.kalasim.hour
 import org.kalasim.misc.*
 import org.kalasim.monitors.*
 import org.kalasim.test.MonitorTests.Car.*
 import kotlin.time.Duration.Companion.minutes
 
-@OptIn(AmbiguousDuration::class)
 class MonitorTests {
 
     private enum class Car {
@@ -102,12 +102,12 @@ class MonitorTests {
     fun `it should correctly calculate numeric level stats`() = createTestSimulation {
         val nlm = IntTimeline()
 
-        run(2)
+        run(2.minutes)
         nlm.addValue(2)
 
-        run(2)
+        run(2.minutes)
         nlm.addValue(6)
-        run(4)
+        run(4.minutes)
 
 //            expected value (2*0 + 2*2 + 4*6)/8
         nlm.statistics().mean shouldBe 3.5.plusOrMinus(.1)
@@ -123,12 +123,12 @@ class MonitorTests {
         createTestSimulation {
             val nlm = IntTimeline()
 
-            run(2)
+            run(2.minutes)
             nlm.addValue(2)
 
-            run(2)
+            run(2.minutes)
             nlm.addValue(6)
-            run(4)
+            run(4.minutes)
 
 
             // first we try a get that should fail because it precedes simulation start
@@ -146,17 +146,17 @@ class MonitorTests {
         createTestSimulation {
             val nlm = CategoryTimeline("foo")
 
-            run(2)
+            run(2.minutes)
             nlm.addValue("bar")
 
-            run(2)
+            run(2.minutes)
             nlm.addValue("kalasim")
-            run(4)
+            run(4.minutes)
 
 
             // first we try a get that should fail because it precedes simulation start
             shouldThrow<java.lang.IllegalArgumentException> {
-                nlm[-1.0]
+                nlm[startDate - 1.hour]
             }
 
             // now we try to get a value for `now`
@@ -167,12 +167,12 @@ class MonitorTests {
     fun `it should correctly calculate numeric  stats`() = createTestSimulation {
         val nsm = NumericStatisticMonitor()
 
-        run(2)
+        run(2.minutes)
         nsm.addValue(2)
 
-        run(2)
+        run(2.minutes)
         nsm.addValue(6)
-        run(4)
+        run(4.minutes)
 
         nsm.statistics().mean shouldBe 4.0
     }
@@ -204,7 +204,6 @@ class MonitorTests {
 
 
 /* Test the monitors can be merged. */
-@OptIn(org.kalasim.misc.AmbiguousDuration::class)
 class MergeTimelineTests {
 
     @Test

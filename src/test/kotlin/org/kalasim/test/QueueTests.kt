@@ -7,12 +7,12 @@ import org.kalasim.*
 import org.kalasim.ComponentState.DATA
 import org.kalasim.Priority.Companion.IMPORTANT
 import org.kalasim.analysis.InteractionEvent
-import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.createTestSimulation
 import kotlin.math.roundToInt
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.days
 
 @Suppress("OPT_IN_USAGE")
 class QueueTests {
@@ -43,8 +43,9 @@ class QueueTests {
             override fun process() = sequence {
                 while(waitingLine.isNotEmpty()) {
                     waitingLine.poll()
+
                     // wait for it...
-                    hold(5.0)
+                    hold(5.minutes)
                 }
 
                 passivate()
@@ -99,7 +100,7 @@ class QueueTests {
             queue.first() shouldBe c1
             queue.last() shouldBe c2
 
-            run(10)
+            run(10.minutes)
 
             tc.events.filterIsInstance<InteractionEvent>()
                 .filter { it.action == "Ended" }
@@ -113,7 +114,7 @@ class QueueTests {
         createSimulation {
             enableComponentLogger()
 
-            // to make sure that the component methods are auto-scheduled we need to overrride them
+            // to make sure that the component methods are auto-scheduled we need to override them
 //            class TestComponent(name:String, at: Number, priority: Priority = NORMAL): Component(name, priority = priority){
 //                override fun process(): Sequence<Component> = super.process()
 //            }
@@ -124,50 +125,48 @@ class QueueTests {
             val c2 = object : Component("comp2", at = startDate + 3.minutes, priority = IMPORTANT) {
                 override fun process() = sequence<Component> {}
             }
-            val tc = EventLog().also { addEventListener(it) }
-
+//            val tc = EventLog().also { addEventListener(it) }
 
             queue.first() shouldBe c2
             queue.last() shouldBe c1
 
-            run(10)
+            run(10.minutes)
         }
     }
 
 
     @Test
-    fun `it should correctly calculate inversed iat`() = createTestSimulation {
-        run(5)
+    fun `it should correctly calculate inverse iat`() = createTestSimulation {
+        run(5.minutes)
         val inverseIat = inversedIatDist(6, 7, 9)
 
-        run(inverseIat())
+        run(inverseIat().minutes)
         now shouldBe asSimTime(6)
 
-        run(inverseIat())
+        run(inverseIat().minutes)
         now shouldBe asSimTime(7)
 
-        run(inverseIat())
+        run(inverseIat().minutes)
         now shouldBe asSimTime(9)
 
-        // since the underying iterator is exhausted now, we expect an exception
+        // since the underlying iterator is exhausted now, we expect an exception
         shouldThrow<NoSuchElementException> {
             inverseIat()
         }
     }
 
     @Test
-    fun `it should correctly generate using inversed iat`() = createTestSimulation {
+    fun `it should correctly generate using inverse iat`() = createTestSimulation {
         val arrivalsTimes = listOf(6, 7, 9)
-        val inverseIat = inversedIatDist(*arrivalsTimes.toTypedArray())
+        val inverseIat = inversedIatDist(*arrivalsTimes.toTypedArray()).minutes
 
         val generated = mutableListOf<Component>()
         ComponentGenerator(inverseIat) { Component() }.addConsumer { generated.add(it) }
 
-        run(20)
+        run(20.minutes)
         generated.map { it.creationTime.toTickTime().value.roundToInt() } shouldBe arrivalsTimes
     }
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should form batches`() = createTestSimulation {
         // see ferryman.md
@@ -189,10 +188,10 @@ class QueueTests {
             }
         }
 
-        ComponentGenerator(inversedIatDist(1, 4, 5, 8, 21, 25)) { Passenger() }
+        ComponentGenerator(inversedIatDist(1, 4, 5, 8, 21, 25).minutes) { Passenger() }
             .addConsumer { fm.waitingLine.add(it) }
 
-        run(100)
+        run(2.days)
 
         fm.componentState shouldBe DATA
     }
@@ -211,10 +210,10 @@ class QueueTests {
             }
         }
 
-        ComponentGenerator(inversedIatDist(1, 4, 5, 50, 60, 70)) { Passenger() }
+        ComponentGenerator(inversedIatDist(1, 4, 5, 50, 60, 70).minutes) { Passenger() }
             .addConsumer { fm.waitingLine.add(it) }
 
-        run(55)
+        run(1.hour)
 
         fm.componentState shouldBe DATA
     }

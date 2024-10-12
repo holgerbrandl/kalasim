@@ -19,6 +19,7 @@ import kotlin.repeat
 import kotlin.test.fail
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
 @OptIn(AmbiguousDurationComponent::class)
@@ -63,7 +64,6 @@ class ResourceTests {
         }
     }
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should release resourced when terminating`() = createTestSimulation {
 
@@ -81,12 +81,12 @@ class ResourceTests {
             }
         }
 
-        run(10)
+        run(10.minutes)
 
         resource.claimers.size shouldBe 0
     }
 
-    @OptIn(AmbiguousDuration::class)
+
     @Test
     fun `preemptive resources should bump components depending on priority`() = createTestSimulation {
 
@@ -97,14 +97,14 @@ class ResourceTests {
 
         class BumpComponent(
             name: String,
-            val preRequestHold: Int,
-            val postRequestHold: Int,
+            val preRequestHours: Int,
+            val postRequestHours: Int,
             val requestPriority: Int? = null,
             val failOnBump: Boolean = false
-        ) : TickedComponent(name) {
+        ) : Component(name) {
 
             override fun process() = sequence {
-                hold(preRequestHold)
+                hold(preRequestHours.hours)
 
                 if(requestPriority != null) {
                     request(resource withPriority requestPriority)
@@ -112,7 +112,7 @@ class ResourceTests {
                     request(resource)
                 }
 
-                hold(postRequestHold)
+                hold(postRequestHours.hours)
 
                 if(isBumped(resource)) {
                     log("got bumped from $resource")
@@ -130,7 +130,7 @@ class ResourceTests {
         val hpTool = BumpComponent("high-prio tool", 11, 5, requestPriority = 3)
         val hpTool2 = BumpComponent("high-prio tool 2", 12, 5, requestPriority = 3)
 
-        run(10)
+        run(9.hours)
 
         // it should have auto-release the resource by now
         resource.claimers.size shouldBe 1
@@ -138,7 +138,7 @@ class ResourceTests {
         lpTool.isData shouldBe true
         TestUtil.requests(lpTool).shouldBeEmpty()
 
-        run(5)
+        run(6.hours)
 
         // at this point hp-tool should have bumped mpTool
         mpTool.isBumped(resource) shouldBe true
@@ -151,7 +151,7 @@ class ResourceTests {
         resource.claimers.contains(hpTool) shouldBe true
 
 
-        run(5)
+        run(5.hours)
         hpTool.isData shouldBe true
         hpTool2.isScheduled shouldBe true
 
@@ -183,7 +183,7 @@ class ResourceTests {
         bc2.isRequesting shouldBe true
     }
 
-    @OptIn(AmbiguousDuration::class)
+
     @Test
     fun `it should not bump regular non-preemptive resources`() = createTestSimulation {
         val r = Resource()
@@ -200,7 +200,7 @@ class ResourceTests {
         val bc1 = BumpComponent()
         val bc2 = BumpComponent()
 
-        run(8)
+        run(8.minutes)
 
         bc1.isData shouldBe true
         bc2.isScheduled shouldBe true
@@ -291,7 +291,7 @@ class ResourceTests {
     }
 
 
-    @OptIn(AmbiguousDuration::class)
+
     @Test
     fun `it should reevaluate requests upon capacity changes`() {
 
@@ -314,10 +314,10 @@ class ResourceTests {
 
             val customer = Customer(clerk)
 
-            run(8)
+            run(8.minutes)
             clerk.capacity = 1.0
 
-            run(10)
+            run(10.minutes)
             customer.activate()
 
 //            sequence<Component>{
@@ -326,7 +326,7 @@ class ResourceTests {
 //                }
 //            }.toList()
 
-            run(10)
+            run(10.minutes)
 
             // how long was the component in passive state
             customer.stateTimeline.printHistogram()
@@ -336,7 +336,7 @@ class ResourceTests {
         }
     }
 
-    @OptIn(AmbiguousDuration::class)
+
     @Test
     fun `it should auto-release resources in builder`() {
 
@@ -357,7 +357,7 @@ class ResourceTests {
 
             println(toString())
 
-            run(5)
+            run(5.minutes)
 
             println(toString())
 
@@ -366,7 +366,7 @@ class ResourceTests {
         }
     }
 
-    @OptIn(AmbiguousDuration::class)
+
     @Test
     fun `it should report correct resource in honor block when using oneOf mode`() = createTestSimulation {
         val r1 = Resource(capacity = 3)
@@ -390,12 +390,12 @@ class ResourceTests {
             }
         }
 
-        run(1)
+        run(1.minutes)
 
         honorBlockReached shouldBe true
     }
 
-    @OptIn(AmbiguousDuration::class)
+
     @Test
     fun `it should be possible to use nested requests on the same resource`() = createTestSimulation {
         val r1 = Resource(capacity = 4)
@@ -412,15 +412,18 @@ class ResourceTests {
                         r1.claimers.size shouldBe 1
                     }
 
-                    r1.claimed shouldBe 0
+                    r1.claimed shouldBe 1
                 }
+
+                //outside of the request scope, the resource shall not be claimed
+                r1.claimed shouldBe 0
             }
         }
 
-        run(1)
+        run(1.minutes)
     }
 
-    @OptIn(AmbiguousDuration::class)
+
     @Test
     fun `it should track request scoped activities`() = createTestSimulation(Instant.parse("2021-01-01T00:00:00.00Z")) {
         val r1 = Resource(capacity = 4)
@@ -452,7 +455,7 @@ class ResourceTests {
             }
         }
 
-        run(10)
+        run(10.minutes)
 
         r1.activities.apply {
             size shouldBe 1
@@ -475,14 +478,15 @@ class ResourceTests {
     }
 
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should correctly set failed after timeout`() {
 
         createSimulation {
             enableComponentLogger()
 
+            @Suppress("RedundantValueArgument")
             val r = Resource(capacity = 1)
+            @Suppress("RedundantValueArgument")
             val dr = Resource(capacity = 1)
 
             val c = object : Component() {
@@ -509,7 +513,7 @@ class ResourceTests {
                 }
             }
 
-            run(5)
+            run(5.minutes)
 
             println(toString())
 
@@ -552,7 +556,7 @@ class ResourceTests {
 }
 
 class ResourceSelectionTests {
-    @OptIn(AmbiguousDuration::class)
+
     @Test
     fun `it should allow to select with FIRST_AVAILBLE`() = createTestSimulation {
         val resources = List(3) { Resource().apply { capacity = 0.0 } }
@@ -564,12 +568,12 @@ class ResourceSelectionTests {
             }
         }
 
-        run(3)
+        run(3.minutes)
         resources[1].capacity = 3.0
-        run(3)
+        run(3.minutes)
     }
 
-    @OptIn(AmbiguousDuration::class)
+
     @Test
     fun `it should allow to select with ShortestQueue`() = createTestSimulation {
         val resources = List(3) { Resource() }
@@ -591,9 +595,9 @@ class ResourceSelectionTests {
             }
         }
 
-        run(3)
+        run(3.minutes)
         resources[1].capacity = 3.0
-        run(3)
+        run(3.minutes)
     }
 
     @Test

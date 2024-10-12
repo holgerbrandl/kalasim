@@ -3,13 +3,13 @@ package org.kalasim.dokka
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.junit.jupiter.api.Test
 import org.kalasim.Environment
-import org.kalasim.misc.AmbiguousDuration
+import org.kalasim.minute
 import org.kalasim.misc.asCMPairList
 import org.kalasim.monitors.CategoryTimeline
+import kotlin.time.Duration.Companion.minutes
 
 
 // Adopted from example in https://www.salabim.org/manual/Monitor.html
-@OptIn(AmbiguousDuration::class)
 fun freqLevelDemo() {
     val data = listOf(
         "foo" to 0.1,
@@ -22,13 +22,13 @@ fun freqLevelDemo() {
 
     repeat(1000) {
         dm.addValue(dist.sample());
-        dm.env.run(1)
+        dm.env.run(1.minute)
     }
 
     dm.printHistogram()
 
     // get a value at a specific time
-    dm[4.5]
+    dm[dm.env.now + 4.5.minutes]
 }
 
 

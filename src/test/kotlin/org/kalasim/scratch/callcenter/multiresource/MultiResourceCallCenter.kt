@@ -67,7 +67,7 @@ class MultiResourceCallCenter(arrivalRate: Double = 0.3, logEvents: Boolean = tr
     val shiftManager = dependency { ShiftManager() }
 
     init {
-        ComponentGenerator(iat = exponential(arrivalRate)) { Request() }
+        ComponentGenerator(iat = exponential(arrivalRate).minutes) { Request() }
     }
 }
 

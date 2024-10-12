@@ -57,7 +57,7 @@ createSimulation {
     TrafficLightController(get())
 
     // Setup a car generator with an exponentially distributed arrival time
-    ComponentGenerator(exponential(7)) { Car(get()) }
+    ComponentGenerator(exponential(7).minutes) { Car(get()) }
 
     // enable component tracking for later analytics
     val cg = componentCollector()

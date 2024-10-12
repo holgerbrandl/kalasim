@@ -33,6 +33,7 @@ class ComponentGenerator<T>(
      * For supported arguments see https://www.kalasim.org/component/#component-generator
      */
     @AmbiguousDuration
+    @Deprecated("used constructor with DurationDistribution iat parameter instead")
     constructor(
         iat: RealDistribution,
         startAt: SimTime? = null,

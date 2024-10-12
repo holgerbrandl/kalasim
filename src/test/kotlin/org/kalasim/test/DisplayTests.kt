@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.kalasim.asSimTime
 import org.kalasim.examples.MM1Queue
-import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.plot.kravis.*
 import java.io.*
 import javax.xml.transform.OutputKeys
@@ -35,7 +34,6 @@ class DisplayTests : AbstractSvgPlotRegression() {
         assumeTrue(runDisplayTests)
     }
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     fun `it should display the mm1 server utilization`() {
         val mm1 = MM1Queue()
@@ -44,7 +42,7 @@ class DisplayTests : AbstractSvgPlotRegression() {
 //        mm1.customers
 
         mm1.server.requesters.queueLengthTimeline
-            .display("Trimmed queue timeline", mm1.asSimTime(5), mm1.asSimTime(10))
+            .display("Trimmed queue timeline", mm1.startDate + 5.minutes, mm1.startDate + 10.minutes)
 //            .showFile()
             .apply {
                 assertExpected(this, "trimmed_queue_timeline")
@@ -135,9 +133,10 @@ abstract class AbstractSvgPlotRegression {
 
 //        assertTrue(plotFile.exists() && plotFile.fileSize() > 0)
 
-        val svgDoc = plotFile.readText().run { prettyFormat(this, 4) }.trim()
+        val svgDoc = plotFile.readText().run { prettyFormat(this) }.trim()
         //        val obtained = prettyFormat(svgDoc, 4).trim()
 
+        @Suppress("USELESS_ELVIS")
         val methodName = testName ?: return // because we're running not in test mode
 
         val file = File(testDataDir, methodName + "${subtest?.let { ".$it" } ?: ""}.svg")
@@ -153,14 +152,13 @@ abstract class AbstractSvgPlotRegression {
         // note assertEquals would be cleaner but since its printing the complete diff, it's polluting the travis logs
         assertEquals(expected, svgDoc)
         val failMsg = "svg mismatch got:\n${svgDoc.lines().take(30).joinToString("\n")}"
-        @Suppress("HttpUrlsUsage")
         assertTrue(expected == svgDoc, failMsg)
 
         // compare actual images
         //        saveImage(File(testDataDir, name.methodName.replace(" ", "_") + ".png"))
     }
 
-    private fun prettyFormat(input: String, indent: Int): String {
+    private fun prettyFormat(input: String, indent: Int = 4): String {
         try {
             val xmlInput = StreamSource(StringReader(input))
             val stringWriter = StringWriter()

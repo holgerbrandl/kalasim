@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.kalasim.*
 import org.kalasim.ComponentState.*
 import org.kalasim.analysis.EntityCreatedEvent
-import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.createTestSimulation
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.days
@@ -44,7 +43,6 @@ class StateTransitionTests {
     }
 
 
-    @OptIn(AmbiguousDuration::class)
     @Test
     fun customProc() {
         class Customer : Component(process = Customer::doSmthg) {

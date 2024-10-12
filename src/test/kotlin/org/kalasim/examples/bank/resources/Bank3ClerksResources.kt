@@ -5,6 +5,7 @@ import org.kalasim.*
 import org.kalasim.plot.kravis.canDisplay
 import org.kalasim.plot.kravis.display
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.days
 
 
 class Customer(private val clerks: Resource) : Component() {
@@ -21,10 +22,10 @@ fun main() {
     val env = createSimulation {
         dependency { Resource("clerks", capacity = 3) }
 
-        ComponentGenerator(iat = uniform(5.0, 15.0)) { Customer(get()) }
+        ComponentGenerator(iat = uniform(5.0, 15.0).minutes) { Customer(get()) }
     }
 
-    env.run(3000)
+    env.run(3.days)
 
     env.get<Resource>().apply {
         printSummary()
