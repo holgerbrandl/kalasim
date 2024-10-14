@@ -1,6 +1,5 @@
 //Bank3ClerksStandby.kt
 import org.kalasim.*
-import org.kalasim.plot.kravis.display
 import org.koin.core.component.inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -46,6 +45,6 @@ fun main() {
         printSummary()
 
         println(statistics)
-        lengthOfStayStatistics.display()
+//        lengthOfStayStatistics.display()
     }
 }

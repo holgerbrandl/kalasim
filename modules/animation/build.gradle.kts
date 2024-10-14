@@ -1,11 +1,9 @@
 plugins {
-    kotlin("jvm") version "2.0.20"
+    kotlin("jvm") version "2.0.21"
     `maven-publish`
     signing
 }
 
-group = "com.github.holgerbrandl"
-//version = "1.0-SNAPSHOT"
 version = "${rootProject.version}"
 
 val orxFeatures = setOf(
@@ -42,23 +40,14 @@ fun orx(module: String): Any {
 
 
 repositories {
-    mavenCentral()
-    mavenLocal()
+//    mavenCentral()
+//    mavenLocal()
     maven(url = "https://maven.openrndr.org")
 }
 
 dependencies {
     api(project(":"))
     api(project(":modules:logistics"))
-
-//    implementation(project ("kalasim"))
-//    api("com.github.holgerbrandl:kalasim:0.7.93-SNAPSHOT")
-
-//    api("com.github.holgerbrandl:kravis:0.8.5")
-
-    implementation ("org.jetbrains.kotlinx:dataframe:0.12.0")
-    implementation("com.github.holgerbrandl:kdfutils:1.3.3")
-
 
     runtimeOnly(openrndr("gl3"))
     runtimeOnly(openrndrNatives("gl3"))
@@ -72,7 +61,7 @@ dependencies {
 //    implementation(openrndr("filter"))
 
 //    implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core","1.6.0")
-    implementation("io.github.microutils", "kotlin-logging-jvm","2.0.6")
+//    implementation("io.github.microutils", "kotlin-logging-jvm","2.0.6")
 //    implementation(kotlin("script-runtime"))
 
     if ("video" in openrndrFeatures) {
@@ -85,7 +74,6 @@ dependencies {
     }
 
     testImplementation("io.kotest:kotest-assertions-core:5.7.2")
-
     testImplementation(kotlin("test"))
 }
 

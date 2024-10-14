@@ -161,7 +161,7 @@ data class CityMap(val roads: List<PathSegment>, val buildings: List<Building> =
         roads.toDataFrame()
             .unfold<Node>("from", addPrefix = true)
             .unfold<Node>("to", addPrefix = true)
-            .unfoldByProperty<Point>("from_position", listOf(Point::x, Point::y), addPrefix = true)
+            . unfoldByProperty<Point>("from_position", listOf(Point::x, Point::y), addPrefix = true)
             .unfoldByProperty<Point>("to_position", listOf(Point::x, Point::y), addPrefix = true)
             .renameToSnakeCase()
             .writeCSV(basePath.withExtension("segments.csv").toFile())

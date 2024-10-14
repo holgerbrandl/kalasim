@@ -7,8 +7,7 @@ import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
 import kotlinx.datetime.Instant
-import krangl.cumSum
-import krangl.mean
+import org.jetbrains.kotlinx.dataframe.math.mean
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.kalasim.*
@@ -22,6 +21,7 @@ import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 import java.io.File
 import java.lang.Thread.sleep
+import java.nio.file.Path
 import kotlin.io.path.div
 import kotlin.test.fail
 import kotlin.time.Duration.Companion.days
@@ -31,16 +31,15 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
-@OptIn(AmbiguousDurationComponent::class)
 class EnvTests {
 
     @Test
     fun `it should support more than one env`() {
         DependencyContext.stopKoin()
 
-        class TestComponent(koin: Koin) : TickedComponent(koin = koin) {
+        class TestComponent(koin: Koin) : Component(koin = koin) {
             override fun process() = sequence {
-                hold(2)
+                hold(2.minutes)
                 println("my env is ${env.getKoin()}")
             }
         }
@@ -73,9 +72,9 @@ class EnvTests {
     fun `it should run be possible to stop a simulation from an event-handler`() = createTestSimulation {
         var holdCounter = 0
 
-        object : TickedComponent() {
+        object : Component() {
             override fun repeatedProcess() = sequence {
-                hold(1)
+                hold(1.minutes)
                 holdCounter++
 
                 if(holdCounter > 5) fail("simulation did not stop")
@@ -96,7 +95,7 @@ class EnvTests {
     fun `it should run be possible to run an old koin-context`() {
 
         // Note: make sure that we need DI during execution
-        class TestResource(@Suppress("unused") resource: Resource) : Component()
+        class TestResource(@Suppress("UNUSED_PARAMETER") resource: Resource) : Component()
 
         val env1 = Environment().apply {
             Component()
@@ -215,9 +214,9 @@ class EnvTests {
         }
 
         runOutput.stdout shouldBeDiff """
-            INFO BusMetrics - BusMetrics: 13 events processed in last 10m
-            INFO BusMetrics - BusMetrics: 1 events processed in last 10m
-            INFO BusMetrics - BusMetrics: 7 events processed in last 10m
+            INFO Component - BusMetrics: 13 events processed in last 10m
+            INFO Component - BusMetrics: 1 events processed in last 10m
+            INFO Component - BusMetrics: 7 events processed in last 10m
         """.trimIndent()
 
         val postOutput = captureOutput {
@@ -225,7 +224,7 @@ class EnvTests {
         }
 
         postOutput.stdout shouldBeDiff """
-            INFO BusMetrics - BusMetrics: 0.0 events processed on average per wall-time second
+            INFO Component - BusMetrics: 0.0 events processed on average per wall-time second
         """.trimIndent()
 
 
@@ -315,11 +314,11 @@ class EnvTests {
         createSimulation {
             enableComponentLogger()
 
-            object : TickedComponent() {
+            object : Component() {
                 var waitCounter = 1
 
                 override fun repeatedProcess() = sequence {
-                    hold(1)
+                    hold(1.minutes)
                     // doe something insanely complex that takes 2seconds
                     sleep(waitCounter++ * 1000L)
                 }
@@ -340,10 +339,10 @@ class EnvTests {
         createSimulation {
             val cc = componentCollector()
 
-            object : TickedComponent() {
+            object : Component() {
                 override fun process() =
                     sequence {
-                        hold(10)
+                        hold(10.minutes)
                     }
             }
 
@@ -446,7 +445,7 @@ class EnvTests {
     }
 
 
-    val testDataDir
+    val testDataDir: Path
         get() = File("src/test/resources/stdout/EnvTests").toPath()
 
     @Test

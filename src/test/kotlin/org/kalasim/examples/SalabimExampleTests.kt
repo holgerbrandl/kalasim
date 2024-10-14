@@ -4,7 +4,6 @@ package org.kalasim.examples
 import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
-import kravis.*
 import org.apache.commons.math3.distribution.UniformRealDistribution
 import org.json.JSONObject
 import org.junit.jupiter.api.Disabled
@@ -17,7 +16,6 @@ import org.kalasim.misc.median
 import org.kalasim.test.captureOutput
 import org.koin.core.context.stopKoin
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
@@ -115,16 +113,16 @@ class SalabimExampleTests {
 
         print(avgQueueMeans)
 
-        @Suppress("ConstantConditionIf")
-        if(false) {
-            avgQueueMeans
-                .plot(x = { it.first }, y = { it.second.median })
-                .geomPoint()
-                .geomLine()
-                .show()
-
-            Thread.sleep(100000)
-        }
+//        @Suppress("ConstantConditionIf")
+//        if(false) {
+//            avgQueueMeans
+//                .plot(x = { it.first }, y = { it.second.median })
+//                .geomPoint()
+//                .geomLine()
+//                .show()
+//
+//            Thread.sleep(100000)
+//        }
 
         // What is the expected mean here from a queuing theory perspective?
         // What is the mean waiting time with a uniform arrival between 5 and 15 minutes and a processing time of 10.minutes --> ChatGPT: since not exponential arrival no precise answer but roughly

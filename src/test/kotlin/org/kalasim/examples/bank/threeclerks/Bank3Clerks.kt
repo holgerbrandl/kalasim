@@ -2,8 +2,6 @@
 package org.kalasim.examples.bank.threeclerks
 
 import org.kalasim.*
-import org.kalasim.plot.kravis.canDisplay
-import org.kalasim.plot.kravis.display
 import org.koin.core.component.inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -63,13 +61,16 @@ fun main() {
 
         val waitingLine: ComponentQueue<Customer> = get()
 
-        if(canDisplay()) {
-//        waitingLine.lengthOfStayMonitor.printHistogram()
-//        waitingLine.queueLengthMonitor.printHistogram()
+//        if(canDisplay()) {
+////        waitingLine.lengthOfStayMonitor.printHistogram()
+////        waitingLine.queueLengthMonitor.printHistogram()
+//
+//            waitingLine.queueLengthTimeline.display()
+//            waitingLine.lengthOfStayStatistics.display()
+        waitingLine.queueLengthTimeline.printSummary()
+        waitingLine.queueLengthTimeline.printSummary()
 
-            waitingLine.queueLengthTimeline.display()
-            waitingLine.lengthOfStayStatistics.display()
-        }
+//        }
 
 //        waitingLine.stats.toJson().toString(2).printThis()
         waitingLine.printSummary()

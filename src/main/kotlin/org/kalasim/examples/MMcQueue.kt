@@ -7,7 +7,6 @@ import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.AmbiguousDurationComponent
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.time.DurationUnit
 
 /**
@@ -30,7 +29,7 @@ open class MMcQueue(
     lambda: Number = 5,
     mu: Number = 10,
     durationUnit : DurationUnit = DurationUnit.SECONDS
-) : Environment() {
+) : Environment(tickDurationUnit = durationUnit) {
 
     val server: Resource
 

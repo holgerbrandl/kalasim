@@ -1,31 +1,18 @@
 plugins {
-    kotlin("jvm") version "2.0.20"
+    kotlin("jvm") version "2.0.21"
     `maven-publish`
     signing
 }
 
-group = "com.github.holgerbrandl"
-//version = "1.0-SNAPSHOT"
 version = "${rootProject.version}"
-
-repositories {
-    mavenCentral()
-    mavenLocal()
-}
 
 dependencies {
     api(project(":"))
 
-    api ("org.jetbrains.kotlinx:dataframe:0.12.0")
-    api("com.github.holgerbrandl:kdfutils:1.3.3")
-
     implementation("org.jgrapht:jgrapht-core:1.5.2")
 
-    api("com.github.holgerbrandl:kdfutils:1.3.5")
-
     // todo@2023.1 disable for release
-    implementation("org.slf4j:slf4j-simple:1.7.30")
-
+//    implementation("org.slf4j:slf4j-simple:1.7.30")
 
     testImplementation(kotlin("test"))
     testImplementation(project(":"))
@@ -50,28 +37,6 @@ java {
     withJavadocJar()
     withSourcesJar()
 }
-
-
-
-// disabled because docs examples were moved back into tests
-//java {
-//    sourceSets["test"].java {
-//        srcDir("docs/userguide/examples/kotlin")
-//    }
-//}
-
-
-
-
-//publishing {
-//    publications {
-//        create<MavenPublication>("maven") {
-//            from(components["java"])
-//            artifactId = "kalasim-animation"
-//
-//        }
-//    }
-//}
 
 
 

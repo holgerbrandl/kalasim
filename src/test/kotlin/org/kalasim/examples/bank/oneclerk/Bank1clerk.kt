@@ -3,8 +3,6 @@ package org.kalasim.examples.bank.oneclerk
 
 import org.kalasim.*
 import org.kalasim.misc.printThis
-import org.kalasim.plot.kravis.canDisplay
-import org.kalasim.plot.kravis.display
 import org.koin.core.component.inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -70,8 +68,8 @@ fun main() {
 
     waitingLine.statistics.printThis()
 
-    if(canDisplay()) {
-        waitingLine.queueLengthTimeline.display()
-        waitingLine.lengthOfStayStatistics.display()
-    }
+//    if(canDisplay()) {
+//        waitingLine.queueLengthTimeline.display()
+//        waitingLine.lengthOfStayStatistics.display()
+//    }
 }

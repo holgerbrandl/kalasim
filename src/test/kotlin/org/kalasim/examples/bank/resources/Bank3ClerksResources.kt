@@ -2,10 +2,8 @@
 package org.kalasim.examples.bank.resources
 
 import org.kalasim.*
-import org.kalasim.plot.kravis.canDisplay
-import org.kalasim.plot.kravis.display
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 
 
 class Customer(private val clerks: Resource) : Component() {
@@ -30,10 +28,10 @@ fun main() {
     env.get<Resource>().apply {
         printSummary()
 
-        if(canDisplay()) {
-            claimedTimeline.display()
-            requesters.queueLengthTimeline.display()
-        }
+//        if(canDisplay()) {
+//            claimedTimeline.display()
+//            requesters.queueLengthTimeline.display()
+//        }
 
         printStatistics()
     }
