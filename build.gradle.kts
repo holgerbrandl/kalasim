@@ -8,7 +8,7 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.2.0"
 }
 
-version = "0.12.110-SNAPSHOT"
+version = "1.0"
 
 
 allprojects {
@@ -33,11 +33,12 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
 
     api("io.github.oshai:kotlin-logging-jvm:6.0.9")
-    api("org.jetbrains.kotlinx:dataframe:0.14.1")
-    api("com.github.holgerbrandl:kdfutils:1.4.0-SNAPSHOT")
+
+//    api("org.jetbrains.kotlinx:dataframe-core:0.14.1")
+    api("com.github.holgerbrandl:kdfutils:1.4.3")
 
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.21")
+//    implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.21")
 
     testImplementation("io.kotest:kotest-assertions-core:5.7.2")
 

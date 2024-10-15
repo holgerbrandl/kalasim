@@ -1,6 +1,6 @@
 # Kalasim Release History
 
-## v2024.1
+## 1.0
 
 !! not yet released!
 

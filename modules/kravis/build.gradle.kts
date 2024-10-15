@@ -14,13 +14,10 @@ repositories {
 
 dependencies {
     api(project(":"))
-//    api("com.github.holgerbrandl:kalasim:0.12.109")
 
-    api("com.github.holgerbrandl:kravis:0.9.96")
-//    api("com.github.holgerbrandl:krangl:0.18.4")
+    api("com.github.holgerbrandl:kravis:1.0.1")
 
     testImplementation(kotlin("test"))
-//    testImplementation(project(":"))
 }
 
 tasks.test {

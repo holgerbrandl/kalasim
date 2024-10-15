@@ -80,6 +80,6 @@ class BusMetrics(
 
     fun stop() {
         wtLogger?.interrupt()
-        Thread.sleep(2.seconds.inWholeMilliseconds)
+//        Thread.sleep(2.seconds.inWholeMilliseconds)
     }
 }

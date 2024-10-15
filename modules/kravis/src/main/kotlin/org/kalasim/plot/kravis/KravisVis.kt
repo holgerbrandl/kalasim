@@ -2,7 +2,6 @@ package org.kalasim.plot.kravis
 
 import kravis.*
 import kravis.device.JupyterDevice
-import org.jetbrains.letsPlot.label.ggtitle
 import org.kalasim.*
 import org.kalasim.Component
 import org.kalasim.analysis.ResourceActivityEvent
@@ -142,7 +141,7 @@ fun List<ResourceActivityEvent>.display(
         .geomSegment(size = 10.0)
         .yLabel("")
         .xLabel("Time")
-        .also { if(title != null) ggtitle(title) }
+        .also { if(title != null) it.title(title) }
         .showOptional()
 }
 
@@ -166,7 +165,7 @@ fun List<ResourceTimelineSegment>.display(
         .plot(x = { if(forceTickAxis) env.asTickTime(start).value else start }, y = { value }, color = { metric })
         .geomStep()
         .facetWrap("color", ncol = 1, scales = FacetScales.free_y)
-        .also { if(title != null) ggtitle(title) }
+        .also { if(title != null) it.title(title) }
         .showOptional()
 }
 
@@ -203,7 +202,7 @@ fun List<Component>.displayStateTimeline(
         color = { second.value }
     )
         .geomSegment()
-        .also { if(title != null) ggtitle(title) }
+        .also { if(title != null) it.title(title) }
         .xLabel(componentName)
         .showOptional()
 }
@@ -228,7 +227,7 @@ fun List<Component>.displayStateProportions(
     )
         .geomBar(position = PositionFill())
         .xLabel("State Proportion")
-        .also { if(title != null) ggtitle(title) }
+        .also { if(title != null) it.title(title) }
         .showOptional()
 }
 
