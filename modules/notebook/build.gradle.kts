@@ -66,6 +66,12 @@ publishing {
 }
 
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+
 signing {
     sign(publishing.publications["maven"])
 }

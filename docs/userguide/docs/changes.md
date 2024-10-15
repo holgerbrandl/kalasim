@@ -2,7 +2,6 @@
 
 ## 1.0
 
-!! not yet released!
 
 Major & Breaking API Changes
 
