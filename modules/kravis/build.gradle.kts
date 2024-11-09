@@ -15,7 +15,7 @@ repositories {
 dependencies {
     api(project(":"))
 
-    api("com.github.holgerbrandl:kravis:1.0.1")
+    api("com.github.holgerbrandl:kravis:1.0.2")
 
     testImplementation(kotlin("test"))
 }
@@ -73,5 +73,5 @@ signing {
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(17)
 }

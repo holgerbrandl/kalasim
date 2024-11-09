@@ -75,5 +75,5 @@ signing {
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(17)
 }
