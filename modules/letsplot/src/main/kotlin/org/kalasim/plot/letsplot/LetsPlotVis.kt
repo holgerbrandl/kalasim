@@ -2,7 +2,9 @@ package org.kalasim.plot.letsplot
 
 import org.jetbrains.kotlinx.dataframe.DataFrame
 import org.jetbrains.kotlinx.dataframe.api.*
-import org.jetbrains.kotlinx.dataframe.api.util.unfold
+import org.jetbrains.kotlinx.dataframe.api.util.unfoldByProperty
+import org.jetbrains.kotlinx.dataframe.api.util.unfoldPropertiesByRefOf
+import org.jetbrains.kotlinx.dataframe.api.util.unfoldPropertiesOf
 import org.jetbrains.letsPlot.Stat
 import org.jetbrains.letsPlot.facet.facetWrap
 import org.jetbrains.letsPlot.geom.*
@@ -106,7 +108,7 @@ fun List<ResourceActivityEvent>.display(
 
     val plotData = toDataFrame()
         //<Resource>
-        .unfold<Resource>("resource", listOf("name"))
+        .unfoldPropertiesOf<Resource>("resource", listOf("name"))
         .add("activity") { "activity"() ?: "Other" }
         .convertTick2Double("requested")
         .convertTick2Double("released")
@@ -174,9 +176,9 @@ fun List<Component>.displayStateTimeline(
     val df = clistTimeline()
         .toDataFrame()
         //<Component>
-        .unfold<Component>("first", listOf("name"))
+        .unfoldPropertiesOf<Component>("first", listOf("name"))
         //<LevelStateRecord<ComponentState>>
-        .unfold<LevelStateRecord<ComponentState>>("second", listOf("timestamp", "duration", "value"))
+        .unfoldPropertiesOf<LevelStateRecord<ComponentState>>("second", listOf("timestamp", "duration", "value"))
 //        .addColumn("start") { expr -> expr["timestamp"].map<Double> { wtTransform(TickTime(it)) } }
 //        .addColumn("end") { expr -> (expr["timestamp"] + expr["timestamp"]).map<Double> { wtTransform(TickTime(it)) } }
         .convertTick2Double("start")
@@ -201,8 +203,8 @@ fun List<Component>.displayStateProportions(
 ): Plot {
     val df = clistTimeline()
         .toDataFrame()
-        .unfold<Component>("first", listOf("name"))
-        .unfold<LevelStateRecord<ComponentState>>("second", listOf("timestamp", "duration", "value"))
+        .unfoldPropertiesOf<Component>("first", listOf("name"))
+        .unfoldPropertiesOf<LevelStateRecord<ComponentState>>("second", listOf("timestamp", "duration", "value"))
 
     return df.letsPlot() + geomBar {
         y = "name"

@@ -2,8 +2,9 @@ package org.kalasim.logistics
 
 import com.github.holgerbrandl.kdfutils.renameToSnakeCase
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
-import org.jetbrains.kotlinx.dataframe.api.util.unfold
+import org.jetbrains.kotlinx.dataframe.api.unfold
 import org.jetbrains.kotlinx.dataframe.api.util.unfoldByProperty
+import org.jetbrains.kotlinx.dataframe.api.util.unfoldPropertiesByRefOf
 import org.jetbrains.kotlinx.dataframe.io.writeCSV
 import org.kalasim.animation.*
 import org.kalasim.misc.withExtension
@@ -159,15 +160,15 @@ data class CityMap(val roads: List<PathSegment>, val buildings: List<Building> =
 
     fun exportCsv(basePath: Path) {
         roads.toDataFrame()
-            .unfold<Node>("from", addPrefix = true)
-            .unfold<Node>("to", addPrefix = true)
+            .unfoldPropertiesByRefOf<Node>("from", addPrefix = true)
+            .unfoldPropertiesByRefOf<Node>("to", addPrefix = true)
             . unfoldByProperty<Point>("from_position", listOf(Point::x, Point::y), addPrefix = true)
             .unfoldByProperty<Point>("to_position", listOf(Point::x, Point::y), addPrefix = true)
             .renameToSnakeCase()
             .writeCSV(basePath.withExtension("segments.csv").toFile())
 
         buildings.toDataFrame()
-            .unfold<Port>("port", addPrefix = true)
+            .unfoldPropertiesByRefOf<Port>("port", addPrefix = true)
             .unfoldByProperty<Point>("port_position", listOf(Point::x, Point::y), addPrefix = true)
             .renameToSnakeCase()
             .writeCSV(basePath.withExtension("buildings.csv").toFile())
