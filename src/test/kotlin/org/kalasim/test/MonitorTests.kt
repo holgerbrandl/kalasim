@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.apache.commons.math3.stat.descriptive.StatisticalSummaryValues
 import org.junit.jupiter.api.Test
+import org.kalasim.get
 import org.kalasim.hour
 import org.kalasim.misc.*
 import org.kalasim.monitors.*
@@ -199,7 +200,53 @@ class MonitorTests {
         }
     }
 
-    // TODO test the others
+
+    @Test
+    fun `CategoryTimeline should allow to retrieve range selection`() =
+        createTestSimulation {
+            val ct = CategoryTimeline("A")
+            run(2.minutes)
+
+            ct.addValue("B")
+            run(2.minutes)
+
+            ct.addValue("C")
+            run(2.minutes)
+
+            ct.addValue("D")
+            run(4.minutes)
+            ct.addValue("A")
+            run(3.minutes)
+
+
+            val rangeDist = ct.valueDistribution(startDate + 1.minutes, startDate + 4.minutes)
+
+            println(rangeDist.pmf)
+
+            rangeDist["A"] shouldBe 1.0/3
+            rangeDist["B"] shouldBe 2.0/3
+
+            shouldThrow<java.lang.IllegalArgumentException> {
+                ct.valueDistribution(startDate - 10.minutes, startDate + 4.minutes)
+            }
+            shouldThrow<java.lang.IllegalArgumentException> {
+                ct.valueDistribution(startDate - 10.minutes, now + 12.minutes)
+            }
+
+            // now we try to get a value for `now`
+            ct[now] shouldBe "A"
+
+            val rangeDistEnd = ct.valueDistribution(now-5.minutes)
+            println(rangeDistEnd)
+
+            rangeDistEnd["D"] shouldBe 0.4
+            rangeDistEnd["A"] shouldBe 0.6
+
+            // repeat over another range but include all values
+            val initRangeAll = ct.valueDistribution(end = now-5.minutes, includeAll = true)
+            initRangeAll.pmf.size shouldBe  4
+        }
+
 }
 
 

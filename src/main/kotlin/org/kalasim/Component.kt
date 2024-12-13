@@ -18,6 +18,7 @@ import java.util.logging.Logger
 import kotlin.math.*
 import kotlin.reflect.*
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 
 internal const val EPS = 1E-8
@@ -2125,7 +2126,7 @@ data class ComponentLifecycleRecord(
 fun Component.toLifeCycleRecord(): ComponentLifecycleRecord {
     val c = this
 
-    val histogram: Map<ComponentState, Double> = c.stateTimeline.summed()
+    val histogram = c.stateTimeline.summed().mapValues{ it.value.toDouble(DurationUnit.MINUTES)}
 
     return ComponentLifecycleRecord(
         c.name,

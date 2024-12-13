@@ -1,5 +1,9 @@
 # Kalasim Release History
 
+## 1.0.3
+
+* Added slicing for `CategoryTimeline`
+
 ## 1.0
 
 

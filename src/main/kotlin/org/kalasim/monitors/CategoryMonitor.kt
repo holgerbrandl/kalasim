@@ -5,6 +5,9 @@ import org.kalasim.misc.*
 import org.koin.core.Koin
 import kotlin.math.roundToInt
 
+
+import org.apache.commons.math3.distribution.EnumeratedDistribution
+import org.apache.commons.math3.util.Pair
 /**
  * Frequency tally levels irrespective of current (simulation) time.
  *
@@ -64,6 +67,11 @@ fun <T> CategoryMonitor<T>.printHistogram(values: List<T>? = null, sortByWeight:
 
 typealias FrequencyTable<T> = Map<T, Double>
 
+
+fun <T> FrequencyTable<T>.toDistribution(): EnumeratedDistribution<T> {
+    val distribution = this.map { Pair(it.key, it.value) }
+    return EnumeratedDistribution(distribution)
+}
 
 fun <T> FrequencyTable<T>.printConsole(
     colWidth: Double = 40.0,

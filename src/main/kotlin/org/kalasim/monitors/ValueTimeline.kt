@@ -37,6 +37,8 @@ interface ValueTimeline<T> {
 
     /** Discards all history before the given time. */
     fun clearHistory(before: SimTime)
+
+//    operator fun get(from: SimTime, to: SimTime): ValueTimeline<T>
 }
 
 // replacement for Pair to get better auto-conversion to data-frame

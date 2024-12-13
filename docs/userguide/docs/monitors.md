@@ -284,7 +284,17 @@ See [`MergeMonitorTests`](https://github.com/holgerbrandl/kalasim/blob/master/sr
 
 ## Slicing of monitors
 
-**Note**: Slicing of monitors as in [salabim](https://www.salabim.org/manual/Monitor.html#slicing-of-monitors) is  not yet supported. If needed please file a [ticket](https://github.com/holgerbrandl/kalasim/issues).
+Slicing of monitors is supported for `CategoryTimeline`
+
+```kotlin
+val ct = CategoryTimeline("foo")
+
+// compute frequency table for range
+ct.summed(now-3.hours, now.hours)
+
+// same but output EnumeratedDistribution
+val dist: EnumeratedDistribution<String> = ct.valueDistribution(now-3.hours, now.hours)
+```
 
 Use-cases for slicing are
 
