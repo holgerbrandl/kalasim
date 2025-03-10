@@ -135,6 +135,7 @@ open class Environment(
 
     // intentionally immutable to avoid checkForCoModification when iterating it (suggested by chat-gpt)
     internal var eventListeners: List<EventListener> = emptyList()
+    private val logQueue: Queue<Event> = LinkedList()
 
 
     /** The current time of the simulation. See https://www.kalasim.org/basics/#running-a-simulation.*/
@@ -424,10 +425,20 @@ open class Environment(
     }
 
 
+
+    private var isProcessing = false
+
     internal fun publishEvent(event: Event) {
-        eventListeners.forEach {
-            it.consume(event)
+        logQueue.add(event)
+
+        if (isProcessing) return // Avoid recursion
+
+        isProcessing = true
+        while (logQueue.isNotEmpty()) {
+            val currentEvent = logQueue.poll()
+            eventListeners.forEach { it.consume(currentEvent) }
         }
+        isProcessing = false
     }
 
     /**

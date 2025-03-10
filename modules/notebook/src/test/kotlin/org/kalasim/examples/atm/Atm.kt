@@ -2,12 +2,11 @@
 
 
 import kotlinx.coroutines.*
-import krangl.cumSum
 import kravis.geomTile
 import kravis.plot
 import org.jetbrains.kotlinx.dataframe.api.rename
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
-import org.jetbrains.kotlinx.dataframe.api.util.unfold
+import org.jetbrains.kotlinx.dataframe.api.util.unfoldPropertiesOf
 import org.kalasim.*
 import org.kalasim.misc.*
 import org.kalasim.plot.kravis.display
@@ -100,7 +99,7 @@ object WhatIf {
             it to it.get<Resource>().statistics.requesters.lengthStats.mean!!.roundAny(2)
         }.toList()
             .toDataFrame()
-            .unfold<AtmQueue>("first", listOf("rho", "lambda"))
+            .unfoldPropertiesOf<AtmQueue>("first", listOf("rho", "lambda"))
             .rename("second" to "mean_queue_length")
     }
 }

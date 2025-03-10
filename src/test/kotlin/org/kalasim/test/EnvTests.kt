@@ -77,12 +77,12 @@ class EnvTests {
                 hold(1.minutes)
                 holdCounter++
 
-                if(holdCounter > 5) fail("simulation did not stop")
+                if (holdCounter > 5) fail("simulation did not stop")
             }
         }
 
         addEventListener<RescheduledEvent> {
-            if(it.time.toTickTime().value > 3 && it.type == ScheduledType.HOLD) {
+            if (it.time.toTickTime().value > 3 && it.type == ScheduledType.HOLD) {
                 stopSimulation()
             }
         }
@@ -154,7 +154,7 @@ class EnvTests {
 
         // add an asynchronous log consumer
         val asyncListener = addAsyncEventListener<EntityCreatedEvent> { event ->
-            if(event.entity.name == "Car.1") {
+            if (event.entity.name == "Car.1") {
                 println("Consumed async!")
                 consumed = true
             }
@@ -191,6 +191,35 @@ class EnvTests {
 
         (System.currentTimeMillis() - timeBefore) / 1000.0 shouldBe 5.0.plusOrMinus(1.0)
     }
+
+    @Test
+    fun `it should log in strict order`() {
+        class TestEvent(val label: String, time: SimTime) : Event(time)
+
+        Environment().apply {
+            val collect1 = collect<TestEvent>()
+
+            val se = object : Component(){
+                override fun process() =sequence<Component> {
+                    log(TestEvent("1st", now))
+                }
+            }
+
+            addEventListener<TestEvent> {
+                if(it.label=="1st") {
+                    se.log(TestEvent("2nd", now))
+                }
+            }
+
+            val collect2 = collect<TestEvent>()
+
+            run()
+
+            collect1 shouldBe collect2
+        }
+
+    }
+
 
     @Test
     fun `it should log bus metrics`() {
