@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "2.0.21"
+    kotlin("jvm") version "2.1.20"
     `maven-publish`
     signing
 
@@ -37,7 +37,7 @@ dependencies {
     api("com.github.holgerbrandl:kdfutils:1.5.0")
 
     implementation("com.google.code.gson:gson:2.10.1")
-//    implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.21")
+//    implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.20")
 
     testImplementation("io.kotest:kotest-assertions-core:5.7.2")
 
