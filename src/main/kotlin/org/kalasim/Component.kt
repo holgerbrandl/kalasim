@@ -1,6 +1,5 @@
 package org.kalasim
 
-import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.datetime.isDistantFuture
 import org.kalasim.Component.*
@@ -14,7 +13,6 @@ import org.kalasim.analysis.snapshot.ComponentSnapshot
 import org.kalasim.misc.*
 import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
-import java.util.logging.Logger
 import kotlin.math.*
 import kotlin.reflect.*
 import kotlin.time.Duration
@@ -1185,18 +1183,15 @@ open class Component(
             env.push(this, scheduledTime, priority, urgent)
         }
 
-        if(trackingConfig.logStateChangeEvents) {
-
-            log(trackingConfig.logStateChangeEvents) {
-                RescheduledEvent(
-                    now,
-                    env.currentComponent,
-                    this,
-                    description,
-                    scheduledTime,
-                    type
-                )
-            }
+        log(trackingConfig.logStateChangeEvents) {
+            RescheduledEvent(
+                now,
+                env.currentComponent,
+                this,
+                description,
+                scheduledTime,
+                type
+            )
         }
     }
 
