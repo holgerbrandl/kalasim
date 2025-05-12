@@ -58,6 +58,7 @@ open class State<T>(
 
     val timeline = CategoryTimeline(initialValue = value, koin = koin, name = "State of '$name'")
 
+    fun hasWaiters() = waiters.isNotEmpty()
     internal val waiters = ComponentQueue<Component>("waiters of ${this.name}", koin = koin)
 //    val waiters = PriorityQueue<Component>()
 
