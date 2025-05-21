@@ -425,6 +425,17 @@ open class Environment(
     }
 
 
+    /**
+     * Returns the list of event listeners currently registered in this simulation environment.
+     *
+     * This method is for internal use only and should not be called directly from user code. It's typically consumed in
+     * unit tests only. Use [addEventListener] and [removeEventListener] to manage event listeners instead.
+     *
+     * @return An immutable list of [EventListener] instances
+     */
+    @InternalKalasimApi
+    fun getEventListeners() = eventListeners
+
 
     private var isProcessing = false
 
