@@ -8,6 +8,8 @@ import kotlin.time.Duration
 // Duration utilities
 /** Compute the sum of a set of durations.*/
 fun Iterable<Duration>.sum(): Duration = sumOf { it }
+fun List<Duration>.sum(): Duration = sumOf { it }
+
 
 /** Compute the sum of a set of durations via a selector function.*/
 fun <T> Iterable<T>.sumOf(selector: (T) -> Duration) = map { selector(it) }.run {

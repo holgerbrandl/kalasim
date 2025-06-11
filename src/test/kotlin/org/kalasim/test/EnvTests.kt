@@ -4,7 +4,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.doubles.plusOrMinus
-import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.beInstanceOf
 import kotlinx.datetime.Instant
 import org.jetbrains.kotlinx.dataframe.math.mean
@@ -656,5 +655,23 @@ class CustomKoinModuleTests {
 
         eventLog.size shouldBe 2
         eventLog.last().shouldBe(beInstanceOf<MyGoodEvent>())
+    }
+
+
+    @OptIn(InternalKalasimApi::class)
+    @Test
+    fun `it should computing the scheduled time of a component`() = createTestSimulation {
+
+        object : Component("foo", trackingConfig = ComponentTrackingConfig.NONE) {
+            override fun process() = sequence<Component> {
+                hold(4.hours)
+            }
+        }
+
+        run(10.minutes)
+
+        val match = computeQueueStatus().find { it.component.name == "foo" }!!
+
+        match.remaining shouldBe (3.hours + 50.minutes)
     }
 }

@@ -287,6 +287,15 @@ open class Environment(
             return tm.timeline
         }
 
+    /**
+     * Returns the current status of the event queue as a sorted list of queue elements.
+     * This method is intended for internal use only.
+     *
+     * @return A sorted list of [QueueElement]s representing the current state of the event queue
+     */
+    @InternalKalasimApi
+    fun computeQueueStatus() = eventQueue.sortedIterator().toList()
+
     private val standBy = mutableListOf<Component>()
     private val pendingStandBy = mutableListOf<Component>()
 
@@ -563,6 +572,10 @@ data class QueueElement(
 //        return "${component.javaClass.simpleName}(${component.name}, $time, $priority, $seq)"
         return "${component.javaClass.simpleName}(${component.name}, $time, $priority, $queueCounter) : ${component.componentState}"
     }
+
+    /** Compute the remaining time until the component becomes active. */
+    val remaining : Duration
+        get() = time - component.now
 }
 
 
