@@ -1,5 +1,12 @@
 # Kalasim Release History
 
+## 1.1.0
+
+* Updated all dependencies
+* Added duplicate check to avoid reregistering components in `Environment`
+* Removed deprecated API
+* Test fixes
+
 ## 1.0.3
 
 * Added slicing for `CategoryTimeline`
