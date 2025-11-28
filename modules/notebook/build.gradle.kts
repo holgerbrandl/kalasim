@@ -1,10 +1,10 @@
 plugins {
-    kotlin("jvm") version "2.1.20"
+    kotlin("jvm") version "2.2.21"
     `maven-publish`
     signing
 
     // see https://kotlinlang.slack.com/archives/C4W52CFEZ/p1641056747134600
-    id("org.jetbrains.kotlin.jupyter.api") version "0.12.0-285"
+    id("org.jetbrains.kotlin.jupyter.api") version "0.16.0-742"
 }
 
 version = "${rootProject.version}"

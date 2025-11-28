@@ -54,7 +54,7 @@ fun main() {
         pStats.toDataFrame().print()
 
 
-        cg.history.first().stateTimeline.summed().printConsole()
-        cg.history.first().stateTimeline.summed().display()
+//        cg.history.first().stateTimeline.summed().printConsole()
+//        cg.history.first().stateTimeline.summed().display()
     }
 }

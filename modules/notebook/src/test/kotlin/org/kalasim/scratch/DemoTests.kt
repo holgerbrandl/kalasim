@@ -1,9 +1,9 @@
 package org.kalasim.scratch
 
-import krangl.irisData
-import krangl.toMap
 import org.jetbrains.kotlinx.dataframe.api.print
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
+import org.jetbrains.kotlinx.dataframe.api.toMap
+import org.jetbrains.kotlinx.dataframe.datasets.irisData
 import org.jetbrains.letsPlot.geom.*
 import org.jetbrains.letsPlot.ggsize
 import org.jetbrains.letsPlot.intern.Plot
