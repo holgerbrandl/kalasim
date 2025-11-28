@@ -178,7 +178,7 @@ class QueueTests {
             override fun process() = sequence {
                 val batchComplete = batch(waitingLine, 4, timeout = 10.minutes)
                 batchComplete.size shouldBe 4
-                env.nowTT shouldBe 8.tt
+                env.now.toTickTime() shouldBe 8.tt
 
                 hold(until = TickTime(20.0).asSimTime())
 
@@ -206,7 +206,7 @@ class QueueTests {
             override fun process() = sequence {
                 val batchComplete = batch(waitingLine, 4)
                 batchComplete.size shouldBe 4
-                env.nowTT shouldBe 50.tt
+                env.now.toTickTime() shouldBe 50.tt
             }
         }
 

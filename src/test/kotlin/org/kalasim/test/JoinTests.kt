@@ -1,6 +1,7 @@
 package org.kalasim.test
 
 import io.kotest.matchers.comparables.shouldBeLessThan
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import org.kalasim.*
 import org.kalasim.examples.shipyard.PartCompleted

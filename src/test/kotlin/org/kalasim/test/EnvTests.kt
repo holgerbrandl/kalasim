@@ -4,7 +4,8 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.doubles.plusOrMinus
-import io.kotest.matchers.types.beInstanceOf
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.instanceOf
 import kotlinx.datetime.Instant
 import org.jetbrains.kotlinx.dataframe.math.mean
 import org.junit.jupiter.api.Disabled
@@ -15,7 +16,8 @@ import org.kalasim.examples.bank.data.*
 import org.kalasim.examples.er.EmergencyRoom
 import org.kalasim.misc.*
 import org.koin.core.Koin
-import org.koin.core.error.NoBeanDefFoundException
+import org.koin.core.error.DefinitionOverrideException
+import org.koin.core.error.NoDefinitionFoundException
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 import java.io.File
@@ -135,7 +137,7 @@ class EnvTests {
             LateArriver(getKoin())
         }
 
-        shouldThrow<NoBeanDefFoundException> {
+        shouldThrow<NoDefinitionFoundException> {
             env2.get<LateArriver>()
         }
 
@@ -188,7 +190,7 @@ class EnvTests {
             run(10.minutes)
         }
 
-        (System.currentTimeMillis() - timeBefore) / 1000.0 shouldBe 5.0.plusOrMinus(1.0)
+       ( (System.currentTimeMillis() - timeBefore) / 1000.0 ) shouldBe (5.0 plusOrMinus 1.0)
     }
 
     @Test
@@ -333,6 +335,22 @@ class EnvTests {
             }
 
             sim.get<String>("foo")
+            sim.run(1.days)
+        }
+    }
+
+
+    @Test
+    fun `it must allow registering the same dependency twice without qualifier`() {
+        data class Foo(val flag: Boolean=true)
+        shouldThrow<DefinitionOverrideException> {
+            val sim = createSimulation {
+                dependency{ Foo() }
+                dependency{ Foo() }
+                println()
+            }
+
+            sim.get<Foo>()
             sim.run(1.days)
         }
     }
@@ -597,7 +615,11 @@ class CustomKoinModuleTests {
     @Test
     // https://kotlinlang.slack.com/archives/C67HDJZ2N/p1671535899858929
     fun `avoid updating koin until 3_2_1 regression is fixed`() {
-        data class Tester(val created: Long = System.nanoTime())
+        data class Tester(val created: Long = System.nanoTime()){
+            init {
+                println("created")
+            }
+        }
 
         val myModule = module(createdAtStart = true) {
             single(createdAtStart = true) {
@@ -605,9 +627,15 @@ class CustomKoinModuleTests {
             }
         }
 
-        val koinApplication = koinApplication {}
+        val koinApplication = koinApplication {
+
+        }
         val koin = koinApplication.koin
         koin.loadModules(modules = listOf(myModule))
+        koinApplication.createEagerInstances()
+
+        println("post-creation")
+
 
         val now = System.nanoTime()
 
@@ -630,7 +658,7 @@ class CustomKoinModuleTests {
             run(10.days)
 
             val waitingLine: ComponentQueue<Customer> = get()
-            waitingLine.creationTime.epochSeconds shouldBe 0
+            waitingLine.creationTime.epochSeconds.toInt() shouldBe 0
 
             println(waitingLine.statistics.toJson())
         }
@@ -654,7 +682,7 @@ class CustomKoinModuleTests {
         run(10.minutes)
 
         eventLog.size shouldBe 2
-        eventLog.last().shouldBe(beInstanceOf<MyGoodEvent>())
+        eventLog.last() shouldBe instanceOf(MyGoodEvent::class)
     }
 
 
