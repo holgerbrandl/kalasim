@@ -121,12 +121,14 @@ publishing {
 
 
 nexusPublishing {
-//    packageGroup.set("com.github.holgerbrandl.kalasim")
     repositories {
-        sonatype()
+        // see https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/#configuration
+        sonatype {
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
+        }
     }
 }
-
 
 signing {
     sign(publishing.publications["maven"])
