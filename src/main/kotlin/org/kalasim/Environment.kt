@@ -17,6 +17,7 @@ import org.kalasim.misc.*
 import org.kalasim.monitors.MetricTimeline
 import org.koin.core.Koin
 import org.koin.core.definition.Definition
+import org.koin.core.error.DefinitionOverrideException
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
 import org.koin.core.qualifier.named
@@ -150,20 +151,11 @@ open class Environment(
     val runtime
         get() = now - startDate
 
-    @Deprecated("use now instead", ReplaceWith("now"))
-    val nowWT: Instant
-        get() = now
-
-    @AmbiguousDuration
-    val nowTT: TickTime
-        get() = now.toTickTime()
-
 
     @Suppress("LeakingThis")
     // That's a pointless self-recursion, but it allows to simplify support API (tick-transform, distributions, etc.)
     /** Self-pointer. Pointless from a user-perspective, but helpful to build the kalasim APIs more efficiently.*/
     override val env: Environment = this
-
 
     /** Allows to transform ticks to wall time (represented by `kotlinx.datetime.Instant`) */
     internal var tickTransform: TickTransform = TickTransform(tickDurationUnit)
@@ -230,6 +222,7 @@ open class Environment(
      *
      * @return an instance of type [T] if found in simulation environment, otherwise null.
      */
+    @Suppress("unused")
     inline fun <reified T : Any> getOrNull(
         qualifier: String, noinline parameters: ParametersDefinition? = null,
     ): T? = getKoin().getOrNull(named(qualifier), parameters)
@@ -614,6 +607,10 @@ inline fun <reified T> Environment.dependency(qualifier: String, builder: Enviro
 /** Register dependency in simulation context. For details see https://www.kalasim.org/basics/#dependency-injection */
 inline fun <reified T> Environment.dependency(qualifier: Qualifier? = null, builder: Environment.() -> T): T {
     val something = builder(this)
+
+    require (getKoin().getOrNull<T> (T::class, qualifier)==null){
+        throw DefinitionOverrideException("duplicate definition for $something")
+    }
 
     getKoin().loadModules(listOf(module(createdAtStart = true) {
         dependency(qualifier) { something }
