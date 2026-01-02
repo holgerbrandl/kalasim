@@ -26,24 +26,24 @@ dependencies {
     // note update to latest version postponed because of regression errors
 //    api("io.insert-koin:koin-core:3.1.2")
     api("io.insert-koin:koin-core:4.1.0")
-    api("org.json:json:20250517")
+    api("org.json:json:20251224")
     api("com.github.holgerbrandl:jsonbuilder:0.10")
 
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-    api("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+    api("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2") // 0.7.1 marks kotlinx-datetime as deprecated
 
-    api("io.github.oshai:kotlin-logging-jvm:6.0.9")
+    api("io.github.oshai:kotlin-logging-jvm:7.0.14")
 
     api("com.github.holgerbrandl:kdfutils:1.5.0")
 
-    implementation("com.google.code.gson:gson:2.11.0")
+    implementation("com.google.code.gson:gson:2.13.2")
 //    implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.20")
 
-    testImplementation("io.kotest:kotest-assertions-core:5.9.1")
+    testImplementation("io.kotest:kotest-assertions-core:6.0.7")
 
     //experimental dependencies  use for experimentation
     testImplementation("com.thoughtworks.xstream:xstream:1.4.21")
-    testImplementation("org.slf4j:slf4j-simple:1.7.30")
+    testImplementation("org.slf4j:slf4j-simple:2.0.17")
 
     testImplementation(kotlin("script-runtime"))
     testImplementation(kotlin("test"))
@@ -81,7 +81,7 @@ compileKotlin.compilerOptions {
 
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 
