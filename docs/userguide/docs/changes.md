@@ -1,5 +1,16 @@
 # Kalasim Release History
 
+## 1.1.2
+
+Released 2026-01-02
+
+
+* Fixed `interupt()` to work better in combination with `wait()`
+* Updated jvm baseline to 21
+* Updated dependencies
+
+
+
 ## 1.1.0
 
 * Updated all dependencies
