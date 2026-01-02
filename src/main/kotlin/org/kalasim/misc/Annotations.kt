@@ -27,5 +27,5 @@ annotation class AmbiguousDurationComponent
     message = "This API is not recommended for public use. It's consumed only internally in modules of kalasim."
 )
 @Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.FUNCTION)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
 annotation class InternalKalasimApi

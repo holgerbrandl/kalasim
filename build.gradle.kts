@@ -8,7 +8,7 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
-version = "1.1.0"
+version = "1.1.1"
 
 
 allprojects {

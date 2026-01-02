@@ -5,11 +5,27 @@ import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.kalasim.*
+import org.kalasim.misc.ASSERT_MODE
+import org.kalasim.misc.AssertMode
 import org.kalasim.misc.createTestSimulation
+import org.kalasim.test.StateTests.TrafficLightState.GREEN
+import org.kalasim.test.StateTests.TrafficLightState.RED
 import kotlin.test.fail
 import kotlin.time.Duration.Companion.minutes
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.AfterEach
 
 class StateTests {
+
+    @BeforeEach
+    fun setUp() {
+        ASSERT_MODE = AssertMode.FULL
+    }
+
+    @AfterEach
+    fun tearDown() {
+        ASSERT_MODE = AssertMode.LIGHT
+    }
 
     @Test
     fun testPredicate() {
@@ -135,10 +151,13 @@ class StateTests {
         """.trimIndent()
     }
 
+    enum class TrafficLightState { RED, GREEN }
+
+
     @Test
     fun `it should wait until multiple predicates are honored`() {
 
-        class TrafficLight : State<String>("red")
+        class TrafficLight : State<TrafficLightState>(RED)
         class Engine : State<Boolean>(false)
 
         class Car : Component() {
@@ -148,7 +167,7 @@ class StateTests {
 
             override fun process() = sequence {
                 @Suppress("RedundantValueArgument")
-                wait(trafficLight turns "green", engine turns true, all = true)
+                wait(trafficLight turns GREEN, engine turns true, all = true)
                 log("passing crossing")
 //                terminate()
             }
@@ -169,7 +188,7 @@ class StateTests {
             trafficLight.snapshot.waiters.size shouldBe 1
 
             // toggle state
-            trafficLight.value = "green"
+            trafficLight.value = GREEN
 
             run(10.minutes)
 
@@ -191,6 +210,75 @@ class StateTests {
 
             trafficLight.snapshot.waiters.shouldBeEmpty()
             engine.snapshot.waiters.shouldBeEmpty()
+        }
+    }
+
+
+    @Test
+    fun `it should honor a wait after a component has been resumed`() {
+
+        class TrafficLight : State<TrafficLightState>(RED)
+
+        class Car : Component() {
+
+            val trafficLight = get<TrafficLight>()
+
+            override fun process() = sequence {
+                wait(trafficLight turns GREEN)
+                hold(30.minutes,"passing crossing and starting roadtrip")
+                stopSimulation()
+            }
+        }
+
+        class EngineFailure : Component() {
+
+            val car = get<Car>()
+
+            override fun process() = sequence {
+                hold(3.minutes)
+                car.interrupt()
+                hold(5.minutes)
+                car.isInterrupted shouldBe true
+                car.resume()
+
+                // another breakdown this time without a traffic light
+                hold(15.minutes)
+                car.interrupt()
+                hold(5.minutes)
+                car.resume()
+            }
+        }
+
+        createSimulation {
+            val trafficLight = dependency { TrafficLight() }
+
+            object : Component("TrafficLightController"){
+                override fun repeatedProcess(): Sequence<Component> = sequence {
+                    hold(5.minutes)
+                    trafficLight.value = GREEN
+                    hold(5.minutes)
+                    trafficLight.value = RED
+                }
+            }
+
+            val car = dependency { Car() }
+
+            EngineFailure()
+
+            object : Component("TestMonitor"){
+                override fun process(): Sequence<Component> = sequence {
+                    hold(4.minutes)
+                    trafficLight.snapshot.waiters.size shouldBe 1
+                    car.isInterrupted shouldBe true
+                }
+            }
+
+            run()
+
+            now shouldBe startDate+43.minutes
+
+            trafficLight.snapshot.waiters.shouldBeEmpty()
+            car.isWaiting shouldBe false
         }
     }
 
