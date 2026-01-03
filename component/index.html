@@ -1,0 +1,3532 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Discrete event simulator with type support, dependency injection, modern persistence and logging to enable large-scale, industrial-ready simulations">
+      
+      
+        <meta name="author" content="Holger Brandl">
+      
+      
+        <link rel="canonical" href="https://www.kalasim.org/component/">
+      
+      
+        <link rel="prev" href="../basics/">
+      
+      
+        <link rel="next" href="../resource/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Components - kalasim - discrete event simulator</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../None">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="pink">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#component" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="kalasim - discrete event simulator" class="md-header__button md-logo" aria-label="kalasim - discrete event simulator" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            kalasim - discrete event simulator
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Components
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="pink"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="pink"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/holgerbrandl/kalasim" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    holgerbrandl/kalasim
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href=".." class="md-tabs__link">
+          
+  
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../basics/" class="md-tabs__link">
+          
+  
+  
+  Basics
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../analysis/" class="md-tabs__link">
+          
+  
+  
+  Analysis
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../articles/articles/" class="md-tabs__link">
+          
+  
+  
+  Articles
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../examples/" class="md-tabs__link">
+          
+  
+  
+  Examples
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../advanced/" class="md-tabs__link">
+          
+  
+  
+  Advanced
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../about/" class="md-tabs__link">
+          
+  
+  
+  About
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="kalasim - discrete event simulator" class="md-nav__button md-logo" aria-label="kalasim - discrete event simulator" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    kalasim - discrete event simulator
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/holgerbrandl/kalasim" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    holgerbrandl/kalasim
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Home
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../theory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What's New?
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basics
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Basics
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../basics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulation Basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Components
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Components
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#process-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process Definition
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Process Definition">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-extend-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Extend process
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-extend-repeatedprocess" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Extend repeatedProcess
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-process-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Process Reference
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inlining-subprocesses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inlining Subprocesses
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#toggling-processes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Toggling processes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#process-interaction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process Interaction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Process Interaction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hold
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="hold">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#state-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        State Contract
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#activate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        activate
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="activate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#state-contract_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        State Contract
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#misc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Misc
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#passivate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        passivate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cancel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cancel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#standby" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        standby
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        request
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wait" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        wait
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interrupt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        interrupt
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-of-process-interaction-methods-within-a-function-or-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage of process interaction methods within a function or method
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#component-generator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Component Generator
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resource/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resources
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../state/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    States
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../collections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analysis
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Analysis
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../events/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Events
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../monitors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Monitors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../visualization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../animation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Animation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Articles
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Articles
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../articles/articles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2022
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    2022
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../articles/2022-11-25-kalasim-at-wsc22/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    WSC22
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../articles/2022-09-27-kalasim-v08/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kalasim v0.8
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../animation/lunar_mining/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lunar Mining
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2021
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    2021
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../articles/2021-11-27-kalasim-v07/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kalasim v0.7
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changes/#v06" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kalasim v0:6
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/car/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Car
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/traffic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Traffic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/bank_office/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bank Office
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/movie_theater/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Movie Theater
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/car_wash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Car Wash
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/atm_queue/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ATM Queue
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/gas_station/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gas Station
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/bridge_game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bridge Game
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/machine_parts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Machine Parts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/machine_shop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Machine Shop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/dining_philosophers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dining Philosophers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/office_tower/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Office Tower
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/ferryman/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The Ferryman
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/emergency_room/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Emergyency Room
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../animation/lunar_mining/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lunar Mining
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/callcenter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Call Center
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Advanced
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../advanced/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    About
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#process-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process Definition
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Process Definition">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-extend-process" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Extend process
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-extend-repeatedprocess" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Extend repeatedProcess
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-process-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Process Reference
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inlining-subprocesses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inlining Subprocesses
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#toggling-processes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Toggling processes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#process-interaction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Process Interaction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Process Interaction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hold
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="hold">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#state-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        State Contract
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#activate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        activate
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="activate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#state-contract_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        State Contract
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#misc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Misc
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#passivate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        passivate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cancel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cancel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#standby" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        standby
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        request
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wait" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        wait
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interrupt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        interrupt
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-of-process-interaction-methods-within-a-function-or-method" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage of process interaction methods within a function or method
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#component-generator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Component Generator
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="component">Component</h1>
+<p>Components are the key elements of a simulation. By providing a <a href="#process-definition">process definition</a> of the business process in study, components allow modeling the interplay with other simulation components as well as its timing.</p>
+<p>Components can be in different <a href="#lifecycle">lifecycle</a> state. An <code>ACTIVE</code>  component has one or more <a href="#process-definition">process definitions</a> of which one was activated at some point earlier in time. </p>
+<p>If a component has an associated process definition, we can schedule it for execution using  <a href="#activate"><code>activate()</code></a>. This will also change its state to become active <code>ACTIVE</code>, </p>
+<p>An <code>ACTIVE</code> component can become <code>DATA</code> either with a <a href="#cancel"><code>cancel()</code></a> or by reaching the end of its <a href="#process-definition">process definition</a>.</p>
+<p>It is very easy to create a <code>DATA</code> components which can be useful to model more passive elements in a model (such as production material).</p>
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">component</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Component</span><span class="p">()</span>
+</code></pre></div>
+<p>Components will interact with each other through a well-defined vocabulary of <a href="#process-interaction">process interaction</a> methods.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>By default, Components will be named automatically, using the pattern <code>[Class Name].[Instance Number]</code> unless a custom name is provided via the <code>name</code> parameter in <code>Component(name="Foo")</code>. Kalasim also supports <em>auto-indexing</em> if a provided component name ends with a dash <code>-</code>, dot <code>.</code> or underscore <code>_</code>. E.g. A first <code>Component("Foo-")</code> will be named <code>Foo-1</code>, a second one <code>Foo-2</code> and so on.</p>
+</div>
+<h2 id="process-definition">Process Definition</h2>
+<p>Although it is possible to create a component directly with <code>val x = Component()</code>, this does not encode any simulation mechanics a there is process definition defining how the <code>x</code> will interact with the simulation environment. So, nearly always we define our simulation entities by extending <code>Component</code> and by providing a <em>process definition</em> which details out the component's life cycle:</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The process definition of a component defines its dynamics and interplay with other simulation entities. Writing down the process definition is the <strong>key</strong> modelling task when using <code>kalasim</code>.</p>
+</div>
+<p>If there is no process definition, a component will stay passive. Techncially, it is refrerred to as a <a href="#lifecycle"><code>DATA</code></a> component.</p>
+<p>There are 3 supported methods to provide a process definition.</p>
+<h3 id="1-extend-process">1. Extend <code>process</code></h3>
+<p>Let's start with the most common method. In order to define an <code>ACTIVE</code>  component it is necessary to extend <code>org.kalasim.Component</code> to provide (at least) one sequence generator method, normally called <code>process</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">Car</span><span class="p">:</span><span class="w"> </span><span class="n">Component</span><span class="p">(){</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">process</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">wait</span><span class="p">(</span><span class="n">customerArrived</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">request</span><span class="p">(</span><span class="n">driver</span><span class="p">){</span>
+<span class="w">            </span><span class="n">hold</span><span class="p">(</span><span class="m">4</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;driving&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>If we then later say <code>val car = Car()</code>, a component is created, and it is scheduled for execution within kalasim's <a href="../basics/#event-queue">event loop</a>. The <code>process</code> method is nearly always, but not necessarily a <em>generator method</em>  (i.e. it has at least one <code>yield</code> statement), so it contains suspension points where execution can be stalled. </p>
+<p>It is also possible to set a time at which the component (<code>car</code>) becomes active, like <code>val car = Car(delay=10)</code>. This requires an additional constructor argument to be passed on to <code>Component</code> as in <code>class Car(delay:Number): Component(delay=delay)</code>.</p>
+<p>Creation and activation are by default combined when creating a new <code>Component</code> instance:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">car1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Car</span><span class="p">()</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">car2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Car</span><span class="p">()</span>
+<span class="kd">val</span><span class="w"> </span><span class="nv">car3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Car</span><span class="p">()</span>
+</code></pre></div>
+<p>This causes three cars to be created and to be <a href="./#activate">activated</a>, so these instances are <em>scheduled</em> for execution in the simulation's <a href="../basics/#event-queue">event queue</a>.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+</div>
+<p>In some situations, automatic activation of the process definition may not be needed or desired. If so, even in presence of a <code>process</code> or <code>repeatedProcess</code> method, you can disable the automatic activation (i.e. make it a data component), by specifying <code>Component(process = Component::none)</code>.</p>
+<p>Normally, any process definition will contain at least one <a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence-scope/yield.html"><code>yield</code></a> statement. By doing so, the component can hand-back control to the simulation engine at defined points when a component needs to wait. Typically, the user must not use <code>yield</code> directly, but rather the provided <a href="#process-interaction">process interaction</a> methods.</p>
+<h3 id="2-extend-repeatedprocess">2. Extend <code>repeatedProcess</code></h3>
+<p>Another very common pattern when writing down process definitions, iteratively executed processes. This could be modelled directly as described above using <a href="#1-extend-process"><code>process</code></a>. But as shown in the following example, this lacks somewhat lacks conciseness: </p>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">Machine</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Component</span><span class="p">(){</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">process</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">while</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="n">wait</span><span class="p">(</span><span class="n">hasMaterial</span><span class="p">)</span>
+<span class="w">          </span><span class="n">hold</span><span class="p">(</span><span class="m">7</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;drilling&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Luckily, this can be expressed more elegantly with <code>repeatedProcess</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span><span class="w"> </span><span class="nc">Machine</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Component</span><span class="p">(){</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">repeatedProcess</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">wait</span><span class="p">(</span><span class="n">hasMaterial</span><span class="p">)</span>
+<span class="w">        </span><span class="n">hold</span><span class="p">(</span><span class="m">7</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;drilling&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="3-process-reference">3. Process Reference</h3>
+<p>A component may be initialized to start at another process definition method. This is achieved by passing a reference to this method which must be part of the component's class definition, like <code>val car = Car(process = Car::wash)</code>.</p>
+<p>It is also possible to prepare multiple process definition, which may become active later by means of an <code>activate()</code> statement:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">////CraneProcess.kts</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">org.kalasim.*</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">Crane</span><span class="p">(</span>
+<span class="w">    </span><span class="n">process</span><span class="p">:</span><span class="w"> </span><span class="n">GeneratorFunRef? </span><span class="o">=</span><span class="w"> </span><span class="n">Component</span><span class="o">::</span><span class="n">process</span>
+<span class="p">)</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Component</span><span class="p">(</span><span class="n">process</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Crane</span><span class="o">::</span><span class="n">load</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">unload</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="o">&lt;</span><span class="n">Component</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// hold, request, wait ...</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">load</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="o">&lt;</span><span class="n">Component</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// hold, request, wait ...</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">createSimulation</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">crane1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Crane</span><span class="p">()</span><span class="w"> </span><span class="c1">// load will be activated be default</span>
+
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">crane2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Crane</span><span class="p">(</span><span class="n">process</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Crane</span><span class="o">::</span><span class="n">load</span><span class="p">)</span><span class="w"> </span><span class="c1">// force unloading at start</span>
+
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">crane3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Crane</span><span class="p">(</span><span class="n">process</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Crane</span><span class="o">::</span><span class="n">unload</span><span class="p">)</span><span class="w"> </span><span class="c1">// force unloading at start</span>
+<span class="w">    </span><span class="n">crane3</span><span class="p">.</span><span class="na">activate</span><span class="p">(</span><span class="n">process</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Crane</span><span class="o">::</span><span class="n">load</span><span class="p">)</span><span class="w"> </span><span class="c1">// activate other process</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Effectively, creation and start of <code>crane1</code> and <code>crane2</code> is the same.</p>
+<h3 id="inlining-subprocesses">Inlining Subprocesses</h3>
+<p>To run/consume/inline another <a href="#process-definition">process definition</a>, we can use<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.sequences/-sequence-scope/yield-all.html"><code>yieldAll(subProcess())</code></a> to inline <code>subProcess()</code> defined for the same component. This allows to inline the entire process definition in a blocking manner. Here's an example how to do so:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">//import org.kalasim.*</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">kotlin.time.Duration.Companion.minutes</span>
+
+<span class="n">createSimulation</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">enableComponentLogger</span><span class="p">()</span>
+
+<span class="w">    </span><span class="k">object</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nc">Component</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">process</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">hold</span><span class="p">(</span><span class="m">1.</span><span class="n">minute</span><span class="p">)</span>
+<span class="w">            </span><span class="c1">// to consume the sub-process we use yieldAll</span>
+<span class="w">            </span><span class="n">yieldAll</span><span class="p">(</span><span class="n">subProcess</span><span class="p">())</span>
+<span class="w">            </span><span class="c1">// it will continue here after the sub-process has been consumed</span>
+<span class="w">            </span><span class="n">hold</span><span class="p">(</span><span class="m">2.</span><span class="n">minutes</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="kd">fun</span><span class="w"> </span><span class="nf">subProcess</span><span class="p">():</span><span class="w"> </span><span class="n">Sequence</span><span class="o">&lt;</span><span class="n">Component</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">hold</span><span class="p">(</span><span class="m">3.</span><span class="n">minutes</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">run</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="toggling-processes">Toggling processes</h3>
+<p>It's a very effective tool in discrete simulation, to toggle the process definition of a component at runtime. Using <a href="#activate"><code>activate()</code></a> we can toggle processes very effectively in a simulation model. There are 3 ways to do so</p>
+<ol>
+<li>From with a component's <a href="#process-definition">process defintion</a></li>
+<li>Within another component process defintion</li>
+<li>Outside of any process definition.</li>
+</ol>
+<p>The following example illustrates these examples as well as <a href="#inlining-subprocesses">process inlining</a>:</p>
+<p><div class="highlight"><pre><span></span><code><span class="c1">////Restaurant.kts</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">org.kalasim.*</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">kotlin.time.Duration.Companion.hours</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">kotlin.time.Duration.Companion.minutes</span>
+
+<span class="kd">data</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">Recipe</span><span class="p">(</span><span class="kd">val</span><span class="w"> </span><span class="nv">name</span><span class="p">:</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">toString</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span>
+<span class="p">}</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">Customer</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Component</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">restaurant</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="k">get</span><span class="o">&lt;</span><span class="n">Restaurant</span><span class="o">&gt;</span><span class="p">()</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">process</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="o">&lt;</span><span class="n">Component</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">hold</span><span class="p">(</span><span class="m">3.</span><span class="n">hours</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">15.</span><span class="n">minutes</span><span class="p">)</span><span class="w"> </span><span class="c1">// arrive somewhen</span>
+
+<span class="w">        </span><span class="n">restaurant</span><span class="p">.</span><span class="na">activate</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">Restaurant</span><span class="o">::</span><span class="n">cookSomething</span><span class="p">,</span><span class="w"> </span><span class="n">Recipe</span><span class="p">(</span><span class="s">&quot;pasta&quot;</span><span class="p">))</span>
+
+<span class="w">        </span><span class="n">hold</span><span class="p">(</span><span class="m">30.</span><span class="n">minutes</span><span class="p">,</span><span class="s">&quot;drink something while waiting for food&quot;</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c1">// wait for the food preparation to complete</span>
+<span class="w">        </span><span class="n">join</span><span class="p">(</span><span class="n">restaurant</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c1">//order something else</span>
+<span class="w">        </span><span class="n">restaurant</span><span class="p">.</span><span class="na">activate</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">Restaurant</span><span class="o">::</span><span class="n">specialOffer</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Component</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">process</span><span class="p">():</span><span class="w"> </span><span class="n">Sequence</span><span class="o">&lt;</span><span class="n">Component</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">hold</span><span class="p">(</span><span class="m">2.</span><span class="n">hours</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;opening restaurant&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">cookSomething</span><span class="p">(</span><span class="n">recipe</span><span class="p">:</span><span class="w"> </span><span class="n">Recipe</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">hold</span><span class="p">(</span><span class="m">10.</span><span class="n">minutes</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;preparing </span><span class="si">$</span><span class="n">recipe</span><span class="s">&quot;</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">log</span><span class="p">(</span><span class="s">&quot;dinner&#39;s ready! I am serving </span><span class="si">$</span><span class="n">recipe</span><span class="s"> today&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">specialOffer</span><span class="p">():</span><span class="w"> </span><span class="n">Sequence</span><span class="o">&lt;</span><span class="n">Component</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">hold</span><span class="p">(</span><span class="m">5.</span><span class="n">minutes</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;selecting dish of the day&quot;</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c1">// We can activate another process from within a process definition</span>
+<span class="w">        </span><span class="c1">// Provide a recipe, set the `spicy` flag and delay activation by 5 minutes</span>
+<span class="w">        </span><span class="n">activate</span><span class="p">(</span><span class="o">::</span><span class="n">cookSomethingSpecial</span><span class="p">,</span><span class="w"> </span><span class="n">Recipe</span><span class="p">(</span><span class="s">&quot;cake&quot;</span><span class="p">),</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="n">delay</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5.</span><span class="n">minutes</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">cookSomethingSpecial</span><span class="p">(</span><span class="n">recipe</span><span class="p">:</span><span class="w"> </span><span class="n">Recipe</span><span class="p">,</span><span class="w"> </span><span class="n">spicy</span><span class="p">:</span><span class="w"> </span><span class="kt">Boolean</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">hold</span><span class="p">(</span><span class="m">20.</span><span class="n">minutes</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;preparing </span><span class="si">$</span><span class="n">recipe</span><span class="s"> ...&quot;</span><span class="p">)</span>
+
+<span class="w">        </span><span class="n">yieldAll</span><span class="p">(</span><span class="n">prepareDesert</span><span class="p">())</span><span class="w"> </span><span class="c1">// inline sub-process</span>
+
+<span class="w">        </span><span class="n">log</span><span class="p">(</span><span class="s">&quot;special dinner&#39;s ready!&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="n">log</span><span class="p">(</span><span class="s">&quot;serving </span><span class="si">${</span><span class="k">if</span><span class="p">(</span><span class="n">spicy</span><span class="p">)</span><span class="w"> </span><span class="s">&quot;</span><span class="n">spicy</span><span class="s">&quot;</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="si">}</span><span class="s"> </span><span class="si">$</span><span class="n">recipe</span><span class="s"> and some desert&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// another small process without any arguments</span>
+<span class="w">    </span><span class="kd">fun</span><span class="w"> </span><span class="nf">prepareDesert</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">hold</span><span class="p">(</span><span class="m">15.</span><span class="n">minutes</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;making a pie&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">createSimulation</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">enableComponentLogger</span><span class="p">()</span>
+
+<span class="w">    </span><span class="c1">// instantiate the simulation components</span>
+<span class="w">    </span><span class="kd">val</span><span class="w"> </span><span class="nv">restaurant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dependency</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Restaurant</span><span class="p">()</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// create customer</span>
+<span class="w">    </span><span class="n">Customer</span><span class="p">()</span>
+
+<span class="w">    </span><span class="c1">// run the model</span>
+<span class="w">    </span><span class="n">run</span><span class="p">()</span>
+
+<span class="w">    </span><span class="c1">// activate process with arguments from outside a process definition</span>
+<span class="w">    </span><span class="n">restaurant</span><span class="p">.</span><span class="na">activate</span><span class="p">(</span>
+<span class="w">        </span><span class="n">process</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Restaurant</span><span class="o">::</span><span class="n">cookSomething</span><span class="p">,</span>
+<span class="w">        </span><span class="n">processArgument</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Recipe</span><span class="p">(</span><span class="s">&quot;lasagne&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">)</span>
+
+<span class="w">    </span><span class="c1">// and run again</span>
+<span class="w">    </span><span class="n">run</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+Notably, we can provide process arguments here in a typesafe manner.</p>
+<h2 id="lifecycle">Lifecycle</h2>
+<p>A simulation component is always in one of the following states modelled by <code>org.kalasim.ComponentState</code>:</p>
+<ul>
+<li><code>CURRENT</code> - The component's process is currently being executed by the <a href="../basics/#event-queue">event queue</a></li>
+<li><code>SCHEDULED</code> - The component is <a href="../basics/#event-queue">scheduled</a> for future execution</li>
+<li><code>PASSIVE</code> - The component is idle</li>
+<li><code>REQUESTING</code> - The component is waiting for a <a href="../resource/">resource</a> requirement to be met</li>
+<li><code>WAITING</code> - The component is <a href="#wait">waiting</a> for a <a href="../state/">state</a> predicate to be met</li>
+<li><code>STANDBY</code> - The component was put on <a href="#standby">standby</a></li>
+<li><code>INTERRUPTED</code> - The component was <a href="#interrupt">interrupted</a></li>
+<li><code>DATA</code> - The component is non of the <em>active</em> states above. Components without a <code>process</code> definition are always in this state.</li>
+</ul>
+<p>A component's status is managed via the property <code>component.componentState</code>, and is automatically tracked with a <a href="../monitors/#level-monitor">level monitor</a> named <code>component.statusTimeline</code>.</p>
+<p>The <code>statusMonitor</code> can be consumed in different ways. It possible to check how long a component has been in a particular state with</p>
+<p><div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">passiveDuration</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">component</span><span class="p">.</span><span class="na">statusMonitor</span><span class="o">[</span><span class="n">ComponentState</span><span class="p">.</span><span class="na">PASSIVE</span><span class="o">]</span>
+</code></pre></div>
+Also, it is possible to print a histogram with all the statuses a component has been in with</p>
+<div class="highlight"><pre><span></span><code><span class="n">component</span><span class="p">.</span><span class="na">statusMonitor</span><span class="p">.</span><span class="na">printHistogram</span><span class="p">()</span>
+</code></pre></div>
+<p>Accumulated times in a particular state can be obtained with <code>summed()</code> and be printed to console or displayed with the selected graphics backend</p>
+<div class="highlight"><pre><span></span><code><span class="kd">val</span><span class="w"> </span><span class="nv">timeInEachState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">component</span><span class="p">.</span><span class="na">statusMonitor</span><span class="p">.</span><span class="na">summed</span><span class="p">()</span>
+
+<span class="n">timeInEachState</span><span class="p">.</span><span class="na">printConsole</span><span class="p">()</span>
+<span class="n">timeInEachState</span><span class="p">.</span><span class="na">display</span><span class="p">()</span>
+</code></pre></div>
+<p><img alt="" src="../component_state_summed.png" /></p>
+<h2 id="process-interaction">Process Interaction</h2>
+<p>The scheme below shows how interaction relate to component state transitions:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">from/to</th>
+<th style="text-align: center;">data</th>
+<th style="text-align: center;">current</th>
+<th style="text-align: center;">scheduled</th>
+<th style="text-align: center;">passive</th>
+<th style="text-align: center;">requesting</th>
+<th style="text-align: center;">waiting</th>
+<th style="text-align: center;">standby</th>
+<th style="text-align: center;">interrupted</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">data</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">activate<sup><a href="#f1">1</a></sup></td>
+<td style="text-align: center;">activate</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">current</td>
+<td style="text-align: center;">process end</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">yield hold</td>
+<td style="text-align: center;">yield passivate</td>
+<td style="text-align: center;">yield request</td>
+<td style="text-align: center;">yield wait</td>
+<td style="text-align: center;">yield standby</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">.</td>
+<td style="text-align: center;">yield cancel</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">yield activate</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">scheduled</td>
+<td style="text-align: center;">cancel</td>
+<td style="text-align: center;">next event</td>
+<td style="text-align: center;">hold</td>
+<td style="text-align: center;">passivate</td>
+<td style="text-align: center;">request</td>
+<td style="text-align: center;">wait</td>
+<td style="text-align: center;">standby</td>
+<td style="text-align: center;">interrupt</td>
+</tr>
+<tr>
+<td style="text-align: center;">.</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">activate</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">passive</td>
+<td style="text-align: center;">cancel</td>
+<td style="text-align: center;">activate<sup>1</sup></td>
+<td style="text-align: center;">activate</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">request</td>
+<td style="text-align: center;">wait</td>
+<td style="text-align: center;">standby</td>
+<td style="text-align: center;">interrupt</td>
+</tr>
+<tr>
+<td style="text-align: center;">.</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">hold<sup>2</sup></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">requesting</td>
+<td style="text-align: center;">cancel</td>
+<td style="text-align: center;">claim honor</td>
+<td style="text-align: center;">activate<sup>3</sup></td>
+<td style="text-align: center;">passivate</td>
+<td style="text-align: center;">request</td>
+<td style="text-align: center;">wait</td>
+<td style="text-align: center;">standby</td>
+<td style="text-align: center;">interrupt</td>
+</tr>
+<tr>
+<td style="text-align: center;">.</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">time out</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">activate<sup>4</sup></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">waiting</td>
+<td style="text-align: center;">cancel</td>
+<td style="text-align: center;">wait honor</td>
+<td style="text-align: center;">activate<sup>5</sup></td>
+<td style="text-align: center;">passivate</td>
+<td style="text-align: center;">wait</td>
+<td style="text-align: center;">wait</td>
+<td style="text-align: center;">standby</td>
+<td style="text-align: center;">interrupt</td>
+</tr>
+<tr>
+<td style="text-align: center;">.</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">timeout</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">activate<sup>6</sup></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">standby</td>
+<td style="text-align: center;">cancel</td>
+<td style="text-align: center;">next event</td>
+<td style="text-align: center;">activate</td>
+<td style="text-align: center;">passivate</td>
+<td style="text-align: center;">request</td>
+<td style="text-align: center;">wait</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">interrupt</td>
+</tr>
+<tr>
+<td style="text-align: center;">interrupted</td>
+<td style="text-align: center;">cancel</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">resume<sup>7</sup></td>
+<td style="text-align: center;">resume<sup>7</sup></td>
+<td style="text-align: center;">resume<sup>7</sup></td>
+<td style="text-align: center;">resume<sup>7</sup></td>
+<td style="text-align: center;">resume<sup>7</sup></td>
+<td style="text-align: center;">interrupt<sup>8</sup></td>
+</tr>
+<tr>
+<td style="text-align: center;">.</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">activate</td>
+<td style="text-align: center;">passivate</td>
+<td style="text-align: center;">request</td>
+<td style="text-align: center;">wait</td>
+<td style="text-align: center;">standby</td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<!--https://stackoverflow.com/questions/25579868/how-to-add-footnotes-to-github-flavoured-markdown-->
+
+<!-- to enable achnor link parsing in markdown navigator enable "inline html a tag" -->
+
+<ol>
+<li><a id="f1"></a> Via <code>scheduled()</code></li>
+<li><a id="f2"></a> Not recommended</li>
+<li><a id="f3"></a> With <code>keepRequest = false</code> (default)</li>
+<li><a id="f4"></a> With <code>keepRequest = true</code>. This allows to set a new time out</li>
+<li><a id="f5"></a> With <code>keepWait = false</code> (default)</li>
+<li><a id="f6"></a> With <code>keepWait = true</code>. This allows to set a new timeout</li>
+<li><a id="f7"></a> State at time of interrupt</li>
+<li><a id="f8"></a> Increases the <code>interruptLevel</code></li>
+</ol>
+<h3 id="hold">hold</h3>
+<p>This method is utilized to suspend a component for a specific duration of simulation time. It changes that the state of a - usually <code>current</code> - component to <code>scheduled</code>. By invoking the hold method, control is returned from the process definition back to the simulation engine.
+After the specified hold duration, the engine will resume the execution of the process definition. This becomes a crucial method in <code>kalasim</code>, as it dictates the temporal flow of the overall process.</p>
+<p>Here's a basic example illustrating this process:</p>
+<div class="highlight"><pre><span></span><code><span class="k">object</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nc">Component</span><span class="p">(</span><span class="s">&quot;Something&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">process</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">hold</span><span class="p">(</span><span class="m">10.</span><span class="n">minutes</span><span class="p">,</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;some action&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="c1">// ^^ This is telling kalasim to suspend execution of this process </span>
+<span class="w">        </span><span class="c1">// for 10 simulation minutes</span>
+
+<span class="w">        </span><span class="c1">// ... 10 minutes later ...</span>
+<span class="w">        </span><span class="c1">// After these 10 minutes, it will continue execution of the process</span>
+<span class="w">        </span><span class="n">hold</span><span class="p">(</span><span class="m">1.</span><span class="n">minutes</span><span class="p">,</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;some other action &quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Supported parameters in <code>hold()</code> are</p>
+<ul>
+<li><code>duration</code> - The duration for which the component should be held.</li>
+<li><code>description</code> - An optional description for the hold operation.</li>
+<li><code>until</code> - The simulation time until which the component should be held. If provided, the component will be held until the specified simulation time.</li>
+<li><code>priority</code> - The priority of the hold operation. A higher priority value indicates a higher priority. Defaults to <code>NORMAL</code>.</li>
+<li><code>urgent</code> - A flag indicating whether the hold operation is urgent. If set to true, the component will be scheduled with the highest possible priority. Defaults to <code>false</code>.</li>
+</ul>
+<p>Either <code>duration</code> or <code>until</code> must be specified when calling <code>hold()</code> to indicate the intended delay.</p>
+<h4 id="state-contract">State Contract</h4>
+<p>The <a href="#lifecycle">state</a> contract when calling <code>hold()</code> is as follows</p>
+<ul>
+<li>If the component is <code>CURRENT</code>, it will suspend execution internally, and the component becomes scheduled for the specified time</li>
+<li>If the component to be held is passive, the component becomes scheduled for the specified time.</li>
+<li>If the component to be held is scheduled, the component will be rescheduled for the specified time, thus
+  essentially the same as activate.</li>
+<li>If the component to be held is standby, the component becomes scheduled for the specified time.</li>
+<li>If the component to be activated is requesting, the request will be terminated, the attribute failed
+  set and the component will become scheduled. It is recommended to use the more versatile activate method.</li>
+<li>If the component to be activated is waiting, the wait will be
+  terminated, the attribute failed set and the component will become scheduled. It is recommended to
+  use the more versatile activate method.</li>
+<li>If the component is interrupted, the component will be activated at the specified time.</li>
+</ul>
+<h3 id="activate">activate</h3>
+<p><code>activate()</code> will schedule execution of a <a href="#process-definition">process definition</a> at the specified time. If no time is specified, execution will be scheduled for the current simulation time. If you do not specify a process, the current process will be scheduled for <em>continuation</em>. If a <code>process</code> argument is provided, the process will be <em>started</em> (or <em>restarted</em> if it is equal to the currently active process).</p>
+<div class="highlight"><pre><span></span><code><span class="n">Car</span><span class="p">()</span><span class="w"> </span><span class="c1">// default to process=Component::process or Component::repeatedProcess   </span>
+<span class="n">Car</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">Component</span><span class="o">::</span><span class="n">none</span><span class="p">)</span><span class="w"> </span><span class="c1">// no process, which effectivly makes the car DATA     </span>
+
+<span class="kd">val</span><span class="w"> </span><span class="nv">car</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Car</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">Car</span><span class="o">::</span><span class="n">driving</span><span class="p">)</span><span class="w"> </span><span class="c1">// start car in driving mode  </span>
+
+<span class="c1">// stop driving (if still ongoing) and activate refilling process</span>
+<span class="n">car1</span><span class="p">.</span><span class="na">activate</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">Car</span><span class="o">::</span><span class="n">refilling</span><span class="p">)</span>
+
+<span class="c1">// activate defined process if set, otherwise error</span>
+<span class="n">car0</span><span class="p">.</span><span class="na">activate</span><span class="p">()</span><span class="w">  </span>
+</code></pre></div>
+<h4 id="parameters">Parameters</h4>
+<p>Supported parameters in <code>activate()</code></p>
+<ul>
+<li><code>process</code> - The name of the process to be started. If set to <code>None</code>, the process will not be changed. If the component is a data component, the generator function <code>process</code> will be used as the default process. Optionally type safe arguments can be provided to the generator function  via <code>processArgument</code> and <code>otherProcessArgument</code></li>
+<li><code>processArgument</code> - The argument to be passed to the process.</li>
+<li><code>at</code> - The schedule time. If omitted, no <code>delay</code> is used.</li>
+<li><code>delay</code> - The delay before starting the process. It uses a <code>Duration</code> object to specify the delay amount. The default value is <code>Duration.ZERO</code>.</li>
+<li><code>priority</code> - The priority level of the activation. It uses the <code>Priority</code> enumeration with options HIGH, NORMAL, and LOW. The default value is NORMAL.</li>
+<li><code>urgent</code> - Indicates whether the activation is urgent or not. If set to true, the activation will be treated as urgent. The default value is false.</li>
+<li><code>keepRequest</code> - Indicates whether to keep the activation request even after the process is started. If set to true, the activation request will be kept. The default value is false.</li>
+<li><code>keepWait</code> - Indicates whether to keep waiting for the process to complete before returning. If set to true, the activation will not return until the process is complete. The default value is false.</li>
+</ul>
+<h4 id="state-contract_1">State Contract</h4>
+<p>The <a href="#lifecycle">state</a> contract when calling <code>hold()</code> is as follows</p>
+<!--* If the component to be activated is `CURRENT`, always use `yield(activate())`. The effect is that the-->
+<!--  component becomes scheduled, thus this is essentially equivalent to the preferred hold method.-->
+<ul>
+<li>If the component to be activated is <code>DATA</code>, unless provided with <code>process</code> the default <code>Component::process</code> will be scheduled at the specified time.</li>
+<li>If the component to be activated is <code>PASSIVE</code>, the component will be activated at the specified time.</li>
+<li>If the component to be activated is <code>SCHEDULED</code>, the component will get a new scheduled time.</li>
+<li>If the component to be activated is <code>REQUESTING</code>, the request will be
+  terminated, the attribute failed set, and the component will become scheduled. If keep_request=True
+  is specified, only the fail_at will be updated, and the component will stay requesting.</li>
+<li>If the component to be activated is <code>WAITING</code>, the wait will be
+  terminated, the attribute <code>failed</code> set, and the component will become scheduled. If <code>keepWait=true</code>
+  is specified, only the <code>failAt</code> will be updated, and the component will stay waiting.</li>
+<li>If the component to be activated is <code>STANDBY</code>, the component will get a new scheduled time and become
+  scheduled.</li>
+<li>If the component is <code>INTERRUPTED</code>, the component will be activated at the specified time.</li>
+</ul>
+<h4 id="misc">Misc</h4>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>It is not possible to <code>activate()</code> the <code>CURRENT</code> component without providing a <code>process</code> argument. <code>kalasim</code> will throw an error in this situation. The effect of a "self"-activate would be that the component becomes scheduled, thus this is essentially equivalent to the preferred hold method, so please use <code>hold</code> instead. The error is a safe-guard mechanism to prevent the user from unintentionally rescheduling the current component again. </p>
+</div>
+<p>In situations where the current process need to be restarted, we can use activate <code>yield(activate(process = Component::process))</code> which will bypass the internal requirement that the activated component must not be <code>CURRENT</code>.</p>
+<p>Although not very common, it is also possible to activate a component at a certain time or with a specified delay:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ship1</span><span class="p">.</span><span class="na">activate</span><span class="p">(</span><span class="n">at</span><span class="o">=</span><span class="m">100</span><span class="p">)</span>
+<span class="n">ship2</span><span class="p">.</span><span class="na">activate</span><span class="p">(</span><span class="n">delay</span><span class="o">=</span><span class="m">50.</span><span class="n">minutes</span><span class="p">)</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is possible to use <code>activate()</code> outside of a process definition, e.g. to toggle processes after some time  </p>
+<p><div class="highlight"><pre><span></span><code><span class="n">sim</span><span class="p">.</span><span class="na">run</span><span class="p">(</span><span class="m">10</span><span class="p">)</span>
+<span class="n">car</span><span class="p">.</span><span class="na">activate</span><span class="p">(</span><span class="n">process</span><span class="o">=</span><span class="n">Car</span><span class="o">::</span><span class="n">repair</span><span class="p">)</span>
+<span class="n">sim</span><span class="p">.</span><span class="na">run</span><span class="p">(</span><span class="m">10</span><span class="p">)</span>
+</code></pre></div>
+However, in most situations this is better modelled within a <a href="#process-definition">process definition</a>.</p>
+</div>
+<p>We can use <code>activate</code>  to <a href="#toggling-processes">toggle</a> the active process of a component</p>
+<h3 id="passivate">passivate</h3>
+<p>Passivate is the way to make a - usually <code>current</code> - component <code>passive</code>. This is essentially the
+same as scheduling for time=inf.</p>
+<!--TODO rework time=inf-->
+
+<ul>
+<li>If the component to be passivated is <code>CURRENT</code>, the component becomes passive, and it will suspend execution internally.</li>
+<li>If the component to be passivated is <code>passive</code>, the component remains <code>passive</code>.</li>
+<li>If the component to be passivated is <code>scheduled</code>, the component becomes <code>passive</code>.</li>
+<li>If the component to be held is <code>standby</code>, the component becomes <code>passive</code>.</li>
+<li>If the component to be activated is requesting, the request will be terminated, the attribute failed
+  set and the component becomes passive. It is recommended to use the more versatile activate method.</li>
+<li>If the component to be activated is waiting, the wait will be
+  terminated, the attribute failed set and the component becomes passive. It is recommended to
+  use the more versatile activate method.</li>
+<li>If the component is interrupted, the component becomes passive.</li>
+</ul>
+<h3 id="cancel">cancel</h3>
+<p>Cancel has the effect that the component becomes a data component.</p>
+<ul>
+<li>If the component to be cancelled is <code>CURRENT</code>, it will suspend execution internally.</li>
+<li>If the component to be cancelled is <code>passive</code>, scheduled, interrupted  or standby, the component
+  becomes a data component.</li>
+<li>If the component to be cancelled is <code>requesting</code>, the request will be terminated, the attribute failed
+  set, and the component becomes a data component.</li>
+<li>If the component to be cancelled is waiting, the wait will be terminated, the attribute failed
+  set and the component becomes a data component.</li>
+</ul>
+<p>Examples</p>
+<ul>
+<li><a href="../examples/bank_office/#bank-office-with-balking-and-reneging">Bank Office with Reneging</a></li>
+</ul>
+<h3 id="standby">standby</h3>
+<p>Standby has the effect that the component will be triggered on the next simulation event.</p>
+<ul>
+<li>If the component is <code>CURRENT</code>, it will suspend execution internally</li>
+<li>Although theoretically possible, it is not recommended to use standby for non current components. If needed to do so, the pattern to provide the correct receiver is <code>with(nonCurrent){ standby() }</code></li>
+<li>Not allowed for <code>DATA</code> components or <code>main</code></li>
+</ul>
+<p>Examples</p>
+<ul>
+<li><a href="../examples/bank_office/#bank-office-with-standby">Bank Office with Standby</a></li>
+</ul>
+<h3 id="request">request</h3>
+<p>Request has the effect that the component will check whether the requested quantity from a <a href="../resource/">resource</a> is available. It is possible to check for multiple availability of a certain quantity from several resources.</p>
+<p>Instead of checking for all of number of resources, it is also possible to check for any of a number of resources, by setting the <code>oneOf</code> parameter to <code>true</code>.</p>
+<p>By default, there is no limit on the time to wait for the resource(s) to become available. However, it is possible to set a time with <code>failAt</code> at which the condition has to be met. If that failed, the component becomes <code>CURRENT</code> at the given point of time. This is also known as <em>reneging</em>.</p>
+<!--The code should then check whether the request had failed. That can be checked with the `Component.failed` property.-->
+
+<p>If the component is canceled, activated, passivated, interrupted or held the <code>failed</code> flag will be set as well.</p>
+<ul>
+<li>If the component is <code>CURRENT</code>, it will suspend execution internally</li>
+<li>Although theoretically possible it is not recommended to use request for non current components. If needed to do so, the pattern to provide the correct receiver is <code>with(nonCurrent){ request(r) }</code></li>
+</ul>
+<!-- TODO describe better what happens if request is rejected or fails to be fulfilled-->
+
+<!--TBD support simmer::renege_if?-->
+
+<p>A component can also actively renege a pending request by calling <code>release(resource)</code>. See <code>Bank3ClerksRenegingResources</code> for an example (as well as <code>Bank3ClerksReneging</code> <code>Bank3ClerksRenegingState</code> for other supported reneging modes).</p>
+<h3 id="wait">wait</h3>
+<p>Wait has the effect that the component will check whether the value of a state meets a given condition. It is possible to check for multiple states. By default, there is no limit on the time to wait for the condition(s) to be met. However, it is possible to set a time with <code>failAt</code> at which the condition has to be met. If that failed, the component becomes <code>CURRENT</code> at the given point of time. The code should then check whether the wait had failed. That can be checked with the <code>Component.failed</code> property.</p>
+<p>If the component is <a href="#cancel">canceled</a>, <a href="#activate">activated</a>, <a href="#passivate">passivated</a>, <a href="#interrupt">interrupted</a> or <a href="#hold">held</a> the failed flag will be set as well.</p>
+<ul>
+<li>If the component is <code>CURRENT</code>, it will suspend execution internally</li>
+<li>Although theoretically possible it is not recommended to use wait for non current components. If needed to do so, the pattern to provide the correct receiver is <code>with(nonCurrent){ wait() }</code></li>
+</ul>
+<p>Examples</p>
+<ul>
+<li><a href="../examples/gas_station/">Gas Station</a></li>
+</ul>
+<p>Supported parameters in <code>wait</code></p>
+<ul>
+<li><code>state</code> -  A state variable</li>
+<li><code>waitFor</code> -  The state value to wait for</li>
+<li><code>description</code> -  The description of the wait request.</li>
+<li><code>triggerPriority</code> -  The queue priority to be used along with a <a href="https://www.kalasim.org/state/#state-change-triggers">state change trigger</a></li>
+<li><code>failAt</code> -  If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.</li>
+<li><code>failDelay</code> -  If the request is not honored before <code>now + failDelay</code>,
+the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.</li>
+<li><code>failPriority</code> -  Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.</li>
+</ul>
+<h3 id="interrupt">interrupt</h3>
+<p>With interrupt components that are not current or data can be temporarily be interrupted. Once a resume is called for the component, the component will continue (for scheduled with the remaining time, for waiting or requesting possibly with the remaining fail_at duration).</p>
+<p>Examples</p>
+<ul>
+<li><a href="../examples/machine_parts/">Machine Parts</a></li>
+</ul>
+<h2 id="usage-of-process-interaction-methods-within-a-function-or-method">Usage of process interaction methods within a function or method</h2>
+<p>There is a way to put process interaction statement in another function or method.
+This requires a slightly different way than just calling the method.</p>
+<p>As an example, let's assume that we want a method that holds a component for a number of minutes and that the time unit is actually seconds.
+So we need a method to wait 60 times the given parameter.</p>
+<p>We start with a not so elegant solution:</p>
+<div class="highlight"><pre><span></span><code><span class="k">object</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nc">Component</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">process</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="o">&lt;</span><span class="n">Component</span><span class="o">&gt;</span><span class="p">{</span>
+<span class="w">        </span><span class="n">hold</span><span class="p">(</span><span class="m">5.</span><span class="n">days</span><span class="p">)</span>
+<span class="w">        </span><span class="n">hold</span><span class="p">(</span><span class="m">5.</span><span class="n">hours</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>Now we just add a method <code>holdMinutes</code>. Direct calling <code>holdMinutes</code> is not possible. Instead, we have to define an extension function on <code>SequenceScope&lt;Component&gt;</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">object</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nc">Component</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">process</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">holdMinutes</span><span class="p">()</span>
+<span class="w">        </span><span class="n">holdMinutes</span><span class="p">()</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">suspend</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">SequenceScope</span><span class="o">&lt;</span><span class="n">Component</span><span class="o">&gt;</span><span class="p">.</span><span class="na">holdMinutes</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">hold</span><span class="p">(</span><span class="m">5.</span><span class="n">minutes</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>All process interaction statements including <code>passivate</code>, <code>request</code> and <code>wait</code> can be used that way!</p>
+<p>So remember if the method contains a <code>yield</code> statement (technically speaking iss a generator method), it should be called with from an extension function.</p>
+<h2 id="component-generator">Component Generator</h2>
+<p>The creation of components is a key function of most simulations. To facilitate component creation, a <code>ComponentGenerator</code> can be used to create components according to a given inter arrival time (or distribution).</p>
+<div class="highlight"><pre><span></span><code><span class="n">ComponentGenerator</span><span class="p">(</span><span class="n">iat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exponential</span><span class="p">(</span><span class="n">lambda</span><span class="p">,</span><span class="w"> </span><span class="n">rg</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Customer</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The following arguments are supported when setting up a component generator</p>
+<ol>
+<li>Inter arrival duration <code>iat</code> or distribution between history/generations.</li>
+<li>A builder named <code>builder</code> of type <code>Environment.(counter: Int) -&gt; T</code> allows to specify how the objects of type <code>T</code> are generated. Thereby, <code>counter</code> can be used to name the objects accordingly.</li>
+</ol>
+<p>There are also additional arguments available to support more custom/advanced use-cases: </p>
+<ul>
+<li><code>startAt</code> - time where the generator starts its operation. If omitted, <code>now</code> is used.</li>
+<li><code>forceStart</code> - If <code>false</code> (default), the first component will be generated at <code>time = startAt + iat()</code>. If <code>true</code>, the first component will be generated at <code>startAt</code>.</li>
+<li><code>until</code> - time up to which components should be generated. If omitted, no end.</li>
+<li><code>total</code> - (maximum) number of components to be generated.</li>
+<li><code>name</code> - Name of the component.  If the name ends with a period (.), auto serializing will be applied. </li>
+<li><code>priority</code> - If a component has the same time on the event list, this component is scheduled according to the priority. An event with a higher priority will be scheduled first.</li>
+<li><code>keepHistory</code> - If <code>true</code>, i will store a reference of all generated components which can be queried with <code>history</code>.</li>
+<li><code>envProvider</code> - The simulation  context to be used to resolve the <code>org.kalasim.Environment</code></li>
+</ul>
+<p>Note, that the entities being created are not required to extend <code>org.kalasim.Component</code>, but can be in fact arbitrary types. </p>
+<p>Usage:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">////ComponentGeneratorExamples.kts</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">org.kalasim.*</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">kotlin.time.Duration.Companion.days</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">kotlin.time.Duration.Companion.hours</span>
+<span class="k">import</span><span class="w"> </span><span class="nn">kotlin.time.Duration.Companion.minutes</span>
+
+
+<span class="n">createSimulation</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// example 1</span>
+<span class="w">    </span><span class="c1">// we can schedule with a probabilist inter-arrival distribution</span>
+<span class="w">    </span><span class="kd">data</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">Customer</span><span class="p">(</span><span class="kd">val</span><span class="w"> </span><span class="nv">id</span><span class="p">:</span><span class="w"> </span><span class="kt">Int</span><span class="p">)</span>
+
+<span class="w">    </span><span class="n">ComponentGenerator</span><span class="p">(</span><span class="n">uniform</span><span class="p">(</span><span class="m">5.</span><span class="n">minutes</span><span class="p">,</span><span class="w"> </span><span class="m">2.</span><span class="n">hours</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">customerNo</span><span class="w"> </span><span class="o">-&gt;</span>
+<span class="w">        </span><span class="n">Customer</span><span class="p">(</span><span class="n">customerNo</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// we can also schedule with a fixed rate</span>
+<span class="w">    </span><span class="c1">// here we create 3 strings with fixed inter-arrival duration</span>
+<span class="w">    </span><span class="n">ComponentGenerator</span><span class="p">(</span><span class="m">3.</span><span class="n">minutes</span><span class="p">,</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">it</span><span class="w"> </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// example 2</span>
+<span class="w">    </span><span class="c1">// we define a component with simplistic process definition</span>
+<span class="w">    </span><span class="kd">class</span><span class="w"> </span><span class="nc">Car</span><span class="p">()</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Component</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">override</span><span class="w"> </span><span class="kd">fun</span><span class="w"> </span><span class="nf">process</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sequence</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">hold</span><span class="p">(</span><span class="m">3.</span><span class="n">hours</span><span class="p">,</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;driving&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">ComponentGenerator</span><span class="p">(</span><span class="n">exponential</span><span class="p">(</span><span class="m">3.</span><span class="n">minutes</span><span class="p">),</span><span class="w"> </span><span class="n">until</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">now</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">3.</span><span class="n">days</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Car</span><span class="p">()</span><span class="w"> </span><span class="c1">// when creating a component it will be automatically scheduled next</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// example 3 no-longer recommend:</span>
+<span class="w">    </span><span class="c1">// inter-arrival distribution without duration unit</span>
+<span class="w">    </span><span class="n">ComponentGenerator</span><span class="p">(</span><span class="n">uniform</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="w"> </span><span class="m">4</span><span class="p">).</span><span class="na">minutes</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">Customer</span><span class="p">(</span><span class="nb">it</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>More examples</p>
+<ul>
+<li><a href="../examples/car_wash/">Car Wash</a></li>
+<li><a href="../examples/gas_station/">Gas Station</a></li>
+<li><a href="../examples/atm_queue/">ATM Queue</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2023 Holger Brandl
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/holgerbrandl" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/holgerbrandl" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M459.4 151.7c.3 4.5.3 9.1.3 13.6 0 138.7-105.6 298.6-298.6 298.6-59.5 0-114.7-17.2-161.1-47.1 8.4 1 16.6 1.3 25.3 1.3 49.1 0 94.2-16.6 130.3-44.8-46.1-1-84.8-31.2-98.1-72.8 6.5 1 13 1.6 19.8 1.6 9.4 0 18.8-1.3 27.6-3.6-48.1-9.7-84.1-52-84.1-103v-1.3c14 7.8 30.2 12.7 47.4 13.3-28.3-18.8-46.8-51-46.8-87.4 0-19.5 5.2-37.4 14.3-53C87.4 130.8 165 172.4 252.1 176.9c-1.6-7.8-2.6-15.9-2.6-24C249.5 95.1 296.3 48 354.4 48c30.2 0 57.5 12.7 76.7 33.1 23.7-4.5 46.5-13.3 66.6-25.3-7.8 24.4-24.4 44.8-46.1 57.8 21.1-2.3 41.6-8.1 60.4-16.2-14.3 20.8-32.2 39.3-52.6 54.3"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://linkedin.com/in/holgerbrandl/" target="_blank" rel="noopener" title="linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.expand", "navigation.instant", "navigation.tabs"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@8.8.4/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>
