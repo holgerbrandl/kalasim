@@ -45,6 +45,7 @@ development.
 ---
 
 !!! tip "KotlinConf Presentation"
+
 We presented at [KotlinConf](https://kotlinconf.com/talks/389146/) in Amsterdam, joining technology leaders from cloud
 computing, mobile development, and data science for collaborative knowledge exchange. Our presentation on "Make more
 money by modeling and optimizing your business processes with Kotlin" was well-received by the professional community:

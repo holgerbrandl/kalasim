@@ -1,6 +1,6 @@
 # Kalasim Release History
 
-## 1.1.2
+## 1.1.3
 
 Released 2026-01-03
 
