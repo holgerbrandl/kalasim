@@ -53,21 +53,28 @@ internal fun overrideFlagsTL(clazz: Class<out Component>): OverrideFlags {
     val cache = overrideCacheTL.get()
     return cache[clazz] ?: run {
 
-        // Component itself should NOT count as "overriding"
-        if (clazz == Component::class.java) {
-            val flags = OverrideFlags(overridesProcess = false, overridesRepeated = false)
-            cache[clazz] = flags
-            return flags
+        fun declaresNoArg(c: Class<*>, name: String): Boolean =
+            try {
+                val m = c.getDeclaredMethod(name)
+                // optional: ignore synthetic/bridge methods if you want
+                !(m.isSynthetic || m.isBridge)
+            } catch (_: NoSuchMethodException) {
+                false
+            }
+
+        fun findsOverrideInHierarchy(methodName: String): Boolean {
+            var c: Class<*>? = clazz
+            while (c != null) {
+                if (c == Component::class.java) return false  // base impl doesn't count
+                if (declaresNoArg(c, methodName)) return true // found in subclass chain
+                c = c.superclass
+            }
+            return false
         }
 
-        val declared = clazz.declaredMethods
-
-        fun declaresNoArg(name: String): Boolean =
-            declared.any { it.name == name && it.parameterCount == 0 }
-
         val flags = OverrideFlags(
-            overridesProcess = declaresNoArg("process"),
-            overridesRepeated = declaresNoArg("repeatedProcess"),
+            overridesProcess = findsOverrideInHierarchy("process"),
+            overridesRepeated = findsOverrideInHierarchy("repeatedProcess"),
         )
 
         cache[clazz] = flags

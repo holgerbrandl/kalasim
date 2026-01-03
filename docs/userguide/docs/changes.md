@@ -1,6 +1,6 @@
 # Kalasim Release History
 
-## 1.1.3
+## 1.2
 
 Released 2026-01-03
 
@@ -9,7 +9,7 @@ Released 2026-01-03
   * Adding better reflection logic to identify process definitions
   * Moved consistency checks into ASSERT mode 
   * Faster (cached) detection of process definition
-* Added  new `EnvProvider` interface for more directly coupling of components to the 
+* Added  new `EnvProvider` interface for more direct coupling of components to the 
 
 ## 1.1.2
 

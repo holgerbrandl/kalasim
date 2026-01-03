@@ -556,6 +556,27 @@ class ComponentTests {
 
 
     @Test
+    fun `it should detect process definitions in type hierarchies`(){
+        var cookedIt = false
+
+        open class Recipe : Component(){
+            override fun process() = sequence<Component> {
+                hold(10.minutes, "cook it")
+                cookedIt =true
+            }
+        }
+
+        class PizzaRecipe : Recipe()
+
+        createSimulation {
+            PizzaRecipe()
+
+            run (20.minutes)
+            cookedIt shouldBe true
+        }
+    }
+
+    @Test
     fun itShouldAllowTogglingProcesses() = createTestSimulation {
 
         data class Recipe(val name: String)
