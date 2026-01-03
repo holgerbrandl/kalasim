@@ -1,13 +1,18 @@
 package org.kalasim.monitors
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
+import org.kalasim.DefaultProvider
+import org.kalasim.EnvProvider
 import org.kalasim.analysis.snapshot.StatisticalSummarySnapshot
 import org.kalasim.misc.*
 import org.koin.core.Koin
 import kotlin.math.roundToInt
 
-class NumericStatisticMonitor(name: String? = null, koin: Koin = DependencyContext.get()) :
-    Monitor<Number>(name, koin), ValueMonitor<Number> {
+class NumericStatisticMonitor(
+    name: String? = null,
+    envProvider: EnvProvider = DefaultProvider()
+) :
+    Monitor<Number>(name, envProvider), ValueMonitor<Number> {
 
     private val sumStats = ifEnabled { DescriptiveStatistics() }
 

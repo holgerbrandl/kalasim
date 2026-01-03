@@ -5,9 +5,13 @@ import org.jetbrains.kotlinx.dataframe.api.*
 import org.kalasim.analysis.EntityCreatedEvent
 import org.kalasim.analysis.ResourceActivityEvent
 import org.kalasim.analysis.snapshot.ResourceSnapshot
-import org.kalasim.misc.*
-import org.kalasim.monitors.*
-import org.koin.core.Koin
+import org.kalasim.misc.ComponentCollectionTrackingConfig
+import org.kalasim.misc.Jsonable
+import org.kalasim.misc.ResourceTrackingConfig
+import org.kalasim.monitors.MetricTimeline
+import org.kalasim.monitors.copy
+import org.kalasim.monitors.div
+import org.kalasim.monitors.minus
 import java.util.*
 import kotlin.random.Random
 import kotlin.time.Duration
@@ -42,10 +46,10 @@ sealed class RequestHonorPolicy {
         }
 
         private fun trimOptional(value: Double, maxValue: Double?) =
-            if(maxValue != null && value > maxValue) maxValue else value
+            if (maxValue != null && value > maxValue) maxValue else value
 
         private fun trimDurationOptional(value: Duration, maxValue: Duration?) =
-            if(maxValue != null && value > maxValue) maxValue else value
+            if (maxValue != null && value > maxValue) maxValue else value
 
 //        init {
 //            require(alpha in 0.0..1.0) { "alpha must be between 0 and 1 " }
@@ -65,13 +69,13 @@ open class DepletableResource(
     initialLevel: Number = capacity,
     honorPolicy: RequestHonorPolicy = RequestHonorPolicy.StrictFCFS,
     preemptive: Boolean = false,
-    koin: Koin = DependencyContext.get()
+    envProvider: EnvProvider = DefaultProvider(),
 ) : Resource(
     name = name,
     capacity = capacity,
     honorPolicy = honorPolicy,
     preemptive = preemptive,
-    koin = koin
+    envProvider = envProvider
 ) {
 
     /** Indicates the current level of the resource. Technically is a synonym for `capacity - claimed` */
@@ -104,7 +108,7 @@ open class DepletableResource(
     }
 
 
-    override fun canComponentHonorQuantity(component: Component, quantity: Double) = when(honorPolicy) {
+    override fun canComponentHonorQuantity(component: Component, quantity: Double) = when (honorPolicy) {
         RequestHonorPolicy.RANDOM, RequestHonorPolicy.RelaxedFCFS, is RequestHonorPolicy.WeightedFCFS -> {
             canHonorQuantity(quantity)
         }
@@ -122,14 +126,16 @@ open class DepletableResource(
 }
 
 class SQFComparator(val resource: Resource) : Comparator<CQElement<Component>> {
-    override fun compare(o1: CQElement<Component>, o2: CQElement<Component>): Int = compareValuesBy(o1, o2,
+    override fun compare(o1: CQElement<Component>, o2: CQElement<Component>): Int = compareValuesBy(
+        o1, o2,
         { it.priority?.value?.times(-1) ?: 0 },
         { it.component.requests[resource]!!.quantity }
     )
 }
 
 class RandomComparator(val random: Random) : Comparator<CQElement<Component>> {
-    override fun compare(o1: CQElement<Component>, o2: CQElement<Component>): Int = compareValuesBy(o1, o2,
+    override fun compare(o1: CQElement<Component>, o2: CQElement<Component>): Int = compareValuesBy(
+        o1, o2,
         { it.priority?.value?.times(-1) ?: 0 },
         { random.nextInt() }
     )
@@ -146,9 +152,9 @@ open class Resource(
     capacity: Number = 1,
     val honorPolicy: RequestHonorPolicy = RequestHonorPolicy.StrictFCFS,
     val preemptive: Boolean = false,
-    koin: Koin = DependencyContext.get(),
-    val trackingConfig: ResourceTrackingConfig = koin.getEnvDefaults().DefaultResourceConfig,
-) : SimulationEntity(name = name, simKoin = koin) {
+    envProvider: EnvProvider = DefaultProvider(),
+    val trackingConfig: ResourceTrackingConfig = envProvider.getEnv().entityTrackingDefaults.DefaultResourceConfig,
+) : SimulationEntity(name = name, envProvider = envProvider) {
 
     internal var depletable: Boolean = false
 
@@ -159,19 +165,19 @@ open class Resource(
     @Suppress("LeakingThis")
     val requesters = ComponentQueue(
         "requesters of ${this.name}",
-        comparator = when(honorPolicy) {
+        comparator = when (honorPolicy) {
             RequestHonorPolicy.SQF -> SQFComparator(this)
             RequestHonorPolicy.RANDOM -> RandomComparator(random)
             else -> PriorityFCFSQueueComparator()
         },
         trackingConfig = ComponentCollectionTrackingConfig(trackingConfig.trackRequesters),
-        koin = koin
+        envProvider = envProvider
     )
 
     val claimers = ComponentQueue<Component>(
         "claimers of ${this.name}",
         trackingConfig = ComponentCollectionTrackingConfig(trackingConfig.trackClaimers),
-        koin = koin
+        envProvider = envProvider
     )
 
     var capacity = capacity.toDouble()
@@ -189,7 +195,7 @@ open class Resource(
             capacityTimeline.addValue(capacity)
 //            updatedDerivedMetrics()
 
-            if(this is DepletableResource) {
+            if (this is DepletableResource) {
                 // maintain the fill level of depletable resources
                 claimed += capacityDiff
             }
@@ -208,9 +214,9 @@ open class Resource(
             field = x
 
             // this ugly hak is needed to avoid tracking of initialLevel setting in DR constructor
-            if(this is DepletableResource && diffQuantity == 0.0 && requesters.isEmpty()) return
+            if (this is DepletableResource && diffQuantity == 0.0 && requesters.isEmpty()) return
 
-            if(field < EPS)
+            if (field < EPS)
                 field = 0.0
 
             claimedTimeline.addValue(x)
@@ -228,7 +234,7 @@ open class Resource(
     // todo when would a capcity less than 0?
     val occupancy
             : Double
-        get() = if(capacity < 0) 0.0 else claimed / capacity
+        get() = if (capacity < 0) 0.0 else claimed / capacity
 
     // note: called _just_ available and availableQuanity because more readible in many situations doctors.available
     val available
@@ -248,8 +254,11 @@ open class Resource(
         validateCapacityRange(capacity)
     }
 
-    val capacityTimeline = MetricTimeline("Capacity of ${super.name}", initialValue = capacity.toDouble(), koin = koin)
-    val claimedTimeline = MetricTimeline("Claimed quantity of ${this.name}", koin = koin, initialValue = 0.0)
+    val capacityTimeline = MetricTimeline(
+        "Capacity of ${super.name}", initialValue = capacity.toDouble(), envProvider = envProvider
+    )
+    val claimedTimeline =
+        MetricTimeline("Claimed quantity of ${this.name}", envProvider = envProvider, initialValue = 0.0)
 
     //    val availabilityTimeline =
 //            MetricTimeline("Available quantity of ${this.name}", initialValue = availableQuantity, koin = koin)
@@ -279,13 +288,13 @@ open class Resource(
                 now,
                 env.currentComponent,
                 this,
-                "capacity=$capacity " + if(depletable) "anonymous" else ""
+                "capacity=$capacity " + if (depletable) "anonymous" else ""
             )
         }
     }
 
     internal fun tryRequest() {
-        when(honorPolicy) {
+        when (honorPolicy) {
             RequestHonorPolicy.RelaxedFCFS -> {
                 // Note: This is an insanely expensive operation, as we need to to build another sorted copy of the requesters queue
                 (requesters.q as PriorityQueue).sortedIterator()
@@ -304,13 +313,13 @@ open class Resource(
 
             RequestHonorPolicy.SQF, RequestHonorPolicy.StrictFCFS, RequestHonorPolicy.RANDOM -> {
                 // original port from salabim
-                while(requesters.q.isNotEmpty()) {
+                while (requesters.q.isNotEmpty()) {
                     //try honor as many requests as possible
-                    if(minq > (capacity - claimed + EPS)) {
+                    if (minq > (capacity - claimed + EPS)) {
                         break
                     }
 
-                    if(!requesters.q.peek().component.tryRequest()) {
+                    if (!requesters.q.peek().component.tryRequest()) {
                         // if we can not honor this request, we must stop here (to respect request priorities)
                         break
                     }
@@ -342,7 +351,7 @@ open class Resource(
         }
     }
 
-    internal open fun canComponentHonorQuantity(component: Component, quantity: Double) = when(honorPolicy) {
+    internal open fun canComponentHonorQuantity(component: Component, quantity: Double) = when (honorPolicy) {
         RequestHonorPolicy.RANDOM, RequestHonorPolicy.RelaxedFCFS, is RequestHonorPolicy.WeightedFCFS -> {
             canHonorQuantity(quantity)
         }
@@ -355,9 +364,9 @@ open class Resource(
 
 
     internal fun canHonorQuantity(quantity: Double): Boolean {
-        if(quantity > 0 && quantity > capacity - claimed + EPS) {
+        if (quantity > 0 && quantity > capacity - claimed + EPS) {
             return false
-        } else if(-quantity > claimed + EPS) {
+        } else if (-quantity > claimed + EPS) {
             return false
         }
 
@@ -367,7 +376,7 @@ open class Resource(
 
     internal fun removeRequester(component: Component) {
         requesters.remove(component)
-        if(requesters.isEmpty()) minq = Double.MAX_VALUE
+        if (requesters.isEmpty()) minq = Double.MAX_VALUE
     }
 
     /** Prints a summary of statistics of a resource. */
@@ -389,7 +398,7 @@ open class Resource(
 internal fun <E> PriorityQueue<E>.sortedIterator() = sequence {
     val pqCopy = PriorityQueue(this@sortedIterator)
 
-    while(pqCopy.isNotEmpty()) {
+    while (pqCopy.isNotEmpty()) {
         yield(pqCopy.poll())
     }
 }

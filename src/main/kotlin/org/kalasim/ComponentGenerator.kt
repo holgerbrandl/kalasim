@@ -3,8 +3,6 @@ package org.kalasim
 import org.apache.commons.math3.distribution.RealDistribution
 import org.kalasim.analysis.snapshot.ComponentGeneratorSnapshot
 import org.kalasim.misc.AmbiguousDuration
-import org.kalasim.misc.DependencyContext
-import org.koin.core.Koin
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -22,9 +20,9 @@ class ComponentGenerator<T>(
     name: String? = null,
     priority: Priority = Priority.NORMAL,
     val keepHistory: Boolean = false,
-    koin: Koin = DependencyContext.get(),
+    envProvider: EnvProvider = DefaultProvider(),
     val builder: Environment.(counter: Int) -> T
-) : Component(name, priority = priority, at = startAt, process = ComponentGenerator<T>::doIat, koin = koin) {
+) : Component(name, priority = priority, at = startAt, process = ComponentGenerator<T>::doIat, envProvider = envProvider) {
 
 
     /**
@@ -43,10 +41,10 @@ class ComponentGenerator<T>(
         name: String? = null,
         priority: Priority = Priority.NORMAL,
         keepHistory: Boolean = false,
-        koin: Koin = DependencyContext.get(),
+        envProvider: EnvProvider = DefaultProvider(),
         builder: Environment.(counter: Int) -> T
     ) : this(
-        DurationDistribution(koin.get<Environment>().tickDurationUnit, iat),
+        DurationDistribution(envProvider.getEnv().tickDurationUnit, iat),
         startAt,
         forceStart,
         until,
@@ -54,7 +52,7 @@ class ComponentGenerator<T>(
         name,
         priority,
         keepHistory,
-        koin,
+        envProvider,
         builder
     )
 
@@ -72,7 +70,7 @@ class ComponentGenerator<T>(
         name: String? = null,
         priority: Priority = Priority.NORMAL,
         keepHistory: Boolean = false,
-        koin: Koin = DependencyContext.get(),
+        envProvider: EnvProvider = DefaultProvider(),
         builder: Environment.(counter: Int) -> T
     ) : this(
         constant(iat),
@@ -83,7 +81,7 @@ class ComponentGenerator<T>(
         name,
         priority,
         keepHistory,
-        koin,
+        envProvider,
         builder
     )
 

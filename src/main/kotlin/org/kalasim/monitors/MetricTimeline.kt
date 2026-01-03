@@ -31,8 +31,8 @@ import kotlin.time.Duration
 open class MetricTimeline<V : Number>(
     name: String? = null,
     internal val initialValue: V,
-    koin: Koin = DependencyContext.get()
-) : Monitor<V>(name, koin), ValueTimeline<V> {
+    envProvider: EnvProvider = DefaultProvider(),
+) : Monitor<V>(name, envProvider), ValueTimeline<V> {
 
     val timestamps = mutableListOf<SimTime>()
     val values = ifEnabled { mutableListOf<V>() }
@@ -129,7 +129,7 @@ open class MetricTimeline<V : Number>(
         }
     }
 
-    fun asDoubleTimeline() = MetricTimeline(name, initialValue.toDouble(), koin = getKoin()).apply {
+    fun asDoubleTimeline() = MetricTimeline(name, initialValue.toDouble(), envProvider = envProvider).apply {
         timestamps.apply { clear(); addAll(this@MetricTimeline.timestamps) }
         values.apply { clear(); addAll(this@MetricTimeline.values.map { it.toDouble() }) }
     }
@@ -253,7 +253,7 @@ private fun <V : Number> combineInternal(
 
     val merged = MetricTimeline(
         "'${mt.name}' $mode '${other.name}'",
-        koin = mt.getKoin(),
+        envProvider = mt.envProvider,
         initialValue = 0.0
     ).apply {
         timestamps.clear()
@@ -295,7 +295,7 @@ fun <V : Number> List<MetricTimeline<V>>.mean(): MetricTimeline<Double> = sum() 
 
 // not pretty but allows assigning new names to merged timelines without make SimEntity.name var.
 internal fun <V : Number> MetricTimeline<V>.copy(name: String = this.name): MetricTimeline<V> =
-    MetricTimeline<V>(name, initialValue = initialValue, koin = getKoin()).apply {
+    MetricTimeline<V>(name, initialValue = initialValue,         envProvider = envProvider).apply {
         values.clear()
         values.addAll(this@copy.values)
         timestamps.clear()

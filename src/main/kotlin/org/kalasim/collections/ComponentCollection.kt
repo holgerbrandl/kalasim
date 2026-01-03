@@ -19,9 +19,9 @@ class CapacityLimitException(
 abstract class ComponentCollection<C>(
     name: String? = null,
     capacity: Int = Int.MAX_VALUE,
-    koin: Koin = DependencyContext.get(),
-    val trackingConfig: ComponentCollectionTrackingConfig = koin.getEnvDefaults().DefaultComponentCollectionConfig,
-) : SimulationEntity(name, koin) {
+    envProvider: EnvProvider = DefaultProvider(),
+    val trackingConfig: ComponentCollectionTrackingConfig = envProvider.getEnv().entityTrackingDefaults.DefaultComponentCollectionConfig,
+) : SimulationEntity(name, envProvider) {
 
     abstract val size: Int
 
@@ -46,9 +46,9 @@ abstract class ComponentCollection<C>(
 
 
     //    val ass = AggregateSummaryStatistics()
-    val sizeTimeline = MetricTimeline<Int>("Size of ${this.name}", 0, koin = koin)
-    val lengthOfStayStatistics = NumericStatisticMonitor("Length of stay in ${this.name}", koin = koin)
-    val capacityTimeline = MetricTimeline("Capacity of ${this.name}", initialValue = capacity, koin = koin)
+    val sizeTimeline = MetricTimeline<Int>("Size of ${this.name}", 0, envProvider = envProvider)
+    val lengthOfStayStatistics = NumericStatisticMonitor("Length of stay in ${this.name}", envProvider = envProvider)
+    val capacityTimeline = MetricTimeline("Capacity of ${this.name}", initialValue = capacity, envProvider = envProvider)
 
 
     init {

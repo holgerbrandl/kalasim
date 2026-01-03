@@ -86,6 +86,8 @@ applications. YourKit is the creator of [YourKit Java Profiler](https://www.your
 
 ## Repo Maintainer
 
-[Holger Brandl](https://linkedin.com/in/holgerbrandl/) holds a Ph.D. degree in machine learning and has developed new concepts in the field of computational linguistics. More recently he has co-authored [publications](https://orcid.org/0000-0003-1911-8570) in high-ranking journals such as Nature and Science.
+Dr. [Holger Brandl](https://linkedin.com/in/holgerbrandl) is a seasoned solution architect and project/team lead with deep experience in automation and material-flow optimization across manufacturing environments. Over the past 6+ years, he has designed and implemented data-driven solutions that improve WIP flow, transparency, and operational efficiency—bridging software architecture, production processes, and applied AI/predictive analytics.
 
-To stay in sync with what's happening in tech, he's [developing](https://github.com/holgerbrandl) open-source tools, methods and algorithms for bioinformatics, high-performance computing and data science. He's passionate about machine learning, AI, analytics, elegant APIs and data visualisation. His professional scope mainly centers around systems biology and industrial manufacturing.
+His industry focus includes semiconductor and electronics manufacturing as well as automotive, with expertise spanning material-flow simulation, scheduling and sequencing, predictive maintenance/quality, and manufacturing analytics. He has led cross-functional teams from concept to rollout, contributed to product design of AI-driven planning solutions, and supported pre-sales and portfolio activities. Holger is also a [published](https://orcid.org/0000-0003-1911-8570) author (including journals such as Science, Nature, and Cell).
+
+To stay in sync with what's happening in tech, he [develops](https://github.com/holgerbrandl) open-source tools, methods and algorithms for bioinformatics, high-performance computing and data science. He is passionate about machine learning, AI, analytics, elegant APIs and data visualization. His professional scope mainly centers around systems biology and industrial manufacturing.

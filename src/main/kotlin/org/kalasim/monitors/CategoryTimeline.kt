@@ -2,12 +2,13 @@ package org.kalasim.monitors
 
 import kotlinx.datetime.Instant
 import org.apache.commons.math3.distribution.EnumeratedDistribution
-import org.kalasim.*
+import org.kalasim.DefaultProvider
+import org.kalasim.EnvProvider
+import org.kalasim.SimTime
+import org.kalasim.asSimTime
 import org.kalasim.misc.AmbiguousDuration
-import org.kalasim.misc.DependencyContext
 import org.kalasim.misc.time.sum
 import org.kalasim.misc.time.sumOf
-import org.koin.core.Koin
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
@@ -19,8 +20,8 @@ import kotlin.time.DurationUnit
 class CategoryTimeline<T>(
     val initialValue: T,
     name: String? = null,
-    koin: Koin = DependencyContext.get()
-) : Monitor<T>(name, koin), ValueTimeline<T> {
+    envProvider: EnvProvider = DefaultProvider()
+) : Monitor<T>(name, envProvider), ValueTimeline<T> {
 
     private val timestamps = mutableListOf<SimTime>()
     private val values = ifEnabled { mutableListOf<T>() }
@@ -117,7 +118,7 @@ class CategoryTimeline<T>(
             .printConsole(sortByWeight = sortByWeight, values = values)
     }
 
-    
+
     /**
      * Calculates the distribution of timeline values within a specified time range or all available data.
      *

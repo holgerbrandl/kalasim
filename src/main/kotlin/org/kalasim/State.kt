@@ -18,9 +18,9 @@ import org.koin.core.Koin
 open class State<T>(
     initialValue: T,
     name: String? = null,
-    koin: Koin = DependencyContext.get(),
-    val trackingConfig: StateTrackingConfig = koin.getEnvDefaults().DefaultStateConfig,
-) : SimulationEntity(name, koin) {
+    envProvider: EnvProvider = DefaultProvider(),
+    val trackingConfig: StateTrackingConfig = envProvider.getEnv().entityTrackingDefaults.DefaultStateConfig,
+) : SimulationEntity(name, envProvider) {
 
     private var maxTriggerCxt: Int? = null
     private val isTriggerCxt
@@ -56,10 +56,10 @@ open class State<T>(
         }
 
 
-    val timeline = CategoryTimeline(initialValue = value, koin = koin, name = "State of '$name'")
+    val timeline = CategoryTimeline(initialValue = value, envProvider = envProvider, name = "State of '$name'")
 
     fun hasWaiters() = waiters.isNotEmpty()
-    internal val waiters = ComponentQueue<Component>("waiters of ${this.name}", koin = koin)
+    internal val waiters = ComponentQueue<Component>("waiters of ${this.name}", envProvider = envProvider)
 //    val waiters = PriorityQueue<Component>()
 
     /** Tracks the queue length level along time. */

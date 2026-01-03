@@ -13,7 +13,10 @@ import org.kalasim.analysis.snapshot.ComponentSnapshot
 import org.kalasim.misc.*
 import org.kalasim.monitors.CategoryTimeline
 import org.koin.core.Koin
-import kotlin.math.*
+import kotlin.math.abs
+import kotlin.math.absoluteValue
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.reflect.*
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -102,8 +105,8 @@ open class TickedComponent(
     priority: Priority = NORMAL,
     process: GeneratorFunRef? = null,
     trackingConfig: ComponentTrackingConfig = ComponentTrackingConfig(),
-    koin: Koin = DependencyContext.get(),
-) : Component(name, at, delay, priority, process, koin, trackingConfig) {
+    envProvider: EnvProvider = DefaultProvider()
+) : Component(name, at, delay, priority, process, envProvider, trackingConfig) {
 
 
     @AmbiguousDuration
@@ -192,6 +195,7 @@ class ComponentProperties {
 }
 
 
+
 /**
  * A kalasim component is used as component (primarily for queueing) or as a component with a process.
  * Usually, a component will be defined as a subclass of Component.
@@ -212,12 +216,12 @@ open class Component(
     delay: Duration? = null,
     priority: Priority = NORMAL,
     process: GeneratorFunRef? = null,
-    koin: Koin = DependencyContext.get(),
-    val trackingConfig: ComponentTrackingConfig = koin.getEnvDefaults().DefaultComponentConfig,
+    envProvider: EnvProvider = DefaultProvider(),
+    val trackingConfig: ComponentTrackingConfig = envProvider.getEnv()._koin.getEnvDefaults().DefaultComponentConfig,
 
     // to be re-enabled/reworked as part of https://github.com/holgerbrandl/kalasim/issues/11
 //    builder: SequenceScope<Component>.() -> Unit = {   }
-) : SimulationEntity(name, koin) {
+) : SimulationEntity(name, envProvider) {
 
 
     private var oneOfRequest: Boolean = false
@@ -260,7 +264,7 @@ open class Component(
         }
 
 
-    val stateTimeline = CategoryTimeline(componentState, "status of ${this.name}", koin)
+    val stateTimeline = CategoryTimeline(componentState, "status of ${this.name}", envProvider)
 
     init {
 
@@ -272,14 +276,18 @@ open class Component(
             EntityCreatedEvent(now, env.currentComponent, this)
         }
 
-        val overriddenProcess = javaClass.getMethod("process").declaringClass.simpleName != "Component"
-        val overriddenRepeated = javaClass.getMethod("repeatedProcess").declaringClass.simpleName != "Component"
         val isCustomProcess = process != null && process.name != "process"
         val isNone = process != null && process.name == "none"
 
+        val (overriddenProcess, overriddenRepeated) =
+            if (!isCustomProcess) {
+                val f = overrideFlagsTL(javaClass as Class<out Component>)
+                f.overridesProcess to f.overridesRepeated
+            } else false to false
+
         if (!isCustomProcess) {
             require(!(overriddenProcess && overriddenRepeated)) {
-                " So either override process or override repeatedProcess but not both"
+                "So either override process or override repeatedProcess but not both"
             }
         }
 
@@ -320,18 +328,35 @@ open class Component(
     class ProcessReference(val generatorFunRef: GeneratorFunRef, vararg val arguments: Any)
 
     private fun GeneratorFunRef.ingestFunPointer(vararg processArgs: Any): SimProcess {
-        val isGenerator = returnType.toString().startsWith("kotlin.sequences.Sequence")
+        if (ASSERT_MODE == AssertMode.FULL) {
+//        val isGenerator = returnType.toString().startsWith("kotlin.sequences.Sequence")
+            val isGenerator = returnType == typeOf<Sequence<Component>>()
+//        val isGenerator =  returnType.isSequenceOf(Component::class)
 
-        require(isGenerator) {
-            error("non-generating processes are no longer supported. If you feel this is a bug please file an issue at https://github.com/holgerbrandl/kalasim/issues")
+            require(isGenerator) {
+                error("non-generating processes are no longer supported. If you feel this is a bug please file an issue at https://github.com/holgerbrandl/kalasim/issues")
+            }
         }
 
         lastProcess = ProcessReference(this, *processArgs)
 
-        val sequence = if (parameters.run { isNotEmpty() && first().kind.name == "INSTANCE" }) {
-            call(this@Component, *processArgs)
+        // old kalasim <1.2 approach which directly used slow reflection
+//        val sequence = if (parameters.run { isNotEmpty() && first().kind.name == "INSTANCE" }) {
+//            call(this@Component, *processArgs)
+//        } else {
+//            call(*processArgs)
+//        }
+
+        // new cached approach to invoke process definition using cached logic
+        val invoker = cachedInvoker()
+        @Suppress("UNCHECKED_CAST")
+        val args = processArgs as Array<Any?> // vararg already is an array at runtime
+        val sequence = if (invoker.needsInstance) {
+            @Suppress("UNCHECKED_CAST")
+            invoker.call(this@Component, args) as Sequence<Component>
         } else {
-            call(*processArgs)
+            @Suppress("UNCHECKED_CAST")
+            invoker.call(null, args) as Sequence<Component>
         }
 
         return GenProcessInternal(this@Component, sequence, name)
@@ -465,7 +490,9 @@ open class Component(
 
 
             cmpntPrps.interruptProperties = InterruptProperties(
-                remainingDuration = if(scheduledTime?.isDistantFuture ?: true) null else scheduledTime!!.minus(env.now),
+                remainingDuration = if (scheduledTime?.isDistantFuture
+                        ?: true
+                ) null else scheduledTime!!.minus(env.now),
                 interruptedStatus = componentState
             )
 
@@ -497,7 +524,7 @@ open class Component(
             logInternal(trackingConfig.logInteractionEvents, "resume stalled (interrupt level=$interruptLevel)")
         } else {
             componentState = interruptedStatus
-            cmpntPrps.interruptProperties =null
+            cmpntPrps.interruptProperties = null
 
             logInternal(trackingConfig.logInteractionEvents, "resume ($componentState)")
 
@@ -2064,6 +2091,10 @@ class GenProcessInternal(val component: Component, seq: Sequence<Component>, ove
 
     override fun call() {
         try {
+            if (!iterator.hasNext()) {
+                component.terminate()
+                return
+            }
             iterator.next()
         } catch (e: NoSuchElementException) {
             if (e.message != null) e.printStackTrace()

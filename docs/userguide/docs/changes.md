@@ -2,6 +2,17 @@
 
 ## 1.1.2
 
+Released 2026-01-03
+
+* Significantly improved process bootstrap performance for models with many [components](https://www.kalasim.org/component/) (>1M) 
+  * Adding better reflection logic to identify process definitions
+  * Moved consistency checks into ASSERT mode 
+  * Faster (cached) detection of process definition
+* Added  new `EnvProvider` interface for more directly coupling of components to the simulation enviroment (along with a considerable performance boost)
+*  
+
+## 1.1.2
+
 Released 2026-01-02
 
 

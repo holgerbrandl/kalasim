@@ -38,7 +38,7 @@ class EnvTests {
     fun `it should support more than one env`() {
         DependencyContext.stopKoin()
 
-        class TestComponent(koin: Koin) : Component(koin = koin) {
+        class TestComponent(koin: Koin) : Component(envProvider = KoinEnvProvider(koin)) {
             override fun process() = sequence {
                 hold(2.minutes)
                 println("my env is ${env.getKoin()}")
@@ -49,9 +49,11 @@ class EnvTests {
 
         env1.apply {
             TestComponent(koin = getKoin())
-            Resource(koin = env1.getKoin())
-            State(false, koin = getKoin())
-            ComponentQueue<Component>(koin = getKoin())
+
+            val envProvider = KoinEnvProvider(getKoin())
+            Resource(envProvider = envProvider)
+            State(false, envProvider = envProvider)
+            ComponentQueue<Component>(envProvider = envProvider)
 
         }
 
@@ -127,7 +129,7 @@ class EnvTests {
         }
 
         println("continuing env1...")
-        class LateArriver(koin: Koin) : Component("late arriver", koin = koin)
+        class LateArriver(koin: Koin) : Component("late arriver", envProvider = KoinEnvProvider(koin))
 
         env1.addEventListener { println(it) }
 //        shouldThrow<IllegalStateException> {

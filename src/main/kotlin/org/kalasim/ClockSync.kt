@@ -2,6 +2,8 @@ package org.kalasim
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import org.kalasim.DefaultProvider
+import org.kalasim.EnvProvider
 import org.kalasim.misc.*
 import org.koin.core.Koin
 import kotlin.math.roundToLong
@@ -19,10 +21,10 @@ class ClockSync(
     tickDuration: Duration,
     val syncsPerTick: Number = 10,
     val maxDelay: Duration? = null,
-    koin: Koin = DependencyContext.get()
+    envProvider: EnvProvider = DefaultProvider()
 ) : Component(
     trackingConfig = ComponentTrackingConfig(logCreation = false, logStateChangeEvents = false),
-    koin = koin
+    envProvider = envProvider
 ) {
     // todo add secondary constructor that accepts speed-parameter instead of too complex
     /**
@@ -37,13 +39,13 @@ class ClockSync(
         speedUp: Double = 1.0,
         syncsPerTick: Number = 10,
         maxDelay: Duration? = null,
-        koin: Koin = DependencyContext.get()
+        envProvider: EnvProvider = DefaultProvider()
     ) : this(
         // compute necessary tick duration
-        koin.get<Environment>().asDuration(1.0 / speedUp),
+        envProvider.getEnv().asDuration(1.0 / speedUp),
         syncsPerTick,
         maxDelay,
-        koin
+        envProvider
     )
 
     fun adjustSpeedUp(speedUp: Double) {

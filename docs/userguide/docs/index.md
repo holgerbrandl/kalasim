@@ -3,19 +3,51 @@
 [ ![Download](https://img.shields.io/github/v/release/holgerbrandl/kalasim) ](https://github.com/holgerbrandl/kalasim/releases)  [![Build Status](https://github.com/holgerbrandl/kalasim/workflows/build/badge.svg)](https://github.com/holgerbrandl/kalasim/actions?query=workflow%3Abuild)  [![slack](https://img.shields.io/badge/kotlinlang%20slack-kalasim-yellowgreen)](https://kotlinlang.slack.com/messages/kalasim/)
 [![github-discussions](https://img.shields.io/badge/discuss-kalasim-orange)](https://github.com/holgerbrandl/kalasim/discussions)
 
-`kalasim` is a [discrete event simulator](theory.md#what-is-discrete-event-simulation). It provides a statically typed API, dependency injection, modern persistence, structured logging and automation capabilities.
+`kalasim` is a [discrete event simulation](theory.md#what-is-discrete-event-simulation) framework
+providing a statically typed API, dependency injection, enterprise-grade persistence, structured logging, and
+comprehensive automation capabilities for building digital twins.
 
-kalasim is designed for simulation practitioners, process analysts and industrial engineers, who need to go beyond the limitations of existing simulation tools to model and optimize their business-critical use-cases.
+`kalasim` is designed for simulation practitioners, process analysts, and industrial engineers who require advanced
+modeling capabilities beyond conventional simulation tools to analyze and optimize business-critical systems and
+processes.
 
-In contrast to many other simulation tools, `kalasim` is neither low-code nor no-code. It is _code-first_ to enable change tracking, scaling, refactoring, CI/CD, unit-tests, and the rest of the gang that makes simulation development fun.
+Unlike many simulation tools, `kalasim` is neither low-code nor no-code. It follows a _code-first_ philosophy, enabling
+version control, scalability, refactoring, continuous integration and deployment (CI/CD), comprehensive unit testing,
+and modern software engineering practices that ensure robust simulation development.
 
-`kalasim` is written in [Kotlin](https://kotlinlang.org/), is designed around suspendable [coroutines](https://kotlinlang.org/docs/reference/coroutines-overview.html) for process definitions, runs on the [JVM](https://github.com/openjdk/jdk) for performance and scale, is built with [koin](https://github.com/InsertKoinIO/koin) as dependency wiring framework, and is using [common-math](https://commons.apache.org/proper/commons-math/) for stats and distributions. See [acknowledgements](about.md#acknowledgements) for further references. `kalasim` is agnostic regarding a visualization frontend, but we provide bindings/examples using [plotly.kt](https://github.com/mipt-npm/plotly.kt), [lets-plot](https://github.com/JetBrains/lets-plot-kotlin) as well as [kravis](https://github.com/holgerbrandl/kravis).
+`kalasim` is implemented in [Kotlin](https://kotlinlang.org/), leveraging
+suspendable [coroutines](https://kotlinlang.org/docs/reference/coroutines-overview.html) for intuitive process
+definitions. The framework operates on the [JVM](https://github.com/openjdk/jdk) to deliver enterprise-level performance
+and scalability, utilizes [koin](https://github.com/InsertKoinIO/koin) for dependency injection, and
+integrates [Apache Commons Math](https://commons.apache.org/proper/commons-math/) for statistical analysis and
+probability distributions. For additional technical references, see [acknowledgements](about.md#acknowledgements).
+`kalasim` maintains visualization framework independence while providing integration examples
+for [plotly.kt](https://github.com/mipt-npm/plotly.kt), [lets-plot](https://github.com/JetBrains/lets-plot-kotlin),
+and [kravis](https://github.com/holgerbrandl/kravis).
 
+## 2026 - Advancing Digital Twin Development
+
+Building on our deep understanding of the challenges faced by simulation practitioners, we are pleased to announce
+significant enhancements to `kalasim` in 2026, further strengthening its capabilities for enterprise digital twin
+development.
+
+* **Enhanced Performance**: Significant improvements in simulation performance through optimized event processing and
+  memory management architectures, enabling accurate modeling of larger, more complex industrial systems
+* **Modern Technology Stack**: Full compatibility with Kotlin 2.2, providing access to advanced language features and
+  state-of-the-art development tooling for professional simulation engineering
+* **Industry-Validated**: `kalasim` has been successfully deployed across diverse industrial sectors—from automotive
+  supply chain optimization to precision execution control in semiconductor manufacturing—demonstrating proven
+  reliability in production-critical environments
+* **Expanding Professional Community**: A growing network of researchers, practitioners, and industrial engineers
+  actively contributing to the framework through comprehensive documentation, peer-reviewed case studies, and
+  collaborative knowledge exchange
 
 ---
 
-!!! tip "Meet kalasim at KotlinConf" 
-    We presented at [KotlinConf 2023](https://kotlinconf.com/talks/389146/) in Amsterdam! We were there together with other technology leads from cloud, mobile & data-science for a great week of discussion and knowledge sharing. Our talk  about "Make more money by modeling and optimizing your business processes with Kotlin" was well perceived and a lot of fun. Enjoy:
+!!! tip "KotlinConf Presentation"
+We presented at [KotlinConf](https://kotlinconf.com/talks/389146/) in Amsterdam, joining technology leaders from cloud
+computing, mobile development, and data science for collaborative knowledge exchange. Our presentation on "Make more
+money by modeling and optimizing your business processes with Kotlin" was well-received by the professional community:
 
 
 <div class="video-wrapper">
@@ -30,12 +62,17 @@ In contrast to many other simulation tools, `kalasim` is neither low-code nor no
 
 ## Core Features
 
-`kalasim` is a generic [process-oriented](theory.md) discrete event simulation (DES) engine.
+`kalasim` is a comprehensive [process-oriented](theory.md) discrete event simulation (DES) engine designed for
+industrial applications.
 
-* [Simulation entities](component.md) have a generative process description that defines the interplay with other entities
-* There is a well-defined rich process interaction vocabulary, including [hold](component.md#hold), [request](component.md#request), [wait](component.md#wait) or [passivate](component.md#passivate)
-* An [event trigger queue](basics.md#event-queue) maintains future action triggers and acts as sole driver to progress simulation state
-* Built-in [monitoring](monitors.md) and [statistics](analysis.md) gathering across the entire API
+* [Simulation entities](component.md) employ generative process descriptions that define interactions and dependencies
+  with other system entities
+* A well-defined, expressive process interaction vocabulary,
+  including [hold](component.md#hold), [request](component.md#request), [wait](component.md#wait),
+  and [passivate](component.md#passivate) operations
+* An [event trigger queue](basics.md#event-queue) that maintains scheduled future actions and serves as the primary
+  mechanism for simulation state progression
+* Integrated [monitoring](monitors.md) and [statistical analysis](analysis.md) capabilities throughout the entire API
 
 Find out more about the [basics](basics.md) of a `kalasim` simulation.
 
@@ -49,16 +86,18 @@ Let’s start with a very simple model. The example demonstrates the main mode o
 
 Curious about an in-depth analysis of this example? It's your lucky day, see [here](examples/car.md).
 
-##  How to contribute?
+## How to Contribute
 
-Feel welcome to post ideas and suggestions to the project [tracker](https://github.com/holgerbrandl/kalasim/issues).
+We welcome contributions from the community. Please submit ideas and suggestions to the
+project [issue tracker](https://github.com/holgerbrandl/kalasim/issues).
 
-We always welcome pull requests. :-)
-
+Pull requests are always appreciated and will be reviewed promptly.
 
 ## Support
 
-Feel welcome to post questions and ideas in the project's [discussion forum](https://github.com/holgerbrandl/kalasim/discussions)
+For questions and discussions, please visit the
+project's [discussion forum](https://github.com/holgerbrandl/kalasim/discussions).
 
-Feel also invited to chat with us in the [kotlinlang.slack.com](http://kotlinlang.slack.com) in the `#kalasim` channel.
+You are also invited to join our community on [kotlinlang.slack.com](http://kotlinlang.slack.com) in the `#kalasim`
+channel.
 

@@ -8,6 +8,9 @@ import kotlin.math.roundToInt
 
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.apache.commons.math3.util.Pair
+import org.kalasim.DefaultProvider
+import org.kalasim.EnvProvider
+
 /**
  * Frequency tally levels irrespective of current (simulation) time.
  *
@@ -15,8 +18,8 @@ import org.apache.commons.math3.util.Pair
  */
 open class CategoryMonitor<T>(
     name: String? = null,
-    koin: Koin = DependencyContext.get()
-) : Monitor<T>(name, koin), ValueMonitor<T> {
+    envProvider: EnvProvider = DefaultProvider(),
+    ) : Monitor<T>(name, envProvider), ValueMonitor<T> {
 
 //    override var enabled: Boolean = true
 //        set(isEnabled) {

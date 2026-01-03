@@ -493,7 +493,7 @@ There are also additional arguments available to support more custom/advanced us
 * `name` - Name of the component.  If the name ends with a period (.), auto serializing will be applied. 
 * `priority` - If a component has the same time on the event list, this component is scheduled according to the priority. An event with a higher priority will be scheduled first.
 * `keepHistory` - If `true`, i will store a reference of all generated components which can be queried with `history`.
-* `koin` - The dependency resolution context to be used to resolve the `org.kalasim.Environment`
+* `envProvider` - The simulation  context to be used to resolve the `org.kalasim.Environment`
 
 Note, that the entities being created are not required to extend `org.kalasim.Component`, but can be in fact arbitrary types. 
 

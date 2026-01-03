@@ -38,7 +38,7 @@ open class MMcQueue(
     // disabled because not strictly needed to study the queue parameters
     //    val traces: EventLog = enableEventLog()
 
-    class Customer(mu: Number) : TickedComponent() {
+    class Customer(mu: Number, envProvider: EnvProvider= DefaultProvider()) : TickedComponent(envProvider = envProvider) {
         val ed = exponential(mu.toDouble())
 
         override fun process() = sequence {
@@ -60,7 +60,7 @@ open class MMcQueue(
         server = dependency { Resource("server", c) }
 
         componentGenerator = ComponentGenerator(iat = exponential(lambda).minutes, keepHistory = true) {
-            Customer(mu)
+            Customer(mu, envProvider = WrappedProvider(this))
         }
     }
 }

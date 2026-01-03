@@ -19,8 +19,8 @@ class TickMetrics(
     val enableMonitor: Boolean = true,
     /** Emit events via the kalasim message bus. */
     val enableMetricEvents: Boolean = true,
-    koin: Koin? = null
-) : TickedComponent(koin = koin ?: DependencyContext.get()) {
+    envProvider: EnvProvider = DefaultProvider(),
+) : TickedComponent(envProvider = envProvider) {
 
     val timeline = MetricTimeline(name, 0)
 

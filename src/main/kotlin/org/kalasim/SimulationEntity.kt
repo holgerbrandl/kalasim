@@ -10,10 +10,10 @@ import org.koin.core.qualifier.Qualifier
 
 
 /** Base class of all main simulation entities such as environments, resources, components, states and collections. */
-abstract class SimulationEntity(name: String? = null, val simKoin: Koin = DependencyContext.get()) : SimContext,
+abstract class SimulationEntity(name: String? = null, val envProvider: EnvProvider = DefaultProvider()) : SimContext,
     WithJson {
 
-    final override val env = getKoin().get<Environment>()
+    final override val env = envProvider.getEnv()
 
     /** The (possibly auto-generated) name of this simulation entity.*/
     val name: String = name?.run {
@@ -42,7 +42,7 @@ abstract class SimulationEntity(name: String? = null, val simKoin: Koin = Depend
     override fun toString(): String = name
 
     //https://medium.com/koin-developers/ready-for-koin-2-0-2722ab59cac3
-    final override fun getKoin(): Koin = simKoin
+    final override fun getKoin(): Koin = env.getKoin()
 
 
     //redeclare to simplify imports

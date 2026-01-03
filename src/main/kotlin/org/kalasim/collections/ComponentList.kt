@@ -18,9 +18,9 @@ class ComponentList<C>(
     name: String? = null,
     capacity: Int = Int.MAX_VALUE,
     private val list: MutableList<C> = LinkedList<C>(),
-    koin: Koin = DependencyContext.get(),
-    trackingConfig: ComponentCollectionTrackingConfig = koin.getEnvDefaults().DefaultComponentCollectionConfig,
-) : ComponentCollection<C>(name, capacity, koin, trackingConfig), MutableList<C> by list {
+    envProvider: EnvProvider = DefaultProvider(),
+    trackingConfig: ComponentCollectionTrackingConfig = envProvider.getEnv().entityTrackingDefaults.DefaultComponentCollectionConfig,
+) : ComponentCollection<C>(name, capacity, envProvider, trackingConfig), MutableList<C> by list {
 
     internal val stayTracker = mutableMapOf<C, SimTime>()
 

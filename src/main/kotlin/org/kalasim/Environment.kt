@@ -92,7 +92,7 @@ object Defaults {
 }
 
 
-internal class MainComponent(koin: Koin) : Component(MAIN, koin = koin) {
+internal class MainComponent(koin: Koin) : Component(MAIN, envProvider = KoinEnvProvider(koin)) {
     override fun process() = sequence<Component> {}
 }
 
@@ -269,7 +269,7 @@ open class Environment(
             "The tick-metrics monitor is already registered"
         }
 
-        TickMetrics(koin = getKoin())
+        TickMetrics(envProvider = WrappedProvider(this))
     }
 
     val tickMetrics: MetricTimeline<Int>

@@ -1,5 +1,7 @@
 package org.kalasim.monitors
 
+import org.kalasim.DefaultProvider
+import org.kalasim.EnvProvider
 import org.kalasim.SimulationEntity
 import org.kalasim.misc.DependencyContext
 import org.koin.core.Koin
@@ -10,8 +12,8 @@ import org.koin.core.Koin
 
 abstract class Monitor<T>(
     name: String? = null,
-    koin: Koin = DependencyContext.get()
-) : SimulationEntity(name, koin) {
+     envProvider: EnvProvider = DefaultProvider()
+) : SimulationEntity(name, envProvider) {
 
     /** Disable or enable data collection in a timeline. */
     var enabled: Boolean = true
