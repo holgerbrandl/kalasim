@@ -8,6 +8,7 @@ include(":modules:logistics")
 include(":modules:notebook")
 include(":modules:letsplot")
 include(":modules:kravis")
+include(":modules:benchmarks")
 
 //having a module name that is identical to one of your imported dependencies,
 // especially when the group ID is also the same, can indeed lead to issues in Gradle.

@@ -1,15 +1,25 @@
 # Kalasim Release History
 
+## 1.3 (Under Devevelopment)
+
+* Added support for clipping `MetricTimeline`s with `clip()`
+  ```kotlin
+  val timeline = MetricTimeline<Int>()
+  timeline.add(10)
+  timeline.clip(end=env.start+1.day)
+  ```
+
 ## 1.2
 
 Released 2026-01-03
 
-* Significantly improved process bootstrap performance for models with many [components](https://www.kalasim.org/component/) (>1M) 
+* Significantly improved process bootstrap performance for models with
+  many [components](https://www.kalasim.org/component/) (>1M)
 
-  * Adding better reflection logic to identify process definitions
-  * Moved consistency checks into ASSERT mode 
-  * Faster (cached) detection of process definition
-* Added  new `EnvProvider` interface for more direct coupling of components to the 
+  * Added better reflection logic to identify process definitions
+  * Moved consistency checks into ASSERT mode
+  * Improved (cached) detection of process definitions
+* Introduced new `EnvProvider` interface for more direct coupling of components to the environment
 
 ## 1.1.2
 
