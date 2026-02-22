@@ -8,7 +8,7 @@ import kotlin.time.Duration.Companion.days
 
 @State(Scope.Benchmark)
 //@Fork(4)
-@Warmup(iterations = 2)
+@Warmup(iterations = 1)
 @Measurement(iterations = 5)
 @OutputTimeUnit(TimeUnit.SECONDS)
 @BenchmarkMode(Mode.AverageTime)

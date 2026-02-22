@@ -15,10 +15,26 @@ For gradle plugin options see https://github.com/melix/jmh-gradle-plugin
 ./gradlew --console=plain clean jmh`
 ```
 
+When running as part of multimodule project run
+```bash
+./gradlew --console=plain :modules:benchmarks:clean  :modules:benchmarks:jmh
+```
+
 * Output is saved as CSV in `benchmarks/build/results/jmh/results.csv`
 
 ### How to build report
 
+We use a small [R](https://www.r-project.org/) script and render it with [quarto](https://quarto.org/)
+
+```bash
+cd ${KALASIM_ROOT}benchmarks
+
+#quarto render BenchmarkVis.R
+
+# with timestamp
+TIMESTAMP=$(date +"%Y%m%dT%H%M%S")
+quarto render BenchmarkVis.R --output "BenchmarkReport_${TIMESTAMP}.html"
+```
 
 ### How is repo history preserved?
 

@@ -11,7 +11,7 @@ import kotlin.time.Duration.Companion.days
 @Measurement(iterations = 5)
 @OutputTimeUnit(TimeUnit.SECONDS)
 @BenchmarkMode(Mode.AverageTime)
-open class ERBenchmark {
+open class SimpleERBenchmark {
 
 //    var value: Double = 0.0
 //
@@ -32,11 +32,11 @@ open class ERBenchmark {
 
 @State(Scope.Benchmark)
 @Fork(1)
-@Warmup(iterations = 2)
+@Warmup(iterations = 1)
 @Measurement(iterations = 5)
 @OutputTimeUnit(TimeUnit.SECONDS)
 @BenchmarkMode(Mode.AverageTime)
-open class ERLoggingBenchmark {
+open class ExtErBenchmark {
 
 //    var value: Double = 0.0
 //
@@ -49,8 +49,8 @@ open class ERLoggingBenchmark {
     @State(Scope.Benchmark)
     open class ExecutionPlan {
 
-//        @Param("10", "20","30")
-//        var numFloors =
+        @Param("36","365", "3650")
+        var numDays:Int =0
 
         lateinit var sim: EmergencyRoom
 
@@ -62,45 +62,7 @@ open class ERLoggingBenchmark {
 
     @Benchmark
     fun measureER(execPlan: ExecutionPlan) {
-        execPlan.sim.run(30.days)
+        execPlan.sim.run(execPlan.numDays.days)
     }
-
 }
 
-
-@State(Scope.Benchmark)
-@Fork(1)
-@Warmup(iterations = 2)
-@Measurement(iterations = 5)
-@OutputTimeUnit(TimeUnit.SECONDS)
-@BenchmarkMode(Mode.AverageTime)
-open class ERLoggingBenchmark {
-
-//    var value: Double = 0.0
-//
-//    @Setup
-//    fun setUp(): Unit {
-//        value = 3.0
-//    }
-
-
-    @State(Scope.Benchmark)
-    open class ExecutionPlan {
-
-//        @Param("10", "20","30")
-//        var numFloors =
-
-        lateinit var sim: EmergencyRoom
-
-        @Setup(Level.Invocation)
-        fun setUp() {
-            sim = EmergencyRoom()
-        }
-    }
-
-    @Benchmark
-    fun measureER(execPlan: ExecutionPlan) {
-        execPlan.sim.run(30.days)
-    }
-
-}

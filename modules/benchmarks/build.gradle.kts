@@ -3,11 +3,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 plugins {
-    kotlin("jvm") version "1.9.20"
+    kotlin("jvm") version "2.2.21"
     id("java")
-    id("me.champeau.jmh") version "0.7.1"
+    id("me.champeau.jmh") version "0.7.3"
 //    id("io.morethan.jmhreport") version "0.9.0"
-
 }
 
 repositories {
@@ -15,18 +14,22 @@ repositories {
     mavenLocal()
 }
 
+
 dependencies {
 //    jmh("org.openjdk.jmh:jmh-core:0.9")
 //    jmh( "org.openjdk.jmh:jmh-generator-annprocess:0.9")
 
 //    jmh(kotlin("stdlib"))
-    jmh("org.apache.commons:commons-lang3:3.12.0")
-    jmh("org.slf4j:slf4j-simple:2.0.9")
+    jmh("org.apache.commons:commons-lang3:3.18.0")
+    jmh("org.slf4j:slf4j-simple:2.0.17")
 
-    jmh("com.github.holgerbrandl:kalasim:2023.1-SNAPSHOT")
+    val prodModel = System.getenv("KALASIM_PROD_MODEL")
+    println("KALASIM_PROD_MODEL: $prodModel")
+    jmh(prodModel)
 
-//    jmh ("com.systema.risuite:fsm-simulator:2.4.1")
-//    jmh(project(":"))
+    testImplementation(testFixtures(project(":")))
+
+    jmh(project(":"))
 }
 
 
@@ -42,7 +45,12 @@ val commitHash = Runtime
         output.trim()
     }
 
+tasks.named<Jar>("jmhJar") {
+    isZip64 = true
+}
+
 val timestamp: String = SimpleDateFormat("yyyyMMdd'T'HHmmss").format(Date())
+val label:String?="test"
 //fun getDate(): String = Date().toString()//.format("yyyyMMdd_HHmm")
 
 jmh {
@@ -66,7 +74,7 @@ jmh {
 //    resultFormat = "csv"
 //    resultFormat = 'csv'
     resultsFile.set(File("perf_logs/benchmarks.json"))
-    resultsFile.set(File("perf_logs/results_${timestamp}_${commitHash}.csv"))
+    resultsFile.set(File("perf_logs/results_${timestamp}_${commitHash}${if (label != null) "_$label" else ""}.csv"))
 //    resultsFile = file('perf_logs/jmh_results_' + getDate()+ '.csv')
 
     // for list of available profilers see http://java-performance.info/introduction-jmh-profilers/
