@@ -7,7 +7,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.datetime.Instant
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
 import org.jetbrains.kotlinx.dataframe.io.writeCSV
-import org.kalasim.Exponential
+import org.kalasim.exponential
 import org.kalasim.examples.MMcQueue
 import org.kalasim.examples.er.EmergencyRoom
 import org.kalasim.examples.er.FifoNurse
@@ -24,6 +24,7 @@ import java.util.*
 import kotlin.io.path.div
 import kotlin.io.path.exists
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.measureTime
 
 
@@ -34,7 +35,7 @@ object SimpleBenchmark {
     @JvmStatic
     fun main(args: Array<String>) {
 
-        val config = "baseline3" // new baseline from SYSTEMA_FOP_2035
+        val config = "baseline4" // new baseline from SYSTEMA_FOP_2035
 
         val now = now()
         val date = SimpleDateFormat("yyyyMMdd").format(Date())
@@ -106,7 +107,7 @@ object SimpleBenchmark {
                     numRooms = 4,
                     numPhysicians = 6,
                     physicianQualRange = 2..4,
-                    patientArrival = Exponential(0.2),          // ~ 1 patient / 12 min during day
+                    patientArrival = exponential(0.2.hours),          // ~ 1 patient / 12 min during day
                     nurse = FifoNurse()
                 )
                 er.run(10000.days)
@@ -120,7 +121,7 @@ object SimpleBenchmark {
                     numRooms = 30,
                     numPhysicians = 60,
                     physicianQualRange = 3..6,
-                    patientArrival = Exponential(0.02),          // ~ 1 patient / 12 min during day
+                    patientArrival = exponential(0.02.hours),          // ~ 1 patient / 12 min during day
                     waitingAreaSize = 5000,
                     keepHistory = false,
                     nurse = RefittingAvoidanceNurse
@@ -136,7 +137,7 @@ object SimpleBenchmark {
                     numRooms = 4,
                     numPhysicians = 6,
                     physicianQualRange = 2..4,
-                    patientArrival = Exponential(0.08),         // ~ 1 patient / 4.8 min during day (~2.5× arrivals)
+                    patientArrival = exponential(0.08.hours),         // ~ 1 patient / 4.8 min during day (~2.5× arrivals)
                     waitingAreaSize = 20000,      // allow deep queue to form
                     keepHistory = false,
                     nurse = UrgencyNurse          // forces more sorting/selection work if you change to sorted structure later

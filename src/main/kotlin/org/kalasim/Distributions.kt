@@ -45,7 +45,7 @@ fun constant(value: Duration) = DurationDistribution(
     ConstantRealDistribution(value.toDouble(DurationUnit.SECONDS))
 )
 
-data class Rate(val eventsPerTimeunit: Number, val timeUnit :  TimeUnit = TimeUnit.SECONDS ){
+data class Rate(val eventsPerTimeunit: Number, val timeUnit: TimeUnit = TimeUnit.SECONDS) {
 
     val mean: Duration
         get() {
@@ -63,7 +63,6 @@ data class Rate(val eventsPerTimeunit: Number, val timeUnit :  TimeUnit = TimeUn
 }
 
 
-
 /**
  * Exponential distribution with built-in support for controlled-randomization.
  *
@@ -72,14 +71,87 @@ data class Rate(val eventsPerTimeunit: Number, val timeUnit :  TimeUnit = TimeUn
 fun SimContext.exponential(mean: Number) = ExponentialDistribution(env.rg, mean.toDouble())
 fun SimContext.exponential(rate: Rate) = ExponentialDistribution(env.rg, rate.mean.inSeconds).seconds
 
-fun interface DurationDistributionBuilder{
+fun interface DistributionBuilder {
+    fun build(environment: Environment): RealDistribution
+}
+
+/**
+ * Creates an exponential distribution builder with the specified mean.
+ *
+ * The exponential distribution is commonly used to model the time between events in a Poisson point process,
+ * i.e., a process in which events occur continuously and independently at a constant average rate.
+ *
+ * @param mean The mean (expected value) of the exponential distribution. Must be a positive number.
+ * @return A [DistributionBuilder] that creates an exponential distribution when built with an environment.
+ *
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
+fun exponential(mean: Number) = DistributionBuilder { it.exponential(mean) }
+
+/**
+ * Creates an exponential distribution builder with the specified mean duration.
+ *
+ * The exponential distribution is commonly used to model the time between events in a Poisson point process,
+ * i.e., a process in which events occur continuously and independently at a constant average rate.
+ *
+ * @param mean The mean (expected value) of the exponential distribution as a [Duration]. Must be positive.
+ * @return A [DurationDistributionBuilder] that creates an exponential duration distribution when built with an environment.
+ *
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
+fun exponential(mean: Duration) = DurationDistributionBuilder { it.exponential(mean) }
+
+/**
+ * Creates a normal (Gaussian) distribution builder with the specified mean and standard deviation.
+ *
+ * The normal distribution is a continuous probability distribution that is symmetric around the mean,
+ * showing that data near the mean are more frequent in occurrence than data far from the mean.
+ *
+ * @param mean The mean (expected value) of the normal distribution. Defaults to 0.
+ * @param sd The standard deviation of the normal distribution. Must be positive. Defaults to 1.
+ * @param rectify If true, negative samples are replaced with 0. Defaults to false.
+ * @return A [DistributionBuilder] that creates a normal distribution when built with an environment.
+ *
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
+fun normal(mean: Number = 0, sd: Number = 1, rectify: Boolean = false) =
+    DistributionBuilder { it.normal(mean, sd, rectify) }
+
+/**
+ * Creates a normal (Gaussian) distribution builder with the specified mean and standard deviation as durations.
+ *
+ * The normal distribution is a continuous probability distribution that is symmetric around the mean,
+ * showing that data near the mean are more frequent in occurrence than data far from the mean.
+ *
+ * @param mean The mean (expected value) of the normal distribution as a [Duration].
+ * @param sd The standard deviation of the normal distribution as a [Duration]. Must be positive.
+ * @param rectify If true, negative samples are replaced with 0. Defaults to false.
+ * @return A [DurationDistributionBuilder] that creates a normal duration distribution when built with an environment.
+ *
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
+fun normal(mean: Duration, sd: Duration, rectify: Boolean = false) =
+    DurationDistributionBuilder { it.normal(mean, sd, rectify) }
+
+
+fun interface DurationDistributionBuilder {
     fun build(environment: Environment): DurationDistribution
 }
-class Exponential(val mean: Number): DurationDistributionBuilder{
-    override fun build(environment: Environment): DurationDistribution {
-        return environment.exponential(mean).hours
-    }
+
+
+data class DurationDistributionBuilderImpl(val unit: DurationUnit, val distBuilder: DistributionBuilder) :
+    DurationDistributionBuilder {
+    override fun build(environment: Environment): DurationDistribution =
+        DurationDistribution(unit, distBuilder.build(environment))
 }
+
+
+// todo reassess for api redundancy
+val DistributionBuilder.seconds get() = DurationDistributionBuilderImpl(DurationUnit.SECONDS, this)
+val DistributionBuilder.minutes get() = DurationDistributionBuilderImpl(DurationUnit.MINUTES, this)
+val DistributionBuilder.hours get() = DurationDistributionBuilderImpl(DurationUnit.HOURS, this)
+val DistributionBuilder.days get() = DurationDistributionBuilderImpl(DurationUnit.DAYS, this)
+
 
 /**
  * Exponential distribution with built-in support for controlled-randomization.
@@ -93,7 +165,7 @@ fun SimContext.exponential(mean: Duration) = ExponentialDistribution(env.rg, mea
  *
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
-fun SimContext.normal(mean: Number = 0, sd: Number = 1, rectify: Boolean = false): NormalDistribution = if(rectify) {
+fun SimContext.normal(mean: Number = 0, sd: Number = 1, rectify: Boolean = false): NormalDistribution = if (rectify) {
     RectifiedNormalDistribution(env.rg, mean.toDouble(), sd.toDouble())
 } else {
     NormalDistribution(env.rg, mean.toDouble(), sd.toDouble())
@@ -110,7 +182,7 @@ operator fun ExponentialDistribution.invoke(): Double = sample()
  *
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
-fun SimContext.normal(mean: Duration, sd: Duration, rectify: Boolean = false): DurationDistribution = if(rectify) {
+fun SimContext.normal(mean: Duration, sd: Duration, rectify: Boolean = false): DurationDistribution = if (rectify) {
     RectifiedNormalDistribution(env.rg, mean.inSeconds, sd.inSeconds)
 } else {
     NormalDistribution(env.rg, mean.inSeconds, sd.inSeconds)
@@ -122,7 +194,7 @@ private class RectifiedNormalDistribution(rng: RandomGenerator, mean: Double, sd
 
     override fun sample(sampleSize: Int): DoubleArray = Array(sampleSize) { sample() }.toDoubleArray()
 
-    override fun sample(): Double = super.sample().let { if(it < 0) 0.0 else it }
+    override fun sample(): Double = super.sample().let { if (it < 0) 0.0 else it }
 }
 
 
@@ -172,7 +244,7 @@ fun SimContext.uniform(lower: Duration, upper: Duration) =
 
 data class DurationDistribution(val unit: DurationUnit, val dist: RealDistribution) {
     operator fun invoke() = sample()
-    fun sample() = when(unit) {
+    fun sample() = when (unit) {
         DurationUnit.SECONDS -> dist().seconds
         DurationUnit.MINUTES -> dist().minutes
         DurationUnit.HOURS -> dist().hours
@@ -188,7 +260,7 @@ val RealDistribution.days get() = DurationDistribution(DurationUnit.DAYS, this)
 
 data class IntegerDurationDistribution(val unit: DurationUnit, val dist: IntegerDistribution) {
     fun invoke() = sample()
-    fun sample() = when(unit) {
+    fun sample() = when (unit) {
         DurationUnit.SECONDS -> dist().seconds
         DurationUnit.MINUTES -> dist().minutes
         DurationUnit.DAYS -> dist().days

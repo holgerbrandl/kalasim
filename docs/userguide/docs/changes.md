@@ -8,6 +8,13 @@
   timeline.add(10)
   timeline.clip(end=env.start+1.day)
   ```
+  
+* New distribution API to support configuration without simulation context: 
+  ```kotlin
+  val timeline = EmergencyRoom(
+      patientArrival = exponential(8.minutes)
+  ).run(3.days)
+  ```
 
 ## 1.2
 

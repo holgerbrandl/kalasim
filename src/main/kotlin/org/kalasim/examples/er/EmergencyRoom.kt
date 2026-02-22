@@ -1,6 +1,5 @@
 package org.kalasim.examples.er
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.kalasim.*
@@ -273,7 +272,7 @@ class EmergencyRoom(
     val numRooms: Int = 4,
     val nurse: HeadNurse = FifoNurse(),
     val waitingAreaSize: Int = 300,
-    patientArrival: DurationDistributionBuilder = Exponential(0.2),
+    patientArrival: DurationDistributionBuilder = exponential(0.2.hours),
 
     // basic sim options
     tickDurationUnit: DurationUnit = DurationUnit.HOURS,
@@ -389,3 +388,7 @@ class EmergencyRoom(
     }
 }
 
+
+fun main() {
+    EmergencyRoom().run(1.day)
+}
