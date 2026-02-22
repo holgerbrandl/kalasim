@@ -76,3 +76,10 @@ fun main() {
         println(SimpleDateFormat("yyyyMMdd'T'HHmmss").format(Date()))
     }
 }
+object MMCBig{
+    @JvmStatic
+    fun main(args: Array<String>) {
+        MMcQueue(c = 40, mu = 40, lambda = 800).run(10000000)
+
+    }
+}

@@ -1,5 +1,6 @@
 package org.kalasim.examples.er
 
+import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.kalasim.*
@@ -52,14 +53,13 @@ data class Patient(
     val patientStatus: State<PatientStatus>
 ) : Component("$patientId $fullName") {
 
-
     override fun process() = sequence {
         suspend fun SequenceScope<Component>.holdExponential(meanTime: Duration) {
             hold(exponential(meanTime).sample())
         }
 
-        while(!patientStatus.value.deceased) {
-            when(severity.value) {
+        while (!patientStatus.value.deceased) {
+            when (severity.value) {
                 NonUrgent -> passivate()
                 LessUrgent -> {
                     holdExponential(8.hours)
@@ -83,7 +83,7 @@ data class Patient(
                     patientStatus.value = DeceasedWhileWaiting
                     val get = get<EmergencyRoom>()
 
-                    // Dead patients is removed from the queue
+                    // Dead patients are removed from the queue
                     get.deceasedMonitor.inc()
                     get.waitingLine.remove(this@Patient)
                 }
@@ -108,7 +108,7 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
         val er = get<EmergencyRoom>()
         val patient = er.nurse.nextOne(er, this@Room)
 
-        if(patient == null) {
+        if (patient == null) {
             cancel(); return@sequence
         }
 
@@ -116,10 +116,10 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
         er.waitingLine.remove(patient)
         patient.patientStatus.value = InSurgery
 
-        // check setup state of room
+        // check the setup state of the room
         val injuryType = patient.type
 
-        if(setup.value != injuryType) {
+        if (setup.value != injuryType) {
             hold(setupTimes[injuryType]!!, description = "preparing room ${this@Room} for $injuryType")
             setup.value = injuryType
         }
@@ -128,12 +128,12 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
         val doctors = get<EmergencyRoom>().doctors
             .filter { it.qualification.contains(injuryType) }
 
-        // perform surgery one a qualified doctor becomes available
+        // to perform surgery once a qualified doctor becomes available
         request(doctors, oneOf = true) { doctor ->
             // will be in range [1, inf]
             val stressFactor = sqrt(1 + get<EmergencyRoom>().waitingLine.size.toDouble())
 
-            // surgery time is a weighted by business in the ER and severity of the patient
+            // surgery time is weighted by business in the ER and severity of the patient
             val severityWeightedSurgeryTime = patient.severityWeightedSurgeryTime
 
             val surgeryTime = severityWeightedSurgeryTime * stressFactor
@@ -144,7 +144,7 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
 
             // was it successful? This depends on the severity of the injury
             val treatmentSuccessful = surgerySuccessProbability[patient.severity.value]!! > env.random.nextDouble()
-            if(treatmentSuccessful) {
+            if (treatmentSuccessful) {
                 get<EmergencyRoom>().treatedMonitor.inc()
                 patient.patientStatus.value = Released
             } else {
@@ -152,7 +152,7 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
                 patient.patientStatus.value = DeceasedInSurgery
             }
 
-            log("surgery of $patient completed ${if(treatmentSuccessful) "with" else "without"} success")
+            log("surgery of $patient completed ${if (treatmentSuccessful) "with" else "without"} success")
         }
     }
 }
@@ -166,14 +166,14 @@ val Patient.severityWeightedSurgeryTime: Duration
     }
 
 val setupTimes = with(Random(1)) {
-    InjuryType.values().associateWith { nextInt(5, 10).minutes }
+    InjuryType.entries.associateWith { nextInt(5, 10).minutes }
 }
 
 val nonUrgentSurgeryTimes = with(Random(1)) {
-    InjuryType.values().associateWith { nextDouble(0.1, 0.4).hours }
+    InjuryType.entries.associateWith { nextDouble(0.1, 0.4).hours }
 }
 
-val surgerySuccessProbability = Severity.values().zip(listOf(1.0, 1.0, 1.0, 0.9, 0.8)).toMap()
+val surgerySuccessProbability = Severity.entries.toTypedArray().zip(listOf(1.0, 1.0, 1.0, 0.9, 0.8)).toMap()
 
 
 /** Observations */
@@ -193,77 +193,106 @@ class FifoNurse : HeadNurse {
     override fun nextOne(er: EmergencyRoom, room: Room): Patient? {
 
         // simple fifo
-        return if(er.waitingLine.size > 0) er.waitingLine.poll() else null
+        return if (er.waitingLine.size > 0) er.waitingLine.poll() else null
     }
 }
 
-val RefittingAvoidanceNurse = HeadNurse { er, room -> // simple fifo
+val RefittingAvoidanceNurse = HeadNurse { er, room ->
     val sameTypePatients = er.waitingLine.filter { it.type == room.setup.value }
 
-    val firstBySeverity = sameTypePatients.sortedWith(bySeverity).firstOrNull()
+    val firstBySeverity = sameTypePatients.minByOrNull { it.severity.value }
 
-    // if we need to setup we setup to whats most needed in total count
-//    if(er.waitingLine.isEmpty()) return@HeadNurse null
-//    val maxSeverity = er.waitingLine.groupingBy { it.severity.value }.eachCount().maxByOrNull { it.value }!!
-//    return er.waitingLine.filter{it.severity.value ==maxSeverity.key}.sortedWith (org.kalasim.examples.er.getBySeverity).firstOrNull()
-
-    // or if no same type injuries are present, we could use the most severe patient
-    firstBySeverity ?: er.waitingLine.sortedWith(bySeverity).firstOrNull()
+    // Fallback: if no same-type patients, take the most severe overall
+    firstBySeverity ?: er.waitingLine.minByOrNull { it.severity.value }
 }
 
 // todo add considerate-nurse
 
 @Suppress("unused")
-val SetupAvoidanceNoMatterWhatNurse = HeadNurse { er, _ -> // simple fifo
-//    val sameTypePatients = er.waitingLine.filter { it.type == room.setup.value }
-//    val firstBySeverity = sameTypePatients.sortedWith(bySeverity).firstOrNull()
-
-    // if we need to setup we setup to whats most needed in total count
-    if(er.waitingLine.isEmpty()) return@HeadNurse null
+val SetupAvoidanceNoMatterWhatNurse = HeadNurse { er, _ ->
+    // If we need to set up, we set up to what's most needed in total count
+    if (er.waitingLine.isEmpty()) return@HeadNurse null
 
     val maxSeverity = er.waitingLine.groupingBy { it.severity.value }.eachCount().maxByOrNull { it.value }!!
-    er.waitingLine.filter { it.severity.value == maxSeverity.key }.sortedWith(bySeverity).firstOrNull()
+    er.waitingLine
+        .filter { it.severity.value == maxSeverity.key }
+        .minByOrNull { it.severity.value }
 }
 
 
 @Suppress("unused")
-val UrgencyNurse = HeadNurse { er, _ -> // simple fifo
-    er.waitingLine.sortedWith(bySeverity).firstOrNull()
+val UrgencyNurse = HeadNurse { er, _ ->
+    er.waitingLine.minByOrNull { it.severity.value }
 }
 
 @Suppress("unused")
 val ShortestTreatmentTimeNurse = HeadNurse { er, _ ->
-    er.waitingLine.sortedWith(bySurgeryTime).firstOrNull()
+    er.waitingLine.minByOrNull { it.severityWeightedSurgeryTime }
 }
 
 class Doctor(name: String, val qualification: List<InjuryType>) : Resource(name)
 
-
+/**
+ * Emergency room simulation model.
+ *
+ * This model simulates the operations of an emergency room, including patient arrivals, triage,
+ * room assignments, physician allocation, and treatment outcomes. The simulation tracks patient
+ * flow through the ER system and provides metrics on treatment success and mortality.
+ *
+ * @param numPhysicians The number of physicians staffing the ER. Default is 6.
+ * @param physicianQualRange The range of qualifications (injury types) each physician can treat.
+ *                           For example, 2..4 means each doctor can treat between 2 and 4 different
+ *                           injury types. Default is 2..4.
+ * @param numRooms The number of treatment rooms in the ER. Each room is dynamically configured
+ *                 for a specific injury type during operation. Default is 4.
+ * @param nurse The head nurse policy that determines patient selection strategy (e.g., FIFO,
+ *              urgency-based, shortest treatment time). This controls which patient is assigned
+ *              to which available room. Default is FifoNurse().
+ * @param waitingAreaSize The maximum capacity of the waiting area. When the waiting area reaches
+ *                        capacity, new patients will not be admitted to the ER. Default is 300.
+ * @param patientArrival Inter-arrival time distribution builder for patient arrivals. For example,
+ *                   Exponential(0.2) corresponds to lambda = 1/0.2 = 5 patients per hour base rate.
+ *                   The effective 24h average is lower (~3.5–4 patients/hour) due to reduced
+ *                   arrivals during night hours. Default is Exponential(0.2).
+ * @param tickDurationUnit The time unit for simulation ticks, affecting how time is represented
+ *                         internally. Default is DurationUnit.HOURS.
+ * @param enableComponentLogger Whether to enable detailed component-level logging for debugging
+ *                              and analysis. Default is false.
+ * @param keepHistory Whether to maintain detailed historical data of all events and state changes
+ *                    during the simulation. Enabling this increases memory usage but allows for
+ *                    detailed post-simulation analysis. Default is false.
+ * @param enableInternalMetrics Whether to enable internal metrics tracking for performance monitoring.
+ *                              When disabled, entity tracking is turned off to improve performance.
+ *                              Default is false.
+ * @param start The simulation start time as an instant. Default is epoch time (January 1, 1970, 00:00:00 UTC).
+ *              The time of day affects patient arrival rates (higher during daytime hours 8:00-18:00).
+ */
 class EmergencyRoom(
-//    nurse: HeadNurse = FifoNurse()
-    /** The number of physicians in the ER */
     val numPhysicians: Int = 6,
-    /** The number of qualifications per physician. */
     val physicianQualRange: IntRange = 2..4,
-    /** The number of rooms in the ER. Each room is assigned a random injury-type.*/
     val numRooms: Int = 4,
-    /** The execution planning policy of the ER. */
     val nurse: HeadNurse = FifoNurse(),
+    val waitingAreaSize: Int = 300,
+    patientArrival: DurationDistributionBuilder = Exponential(0.2),
 
+    // basic sim options
     tickDurationUnit: DurationUnit = DurationUnit.HOURS,
     enableComponentLogger: Boolean = false,
+    keepHistory: Boolean = false,
     enableInternalMetrics: Boolean = false,
+    start: SimTime = somewhen() //Instant.fromEpochMilliseconds(0)
 ) : Environment(
     enableComponentLogger = enableComponentLogger,
-    tickDurationUnit = tickDurationUnit
+    tickDurationUnit = tickDurationUnit,
+    startDate = start
 ) {
+    val iat: DurationDistribution = patientArrival.build(this)
 
     // todo this should be opt-in anyway https://github.com/holgerbrandl/kalasim/issues/66
     init {
-        if(!enableInternalMetrics) entityTrackingDefaults.disableAll()
+        if (!enableInternalMetrics) entityTrackingDefaults.disableAll()
     }
 
-    val waitingAreaSize = 300
 
     // todo also here having sorted queue is causing almost more problems than solving
 //    val waitingLine = ComponentQueue(comparator = compareBy <Patient>{ it.severity.value }, name = "ER Waiting Area")
@@ -271,7 +300,7 @@ class EmergencyRoom(
     val waitingLine = ComponentList<Patient>(name = "ER Waiting Area Queue")
 
     private fun sampleQualification(numQuals: Int) =
-        InjuryType.values().toList().shuffled(random).take(numQuals)
+        InjuryType.entries.shuffled(random).take(numQuals)
 
     val faker = Faker(random)
 
@@ -284,17 +313,22 @@ class EmergencyRoom(
     }
 
     init {
-        // add it self as dependency
+        // add itself as a dependency
         dependency { this@EmergencyRoom }
 
-        // make sure that there is a doctor for each typo of injury
+        // make sure that there is a doctor for each type of injury
         require(
-            doctors.flatMap { it.qualification }.toSet() == InjuryType.values().toSet()
+            doctors.flatMap { it.qualification }.toSet() == InjuryType.entries.toSet()
         ) { "lack of staff qualification" }
     }
 
     val rooms =
-        List(numRooms) { Room("room $it", State(InjuryType.values().random(random), name = "Setup of room $it")) }
+        List(numRooms) {
+            Room(
+                "room $it",
+                State(InjuryType.entries.toTypedArray().random(random), name = "Setup of room $it")
+            )
+        }
 
     // Add additional metrics
     val deceasedMonitor = IntTimeline("deceased patients")
@@ -312,13 +346,13 @@ class EmergencyRoom(
 
     // incoming patients
     init {
-        val typeDist = enumerated(InjuryType.values())
-        val sevDist = enumerated(Severity.values().zip(listOf(0.05, 0.1, 0.2, 0.3, 0.45)).toMap())
+        val typeDist = enumerated(InjuryType.entries.toTypedArray())
+        val sevDist = enumerated(Severity.entries.toTypedArray().zip(listOf(0.05, 0.1, 0.2, 0.3, 0.45)).toMap())
 
         val cg = ComponentGenerator(
-            iat = exponential(0.2).hours,
+            iat = iat,
 //            total = 800,
-            keepHistory = true
+            keepHistory = keepHistory
         ) {
             val name = faker.makeName()
             val patient = Patient(
@@ -332,10 +366,12 @@ class EmergencyRoom(
             // todo this is not pretty; How to model time-dependent iat?
             // reduce new patients during the night
             val isDay = (now.toLocalDateTime(TimeZone.UTC).hour % 24) in 8..18
-            if((isDay || random.nextDouble() > 0.9) && waitingLine.size <= waitingAreaSize) {
+//            println("is day $isDay")
+            if ((isDay || random.nextDouble() > 0.95) && waitingLine.size <= waitingAreaSize) {
                 register(patient)
             } else {
 //                println("skipping patient (out-of-office")
+                patient.cancel()
             }
 
             patient
@@ -348,7 +384,7 @@ class EmergencyRoom(
         incomingMonitor.inc()
         waitingLine.add(patient)
 
-        // if there is an idle room activate it
+        // if there is an idle room, activate it
         rooms.find { it.isData }?.activate()
     }
 }

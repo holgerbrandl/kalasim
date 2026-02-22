@@ -72,6 +72,15 @@ data class Rate(val eventsPerTimeunit: Number, val timeUnit :  TimeUnit = TimeUn
 fun SimContext.exponential(mean: Number) = ExponentialDistribution(env.rg, mean.toDouble())
 fun SimContext.exponential(rate: Rate) = ExponentialDistribution(env.rg, rate.mean.inSeconds).seconds
 
+fun interface DurationDistributionBuilder{
+    fun build(environment: Environment): DurationDistribution
+}
+class Exponential(val mean: Number): DurationDistributionBuilder{
+    override fun build(environment: Environment): DurationDistribution {
+        return environment.exponential(mean).hours
+    }
+}
+
 /**
  * Exponential distribution with built-in support for controlled-randomization.
  *

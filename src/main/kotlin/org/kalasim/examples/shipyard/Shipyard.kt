@@ -52,7 +52,6 @@ class PartAssembly(val part: Part) : Component() {
         val makeTimeDist = uniform(part.makeTime- part.makeTimeSD, part.makeTime+ part.makeTimeSD)
         val duration = makeTimeDist()
 
-        println(duration)
         hold(duration)
 
 //        logger.info { "completed assembly of part ${this}" }
@@ -77,7 +76,7 @@ class Shipyard : Environment(tickDurationUnit = DurationUnit.DAYS) {
             bom.random()
         }.addConsumer {
             PartAssembly(it).componentState().onChange {
-                println("state changed ${it.value}")
+//                println("state changed ${it.value}")
             }
         }
     }
@@ -113,6 +112,6 @@ fun main() {
 
         enableComponentLogger()
 
-        run(3.weeks)
+        run(52.weeks)
     }
 }

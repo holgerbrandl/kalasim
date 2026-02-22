@@ -36,6 +36,18 @@ TIMESTAMP=$(date +"%Y%m%dT%H%M%S")
 quarto render BenchmarkVis.R --output "BenchmarkReport_${TIMESTAMP}.html"
 ```
 
+To build simple report do
+```bash
+#export KALASIM_ROOT=.
+cd ${KALASIM_ROOT}/modules/benchmarks
+
+quarto render  simple_benchmark.R
+
+# with timestamp
+TIMESTAMP=$(date +"%Y%m%dT%H%M%S")
+quarto render simple_benchmark.R --output "BenchmarkReport_${TIMESTAMP}.html"
+```
+
 ### How is repo history preserved?
 
 ### Run directly
