@@ -199,9 +199,9 @@ class Car(initialFloor: Floor, val capacity: Int) :
 
     suspend fun SequenceScope<Component>.openDoor() {
         if(door == OPEN) return
-        println("${this@Car} opening at ${System.now()}")
+//        println("${this@Car} opening at ${System.now()}")
         hold(DOOR_OPEN_TIME, description = "Opening door of ${this@Car.name}")
-        println("${this@Car} opened at ${System.now()}")
+//        println("${this@Car} opened at ${System.now()}")
 
         door = OPEN
     }
