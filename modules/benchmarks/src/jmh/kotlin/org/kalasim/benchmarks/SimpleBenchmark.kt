@@ -15,6 +15,7 @@ import org.kalasim.examples.er.RefittingAvoidanceNurse
 import org.kalasim.examples.er.UrgencyNurse
 import org.kalasim.examples.shipyard.Shipyard
 import org.kalasim.misc.AmbiguousDuration
+import org.kalasim.misc.QuartoUtil
 import org.kalasim.weeks
 import util.ProdSim
 import util.largeModel
@@ -35,7 +36,8 @@ object SimpleBenchmark {
     @JvmStatic
     fun main(args: Array<String>) {
 
-        val config = "baseline4" // new baseline from SYSTEMA_FOP_2035
+//        val config = "baseline" // v1.2
+        val config = "dsclmbds" // changed descriptions in major verbs to function pointers (only partially applied)
 
         val now = now()
         val date = SimpleDateFormat("yyyyMMdd").format(Date())
@@ -48,7 +50,8 @@ object SimpleBenchmark {
             val runtime: Int,
         )
 
-        val outputFile = Path.of("modules") / "benchmarks" / "simple_perf_logs" / "simplebench_${date}_${config}.csv"
+        val benchmarkModulDir = Path.of("modules") / "benchmarks"
+        val outputFile = benchmarkModulDir / "simple_perf_logs" / "simplebench_${date}_${config}.csv"
         require(!outputFile.exists()) { "output file already exists" }
 
 
@@ -74,13 +77,13 @@ object SimpleBenchmark {
         val measurements = buildList {
             runExperiment("mmc-4-4-12") {
                 // Baseline (moderate events, moderate queueing)
-                MMcQueue(c = 4, mu = 4, lambda = 12).run(10000000)
+                MMcQueue(c = 4, mu = 4, lambda = 12).run(1000)
             }
 
             runExperiment("mmc-40-40-800") {
                 // High-event-rate, low congestion (throughput stress)
                 // Lots of arrivals/services per simulated time (engine does many events), but queues stay small.
-                MMcQueue(c = 40, mu = 40, lambda = 800).run(10000000)
+                MMcQueue(c = 40, mu = 40, lambda = 800).run(1000)
 
             }
 
@@ -88,8 +91,12 @@ object SimpleBenchmark {
                 // Near-saturation, small c (deep queue stress)
                 // Fewer servers but very high utilization → long queues, lots of waiting/completions and more state pressure.
                 // stresses queue length growth, waiting-time bookkeeping, and edge cases near instability while still stable.
-                MMcQueue(c = 2, mu = 4, lambda = 7.6).run(10000000)
+                MMcQueue(c = 2, mu = 4, lambda = 7.6).run(1000)
             }
+
+
+            // todo add one mmc example with metrics
+
 
             runExperiment("prod4-1h") {
                 //BenchmarkUtil.kt
@@ -100,7 +107,6 @@ object SimpleBenchmark {
                 //BenchmarkUtil.kt
                 ProdSim(masterExcel = largeModel, useExcelOrders=false, targetWIP = 1000).run(100.days)
             }
-
 
             runExperiment("er_small") {
                 val er = EmergencyRoom(
@@ -153,5 +159,7 @@ object SimpleBenchmark {
         }
 
         measurements.toDataFrame().writeCSV(outputFile.toFile())
+
+        QuartoUtil.runQuartoInDir(benchmarkModulDir, "er_analysis.R")
     }
 }

@@ -1,15 +1,10 @@
 package org.kalasim.scratch.callcenter
 
-import kravis.GGPlot
 import kravis.SessionPrefs
 import kravis.device.SwingPlottingDevice
 import kravis.device.showFile
 import org.kalasim.*
 import org.kalasim.plot.kravis.display
-import java.awt.Desktop
-import java.awt.Dimension
-import java.nio.file.Files
-import java.time.Instant
 import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.time.Duration

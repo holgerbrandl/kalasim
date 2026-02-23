@@ -95,7 +95,7 @@ data class RequestContext(
  * @param priority The priority of the ticked component.
  * @param process The process pointer associated with the ticked component.
  * @param trackingConfig The component tracking configuration.
- * @param koin The Koin instance used for dependency injection.
+ * @param envProvider The simulation provider used for dependency injection.
  */
 @AmbiguousDurationComponent
 open class TickedComponent(
@@ -195,7 +195,6 @@ class ComponentProperties {
 }
 
 
-
 /**
  * A kalasim component is used as component (primarily for queueing) or as a component with a process.
  * Usually, a component will be defined as a subclass of Component.
@@ -207,7 +206,7 @@ class ComponentProperties {
  * @param delay Schedule with a delay if omitted, no delay
  * @param priority If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
  * @param process The process to be started. If None (default), it will try to start self.process()
- * @param koin The dependency resolution context to be used to resolve the `org.kalasim.Environment`
+ * @param envProvider The simulation provider used for dependency injection.
  */
 @OptIn(InternalKalasimApi::class)
 open class Component(
@@ -457,7 +456,7 @@ open class Component(
                 env.currentComponent,
                 this,
                 componentState,
-                details
+                asLambda(details)
             )
         }
     ) {
@@ -465,7 +464,7 @@ open class Component(
     }
 
     internal fun logInternal(enabled: Boolean, action: String) = log(enabled) {
-        with(env) { InteractionEvent(now, currentComponent, this@Component, action) }
+        with(env) { InteractionEvent(now, currentComponent, this@Component, { action }) }
     }
 
     /**
@@ -473,7 +472,8 @@ open class Component(
      *
      * @param action Describing the nature if the event
      */
-    fun log(action: String) = env.apply { log(InteractionEvent(now, currentComponent, this@Component, action)) }
+    fun log(action: String) = log { action }
+    fun log(action: DescriptionFn) = env.apply { log(InteractionEvent(now, currentComponent, this@Component, action)) }
 
 
     /** Interrupt the component.
@@ -987,7 +987,13 @@ open class Component(
             tryRequest()
 
             if (requests.isNotEmpty()) {
-                reschedule(scheduledTime!!, priority = failPriority, urgent = urgent, description, REQUEST)
+                reschedule(
+                    scheduledTime!!,
+                    priority = failPriority,
+                    urgent = urgent,
+                    description?.let { { it } },
+                    REQUEST
+                )
             }
         }
 
@@ -1118,7 +1124,7 @@ open class Component(
 
         val honorInfo = rHonor.firstOrNull()!!.first.name + (if (rHonor.size > 1) "++" else "")
 
-        reschedule(now, NORMAL, false, "Request honored by $honorInfo", ACTIVATE)
+        reschedule(now, NORMAL, false, { "Request honored by $honorInfo" }, ACTIVATE)
 
         // process negative put requests
         rHonor.filter { it.first.depletable }.forEach {
@@ -1204,7 +1210,7 @@ open class Component(
         scheduledTime: SimTime,
         priority: Priority = NORMAL,
         urgent: Boolean = false,
-        description: String? = null,
+        description: DescriptionFn? = null,
         type: ScheduledType
     ) {
         require(scheduledTime >= env.now) {
@@ -1538,7 +1544,7 @@ open class Component(
             at + delay
         }
 
-        reschedule(scheduledTime, priority, urgent, "Activating $extra", ACTIVATE)
+        reschedule(scheduledTime, priority, urgent, { "Activating $extra" }, ACTIVATE)
     }
 
     internal fun checkFail() {
@@ -1586,7 +1592,40 @@ open class Component(
      */
     suspend fun SequenceScope<Component>.hold(
         duration: Duration? = null,
-        description: String? = null,
+        description: String?,
+        until: SimTime? = null,
+        priority: Priority = NORMAL,
+        urgent: Boolean = false
+    ) = hold(duration, asLambda(description), until, priority, urgent)
+
+    /**
+     * Holds the component. For details see [user manual](https://www.kalasim.org/component/#hold)
+     *
+     * This method is used to hold the component for a specific duration, with an optional description,
+     * until a specific simulation time, with an optional priority, and an optional urgent flag.
+     *
+     * The component will be held for the specified duration or until the next simulation event,
+     * whichever comes first. If a duration is not provided, the component will be held until the
+     * next simulation event. If a description is provided, it can be used to identify the hold
+     * operation when analyzing the simulation results. If an until parameter is provided, the
+     * component will be held until the specified simulation time. If a priority is provided, it will
+     * determine the order in which the component will be scheduled if there are other components
+     * with the same hold duration. A higher priority value indicates a higher priority. If the
+     * urgent flag is set to true, the component will be scheduled with the highest possible priority.
+     *
+     * @param duration The duration for which the component should be held. If not provided, the
+     * component will be held until the next simulation event.
+     * @param description An optional description for the hold operation.
+     * @param until The simulation time until which the component should be held. If provided, the
+     * component will be held until the specified simulation time.
+     * @param priority The priority of the hold operation. A higher priority value indicates a higher
+     * priority. Defaults to NORMAL.
+     * @param urgent A flag indicating whether the hold operation is urgent. If set to true, the
+     * component will be scheduled with the highest possible priority. Defaults to false.
+     */
+    suspend fun SequenceScope<Component>.hold(
+        duration: Duration? = null,
+        description: DescriptionFn? = null,
         until: SimTime? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
@@ -1607,7 +1646,25 @@ open class Component(
      */
     fun hold(
         duration: Duration? = null,
-        description: String? = null,
+        description: String?,
+        until: SimTime? = null,
+        priority: Priority = NORMAL,
+        urgent: Boolean = false
+    ) = hold(duration, asLambda(description), until, priority, urgent)
+
+    /**
+     * Hold the component.
+     *
+     * For `hold` contract see [user manual](https://www.kalasim.org/component/#hold)
+     *
+     * @param duration Time to hold. Either `duration` or `till` must be specified.
+     * @param until Absolute time until the component should be held
+     * @param priority If a component has the same time on the event list, this component is sorted according to
+     * the priority. An event with a higher priority will be scheduled first.
+     */
+    fun hold(
+        duration: Duration? = null,
+        description: DescriptionFn? = null,
         until: SimTime? = null,
         priority: Priority = NORMAL,
         urgent: Boolean = false
@@ -1754,7 +1811,7 @@ open class Component(
         failPriority: Priority = NORMAL
     ) = wait(
         StateRequest(state, priority = triggerPriority) { state.value == waitFor },
-        description = description,
+        description = asLambda(description),
         failPriority = failPriority,
         failAt = failAt,
         failDelay = failDelay,
@@ -1785,7 +1842,7 @@ open class Component(
         predicate: (T) -> Boolean
     ) = wait(
         StateRequest(state, predicate = predicate, priority = triggerPriority),
-        description = description,
+        description = asLambda(description),
         failPriority = failPriority,
         failAt = failAt,
         failDelay = failDelay,
@@ -1809,7 +1866,41 @@ open class Component(
      */
     suspend fun SequenceScope<Component>.wait(
         vararg stateRequests: StateRequest<*>,
-        description: String? = null,
+        description: String,
+        urgent: Boolean = false,
+        failAt: SimTime? = null,
+        failDelay: Duration? = null,
+        failPriority: Priority = NORMAL,
+        all: Boolean = true
+    ) = wait(
+        *stateRequests,
+        description = asLambda(description),
+        urgent = urgent,
+        failAt = failAt,
+        failDelay = failDelay,
+        failPriority = failPriority,
+        all = all
+    )
+
+
+    /**
+     * Wait for any or all of the given state values are met
+     *
+     * For `wait` contract see [user manual](https://www.kalasim.org/component/#wait)
+     *
+     * @sample org.kalasim.dokka.statesHowTo
+     *
+     * @param stateRequests Requests indicating a state and a target condition or predicate for fulfilment
+     * @param description The description of the wait request.
+     * @param failAt If the request is not honored before fail_at, the request will be cancelled and the parameter failed will be set. If not specified, the request will not time out.
+     * @param failDelay Skip and set `failed` if the request is not honored before `now + failDelay`,
+    the request will be cancelled and the parameter failed will be set. if not specified, the request will not time out.
+     * @param failPriority Schedule priority of the fail event. If a component has the same time on the event list, this component is sorted according to the priority. An event with a higher priority will be scheduled first.
+     * @param all If `false`, continue, if any of the given state/values is met. if `true` (default), continue if all of the given state/values are met.
+     */
+    suspend fun SequenceScope<Component>.wait(
+        vararg stateRequests: StateRequest<*>,
+        description: DescriptionFn? = null,
         urgent: Boolean = false,
         failAt: SimTime? = null,
         failDelay: Duration? = null,
@@ -2029,7 +2120,7 @@ open class Component(
      * @param components The list of components to wait for.
      */
     suspend fun SequenceScope<Component>.join(components: List<Component>) =
-        wait(*components.map { it.componentState() turns ComponentState.DATA }.toTypedArray(), all = true)
+        wait(*components.map { it.componentState() turns DATA }.toTypedArray(), all = true)
 //        wait(*components.map { it.componentState() turns DATA }.toTypedArray<StateRequest<ComponentState>>())
 
 

@@ -117,3 +117,16 @@ fun Path.withExtension(extension: String, stripExisting: Boolean = false): Path 
     return absolute().parent.resolve("$fileName.$extension")
 }
 
+
+object  QuartoUtil {
+    fun runQuartoInDir(workingDir: java.nio.file.Path, scriptFile: String) {
+        val processBuilder = ProcessBuilder("quarto", "render", scriptFile)
+        processBuilder.directory(workingDir.toFile())
+        processBuilder.inheritIO()
+        val process = processBuilder.start()
+        process.waitFor()
+
+        val htmlFile = workingDir.resolve(scriptFile.replace(".R", ".html")).toFile()
+        java.awt.Desktop.getDesktop().browse(htmlFile.toURI())
+    }
+}

@@ -217,7 +217,7 @@ open class Vehicle(
         // inherit priority from parent
 
         env.remove(this)
-        reschedule(estimatedArrival, description = "moving to $to", type = ScheduledType.HOLD)
+        reschedule(estimatedArrival, description = { "moving to $to" }, type = ScheduledType.HOLD)
         //duration, description ?: "moving to $nextTarget", priority = priority)
 
         // inform follow vehicle

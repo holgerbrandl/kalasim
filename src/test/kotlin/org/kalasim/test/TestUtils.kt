@@ -62,8 +62,8 @@ internal fun Environment.inversedIatDist(vararg arrivalTimes: Number) = object :
 infix fun String.shouldBeDiff(expected: String) = assertEquals(expected, this)
 
 
-inline infix fun <reified T> T.shouldBe(expected: Any) {
-    if(expected !is T) throw IllegalArgumentException("Type mismatch. Expected type was ${T::class}, actual type was ${expected::class}")
-    assertEquals(this, expected)
-}
+//inline infix fun <reified T> T.shouldBe(expected: Any) {
+//    if(expected !is T) throw IllegalArgumentException("Type mismatch. Expected type was ${T::class}, actual type was ${expected::class}")
+//    assertEquals(expected,this)
+//}
 

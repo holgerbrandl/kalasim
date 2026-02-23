@@ -5,13 +5,13 @@ import org.apache.commons.math3.random.RandomGenerator
 import org.kalasim.misc.ImplementMe
 import org.kalasim.misc.asCMPairList
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 /**
  * Distribution support API with controlled randomization via `env.rg`
@@ -41,25 +41,28 @@ fun constant(value: Number) = ConstantRealDistribution(value.toDouble())
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
 fun constant(value: Duration) = DurationDistribution(
-    DurationUnit.SECONDS,
-    ConstantRealDistribution(value.toDouble(DurationUnit.SECONDS))
+    ConstantRealDistribution(value.toDouble(DurationUnit.SECONDS)),
+    DurationUnit.SECONDS
 )
 
-data class Rate(val eventsPerTimeunit: Number, val timeUnit: TimeUnit = TimeUnit.SECONDS) {
+val Number.perSecond get() = Rate(this, DurationUnit.SECONDS)
+val Number.perMinute get() = Rate(this, DurationUnit.MINUTES)
+val Number.perHour get() = Rate(this, DurationUnit.HOURS)
+
+data class Rate(
+    val eventsPerTimeUnit: Number,
+    val timeUnit: DurationUnit = DurationUnit.SECONDS
+) {
+    init {
+        require(eventsPerTimeUnit.toDouble() >= 0) { "Rate must be non-negative" }
+    }
 
     val mean: Duration
-        get() {
-            val rateValue = eventsPerTimeunit.toDouble()
-            return if (rateValue != 0.0) {
-                // Convert the rate to the default time unit (seconds) and then find the inverse.
-                val timeInSeconds = timeUnit.toSeconds(1L).toDouble()
-                val periodInSeconds = timeInSeconds / rateValue
-                periodInSeconds.seconds
-            } else {
-                Duration.INFINITE // Handle the case when rate is zero to prevent division by zero
-            }
+        get() = if (eventsPerTimeUnit == 0.0) {
+            Duration.INFINITE
+        } else {
+            (1.0 / eventsPerTimeUnit.toDouble()).toDuration(timeUnit)
         }
-
 }
 
 
@@ -69,7 +72,10 @@ data class Rate(val eventsPerTimeunit: Number, val timeUnit: TimeUnit = TimeUnit
  * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
  */
 fun SimContext.exponential(mean: Number) = ExponentialDistribution(env.rg, mean.toDouble())
-fun SimContext.exponential(rate: Rate) = ExponentialDistribution(env.rg, rate.mean.inSeconds).seconds
+fun SimContext.exponential(rate: Rate) = DurationDistribution(
+    ExponentialDistribution(env.rg, 1.0/rate.eventsPerTimeUnit.toDouble()),
+    rate.timeUnit,
+)
 
 fun interface DistributionBuilder {
     fun build(environment: Environment): RealDistribution
@@ -142,7 +148,7 @@ fun interface DurationDistributionBuilder {
 data class DurationDistributionBuilderImpl(val unit: DurationUnit, val distBuilder: DistributionBuilder) :
     DurationDistributionBuilder {
     override fun build(environment: Environment): DurationDistribution =
-        DurationDistribution(unit, distBuilder.build(environment))
+        DurationDistribution(distBuilder.build(environment), unit)
 }
 
 
@@ -242,7 +248,7 @@ fun SimContext.uniform(lower: Duration, upper: Duration) =
 //
 // date utils for distributions
 
-data class DurationDistribution(val unit: DurationUnit, val dist: RealDistribution) {
+data class DurationDistribution(val dist: RealDistribution, val unit: DurationUnit) {
     operator fun invoke() = sample()
     fun sample() = when (unit) {
         DurationUnit.SECONDS -> dist().seconds
@@ -253,10 +259,10 @@ data class DurationDistribution(val unit: DurationUnit, val dist: RealDistributi
     }
 }
 
-val RealDistribution.seconds get() = DurationDistribution(DurationUnit.SECONDS, this)
-val RealDistribution.minutes get() = DurationDistribution(DurationUnit.MINUTES, this)
-val RealDistribution.hours get() = DurationDistribution(DurationUnit.HOURS, this)
-val RealDistribution.days get() = DurationDistribution(DurationUnit.DAYS, this)
+val RealDistribution.seconds get() = DurationDistribution(this, DurationUnit.SECONDS)
+val RealDistribution.minutes get() = DurationDistribution(this, DurationUnit.MINUTES)
+val RealDistribution.hours get() = DurationDistribution(this, DurationUnit.HOURS)
+val RealDistribution.days get() = DurationDistribution(this, DurationUnit.DAYS)
 
 data class IntegerDurationDistribution(val unit: DurationUnit, val dist: IntegerDistribution) {
     fun invoke() = sample()

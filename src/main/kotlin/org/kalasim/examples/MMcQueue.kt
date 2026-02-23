@@ -7,6 +7,7 @@ import org.kalasim.misc.AmbiguousDuration
 import org.kalasim.misc.AmbiguousDurationComponent
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.Boolean
 import kotlin.time.DurationUnit
 
 /**
@@ -22,14 +23,23 @@ class MM1Queue(
 /** An implementation of an MMc queue, see https://en.wikipedia.org/wiki/M/M/c_queue, which
  * models the queue length in a system having a `c` servers, where arrivals are
  * determined by a Poisson process and job service times have an exponential distribution.
- * Also see https://commons.wikimedia.org/wiki/File:M-m-c_queue.png
+ *
+ * @param lambda arrival rate, customers per time unit; Mean interarrival time = 1 / λ
+ * @param mu service rate (per server), customers per time unit; Mean service time = 1 / μ
  */
 open class MMcQueue(
-    c: Int = 1,
-    lambda: Number = 5,
-    mu: Number = 10,
-    durationUnit : DurationUnit = DurationUnit.SECONDS
+    val c: Int = 1,
+    val lambda: Number = 5,
+    val mu: Number = 10,
+    val durationUnit : DurationUnit = DurationUnit.MINUTES,
+    enableInternalMetrics: Boolean = false,
+
 ) : Environment(tickDurationUnit = durationUnit) {
+
+    // todo this should be opt-in anyway https://github.com/holgerbrandl/kalasim/issues/66
+    init {
+        if (!enableInternalMetrics) entityTrackingDefaults.disableAll()
+    }
 
     val server: Resource
 
@@ -38,8 +48,8 @@ open class MMcQueue(
     // disabled because not strictly needed to study the queue parameters
     //    val traces: EventLog = enableEventLog()
 
-    class Customer(mu: Number, envProvider: EnvProvider= DefaultProvider()) : TickedComponent(envProvider = envProvider) {
-        val ed = exponential(mu.toDouble())
+   inner class Customer(mu: Number, envProvider: EnvProvider= DefaultProvider()) : Component(envProvider = envProvider) {
+        val ed = exponential(Rate(mu, durationUnit))
 
         override fun process() = sequence {
             request(get<Resource>()) {
@@ -59,7 +69,9 @@ open class MMcQueue(
 
         server = dependency { Resource("server", c) }
 
-        componentGenerator = ComponentGenerator(iat = exponential(lambda).minutes, keepHistory = true) {
+        val iat = exponential(Rate(lambda, durationUnit))
+
+        componentGenerator = ComponentGenerator(iat, keepHistory = false) {
             Customer(mu, envProvider = WrappedProvider(this))
         }
     }
@@ -79,7 +91,11 @@ fun main() {
 object MMCBig{
     @JvmStatic
     fun main(args: Array<String>) {
-        MMcQueue(c = 40, mu = 40, lambda = 800).run(10000000)
+//        MMcQueue(c = 40, mu = 40, lambda = 800).run(10000000)
+       val server= MMcQueue(c = 40, mu = 40, lambda = 800)
+       server.run(1000)
 
+//        println(server.server.occupancyTimeline.statistics())
+        println("num generated "+ server.componentGenerator.numGenerated)
     }
 }

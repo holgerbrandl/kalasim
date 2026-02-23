@@ -3,8 +3,6 @@ package org.kalasim.scratch
 import org.jetbrains.kotlinx.dataframe.api.print
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
 import org.kalasim.*
-import org.kalasim.monitors.printConsole
-import org.kalasim.plot.kravis.display
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.hours
 

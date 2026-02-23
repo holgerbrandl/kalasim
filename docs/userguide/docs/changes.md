@@ -16,6 +16,18 @@
   ).run(3.days)
   ```
 
+
+* Changed `description` all interactions function into lambda for delayed evaluation and better performance
+```kotlin
+hold(
+    3.hours,
+    description = { "Surgery of patient $patient by doctor $doctor" }
+)
+```
+* Fixed MMC queue implementation to handle rates correctly
+* Disable internal metrics by default in MMC queue
+* Reworked `Rate` to suport more semantic creation
+
 ## 1.2
 
 Released 2026-01-03

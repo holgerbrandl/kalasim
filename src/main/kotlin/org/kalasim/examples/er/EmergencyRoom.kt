@@ -119,7 +119,7 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
         val injuryType = patient.type
 
         if (setup.value != injuryType) {
-            hold(setupTimes[injuryType]!!, description = "preparing room ${this@Room} for $injuryType")
+            hold(setupTimes[injuryType]!!, description = { "preparing room ${this@Room} for $injuryType" })
             setup.value = injuryType
         }
 
@@ -138,7 +138,7 @@ class Room(name: String, var setup: State<InjuryType>) : Component(name) {
             val surgeryTime = severityWeightedSurgeryTime * stressFactor
             hold(
                 surgeryTime,
-                description = "Surgery of patient $patient in room ${this@Room} by doctor $doctor"
+                description = { "Surgery of patient $patient in room ${this@Room} by doctor $doctor" }
             )
 
             // was it successful? This depends on the severity of the injury
@@ -201,15 +201,23 @@ val RefittingAvoidanceNurse = HeadNurse { er, room ->
 
     val firstBySeverity = sameTypePatients.minByOrNull { it.severity.value }
 
-    // Fallback: if no same-type patients, take the most severe overall
-    firstBySeverity ?: er.waitingLine.minByOrNull { it.severity.value }
+    // if we need to set up we set up to whats most needed in total count
+//    if(er.waitingLine.isEmpty()) return@HeadNurse null
+//    val maxSeverity = er.waitingLine.groupingBy { it.severity.value }.eachCount().maxByOrNull { it.value }!!
+//    return er.waitingLine.filter{it.severity.value ==maxSeverity.key}.sortedWith (org.kalasim.examples.er.getBySeverity).firstOrNull()
+
+    // or if no same type of injuries is present, we could use the most severe patient
+    firstBySeverity ?: er.waitingLine.sortedWith(bySeverity).firstOrNull()
 }
 
 // todo add considerate-nurse
 
 @Suppress("unused")
-val SetupAvoidanceNoMatterWhatNurse = HeadNurse { er, _ ->
-    // If we need to set up, we set up to what's most needed in total count
+val SetupAvoidanceNoMatterWhatNurse = HeadNurse { er, _ -> // simple fifo
+//    val sameTypePatients = er.waitingLine.filter { it.type == room.setup.value }
+//    val firstBySeverity = sameTypePatients.sortedWith(bySeverity).firstOrNull()
+
+    // if we need to set up we set up to what's most need in total count
     if (er.waitingLine.isEmpty()) return@HeadNurse null
 
     val maxSeverity = er.waitingLine.groupingBy { it.severity.value }.eachCount().maxByOrNull { it.value }!!

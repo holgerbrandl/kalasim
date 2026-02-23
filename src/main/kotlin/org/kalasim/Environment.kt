@@ -3,7 +3,6 @@ package org.kalasim
 import com.github.holgerbrandl.jsonbuilder.json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.datetime.Instant
 import org.apache.commons.math3.random.JDKRandomGenerator
 import org.apache.commons.math3.random.RandomGenerator
 import org.kalasim.ComponentState.CURRENT
@@ -332,7 +331,7 @@ open class Environment(
         if(duration != null || until != null) {
             val scheduledTime = calcScheduleTime(until, duration)
 
-            main.reschedule(scheduledTime, priority, urgent, "running", ScheduledType.HOLD)
+            main.reschedule(scheduledTime, priority, urgent, { "running" }, ScheduledType.HOLD)
         }
 
         // restore dependency context
@@ -367,7 +366,7 @@ open class Environment(
 
             time to c
         } else {
-            publishEvent(InteractionEvent(now, currentComponent, null, "run end; no events left"))
+            publishEvent(InteractionEvent(now, currentComponent, null, { "run end; no events left" }))
             val t = now
 
             t to main
@@ -435,6 +434,7 @@ open class Environment(
      *
      * @return An immutable list of [EventListener] instances
      */
+    @Suppress("unused")
     @InternalKalasimApi
     fun getEventListeners() = eventListeners
 

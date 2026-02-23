@@ -1,29 +1,21 @@
 package org.kalasim.monitors
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.apache.commons.math3.stat.Frequency
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.kalasim.*
 import org.kalasim.analysis.snapshot.MetricTimelineSnapshot
-import org.kalasim.misc.*
+import org.kalasim.misc.asCMPairList
+import org.kalasim.misc.buildHistogram
+import org.kalasim.misc.printHistogram
+import org.kalasim.misc.printThis
 import org.kalasim.misc.time.sumOf
-import org.koin.core.Koin
 import java.util.*
 import kotlin.time.Duration
 
-//class MetricWalltTimeline<V : Number>(
-//    name: String? = null,
-//    initialValue: V,
-//    koin: Koin = DependencyContext.get()
-//) : MetricTimeline<V>(name, initialValue, koin){
-//
-//    override fun getCurrentTime(): SimTime = Clock.System.now()
-//}
 
 /**
- * Allows to track a numeric quantity over time.
+ * Allows tracking a numeric quantity over time.
  *
  * @param initialValue initial value for a level timeline. It is important to set the value correctly. Default: 0
  */
@@ -36,6 +28,8 @@ open class MetricTimeline<V : Number>(
 
     val timestamps = mutableListOf<SimTime>()
     val values = ifEnabled { mutableListOf<V>() }
+
+    var fixedEnd : SimTime? = null
 
     init {
         addValue(initialValue)
@@ -95,7 +89,7 @@ open class MetricTimeline<V : Number>(
         }
     }
 
-    private fun getCurrentTime() = env.now
+    private fun getCurrentTime() = fixedEnd?: env.now
 
     /** Returns the step function of this monitored value along the time axis. */
     override fun stepFun() = statsData().stepFun()
@@ -120,18 +114,65 @@ open class MetricTimeline<V : Number>(
     override fun clearHistory(before: SimTime) {
         val startFromIdx = timestamps.withIndex().firstOrNull { before > it.value }?.index ?: return
 
-        for(i in 0 until startFromIdx) {
-            val newTime = timestamps.subList(0, startFromIdx)
-            val newValues = values.subList(0, startFromIdx)
+        val newTime = timestamps.subList(startFromIdx, timestamps.size)
+        val newValues = values.subList(startFromIdx, values.size)
 
-            timestamps.apply { clear(); addAll(newTime) }
-            values.apply { clear(); addAll(newValues) }
-        }
+        timestamps.apply { clear(); addAll(newTime) }
+        values.apply { clear(); addAll(newValues) }
     }
 
     fun asDoubleTimeline() = MetricTimeline(name, initialValue.toDouble(), envProvider = envProvider).apply {
         timestamps.apply { clear(); addAll(this@MetricTimeline.timestamps) }
         values.apply { clear(); addAll(this@MetricTimeline.values.map { it.toDouble() }) }
+    }
+
+    /**
+     * Creates a new MetricTimeline containing only the data within the specified time range.
+     *
+     * @param start The start time of the clip range. Defaults to env.startDate.
+     * @param end The end time of the clip range. Defaults to env.now.
+     * @return A new MetricTimeline with data clipped to the specified range.
+     */
+    fun clip(start: SimTime = env.startDate, end: SimTime = env.now): MetricTimeline<V> {
+        require(start <= end) { "start time must be less than or equal to end time" }
+
+        val clipped = MetricTimeline(name, initialValue, envProvider = envProvider).apply {
+            timestamps.clear()
+            values.clear()
+        }
+
+        // Find indices within the range
+        val indices = timestamps.indices.filter { i ->
+            timestamps[i] >= start && timestamps[i] <= end
+        }
+
+        if (indices.isEmpty()) {
+            // If no timestamps in range, add a single value at start time
+            clipped.timestamps.add(start)
+            clipped.values.add(get(start))
+        } else {
+            // Add value at start if first timestamp is after start
+            if (timestamps[indices.first()] > start) {
+                clipped.timestamps.add(start)
+                clipped.values.add(get(start))
+            }
+
+            // Add all timestamps and values in range
+            indices.forEach { i ->
+                clipped.timestamps.add(timestamps[i])
+                clipped.values.add(values[i])
+            }
+
+            // Add value at end if last timestamp is before end
+            if (timestamps[indices.last()] < end) {
+                clipped.timestamps.add(end)
+                clipped.values.add(get(end))
+            }
+        }
+
+        clipped.fixedEnd= end
+
+        return clipped
     }
 }
 

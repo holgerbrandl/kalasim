@@ -96,8 +96,11 @@ open class InteractionEvent(
     time: SimTime,
     val current: Component? = null,
     val component: Component? = null,
-    open val action: String? = null,
+    open val actionFn: DescriptionFn? = null,
 ) : Event(time) {
+
+    open val action: String?
+        get()= actionFn?.invoke() ?: ""
 
     override fun toJson(): JSONObject = json {
         "eventType" to eventType
@@ -161,7 +164,7 @@ open class ComponentStateChangeEvent(
     current: Component? = null,
     component: Component,
     val state: ComponentState,
-    details: String? = null
+    details: DescriptionFn? = null
 ) : InteractionEvent(time, current, component, details) {
 
     override fun toJson(): JSONObject = json {
@@ -174,6 +177,14 @@ open class ComponentStateChangeEvent(
     }
 }
 
+typealias DescriptionFn = () -> String
+//val DummyFn : DescriptionFn= { "" }
+
+internal fun asLambda(description: String?): DescriptionFn? {
+   return description?.let{ {description}}
+}
+
+
 /** An event indicating that a component process was scheduled for later execution or continuation.
  * See https://www.kalasim.org/component/#lifecycle
  */
@@ -181,10 +192,13 @@ class RescheduledEvent(
     time: SimTime,
     current: Component? = null,
     simEntity: Component,
-    val description: String? = null,
+    private val descriptionFn: DescriptionFn? = null,
     val scheduledFor: SimTime,
     val type: ScheduledType
 ) : ComponentStateChangeEvent(time, current, simEntity, ComponentState.SCHEDULED) {
+
+    val description: String?
+        get()= descriptionFn?.invoke()
 
     override val action: String
         get() {
@@ -201,6 +215,7 @@ class RescheduledEvent(
                 else -> type.toString().lowercase().titlecaseFirstChar()
             }
 
+            val description= descriptionFn?.invoke()
             return (if(!description.isNullOrBlank()) ("$description; ") else "") + ("$prettyType $delta").trim() + extra
         }
 }

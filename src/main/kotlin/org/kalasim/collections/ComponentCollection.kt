@@ -3,9 +3,9 @@
 package org.kalasim
 
 import org.kalasim.misc.ComponentCollectionTrackingConfig
-import org.kalasim.misc.DependencyContext
-import org.kalasim.monitors.*
-import org.koin.core.Koin
+import org.kalasim.monitors.MetricTimeline
+import org.kalasim.monitors.NumericStatisticMonitor
+import org.kalasim.monitors.printHistogram
 
 
 class CapacityLimitException(
@@ -46,7 +46,7 @@ abstract class ComponentCollection<C>(
 
 
     //    val ass = AggregateSummaryStatistics()
-    val sizeTimeline = MetricTimeline<Int>("Size of ${this.name}", 0, envProvider = envProvider)
+    val sizeTimeline = MetricTimeline("Size of ${this.name}", 0, envProvider = envProvider)
     val lengthOfStayStatistics = NumericStatisticMonitor("Length of stay in ${this.name}", envProvider = envProvider)
     val capacityTimeline = MetricTimeline("Capacity of ${this.name}", initialValue = capacity, envProvider = envProvider)
 

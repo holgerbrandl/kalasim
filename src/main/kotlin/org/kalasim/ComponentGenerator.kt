@@ -44,7 +44,7 @@ class ComponentGenerator<T>(
         envProvider: EnvProvider = DefaultProvider(),
         builder: Environment.(counter: Int) -> T
     ) : this(
-        DurationDistribution(envProvider.getEnv().tickDurationUnit, iat),
+        DurationDistribution(iat, envProvider.getEnv().tickDurationUnit),
         startAt,
         forceStart,
         until,
