@@ -1,1 +1,1 @@
-rootProject.name = "kalasim-kravis2"
+//rootProject.name = "kravisutil"

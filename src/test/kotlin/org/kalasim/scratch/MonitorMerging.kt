@@ -27,7 +27,7 @@ fun main() {
         val aggregate = AggregateSummaryStatistics.aggregate(listOf(nsm, nsm))
 
 
-        val flm = CategoryTimeline("foo")
+        val flm = CategoryTimeline(initialValue = "foo")
 
 
 //        EnumeratedRealDistribution()

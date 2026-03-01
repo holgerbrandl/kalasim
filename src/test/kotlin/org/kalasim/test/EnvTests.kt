@@ -544,13 +544,10 @@ class EnvTests {
 
         doctors.first().snapshot.toJson().toIndentString() shouldBeDiff """
             {
-              "requestedBy": [{
-                "component": "room 2",
-                "quantity": 1
-              }],
+              "requestedBy": [],
               "claimedQuantity": 1,
-              "creationTime": "1970-01-01T00:00:00Z",
-              "now": "1970-01-11T00:00:00Z",
+              "creationTime": "2022-02-23T06:00:00Z",
+              "now": "2022-03-05T06:00:00Z",
               "name": "Dr. Howe",
               "claimedBy": [{
                 "first": "room 0",

@@ -5,6 +5,7 @@ import kotlinx.datetime.toLocalDateTime
 import org.kalasim.*
 import org.kalasim.examples.er.PatientStatus.*
 import org.kalasim.examples.er.Severity.*
+import org.kalasim.misc.ComponentCollectionTrackingConfig
 import org.kalasim.misc.Faker
 import org.kalasim.monitors.IntTimeline
 import kotlin.math.pow
@@ -89,6 +90,8 @@ data class Patient(
             }
         }
     }
+
+//    Patient
 
     private fun updatePatient(newSeverity: Severity) {
         this.severity.value = newSeverity
@@ -275,19 +278,19 @@ class Doctor(name: String, val qualification: List<InjuryType>) : Resource(name)
  *              The time of day affects patient arrival rates (higher during daytime hours 8:00-18:00).
  */
 class EmergencyRoom(
-    val numPhysicians: Int = 6,
+    val numPhysicians: Int = 8,
     val physicianQualRange: IntRange = 2..4,
     val numRooms: Int = 4,
     val nurse: HeadNurse = FifoNurse(),
     val waitingAreaSize: Int = 300,
-    patientArrival: DurationDistributionBuilder = exponential(0.2.hours),
+    patientArrival: DurationDistributionBuilder = exponential(0.25.hours),
 
     // basic sim options
     tickDurationUnit: DurationUnit = DurationUnit.HOURS,
     enableComponentLogger: Boolean = false,
     keepHistory: Boolean = false,
-    enableInternalMetrics: Boolean = false,
-    start: SimTime = somewhen() //Instant.fromEpochMilliseconds(0)
+    enableInternalMetrics: Boolean = true,
+    start: SimTime = somewhen()
 ) : Environment(
     enableComponentLogger = enableComponentLogger,
     tickDurationUnit = tickDurationUnit,
@@ -299,12 +302,15 @@ class EmergencyRoom(
     init {
         if (!enableInternalMetrics) entityTrackingDefaults.disableAll()
     }
+    
+    
+    
 
 
     // todo also here having sorted queue is causing almost more problems than solving
 //    val waitingLine = ComponentQueue(comparator = compareBy <Patient>{ it.severity.value }, name = "ER Waiting Area")
 //    val waitingLine = ComponentQueue(comparator = compareBy <Patient>{ it.severity.value }.thenBy { it.type }, name = "ER Waiting Area")
-    val waitingLine = ComponentList<Patient>(name = "ER Waiting Area Queue")
+    val waitingLine = ComponentList<Patient>(name = "ER Waiting Area Queue", trackingConfig =ComponentCollectionTrackingConfig() )
 
     private fun sampleQualification(numQuals: Int) =
         InjuryType.entries.shuffled(random).take(numQuals)
@@ -366,8 +372,8 @@ class EmergencyRoom(
                 name.fullName,
                 it.toLong(),
                 typeDist.sample(),
-                State(sevDist.sample()),
-                State(Waiting)
+                State(sevDist.sample(),name.fullName),
+                State(Waiting,name.fullName)
             )
 
             // todo this is not pretty; How to model time-dependent iat?
@@ -393,6 +399,40 @@ class EmergencyRoom(
 
         // if there is an idle room, activate it
         rooms.find { it.isData }?.activate()
+
+        waitingLine.log(PatientRegisteredEvent(now, patient))
+    }
+
+    class PatientRegisteredEvent(time: SimTime, val patient: Patient) : Event(time)
+
+    val patients
+        get()= eventsInstanceOf<PatientRegisteredEvent>().map{ it.patient}
+
+    override fun toString(): String {
+        val treatedCount = treatedMonitor[now]
+        val deceasedCount = deceasedMonitor[now]
+        val incomingCount = incomingMonitor[now]
+        val currentWaitingCount = waitingLine.size
+        val successRate = if (treatedCount + deceasedCount > 0) {
+            treatedCount.toDouble() / (treatedCount + deceasedCount) * 100
+        } else {
+            0.0
+        }
+
+        return """
+            |EmergencyRoom Summary Statistics (at t=${now}):
+            |  Physicians: $numPhysicians
+            |  Rooms: $numRooms
+            |  Waiting Area Capacity: $waitingAreaSize
+            |  
+            |  Incoming Patients: $incomingCount
+            |  Currently Waiting: $currentWaitingCount
+            |  Treated Successfully: $treatedCount
+            |  Deceased: $deceasedCount
+            |  Success Rate: ${"%.2f".format(successRate)}%
+            |  
+            |  Nurse Policy: ${nurse::class.simpleName}
+        """.trimMargin()
     }
 }
 

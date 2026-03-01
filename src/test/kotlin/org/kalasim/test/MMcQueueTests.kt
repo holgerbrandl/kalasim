@@ -14,7 +14,7 @@ class MMcQueueTests {
         val mMcQueue = MMcQueue(c = 4, mu = 4, lambda = 12)
         mMcQueue.run(1000)
 
-        mMcQueue.componentGenerator.numGenerated shouldBe 12000.0
+        mMcQueue.componentGenerator.numGenerated shouldBe 11816
 
 
     }

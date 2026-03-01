@@ -69,7 +69,7 @@ class MonitorTests {
 
     @Test
     fun `it should disallow querying from a disabled monitor`() = createTestSimulation {
-        val m = CategoryTimeline(AUDI)
+        val m = CategoryTimeline(initialValue = AUDI)
         m.disable()
 
         shouldThrow<IllegalArgumentException> {
@@ -86,7 +86,7 @@ class MonitorTests {
 
     @Test
     fun `Frequency level stats should be correct`() = createTestSimulation {
-        val m = CategoryTimeline(AUDI)
+        val m = CategoryTimeline(initialValue = AUDI)
 //        m.addValue(AUDI)
         run(until = startDate + 2.minutes)
 
@@ -145,7 +145,7 @@ class MonitorTests {
     @Test
     fun `CategoryTimeline should allow to retrieve a value for now but not before recording start`() =
         createTestSimulation {
-            val nlm = CategoryTimeline("foo")
+            val nlm = CategoryTimeline(initialValue = "foo")
 
             run(2.minutes)
             nlm.addValue("bar")
@@ -204,7 +204,7 @@ class MonitorTests {
     @Test
     fun `CategoryTimeline should allow to retrieve range selection`() =
         createTestSimulation {
-            val ct = CategoryTimeline("A")
+            val ct = CategoryTimeline(initialValue = "A")
             run(2.minutes)
 
             ct.addValue("B")
@@ -340,8 +340,8 @@ class MergeMonitorStatsTests {
 
     @Test
     fun `it should merge FLM stats`() = createTestSimulation {
-        val flmA = CategoryTimeline(1)
-        val flmB = CategoryTimeline(2)
+        val flmA = CategoryTimeline(initialValue = 1)
+        val flmB = CategoryTimeline(initialValue = 2)
 
         flmA.addValue(1)
         flmB.addValue(2)

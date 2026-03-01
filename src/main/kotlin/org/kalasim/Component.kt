@@ -263,7 +263,7 @@ open class Component(
         }
 
 
-    val stateTimeline = CategoryTimeline(componentState, "status of ${this.name}", envProvider)
+    val stateTimeline = CategoryTimeline("status of ${this.name}", componentState, envProvider)
 
     init {
 

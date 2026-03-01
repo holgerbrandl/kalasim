@@ -18,13 +18,15 @@ import kotlin.time.DurationUnit
  * @sample org.kalasim.dokka.freqLevelDemo
  */
 class CategoryTimeline<T>(
-    val initialValue: T,
     name: String? = null,
+    val initialValue: T,
     envProvider: EnvProvider = DefaultProvider()
 ) : Monitor<T>(name, envProvider), ValueTimeline<T> {
 
     private val timestamps = mutableListOf<SimTime>()
     private val values = ifEnabled { mutableListOf<T>() }
+
+    var fixedEnd : SimTime? = null
 
     init {
         reset(initialValue)
@@ -43,7 +45,7 @@ class CategoryTimeline<T>(
     override fun addValue(value: T) {
         if (!enabled) return
 
-        timestamps.add(env.now)
+        timestamps.add(getCurrentTime())
         values.add(value)
     }
 
@@ -212,13 +214,14 @@ class CategoryTimeline<T>(
 
         val valuesLst = values.toList()
 
-        val timepointsExt = timestamps + env.now
+        val timepointsExt = timestamps + getCurrentTime()
         val durations = timepointsExt.toMutableList().zipWithNext { first, second -> second - first }
 
 //        xDuration()
         return LevelStatsData(valuesLst, timestamps, durations)
     }
 
+    private fun getCurrentTime() = fixedEnd?: env.now
 
     /** Returns the step function of this monitored value along the time axis. */
     override fun stepFun() = statsData().stepFun()
@@ -238,5 +241,54 @@ class CategoryTimeline<T>(
         }
     }
 
+    /**
+     * Creates a new MetricTimeline containing only the data within the specified time range.
+     *
+     * @param start The start time of the clip range. Defaults to env.startDate.
+     * @param end The end time of the clip range. Defaults to env.now.
+     * @return A new MetricTimeline with data clipped to the specified range.
+     */
+    fun clip(start: SimTime = env.startDate, end: SimTime = env.now): CategoryTimeline<T> {
+        require(start <= end) { "start time must be less than or equal to end time" }
 
+        val indices = timestamps.indices.filter { i ->
+            timestamps[i] in start..end
+        }
+
+        val clipped = CategoryTimeline(name, initialValue, envProvider = envProvider).apply {
+            timestamps.clear()
+            values.clear()
+        }
+
+        // Find indices within the range
+
+
+//        if (indices.isEmpty()) {
+//            // If no timestamps in range, add a single value at start time
+//            clipped.timestamps.add(start)
+//            clipped.values.add(get(start)!!)
+//        } else {
+//            // Add value at start if first timestamp is after start
+//            if (timestamps[indices.first()] > start) {
+//                clipped.timestamps.add(start)
+//                clipped.values.add(get(start) ?L clip)
+//            }
+
+            // Add all timestamps and values in range
+            indices.forEach { i ->
+                clipped.timestamps.add(timestamps[i])
+                clipped.values.add(values[i])
+            }
+//
+//            // Add value at end if last timestamp is before end
+//            if (timestamps[indices.last()] < end) {
+//                clipped.timestamps.add(end)
+//                clipped.values.add(get(end)!!)
+//            }
+//        }
+
+        clipped.fixedEnd = end
+
+        return clipped
+    }
 }

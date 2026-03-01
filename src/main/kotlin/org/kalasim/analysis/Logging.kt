@@ -84,6 +84,11 @@ fun Environment.enableEventLog(
 }
 
 
+inline fun <reified T: Event> Environment.eventsInstanceOf(): List<T> = events.filterIsInstance<T>()
+
+val Environment.events: EventLog
+    get() = getOrNull<EventLog>() ?: throw IllegalStateException("EventLog not enabled. Use enableEventLog()")
+
 /** A list of all events that were created in a simulation run.  See [Event Log](https://www.kalasim.org/events/) for details. */
 class EventLog(
     val events: MutableList<Event> = mutableListOf(),
@@ -93,7 +98,7 @@ class EventLog(
 //    val events = mutableListOf<Event>()
 
     override fun consume(event: Event) {
-        if(blackList.any { it.isInstance(event) }) return
+        if (blackList.any { it.isInstance(event) }) return
 
         events.add(event)
     }
@@ -114,7 +119,7 @@ inline fun <reified E : Event> Environment.collect(crossinline filter: (E) -> Bo
     val traces: MutableList<E> = mutableListOf()
 
     addEventListener {
-        if(it is E && filter(it)) traces.add(it)
+        if (it is E && filter(it)) traces.add(it)
     }
 
     return traces
@@ -127,7 +132,7 @@ fun Environment.componentCollector(): List<Component> {
     val components: MutableList<Component> = mutableListOf()
 
     addEventListener {
-        if(it is EntityCreatedEvent && it.entity is Component) components.add(it.entity)
+        if (it is EntityCreatedEvent && it.entity is Component) components.add(it.entity)
     }
 
     return components

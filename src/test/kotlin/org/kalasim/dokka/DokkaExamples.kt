@@ -18,7 +18,7 @@ fun freqLevelDemo() {
 
     val dist = EnumeratedDistribution(data.asCMPairList())
 
-    val dm = CategoryTimeline("bla")
+    val dm = CategoryTimeline(initialValue = "bla")
 
     repeat(1000) {
         dm.addValue(dist.sample());

@@ -68,14 +68,14 @@ fun main() {
     records.forEach { println("$it") }
 
 
-    records.displayTimeline()
+    records.displayEventTimeline()
 
 //    sim.components
     // component state heatmap
 
 }
 
-fun List<ResourceEvent>.displayTimeline(
+fun List<ResourceEvent>.displayEventTimeline(
     resources: List<Resource>? = null,
 //    items: List<String> = listOf("capacity", "requesters", "claimers"),
     avg: Boolean = true

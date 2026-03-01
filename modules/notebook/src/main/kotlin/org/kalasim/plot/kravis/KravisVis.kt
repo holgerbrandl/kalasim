@@ -33,7 +33,7 @@ internal fun printWarning(msg: String) {
     System.err.println("[kalasim] $msg")
 }
 
-private fun GGPlot.showOptional(): GGPlot = also {
+internal fun GGPlot.showOptional(): GGPlot = also {
     if(USE_KRAVIS_VIEWER && SessionPrefs.OUTPUT_DEVICE !is JupyterDevice) {
         checkDisplay()
         show()

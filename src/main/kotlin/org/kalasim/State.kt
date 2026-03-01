@@ -3,10 +3,8 @@ package org.kalasim
 import org.kalasim.analysis.EntityCreatedEvent
 import org.kalasim.analysis.StateChangedEvent
 import org.kalasim.analysis.snapshot.StateSnapshot
-import org.kalasim.misc.DependencyContext
 import org.kalasim.misc.StateTrackingConfig
 import org.kalasim.monitors.*
-import org.koin.core.Koin
 
 /**
  * States together with the Component.wait() method provide a powerful way of process interaction.
@@ -56,7 +54,7 @@ open class State<T>(
         }
 
 
-    val timeline = CategoryTimeline(initialValue = value, envProvider = envProvider, name = "State of '$name'")
+    val timeline = CategoryTimeline(name = "State of '$name'", initialValue = value, envProvider = envProvider)
 
     fun hasWaiters() = waiters.isNotEmpty()
     internal val waiters = ComponentQueue<Component>("waiters of ${this.name}", envProvider = envProvider)

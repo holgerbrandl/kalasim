@@ -123,3 +123,4 @@ fun Environment.asTickTime(instant: SimTime) = instant.toTickTime()
 
 fun somewhen() = LocalDate.parse("2022-02-23").atStartOfDayIn(TimeZone.UTC) + 6.hours
 fun someday() = LocalDate.parse("2022-02-23")
+

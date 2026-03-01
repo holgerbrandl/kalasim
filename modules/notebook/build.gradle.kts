@@ -12,7 +12,7 @@ version = "${rootProject.version}"
 dependencies {
     api(project(":"))
 
-    api(project(":modules:kravis4klsm"))
+    api(project(":modules:kravisutil"))
     api(project(":modules:letsplot"))
 
 

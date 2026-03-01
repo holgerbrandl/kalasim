@@ -16,7 +16,7 @@ include(":modules:benchmarks")
 // and version (often called GAV) to uniquely identify dependencies and projects.
 // If a module in your project has the same GAV identifier as an external dependency,
 // it can confuse Gradle
-findProject(":modules:kravis")?.name = "kravis4klsm"
+findProject(":modules:kravis")?.name = "kravisutil"
 
 //include(":modules:benchmarks")
 //include("modules:sparksim")
