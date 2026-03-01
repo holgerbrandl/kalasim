@@ -86,20 +86,19 @@ object ErDisplayTests {
 
         kravis.SessionPrefs.OUTPUT_DEVICE = SwingPlottingDevice()
 
-//        er.doctors.displayTimelines().showFile()
-////        er.doctors.displayTimeline(byRequester = true, colorBy = { it.requester.name}).showFile()
-////        rae.display().show()
-//
-////        er.doctors.foo2()
-//
-//
-//        er.patients.map { it.patientStatus }.displayStateCounts().showFile()
-//
-//        er.patients.take(10).map { it.patientStatus }.displayTimelines(to = er.startDate + 4.hours).showFile()
-//        er.patients.drop(100).take(10).map { it.patientStatus }.let {
-//            val minBy = it.minOf { it.timeline.statsData().asList().first().timestamp }
-//            it.displayTimelines(from = minBy, to = minBy + 100.hours, title = "100-110").showFile()
-//        }
+        er.doctors.displayTimelines().showFile()
+//        er.doctors.displayTimeline(byRequester = true, colorBy = { it.requester.name}).showFile()
+//        rae.display().show()
+
+//        er.doctors.foo2()
+
+        er.patients.map { it.patientStatus }.displayStateCounts().showFile()
+
+        er.patients.take(10).map { it.patientStatus }.displayTimelines(to = er.startDate + 4.hours).showFile()
+        er.patients.drop(100).take(10).map { it.patientStatus }.let {
+            val minBy = it.minOf { it.timeline.statsData().asList().first().timestamp }
+            it.displayTimelines(from = minBy, to = minBy + 100.hours, title = "100-110").showFile()
+        }
 
         er.patients.map{it.patientStatus}.displayStayDistributions().showFile()
 //        er.patients.map{it.patientStatus.timeline}.displayTimelines().showFile()

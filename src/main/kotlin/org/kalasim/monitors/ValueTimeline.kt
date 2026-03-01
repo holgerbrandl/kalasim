@@ -79,38 +79,3 @@ data class LevelStatsData<T>(
 }
 
 data class LevelStateRecord<T>(val timestamp: SimTime, val value: T, val duration: Duration?)
-
-//
-//class IntVarTimeline(initialValue: Int = 0, name: String? = null, koin: Koin = DependencyContext.get()) {
-//    var value: Int = initialValue
-//        set(value) {
-//            field = value
-//            timeline.addValue(value)
-//        }
-//
-//    val timeline by lazy { MetricTimeline<Int>(name, koin = koin) }
-//
-//    override fun toString(): String = value.toString()
-//}
-
-//class GenericVarTimeline<T>(initialValue: T, name: String? = null, koin: Koin = DependencyContext.get()) {
-//    var value: T = initialValue
-//        set(value) {
-//            field = value
-//            timeline.addValue(value)
-//        }
-//
-//    val timeline by lazy { CategoryTimeline<T>(initialValue, name, koin = koin) }
-//
-//    override fun toString(): String = value.toString()
-//}
-
-
-// without wrapping type
-//to inject use data class Counter(var value: Int)
-//val numBalkedMonitor by lazy { MetricTimeline() }
-//var numBalked: Int = 0
-//    set(value) {
-//        field = value
-//        numBalkedMonitor.addValue(value)
-//    }

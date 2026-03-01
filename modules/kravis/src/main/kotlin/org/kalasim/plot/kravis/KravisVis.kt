@@ -39,32 +39,3 @@ internal fun GGPlot.showOptional(): GGPlot = also {
 
 var USE_KRAVIS_VIEWER = false
 
-
-//
-// Components
-//
-
-
-fun List<Component>.displayStateProportions(
-    title: String? = null,
-): GGPlot {
-    val df = clistTimeline()
-
-
-    return df.plot(
-        y = { first.name },
-        fill = { second.value },
-        weight = { second.duration?.inMinutes }
-    )
-        .geomBar(position = PositionFill())
-        .xLabel("State Proportion")
-        .also { if (title != null) it.title(title) }
-        .showOptional()
-}
-
-
-internal fun List<Component>.clistTimeline() = flatMap { eqn ->
-    eqn.stateTimeline
-        .statsData().asList().map { eqn to it }
-}
-

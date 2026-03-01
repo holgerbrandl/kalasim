@@ -25,12 +25,18 @@ fun <T> CategoryTimeline<T>.displayTimelines(
         Segment(it.first.value, it.first.time, it.second.time)
     }
 
-    // why cant we use "x".asDiscreteVariable here?
+    // why can't we use "x".asDiscreteVariable here?
     return segments.plot(
         x = { if (forceTickAxis) env.asTickTime(start).value else start },
         y = { value },
         xend = { if (forceTickAxis) env.asTickTime(end).value else end },
-        yend = { value }).xLabel("Time").yLabel("").geomSegment().geomPoint().title(title).showOptional()
+        yend = { value })
+        .xLabel("Time")
+        .yLabel("")
+        .geomSegment()
+        .geomPoint()
+        .title(title)
+        .showOptional()
 }
 
 

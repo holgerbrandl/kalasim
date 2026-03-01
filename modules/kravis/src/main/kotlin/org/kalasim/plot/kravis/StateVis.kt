@@ -1,18 +1,11 @@
 package org.kalasim.plot.kravis
 
-import kravis.GGPlot
-import kravis.facetWrap
-import kravis.geomBar
-import kravis.geomHistogram
-import kravis.geomSegment
-import kravis.plot
+import kravis.*
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
 import org.kalasim.SimTime
 import org.kalasim.State
 import org.kalasim.analysis.StateChangedEvent
-import org.kalasim.eventsInstanceOf
 import org.kalasim.monitors.CategoryTimeline
-import kotlin.time.Duration
 
 
 typealias StateChangedEventSelector<T> = StateChangedEvent<T>.(StateChangedEvent<T>) -> Any?
@@ -25,12 +18,15 @@ fun <T> List<State<T>>.displayStateCounts(
     roundTimeBy: TimeDiscretizer = TimeDiscretizer.DAY,
     filter: StateChangedEventFilter<T>? = null
 ): GGPlot {
-    val env = first().env
+    val events = flatMap { state ->
+        state.timeline.getData().map { StateChangedEvent(it.first, state, it.second) }
+    }.filter { sae -> filter?.let { it(sae) } ?: true }
 
-    val events = env
-        .eventsInstanceOf<StateChangedEvent<T>>()
-        .filter { it.state in this }
-        .filter { sae -> filter?.let { it(sae) } ?: true }
+    // lcaks initial onset (setter)
+//    val events = env
+//        .eventsInstanceOf<StateChangedEvent<T>>()
+//        .filter { it.state in this }
+//        .filter { sae -> filter?.let { it(sae) } ?: true }
 
     val plot = events.plot(
         x = { roundTimeBy.discretize(it.time) },
@@ -94,26 +90,43 @@ fun <T> List<State<T>>.displayStayDistributions(
     title: String? = null,
     from: SimTime? = null,
     to: SimTime? = null,
+    durationUnit: kotlin.time.DurationUnit = kotlin.time.DurationUnit.MINUTES
 //    colorBy: ResourceActivityEventSelector = { it.activity ?: "Other" }
 ): GGPlot {
     val env = first().timeline.env
 
-    data class StateDurationRecord(val state: String, val duration: Int)
+    data class StateDurationRecord(val state: String, val duration: Double)
+
     val records = flatMap { state ->
         state.timeline
             .clip(from ?: env.startDate, to ?: env.now)
             .statsData().asList()
-            .filter{it.duration !=null}
-            .map { StateDurationRecord(it.value.toString(), it.duration!!.inWholeMinutes.toInt()) }
+            .filter { it.duration != null }
+            .map { StateDurationRecord(it.value.toString(), it.duration!!.toDouble(durationUnit)) }
     }
 
     val df = records.toDataFrame()
     val plot = df.plot(
         x = "duration"
     )
+
     return plot
         .geomHistogram()
         .facetWrap("state")
+        .xLabel("Duration (${durationUnit.toLabel()})")
         .also { if (title != null) it.title(title) }
         .showOptional()
+}
+
+/**
+ * Converts a DurationUnit to a human-readable label for plotting.
+ */
+private fun kotlin.time.DurationUnit.toLabel(): String = when (this) {
+    kotlin.time.DurationUnit.DAYS -> "days"
+    kotlin.time.DurationUnit.HOURS -> "hours"
+    kotlin.time.DurationUnit.MINUTES -> "minutes"
+    kotlin.time.DurationUnit.SECONDS -> "seconds"
+    kotlin.time.DurationUnit.MILLISECONDS -> "milliseconds"
+    kotlin.time.DurationUnit.MICROSECONDS -> "microseconds"
+    kotlin.time.DurationUnit.NANOSECONDS -> "nanoseconds"
 }

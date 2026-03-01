@@ -1,10 +1,13 @@
 package org.kalasim.plot.kravis
 
 import kravis.GGPlot
+import kravis.PositionFill
+import kravis.geomBar
 import kravis.geomSegment
 import kravis.plot
 import org.kalasim.Component
 import org.kalasim.asTickTime
+import org.kalasim.inMinutes
 import kotlin.time.Duration
 
 fun Component.display(
@@ -18,7 +21,6 @@ fun List<Component>.displayStateTimeline(
     componentName: String = "Component",
     forceTickAxis: Boolean = false,
 ): GGPlot {
-//    val df = csTimelineDF(componentName)
     val df = clistTimeline()
 
     val env = first().env
@@ -39,3 +41,30 @@ fun List<Component>.displayStateTimeline(
         .xLabel(componentName)
         .showOptional()
 }
+
+
+fun List<Component>.displayStateProportions(
+    title: String? = null,
+): GGPlot {
+    val df = clistTimeline()
+
+
+    return df.plot(
+        y = { first.name },
+        fill = { second.value },
+        weight = { second.duration?.inMinutes }
+    )
+        .geomBar(position = PositionFill())
+        .xLabel("State Proportion")
+        .also { if (title != null) it.title(title) }
+        .showOptional()
+}
+
+
+
+
+internal fun List<Component>.clistTimeline() = flatMap { eqn ->
+    eqn.stateTimeline
+        .statsData().asList().map { eqn to it }
+}
+

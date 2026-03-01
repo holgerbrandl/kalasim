@@ -49,6 +49,8 @@ class CategoryTimeline<T>(
         values.add(value)
     }
 
+    fun getData()= timestamps.zip(values)
+
     fun getPct(value: T): Double {
         val durations = xDuration()
 
