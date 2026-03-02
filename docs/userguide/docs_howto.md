@@ -52,8 +52,16 @@ Online Editor <https://mermaid-js.github.io/mermaid-live-editor>
 ## How to build markdown from jupyter notebooks?
 
 ```bash
-export KALASIM_HOME=/d/projects/scheduling/kalasim
-cd ${KALASIM_HOME}/docs/userguide/docs/examples
+¬
+
+# install python (e.g. via windows app-store)
+
+# install jupyter
+pip install jupyterlab
+
+# install jupyter kernel
+pip install kotlin-jupyter-kernel
+
 
 # clean up SNAPSHOT builds in local ivy cache
 # rm -rf ~/.ivy2/cache/com.github.holgerbrandl/kravis
@@ -77,6 +85,11 @@ jupyter nbconvert --kernel=kotlin --to markdown  atm_queue.ipynb --out  atm_queu
 
 ## Gasstation
 jupyter nbconvert --kernel=kotlin --to markdown  gas_station.ipynb --out  gas_station.md
+
+
+## ER
+jupyter nbconvert --kernel=kotlin --execute  emergency_room.ipynb  --to notebook --inplace
+jupyter nbconvert --kernel=kotlin --to markdown  emergency_room.ipynb --out  emergency_room.md
 
 
 cd ${KALASIM_HOME}/docs/userguide/docs/examples

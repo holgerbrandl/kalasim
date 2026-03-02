@@ -52,8 +52,11 @@ fun <T> List<ValuedCategoryTimeline<T>>.displayTimelines(
     val env = first().timeline.env
 
     val records = flatMap { ctl ->
-        ctl.timeline
+        val clipped = ctl.timeline
             .clip(from ?: env.startDate, to ?: env.now)
+        if(clipped.getData().isEmpty()) return@flatMap emptyList()
+
+        clipped
             .statsData().asList()
             .map { ctl.timeline to it }
     }
