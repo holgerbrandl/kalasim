@@ -114,7 +114,7 @@ er.enableEventLog()
 
 
 
-    org.kalasim.EventLog@9d469
+    org.kalasim.EventLog@12a886a
 
 
 
@@ -304,7 +304,7 @@ er.patients.map{ it.patientStatus }.displayStayDistributions()
 The distribution of stay durations is heavily skewed towards shorter stays, indicating that most patients are discharged quickly. This could be due to the efficient triage and treatment processes in place.
 
 
-Finally, we inspect raw events from the model (using the [kotlin-dataframe](https://kotlin.github.io/dataframe/quickstart.html) interation)
+Finally, as a DES model is driven by events, we inspect [raw events](https://www.kalasim.org/events/) from the model (using the [kotlin-dataframe](https://kotlin.github.io/dataframe/quickstart.html) interation)
 
 
 ```kotlin
@@ -329,16 +329,169 @@ val intDF = interactions.toDataFrame()
 
 
 ```kotlin
-intDF
+
+intDF.take(10).toHTML()
 ```
 
 
 
 
-            <iframe onload="o_resize_iframe_out_5()" style="width:100%;" class="result_container" id="iframe_out_5" frameBorder="0" srcdoc="        &lt;html&gt;
+            <iframe onload="o_resize_iframe_out_8()" style="width:100%;" class="result_container" id="iframe_out_8" frameBorder="0" srcdoc="        &lt;html&gt;
         &lt;head&gt;
             &lt;style type=&quot;text&sol;css&quot;&gt;
                 :root {
+    --background: #fff;
+    --background-odd: #f5f5f5;
+    --background-hover: #d9edfd;
+    --header-text-color: #474747;
+    --text-color: #848484;
+    --text-color-dark: #000;
+    --text-color-medium: #737373;
+    --text-color-pale: #b3b3b3;
+    --inner-border-color: #aaa;
+    --bold-border-color: #000;
+    --link-color: #296eaa;
+    --link-color-pale: #296eaa;
+    --link-hover: #1a466c;
+}
+
+:root[theme=&quot;dark&quot;], :root [data-jp-theme-light=&quot;false&quot;], .dataframe_dark{
+    --background: #303030;
+    --background-odd: #3c3c3c;
+    --background-hover: #464646;
+    --header-text-color: #dddddd;
+    --text-color: #b3b3b3;
+    --text-color-dark: #dddddd;
+    --text-color-medium: #b2b2b2;
+    --text-color-pale: #737373;
+    --inner-border-color: #707070;
+    --bold-border-color: #777777;
+    --link-color: #008dc0;
+    --link-color-pale: #97e1fb;
+    --link-hover: #00688e;
+}
+
+p.dataframe_description {
+    color: var(--text-color-dark);
+}
+
+table.dataframe {
+    font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    background-color: var(--background);
+    color: var(--text-color-dark);
+    border: none;
+    border-collapse: collapse;
+}
+
+table.dataframe th, td {
+    padding: 6px;
+    border: 1px solid transparent;
+    text-align: left;
+}
+
+table.dataframe th {
+    background-color: var(--background);
+    color: var(--header-text-color);
+}
+
+table.dataframe td {
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+table.dataframe th.bottomBorder {
+    border-bottom-color: var(--bold-border-color);
+}
+
+table.dataframe tbody &gt; tr:nth-child(odd) {
+    background: var(--background-odd);
+}
+
+table.dataframe tbody &gt; tr:nth-child(even) {
+    background: var(--background);
+}
+
+table.dataframe tbody &gt; tr:hover {
+    background: var(--background-hover);
+}
+
+table.dataframe a {
+    cursor: pointer;
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+table.dataframe tr:hover &gt; td a {
+    color: var(--link-color-pale);
+}
+
+table.dataframe a:hover {
+    color: var(--link-hover);
+    text-decoration: underline;
+}
+
+table.dataframe img {
+    max-width: fit-content;
+}
+
+table.dataframe th.complex {
+    background-color: var(--background);
+    border: 1px solid var(--background);
+}
+
+table.dataframe .leftBorder {
+    border-left-color: var(--inner-border-color);
+}
+
+table.dataframe .rightBorder {
+    border-right-color: var(--inner-border-color);
+}
+
+table.dataframe .rightAlign {
+    text-align: right;
+}
+
+table.dataframe .expanderSvg {
+    width: 8px;
+    height: 8px;
+    margin-right: 3px;
+}
+
+table.dataframe .expander {
+    display: flex;
+    align-items: center;
+}
+
+&sol;* formatting *&sol;
+
+table.dataframe .null {
+    color: var(--text-color-pale);
+}
+
+table.dataframe .structural {
+    color: var(--text-color-medium);
+    font-weight: bold;
+}
+
+table.dataframe .dataFrameCaption {
+    font-weight: bold;
+}
+
+table.dataframe .numbers {
+    color: var(--text-color-dark);
+}
+
+table.dataframe td:hover .formatted .structural, .null {
+    color: var(--text-color-dark);
+}
+
+table.dataframe tr:hover .formatted .structural, .null {
+    color: var(--text-color-dark);
+}
+
+
+:root {
     --background: #fff;
     --background-odd: #f5f5f5;
     --background-hover: #d9edfd;
@@ -514,9 +667,10 @@ body::-webkit-scrollbar-track {
             &lt;&sol;style&gt;
         &lt;&sol;head&gt;
         &lt;body&gt;
-            &lt;table class=&quot;dataframe&quot; id=&quot;df_788529160&quot;&gt;&lt;&sol;table&gt;
+            &lt;table class=&quot;dataframe&quot; id=&quot;df_16777239&quot;&gt;&lt;&sol;table&gt;
 
-&lt;p class=&quot;dataframe_description&quot;&gt;... showing only top 20 of 6403 rows&lt;&sol;p&gt;&lt;p class=&quot;dataframe_description&quot;&gt;DataFrame: rowsCount = 6403, columnsCount = 7&lt;&sol;p&gt;
+&lt;table class=&quot;dataframe&quot; id=&quot;static_df_16777240&quot;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th class=&quot;bottomBorder&quot; style=&quot;text-align:left&quot;&gt;time&lt;&sol;th&gt;&lt;th class=&quot;bottomBorder&quot; style=&quot;text-align:left&quot;&gt;current&lt;&sol;th&gt;&lt;th class=&quot;bottomBorder&quot; style=&quot;text-align:left&quot;&gt;component&lt;&sol;th&gt;&lt;th class=&quot;bottomBorder&quot; style=&quot;text-align:left&quot;&gt;actionFn&lt;&sol;th&gt;&lt;th class=&quot;bottomBorder&quot; style=&quot;text-align:left&quot;&gt;action&lt;&sol;th&gt;&lt;th class=&quot;bottomBorder&quot; style=&quot;text-align:left&quot;&gt;eventType&lt;&sol;th&gt;&lt;th class=&quot;bottomBorder&quot; style=&quot;text-align:left&quot;&gt;tickTime&lt;&sol;th&gt;&lt;&sol;tr&gt;&lt;&sol;thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;2022-02-23T06:00:00Z&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;null&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;main&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;null&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;running; Hold +168.00, scheduled for &lt;span class=&quot;structural&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;RescheduledEvent&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;1645596000&lt;&sol;td&gt;&lt;&sol;tr&gt;&lt;tr&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;2022-02-23T06:00:00Z&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;room 0&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;room 0&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&quot;structural&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;canceled&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;ComponentStateChangeEvent&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;1645596000&lt;&sol;td&gt;&lt;&sol;tr&gt;&lt;tr&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;2022-02-23T06:00:00Z&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;room 1&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;room 1&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&quot;structural&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;canceled&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;ComponentStateChangeEvent&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;1645596000&lt;&sol;td&gt;&lt;&sol;tr&gt;&lt;tr&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;2022-02-23T06:00:00Z&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;room 2&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;room 2&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&quot;structural&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;canceled&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;ComponentStateChangeEvent&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;1645596000&lt;&sol;td&gt;&lt;&sol;tr&gt;&lt;tr&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;2022-02-23T06:00:00Z&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;room 3&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;room 3&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&quot;structural&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;canceled&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;ComponentStateChangeEvent&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;1645596000&lt;&sol;td&gt;&lt;&sol;tr&gt;&lt;tr&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;2022-02-23T06:00:00Z&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;ComponentGenerator.1&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;ComponentGenerator.1&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;null&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;Hold +.08, scheduled for .08&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;RescheduledEvent&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;1645596000&lt;&sol;td&gt;&lt;&sol;tr&gt;&lt;tr&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;2022-02-23T06:04:57.988113230Z&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;ComponentGenerator.1&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;Patient(fullName=Armando Kessler, pat&lt;span class=&quot;structural&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;null&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;Activated, scheduled for .08&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;RescheduledEvent&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;1645596297&lt;&sol;td&gt;&lt;&sol;tr&gt;&lt;tr&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;2022-02-23T06:04:57.988113230Z&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;ComponentGenerator.1&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;Patient(fullName=Armando Kessler, pat&lt;span class=&quot;structural&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&quot;structural&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;canceled&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;ComponentStateChangeEvent&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;1645596297&lt;&sol;td&gt;&lt;&sol;tr&gt;&lt;tr&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;2022-02-23T06:04:57.988113230Z&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;ComponentGenerator.1&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;ComponentGenerator.1&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;null&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;Hold +.20, scheduled for .28&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;RescheduledEvent&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;1645596297&lt;&sol;td&gt;&lt;&sol;tr&gt;&lt;tr&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;2022-02-23T06:16:54.513625724Z&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;ComponentGenerator.1&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;Patient(fullName=Laurie Keebler, pati&lt;span class=&quot;structural&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;null&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;Activated, scheduled for .28&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;RescheduledEvent&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;1645597014&lt;&sol;td&gt;&lt;&sol;tr&gt;&lt;&sol;tbody&gt;&lt;&sol;table&gt;
+&lt;p class=&quot;dataframe_description&quot;&gt;DataFrame [10 x 7]&lt;&sol;p&gt;
 
         &lt;&sol;body&gt;
         &lt;script&gt;
@@ -795,34 +949,49 @@ body::-webkit-scrollbar-track {
 })()
 
 &sol;*&lt;!--*&sol;
-call_DataFrame(function() { DataFrame.addTable({ cols: [{ name: &quot;&lt;span title=&bsol;&quot;time: kotlinx.datetime.Instant&bsol;&quot;&gt;time&lt;&sol;span&gt;&quot;, children: [], rightAlign: false, values: [&quot;2022-02-23T06:00:00Z&quot;,&quot;2022-02-23T06:00:00Z&quot;,&quot;2022-02-23T06:00:00Z&quot;,&quot;2022-02-23T06:00:00Z&quot;,&quot;2022-02-23T06:00:00Z&quot;,&quot;2022-02-23T06:00:00Z&quot;,&quot;2022-02-23T06:04:57.988113230Z&quot;,&quot;2022-02-23T06:04:57.988113230Z&quot;,&quot;2022-02-23T06:04:57.988113230Z&quot;,&quot;2022-02-23T06:16:54.513625724Z&quot;,&quot;2022-02-23T06:16:54.513625724Z&quot;,&quot;2022-02-23T06:16:54.513625724Z&quot;,&quot;2022-02-23T06:21:26.810865159Z&quot;,&quot;2022-02-23T06:21:26.810865159Z&quot;,&quot;2022-02-23T06:21:26.810865159Z&quot;,&quot;2022-02-23T06:24:16.640704760Z&quot;,&quot;2022-02-23T06:24:16.640704760Z&quot;,&quot;2022-02-23T06:24:16.640704760Z&quot;,&quot;2022-02-23T06:50:44.274781120Z&quot;,&quot;2022-02-23T06:50:44.274781120Z&quot;] }, 
-{ name: &quot;&lt;span title=&bsol;&quot;current: org.kalasim.Component?&bsol;&quot;&gt;current&lt;&sol;span&gt;&quot;, children: [], rightAlign: false, values: [&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;room 0&quot;,&quot;room 1&quot;,&quot;room 2&quot;,&quot;room 3&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;] }, 
-{ name: &quot;&lt;span title=&bsol;&quot;component: org.kalasim.Component?&bsol;&quot;&gt;component&lt;&sol;span&gt;&quot;, children: [], rightAlign: false, values: [&quot;main&quot;,&quot;room 0&quot;,&quot;room 1&quot;,&quot;room 2&quot;,&quot;room 3&quot;,&quot;ComponentGenerator.1&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;Patient(fullName=Armando Kessler, patientId=0, type=Scratches, severity=Armando Kessler[Emergent], patientStatus=Armando Kessler[Waiting])&bsol;&quot;&gt;Patient(fullName=Armando Kessler, pat&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;Patient(fullName=Armando Kessler, patientId=0, type=Scratches, severity=Armando Kessler[Emergent], patientStatus=Armando Kessler[Waiting])&bsol;&quot;&gt;Patient(fullName=Armando Kessler, pat&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;ComponentGenerator.1&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;Patient(fullName=Laurie Keebler, patientId=1, type=Dislocations, severity=Laurie Keebler[Resuscitation], patientStatus=Laurie Keebler[Waiting])&bsol;&quot;&gt;Patient(fullName=Laurie Keebler, pati&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;Patient(fullName=Laurie Keebler, patientId=1, type=Dislocations, severity=Laurie Keebler[Resuscitation], patientStatus=Laurie Keebler[Waiting])&bsol;&quot;&gt;Patient(fullName=Laurie Keebler, pati&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;ComponentGenerator.1&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;Patient(fullName=Eugene Crona, patientId=2, type=Dislocations, severity=Eugene Crona[Urgent], patientStatus=Eugene Crona[Waiting])&bsol;&quot;&gt;Patient(fullName=Eugene Crona, patien&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;Patient(fullName=Eugene Crona, patientId=2, type=Dislocations, severity=Eugene Crona[Urgent], patientStatus=Eugene Crona[Waiting])&bsol;&quot;&gt;Patient(fullName=Eugene Crona, patien&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;ComponentGenerator.1&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;Patient(fullName=Darell Ortiz, patientId=3, type=Bruises, severity=Darell Ortiz[Resuscitation], patientStatus=Darell Ortiz[Waiting])&bsol;&quot;&gt;Patient(fullName=Darell Ortiz, patien&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;Patient(fullName=Darell Ortiz, patientId=3, type=Bruises, severity=Darell Ortiz[Resuscitation], patientStatus=Darell Ortiz[Waiting])&bsol;&quot;&gt;Patient(fullName=Darell Ortiz, patien&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;ComponentGenerator.1&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;Patient(fullName=Sheldon Simonis, patientId=4, type=Fractures, severity=Sheldon Simonis[Resuscitation], patientStatus=Sheldon Simonis[Waiting])&bsol;&quot;&gt;Patient(fullName=Sheldon Simonis, pat&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;Patient(fullName=Sheldon Simonis, patientId=4, type=Fractures, severity=Sheldon Simonis[Resuscitation], patientStatus=Sheldon Simonis[Waiting])&bsol;&quot;&gt;Patient(fullName=Sheldon Simonis, pat&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;] }, 
-{ name: &quot;&lt;span title=&bsol;&quot;actionFn: Function0&lt;String&gt;?&bsol;&quot;&gt;actionFn&lt;&sol;span&gt;&quot;, children: [], rightAlign: false, values: [&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;org.kalasim.analysis.EventsKt$$Lambda&sol;0x00000000818ff798@23d6d5c4&bsol;&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;org.kalasim.analysis.EventsKt$$Lambda&sol;0x00000000818ff798@2e3c11ec&bsol;&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;org.kalasim.analysis.EventsKt$$Lambda&sol;0x00000000818ff798@6c175c16&bsol;&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;org.kalasim.analysis.EventsKt$$Lambda&sol;0x00000000818ff798@1bba7f48&bsol;&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;org.kalasim.analysis.EventsKt$$Lambda&sol;0x00000000818ff798@ed7e10e&bsol;&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;org.kalasim.analysis.EventsKt$$Lambda&sol;0x00000000818ff798@402a3249&bsol;&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;org.kalasim.analysis.EventsKt$$Lambda&sol;0x00000000818ff798@168b31b6&bsol;&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;org.kalasim.analysis.EventsKt$$Lambda&sol;0x00000000818ff798@5e835c10&bsol;&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;org.kalasim.analysis.EventsKt$$Lambda&sol;0x00000000818ff798@6f6d095f&bsol;&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;] }, 
-{ name: &quot;&lt;span title=&bsol;&quot;action: String&bsol;&quot;&gt;action&lt;&sol;span&gt;&quot;, children: [], rightAlign: false, values: [&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;running; Hold +168.00, scheduled for 168.00&bsol;&quot;&gt;running; Hold +168.00, scheduled for &lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;canceled&quot;,&quot;canceled&quot;,&quot;canceled&quot;,&quot;canceled&quot;,&quot;Hold +.08, scheduled for .08&quot;,&quot;Activated, scheduled for .08&quot;,&quot;canceled&quot;,&quot;Hold +.20, scheduled for .28&quot;,&quot;Activated, scheduled for .28&quot;,&quot;canceled&quot;,&quot;Hold +.08, scheduled for .36&quot;,&quot;Activated, scheduled for .36&quot;,&quot;canceled&quot;,&quot;Hold +.05, scheduled for .40&quot;,&quot;Activated, scheduled for .40&quot;,&quot;canceled&quot;,&quot;Hold +.44, scheduled for .85&quot;,&quot;Activated, scheduled for .85&quot;,&quot;canceled&quot;] }, 
-{ name: &quot;&lt;span title=&bsol;&quot;eventType: String&bsol;&quot;&gt;eventType&lt;&sol;span&gt;&quot;, children: [], rightAlign: false, values: [&quot;RescheduledEvent&quot;,&quot;ComponentStateChangeEvent&quot;,&quot;ComponentStateChangeEvent&quot;,&quot;ComponentStateChangeEvent&quot;,&quot;ComponentStateChangeEvent&quot;,&quot;RescheduledEvent&quot;,&quot;RescheduledEvent&quot;,&quot;ComponentStateChangeEvent&quot;,&quot;RescheduledEvent&quot;,&quot;RescheduledEvent&quot;,&quot;ComponentStateChangeEvent&quot;,&quot;RescheduledEvent&quot;,&quot;RescheduledEvent&quot;,&quot;ComponentStateChangeEvent&quot;,&quot;RescheduledEvent&quot;,&quot;RescheduledEvent&quot;,&quot;ComponentStateChangeEvent&quot;,&quot;RescheduledEvent&quot;,&quot;RescheduledEvent&quot;,&quot;ComponentStateChangeEvent&quot;] }, 
-{ name: &quot;&lt;span title=&bsol;&quot;tickTime: Long&bsol;&quot;&gt;tickTime&lt;&sol;span&gt;&quot;, children: [], rightAlign: true, values: [&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596000&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596000&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596000&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596000&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596000&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596000&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596297&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596297&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596297&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645597014&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645597014&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645597014&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645597286&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645597286&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645597286&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645597456&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645597456&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645597456&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645599044&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645599044&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;] }, 
-], id: 788529160, rootId: 788529160, totalRows: 6403 } ) });
+call_DataFrame(function() { DataFrame.addTable({ cols: [{ name: &quot;&lt;span title=&bsol;&quot;time: kotlinx.datetime.Instant&bsol;&quot;&gt;time&lt;&sol;span&gt;&quot;, children: [], rightAlign: false, values: [&quot;2022-02-23T06:00:00Z&quot;,&quot;2022-02-23T06:00:00Z&quot;,&quot;2022-02-23T06:00:00Z&quot;,&quot;2022-02-23T06:00:00Z&quot;,&quot;2022-02-23T06:00:00Z&quot;,&quot;2022-02-23T06:00:00Z&quot;,&quot;2022-02-23T06:04:57.988113230Z&quot;,&quot;2022-02-23T06:04:57.988113230Z&quot;,&quot;2022-02-23T06:04:57.988113230Z&quot;,&quot;2022-02-23T06:16:54.513625724Z&quot;] }, 
+{ name: &quot;&lt;span title=&bsol;&quot;current: org.kalasim.Component?&bsol;&quot;&gt;current&lt;&sol;span&gt;&quot;, children: [], rightAlign: false, values: [&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;room 0&quot;,&quot;room 1&quot;,&quot;room 2&quot;,&quot;room 3&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;,&quot;ComponentGenerator.1&quot;] }, 
+{ name: &quot;&lt;span title=&bsol;&quot;component: org.kalasim.Component&bsol;&quot;&gt;component&lt;&sol;span&gt;&quot;, children: [], rightAlign: false, values: [&quot;main&quot;,&quot;room 0&quot;,&quot;room 1&quot;,&quot;room 2&quot;,&quot;room 3&quot;,&quot;ComponentGenerator.1&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;Patient(fullName=Armando Kessler, patientId=0, type=Scratches, severity=Armando Kessler[Emergent], patientStatus=Armando Kessler[Waiting])&bsol;&quot;&gt;Patient(fullName=Armando Kessler, pat&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;Patient(fullName=Armando Kessler, patientId=0, type=Scratches, severity=Armando Kessler[Emergent], patientStatus=Armando Kessler[Waiting])&bsol;&quot;&gt;Patient(fullName=Armando Kessler, pat&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;ComponentGenerator.1&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;Patient(fullName=Laurie Keebler, patientId=1, type=Dislocations, severity=Laurie Keebler[Resuscitation], patientStatus=Laurie Keebler[Waiting])&bsol;&quot;&gt;Patient(fullName=Laurie Keebler, pati&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;] }, 
+{ name: &quot;&lt;span title=&bsol;&quot;actionFn: Function0&lt;String&gt;?&bsol;&quot;&gt;actionFn&lt;&sol;span&gt;&quot;, children: [], rightAlign: false, values: [&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;org.kalasim.analysis.EventsKt$$Lambda&sol;0x00000000938df648@119dcad2&bsol;&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;org.kalasim.analysis.EventsKt$$Lambda&sol;0x00000000938df648@e128865&bsol;&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;org.kalasim.analysis.EventsKt$$Lambda&sol;0x00000000938df648@2e206a70&bsol;&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;org.kalasim.analysis.EventsKt$$Lambda&sol;0x00000000938df648@63df4754&bsol;&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;org.kalasim.analysis.EventsKt$$Lambda&sol;0x00000000938df648@1cebdaa7&bsol;&quot;&gt;org.kalasim.analysis.EventsKt$$Lambda&lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;null&bsol;&quot;&gt;null&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;] }, 
+{ name: &quot;&lt;span title=&bsol;&quot;action: String&bsol;&quot;&gt;action&lt;&sol;span&gt;&quot;, children: [], rightAlign: false, values: [&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;running; Hold +168.00, scheduled for 168.00&bsol;&quot;&gt;running; Hold +168.00, scheduled for &lt;span class=&bsol;&quot;structural&bsol;&quot;&gt;...&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;canceled&quot;,&quot;canceled&quot;,&quot;canceled&quot;,&quot;canceled&quot;,&quot;Hold +.08, scheduled for .08&quot;,&quot;Activated, scheduled for .08&quot;,&quot;canceled&quot;,&quot;Hold +.20, scheduled for .28&quot;,&quot;Activated, scheduled for .28&quot;] }, 
+{ name: &quot;&lt;span title=&bsol;&quot;eventType: String&bsol;&quot;&gt;eventType&lt;&sol;span&gt;&quot;, children: [], rightAlign: false, values: [&quot;RescheduledEvent&quot;,&quot;ComponentStateChangeEvent&quot;,&quot;ComponentStateChangeEvent&quot;,&quot;ComponentStateChangeEvent&quot;,&quot;ComponentStateChangeEvent&quot;,&quot;RescheduledEvent&quot;,&quot;RescheduledEvent&quot;,&quot;ComponentStateChangeEvent&quot;,&quot;RescheduledEvent&quot;,&quot;RescheduledEvent&quot;] }, 
+{ name: &quot;&lt;span title=&bsol;&quot;tickTime: Long&bsol;&quot;&gt;tickTime&lt;&sol;span&gt;&quot;, children: [], rightAlign: true, values: [&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596000&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596000&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596000&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596000&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596000&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596000&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596297&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596297&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645596297&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1645597014&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;] }, 
+], id: 16777239, rootId: 16777239, totalRows: 10 } ) });
 &sol;*--&gt;*&sol;
 
-call_DataFrame(function() { DataFrame.renderTable(788529160) });
+call_DataFrame(function() { DataFrame.renderTable(16777239) });
 
+document.getElementById(&quot;static_df_16777240&quot;).style.display = &quot;none&quot;;
 
         &lt;&sol;script&gt;
         &lt;&sol;html&gt;"></iframe>
             <script>
-                function o_resize_iframe_out_5() {
-                    let elem = document.getElementById("iframe_out_5");
-                    resize_iframe_out_5(elem);
-                    setInterval(resize_iframe_out_5, 5000, elem);
+                function o_resize_iframe_out_8() {
+                    let elem = document.getElementById("iframe_out_8");
+                    resize_iframe_out_8(elem);
+                    setInterval(resize_iframe_out_8, 5000, elem);
                 }
-                function resize_iframe_out_5(el) {
+                function resize_iframe_out_8(el) {
                     let h = el.contentWindow.document.body.scrollHeight;
                     el.height = h === 0 ? 0 : h + 41;
                 }
-            </script>        <html>
-        <head>
-            <style type="text/css">
+            </script>
+
+
+
+
+```kotlin
+intDF    .groupBy {  expr { eventType } }
+    .count()
+    .toHTML()
+```
+
+
+
+
+            <iframe onload="o_resize_iframe_out_6()" style="width:100%;" class="result_container" id="iframe_out_6" frameBorder="0" srcdoc="        &lt;html&gt;
+        &lt;head&gt;
+            &lt;style type=&quot;text&sol;css&quot;&gt;
                 :root {
     --background: #fff;
     --background-odd: #f5f5f5;
@@ -839,7 +1008,7 @@ call_DataFrame(function() { DataFrame.renderTable(788529160) });
     --link-hover: #1a466c;
 }
 
-:root[theme="dark"], :root [data-jp-theme-light="false"], .dataframe_dark{
+:root[theme=&quot;dark&quot;], :root [data-jp-theme-light=&quot;false&quot;], .dataframe_dark{
     --background: #303030;
     --background-odd: #3c3c3c;
     --background-hover: #464646;
@@ -860,7 +1029,7 @@ p.dataframe_description {
 }
 
 table.dataframe {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif;
     font-size: 12px;
     background-color: var(--background);
     color: var(--text-color-dark);
@@ -888,15 +1057,15 @@ table.dataframe th.bottomBorder {
     border-bottom-color: var(--bold-border-color);
 }
 
-table.dataframe tbody > tr:nth-child(odd) {
+table.dataframe tbody &gt; tr:nth-child(odd) {
     background: var(--background-odd);
 }
 
-table.dataframe tbody > tr:nth-child(even) {
+table.dataframe tbody &gt; tr:nth-child(even) {
     background: var(--background);
 }
 
-table.dataframe tbody > tr:hover {
+table.dataframe tbody &gt; tr:hover {
     background: var(--background-hover);
 }
 
@@ -906,7 +1075,7 @@ table.dataframe a {
     text-decoration: none;
 }
 
-table.dataframe tr:hover > td a {
+table.dataframe tr:hover &gt; td a {
     color: var(--link-color-pale);
 }
 
@@ -947,7 +1116,7 @@ table.dataframe .expander {
     align-items: center;
 }
 
-/* formatting */
+&sol;* formatting *&sol;
 
 table.dataframe .null {
     color: var(--text-color-pale);
@@ -975,31 +1144,7 @@ table.dataframe tr:hover .formatted .structural, .null {
 }
 
 
-            </style>
-        </head>
-        <body>
-            <table class="dataframe" id="static_df_788529161"><thead><tr><th class="bottomBorder" style="text-align:left">time</th><th class="bottomBorder" style="text-align:left">current</th><th class="bottomBorder" style="text-align:left">component</th><th class="bottomBorder" style="text-align:left">actionFn</th><th class="bottomBorder" style="text-align:left">action</th><th class="bottomBorder" style="text-align:left">eventType</th><th class="bottomBorder" style="text-align:left">tickTime</th></tr></thead><tbody><tr><td  style="vertical-align:top">2022-02-23T06:00:00Z</td><td  style="vertical-align:top">null</td><td  style="vertical-align:top">main</td><td  style="vertical-align:top">null</td><td  style="vertical-align:top">running; Hold +168.00, scheduled for <span class="structural">...</span></td><td  style="vertical-align:top">RescheduledEvent</td><td  style="vertical-align:top">1645596000</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:00:00Z</td><td  style="vertical-align:top">room 0</td><td  style="vertical-align:top">room 0</td><td  style="vertical-align:top">org.kalasim.analysis.EventsKt$$Lambda<span class="structural">...</span></td><td  style="vertical-align:top">canceled</td><td  style="vertical-align:top">ComponentStateChangeEvent</td><td  style="vertical-align:top">1645596000</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:00:00Z</td><td  style="vertical-align:top">room 1</td><td  style="vertical-align:top">room 1</td><td  style="vertical-align:top">org.kalasim.analysis.EventsKt$$Lambda<span class="structural">...</span></td><td  style="vertical-align:top">canceled</td><td  style="vertical-align:top">ComponentStateChangeEvent</td><td  style="vertical-align:top">1645596000</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:00:00Z</td><td  style="vertical-align:top">room 2</td><td  style="vertical-align:top">room 2</td><td  style="vertical-align:top">org.kalasim.analysis.EventsKt$$Lambda<span class="structural">...</span></td><td  style="vertical-align:top">canceled</td><td  style="vertical-align:top">ComponentStateChangeEvent</td><td  style="vertical-align:top">1645596000</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:00:00Z</td><td  style="vertical-align:top">room 3</td><td  style="vertical-align:top">room 3</td><td  style="vertical-align:top">org.kalasim.analysis.EventsKt$$Lambda<span class="structural">...</span></td><td  style="vertical-align:top">canceled</td><td  style="vertical-align:top">ComponentStateChangeEvent</td><td  style="vertical-align:top">1645596000</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:00:00Z</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">null</td><td  style="vertical-align:top">Hold +.08, scheduled for .08</td><td  style="vertical-align:top">RescheduledEvent</td><td  style="vertical-align:top">1645596000</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:04:57.988113230Z</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">Patient(fullName=Armando Kessler, pat<span class="structural">...</span></td><td  style="vertical-align:top">null</td><td  style="vertical-align:top">Activated, scheduled for .08</td><td  style="vertical-align:top">RescheduledEvent</td><td  style="vertical-align:top">1645596297</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:04:57.988113230Z</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">Patient(fullName=Armando Kessler, pat<span class="structural">...</span></td><td  style="vertical-align:top">org.kalasim.analysis.EventsKt$$Lambda<span class="structural">...</span></td><td  style="vertical-align:top">canceled</td><td  style="vertical-align:top">ComponentStateChangeEvent</td><td  style="vertical-align:top">1645596297</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:04:57.988113230Z</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">null</td><td  style="vertical-align:top">Hold +.20, scheduled for .28</td><td  style="vertical-align:top">RescheduledEvent</td><td  style="vertical-align:top">1645596297</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:16:54.513625724Z</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">Patient(fullName=Laurie Keebler, pati<span class="structural">...</span></td><td  style="vertical-align:top">null</td><td  style="vertical-align:top">Activated, scheduled for .28</td><td  style="vertical-align:top">RescheduledEvent</td><td  style="vertical-align:top">1645597014</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:16:54.513625724Z</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">Patient(fullName=Laurie Keebler, pati<span class="structural">...</span></td><td  style="vertical-align:top">org.kalasim.analysis.EventsKt$$Lambda<span class="structural">...</span></td><td  style="vertical-align:top">canceled</td><td  style="vertical-align:top">ComponentStateChangeEvent</td><td  style="vertical-align:top">1645597014</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:16:54.513625724Z</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">null</td><td  style="vertical-align:top">Hold +.08, scheduled for .36</td><td  style="vertical-align:top">RescheduledEvent</td><td  style="vertical-align:top">1645597014</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:21:26.810865159Z</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">Patient(fullName=Eugene Crona, patien<span class="structural">...</span></td><td  style="vertical-align:top">null</td><td  style="vertical-align:top">Activated, scheduled for .36</td><td  style="vertical-align:top">RescheduledEvent</td><td  style="vertical-align:top">1645597286</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:21:26.810865159Z</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">Patient(fullName=Eugene Crona, patien<span class="structural">...</span></td><td  style="vertical-align:top">org.kalasim.analysis.EventsKt$$Lambda<span class="structural">...</span></td><td  style="vertical-align:top">canceled</td><td  style="vertical-align:top">ComponentStateChangeEvent</td><td  style="vertical-align:top">1645597286</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:21:26.810865159Z</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">null</td><td  style="vertical-align:top">Hold +.05, scheduled for .40</td><td  style="vertical-align:top">RescheduledEvent</td><td  style="vertical-align:top">1645597286</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:24:16.640704760Z</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">Patient(fullName=Darell Ortiz, patien<span class="structural">...</span></td><td  style="vertical-align:top">null</td><td  style="vertical-align:top">Activated, scheduled for .40</td><td  style="vertical-align:top">RescheduledEvent</td><td  style="vertical-align:top">1645597456</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:24:16.640704760Z</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">Patient(fullName=Darell Ortiz, patien<span class="structural">...</span></td><td  style="vertical-align:top">org.kalasim.analysis.EventsKt$$Lambda<span class="structural">...</span></td><td  style="vertical-align:top">canceled</td><td  style="vertical-align:top">ComponentStateChangeEvent</td><td  style="vertical-align:top">1645597456</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:24:16.640704760Z</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">null</td><td  style="vertical-align:top">Hold +.44, scheduled for .85</td><td  style="vertical-align:top">RescheduledEvent</td><td  style="vertical-align:top">1645597456</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:50:44.274781120Z</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">Patient(fullName=Sheldon Simonis, pat<span class="structural">...</span></td><td  style="vertical-align:top">null</td><td  style="vertical-align:top">Activated, scheduled for .85</td><td  style="vertical-align:top">RescheduledEvent</td><td  style="vertical-align:top">1645599044</td></tr><tr><td  style="vertical-align:top">2022-02-23T06:50:44.274781120Z</td><td  style="vertical-align:top">ComponentGenerator.1</td><td  style="vertical-align:top">Patient(fullName=Sheldon Simonis, pat<span class="structural">...</span></td><td  style="vertical-align:top">org.kalasim.analysis.EventsKt$$Lambda<span class="structural">...</span></td><td  style="vertical-align:top">canceled</td><td  style="vertical-align:top">ComponentStateChangeEvent</td><td  style="vertical-align:top">1645599044</td></tr></tbody></table>
-        </body>
-        <script>
-            document.getElementById("static_df_788529161").style.display = "none";
-        </script>
-        </html>
-
-
-
-
-```kotlin
-intDF    .groupBy {  expr { eventType } }
-    .count()
-```
-
-
-
-
-            <iframe onload="o_resize_iframe_out_11()" style="width:100%;" class="result_container" id="iframe_out_11" frameBorder="0" srcdoc="        &lt;html&gt;
-        &lt;head&gt;
-            &lt;style type=&quot;text&sol;css&quot;&gt;
-                :root {
+:root {
     --background: #fff;
     --background-odd: #f5f5f5;
     --background-hover: #d9edfd;
@@ -1175,9 +1320,10 @@ body::-webkit-scrollbar-track {
             &lt;&sol;style&gt;
         &lt;&sol;head&gt;
         &lt;body&gt;
-            &lt;table class=&quot;dataframe&quot; id=&quot;df_788529172&quot;&gt;&lt;&sol;table&gt;
+            &lt;table class=&quot;dataframe&quot; id=&quot;df_16777235&quot;&gt;&lt;&sol;table&gt;
 
-&lt;p class=&quot;dataframe_description&quot;&gt;DataFrame: rowsCount = 5, columnsCount = 2&lt;&sol;p&gt;
+&lt;table class=&quot;dataframe&quot; id=&quot;static_df_16777236&quot;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th class=&quot;bottomBorder&quot; style=&quot;text-align:left&quot;&gt;untitled&lt;&sol;th&gt;&lt;th class=&quot;bottomBorder&quot; style=&quot;text-align:left&quot;&gt;count&lt;&sol;th&gt;&lt;&sol;tr&gt;&lt;&sol;thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;RescheduledEvent&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;2547&lt;&sol;td&gt;&lt;&sol;tr&gt;&lt;tr&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;ComponentStateChangeEvent&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;860&lt;&sol;td&gt;&lt;&sol;tr&gt;&lt;tr&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;StateChangedEvent&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;960&lt;&sol;td&gt;&lt;&sol;tr&gt;&lt;tr&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;ResourceEvent&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;1708&lt;&sol;td&gt;&lt;&sol;tr&gt;&lt;tr&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;InteractionEvent&lt;&sol;td&gt;&lt;td  style=&quot;vertical-align:top&quot;&gt;328&lt;&sol;td&gt;&lt;&sol;tr&gt;&lt;&sol;tbody&gt;&lt;&sol;table&gt;
+&lt;p class=&quot;dataframe_description&quot;&gt;DataFrame [5 x 2]&lt;&sol;p&gt;
 
         &lt;&sol;body&gt;
         &lt;script&gt;
@@ -1458,188 +1604,26 @@ body::-webkit-scrollbar-track {
 &sol;*&lt;!--*&sol;
 call_DataFrame(function() { DataFrame.addTable({ cols: [{ name: &quot;&lt;span title=&bsol;&quot;untitled: String&bsol;&quot;&gt;untitled&lt;&sol;span&gt;&quot;, children: [], rightAlign: false, values: [&quot;RescheduledEvent&quot;,&quot;ComponentStateChangeEvent&quot;,&quot;StateChangedEvent&quot;,&quot;ResourceEvent&quot;,&quot;InteractionEvent&quot;] }, 
 { name: &quot;&lt;span title=&bsol;&quot;count: Int&bsol;&quot;&gt;count&lt;&sol;span&gt;&quot;, children: [], rightAlign: true, values: [&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;2547&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;860&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;960&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;1708&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;,&quot;&lt;span class=&bsol;&quot;formatted&bsol;&quot; title=&bsol;&quot;&bsol;&quot;&gt;&lt;span class=&bsol;&quot;numbers&bsol;&quot;&gt;328&lt;&sol;span&gt;&lt;&sol;span&gt;&quot;] }, 
-], id: 788529172, rootId: 788529172, totalRows: 5 } ) });
+], id: 16777235, rootId: 16777235, totalRows: 5 } ) });
 &sol;*--&gt;*&sol;
 
-call_DataFrame(function() { DataFrame.renderTable(788529172) });
+call_DataFrame(function() { DataFrame.renderTable(16777235) });
 
+document.getElementById(&quot;static_df_16777236&quot;).style.display = &quot;none&quot;;
 
         &lt;&sol;script&gt;
         &lt;&sol;html&gt;"></iframe>
             <script>
-                function o_resize_iframe_out_11() {
-                    let elem = document.getElementById("iframe_out_11");
-                    resize_iframe_out_11(elem);
-                    setInterval(resize_iframe_out_11, 5000, elem);
+                function o_resize_iframe_out_6() {
+                    let elem = document.getElementById("iframe_out_6");
+                    resize_iframe_out_6(elem);
+                    setInterval(resize_iframe_out_6, 5000, elem);
                 }
-                function resize_iframe_out_11(el) {
+                function resize_iframe_out_6(el) {
                     let h = el.contentWindow.document.body.scrollHeight;
                     el.height = h === 0 ? 0 : h + 41;
                 }
-            </script>        <html>
-        <head>
-            <style type="text/css">
-                :root {
-    --background: #fff;
-    --background-odd: #f5f5f5;
-    --background-hover: #d9edfd;
-    --header-text-color: #474747;
-    --text-color: #848484;
-    --text-color-dark: #000;
-    --text-color-medium: #737373;
-    --text-color-pale: #b3b3b3;
-    --inner-border-color: #aaa;
-    --bold-border-color: #000;
-    --link-color: #296eaa;
-    --link-color-pale: #296eaa;
-    --link-hover: #1a466c;
-}
-
-:root[theme="dark"], :root [data-jp-theme-light="false"], .dataframe_dark{
-    --background: #303030;
-    --background-odd: #3c3c3c;
-    --background-hover: #464646;
-    --header-text-color: #dddddd;
-    --text-color: #b3b3b3;
-    --text-color-dark: #dddddd;
-    --text-color-medium: #b2b2b2;
-    --text-color-pale: #737373;
-    --inner-border-color: #707070;
-    --bold-border-color: #777777;
-    --link-color: #008dc0;
-    --link-color-pale: #97e1fb;
-    --link-hover: #00688e;
-}
-
-p.dataframe_description {
-    color: var(--text-color-dark);
-}
-
-table.dataframe {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 12px;
-    background-color: var(--background);
-    color: var(--text-color-dark);
-    border: none;
-    border-collapse: collapse;
-}
-
-table.dataframe th, td {
-    padding: 6px;
-    border: 1px solid transparent;
-    text-align: left;
-}
-
-table.dataframe th {
-    background-color: var(--background);
-    color: var(--header-text-color);
-}
-
-table.dataframe td {
-    vertical-align: top;
-    white-space: nowrap;
-}
-
-table.dataframe th.bottomBorder {
-    border-bottom-color: var(--bold-border-color);
-}
-
-table.dataframe tbody > tr:nth-child(odd) {
-    background: var(--background-odd);
-}
-
-table.dataframe tbody > tr:nth-child(even) {
-    background: var(--background);
-}
-
-table.dataframe tbody > tr:hover {
-    background: var(--background-hover);
-}
-
-table.dataframe a {
-    cursor: pointer;
-    color: var(--link-color);
-    text-decoration: none;
-}
-
-table.dataframe tr:hover > td a {
-    color: var(--link-color-pale);
-}
-
-table.dataframe a:hover {
-    color: var(--link-hover);
-    text-decoration: underline;
-}
-
-table.dataframe img {
-    max-width: fit-content;
-}
-
-table.dataframe th.complex {
-    background-color: var(--background);
-    border: 1px solid var(--background);
-}
-
-table.dataframe .leftBorder {
-    border-left-color: var(--inner-border-color);
-}
-
-table.dataframe .rightBorder {
-    border-right-color: var(--inner-border-color);
-}
-
-table.dataframe .rightAlign {
-    text-align: right;
-}
-
-table.dataframe .expanderSvg {
-    width: 8px;
-    height: 8px;
-    margin-right: 3px;
-}
-
-table.dataframe .expander {
-    display: flex;
-    align-items: center;
-}
-
-/* formatting */
-
-table.dataframe .null {
-    color: var(--text-color-pale);
-}
-
-table.dataframe .structural {
-    color: var(--text-color-medium);
-    font-weight: bold;
-}
-
-table.dataframe .dataFrameCaption {
-    font-weight: bold;
-}
-
-table.dataframe .numbers {
-    color: var(--text-color-dark);
-}
-
-table.dataframe td:hover .formatted .structural, .null {
-    color: var(--text-color-dark);
-}
-
-table.dataframe tr:hover .formatted .structural, .null {
-    color: var(--text-color-dark);
-}
-
-
-            </style>
-        </head>
-        <body>
-            <table class="dataframe" id="static_df_788529173"><thead><tr><th class="bottomBorder" style="text-align:left">untitled</th><th class="bottomBorder" style="text-align:left">count</th></tr></thead><tbody><tr><td  style="vertical-align:top">RescheduledEvent</td><td  style="vertical-align:top">2547</td></tr><tr><td  style="vertical-align:top">ComponentStateChangeEvent</td><td  style="vertical-align:top">860</td></tr><tr><td  style="vertical-align:top">StateChangedEvent</td><td  style="vertical-align:top">960</td></tr><tr><td  style="vertical-align:top">ResourceEvent</td><td  style="vertical-align:top">1708</td></tr><tr><td  style="vertical-align:top">InteractionEvent</td><td  style="vertical-align:top">328</td></tr></tbody></table>
-        </body>
-        <script>
-            document.getElementById("static_df_788529173").style.display = "none";
-        </script>
-        </html>
+            </script>
 
 
 

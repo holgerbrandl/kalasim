@@ -52,7 +52,8 @@ Online Editor <https://mermaid-js.github.io/mermaid-live-editor>
 ## How to build markdown from jupyter notebooks?
 
 ```bash
-¬
+export KALASIM_HOME=/d/projects/scheduling/kalasim
+cd ${KALASIM_HOME}/docs/userguide/docs/examples
 
 # install python (e.g. via windows app-store)
 
