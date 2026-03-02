@@ -34,7 +34,7 @@ dependencies {
 
     api("io.github.oshai:kotlin-logging-jvm:7.0.14")
 
-    api("com.github.holgerbrandl:kdfutils:1.5.0")
+    api("com.github.holgerbrandl:kdfutils:1.6.0")
 
     implementation("com.google.code.gson:gson:2.13.2")
 //    implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.20")
