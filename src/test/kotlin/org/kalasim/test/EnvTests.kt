@@ -7,7 +7,6 @@ import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.instanceOf
 import kotlinx.datetime.Instant
-import org.jetbrains.kotlinx.dataframe.math.mean
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.kalasim.*
@@ -458,7 +457,7 @@ class EnvTests {
         atms.fastMap { it.run(100.minutes) }
 
         // to average over all configs does not make much sense conceptually, but allows to test for regressions
-        val meanQLength = atms.map { it.get<Resource>().statistics.requesters.lengthStats.mean!! }.mean()
+        val meanQLength = atms.map { it.get<Resource>().statistics.requesters.lengthStats.mean!! }.average()
         meanQLength shouldBe (22.37 plusOrMinus 0.1)
     }
 

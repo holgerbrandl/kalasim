@@ -6,6 +6,7 @@ import org.kalasim.SimTime
 import org.kalasim.State
 import org.kalasim.analysis.StateChangedEvent
 import org.kalasim.monitors.CategoryTimeline
+import kotlin.time.DurationUnit
 
 
 typealias StateChangedEventSelector<T> = StateChangedEvent<T>.(StateChangedEvent<T>) -> Any?
@@ -86,18 +87,20 @@ fun <T> List<State<T>>.displayTimelines(
 //        .showOptional()
 }
 
+private data class StateDurationRecord(val state: String, val duration: Double)
+
+
 fun <T> List<State<T>>.displayStayDistributions(
     title: String? = null,
     from: SimTime? = null,
     to: SimTime? = null,
-    durationUnit: kotlin.time.DurationUnit = kotlin.time.DurationUnit.MINUTES
+    durationUnit: DurationUnit = DurationUnit.MINUTES
 //    colorBy: ResourceActivityEventSelector = { it.activity ?: "Other" }
 ): GGPlot {
     val env = first().timeline.env
 
-    data class StateDurationRecord(val state: String, val duration: Double)
 
-    val records = flatMap { state ->
+    val records: List<StateDurationRecord> = flatMap { state ->
         state.timeline
             .clip(from ?: env.startDate, to ?: env.now)
             .statsData().asList()
@@ -121,12 +124,12 @@ fun <T> List<State<T>>.displayStayDistributions(
 /**
  * Converts a DurationUnit to a human-readable label for plotting.
  */
-private fun kotlin.time.DurationUnit.toLabel(): String = when (this) {
-    kotlin.time.DurationUnit.DAYS -> "days"
-    kotlin.time.DurationUnit.HOURS -> "hours"
-    kotlin.time.DurationUnit.MINUTES -> "minutes"
-    kotlin.time.DurationUnit.SECONDS -> "seconds"
-    kotlin.time.DurationUnit.MILLISECONDS -> "milliseconds"
-    kotlin.time.DurationUnit.MICROSECONDS -> "microseconds"
-    kotlin.time.DurationUnit.NANOSECONDS -> "nanoseconds"
+private fun DurationUnit.toLabel(): String = when (this) {
+    DurationUnit.DAYS -> "days"
+    DurationUnit.HOURS -> "hours"
+    DurationUnit.MINUTES -> "minutes"
+    DurationUnit.SECONDS -> "seconds"
+    DurationUnit.MILLISECONDS -> "milliseconds"
+    DurationUnit.MICROSECONDS -> "microseconds"
+    DurationUnit.NANOSECONDS -> "nanoseconds"
 }

@@ -1,9 +1,9 @@
 import java.io.BufferedReader
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 
 plugins {
-    kotlin("jvm") version "2.2.21"
+    kotlin("jvm") version "2.3.10"
     id("java")
     id("me.champeau.jmh") version "0.7.3"
 //    id("io.morethan.jmhreport") version "0.9.0"
@@ -27,7 +27,7 @@ dependencies {
     println("KALASIM_PROD_MODEL: $prodModel")
     jmh(prodModel)
 
-    testImplementation(testFixtures(project(":")))
+//    testImplementation(testFixtures(project(":")))
 
     jmh(project(":"))
 }
@@ -50,7 +50,7 @@ tasks.named<Jar>("jmhJar") {
 }
 
 val timestamp: String = SimpleDateFormat("yyyyMMdd'T'HHmmss").format(Date())
-val label:String?="test"
+val label: String = "test"
 //fun getDate(): String = Date().toString()//.format("yyyyMMdd_HHmm")
 
 jmh {
