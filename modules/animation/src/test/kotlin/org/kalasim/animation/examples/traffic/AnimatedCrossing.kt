@@ -1,5 +1,6 @@
 package org.kalasim.animation.examples.traffic
 
+import kotlinx.datetime.format
 import org.kalasim.animation.*
 import org.kalasim.logistics.CollisionSampler
 import org.kalasim.logistics.Crossing
@@ -10,6 +11,8 @@ import org.openrndr.extra.color.presets.*
 import org.openrndr.extra.gui.GUI
 import org.openrndr.extra.parameters.ActionParameter
 import org.openrndr.extra.parameters.DoubleParameter
+import java.time.format.DateTimeFormatter
+import kotlin.time.toJavaInstant
 
 
 fun main() = animateCrossing { Crossing(2, numBuildings = 4) }
@@ -135,7 +138,7 @@ fun animateCrossing(builder: () -> Crossing = { Crossing() }) = application {
                 defaults()
                 fill = ColorRGBa.WHITE
                 fontMap = font
-                text("Time: ${sim.now.format("HH:mm:ss:SSS")}", sideBarWidth.toDouble() + 10, height - 10.0)
+                text("Time: ${DateTimeFormatter.ofPattern("HH:mm:ss:SSS").format(sim.now.toJavaInstant())}", sideBarWidth.toDouble() + 10, height - 10.0)
                 text("Frame: ${frameCounter++}", sideBarWidth.toDouble() + 10, height - 30.0)
             }
         }

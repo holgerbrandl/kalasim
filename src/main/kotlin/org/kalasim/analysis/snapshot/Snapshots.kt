@@ -1,7 +1,6 @@
 package org.kalasim.analysis.snapshot
 
 import com.github.holgerbrandl.jsonbuilder.json
-import kotlinx.datetime.Instant
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary
 import org.apache.commons.math3.stat.descriptive.moment.Mean
@@ -23,10 +22,10 @@ interface EntitySnapshot : WithJson
 @Suppress("unused")
 open class ComponentSnapshot(component: Component) : AutoJson(), EntitySnapshot {
     val name = component.name
-    val creationTime: Instant = component.creationTime
+    val creationTime: SimTime = component.creationTime
     val now = component.now
     val status = component.componentState
-    val scheduledTime: Instant? = component.scheduledTime
+    val scheduledTime: SimTime? = component.scheduledTime
 
     val claims = component.claims.map { it.key.name to it.value.quantity }.toMap()
     val requests = component.requests.map { it.key.name to it.value.quantity }.toMap()

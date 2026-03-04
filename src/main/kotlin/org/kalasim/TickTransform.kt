@@ -40,7 +40,7 @@ import kotlin.time.ExperimentalTime
 //}
 
 
-typealias SimTime = Instant
+typealias SimTime = kotlin.time.Instant
 
 @Suppress("DeprecatedCallableAddReplaceWith")
 @Deprecated("Use is Disencouraged because it has an implicit reference to tick-duration of environment")
@@ -125,6 +125,6 @@ fun Environment.asTickTime(instant: SimTime) = instant.toTickTime()
 
 
 @OptIn(ExperimentalTime::class)
-fun somewhen() = (LocalDate.parse("2022-02-23").atStartOfDayIn(TimeZone.UTC) + 6.hours).toDeprecatedInstant()
+fun somewhen():SimTime = (LocalDate.parse("2022-02-23").atStartOfDayIn(TimeZone.UTC) + 6.hours)
 fun someday() = LocalDate.parse("2022-02-23")
 

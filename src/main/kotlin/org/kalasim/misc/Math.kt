@@ -2,10 +2,12 @@ package org.kalasim.misc
 
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.apache.commons.math3.stat.descriptive.*
+import org.apache.commons.math3.stat.descriptive.moment.Mean
 import org.apache.commons.math3.stat.descriptive.rank.Median
 import org.kalasim.monitors.ValueTimeline
 
-fun Collection<Double>.median() = Median().evaluate(toDoubleArray())
+fun Collection<Number>.median() = Median().evaluate(map{it.toDouble()}.toDoubleArray())
+fun Collection<Number>.mean() = Mean().evaluate(map{it.toDouble()}.toDoubleArray())
 
 val DescriptiveStatistics.median: Double
     get() = Median().evaluate(values)
@@ -14,7 +16,7 @@ val DescriptiveStatistics.median: Double
 // copied from krangl
 fun <T : Number> List<T>.cumSum(): Iterable<Double> =
     drop(1).fold(listOf(first().toDouble())) { list, curVal ->
-        list + (list.last().toDouble() + curVal.toDouble())
+        list + (list.last() + curVal.toDouble())
     }
 
 fun List<StatisticalSummary>.merge(): StatisticalSummaryValues = AggregateSummaryStatistics.aggregate(this)

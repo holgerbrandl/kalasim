@@ -1,8 +1,8 @@
 package org.kalasim.plot.kravis
 
-import kotlinx.datetime.Instant
 import org.kalasim.SimTime
 import kotlin.time.DurationUnit
+import kotlin.time.Instant
 
 fun interface TimeDiscretizer {
     fun discretize(time: SimTime): SimTime

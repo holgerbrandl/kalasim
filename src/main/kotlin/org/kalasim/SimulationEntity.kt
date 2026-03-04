@@ -1,12 +1,12 @@
 package org.kalasim
 
 import com.github.holgerbrandl.jsonbuilder.json
-import kotlinx.datetime.Instant
 import org.kalasim.analysis.snapshot.EntitySnapshot
 import org.kalasim.misc.*
 import org.koin.core.Koin
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.Qualifier
+import kotlin.time.Instant
 
 
 /** Base class of all main simulation entities such as environments, resources, components, states and collections. */

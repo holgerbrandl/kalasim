@@ -28,6 +28,8 @@ hold(
 * Disable internal metrics by default in MMC queue
 * Reworked `Rate` to suport more semantic creation
 
+* Migrated from kotlinx.datetime to java.time.Instant for better API consistency
+
 ## 1.2
 
 Released 2026-01-03

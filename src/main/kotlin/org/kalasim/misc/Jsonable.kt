@@ -3,9 +3,9 @@ package org.kalasim.misc
 import com.google.gson.*
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import kotlinx.datetime.Instant
 import org.json.JSONObject
 import java.lang.reflect.Type
+import kotlin.time.Instant
 
 
 interface WithJson {
@@ -100,8 +100,31 @@ open class AutoJson : Jsonable() {
 // https://futurestud.io/tutorials/gson-builder-special-values-of-floats-doubles
 // https://github.com/google/gson/blob/master/UserGuide.md#null-object-support
 internal val GSON by lazy {
+    val timeAdpater = object : JsonSerializer<Instant>, JsonDeserializer<Instant> {
+        override fun serialize(
+            src: Instant?,
+            typeOfSrc: Type?,
+            context: JsonSerializationContext?
+        ): JsonElement =
+            if (src == null) JsonNull.INSTANCE else JsonPrimitive(src.toString())
+
+        override fun deserialize(
+            json: JsonElement?,
+            typeOfT: Type?,
+            context: JsonDeserializationContext?
+        ): Instant {
+            if (json == null || json.isJsonNull) {
+                throw JsonParseException("Instant was null")
+            }
+            return Instant.parse(json.asString)
+        }
+    }
+
+
     GsonBuilder()
         .serializeSpecialFloatingPointValues()
+        .registerTypeAdapter(Instant::class.java, timeAdpater)
+
         .setPrettyPrinting()
         // essentially gson does not seem to support polymorphic serialization https://stackoverflow.com/a/19600090/590437
 //        .registerTypeAdapter(SimulationEntity::class.java, SimEntityGsonAdapter())

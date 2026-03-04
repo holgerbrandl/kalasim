@@ -6,7 +6,6 @@ import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.doubles.plusOrMinus
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.instanceOf
-import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.kalasim.*
@@ -30,6 +29,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
+import kotlin.time.Instant
 
 class EnvTests {
 
@@ -549,7 +549,7 @@ class EnvTests {
               "now": "2022-03-05T06:00:00Z",
               "name": "Dr. Howe",
               "claimedBy": [{
-                "first": "room 0",
+                "first": "room 3",
                 "second": null
               }],
               "capacity": 1
@@ -559,9 +559,9 @@ class EnvTests {
         waitingLine.first().snapshot.toJson().toIndentString() shouldBeDiff """
         {
           "scheduledTime": null,
-          "creationTime": "1970-01-06T17:15:42.348298110Z",
-          "now": "1970-01-11T00:00:00Z",
-          "name": "724 Heriberto Farrell",
+          "creationTime": "2022-03-03T14:00:18.310466803Z",
+          "now": "2022-03-05T06:00:00Z",
+          "name": "842 Lakisha Feeney",
           "claims": {},
           "requests": {},
           "status": "DATA"
@@ -572,9 +572,9 @@ class EnvTests {
         {
           "duration": "10d",
           "min": 0,
-          "max": 264,
-          "mean": 74.096,
-          "standard_deviation": 85.135
+          "max": 91,
+          "mean": 17.089,
+          "standard_deviation": 24.979
         }
         """.trimIndent()
 
@@ -584,25 +584,39 @@ class EnvTests {
                 "all": {
                   "duration": "10d",
                   "min": 0,
-                  "max": 264,
-                  "mean": 74.096,
-                  "standard_deviation": 85.135
+                  "max": 91,
+                  "mean": 17.089,
+                  "standard_deviation": 24.979
                 },
                 "excl_zeros": {
-                  "duration": "8d 1h 22m 25.304357505s",
+                  "duration": "5d 20h 39m 51.637788540s",
                   "min": 1,
-                  "max": 264,
-                  "mean": 91.962,
-                  "standard_deviation": 85.751
+                  "max": 91,
+                  "mean": 29.157,
+                  "standard_deviation": 26.708
                 }
               },
               "name": "ER Waiting Area Queue",
               "length_of_stay": {
-                "all": {"entries": 0},
-                "excl_zeros": {"entries": 0}
+                "all": {
+                  "entries": 414,
+                  "median": 7.455,
+                  "mean": 4.761,
+                  "ninety_pct_quantile": 16.192,
+                  "standard_deviation": 7.455,
+                  "ninetyfive_pct_quantile": 19.786
+                },
+                "excl_zeros": {
+                  "entries": 267,
+                  "median": 8.178,
+                  "mean": 7.382,
+                  "ninety_pct_quantile": 18.066,
+                  "standard_deviation": 8.178,
+                  "ninetyfive_pct_quantile": 23.877
+                }
               },
               "type": "ComponentListStatistics",
-              "timestamp": "1970-01-11T00:00:00Z"
+              "timestamp": "2022-03-05T06:00:00Z"
             }
         """.trimIndent()
     }

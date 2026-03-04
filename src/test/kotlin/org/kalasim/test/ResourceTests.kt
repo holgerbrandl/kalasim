@@ -4,7 +4,6 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.maps.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import kotlinx.datetime.Instant
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.junit.jupiter.api.Test
 import org.kalasim.*
@@ -425,7 +424,7 @@ class ResourceTests {
 
 
     @Test
-    fun `it should track request scoped activities`() = createTestSimulation(Instant.parse("2021-01-01T00:00:00.00Z")) {
+    fun `it should track request scoped activities`() = createTestSimulation(SimTime.parse("2021-01-01T00:00:00.00Z")) {
         val r1 = Resource(capacity = 4)
         val r2 = Resource(capacity = 4)
 

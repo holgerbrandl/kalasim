@@ -1,6 +1,5 @@
 package org.kalasim.monitors
 
-import kotlinx.datetime.Instant
 import org.apache.commons.math3.distribution.EnumeratedDistribution
 import org.kalasim.DefaultProvider
 import org.kalasim.EnvProvider
@@ -11,6 +10,7 @@ import org.kalasim.misc.time.sum
 import org.kalasim.misc.time.sumOf
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
+import kotlin.time.Instant
 
 /**
  * Level monitors tally levels along with the current (simulation) time. e.g. the number of parts a machine is working on.
@@ -94,7 +94,7 @@ class CategoryTimeline<T>(
 
 //    operator fun get(time: TickTime) = get(time.value)
 
-    override fun total(value: T): Duration? = statsData().run {
+    override fun total(value: T): Duration = statsData().run {
         // https://youtrack.jetbrains.com/issue/KT-43776
         values.zip(durations)
             .filter { it.first == value }
@@ -165,9 +165,6 @@ class CategoryTimeline<T>(
      * @param end The end time of the interval for which the distribution is to be computed.
      * Defaults to `null`, indicating that the distribution extends to the current time.
      *
-     * @param includeAll If `true`, includes all distinct values in the distribution even if they
-     * have no associated duration in the given time range. Defaults to `false`.
-     *
      * @return A map where the keys are the distinct values from the timeline and the values are
      * their summed durations within the specified time range.
      *
@@ -234,7 +231,7 @@ class CategoryTimeline<T>(
     override fun clearHistory(before: SimTime) {
         val startFromIdx = timestamps.withIndex().firstOrNull { before > it.value }?.index ?: return
 
-        for (i in 0 until startFromIdx) {
+        (0 until startFromIdx).forEach {
             val newTime = timestamps.subList(0, startFromIdx)
             val newValues = values.subList(0, startFromIdx)
 
