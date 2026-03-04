@@ -1,13 +1,10 @@
 package org.kalasim
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
-//import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.toDeprecatedInstant
 import org.kalasim.misc.AmbiguousDuration
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -17,7 +14,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 // note: remove @JvmInline because it did not seem ready on the java-interop-side
 // value class ? --> Blocked by https://github.com/holgerbrandl/kalasim/issues/45
@@ -124,7 +121,6 @@ fun Environment.asDuration(duration: Number): Duration = duration.let {
 fun Environment.asTickTime(instant: SimTime) = instant.toTickTime()
 
 
-@OptIn(ExperimentalTime::class)
 fun somewhen():SimTime = (LocalDate.parse("2022-02-23").atStartOfDayIn(TimeZone.UTC) + 6.hours)
 fun someday() = LocalDate.parse("2022-02-23")
 
