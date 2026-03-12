@@ -13,12 +13,13 @@ import org.kalasim.Priority.Companion.LOW
 import org.kalasim.Priority.Companion.LOWEST
 import org.kalasim.Priority.Companion.NORMAL
 import org.kalasim.ResourceSelectionPolicy.*
-import org.kalasim.misc.*
-import kotlin.repeat
+import org.kalasim.misc.AmbiguousDurationComponent
+import org.kalasim.misc.TestUtil
+import org.kalasim.misc.asCMPairList
+import org.kalasim.misc.createTestSimulation
 import kotlin.test.fail
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
 @OptIn(AmbiguousDurationComponent::class)
@@ -49,10 +50,10 @@ class ResourceTests {
             object : Component() {
 
                 override fun process() = sequence {
-                    while(true) {
+                    while (true) {
                         request(resource withQuantity 1 andPriority Priority(prioPDF.sample()))
                         hold(1.minutes)
-                        if(!isClaiming(resource)) {
+                        if (!isClaiming(resource)) {
                             break
                         } else {
                             release(resource)
@@ -85,6 +86,39 @@ class ResourceTests {
         resource.claimers.size shouldBe 0
     }
 
+    @Test
+    fun `it should wait until capacity become available`() = createTestSimulation {
+
+        val resource = Resource(capacity = 0, defaultLimitMode = CapacityLimitMode.SCHEDULE)
+
+        val foo = object : Component("foo") {
+
+            override fun process() = sequence {
+                request(resource) {
+                    hold(1.minutes)
+                    log("something busy")
+                }
+
+                log("finished process")
+            }
+        }
+
+        object : Component("resource enabler") {
+
+            override fun process() = sequence {
+                hold(5.minutes)
+                resource.capacity = 1.0
+            }
+        }
+
+        run(10.minutes)
+
+        foo.componentState shouldBe ComponentState.DATA
+
+        resource.claimers.size shouldBe 0
+        resource.requesters.size shouldBe 0
+    }
+
 
     @Test
     fun `preemptive resources should bump components depending on priority`() = createTestSimulation {
@@ -105,7 +139,7 @@ class ResourceTests {
             override fun process() = sequence {
                 hold(preRequestHours.hours)
 
-                if(requestPriority != null) {
+                if (requestPriority != null) {
                     request(resource withPriority requestPriority)
                 } else {
                     request(resource)
@@ -113,9 +147,9 @@ class ResourceTests {
 
                 hold(postRequestHours.hours)
 
-                if(isBumped(resource)) {
+                if (isBumped(resource)) {
                     log("got bumped from $resource")
-                    if(failOnBump) fail()
+                    if (failOnBump) fail()
                     return@sequence
                 }
 
@@ -288,7 +322,6 @@ class ResourceTests {
 
         criticalRequestHonored shouldBe true
     }
-
 
 
     @Test
@@ -485,6 +518,7 @@ class ResourceTests {
 
             @Suppress("RedundantValueArgument")
             val r = Resource(capacity = 1)
+
             @Suppress("RedundantValueArgument")
             val dr = Resource(capacity = 1)
 

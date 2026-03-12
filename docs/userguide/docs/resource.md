@@ -216,6 +216,8 @@ It may happen that `request()` (regular resources), `take()` or `put()` (depleta
 2. `SCHEDULE` - Schedule request even the current `capacity` won't ever honor the request, hoping for a later capacity increase.
 3. `CAP` - [Depletable resources](#depletable-resources) also support capping `put` requests at capacity level
 
+Resources can specify a default mode with `Resource(capacity=10,defaultLimitMode=CapacityLimitMode.SCHEDULE)
+
 ## Multiple resources
 
 It is also possible to request for more resources at once. To enable this functionality in a typed manner, we provide a small builder API containing  `withPriority`, `withQuantity`, and `andPriority`. In the following examples, we request 1 quantity from `clerks` **AND** 2 quantities from `assistance`.

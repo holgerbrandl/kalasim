@@ -196,6 +196,19 @@ class ComponentProperties {
 }
 
 
+/** Define error behavior if `put` exceeds the capacity of a depletable resource .*/
+enum class CapacityLimitMode {
+
+    /** Fail if request size exceeds resource capacity.*/
+    FAIL,
+
+    /** Schedule put if necessary, hoping for a later capacity increase.*/
+    SCHEDULE,
+
+    /** Cap put requests at capacity level */
+    CAP
+}
+
 /**
  * A kalasim component is used as component (primarily for queueing) or as a component with a process.
  * Usually, a component will be defined as a subclass of Component.
@@ -349,6 +362,7 @@ open class Component(
 
         // new cached approach to invoke process definition using cached logic
         val invoker = cachedInvoker()
+
         @Suppress("UNCHECKED_CAST")
         val args = processArgs as Array<Any?> // vararg already is an array at runtime
         val sequence = if (invoker.needsInstance) {
@@ -669,18 +683,6 @@ open class Component(
     )
 
 
-    /** Define error behavior if `put` exceeds the capacity of a depletable resource .*/
-    enum class CapacityLimitMode {
-
-        /** Fail if request size exceeds resource capacity.*/
-        FAIL,
-
-        /** Schedule put if necessary, hoping for a later capacity increase.*/
-        SCHEDULE,
-
-        /** Cap put requests at capacity level */
-        CAP
-    }
 
 
     /**
@@ -706,7 +708,7 @@ open class Component(
         failAt: SimTime? = null,
         failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
-        capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
+        capacityLimitMode: CapacityLimitMode = resource.defaultLimitMode
     ) = put(
         ResourceRequest(resource, quantity.toDouble(), priority),
         description = description,
@@ -814,7 +816,7 @@ open class Component(
         failAt: SimTime? = null,
         failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
-        capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
+        capacityLimitMode: CapacityLimitMode = if(resources.size==1) resources.first().defaultLimitMode  else CapacityLimitMode.FAIL,
         honorBlock: (suspend SequenceScope<Component>.(RequestScopeContext) -> Unit)? = null
     ) = request(
         *resources.map { it withQuantity quantity andPriority priority }.toTypedArray(),
@@ -851,7 +853,7 @@ open class Component(
         failAt: SimTime? = null,
         failDelay: Duration? = null,
         failPriority: Priority = NORMAL,
-        capacityLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
+        capacityLimitMode: CapacityLimitMode = if(resourceRequests.size==1) resourceRequests.first().resource.defaultLimitMode  else CapacityLimitMode.FAIL,
         // try to avoid argument by inferring from stacktrace
 //        calledFrom: String? = null,
         // see https://stackoverflow.com/questions/46098105/is-there-a-way-to-open-and-close-a-stream-easily-at-kotlin

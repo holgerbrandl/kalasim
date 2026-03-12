@@ -154,6 +154,7 @@ open class Resource(
     val preemptive: Boolean = false,
     envProvider: EnvProvider = DefaultProvider(),
     val trackingConfig: ResourceTrackingConfig = envProvider.getEnv().entityTrackingDefaults.DefaultResourceConfig,
+    val defaultLimitMode: CapacityLimitMode = CapacityLimitMode.FAIL,
 ) : SimulationEntity(name = name, envProvider = envProvider) {
 
     internal var depletable: Boolean = false
