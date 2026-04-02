@@ -19,7 +19,6 @@ import kotlin.repeat
 import kotlin.test.fail
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
 @OptIn(AmbiguousDurationComponent::class)
@@ -85,6 +84,31 @@ class ResourceTests {
 
         resource.claimers.size shouldBe 0
     }
+
+
+    @Test
+    fun `it should immediately honor request for no resources`() = createTestSimulation {
+        var requestHonored=false
+
+        val fakeResource = Resource()
+
+        val c = object : Component(){
+            override fun process() = sequence {
+                request(listOf()){
+                    hold(10.minutes)
+                    log("finished process, terminating...")
+                    requestHonored=true
+                }
+
+            }
+        }
+
+        run(30.minutes)
+
+        assert(requestHonored)
+        c.componentState shouldBe ComponentState.DATA
+    }
+
 
 
     @Test
