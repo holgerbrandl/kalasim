@@ -121,6 +121,31 @@ class ResourceTests {
 
 
     @Test
+    fun `it should immediately honor request for no resources`() = createTestSimulation {
+        var requestHonored=false
+
+        val fakeResource = Resource()
+
+        val c = object : Component(){
+            override fun process() = sequence {
+                request(listOf()){
+                    hold(10.minutes)
+                    log("finished process, terminating...")
+                    requestHonored=true
+                }
+
+            }
+        }
+
+        run(30.minutes)
+
+        assert(requestHonored)
+        c.componentState shouldBe ComponentState.DATA
+    }
+
+
+
+    @Test
     fun `preemptive resources should bump components depending on priority`() = createTestSimulation {
 
         // see bank office docs: By design resources that were claimed are automatically

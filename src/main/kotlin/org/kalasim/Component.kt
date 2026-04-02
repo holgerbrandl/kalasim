@@ -1079,6 +1079,12 @@ open class Component(
     internal fun tryRequest(): Boolean {
         if (componentState == INTERRUPTED) return false
 
+        // rare case that request was performed with empty argument request list
+        if(requests.isEmpty()){
+            reschedule(now, NORMAL, false, { "Auto-honor empty request" }, ACTIVATE)
+            return true
+        }
+
         val rHonor: List<Pair<Resource, RequestContext>>? = if (oneOfRequest) honorAny() else honorAll()
 
         if (rHonor.isNullOrEmpty()) return false

@@ -245,6 +245,21 @@ fun SimContext.uniform(lower: Duration, upper: Duration) =
     UniformRealDistribution(env.rg, lower.inSeconds, upper.inSeconds).seconds
 
 
+/**
+ * Binomial distribution with built-in support for controlled-randomization.
+ *
+ * The binomial distribution models the number of successes in a fixed number of independent trials,
+ * each with the same probability of success.
+ *
+ * @param trials The number of trials. Must be a non-negative integer.
+ * @param probability The probability of success on each trial. Must be between 0 and 1 (inclusive).
+ * @return A binomial distribution configured with the environment's random generator.
+ *
+ * For additional details see https://www.kalasim.org/basics/#randomness-distributions.
+ */
+fun SimContext.binomial(trials: Number, probability: Number) =
+    BinomialDistribution(env.rg, trials.toInt(), probability.toDouble())
+
 //
 // date utils for distributions
 
