@@ -34,7 +34,7 @@ class DisplayTests : AbstractSvgPlotRegression() {
 
     @Test
     fun `it should display the mm1 server utilization`() {
-        val mm1 = MM1Queue()
+        val mm1 = MM1Queue(keepHistory = true, enableInternalMetrics = true)
 
         mm1.run(50.minutes)
 //        mm1.customers
@@ -82,7 +82,7 @@ class DisplayTests : AbstractSvgPlotRegression() {
     @Test
     fun `it should display the mm1 server utilization with walltime`() {
 
-        val mm1 = MM1Queue()
+        val mm1 = MM1Queue(keepHistory = true, enableInternalMetrics = true)
 
         // redo but with set tick-transform
 //        mm1.startDate = Instant.parse("2021-01-01T00:00:00.00Z")

@@ -16,8 +16,10 @@ import kotlin.time.DurationUnit
  * determined by a Poisson process and job service times have an exponential distribution. */
 class MM1Queue(
     lambda: Double = 1.5,
-    mu: Double = 2.0
-) : MMcQueue(1, lambda, mu)
+    mu: Double = 2.0,
+    enableInternalMetrics: Boolean = false,
+    keepHistory: Boolean = false
+) : MMcQueue(1, lambda, mu, enableInternalMetrics = enableInternalMetrics, keepHistory = keepHistory)
 
 
 /** An implementation of an MMc queue, see https://en.wikipedia.org/wiki/M/M/c_queue, which
@@ -33,7 +35,7 @@ open class MMcQueue(
     val mu: Number = 10,
     val durationUnit : DurationUnit = DurationUnit.MINUTES,
     enableInternalMetrics: Boolean = false,
-
+    keepHistory: Boolean = false
 ) : Environment(tickDurationUnit = durationUnit) {
 
     // todo this should be opt-in anyway https://github.com/holgerbrandl/kalasim/issues/66
@@ -71,7 +73,7 @@ open class MMcQueue(
 
         val iat = exponential(Rate(lambda, durationUnit))
 
-        componentGenerator = ComponentGenerator(iat, keepHistory = false) {
+        componentGenerator = ComponentGenerator(iat, keepHistory = keepHistory) {
             Customer(mu, envProvider = WrappedProvider(this))
         }
     }
