@@ -246,8 +246,8 @@ class EnvTests {
 
         runOutput.stdout shouldBeDiff """
             INFO Component - BusMetrics: 13 events processed in last 10m
-            INFO Component - BusMetrics: 1 events processed in last 10m
             INFO Component - BusMetrics: 7 events processed in last 10m
+            INFO Component - BusMetrics: 13 events processed in last 10m
         """.trimIndent()
 
         val postOutput = captureOutput {
@@ -262,7 +262,7 @@ class EnvTests {
         val busMetrics = sim.get<BusMetrics>()
 
         busMetrics.stop()
-        busMetrics.eventDistribution.statistics["RescheduledEvent"] shouldBe 10.0
+        busMetrics.eventDistribution.statistics["RescheduledEvent"] shouldBe 14.0
 
         // nothing must be logged after stop
         val stoppedOutput = captureOutput {

@@ -88,6 +88,7 @@ class DepletableHonorPolicyTest {
     @Test
     fun `it should allow using a weighted FCFS`() {
         val takes = fruitStore(RequestHonorPolicy.WeightedFCFS(0.4))
+//        val takes = fruitStore(RequestHonorPolicy.StrictFCFS)
 
         takes.map {
             it.requester.name.replace("Customer.", "").toInt()

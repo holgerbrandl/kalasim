@@ -344,8 +344,16 @@ open class Resource(
                         )
                     }
                 @Suppress("ConvertCallChainIntoSequence")
-                sortedWith
-                    .filter { canHonorQuantity(it.component.requests[this]!!.quantity) }
+                sortedWith.asSequence()
+                    .filter {
+                        // needed to avoid recursion errors when this iterator contains no longer valid request objects
+                        // without 'org.kalasim.test.DepletableHonorPolicyTest.it should allow using a relaxed FCFS' will fail
+                        it.component.requests.containsKey(this)
+                    }
+                    .filter {
+                        println("check if $this is in requests of ${it.component} ")
+                        canHonorQuantity(it.component.requests[this]!!.quantity)
+                    }
                     .takeWhile { it.component.tryRequest() }
                     .count() // actually trigger otherwise lazy sequence
             }

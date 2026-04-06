@@ -35,6 +35,7 @@ dependencies {
     api("io.github.oshai:kotlin-logging-jvm:7.0.14")
 
     api("com.github.holgerbrandl:kdfutils:1.6.0")
+    api("org.jetbrains.kotlinx:dataframe-csv:1.0.0-Beta4")
 
     implementation("com.google.code.gson:gson:2.13.2")
 //    implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.20")
