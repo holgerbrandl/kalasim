@@ -15,7 +15,7 @@ repositories {
 dependencies {
     api(project(":"))
 
-    api("com.github.holgerbrandl:kravis:1.1")
+    api("com.github.holgerbrandl:kravis:1.1.2")
 
     testImplementation(kotlin("test"))
 }
