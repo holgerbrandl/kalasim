@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+    <title>The Kalasim Blog</title>
+    <subtitle>Simulation</subtitle>
+    <link href="https://kalasim.org/" rel="self" />
+    <link href="https://kalasim.org/" />
+    <id>urn:uuid:5c32a224-9258-48d2-90d1-3fef0d8345ab</id>
+    <updated>2021-11-27T18:00:00Z</updated>
+
+
+    <entry>
+        <title>Kalasim v0.7 Released</title>
+        <link href="https://kalasim.org/articles/2021-11-27-kalasim-v07/"/>
+<!--        <link rel="alternate" type="text/html" href="http://example.org/2003/12/13/atom03.html"/>-->
+<!--        <link rel="edit" href="http://example.org/2003/12/13/atom03/edit"/>-->
+        <id>urn:uuid:053d8080-a41a-4c73-a9bf-f4d0256751aa</id>
+        <updated>2021-11-27T18:00:00Z</updated>
+        <summary>Read what's new about in kalasim v0.7</summary>
+        <content type="xhtml">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Read about the new features in kalasim v0.7</p>
+            </div>
+        </content>
+        <author>
+            <name>Holger Brandl</name>
+<!--            <email>johndoe@example.com</email>-->
+        </author>
+    </entry>
+
+    <entry>
+        <title>Lunar Mining</title>
+        <link href="https://kalasim.org/animation/lunar_mining/"/>
+<!--        <link rel="alternate" type="text/html" href="http://example.org/2003/12/13/atom03.html"/>-->
+<!--        <link rel="edit" href="http://example.org/2003/12/13/atom03/edit"/>-->
+        <id>urn:uuid:e1858277-d6f3-4345-b53a-d27a12fc9eac</id>
+        <updated>2022-01-10T18:00:00Z</updated>
+        <summary>Mining robots scan the surface of the moon for depletable water deposits.</summary>
+        <content type="xhtml">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Mining robots scan the surface of the moon for depletable water deposits.</p>
+            </div>
+        </content>
+        <author>
+            <name>Holger Brandl</name>
+<!--            <email>johndoe@example.com</email>-->
+        </author>
+    </entry>
+
+    <entry>
+        <title>Kalasim v0.8 Released</title>
+        <link href="https://kalasim.org/articles/2022-09-27-kalasim-v08/"/>
+        <id>urn:uuid:b0a155cc-e554-40cc-b5a8-aba4010f9e0a</id>
+        <updated>2022-09-27T18:00:00Z</updated>
+        <summary>Read what's new about in kalasim v0.8</summary>
+        <content type="xhtml">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Read about the new features in kalasim v0.8</p>
+            </div>
+        </content>
+        <author>
+            <name>Holger Brandl</name>
+        </author>
+    </entry>
+
+
+    <entry>
+        <title>Kalasim v0.8 Released</title>
+        <link href="https://kalasim.org/articles/2022-11-25-kalasim-at-wsc22/"/>
+        <id>urn:uuid:de5c363f-6b76-4d87-8c11-5fbde63a8140</id>
+        <updated>2022-11-25T18:00:00Z</updated>
+        <summary>Meet the team at WSC22!</summary>
+        <content type="xhtml">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>We will be at WSC22 in Singapore (December 11-14, 2022), presenting simulation and promoting open-source tooling for simulation professionals.</p>
+            </div>
+        </content>
+        <author>
+            <name>Holger Brandl</name>
+        </author>
+    </entry>
+</feed>
