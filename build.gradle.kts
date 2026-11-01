@@ -1,14 +1,14 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "2.3.10"
+    kotlin("jvm") version "2.3.21"
     `maven-publish`
     signing
 
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
-version = "1.3.5"
+version = "1.3.6"
 
 
 allprojects {
@@ -29,7 +29,7 @@ dependencies {
     api("org.json:json:20251224")
     api("com.github.holgerbrandl:jsonbuilder:0.10")
 
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0")
     api("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2") // 0.7.1 marks kotlinx-datetime as deprecated
 
     api("io.github.oshai:kotlin-logging-jvm:7.0.14")
@@ -82,7 +82,7 @@ compileKotlin.compilerOptions {
 
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(25)
 }
 
 

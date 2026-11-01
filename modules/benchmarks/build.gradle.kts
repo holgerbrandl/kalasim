@@ -3,7 +3,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 plugins {
-    kotlin("jvm") version "2.3.10"
+    kotlin("jvm") version "2.3.21"
     id("java")
     id("me.champeau.jmh") version "0.7.3"
 //    id("io.morethan.jmhreport") version "0.9.0"
@@ -23,9 +23,12 @@ dependencies {
     jmh("org.apache.commons:commons-lang3:3.18.0")
     jmh("org.slf4j:slf4j-simple:2.0.17")
 
-    val prodModel = System.getenv("KALASIM_PROD_MODEL")
-    println("KALASIM_PROD_MODEL: $prodModel")
-    jmh(prodModel)
+//    val prodModel = System.getenv("KALASIM_PROD_MODEL")
+//        ?.takeIf { it.isNotBlank() }
+//        ?: "default"
+//
+//    println("KALASIM_PROD_MODEL: $prodModel")
+//    jmh(prodModel)
 
 //    testImplementation(testFixtures(project(":")))
 

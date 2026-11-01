@@ -7,7 +7,7 @@
 3. Do the release
 ```bash
 # adjust to te path of your working copy
-export KALASIM_HOME=/c/brandl_data/projects/scheduling/kalasim
+export KALASIM_HOME=/c/Users/holger.brandl/data/projects/scheduling/kalasim
 
 cd $KALASIM_HOME
 
