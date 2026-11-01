@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>org.kalasim.demo.moon.LunarMiningKt</OriginalElement>
+  <nodes>
+    <node x="385.0" y="342.0">org.kalasim.demo.moon.LunarMining</node>
+    <node x="0.0" y="0.0">org.kalasim.demo.moon.Base</node>
+    <node x="641.0" y="552.0">org.kalasim.demo.moon.LunarMiningKt</node>
+    <node x="24.0" y="291.0">org.kalasim.demo.moon.DepositMap</node>
+    <node x="389.0" y="237.5">org.kalasim.demo.moon.Deposit</node>
+    <node x="357.0" y="0.0">org.kalasim.demo.moon.Harvester</node>
+  </nodes>
+  <notes />
+  <edges />
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="301.0" y="270.0" />
+  <SelectedNodes>
+    <node>org.kalasim.demo.moon.DepositMap</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>public</VISIBILITY>
+</Diagram>
+

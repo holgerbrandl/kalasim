@@ -1,0 +1,5 @@
+/* adopted from https://github.com/squidfunk/mkdocs-material/issues/748*/
+.center {
+    display: block;
+    margin: 0 auto;
+}
